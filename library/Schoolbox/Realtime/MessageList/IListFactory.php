@@ -58,6 +58,10 @@ interface IListFactory
      */
     public function retractLike(): QueueInterface;
 
-
+    /**
+     * Returns a queue which handles message set for a given event object.
+     * @param $eventObjectId
+     * @return QueueInterface
+     */
     public function eventObjectList($eventObjectId): QueueInterface;
 }

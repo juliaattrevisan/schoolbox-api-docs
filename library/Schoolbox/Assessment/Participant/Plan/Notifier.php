@@ -1130,7 +1130,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      */
     public function notifyDeleted(Model $plan): Envelope
     {
-        $envelope  = new Envelope();
+        $envelope = new Envelope();
         return $this->retractEventObject($envelope, $plan);
     }
 

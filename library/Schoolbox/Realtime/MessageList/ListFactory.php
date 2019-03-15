@@ -94,6 +94,9 @@ class ListFactory implements IListFactory, Serializable
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function eventObjectList($eventObjectId): QueueInterface
     {
         return new EventObjectList($this->redis, $this->instanceId, $eventObjectId);
