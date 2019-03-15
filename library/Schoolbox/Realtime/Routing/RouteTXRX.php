@@ -28,6 +28,11 @@ class RouteTXRX implements TXRX
     /** @var ListFactory */
     private $listFactory;
 
+    // constants to define request types
+    private const TYPE_USER = 'user';
+    private const TYPE_OBJECT = 'object';
+    private const TYPE_RETRACT = 'retract';
+
     /**
      * Constructor
      *
@@ -95,27 +100,28 @@ class RouteTXRX implements TXRX
         /** @var Instance $instance */
         $key = $instance->getBaseHash() . $instance->getParamHash();
 
-        // Is a retract single: retract it
-        if ($instance->isActionRetractSingle() || $instance->isActionRetractAll()) {
-            $tx->put("{$key}-retract", [$instance, null, 'retract']);
+        // Is a retract action
+        if ($instance->isActionRetract()) {
+            $tx->put("{$key}-retract", [$instance, null, self::TYPE_RETRACT]);
             return;
         }
 
-        // Is a send action: let worker handle it
+        // Is a send action
         if ($instance->isActionSend()) {
             if (!\is_array($userIds)) {
                 throw new InvalidArgumentException('Payload must be an array of user IDs');
             }
 
+            // If event object id is set, put request to add instance to the object set
             if (!empty($instance->getEventObjectId())) {
-                $tx->put("{$key}-object", [$instance, null, 'object']);
+                $tx->put("{$key}-object", [$instance, null, self::TYPE_OBJECT]);
             }
 
             // rather than dump everyone in together, allow the transaction to batch the users
             // the implication of this is that if the user count exceeds the limit placed on the transaction,
             // users will be batched through multiple transactions
             foreach ($userIds as $userId) {
-                $tx->put("$key-$userId", [$instance, (int)$userId, 'user']);
+                $tx->put("$key-$userId", [$instance, (int)$userId, self::TYPE_USER]);
             }
             return;
         }
@@ -149,15 +155,15 @@ class RouteTXRX implements TXRX
         foreach ($args as list($instance, $userId, $type)) {
             $count = 0;
             switch ($type) {
-                case 'user' :
+                case self::TYPE_USER:
                     // this is the payload from $tx->put() above
                     $user = $this->mapper->findById($userId);
                     $count += $this->sorter->process($user, $instance) ? 1 : 0;
                     break;
-                case 'retract' :
+                case self::TYPE_RETRACT:
                     $this->sorter->processRetract($instance);
                     break;
-                case 'object' :
+                case self::TYPE_OBJECT:
                     $this->sorter->processEventObjectList($instance);
                     break;
                 default:

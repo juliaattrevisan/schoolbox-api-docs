@@ -49,10 +49,11 @@ class Postman
     {
         $i = 0;
 
+        // expecting event object id to be detected and attached in the context
         $eventObjectId = isset($appendContext[Instance::EVENT_OBJECT_ID]) ? $appendContext[Instance::EVENT_OBJECT_ID] : '';
 
-        $this->log->info('========== PASSED: ' . $eventObjectId);
         foreach ($bundle->getAll() as $routeKey => $instance) {
+            // Set event object id where available.
             $instance->setEventObjectId($eventObjectId);
             $array = $instance->jsonSerialize();
 

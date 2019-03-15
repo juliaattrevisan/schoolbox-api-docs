@@ -76,14 +76,15 @@ class Redis
     public function connect($parameters = null, $options = null, $instanceId = '')
     {
         // tcp://127.0.0.1:6379
-        $parameters = [
-            'scheme' => 'tcp',
-            'host' => '127.0.0.1',
-            'port' => 6379,
-//    'database' => 15
-            'persistent' => true
-        ];
-
+        // TODO: it's much better to be set as separate redis parameters in config
+        if (is_string($parameters) && preg_match('/^(tcp):\/\/([0-9.]+):([0-9]+)$/', $parameters, $matches)) {
+            $parameters = [
+                'scheme' => $matches[1],
+                'host' => $matches[2],
+                'port' => $matches[3],
+                'persistent' => true
+            ];
+        }
         $this->setClient(new AutoRefreshClient($parameters, $options));
         $this->instanceId = $instanceId;
         return $this;

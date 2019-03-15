@@ -1131,7 +1131,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     public function notifyDeleted(Model $plan): Envelope
     {
         $envelope  = new Envelope();
-        return $this->retract($envelope, $plan);
+        return $this->retractEventObject($envelope, $plan);
     }
 
     /**
@@ -1424,69 +1424,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     private function isParentTargetable(): bool
     {
         return !($this->conf->get('restrict_student_submissions') || $this->conf->get('restrict_parent_duework_access'));
-    }
-
-
-    /**
-     * Retracts notifications related to the given plan.
-     *
-     * @param Envelope $envelope
-     * @param Model $plan
-     * @return Envelope
-     */
-    private function retract(Envelope $envelope, Model $plan): Envelope
-    {
-
-        try {
-            $assessment = $this->assessmentDataSource->findByIdForReview($plan->getAssessment()->getId());
-        } catch (BaseMapper\Exception\Deleted $e) {
-            $assessment = $e->getDeletedObject();
-        }
-        $topicStub = $this->retrieveAssessmentTopicStub($assessment);
-
-        if (!isset($topicStub)) {
-            return $envelope;
-        }
-
-        $titles = [
-            self::PATTERN_OPEN_STUDENT_TITLE,
-            self::PATTERN_OPEN_PARENT_TITLE,
-            self::PATTERN_UPCOMING_STUDENT_TITLE,
-            self::PATTERN_UPCOMING_PARENT_TITLE,
-            self::PATTERN_OVERDUE_STUDENT_TITLE,
-            self::PATTERN_OVERDUE_PARENT_TITLE,
-            self::PATTERN_RENAMED_STUDENT_TITLE,
-            self::PATTERN_RENAMED_PARENT_TITLE,
-            self::PATTERN_DATE_CHANGED_STUDENT_TITLE,
-            self::PATTERN_DATE_CHANGED_PARENT_TITLE,
-            self::PATTERN_NO_SUBMIT_STUDENT_TITLE,
-            self::PATTERN_ACCEPT_ONLINE_STUDENT_TITLE,
-            self::PATTERN_NO_SUBMIT_PARENT_TITLE,
-            self::PATTERN_ACCEPT_ONLINE_PARENT_TITLE,
-            self::PATTERN_UPDATE_STUDENT_TITLE,
-            self::PATTERN_UPDATE_PARENT_TITLE,
-            ReturnedWorkNotifier::PATTERN_MARKED_STUDENT_TITLE,
-            ReturnedWorkNotifier::PATTERN_MARKED_PARENT_TITLE,
-            SubmissionNotifier::PATTERN_DELETED_TITLE,
-        ];
-
-        foreach ($this->retrieveParticipantsFromPlan($plan, $assessment) as $participant) {
-            $href = $this->buildParticipantRoute($assessment, $participant->getUser());
-            $userId = $participant->getUser()->getId();
-
-            foreach ($titles as $key => $title) {
-                $bob = new Builder(false);
-                $bob->setTitle($title)
-                    ->setHref($href)
-                    ->addTopic("$topicStub.$key.$userId"); // needs to be identical
-                $envelope->retractAllLike($bob->build());
-                // just doing once
-                break 2;
-            }
-        }
-
-        // Only broadcast to superusers as there's no system channel
-        return $envelope;
     }
 
 }

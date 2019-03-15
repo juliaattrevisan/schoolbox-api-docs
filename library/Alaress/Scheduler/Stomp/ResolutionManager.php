@@ -76,6 +76,9 @@ class ResolutionManager
             // detach this first, so we're not dependent on whether it resolves or not
             $this->resolvers->detach($resolver);
 
+
+            // TODO: remove the trigger from redis
+
             try {
                 $resolver->acknowledge();
             } catch (RuntimeException $e) {

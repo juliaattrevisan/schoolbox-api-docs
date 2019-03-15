@@ -146,26 +146,43 @@ class QueueSorter implements FilterInterface
 	}
 
 
-	public function processRetract(Instance $instance):bool
+    /**
+     * Process retract requests
+     * @param Instance $instance
+     * @return bool
+     */
+    public function processRetract(Instance $instance): bool
     {
         if ($instance->isActionRetractSingle()) {
-            $this->log->debug("[QueueSorter] retracting single " .  $this->listFactory->retract()->getRedisMsgKey($instance));
-            $this->listFactory->retract()->push($instance);
+            /** @var MessageList\Retractor $retractor */
+            $retractor = $this->listFactory->retract();
+            $this->log->debug("[QueueSorter] retracting single " . $retractor->getRedisMsgKey($instance));
+            $retractor->push($instance);
         } elseif ($instance->isActionRetractAll()) {
-            $this->log->debug("[QueueSorter] retracting all " .  $this->listFactory->retract()->getRedisMsgBaseKey($instance));
             if (!empty($instance->getEventObjectId())) {
-                $this->listFactory->eventObjectList($instance->getEventObjectId())->retract($instance);
+                /** @var MessageList\EventObjectList $retractor */
+                $retractor = $this->listFactory->eventObjectList($instance->getEventObjectId());
+                $this->log->debug("[QueueSorter] retracting event object " . $instance->getEventObjectId());
+                $retractor->retract();
             } else {
-                $this->listFactory->retractLike()->push($instance);
+                /** @var MessageList\Retractor $retractor */
+                $retractor = $this->listFactory->retractLike();
+                $this->log->debug("[QueueSorter] retracting all like " . $retractor->getRedisMsgKey($instance));
+                $retractor->push($instance);
             }
         }
         return true;
     }
 
 
+    /**
+     * Adds an instance to a related event object list
+     * @param Instance $instance
+     * @return bool
+     */
     public function processEventObjectList(Instance $instance):bool
     {
-        $this->log->debug('[QUEUE SORTER] === ' . $instance->getEventObjectId());
+        $this->log->debug('[QUEUE SORTER] Adding instance to event object list: ' . $instance->getEventObjectId());
         $this->listFactory->eventObjectList($instance->getEventObjectId())->push($instance);
         return true;
     }

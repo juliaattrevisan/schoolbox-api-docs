@@ -393,7 +393,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             return;
         }
 
-        $this->log->debug(" =============== GOT OBJECT ID : " . $trigger->getEventObjectId());
         $count = $this->postman->deliver($bundle, [
             'user' => $trigger->getEvent()->getEffector()->getId(),
             Instance::EVENT_OBJECT_ID => $trigger->getEventObjectId()

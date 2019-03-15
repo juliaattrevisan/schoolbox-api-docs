@@ -61,7 +61,6 @@ class Instance implements JsonSerializable
      */
     public const ACTION_RETRACT_ALL = 'retract-all';
 
-
     /**
      * Array key to find event object identifier.
      */
@@ -173,6 +172,9 @@ class Instance implements JsonSerializable
      */
     protected $ttl = self::DEFAULT_TTL;
 
+    /**
+     * The identifier of event object.
+     */
     protected $eventObjectId = '';
 
     /**

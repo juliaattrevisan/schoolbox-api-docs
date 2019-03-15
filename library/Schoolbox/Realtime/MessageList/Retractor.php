@@ -52,7 +52,6 @@ class Retractor extends AbstractList
      */
     public function push(Instance $instance)
     {
-        echo "[Retractor] push \n";
         if ($this->mode === self::MODE_RETRACT_SINGLE) {
             $this->retractSingle($instance);
         } elseif ($this->mode === self::MODE_RETRACT_LIKE) {
