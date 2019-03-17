@@ -8,8 +8,6 @@ Data:
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{% import '@commsNews/macro/layout.twig' as layout %}
-{% import 'sub/breadcrumbs.twig' as bread %}
 
 {# Modify article #}
 {% set modifyRoute = routeLookupIfAuthorized('commsNews.getUpdate', {article: article, articleId: article.id}) %}
@@ -165,12 +163,11 @@ Data:
         <section>
             <div class="row">
                 {# Always use the banner layout, as it has received the redesign and can trivially adapt to not having a banner #}
-                {{ layout.banner(article) }}
-                {#{% if article.featureImage.hash %}#}
-                    {#{{ layout.banner(article) }}#}
-                {#{% else %}#}
-                    {#{{ layout.textonly(article) }}#}
-                {#{% endif %}#}
+                {% include '@commsNews/layout/banner.twig' with {
+                    article:     article,
+                    modifyRoute: modifyRoute,
+                    isAuthor:    isAuthor
+                } only %}
             </div>
         </section>
     </div>
