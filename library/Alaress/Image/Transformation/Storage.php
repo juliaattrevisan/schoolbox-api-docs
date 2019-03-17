@@ -13,6 +13,9 @@ namespace Alaress\Image\Transformation;
 
 class Storage extends BaseTransformation
 {
+    // TODO implement and use other transforms
+    public const TRANSFORM_SQUARE64 = 'square64';
+
     /** @var array $allTransformations */
     protected $allTransformations = [
         'square32'                        => [
@@ -23,7 +26,7 @@ class Storage extends BaseTransformation
                 ],
             ],
         ],
-        'square64'                        => [
+        self::TRANSFORM_SQUARE64          => [
             [
                 'method' => BaseTransformation::METHOD_SQUARE,
                 'args'   => [
