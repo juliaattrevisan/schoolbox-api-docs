@@ -15,156 +15,156 @@ class Storage extends BaseTransformation
 {
     /** @var array $allTransformations */
     protected $allTransformations = [
-        'square32' => [
+        'square32'                        => [
             [
-                'method' => 'Square',
-                'args' => [
+                'method' => BaseTransformation::METHOD_SQUARE,
+                'args'   => [
                     'width' => 32,
-                ]
-            ]
+                ],
+            ],
         ],
-        'square64' => [
+        'square64'                        => [
             [
-                'method' => 'Square',
-                'args' => [
+                'method' => BaseTransformation::METHOD_SQUARE,
+                'args'   => [
                     'width' => 64,
-                ]
-            ]
+                ],
+            ],
         ],
-        'square128' => [
+        'square128'                       => [
             [
-                'method' => 'Square',
-                'args' => [
+                'method' => BaseTransformation::METHOD_SQUARE,
+                'args'   => [
                     'width' => 128,
-                ]
-            ]
+                ],
+            ],
         ],
-        'square200' => [
+        'square200'                       => [
             [
-                'method' => 'Square',
-                'args' => [
+                'method' => BaseTransformation::METHOD_SQUARE,
+                'args'   => [
                     'width' => 200,
-                ]
-            ]
+                ],
+            ],
         ],
-        'constrain200' => [
+        'constrain200'                    => [
             [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 200,
-                    'height' => 300
-                ]
-            ]
+                'method' => BaseTransformation::METHOD_CONSTRAIN,
+                'args'   => [
+                    'width'  => 200,
+                    'height' => 300,
+                ],
+            ],
         ],
-        'rectangle' => [
+        'rectangle'                       => [
             [
-                'method' => 'Rectangle',
-                'args' => [
-                    'width' => 140,
-                    'height' => 50
-                ]
-            ]
+                'method' => BaseTransformation::METHOD_RECTANGLE,
+                'args'   => [
+                    'width'  => 140,
+                    'height' => 50,
+                ],
+            ],
         ],
-        'maxsize' => [
+        'maxsize'                         => [
             [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 2048,
-                    'height' => 2048
-                ]
-            ]
+                'method' => BaseTransformation::METHOD_CONSTRAIN,
+                'args'   => [
+                    'width'  => 2048,
+                    'height' => 2048,
+                ],
+            ],
         ],
         /* The cover photo on the News article page
-		 */
-        'coverPhoto' => [
+         */
+        'coverPhoto'                      => [
             [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 2000,
-                    'height' => 450
-                ]
-            ]
+                'method' => BaseTransformation::METHOD_CONSTRAIN,
+                'args'   => [
+                    'width'  => 2000,
+                    'height' => 450,
+                ],
+            ],
         ],
         /* The huge cover photo on the ePortfolio Profile page
-		 */
-        'eportfolioCoverPhoto' => [
+         */
+        'eportfolioCoverPhoto'            => [
             [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 2000,
-                    'height' => 452
-                ]
-            ]
+                'method' => BaseTransformation::METHOD_CONSTRAIN,
+                'args'   => [
+                    'width'  => 2000,
+                    'height' => 452,
+                ],
+            ],
         ],
         /* ePortfolio Recent Photo list needs to be a square
-		 */
-        'eportfolioRecentPhoto' => [
+         */
+        'eportfolioRecentPhoto'           => [
             [
-                'method' => 'Rectangle',
-                'args' => [
-                    'width' => 300,
+                'method' => BaseTransformation::METHOD_RECTANGLE,
+                'args'   => [
+                    'width'  => 300,
                     'height' => 300,
-                ]
-            ]
+                ],
+            ],
         ],
 
         /* ePortfolio Image Gallery list needs to be a square
-		 */
+         */
         'eportfolioImageGalleryThumbnail' => [
             [
-                'method' => 'Rectangle',
-                'args' => [
-                    'width' => 80,
+                'method' => BaseTransformation::METHOD_RECTANGLE,
+                'args'   => [
+                    'width'  => 80,
                     'height' => 80,
-                ]
-            ]
+                ],
+            ],
         ],
 
         /* ePortfolio Image Gallery can probably be lightboxed
-		 */
-        'eportfolioImageGalleryLarge' => [
+         */
+        'eportfolioImageGalleryLarge'     => [
             [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 800,
+                'method' => BaseTransformation::METHOD_CONSTRAIN,
+                'args'   => [
+                    'width'  => 800,
                     'height' => 800,
-                ]
-            ]
+                ],
+            ],
         ],
 
         /* Card images are 2:1 ratio.  So this is used on class card */
-        'cardImageLarge' => [
+        'cardImageLarge'                  => [
             [
-                'method' => 'Rectangle',
-                'args' => [
-                    'width' => 800,
+                'method' => BaseTransformation::METHOD_RECTANGLE,
+                'args'   => [
+                    'width'  => 800,
                     'height' => 400,
-                ]
-            ]
+                ],
+            ],
         ],
 
         /* Card images are 2:1 ratio.  So this is used on class card */
-        'cardImageSmall' => [
+        'cardImageSmall'                  => [
             [
-                'method' => 'Rectangle',
-                'args' => [
-                    'width' => 200,
+                'method' => BaseTransformation::METHOD_RECTANGLE,
+                'args'   => [
+                    'width'  => 200,
                     'height' => 100,
-                ]
-            ]
+                ],
+            ],
         ],
 
         /* Test to find out whether Constrain skipped canvas creation
-		 * when resultant image dimension was the same as the original
-		 */
-        'cacheTest' => [
+         * when resultant image dimension was the same as the original
+         */
+        'cacheTest'                       => [
             [
-                'method' => 'Constrain',
-                'args' => [
-                    'width' => 247,
+                'method' => BaseTransformation::METHOD_CONSTRAIN,
+                'args'   => [
+                    'width'  => 247,
                     'height' => 204,
-                ]
-            ]
+                ],
+            ],
         ],
     ];
 }
