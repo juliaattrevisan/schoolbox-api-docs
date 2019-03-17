@@ -1,11 +1,10 @@
 <?php
 /**
- * Eportfolio_PageMapper
+ * PostMapper
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace SocialStream;
@@ -14,16 +13,18 @@ use Alaress\Async\Notification\Instance\Instance;
 use PDO;
 use Schoolbox;
 use Schoolbox\Collection;
+use Schoolbox\Feed\FeedableMapperInterface;
 use SocialStream\Post\Factory;
 use SocialStream_Post_Abstract;
 
-class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMapperInterface, Schoolbox\IHomepageCleanable
+class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Schoolbox\IHomepageCleanable
 {
 
     /**
      * Define column/property mapping
      *
      * @return Bool|void
+     * @throws Schoolbox\Mapper\DefinitionException
      */
     protected function mapping()
     {
@@ -143,11 +144,14 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
     /**
      * Custom findById
      *
-     * @param mixed $identifier
+     * @param $identifier
      * @return SocialStream_Post_Abstract
+     * @throws Schoolbox\Mapper\DefinitionException
      * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
-    public function findById($identifier)
+    public function findById($identifier): \SocialStream_Post_Abstract
     {
         /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
@@ -167,7 +171,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
         $row = $statement->fetch();
 
-        if ($row != false) {
+        if ($row !== false) {
             $postItem = $this->hydrate($row, 'p');
 
             $userItem = $user_mapper->hydrate($row, 'u');
@@ -177,6 +181,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
 
             return $postItem;
         }
+
         throw new Schoolbox\Mapper\Exception('Instance of object not found');
     }
 
@@ -185,10 +190,10 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * Find the maximum number of posts at a given point in time
      * for a particular homepage
      *
-     * @param $homepageId
+     * @param int $homepageId
      * @return mixed
      */
-    public function findCount($homepageId)
+    public function findCount(int $homepageId)
     {
         $query = "
             SELECT COUNT(*) AS num
@@ -213,12 +218,15 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * Find all the social stream posts that should appear in a homepage's
      * SocialStream component
      *
-     * @param $homepageId
-     * @param $start
-     * @param $offset
+     * @param int $homepageId
+     * @param int $start
+     * @param int $offset
      * @return Collection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    public function findLatestForHomepage($homepageId, $start, $offset)
+    public function findLatestForHomepage(int $homepageId, int $start, int $offset): Collection
     {
         /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
@@ -238,17 +246,17 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
         /* Optional limit
          */
         if ($offset) {
-            $query .= "
+            $query .= '
                 LIMIT :start,:offset
-            ";
+            ';
 
             $statement = $this->database->prepare($query);
-            $statement->bindParam(":homepageId", $homepageId);
+            $statement->bindParam(':homepageId', $homepageId);
             $statement->bindParam(':start', $start, \PDO::PARAM_INT);
             $statement->bindParam(':offset', $offset, \PDO::PARAM_INT);
         } else {
             $statement = $this->database->prepare($query);
-            $statement->bindParam(":homepageId", $homepageId);
+            $statement->bindParam(':homepageId', $homepageId);
         }
 
         $statement->execute();
@@ -274,12 +282,15 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * Find all the social stream posts that should appear in a homepage's
      * SocialStream component
      *
-     * @param $homepageId
-     * @param $end
-     * @param $offset
+     * @param int $homepageId
+     * @param int $end
+     * @param int $offset
      * @return Collection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    public function findLatestForHomepageSlow($homepageId, $end, $offset)
+    public function findLatestForHomepageSlow(int $homepageId, int $end, int $offset): Collection
     {
         /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
@@ -298,7 +309,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
         ";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":homepageId", $homepageId);
+        $statement->bindParam(':homepageId', $homepageId);
         $statement->bindParam(':end', $end, \PDO::PARAM_INT);
 
         $statement->execute();
@@ -326,10 +337,13 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * This uses the root_id value, which is the post_id of the post
      * to which comments and replies belong.
      *
-     * @param $ids
+     * @param array $ids
      * @return Collection
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    public function findHierarchy($ids)
+    public function findHierarchy(array $ids)
     {
         /** @var Schoolbox\UserMapper $user_mapper */
         $user_mapper = $this->getJoinMapper('user');
@@ -370,11 +384,12 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      *
      * @param array $row
      * @return SocialStream_Post_Abstract
+     * @throws \UnexpectedValueException
      */
-    public function createModel($row = null)
+    public function createModel($row = null): \SocialStream_Post_Abstract
     {
         // default
-        $type = 'string';
+        $type = \SocialStream_Post_String::TYPE;
 
         foreach (array('p.type', 'type') as $t) {
             if (isset($row[$t])) {
@@ -394,8 +409,9 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * @param string   $alias
      * @param callable $callback
      * @return SocialStream_Post_Abstract
+     * @throws \UnexpectedValueException
      */
-    public function hydrate(array $row, $alias = '', $callback = null)
+    public function hydrate(array $row, $alias = '', $callback = null): \SocialStream_Post_Abstract
     {
         $model = $this->createModel($row);
 
@@ -407,12 +423,12 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
                 $columnName = "$alias.$columnName";
             }
 
-            $columnValue = array_key_exists($columnName, $row) ? $row[$columnName] : null;
+            $columnValue = $row[$columnName] ?? null;
             $this->setModelProperty($model, $propertyName, $columnValue);
         }
 
-        if (!empty($callback) && is_callable($callback)) {
-            $model = call_user_func($callback, $this, $model, $row);
+        if (!empty($callback) && \is_callable($callback)) {
+            $model = $callback($this, $model, $row);
         }
 
         return $model;
@@ -424,6 +440,7 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      *
      * @param SocialStream_Post_Abstract $post
      * @return Collection|SocialStream_Post_Abstract[]
+     * @throws \UnexpectedValueException
      */
     public function findChildren($post)
     {
@@ -457,6 +474,9 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * @param int $offset
      * @param int $time
      * @return \Schoolbox\Collection|Instance[]
+     * @throws Schoolbox\Mapper\DefinitionException
+     * @throws Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function findForFeed($context, $limit, $offset = 0, $time = 0)
     {
@@ -469,18 +489,18 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
         $ownerMapper = $this->getJoinMapper('user');
 
         $stmt = $this->database->prepare("
-			SELECT
-				{$this->getColumnString('p')},
- 				{$ownerMapper->getColumnString('u')}
-			FROM `{$this->getTable()}` p
- 			INNER JOIN {$this->getJoinSql('user', 'p', 'u', true)}
-			WHERE
-				p.deleted_at IS NULL
- 				AND p.created_at < :time
- 				AND p.homepage_id = :cat_id
- 			ORDER BY p.created_at DESC
-			LIMIT $offset, $limit
-		");
+            SELECT
+                {$this->getColumnString('p')},
+                {$ownerMapper->getColumnString('u')}
+            FROM `{$this->getTable()}` p
+            INNER JOIN {$this->getJoinSql('user', 'p', 'u', true)}
+            WHERE
+                p.deleted_at IS NULL
+                AND p.created_at < :time
+                AND p.homepage_id = :cat_id
+            ORDER BY p.created_at DESC
+            LIMIT $offset, $limit
+        ");
 
         $stmt->execute(array(
             'time'   => $time,
@@ -504,7 +524,8 @@ class PostMapper extends Schoolbox\Mapper implements \Schoolbox\Feed\FeedableMap
      * @param int $cid
      * @return void
      */
-    public function homepageClean($cid){
-        $this->deleteByColumn('homepage_id',$cid);
+    public function homepageClean($cid): void
+    {
+        $this->deleteByColumn('homepage_id', $cid);
     }
 }

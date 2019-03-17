@@ -49,7 +49,7 @@ if (is_numeric($_GET['delete'])) {
 
         /* This is for top-level posts
          */
-        if ($post->getRootId() == 0) {
+        if ($post->getRootId() === 0) {
             $allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
         } /* For any threaded stuff that isn't a top-level post
          * delete by parent_id

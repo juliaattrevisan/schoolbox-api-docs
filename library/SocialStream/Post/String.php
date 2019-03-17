@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 class SocialStream_Post_String extends SocialStream_Post_Abstract {
@@ -13,15 +12,27 @@ class SocialStream_Post_String extends SocialStream_Post_Abstract {
     /**
      * @var string
      */
-    protected $type = 'string';
+    public const TYPE = 'string';
 
     /**
-	 * Nothing to render here
-	 *
-	 * @param string   $context
-	 * @param SitePage $page
-	 * @return mixed|void
-	 */
-	public function renderThumbnail($context, SitePage $page) {
-	}
+     * SocialStream_Post_String constructor.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->type = self::TYPE;
+    }
+
+    /**
+     * Nothing to render here
+     *
+     * @param string   $context
+     * @param SitePage $page
+     * @return mixed|void
+     */
+    public function renderThumbnail(string $context, SitePage $page) {
+    }
 }

@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\MimetypeMapper;
@@ -15,7 +14,19 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
     /**
      * @var string
      */
-    protected $type = 'url';
+    public const TYPE = 'url';
+
+    /**
+     * SocialStream_Post_Url constructor.
+     *
+     * @throws UnexpectedValueException
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->type = self::TYPE;
+    }
 
     /**
      * Determine whether this should display an icon or something
@@ -41,7 +52,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             /* Mimetype unknown? Try to load either an icon or a thumbnail image
              * specified in the DB for this social stream post
              */
-            if (stristr($this->getThumbnail(), 'icon:')) {
+            if (false !== stripos($this->getThumbnail(), 'icon:')) {
                 // Icon
                 $iconFile = str_replace('icon:', '', $this->getThumbnail());
                 $icon = $iconDirectory . $iconFile;
@@ -59,8 +70,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      *
      * @return bool
      */
-    public function hasThumbnail(): bool
-    {
+    public function hasThumbnail(): bool {
         return '' !== $this->getThumbnail();
     }
 
@@ -71,7 +81,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      * @param SitePage $page
      * @return bool
      */
-    public function renderThumbnail($context, SitePage $page): bool
+    public function renderThumbnail(string $context, SitePage $page): bool
     {
 
         /* Determine which context to render blocks
@@ -79,6 +89,8 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
          * Otherwise display thumbnail via image transform
          */
         $icon = $this->determineIcon();
+
+        $returnValue = false;
 
         if ($context === 'post') {
             $page->setVar(array(
@@ -89,15 +101,14 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             ));
 
             /* Parse metadata
-              */
+             */
             if ('' !== $this->getExternalTitle() || '' !== $this->getExternalBody()) {
                 $page->parse('socialstream_post_has_metadata_block', 'socialstream_post_has_metadata');
             }
             $page->parse('socialstream_post_has_icon_block', 'socialstream_post_has_icon');
 
-            return true;
-        }
-        elseif ($context === 'comment') {
+            $returnValue = true;
+        } elseif ($context === 'comment') {
             $page->setVar(array(
                 'SOCIALSTREAM_COMMENT_URL'            => Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_COMMENT_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
@@ -112,9 +123,8 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             }
             $page->parse('socialstream_comment_has_icon_block', 'socialstream_comment_has_icon');
 
-            return true;
-        }
-        elseif ($context === 'reply') {
+            $returnValue = true;
+        } elseif ($context === 'reply') {
             $page->setVar(array(
                 'SOCIALSTREAM_REPLY_URL'            => Scrub::text($this->getUrl()),
                 'SOCIALSTREAM_REPLY_EXTERNAL_TITLE' => Scrub::text($this->getExternalTitle()) ?: Scrub::text($this->getUrl()),
@@ -129,9 +139,9 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
             }
             $page->parse('socialstream_reply_has_icon_block', 'socialstream_reply_has_icon');
 
-            return true;
+            $returnValue = true;
         }
 
-        return false;
+        return $returnValue;
     }
 }

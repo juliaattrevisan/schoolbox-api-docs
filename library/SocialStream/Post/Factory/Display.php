@@ -12,15 +12,8 @@ namespace SocialStream\Post\Factory;
 class Display extends AbstractFactory {
 
     /**
-     * Const for socialstream posts of type Image, String, Url, Video
-     */
-    public const SOCIALSTREAM_POST_IMAGE = 'image';
-    public const SOCIALSTREAM_POST_STRING = 'string';
-    public const SOCIALSTREAM_POST_URL = 'url';
-    public const SOCIALSTREAM_POST_VIDEO = 'video';
-
-    /**
      * The type of SocialStream Post to manufacture
+     * one of ["image", "string", "url", "video"]
      *
      * @var string
      */
@@ -35,22 +28,24 @@ class Display extends AbstractFactory {
         $this->type = trim($type);
     }
 
+
     /**
      * Produce an instance of SocialStream_Post_Abstract subclass
      *
      * @param array $data
      * @return \SocialStream_Post_Abstract
+     * @throws \UnexpectedValueException
      */
     public function produce(array $data = null): \SocialStream_Post_Abstract
     {
         switch ($this->type) {
-            case self::SOCIALSTREAM_POST_IMAGE:
+            case \SocialStream_Post_Image::TYPE:
                 return new \SocialStream_Post_Image();
 
-            case self::SOCIALSTREAM_POST_URL:
+            case \SocialStream_Post_Url::TYPE:
                 return new \SocialStream_Post_Url();
 
-            case self::SOCIALSTREAM_POST_VIDEO:
+            case \SocialStream_Post_Video::TYPE:
                 return new \SocialStream_Post_Video();
 
             /* If it was not a video, link to the internet, then assume it's
