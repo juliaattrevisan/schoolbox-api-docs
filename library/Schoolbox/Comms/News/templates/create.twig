@@ -616,21 +616,12 @@
         this.ajax           = ajaxRoute;
         this.hideFromModal  = hideFromModal;
         this.isMulti        = isMulti;
-        this.nameLowerCase  = name.toLowerCase();
 
         // We'll populate these via ajax on first time this audience type is displayed in the modal
         this.isLoaded           = false;
         this.availableModifiers = undefined;
         this.canTargetNull      = undefined;
         this.valueLabels        = undefined;    // will maps encoded values to human-friendly labels
-
-        if (this.nameLowerCase === 'role') {
-            this.text = undefined;
-        } else if (this.nameLowerCase === 'campus') {
-            this.text = this.textPrefix + ' please note these include all members of the ' + this.nameLowerCase + ' including staff, parents and students.';
-        } else {
-            this.text = this.textPrefix + ' below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.';
-        }
     };
 
     /** @var {AudienceOption[]|Object} audienceOptions */
@@ -1293,11 +1284,22 @@
                 var tooltipSufixText = '';
 
                 for(var i in this.selectedAudienceOption.availableModifiers){
-                    availableMods.push(this.selectedAudienceOption.availableModifiers[i])
+                    if (this.selectedAudienceOption.availableModifiers.hasOwnProperty(i)) {
+                        availableMods.push(this.selectedAudienceOption.availableModifiers[i]);
+                    }
                 }
 
                 if (availableMods.length === 1 && availableMods[0] === 'self') {
-                    return false;
+                    switch (this.selectedAudienceOption.name.toLowerCase()) {
+                        case 'campus':
+                        case 'role':
+
+                            return 'Select ' + this.selectedAudienceOption.namePlural + ' below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.';
+                            break;
+
+                        default:
+                            return false;
+                    }
                 }
 
                 if (availableMods.length > 1){
