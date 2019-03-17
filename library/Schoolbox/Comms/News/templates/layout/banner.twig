@@ -27,13 +27,12 @@
             {% endif %}
 
             <span id="audience-container" v-if="audienceBricks.length > 0">
-                    <span> | </span>
                     <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
-                            <span v-if="audienceBrick.isComposite()">
+                            <span v-if="audienceBrick.isComposite()" class="pipe meta">
                                 <a href="#" title="Click to view composite audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
                             </span>
                         {# has to be on one line or you get weird whitespace #}
-                        <span v-else>${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
+                        <span v-else class="pipe meta">${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
                     </template>
 
                     {# modal #}
