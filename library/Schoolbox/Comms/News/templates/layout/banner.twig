@@ -63,7 +63,7 @@
             </div>
             <div class="checklist small-6 columns">
                 {% if modifyRoute %}
-                    <input id="allow-comments" type="checkbox">
+                    <input id="allow-comments" name="allowComments" type="checkbox" {% if article.commentsAllowed %}checked{% endif %}>
                     <label for="allow-comments">Allow comments</label>
                 {% endif %}
             </div>
