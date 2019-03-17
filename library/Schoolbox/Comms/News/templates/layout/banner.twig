@@ -56,99 +56,103 @@
         {{ article.body|purify }}
     </section>
 
-    {# Don't show comments if the article isn't publicly available #}
-    {% if article.public %}
-        <section class="comments content">
-            <div class="row">
-                <div class="small-6 columns">
-                    <h2>Comments</h2>
-                </div>
-                <div class="checklist small-6 columns">
-                    {% if modifyRoute %}
-                        <input id="allow-comments" type="checkbox">
-                        <label for="allow-comments">Allow comments</label>
-                    {% endif %}
-                </div>
+    <section class="comments content">
+        <div class="row">
+            <div class="small-6 columns">
+                <h2>Comments</h2>
             </div>
-            <form action="/" method="post">
-                <label>
-                    <textarea id='comment-area' name='comment-area' rows="5"></textarea>
-                </label>
-                <input type="submit" value="Post" />
-            </form>
+            <div class="checklist small-6 columns">
+                {% if modifyRoute %}
+                    <input id="allow-comments" type="checkbox">
+                    <label for="allow-comments">Allow comments</label>
+                {% endif %}
+            </div>
+        </div>
 
-            {% if not article.commentsAllowed %}
-                <!-- Only show alert if comments are locked -->
+        {% if article.commentsAllowed %}
+            {% if article.public %}
+                <form action="/" method="post">
+                    <label>
+                        <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+                    </label>
+                    <input type="submit" value="Post" />
+                </form>
+            {% else %}
                 <div data-alert="" class="alert-box">
-                    <span class="icon-locked">Comments are currently disabled for this article</span>
+                    <span class="icon-locked">Comments will be available once this article is published.</span>
                 </div>
             {% endif %}
+        {% else %}
+            <!-- Only show alert if comments are locked -->
+            <div data-alert="" class="alert-box">
+                <span class="icon-locked">Comments are currently disabled for this article.</span>
+            </div>
+        {% endif %}
 
-            <ul class="information-list social-stream">
-                <li class="actions-small-2">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <a href="#" title="View Profile">
-                                <img src="/portrait.php?userId=507&amp;size=square64" alt="Ms Jana Reed">
-                            </a>
-                            <p><a href="/search/user/25" title="View Profile">Ms Jana Reed</a></p>
-                            <p class="meta" title="Friday March 9th 2018 11:22am">Posted 1 year ago</p>
-                        </div>
+        <ul class="information-list social-stream">
+            <li class="actions-small-2">
+                <div class="list-item">
+                    <div class="card small-12">
+                        <a href="#" title="View Profile">
+                            <img src="/portrait.php?userId=507&amp;size=square64" alt="Ms Jana Reed">
+                        </a>
+                        <p><a href="/search/user/25" title="View Profile">Ms Jana Reed</a></p>
+                        <p class="meta" title="Friday March 9th 2018 11:22am">Posted 1 year ago</p>
                     </div>
-                    <nav>
-                        <a href="#" class="icon-delete no-text" title="Delete post"></a>
-                        <a href="#" class="icon-reply no-text" title="Add Reply"></a>
-                    </nav>
-                    <article>
-                        <p>My group will be working on the balcony scene for the scene presentation task, what scenes are others doing?</p>
-                    </article>
+                </div>
+                <nav>
+                    <a href="#" class="icon-delete no-text" title="Delete post"></a>
+                    <a href="#" class="icon-reply no-text" title="Add Reply"></a>
+                </nav>
+                <article>
+                    <p>My group will be working on the balcony scene for the scene presentation task, what scenes are others doing?</p>
+                </article>
 
-                    <!-- Reply -->
-                    <ul class="information-list reply">
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a href="/search/user/22" title="View Profile">
-                                        <img src="/portrait.php?userId=499&amp;size=square32" alt="Mr Jack Coles">
-                                    </a>
-                                    <p>
-                                        <a href="#" title="View Profile">Mr Jack Coles</a>
-                                        <span class="pipe meta" title="Wednesday March 13th 2019 2:42pm">Replied 1 minute ago</span>
-                                    </p>
-                                </div>
+                <!-- Reply -->
+                <ul class="information-list reply">
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="/search/user/22" title="View Profile">
+                                    <img src="/portrait.php?userId=499&amp;size=square32" alt="Mr Jack Coles">
+                                </a>
+                                <p>
+                                    <a href="#" title="View Profile">Mr Jack Coles</a>
+                                    <span class="pipe meta" title="Wednesday March 13th 2019 2:42pm">Replied 1 minute ago</span>
+                                </p>
                             </div>
-                            <nav>
-                                <a class="icon-delete" href="#" title="Delete Comment"></a>
-                            </nav>
-                            <article>
-                                <p>Cosmic ocean trillion Apollonius of Perga great turbulent clouds a still more glorious
-                                    dawn awaits tesseract. Jean-François Champollion at the edge of forever Cambrian
-                                    explosion courage of our questions gathered by gravity laws of physics.</p>
-                            </article>
-                        </li>
-                    </ul>
-                    <!-- Reply -->
-                </li>
-                <li class="actions-small-2">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <a href="#" title="View Profile">
-                                <img src="/portrait.php?userId=499&amp;size=square64" alt="Mr Jack Coles">
-                            </a>
-                            <p><a href="#" title="View Profile">Mr Jack Coles</a></p>
-                            <p class="meta" title="Wednesday March 13th 2019 2:42pm">Posted 10 seconds ago</p>
                         </div>
+                        <nav>
+                            <a class="icon-delete" href="#" title="Delete Comment"></a>
+                        </nav>
+                        <article>
+                            <p>Cosmic ocean trillion Apollonius of Perga great turbulent clouds a still more glorious
+                                dawn awaits tesseract. Jean-François Champollion at the edge of forever Cambrian
+                                explosion courage of our questions gathered by gravity laws of physics.</p>
+                        </article>
+                    </li>
+                </ul>
+                <!-- Reply -->
+            </li>
+            <li class="actions-small-2">
+                <div class="list-item">
+                    <div class="card small-12">
+                        <a href="#" title="View Profile">
+                            <img src="/portrait.php?userId=499&amp;size=square64" alt="Mr Jack Coles">
+                        </a>
+                        <p><a href="#" title="View Profile">Mr Jack Coles</a></p>
+                        <p class="meta" title="Wednesday March 13th 2019 2:42pm">Posted 10 seconds ago</p>
                     </div>
-                    <nav>
-                        <a href="#" class="icon-delete no-text" title="Delete post"></a>
-                        <a href="#" class="icon-reply no-text" title="Add Reply"></a>
-                    </nav>
-                    <article data-body="">
-                        <p>How far away a mote of dust suspended in a sunbeam a mote of dust suspended in a sunbeam across the centuries gathered by gravity?</p>
-                    </article>
-                </li>
-            </ul>
-            <A href="#" class="button expand" title="Load more">Load more</A>
-        </section>
-    {% endif %}
+                </div>
+                <nav>
+                    <a href="#" class="icon-delete no-text" title="Delete post"></a>
+                    <a href="#" class="icon-reply no-text" title="Add Reply"></a>
+                </nav>
+                <article data-body="">
+                    <p>How far away a mote of dust suspended in a sunbeam a mote of dust suspended in a sunbeam across the centuries gathered by gravity?</p>
+                </article>
+            </li>
+        </ul>
+        <A href="#" class="button expand" title="Load more">Load more</A>
+    </section>
 </div>
