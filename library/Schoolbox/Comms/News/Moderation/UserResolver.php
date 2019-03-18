@@ -62,7 +62,7 @@ class UserResolver implements IUserResolver
         $superuserIds = $this->db->executeQuery(
             'SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')
             ->fetchAll(PDO::FETCH_COLUMN);
-        $moderators = array_unique(array_merge($superuserIds, $this->findCommsOfficerIds()));
+        $moderators = array_unique(array_merge($superuserIds, $this->findModeratorIds()));
 
         $rootSegments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
@@ -87,14 +87,14 @@ class UserResolver implements IUserResolver
 
 
     /**
-     * Returns the ids of users who are comms officer
+     * Returns the ids of users who have news moderate permission
      *
      * @throws \Schoolbox\Mapper\Exception
      * @return int[]
      */
-    private function findCommsOfficerIds(): array
+    private function findModeratorIds(): array
     {
-        return $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS)->getPropertyValues('id');
+        return $this->userAccessMapper->findUsersForService(UserAccess::SERVICE_NEWS, null, UserAccess::ACCESS_FULL)->getPropertyValues('id');
     }
 
 }
