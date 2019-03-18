@@ -6,6 +6,27 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
 
+<script>
+    // Use datatables to do fixed headers and left column
+    // Only do this on small up
+    $(function() {
+        var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
+        if ($windowWidthRems >= 40) {
+            $('[data-mark-sheet]').DataTable({
+                scrollY: '34em', // Fairly arbitrary height, catered to a 1080p screen
+                scrollX: true,
+                scrollCollapse: true,
+                paging: false,
+                bFilter: false,
+                bInfo: false,
+                ordering: false,
+                fixedColumns: {
+                    leftColumns: 1
+                }
+            });
+        }
+    });
+</script>
 <style>
     .rubric-marksheet tr.capability th {
         border-right: 1px solid #ededed;
