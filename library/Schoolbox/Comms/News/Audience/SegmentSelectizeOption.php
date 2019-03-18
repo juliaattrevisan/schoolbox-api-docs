@@ -44,6 +44,11 @@ class SegmentSelectizeOption implements JsonSerializable
     private $labels = [];
 
     /**
+     * @var
+     */
+    private $entityId;
+
+    /**
      * @param string $key
      * @param string $name
      */
@@ -61,10 +66,22 @@ class SegmentSelectizeOption implements JsonSerializable
      * @param string $entityType
      * @param string $encodedValue
      * @param string $label
+     *
+     * @return SegmentSelectizeOption
      */
-    public function addLabel(string $entityType, string $encodedValue, string $label): void
+    public function addLabel(string $entityType, string $encodedValue, string $label): self
     {
         $this->labels[$entityType][$encodedValue] = $label;
+
+        return $this;
+    }
+
+    /**
+     * @param int $entityId
+     */
+    public function setEntityId(int $entityId): void
+    {
+        $this->entityId = $entityId;
     }
 
     /**
@@ -74,9 +91,10 @@ class SegmentSelectizeOption implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'key'    => $this->key,
-            'name'   => $this->name,
-            'labels' => $this->labels,
+            'key'       => $this->key,
+            'name'      => $this->name,
+            'labels'    => $this->labels,
+            'entityId'  => $this->entityId,
         ];
     }
 }
