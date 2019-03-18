@@ -19,7 +19,6 @@ class Controller extends Base
      * @level 190
      * @param Folder\Model $folder                    Folder for this class
      * @throws ServiceNotFound                       If unable to locate HTML web Output
-     * @throws \UnexpectedValueException             If folder not provided or could not be found
      */
     public function getMarkbook(Folder\Model $folder): void
     {
