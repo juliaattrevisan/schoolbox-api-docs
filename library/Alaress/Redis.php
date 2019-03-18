@@ -75,6 +75,12 @@ class Redis
      */
     public function connect($parameters = null, $options = null, $instanceId = '')
     {
+        // tcp://127.0.0.1:6379
+        // TODO: it's much better to be set as separate redis parameters in config
+        if (is_string($parameters) && parse_url($parameters)) {
+            $parameters = parse_url($parameters);
+            $parameters['persistent'] = true;
+        }
         $this->setClient(new AutoRefreshClient($parameters, $options));
         $this->instanceId = $instanceId;
         return $this;

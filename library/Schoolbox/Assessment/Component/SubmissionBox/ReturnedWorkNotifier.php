@@ -121,12 +121,26 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
                 break;
 
             case Mapper::METHOD_READ:
+                break;
             case Mapper::METHOD_DELETE: // when returned work is...uh, un-returned...
+                // trigger to retract existing notifications
+                $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
                 break;
 
             default:
                 throw new ScheduleException("Unrecognised CRUD operation: '{$bundle->getMethod()}'.");
         }
+    }
+
+    /**
+     * Notify system that the work has been deleted.
+     * @param ReturnedWork $returnedWork
+     * @return Envelope
+     */
+    public function notifySystemDeleted(ReturnedWork $returnedWork): Envelope
+    {
+        $envelope  = new Envelope();
+        return $this->retractEventObject($envelope, $returnedWork);
     }
 
     /**

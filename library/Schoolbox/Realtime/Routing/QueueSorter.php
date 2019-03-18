@@ -20,6 +20,7 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing\Filter\FilterException;
 use Schoolbox\Realtime\Routing\Filter\FilterInterface;
+use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Swift_RfcComplianceException;
@@ -143,6 +144,48 @@ class QueueSorter implements FilterInterface
         // exceptions get thrown if it fails a given filter
         $this->filter->validate($message, $user);
 	}
+
+
+    /**
+     * Process retract requests
+     * @param Instance $instance
+     * @return bool
+     */
+    public function processRetract(Instance $instance): bool
+    {
+        if ($instance->isActionRetractSingle()) {
+            /** @var MessageList\Retractor $retractor */
+            $retractor = $this->listFactory->retract();
+            $this->log->debug("[QueueSorter] retracting single " . $retractor->getRedisMsgKey($instance));
+            $retractor->push($instance);
+        } elseif ($instance->isActionRetractAll()) {
+            if (!empty($instance->getEventObjectId())) {
+                /** @var MessageList\EventObjectList $retractor */
+                $retractor = $this->listFactory->eventObjectList($instance->getEventObjectId());
+                $this->log->debug("[QueueSorter] retracting event object " . $instance->getEventObjectId());
+                $retractor->retract();
+            } else {
+                /** @var MessageList\Retractor $retractor */
+                $retractor = $this->listFactory->retractLike();
+                $this->log->debug("[QueueSorter] retracting all like " . $retractor->getRedisMsgKey($instance));
+                $retractor->push($instance);
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * Adds an instance to a related event object list
+     * @param Instance $instance
+     * @return bool
+     */
+    public function processEventObjectList(Instance $instance):bool
+    {
+        $this->log->debug('[QUEUE SORTER] Adding instance to event object list: ' . $instance->getEventObjectId());
+        $this->listFactory->eventObjectList($instance->getEventObjectId())->push($instance);
+        return true;
+    }
 
 
 	/**

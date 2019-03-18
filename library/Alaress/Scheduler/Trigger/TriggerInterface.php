@@ -70,6 +70,14 @@ interface TriggerInterface {
 
 
     /**
+     * Return an identifier of attached event object, if available
+     *
+     * @return string
+     */
+    public function getEventObjectId(): string;
+
+
+    /**
      * Return a hash representation of attached event object
      *
      * @return string

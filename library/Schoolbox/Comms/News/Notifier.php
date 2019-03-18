@@ -285,21 +285,7 @@ class Notifier extends AbstractModuleNotifier
      */
     private function retractPosted(Envelope $envelope, Article $article): Envelope
     {
-        $bob       = new Builder(false);
-        $articleId = $article->getId();
-        $bob->setTitle(self::PATTERN_POSTED_TITLE)
-            ->setHref(sprintf(self::PATTERN_POSTED_HREF, $articleId))
-            ->addTopic("news.$articleId." . self::TRIGGER_POSTED);
-
-        // Empty params for completeness?
-        $bob->setParams([
-            'user'  => new Param(''),
-            'title' => new Param(''),
-        ]);
-
-        // Only broadcast to superusers as there's no system channel
-        $envelope->retractAllLike($bob->build());
-        return $envelope;
+        return $this->retractEventObject($envelope, $article);
     }
 
     /**
@@ -311,21 +297,7 @@ class Notifier extends AbstractModuleNotifier
      */
     private function retractSubmitted(Envelope $envelope, Article $article): Envelope
     {
-        $bob       = new Builder(false);
-        $articleId = $article->getId();
-        $bob->setTitle(self::PATTERN_SUBMITTED_TITLE)
-            ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $articleId))
-            ->addTopic("news.$articleId." . self::TRIGGER_SUBMITTED);
-
-        // Empty params for completeness?
-        $bob->setParams([
-            'user'  => new Param(''),
-            'title' => new Param(''),
-        ]);
-
-        // Only broadcast to superusers as there's no system channel
-        $envelope->retractAllLike($bob->build());
-        return $envelope;
+        return $this->retractEventObject($envelope, $article);
     }
 
     /**

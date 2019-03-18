@@ -10,6 +10,7 @@
 namespace Schoolbox\Realtime\Schedule\Module;
 
 
+use Alaress\Async\Notification\Instance\Builder;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionMethod;
@@ -24,6 +25,7 @@ use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\User;
 
@@ -386,4 +388,24 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
             $mapper->getEventPropagator()->propagate($effector, $action, $model, $mapper, $diff);
         }
     }
+
+
+    /**
+     * Retracts all the messages related to the given object, only if the model has getId method.
+     * @param Envelope $envelope
+     * @param object $model
+     * @return Envelope
+     */
+    protected function retractEventObject(Envelope $envelope, $model) : Envelope
+    {
+        $bob = new Builder(false);
+
+        if (!method_exists($model, 'getId')) {
+            return $envelope;
+        }
+        $bob->addTopic("{$this->getSlug()}.{$model->getId()}");
+        $envelope->retractAllLike($bob->build());
+        return $envelope;
+    }
+
 }

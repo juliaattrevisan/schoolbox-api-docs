@@ -341,4 +341,17 @@ class SubmissionNotifier extends AbstractModuleNotifier
         return $envelope;
     }
 
+
+    /**
+     * Notify system that the submission has been deleted.
+     * @param Submission $submission
+     * @return Envelope
+     */
+    public function notifySystemDeleted(Submission $submission): Envelope
+    {
+        $envelope = new Envelope();
+        return $this->retractEventObject($envelope, $submission);
+    }
+
+
 }
