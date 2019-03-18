@@ -60,7 +60,7 @@ function extractInstance($instance)
             echo date('Y-m-d H:i:s', $output->getTimestamp()) . "\n";
             $classname = get_class($output->getEvent()->getObject());
             $object = $output->getEvent()->getObject();
-            if (method_exists($instance->extractTrigger(), getModuleNotifier)) {
+            if (method_exists($instance->extractTrigger(), 'getModuleNotifier')) {
                 $mapper = $instance->getModuleNotifier()->getMapper();
                 if ($mapper->getIdentifier()) {
                     $getIdMethod = $mapper->getGetIdentifierMethodName();
