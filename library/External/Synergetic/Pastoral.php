@@ -642,12 +642,16 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         );
                     ";
 
-                    $this->connector->executeQuery($query, [
-                        'externalId' => $pastoral->getExternalId(),
-                        'order' => $order,
-                        'email' => $user->getEmail() ?: '',
-                        'userId' => $user->getExternalId(),
-                    ]);
+                    try {
+                        $this->connector->executeQuery($query, [
+                            'externalId' => $pastoral->getExternalId(),
+                            'order' => $order,
+                            'email' => $user->getEmail() ?: '',
+                            'userId' => $user->getExternalId(),
+                        ]);
+                    } catch (\Alaress\Database\Exception $e) {
+                        // The record has probably been deleted in Synergetic; don't complain
+                    }
 
                     $order++;
                 }
