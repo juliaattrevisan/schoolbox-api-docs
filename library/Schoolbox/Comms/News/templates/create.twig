@@ -1292,9 +1292,7 @@
                 if (availableMods.length === 1 && availableMods[0] === 'self') {
                     switch (this.selectedAudienceOption.name.toLowerCase()) {
                         case 'campus':
-                        case 'role':
-
-                            return 'Select ' + this.selectedAudienceOption.namePlural + ' below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.';
+                            return 'Select ' + this.selectedAudienceOption.name.toLowerCase() + ' below, please note these include all members of the campus including staff, parents and students.';
                             break;
 
                         default:
