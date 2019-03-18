@@ -158,26 +158,3 @@ Data:
         {% endif %}
     {% endfor %}
 </div>
-
-<div class="row">
-    <div class="island small-12">
-        <section class="meta" style="padding-left: 10px;">
-            <h2 class="subheader">Dev Debug data:</h2>
-            <p>user name: {{ user.fullName }}</p>
-            <p>userId: {{ user.id }}</p>
-            <p>folderId: {{ folder.id }}</p>
-            <br>
-            <p>isIb: {{ attributes.isIb ? 'true' : 'false' }}</p>
-            <p>userYearLevel: {{ attributes.yearLevel }}</p>
-            <p>term: {{ attributes.term }}</p>
-            <br>
-            <p>Curriculum Year Level: {{ attributes.curriculumYearLevel }}</p>
-            <p>Curriculum Semester: {{ attributes.curriculumSemester }}</p>
-            <p>Report Start: {{ attributes.reportStart.database }}</p>
-            <p>Report Finish: {{ attributes.reportFinish.database }}</p>
-            <p>isMyp: {% if attributes.isMyp %}true{% else %}false{% endif %}</p>
-            <p>isDp: {% if attributes.isDp %}true{% else %}false{% endif %}</p>
-            <p>isHsc: {% if attributes.isHsc %}true{% else %}false{% endif %}</p>
-        </section>
-    </div>
-</div>
