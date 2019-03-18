@@ -188,7 +188,9 @@
                                         <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
                                     </ul>
 
-                                    <p class="meta">Select ${ selectedAudienceOption.namePlural } below, then choose whether you would like to include the users themselves, the parents of the users, the teachers of the users, or a combination.</p>
+                                    <template v-if="tooltipText">
+                                        <p class="meta">${tooltipText}</p>
+                                    </template>
 
                                     <div class="empty-state" v-show="showEmptyState">
                                         <p>No ${ selectedAudienceOption.namePlural } found.</p>
@@ -607,7 +609,7 @@
      */
     var AudienceOption = function(entityType, name, namePlural, icon, selfModifier, ajaxRoute, hideFromModal, isMulti){
         this.entityType     = entityType;
-        this.name           =  name;
+        this.name           = name;
         this.namePlural     = namePlural;
         this.icon           = icon;
         this.selfModifier   = selfModifier;
@@ -661,6 +663,12 @@
         self:        'Self',
         parents_of:  'Parents of students',
         teachers_of: 'Teachers of students'
+    };
+
+    var tooltipTextLabelMap = {
+        self:           'users themselves',
+        parents_of:     'the parents of the users',
+        teachers_of:    'the teachers of the users',
     };
 
     /**
@@ -1269,6 +1277,41 @@
                     }
                 }
                 return false;
+            },
+            tooltipText: function(){
+                var availableMods = [];
+                var tooltipPrefixText = '';
+                var tooltipSufixText = '';
+
+                for(var i in this.selectedAudienceOption.availableModifiers){
+                    if (this.selectedAudienceOption.availableModifiers.hasOwnProperty(i)) {
+                        availableMods.push(this.selectedAudienceOption.availableModifiers[i]);
+                    }
+                }
+
+                if (availableMods.length === 1 && availableMods[0] === 'self') {
+                    switch (this.selectedAudienceOption.name.toLowerCase()) {
+                        case 'campus':
+                            return 'Select ' + this.selectedAudienceOption.name.toLowerCase() + ' below, please note these include all members of the campus including staff, parents and students.';
+                            break;
+
+                        default:
+                            return false;
+                    }
+                }
+
+                if (availableMods.length > 1){
+                    var selectedMods = [];
+                    availableMods.forEach(function(element) {
+                        selectedMods.push(tooltipTextLabelMap[element]);
+                    });
+
+                    tooltipPrefixText = 'Select ' + this.selectedAudienceOption.namePlural + ' below, then choose whether you would like to include the ';
+                    tooltipSufixText = ', or a combination.';
+
+                    return tooltipPrefixText + selectedMods.join(', ') + tooltipSufixText;
+
+                }
             }
         }
     });
