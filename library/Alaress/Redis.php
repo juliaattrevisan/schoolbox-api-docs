@@ -77,13 +77,9 @@ class Redis
     {
         // tcp://127.0.0.1:6379
         // TODO: it's much better to be set as separate redis parameters in config
-        if (is_string($parameters) && preg_match('/^(tcp):\/\/([0-9.]+):([0-9]+)$/', $parameters, $matches)) {
-            $parameters = [
-                'scheme' => $matches[1],
-                'host' => $matches[2],
-                'port' => $matches[3],
-                'persistent' => true
-            ];
+        if (is_string($parameters) && parse_url($parameters)) {
+            $parameters = parse_url($parameters);
+            $parameters['persistent'] = true;
         }
         $this->setClient(new AutoRefreshClient($parameters, $options));
         $this->instanceId = $instanceId;

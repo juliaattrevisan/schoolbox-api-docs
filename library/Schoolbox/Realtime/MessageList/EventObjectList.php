@@ -52,10 +52,7 @@ class EventObjectList extends AbstractList
         }
 
         // delete one by one
-        $count = count($idList);
-        for ($i = 0; $i < $count; ++$i) {
-            $key  = $idList[$i];
-            $unlinkArgs[] = $key;
+        foreach ($idList as $key) {
             $this->redis->executeCommand(new RawCommand(['UNLINK', $key]));
         }
 

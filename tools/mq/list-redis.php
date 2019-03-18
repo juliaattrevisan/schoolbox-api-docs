@@ -9,9 +9,11 @@ new \Schoolbox\Application\Daemon\Kernel(__FILE__, $opts);
 
 $redis = Redis::getClientInstance();
 
-$keys = $redis->keys('msg*');
+// non-blocking search of the keyspace for all messages
+$search = new \Predis\Collection\Iterator\Keyspace($redis, 'msg:' . INSTANCE_ID . '*');
 
-foreach ($keys as $idx => $key) {
+$idx = 0;
+foreach ($search as $key) {
     echo "=====================================================================\n";
     $readableTTL = secondsToTime($redis->ttl($key));
     $expiryTime = ttlToDate($redis->ttl($key));
@@ -40,7 +42,7 @@ foreach ($keys as $idx => $key) {
         continue;
     }
     extractInstance($instance);
-
+    $idx++;
 }
 
 
