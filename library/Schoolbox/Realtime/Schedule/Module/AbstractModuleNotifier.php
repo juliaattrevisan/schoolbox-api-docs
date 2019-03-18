@@ -400,10 +400,14 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     {
         $bob = new Builder(false);
 
-        if (!method_exists($model, 'getId')) {
+        $getIdMethod = 'getId';
+        if ($this->mapper->hasIdentifier()) {
+            $getIdMethod = $this->mapper->getGetIdentifierMethodName();
+        }
+        if (!method_exists($model, $getIdMethod)) {
             return $envelope;
         }
-        $bob->addTopic("{$this->getSlug()}.{$model->getId()}");
+        $bob->addTopic("{$this->getSlug()}.{$model->$getIdMethod()}");
         $envelope->retractAllLike($bob->build());
         return $envelope;
     }
