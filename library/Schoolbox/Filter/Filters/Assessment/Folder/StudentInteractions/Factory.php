@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;

@@ -16,7 +16,7 @@ use Schoolbox\Permission\Access\UserAccess;
 /**
  * No conversion. A int is converted to the same int (representing a folder.id)
  */
-abstract class KeyConverter extends AbstractKeyConverter
+class KeyConverter extends AbstractKeyConverter
 {
 
     /**
@@ -69,17 +69,29 @@ abstract class KeyConverter extends AbstractKeyConverter
         return $this->folderIds->shallowClone();
     }
 
+
     /**
      * @inheritdoc
      */
     protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
     {
-
         if (!$this->folderIds->offsetExists($key)) {
             throw new \InvalidArgumentException("No Folder ID found for key: $key");
         }
-        if ($this->access->getFolderAccess($user, (int)$key) < UserAccess::ACCESS_READ) {
-            throw new \InvalidArgumentException("Session user lacks read perm to folder: $key");
+
+        switch ($page) {
+            case Filter\Page\Model::PAGE_MARK_BOOK:
+            case Filter\Page\Model::PAGE_COURSE_MARK_BOOK:
+                // Must be staff or instructor
+                $notStaff = !$user->getRole()->isStaff();
+                if ($notStaff && $this->access->getFolderAccess($user, (int)$key) < UserAccess::ACCESS_WRITE) {
+                    throw new \InvalidArgumentException("Session user lacks read perm to folder: $key");
+                }
+                break;
+            case Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS:
+            default:
+                // No perm check
+                break;
         }
     }
 }
