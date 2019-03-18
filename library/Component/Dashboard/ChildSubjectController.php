@@ -60,106 +60,121 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 continue;
             }
 
+            if ($this->getConfigMapper()->get('site_location') === 'wenona' && $child['gid'] == 3) {
+                continue;
+            }
 
-            if (!($this->getConfigMapper()->get('site_location') === 'wenona' && $child['gid'] == 3)) {
-                $i++;
+            $i++;
 
-                $this->setVar("STUDENT_ID", $userChild->getId());
-                $this->setVar("STUDENT_EXTERNAL_ID", $userChild->getExternalId());
-                $this->setVar("STUDENT_NAME", $child['name']);
-                $this->setVar("STUDENT_YEAR", $userChild->getYear());
+            $this->setVar("STUDENT_ID", $userChild->getId());
+            $this->setVar("STUDENT_EXTERNAL_ID", $userChild->getExternalId());
+            $this->setVar("STUDENT_NAME", $child['name']);
+            $this->setVar("STUDENT_YEAR", $userChild->getYear());
 
 
-                if ($this->getConfigMapper()->get('pastoral_enabled') &&
-                    $this->getUser()->isParentOf($userChild) &&
-                    $this->getConfigMapper()->get('pastoral_parent_access')) {
-                    $this->parse('pastoral_block', 'pastoral');
-                } else {
-                    $this->setVar('pastoral_block', '');
-                }
+            if ($this->getConfigMapper()->get('pastoral_enabled') &&
+                $this->getUser()->isParentOf($userChild) &&
+                $this->getConfigMapper()->get('pastoral_parent_access')) {
+                $this->parse('pastoral_block', 'pastoral');
+            } else {
+                $this->setVar('pastoral_block', '');
+            }
 
-                if (\is_array($child['subjects'])) {
-                    foreach ($child['subjects'] as $subject) {
-                        if ($subject['perm'] >= UserAccess::ACCESS_READ) {
-                            $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
-                            $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
-                            $this->parse("subject_item", "subject_block", true);
-                        }
+            if (\is_array($child['subjects'])) {
+                foreach ($child['subjects'] as $subject) {
+                    if ($subject['perm'] >= UserAccess::ACCESS_READ) {
+                        $this->setVar("STUDENT_SUBJECT_NAME", Scrub::text($subject['name']));
+                        $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
+                        $this->parse("subject_item", "subject_block", true);
                     }
                 }
-
-                /* Output calendar date to show */
-                $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-                $this->setVar('CAL_TODAY_DATE', $now->getURLDate());
-
-                /* Hide Due Work link from parents, if Due Work access is restricted
-                 */
-                if ($isParent && $this->getConfigMapper()->get('restrict_parent_duework_access')) {
-                    $this->setVar('due_work_block', '');
-                } else {
-                    $this->parse('due_work_block', 'due_work');
-                }
-
-                if ($isParent && $this->getConfigMapper()->get('restrict_parent_grades')) {
-                    $this->setVar('grades_button_block', '');
-                } else {
-                    $this->parse('grades_button_block', 'grades_button');
-                }
-
-                if ($userChild->getHideTimetable()) {
-                    $this->setVar('timetable_block', '');
-                } else {
-                    $this->parse('timetable_block', 'timetable');
-                }
-
-                /* ePortfolio link
-                 */
-                $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $child['id'], 'profile');
-
-                if ($authenticator->canView()) {
-                    $this->parse('eportfolio_block', 'eportfolio');
-                } else {
-                    $this->setVar('eportfolio_block', '');
-                }
-
-                /* Academic report link
-                */
-                if ($this->getConfigMapper()->get('external_document_report_enabled')) {
-                    $this->parse('reports_block', 'reports');
-                } else {
-                    $this->setVar('reports_block');
-                }
-
-                // Custom buttons from admin
-                try {
-                    $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($userChild, $this->getUser());
-                } catch (MapperException $e) {
-                    $customButtons = [];
-                }
-
-                foreach ($customButtons as $customButton) {
-                    $this->setVar([
-                        'BUTTON_TEXT' => $customButton->getText(),
-                        'BUTTON_TITLE' => $customButton->getTitle(),
-                        'BUTTON_HREF' => $customButton->getURL(),
-                        'BUTTON_ICON' => $customButton->getIcon(),
-                        'BUTTON_TARGET' => $customButton->getTarget(),
-                    ]);
-
-                    $this->parse('custom_buttons_block', 'custom_buttons', true);
-                }
-
-                // Parse the parent block
-                $this->parse("student_subjects", "student_block", true);
-
-                /* Clear children after parsing out the parent
-                 */
-                $this->setVar([
-                    'subject_item' => '',
-                    'due_work_block' => '',
-                    'custom_buttons_block' => ''
-                ]);
             }
+
+            /* Output calendar date to show */
+            $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            $this->setVar('CAL_TODAY_DATE', $now->getURLDate());
+
+            /* Hide Due Work link from parents, if Due Work access is restricted
+             */
+            if ($isParent && $this->getConfigMapper()->get('restrict_parent_duework_access')) {
+                $this->setVar('due_work_block', '');
+            } else {
+                $this->parse('due_work_block', 'due_work');
+            }
+
+            if ($isParent && $this->getConfigMapper()->get('restrict_parent_grades')) {
+                $this->setVar('grades_button_block', '');
+            } else {
+                $this->parse('grades_button_block', 'grades_button');
+            }
+
+            if ($userChild->getHideTimetable()) {
+                $this->setVar('timetable_block', '');
+            } else {
+                $this->parse('timetable_block', 'timetable');
+            }
+
+            /* ePortfolio link
+             */
+            $authenticator = new \Eportfolio_Authenticator($_SESSION['id'], $child['id'], 'profile');
+
+            if ($authenticator->canView()) {
+                $this->parse('eportfolio_block', 'eportfolio');
+            } else {
+                $this->setVar('eportfolio_block', '');
+            }
+
+            /* Academic report link
+            */
+            if ($this->getConfigMapper()->get('external_document_report_enabled')) {
+                $this->parse('reports_block', 'reports');
+            } else {
+                $this->setVar('reports_block');
+            }
+
+            // Custom buttons from admin
+            try {
+                $customButtons = ProfileButtonMapper::getInstance()->findButtonsForUser($userChild, $this->getUser());
+            } catch (MapperException $e) {
+                $customButtons = [];
+            }
+
+            foreach ($customButtons as $customButton) {
+                $this->setVar([
+                    'BUTTON_TEXT' => $customButton->getText(),
+                    'BUTTON_TITLE' => $customButton->getTitle(),
+                    'BUTTON_HREF' => $customButton->getURL(),
+                    'BUTTON_ICON' => $customButton->getIcon(),
+                    'BUTTON_TARGET' => $customButton->getTarget(),
+                ]);
+
+                $this->parse('custom_buttons_block', 'custom_buttons', true);
+            }
+
+            // School-specific buttons
+            if ('tigs' === $this->getConfigMapper()->get('site_location')) {
+                $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
+                $route  = 'tigsParticipationReport.getReport';
+                $params = ['userId' => $userChild->getId(), 'user' => $userChild,];
+                if ($this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())) {
+                    $this->setVar('HREF_CONTINUOUS_REPORT', $this->getRouter()->generate($route, $params));
+                    $this->parse('continuous_report_block', 'continuous_report');
+                } else {
+                    $this->setVar('continuous_report_block');
+                }
+            }
+
+            // Parse the parent block
+            $this->parse("student_subjects", "student_block", true);
+
+            /* Clear children after parsing out the parent
+             */
+            $this->setVar([
+                'subject_item' => '',
+                'due_work_block' => '',
+                'custom_buttons_block' => ''
+            ]);
+
         }
 
 

@@ -37,7 +37,7 @@ Data:
                     if (!studentValues.hasOwnProperty(key)) {
                         continue;
                     }
-                    studentValuesInverted[studentValues[key]] = key;
+                    studentValuesInverted[Object.keys(studentValues).length + 1 - studentValues[key]] = key;
                 }
 
                 {#
@@ -50,7 +50,7 @@ Data:
                         continue;
                     }
                     var column = {
-                        x: studentValues[key],
+                        x: Object.keys(studentValues).length + 1 - studentValues[key],
                         y: rawData[key],
                         name: key
                     };
