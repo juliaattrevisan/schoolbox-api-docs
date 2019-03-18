@@ -106,9 +106,67 @@ class External_Schoolpro_User implements External_UserInterface
      *
      * @return array
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails($synergyIds): array
     {
-        return array();
+        $emails = [];
+
+        if (\count($synergyIds)) {
+            foreach ($synergyIds as $studentId) {
+
+                /* Get the contacts for $studentId
+                 */
+                $vars = [
+                    'sbGetStudentContact',
+                    [
+                        'pUserName' => 'alaress',
+                        'pUserPass' => 'alaress',
+                        'pSchoolNum' => $studentId,
+                    ]
+                ];
+
+                $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
+
+                if ($currentStudentContact) {
+
+                    /* Get this contact's email
+                     * De-dupe it just in case
+                     */
+                    $email = trim($currentStudentContact['email']);
+
+                    if ('' !== $email) {
+                        $emails[$email] = $email;
+                    }
+
+                    /* Also get the spouse's email
+                     */
+                    $spouseVars = [
+                        'sbGetParent',
+                        [
+                            'pUserName' => 'alaress',
+                            'pUserPass' => 'alaress',
+                            'pSchoolNum' => $currentStudentContact['SpouseID'],
+                        ]
+                    ];
+
+                    $currentStudentSpouse = $this->getConnector()->executeStoredProcedure($spouseVars[0], $spouseVars[1])->fetch();
+
+                    /* Ironically the Spouse has their Contact's email as well, in their record
+                     * but the Contact doesn't have the Spouse's email ><
+                     */
+                    if ($currentStudentSpouse) {
+                        $email = trim($currentStudentSpouse['email']);
+
+                        if ('' !== $email) {
+                            $emails[$email] = $email;
+                        }
+                    }
+                }
+            }
+        }
+
+        /* Ditch any busted emails, then return them
+         */
+        return array_filter(array_keys($emails));
     }
 
     /**
