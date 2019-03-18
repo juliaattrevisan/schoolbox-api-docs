@@ -24,8 +24,9 @@
             <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
                 <li><a href="/subject/classList/{{ class.getCodeString() }}" class="icon-class-list">Class List</a></li>
                 {% set classMarkbookRoute = routeLookupIfAuthorized('learningMarkbook.getMarkbookForClassAndTerm', {folderId: class.id, termCode: term.code}) %}
-                {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="icon-curriculum">Class Markbook</a></li>
-                <li><a href="{{ routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folderId: class.id}) }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
+                {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="icon-curriculum">Class Markbook</a></li>{% endif %}
+                {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folderId: class.id}) %}
+                {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
                 <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
                 {% if courses | length %}
                     <li class="separator">Analytics</li>
