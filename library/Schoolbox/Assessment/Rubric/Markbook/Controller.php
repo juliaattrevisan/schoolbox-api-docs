@@ -10,16 +10,13 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Assessment\Exception;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Exception;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use PDO;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Alaress_Probe as Probe;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 
 class Controller extends Base
