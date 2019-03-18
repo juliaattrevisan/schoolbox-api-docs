@@ -25,6 +25,18 @@ class Controller extends BaseController
 
 
     /**
+     * @var Decorator\PropertyDecorator
+     */
+    private $jsonDecorator;
+
+
+    /**
+     * @var LinkDecorator
+     */
+    private $linkDecorator;
+
+
+    /**
      * Constructor
      *
      * @param Post\Mapper $postMapper
@@ -48,21 +60,20 @@ class Controller extends BaseController
         $cursor        = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
         $encodedCursor = $this->request->query->get('cursor');
         $posts         = $cursor->retrieveResults($encodedCursor);
-
-        // Set up decorators
-        $linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
-        $jsonDecorator = new Decorator\PropertyDecorator(null, $linkDecorator);
+        $responseData  = [
+            'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'metadata' => [
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
+                    'next'    => $cursor->retrieveNextCursor($posts),
+                ]
+            ]
+        ];
 
         $this->response->content->set(
-            $this->buildJsonOutput([
-                'data'     => $posts->jsonSerialize($jsonDecorator, $linkDecorator),
-                'metadata' => [
-                    'cursor' => [
-                        'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
-                        'next'    => $cursor->retrieveNextCursor($posts),
-                    ]
-                ]
-            ])
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionPosts/list.twig', ['list' => $responseData])
         );
     }
 
@@ -85,6 +96,44 @@ class Controller extends BaseController
             ->setContent($data->content);
 
         $this->postMapper->save($post);
-        $this->response->content->set($this->buildJsonOutput($post));
+
+        $responseData = $post->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
+        $this->response->content->set(
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionPosts/item.twig', ['item' => $responseData])
+        );
+    }
+
+
+    /**
+     * Retrieve this class' link decorator.
+     *
+     * TODO inject this
+     *
+     * @return LinkDecorator
+     */
+    private function retrieveLinkDecorator(): LinkDecorator
+    {
+        if (!$this->linkDecorator) {
+            $this->linkDecorator = new LinkDecorator($this->router, $this->authorizer, $this->getUser());
+        }
+        return $this->linkDecorator;
+    }
+
+
+    /**
+     * Retrieve this class' JSON decorator.
+     *
+     * TODO inject this
+     *
+     * @return Decorator\PropertyDecorator
+     */
+    private function retrieveJsonDecorator(): Decorator\PropertyDecorator
+    {
+        if (!$this->jsonDecorator) {
+            $this->jsonDecorator = new Decorator\PropertyDecorator(null, $this->retrieveLinkDecorator());
+        }
+        return $this->jsonDecorator;
     }
 }

@@ -13,6 +13,12 @@ namespace Alaress\Image\Transformation;
 
 class BaseTransformation implements Transformation
 {
+    // Transform methods
+    protected const METHOD_SQUARE    = 'Square';
+    protected const METHOD_CONSTRAIN = 'Constrain';
+    protected const METHOD_RECTANGLE = 'Rectangle';
+
+
     /** @var array */
     protected $allTransformations = array();
 

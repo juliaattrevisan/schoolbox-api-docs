@@ -41,7 +41,7 @@
  #}
 {% macro textonly(article) %}
     <div class="small-12 columns">
-        <article class="content">
+        <article class="article content">
             {{ article.body|purify }}
         </article>
     </div>
@@ -52,12 +52,6 @@
  # Used when images are more important than words
  #}
 {% macro banner(article) %}
-    <div class="small-12 island">
-        <img src="/storage/image.php?hash={{ article.featureImage.hash }}&size=maxsize" />
-        <section class="content">
-            {{ article.body|purify }}
-        </section>
-    </div>
 {% endmacro %}
 
 

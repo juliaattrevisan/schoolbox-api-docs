@@ -20,11 +20,13 @@ paths:
       summary: Deletes a post
       responses:
         '204':
+          description: The resource was deleted successfully.
         default:
           $ref: '#/components/responses/problem'
-      parameters:
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/token'
+
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/token'
 
   /posts/{id}/posts:
     get:
@@ -35,12 +37,13 @@ paths:
           $ref: '#/components/responses/postList'
         default:
           $ref: '#/components/responses/problem'
-      parameters:
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/cursor'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/token'
-        - $ref: '#/components/parameters/depth'
+
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/cursor'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/token'
+      - $ref: '#/components/parameters/depth'
 
   /threads/{id}/posts:
     get:
@@ -51,12 +54,6 @@ paths:
           $ref: '#/components/responses/postList'
         default:
           $ref: '#/components/responses/problem'
-      parameters:
-        - $ref: '#/components/parameters/id'
-        - $ref: '#/components/parameters/cursor'
-        - $ref: '#/components/parameters/limit'
-        - $ref: '#/components/parameters/token'
-        - $ref: '#/components/parameters/depth'
 
     post:
       operationId: createPostInThread
@@ -75,9 +72,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/post'
-      parameters:
-        - $ref: '#/components/parameters/token'
 
+    parameters:
+      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/cursor'
+      - $ref: '#/components/parameters/limit'
+      - $ref: '#/components/parameters/token'
+      - $ref: '#/components/parameters/depth'
 
 components:
   schemas:
@@ -102,7 +103,9 @@ components:
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct child posts of this thread
-          required: false
+      required:
+        - id
+        - open
 
     post:
       title: Post
@@ -114,7 +117,6 @@ components:
         thread:
           $ref: '#/components/schemas/thread'
           # Usually a post will be retrieved within the context of a thread
-          required: false
         author:
           $ref: '#/components/schemas/user'
           nullable: true
@@ -133,7 +135,6 @@ components:
         children:
           $ref: '#/components/schemas/postList'
           description: A list of direct children of this post
-          required: false
         visibility:
           description: |
             Which role types may view this comment? If not set, assume all role
@@ -144,9 +145,12 @@ components:
           type: array
           items:
             type: string
-            enum: ['teacher', 'parent', 'student']
-          required: false
+            enum:
+              - staff
+              - parent
+              - student
       required:
+        - id
         - thread
         - content
 
@@ -175,6 +179,8 @@ components:
               type: string
               format: uri-reference
               nullable: true
+      required:
+        - id
 
     problem:
       title: Problem Details
@@ -185,17 +191,14 @@ components:
         type:
           type: string
           format: uri
-          required: true
           description: A URI reference that identifies the problem type
           default: 'about:blank'
         title:
           type: string
-          required: true
           description: A short human-readable summary of the problem type
         status:
           type: integer
           format: int32
-          required: true
           minimum: 100
           maximum: 600
           exclusiveMaximum: true
@@ -208,6 +211,10 @@ components:
           type: string
           format: uri
           description: A URI reference that identifies the specific occurrence of the problem
+      required:
+        - type
+        - title
+        - status
 
     listMetadata:
       title: List metadata
@@ -216,17 +223,15 @@ components:
       type: object
       properties:
         count:
-          type: int
-          required: false
+          type: integer
+          format: int32
           description: If provided, the number of items in the result set.
         cursor:
           type: object
-          required: false
           properties:
             current:
               type: string
               nullable: true
-              required: true
               description: |
                 If set, a cursor to the current page of results.
                 Seems redundant, but it does generate a cursor to a request
@@ -234,8 +239,23 @@ components:
             next:
               type: string
               nullable: true
-              required: true
               description: If set, a cursor to the next page of results.
+          required:
+            - current
+            - next
+
+    postList:
+      title: Post list
+      description: A list of posts
+      readOnly: true
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/post'
+        metadata:
+          $ref: '#/components/schemas/listMetadata'
 
     dateTime:
       title: Datetime
@@ -253,22 +273,22 @@ components:
           description: |
             This read-only object representation will be deprecated eventually:
             it exists only for compatibility with existing API endpoints.
+          required:
+            - json
           properties:
             database:
               type: string
-              required: false
               description: |
                 A database representation of the date. Please use the "json"
                 property instead.
             unixTimestamp:
-              type: int
-              required: false
+              type: integer
+              format: int64
               description: |
                 The date as a Unix timestamp. Please use the "json" property
                 instead.
             local:
               type: string
-              required: false
               description: |
                 A string representation of the date, localized to the Schoolbox
                 instance's settings.
@@ -277,7 +297,6 @@ components:
             json:
               type: string
               format: date-time
-              required: true
               description: |
                 The date as a RFC3339 string.
 
@@ -288,18 +307,37 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/problem'
+          examples:
+            badRequestUpdate:
+              $ref: '#/components/examples/problemBadRequestUpdate'
+            badRequestDelete:
+              $ref: '#/components/examples/problemBadRequestDelete'
+            unauthorized:
+              $ref: '#/components/examples/problemUnauthorized'
+            forbidden:
+              $ref: '#/components/examples/problemForbidden'
+            notFound:
+              $ref: '#/components/examples/problemNotFound'
+            internalServerError:
+              $ref: '#/components/examples/problemInternalServerError'
 
     postList:
       description: a list of posts
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              data:
-                $ref: '#/components/schemas/post'
-              metadata:
-                $ref: '#/components/schemas/listMetadata'
+            $ref: '#/components/schemas/postList'
+          examples:
+            empty:
+              $ref: '#/components/examples/postListEmpty'
+            one:
+              $ref: '#/components/examples/postListOne'
+            many:
+              $ref: '#/components/examples/postListMany'
+        text/html:
+          schema:
+            type: string
+            description: The list of posts, rendered into HTML on the server.
 
 
   parameters:
@@ -309,33 +347,21 @@ components:
       description: ID of an item to use
       required:    true
       schema:
-        type: int
+        type: integer
+        format: int32
         minimum: 1
-#    q:
-#      name:        q
-#      in:          query
-#      description: Query (search) parameter
-#    sort:
-#      name:        sort
-#      in:          query
-#      description: Sort parameter
-#    fields:
-#      name:        fields
-#      in:          query
-#      description: Fields parameter. Use this to request a subset of a record's fields.
+
     limit:
       name:        sort
       in:          query
       description: Maximum number of records to return
       schema:
-        type: int
+        type: integer
+        format: int32
         minimum: 1
         maximum: 100
         default: 20
-#    offset:
-#      name:        offset
-#      in:          query
-#      description: The offset of the first record to return
+
     cursor:
       name:        cursor
       in:          query
@@ -344,6 +370,7 @@ components:
         record to return.
       schema:
         type: string
+
     token:
       name:        token
       in:          query
@@ -352,14 +379,196 @@ components:
         This is temporary, and will be replaced with oAuth/JWT authentication.
       schema:
         type: string
+
     depth:
       name:        depth
       in:          query
       description: |
         Number of levels to descend when retrieving child posts.
+      required: false
       schema:
-        type: int
+        type: integer
+        format: int32
         default: 0
         minimum: 0
         maximum: 3
-        required: false
+
+
+  examples:
+    postListEmpty:
+      value:
+        data: []
+        metadata:
+          cursor:
+            current: bbb
+            next: ccc
+
+    postListOne:
+      value:
+        # Frustratingly, sub-keys of example values don't follow $ref
+        data:
+          - id: 1
+            thread:
+              id: 2
+              open: false
+              created: 2019-01-01T00:00:00Z
+              updated:
+                database: 2019-01-01 00:00:00
+                json: 2019-01-01T00:00:00Z
+                local: 1 Jan 2019 12:00am
+                unixTimestamp: 1546300800000
+            author:
+              id: 1
+              externalId: 2
+              firstName: Schoolbox
+              lastName: User
+              _links:
+                avatar: /profile?id=1
+            content: <p>Some HTML content goes here</p>
+            created: 2019-01-01T00:00:00Z
+            updated:
+              database: 2019-01-01 00:00:00
+              json: 2019-01-01T00:00:00Z
+              local: 1 Jan 2019 12:00am
+              unixTimestamp: 1546300800000
+            visibility:
+              - staff
+              - parent
+              - student
+        metadata:
+          cursor:
+            current: bbb
+            next: ccc
+
+    postListMany:
+      value:
+        data:
+          - id: 2
+            thread:
+              id: 1
+              open: true
+              created: 2019-01-01T00:00:00Z
+              updated: 2019-01-01T00:00:00Z
+            author:
+              id: 1
+              externalId: 2
+              firstName: Schoolbox
+              lastName: User
+              _links:
+                avatar: /profile?id=1
+            content: <p>Some HTML content goes here</p>
+            created:
+              database: 2019-01-01 00:00:00
+              json: 2019-01-01T00:00:00Z
+              local: 1 Jan 2019 12:00am
+              unixTimestamp: 1546300800000
+            updated: 2019-01-01T00:00:00Z
+            visibility:
+              - staff
+              - parent
+              - student
+
+          - id: 3
+            thread:
+              id: 1
+              open: true
+              created: 2019-01-01T00:00:00Z
+              updated: 2019-01-01T00:00:00Z
+            author:
+              id: 1
+              externalId: 2
+              firstName: Schoolbox
+              lastName: User
+              _links:
+                avatar: /profile?id=1
+            content: <p>This article was modified</p>
+            created: 2019-01-02T00:00:00Z
+            updated: 2019-01-02T01:00:00Z
+            visibility:
+              - staff
+
+          - id: 4
+            thread:
+              id: 1
+              open: true
+              created: 2019-01-01T00:00:00Z
+              updated: 2019-01-01T00:00:00Z
+            author:
+              id: 1
+              externalId: 2
+              firstName: Schoolbox
+              lastName: User
+              _links:
+                avatar: /profile?id=1
+            content: <p>This article was not modified, just the created/updated are in different timezone</p>
+            created: 2019-01-04T00:00:00Z
+            updated: 2019-01-04T11:00:00+1100
+            visibility:
+              - staff
+              - student
+
+          - id: 5
+            thread:
+              id: 1
+              open: true
+              created: 2019-01-01T00:00:00Z
+              updated: 2019-01-01T00:00:00Z
+            author:
+              id: 1
+              externalId: 2
+              firstName: Schoolbox
+              lastName: User
+              _links:
+                avatar: /profile?id=1
+            content: "<p>XSS Article: you must escape this <script type=\"text/javascript\">alert('XSS')</script></p>"
+            created: 2019-01-01T00:00:00Z
+            updated: 2019-01-01T00:00:00Z
+            visibility:
+              - staff
+
+        metadata:
+          cursor:
+            current: xxx
+            next: yyy
+
+    problemBadRequestUpdate:
+      value:
+        type:   about:blank
+        title:  Bad Request
+        status: 400
+        detail: This resource may not have its created at time modified.
+
+    problemBadRequestDelete:
+      value:
+        type:   about:blank
+        title:  Bad Request
+        status: 400
+        detail: This resource may not be deleted.
+
+    problemUnauthorized:
+      value:
+        type:   about:blank
+        title:  Unauthorized Access
+        status: 401
+        detail: Authorization is required to access resource with ID=1.
+
+    problemForbidden:
+      value:
+        type:   about:blank
+        title:  Forbidden
+        status: 403
+        detail: You do not have permission to access resource with ID=1.
+
+    problemNotFound:
+      value:
+        type:   about:blank
+        title:  Not Found
+        status: 404
+        detail: The resource with ID=1 was not found.
+
+    problemInternalServerError:
+      value:
+        type:   about:blank
+        title:  Internal Server Error
+        status: 500
+        detail: An unexpected error occured when accessing resource with ID=1. This error has been logged.
