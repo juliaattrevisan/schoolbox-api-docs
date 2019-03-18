@@ -205,25 +205,25 @@ class External_Synergetic_Class implements External_ClassInterface
         ];
         if (empty($timetableCode)) {
             $query = "
-                SELECT ClassCode
+                SELECT CASE WHEN ClassCampus != '' THEN CONCAT(ClassCampus, '/', ClassCode) ELSE ClassCode END AS ClassCode
                 FROM dbo.StudentClasses
                 WHERE FileType = :type
                 AND FileYear = :year
                 AND FileSemester = :semester
-                GROUP BY ClassCode
+                GROUP BY CASE WHEN ClassCampus != '' THEN CONCAT(ClassCampus, '/', ClassCode) ELSE ClassCode END
                 ORDER BY ClassCode
             ";
         } else {
             $query                 = "
-                SELECT sc.ClassCode
+                SELECT CASE WHEN sc.ClassCampus != '' THEN CONCAT(sc.ClassCampus, '/', sc.ClassCode) ELSE sc.ClassCode END AS ClassCode
                 FROM dbo.StudentClasses sc
                 INNER JOIN dbo.Timetable t on sc.ClassCampus = t.ClassCampus
                 WHERE sc.FileType = :type
                 AND sc.FileYear = :year
                 AND sc.FileSemester = :semester
                 AND t.TimetableGroup IN (:campusList)
-                GROUP BY sc.ClassCode
-                ORDER BY sc.ClassCode
+                GROUP BY CASE WHEN sc.ClassCampus != '' THEN CONCAT(sc.ClassCampus, '/', sc.ClassCode) ELSE sc.ClassCode END
+                ORDER BY ClassCode
             ";
             $params[':campusList'] = implode(
                 ',',
