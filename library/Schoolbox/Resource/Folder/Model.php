@@ -492,6 +492,22 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
 
     /**
+     * @param Collection $teachers
+     * @return Model
+     * @throws \DomainException
+     * @throws \UnexpectedValueException
+     */
+    public function setTeachers(Collection $teachers): self
+    {
+        if ($this->teacher_collection === null) {
+            $this->teacher_collection = new GenericCollection(User::class);
+        }
+        $this->teacher_collection->replaceWith($teachers);
+        return $this;
+    }
+
+
+    /**
      * @return CourseSpecification
      */
     public function getCourseSpecification()

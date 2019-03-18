@@ -13,6 +13,12 @@ Data:
     houseEvents:            HouseEvent[]
     houseEvents[idx].name
     houseEvents[idx].status
+    subjects                array
+    subjects[idx].name      string
+    subjects[idx].codes     string[]
+    subjects[idx].folderId  int
+    subjects[idx].teachers  User[]
+    nowOverride             null|string
 #}
 
 <div class="row">
@@ -117,10 +123,11 @@ Data:
     <div class="small-12 island">
         <h2 class="subheader">Subject List</h2>
         <section>
-            {% for subject in subjectList %}
+            {% for subject in subjects %}
                 <ul class="subject-list group">
                     <li class="subject-group">
-                        <a href="/modules/custom/tigs/summative/subject/{{ user.id }}/folder/{{ subject.folderId }}"
+                        {% set href = routeLookup('tigsSubjectReport.getReport', {userId: user.id, folderId: subject.folderId}) %}
+                        <a href="{{ href }}{{ nowSuffix }}"
                            class="link-row" title="Subject Report">
                             <div class="small-12 content sibling">
                                 <h3 class="no-margin">
