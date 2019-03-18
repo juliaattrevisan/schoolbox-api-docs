@@ -489,7 +489,7 @@ function Dimension(entityType, entityValue, modifier) {
  * @param {Object|string[]} typeLabelMap    - Maps entityTypes to HR form.          Indexed by [entityType]
  * @param {Object|string[][]} valueLabelMap - Translated names used by the segment. Indexed by [entityType][encodedEntityValue]
  */
-function Brick(segment, typeLabelMap, valueLabelMap)
+function Brick(segment, typeLabelMap, valueLabelMap, entityId)
 {
     "use strict";
     if (!(this instanceof Brick)) {
@@ -521,6 +521,8 @@ function Brick(segment, typeLabelMap, valueLabelMap)
     this.typeLabelMap  = typeLabelMap;            // Need to store a reference so we can inject to new bricks during explosion.
     this.valueLabelMap = valueLabelMap;           // All translated names used by segments in brick. Indexed by [entityType][encodedEntityValue]
                                                   // If an entity's name is not found, fall back to rendering untranslated form, but log to console.
+    this.entityId      = entityId;
+    this.entityType    = segment.getEntityType();
 
     // Special case for adding initial segment (no DOF constraints)
     if(segment.isSimple()){
@@ -1167,7 +1169,7 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
      */
     this.onAddSegment = function(selectize, bricks, key, name, $item, segmentValueLabels){
 
-        var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels),
+        var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels, $item.entityId),
             brickCandidates = [];
 
         for(var i in bricks){
