@@ -481,7 +481,8 @@ abstract class AbstractMailer implements IMailer
      */
     public static function standardiseEmailSeparator($string)
     {
-        return str_replace(',', \chr(self::EMAIL_SEPARATOR_CODE), $string);
+        // Only replace those commas outside () symbol.
+        return preg_replace('/,(?![^\(]*\))/', \chr(self::EMAIL_SEPARATOR_CODE), $string);
     }
 
     /**
