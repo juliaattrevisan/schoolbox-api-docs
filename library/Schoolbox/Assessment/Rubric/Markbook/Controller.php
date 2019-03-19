@@ -136,13 +136,17 @@ class Controller extends Base
             $lastObservedCapabilityId = $row['capability_id'];
         }
 
-        usort(
+        $oldAssessments = $assessments;
+
+
+
+        uasort(
             $assessments,
             function ($a, $b) {
                 return strnatcmp($a['name'], $b['name']);
             }
         );
-
+        
         return $assessments;
     }
 
@@ -304,7 +308,7 @@ class Controller extends Base
 
         }
 
-        usort(
+        uasort(
             $students,
             function ($a, $b) {
                 return strnatcmp($a['lastname'], $b['lastname']);
