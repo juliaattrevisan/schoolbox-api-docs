@@ -126,7 +126,7 @@ Data:
             {% for subject in subjects %}
                 <ul class="subject-list group">
                     <li class="subject-group">
-                        {% set href = routeLookup('tigsSubjectReport.getReport', {userId: user.id, folderId: subject.folderId}) %}
+                        {% set href = routeLookup('tigsSubjectReport.getReport', {userId: user.id, folderId: subject.folderId, now: nowOverride}) %}
                         <a href="{{ href }}{{ nowSuffix }}"
                            class="link-row" title="Subject Report">
                             <div class="small-12 content sibling">

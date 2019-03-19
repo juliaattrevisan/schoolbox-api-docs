@@ -98,6 +98,7 @@ class Controller extends Web\Controller\Base
      * @level 18.1.0
      * @param User         $user
      * @param Folder\Model $folder
+     * @param string|null  $now
      * @throws ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
@@ -109,9 +110,13 @@ class Controller extends Web\Controller\Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \UnderflowException
      */
-    public function getReport(User $user, Folder\Model $folder): void
+    public function getReport(User $user, Folder\Model $folder, ?string $now): void
     {
-        $attributes = $this->deriveStudentAttributes($user, $this->getRequest()->query);
+        $attributes = new StudentAttributes(
+            $user,
+            $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
+            $now
+        );
 
         $errors = [];
 
@@ -171,24 +176,6 @@ class Controller extends Web\Controller\Base
         $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 
         $this->getResponse()->content->set($output);
-    }
-
-
-    /**
-     * Helper to derive relevant student attributes
-     *
-     * @param User           $user
-     * @param Request\Values $query
-     * @return StudentAttributes
-     * @throws \InvalidArgumentException
-     */
-    private function deriveStudentAttributes(User $user, Request\Values $query): StudentAttributes
-    {
-        return new StudentAttributes(
-            $user,
-            $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
-            $query->get('now')
-        );
     }
 
 

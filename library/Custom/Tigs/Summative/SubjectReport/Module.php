@@ -14,7 +14,9 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
+use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Permission\Access\Access;
@@ -53,7 +55,7 @@ class Module extends Alaress\Module\Module
 
         $canSeeSubjectReport = $this->buildRuleCanViewSubjectReport();
 
-        $this->register('GET', '/{userId}/folder/{folderId}', 'getReport', $canSeeSubjectReport, $preloadUserAndFolder);
+        $this->register('GET', '/{userId}/folder/{folderId}{/now}', 'getReport', $canSeeSubjectReport, $preloadUserAndFolder);
     }
 
 
@@ -199,7 +201,7 @@ class Module extends Alaress\Module\Module
                     // User must be enrolled in the specified folder
                     /** @var User $user */
                     $user = $params['user'];
-                    if (!$this->isUserEnrolledInFolder($user, $folder)) {
+                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null)) {
                         throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
                     }
                 }),
@@ -225,10 +227,41 @@ class Module extends Alaress\Module\Module
      *
      * @param User         $user
      * @param Folder\Model $folder
+     * @param string|null  $now
      * @return bool
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws UnexpectedValueException
+     * @throws InvalidPath
      */
-    private function isUserEnrolledInFolder(User $user, Folder\Model $folder): bool
+    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $now): bool
     {
+        if ($now !== null) {
+            // This is pretty heavy, but exists primarily for testing. It is (hopefully) unlikely the client
+            // will ever attempt to reconstruct historical views
+            try {
+                $attributes = new StudentAttributes($user, null, $now);
+            } catch (InvalidArgumentException $e) {
+                throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$now}", 0, $e);
+            }
+            $term = $this->getTermMapper()
+                ->createModel()
+                ->setStart($attributes->getCurriculumSemesterStart())
+                ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+                ->setActualFinish($attributes->getCurriculumSemesterFinish());
+            $withResponses = $this->getFolderMapper()->findFoldersWithResponses($user, $term);
+            $withFeedback = $this->getFolderMapper()->findFoldersWithFeedbackToStudent($user, $term);
+            $folderList = $withResponses->mergeUnique($withFeedback, $this->getFolderMapper()->getIdentifierProperty());
+            /** @var Folder\Model $involvedFolder */
+            foreach ($folderList as $involvedFolder) {
+                if ($involvedFolder->getId() === $folder->getId()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         foreach ($this->getExternalUser()->getSubjectList($user) as $subject) {
             foreach ($folder->getCodes() as $code) {
                 if ($code->getCode() === $subject['code']) {
@@ -258,4 +291,14 @@ class Module extends Alaress\Module\Module
     {
         return $this->getMapperFactory()->get(Folder\Mapper::class);
     }
+
+    /**
+     * @return TermMapper|Mapper
+     * @throws InvalidArgumentException
+     */
+    private function getTermMapper(): TermMapper
+    {
+        return $this->getMapperFactory()->get(TermMapper::class);
+    }
 }
+

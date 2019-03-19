@@ -25,7 +25,6 @@ use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use External_UserInterface;
-use External_ClassInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use External_User;
@@ -36,9 +35,6 @@ class Controller extends Web\Controller\Base
 
     /** @var External_UserInterface|External_User */
     private $externalUser;
-
-    /** @var \External_ClassInterface|\External_Class */
-    private $externalClass;
 
     /** @var UserMapper */
     private $userMapper;
@@ -60,7 +56,6 @@ class Controller extends Web\Controller\Base
 
     /**
      * @param External_UserInterface $externalUser
-     * @param External_ClassInterface $externalClass
      * @param UserMapper             $userMapper
      * @param IConnector             $externalDatabase
      * @param PastoralMapper         $pastoralMapper
@@ -70,7 +65,6 @@ class Controller extends Web\Controller\Base
      */
     public function __construct(
         External_UserInterface $externalUser,
-        External_ClassInterface $externalClass,
         UserMapper $userMapper,
         IConnector $externalDatabase,
         PastoralMapper $pastoralMapper,
@@ -79,7 +73,6 @@ class Controller extends Web\Controller\Base
         AssessmentMapper $assessmentMapper
     ) {
         $this->externalUser     = $externalUser;
-        $this->externalClass    = $externalClass;
         $this->userMapper       = $userMapper;
         $this->externalDatabase = $externalDatabase;
         $this->pastoralMapper   = $pastoralMapper;
@@ -371,7 +364,7 @@ class Controller extends Web\Controller\Base
             return \strnatcmp($a->getName(), $b->getName());
         }, true);
 
-        $excluded = \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+        $excluded = \array_map('trim', \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
         $subjects = [];
         foreach ($folders as $folder) {
             $codes = $this->getFolderCodes($folder, $getCurrent);

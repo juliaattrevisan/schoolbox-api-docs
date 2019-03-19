@@ -83,7 +83,6 @@ class Module extends Alaress\Module\Module
     {
         $injector->params[Controller::class] = [
             'externalUser'     => $injector->lazyGet('externalUser'),
-            'externalClass'    => $injector->lazyGet('externalClass'),
             'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
             'pastoralMapper'   => $this->getMapperFactory()->getLazy(PastoralMapper::class),
             'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
