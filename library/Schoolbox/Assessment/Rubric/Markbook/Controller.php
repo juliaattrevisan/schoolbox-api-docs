@@ -297,6 +297,14 @@ class Controller extends Base
 
         }
 
+        usort(
+            $students,
+            function ($a, $b) {
+                return strnatcmp($a['lastname'], $b['lastname']);
+            }
+        );
+
         return $students;
     }
+
 }
