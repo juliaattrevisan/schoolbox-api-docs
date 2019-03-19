@@ -52,7 +52,9 @@
                             <th>
                                 <div>
                                     <span>
-                                        <span>{{ student.lastname ~ ', ' ~ student.firstname}}</span>
+                                        <a href="{{ student.profileLink }}">
+                                            {{ student.lastname ~ ', ' ~ student.firstname}}
+                                        </a>
                                     </span>
                                 </div>
                             </th>

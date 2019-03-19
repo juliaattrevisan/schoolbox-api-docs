@@ -203,7 +203,8 @@ class Controller extends Base
             $students[$row['student_id']] = [
                 'firstname' => $row['student_firstname'],
                 'lastname' => $row['student_lastname'],
-                'assessments' => $assessmentsForStudent
+                'assessments' => $assessmentsForStudent,
+                'profileLink' => '/search/user/' . $row['student_id']
             ];
 
             $lastObservedAssessmentId = $row['assessment_id'];
