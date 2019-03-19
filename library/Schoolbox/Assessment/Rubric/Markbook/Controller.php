@@ -154,10 +154,10 @@ class Controller extends Base
             FROM       v_rubric_mark vrm
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
-            INNER JOIN assessment a ON a.id = vmrf.assessment_id
             INNER JOIN user u ON u.id = vrm.student_id
+            INNER JOIN assessment a ON a.id = var.assessment_id
             WHERE      var.folder_id=:folderId AND vrm.feedback_type='instructor' AND a.deleted_at IS NULL
-            ORDER BY vmrf.student_id, var.assessment_id"
+            ORDER BY vrm.student_id, var.assessment_id"
         );
 
         $getAuthoritativeMarksInFolderQuery->execute(['folderId' => $folderId]);
