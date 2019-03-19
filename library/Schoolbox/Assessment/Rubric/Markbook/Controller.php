@@ -135,7 +135,14 @@ class Controller extends Base
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
         }
-        
+
+        usort(
+            $assessments,
+            function ($a, $b) {
+                return strnatcmp($a['name'], $b['name']);
+            }
+        );
+
         return $assessments;
     }
 
