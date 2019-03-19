@@ -10,6 +10,7 @@ namespace Alaress\Scheduler\Trigger;
 
 
 use Alaress\Scheduler\Event\EventInterface;
+use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 
 abstract class AbstractTrigger implements TriggerInterface {
 
@@ -68,9 +69,10 @@ abstract class AbstractTrigger implements TriggerInterface {
      */
     public function getEventObjectId(): string
     {
-        $object = $this->getEvent()->getObject();
-        if (method_exists($object, 'getId')) {
-            return sprintf("%s:%s", get_class($object), $object->getId());
+        $object      = $this->getEvent()->getObject();
+        $getIdMethod = $this->determineGetIdMethod();
+        if (method_exists($object, $getIdMethod)) {
+            return sprintf("%s:%s", get_class($object), $object->$getIdMethod());
         }
         return '';
     }
@@ -83,10 +85,11 @@ abstract class AbstractTrigger implements TriggerInterface {
      */
     public function getEventObjectHash(): string
     {
-        $object = $this->getEvent()->getObject();
-        $key = sprintf("%s:%s", get_class($object), $this->getLabel());
-        if (method_exists($object, 'getId')) {
-            $key .= sha1(sprintf("%s:%s", get_class($object), $object->getId()));
+        $object      = $this->getEvent()->getObject();
+        $getIdMethod = $this->determineGetIdMethod();
+        $key         = sprintf("%s:%s", get_class($object), $this->getLabel());
+        if (method_exists($object, $getIdMethod)) {
+            $key .= sha1(sprintf("%s:%s", get_class($object), $object->$getIdMethod()));
         } else {
             // fall back to using the SPL hash if there's no available ID
             $key .= spl_object_hash($object);
@@ -94,4 +97,18 @@ abstract class AbstractTrigger implements TriggerInterface {
         return $key;
     }
 
+    /**
+     * What method can I use to get the ID of this trigger's object?
+     *
+     * @return string
+     */
+    private function determineGetIdMethod(): string
+    {
+        $event       = $this->getEvent();
+        $getIdMethod = 'getId';
+        if ($event instanceof CrudEventInterface && $event->getMapper()->hasIdentifier()) {
+            $getIdMethod = $event->getMapper()->getGetIdentifierMethodName();
+        }
+        return $getIdMethod;
+    }
 }
