@@ -125,6 +125,7 @@ class Controller extends Base
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
+                'statusLink' => '/learning/assessments/' . $row['assessment_id'] . '/status',
                 'maxMark' => $row['assessment_max_mark'],
                 'markType' => $row['assessment_mark_type'],
                 'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
