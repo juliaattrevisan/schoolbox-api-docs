@@ -546,7 +546,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 )
             ";
         } else {
-            // TODO first check if pastoral record with this externalID exists
+            // Don't try to update anything if the pastoral record cannot be found in synergetic
+            if (! $this->checkPastoralRecordExists($pastoral->getExternalId())) {
+                return;
+            }
 
             $query = "
                 UPDATE      tPastoralCare 
@@ -624,7 +627,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         foreach ($access as $accessRecord) {
             $user = $accessRecord->getUser();
             if ($user instanceof User) {
-                if ($this->isExternalIdValid($user->getExternalId())) {
+                if ($this->isExternalIdValid($user->getExternalId()) && $this->checkPastoralRecordExists($pastoral->getExternalId())) {
                     $query = "
                         INSERT INTO PastoralCareContacts
                         (
@@ -659,6 +662,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         return true;
     }
 
+    private function checkPastoralRecordExists(int $externalId) {
+        $query = "SELECT COUNT(*) FROM tPastoralCare WHERE PastoralCareSeq = :externalId";
+        $result = $this->connector->executeQuery($query, ['externalId' => $externalId]);
+        return $result->fetchColumn();
+    }
+
     // Comment synchronization
 
     /**
@@ -684,14 +693,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
-        // Can only do this if the pastoral record has an external ID
-        if (!$this->isExternalIdValid($pastoral->getExternalId()) || !$this->isExternalIdValid($owner->getExternalId())) {
+        // Can only do this if the pastoral record exists in synergetic, and has an external ID
+        if (!$this->checkPastoralRecordExists($pastoral->getExternalId())
+            || !$this->isExternalIdValid($pastoral->getExternalId())
+            || !$this->isExternalIdValid($owner->getExternalId())) {
             return false;
         }
 
-        // Execute the query
-
-        // TODO first check if pastoral record with this externalID exists
         $query =
             "
             INSERT INTO PastoralCareComments 
