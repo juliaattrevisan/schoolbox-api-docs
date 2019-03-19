@@ -228,6 +228,9 @@ class Controller extends Base
         foreach($students as $studentId => $student) {
 
             foreach($student['assessments'] as $assessmentId => $assessmentMarks) {
+                $summaryLink = '/learning/assessments/' . $assessmentId . '/' . $studentId;
+                $students[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
+
                 $assessmentMaxMark = $assessmentsInFolder[$assessmentId]['maxMark'];
                 $assessmentMarkType = $assessmentsInFolder[$assessmentId]['markType'];
                 $assessmentUsesMarkPerCap = $assessmentsInFolder[$assessmentId]['usesMarkPerCap'];

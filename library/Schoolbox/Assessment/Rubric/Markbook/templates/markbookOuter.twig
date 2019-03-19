@@ -39,6 +39,14 @@
         border-right: 1px solid #ededed;
         font-weight: normal;
     }
+
+    .rubric-marksheet tr.capability td a, .rubric-marksheet tr.indicator td a {
+        color: black;
+    }
+
+    .rubric-marksheet tr.capability td a:hover, .rubric-marksheet tr.indicator td a:hover {
+        color: #0066b0;
+    }
 </style>
 {% if studentMarks|length %}
     <div class="row">
@@ -91,8 +99,9 @@
 
                                 {% for studentId, student in studentMarks %}
                                     {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
+                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
                                     <td>
-                                        {{ capabilityMark|default('-') }}
+                                        <a href="{{ summaryLink }}">{{ capabilityMark|default('-') }}</a>
                                     </td>
                                 {% endfor %}
                             </tr>
@@ -107,8 +116,9 @@
                                     {% for studentId, student in studentMarks %}
                                         {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
                                         {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                        {% set summaryLink = student.assessments[assessmentId].summaryLink %}
                                         <td title="{{ descriptorText|default('-No descriptor text-') }}">
-                                            {{ indicatorMark|default('-') }}
+                                            <a href="{{ summaryLink }}">{{ indicatorMark|default('-') }}</a>
                                         </td>
                                     {% endfor %}
                                 </tr>
