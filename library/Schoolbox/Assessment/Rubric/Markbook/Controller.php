@@ -88,7 +88,7 @@ class Controller extends Base
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN assessment a ON a.id = vrm.assessment_id
             INNER JOIN submission_box sb ON sb.assessment_id = vrm.assessment_id
-            WHERE      var.folder_id=:folderId"
+            WHERE      var.folder_id=:folderId AND a.deleted_at IS NULL"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
