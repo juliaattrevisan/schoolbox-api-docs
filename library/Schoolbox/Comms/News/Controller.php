@@ -1300,7 +1300,8 @@ class Controller extends Base
             ->setTitle($postData['title'])
             ->setBody($postData['body'])
             ->setBlurb($postData['blurb'])
-            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']));
+            ->setTopics($this->topicMapper->findByColumn('newsTopicID', $postData['topics']))
+            ->setCommentsAllowed((bool) $postData['commentsAllowed']);
 
         // Only set comments allowed if the value is passed in the form,
         // and the feature is enabled

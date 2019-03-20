@@ -301,6 +301,20 @@
                         <input type="text" name="expiresAt" id="expiresAt" data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" />
                     </div>
                 </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 large-12 columns">
+                        <label for="commentsAllowed">Allow comments</label>
+                        <p class="meta">If enabled, users that can read this {{ locale.news }} will have the ability to post a comment.</p>
+                        <div class="switch">
+                            <input type="checkbox" id="commentsAllowed" name="commentsAllowed" value="1" {% if article.commentsAllowed %} checked {% endif %} />
+                            <label for="commentsAllowed">
+                                <span>Yes</span>
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
             </section>
 
             <div class="row">
@@ -454,7 +468,7 @@
         {% if isAutoSavable %}
             // Init draft plugin
             $createForm.draft({
-                inputs: ['#news-title', '#audience-search', '#news-topics'],
+                inputs: ['#news-title', '#audience-search', '#news-topics', '#commentsAllowed'],
                 textareas: ['body', 'blurb'],
                 attachzones: ['#{{ featureImageZone.id }}-zone'],
                 datepickers: ['#publishAt', '#expiresAt'],
