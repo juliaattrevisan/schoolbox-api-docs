@@ -662,10 +662,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         return true;
     }
 
-    private function checkPastoralRecordExists(int $externalId) {
+    /**
+     * @param int $externalId
+     * @return boolean
+     */
+    private function checkPastoralRecordExists(int $externalId) : bool
+    {
         $query = "SELECT COUNT(*) FROM tPastoralCare WHERE PastoralCareSeq = :externalId";
         $result = $this->connector->executeQuery($query, ['externalId' => $externalId]);
-        return $result->fetchColumn();
+        return (bool)$result->fetchColumn();
     }
 
     // Comment synchronization
