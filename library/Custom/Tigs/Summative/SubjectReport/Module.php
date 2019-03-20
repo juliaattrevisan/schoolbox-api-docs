@@ -198,6 +198,15 @@ class Module extends Alaress\Module\Module
                         throw new InvalidPath("Folder does not exist in SB");
                     }
 
+                    // Check excluded folder codes from reporting
+                    if ($folder->getCodes() && $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)) {
+                        $excluded = \array_map('trim', \explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
+                        if (!empty(\array_intersect($folder->getCodes()->getPropertyValues('code'), $excluded))) {
+                            // Folder is in exclusion list
+                            throw new InvalidPath("Folder is excluded");
+                        }
+                    }
+
                     // User must be enrolled in the specified folder
                     /** @var User $user */
                     $user = $params['user'];
