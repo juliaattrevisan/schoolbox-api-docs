@@ -40,7 +40,7 @@
 }
 
 .title-section {
-    align-items: baseline;
+    align-items: flex-start;
     display: flex;
     margin-bottom: 1rem;
 
@@ -50,7 +50,10 @@
     }
     .label {
         flex: 0 auto;
-        margin: 0 0 0 2rem;
+        margin: ($h1-font-size * .3) 0 0 2rem;
+        @media #{$small-only} {
+            margin-top: ($h1-font-size - $h1-font-reduction) * .3;
+        }
     }
 }
 
