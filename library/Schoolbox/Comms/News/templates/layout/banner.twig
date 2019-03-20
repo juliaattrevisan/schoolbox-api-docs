@@ -16,7 +16,7 @@
         {# TODO this metadata should be in a span tag, but that causes the audience-container to flip out #}
         <div class="meta">
             {# Topics #}
-            <span>By {{ article.author.fullName }}</span>
+            <span>By <a href="/search/user/{{ article.author.id }}">{{ article.author.fullName }}</a></span>
             <span> &mdash; {{ article.publishAt.short }}</span>
             {% if article.topics|length %}
                 <span>in
