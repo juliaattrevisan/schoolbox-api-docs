@@ -71,25 +71,28 @@
             </div>
         </div>
 
-        {% if article.commentsAllowed %}
-            {% if article.public %}
-                <form action="/" method="post">
-                    <label>
-                        <textarea id='comment-area' name='comment-area' rows="5"></textarea>
-                    </label>
-                    <input type="submit" value="Post" />
-                </form>
-            {% else %}
+            <template v-if="commentsEnabled">
+                <template v-if="isPublished">
+                    <form action="/" method="post">
+                        <label>
+                            <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+                        </label>
+                        <input type="submit" value="Post" />
+                    </form>
+                </template>
+                <template v-else>
+                    <div data-alert="" class="alert-box">
+                        <span class="icon-locked">Comments will be available once this article is published.</span>
+                    </div>
+                </template>
+            </template>
+            <template v-else>
+                <!-- Only show alert if comments are locked -->
                 <div data-alert="" class="alert-box">
-                    <span class="icon-locked">Comments will be available once this article is published.</span>
+                    <span class="icon-locked">Comments are currently disabled for this article.</span>
                 </div>
-            {% endif %}
-        {% else %}
-            <!-- Only show alert if comments are locked -->
-            <div data-alert="" class="alert-box">
-                <span class="icon-locked">Comments are currently disabled for this article.</span>
-            </div>
-        {% endif %}
+            </template>
+        </div>
 
         <ul class="information-list social-stream">
             <li class="actions-small-2">
@@ -158,3 +161,28 @@
         <A href="#" class="button expand" title="Load more">Load more</A>
     </section>
 </div>
+
+
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+{% autoescape 'js' %}
+<script>
+    var app = new Vue({
+        el: '#comments-section',
+        delimiters: ['${', '}'],
+        data: {
+            commentsCheckboxEnabled: '{{ (article.commentsAllowed) ? 'checked' : '' }}',
+            commentsEnabled: {{ (article.commentsAllowed == 'checked') ? true : false }},
+            isPublished: {{ article.isPublic }}
+        },
+        // define methods under the `methods` object
+        methods: {
+            enableDisableComments: function (event) {
+                this.$data.commentsEnabled = event.target.checked;
+            }
+        },
+        computed: {
+
+        }
+    })
+</script>
+{% endautoescape %}
