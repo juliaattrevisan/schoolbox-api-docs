@@ -40,12 +40,9 @@
         font-weight: normal;
     }
 
-    .rubric-marksheet tr.capability td a, .rubric-marksheet tr.indicator td a {
-        /*color: black;*/
-    }
-
-    .rubric-marksheet tr.capability td a:hover, .rubric-marksheet tr.indicator td a:hover {
-        /*color: #0066b0;*/
+    .rubric-marksheet a.noMark {
+        padding: 1.25rem;
+        color: black;
     }
 </style>
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -110,7 +107,7 @@
                                     {% endif %}
 
                                     <td>
-                                        <a href="{{ summaryLink }}" class="{{ gradientClass }}">{{ capabilityMark|default('-') }}</a>
+                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'noMark' }}">{{ capabilityMark|default('-') }}</a>
                                     </td>
                                 {% endfor %}
                             </tr>
@@ -134,7 +131,7 @@
                                         {% endif %}
 
                                         <td title="{{ descriptorText|default('-No descriptor text-') }}">
-                                            <a href="{{ summaryLink }}" class="{{ gradientClass }}">{{ indicatorMark|default('-') }}</a>
+                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'noMark' }}">{{ indicatorMark|default('-') }}</a>
                                         </td>
                                     {% endfor %}
                                 </tr>
