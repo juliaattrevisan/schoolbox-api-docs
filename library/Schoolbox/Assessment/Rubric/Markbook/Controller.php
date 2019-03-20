@@ -290,7 +290,9 @@ class Controller extends Base
                     $capabilityMarkModel->setValue($capabilityNormalisedMark);
 
                     $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
+                    $percentageCapabilityMark = $capabilityMarkModel->retrieveNormalizedMark();
                     $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['percentageMark'] = $percentageCapabilityMark;
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                         $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
@@ -301,7 +303,9 @@ class Controller extends Base
                         // No need for creating all the models in order to calculate it -
                         // and indeed the overhead in doing so is prohibitive
                         $humanReadableIndicatorMark = $indicatorNormalisedMark ? round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark) : null;
+                        $percentageIndicatorMark = $indicatorNormalisedMark ? ($indicatorNormalisedMark / $indicatorMaxMark) * 100 : null;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['percentageMark'] = $percentageIndicatorMark;
                     }
                 }
             }
