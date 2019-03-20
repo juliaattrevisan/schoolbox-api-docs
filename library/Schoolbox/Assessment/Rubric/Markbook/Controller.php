@@ -167,7 +167,7 @@ class Controller extends Base
             INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id
             INNER JOIN user u ON u.id = vrm.student_id
             INNER JOIN assessment a ON a.id = var.assessment_id
-            WHERE      var.folder_id=:folderId AND vrm.feedback_type='instructor' AND a.deleted_at IS NULL
+            WHERE      var.folder_id=:folderId AND vrm.feedback_type='instructor' AND vrm.feedback_deleted_at IS NULL AND a.deleted_at IS NULL
             ORDER BY vrm.student_id, var.assessment_id"
         );
 
