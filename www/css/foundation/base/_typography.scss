@@ -160,6 +160,7 @@ a{
 .meta{
 	@include contrast-bg();
 	margin: 0 0 rem-calc(($base-font-size - 10)) 0;
+	font-size: $paragraph-font-size;
 	font-style: italic;
 	&.title {
 	    color: $black !important;

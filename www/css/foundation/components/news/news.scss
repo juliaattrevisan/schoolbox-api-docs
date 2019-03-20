@@ -4,12 +4,19 @@
         justify-content: center;
         margin-bottom: 0;
     }
+    .banner img {
+        align-self: center;
+    }
     .article,
     .comments {
         margin: 0 auto;
         max-width: 45rem;
     }
-    .article .meta {
+    .article h1 {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    .article > .meta {
         border-bottom: 1px solid #9a9a9a;
         margin: 0 0 2rem;
         padding-bottom: .5rem;
@@ -22,6 +29,31 @@
     .comments .checklist {
         display: flex;
         flex-flow: row-reverse;
+    }
+    // Padding
+    .content:first-child {
+        padding-top: 1.5rem;
+    }
+    .content:last-child {
+        padding-bottom: 1.5rem;
+    }
+}
+
+.title-section {
+    align-items: flex-start;
+    display: flex;
+    margin-bottom: 1rem;
+
+    h1 {
+        flex: 1 auto;
+        margin-bottom: 0;
+    }
+    .label {
+        flex: 0 auto;
+        margin: ($h1-font-size * .3) 0 0 2rem;
+        @media #{$small-only} {
+            margin-top: ($h1-font-size - $h1-font-reduction) * .3;
+        }
     }
 }
 
