@@ -302,8 +302,14 @@ class Controller extends Base
                         // This is always just a "total mark" type, so we can work this out ourselves
                         // No need for creating all the models in order to calculate it -
                         // and indeed the overhead in doing so is prohibitive
-                        $humanReadableIndicatorMark = $indicatorNormalisedMark ? round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark) : null;
-                        $percentageIndicatorMark = $indicatorNormalisedMark ? ($indicatorNormalisedMark / $indicatorMaxMark) * 100 : null;
+                        $humanReadableIndicatorMark = $indicatorNormalisedMark !== null ?
+                            round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark) :
+                            null;
+                        $percentageIndicatorMark = $indicatorMaxMark !== 0
+                            && $indicatorMaxMark !== null
+                            && $indicatorNormalisedMark !== null ?
+                            ($indicatorNormalisedMark / $indicatorMaxMark) * 100 :
+                            null;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['percentageMark'] = $percentageIndicatorMark;
                     }
