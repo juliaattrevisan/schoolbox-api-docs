@@ -90,6 +90,7 @@ interface IConnector extends IQuoter
      * @param string $sql
      * @param null|array $parameters
      * @return IQuery
+     * @throws \Alaress\Database\Exception
      */
     public function executeQuery($sql, $parameters = null);
 
