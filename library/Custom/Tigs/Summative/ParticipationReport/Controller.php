@@ -12,12 +12,18 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
@@ -39,18 +45,40 @@ class Controller extends Web\Controller\Base
     /** @var PastoralMapper $pastoralMapper */
     private $pastoralMapper;
 
+    /** @var FolderMapper $folderMapper */
+    private $folderMapper;
+
+    /** @var TermMapper $termMapper */
+    private $termMapper;
+
+    /** @var AssessmentMapper $assessmentMapper */
+    private $assessmentMapper;
+
     /**
      * @param External_UserInterface $externalUser
      * @param UserMapper             $userMapper
      * @param IConnector             $externalDatabase
      * @param PastoralMapper         $pastoralMapper
+     * @param FolderMapper           $folderMapper
+     * @param TermMapper             $termMapper
+     * @param AssessmentMapper       $assessmentMapper
      */
-    public function __construct(External_UserInterface $externalUser, UserMapper $userMapper, IConnector $externalDatabase, PastoralMapper $pastoralMapper)
-    {
+    public function __construct(
+        External_UserInterface $externalUser,
+        UserMapper $userMapper,
+        IConnector $externalDatabase,
+        PastoralMapper $pastoralMapper,
+        FolderMapper $folderMapper,
+        TermMapper $termMapper,
+        AssessmentMapper $assessmentMapper
+    ) {
         $this->externalUser     = $externalUser;
         $this->userMapper       = $userMapper;
         $this->externalDatabase = $externalDatabase;
         $this->pastoralMapper   = $pastoralMapper;
+        $this->folderMapper     = $folderMapper;
+        $this->termMapper       = $termMapper;
+        $this->assessmentMapper = $assessmentMapper;
     }
 
 
@@ -59,26 +87,27 @@ class Controller extends Web\Controller\Base
      *
      * @api   GET /modules/custom/tigs/summative/participation/user/{userId}
      * @level 18.1.0
-     * @param User $user
-     * @throws ServiceNotFound
+     * @param User        $user
+     * @param string|null $now
+     * @throws Exception
      * @throws InvalidArgumentException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws ServiceNotFound
      * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
      */
-    public function getReport(User $user): void
+    public function getReport(User $user, ?string $now): void
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
-
-        $attributes = new StudentAttributes(
-            $user,
-            $externalStudent['StudentIBFlag'],
-            $this->getRequest()->query->get('now')
-        );
+        $attributes      = new StudentAttributes($user, $externalStudent['StudentIBFlag'], $now);
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
+        $subjectList   = $this->getSubjectList($user, $attributes, \is_null($now));
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes);
 
@@ -91,8 +120,10 @@ class Controller extends Web\Controller\Base
             'awards'        => $awards,
             'houseEvents'   => $houseEvents,
             'absences'      => $absences,
+            'subjects'      => $subjectList,
             'deansComments' => $deansComments,
             'explanation'   => $explanation,
+            'nowOverride'   => $now,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -308,6 +339,196 @@ class Controller extends Web\Controller\Base
 
         return $absenceCounts;
 
+    }
+
+
+    /**
+     * Returns subject list for report
+     *
+     * @param User              $user
+     * @param StudentAttributes $attributes
+     * @param bool       $getCurrent
+     * @return array
+     * @throws Exception
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnderflowException
+     * @throws \DomainException
+     */
+    private function getSubjectList(User $user, StudentAttributes $attributes, bool $getCurrent): array
+    {
+        $folders = $this->findEnrolledFolders($user, $attributes, $getCurrent);
+
+        $folders->sortByCallback(function (Folder\Model $a, Folder\Model $b): int {
+            return \strnatcmp($a->getName(), $b->getName());
+        }, true);
+
+        $excluded = \array_map('trim', \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
+        $subjects = [];
+        foreach ($folders as $folder) {
+            $codes = $this->getFolderCodes($folder, $getCurrent);
+            if (!empty(\array_intersect($codes, $excluded))) {
+                // Folder is in exclusion list
+                continue;
+            }
+
+            $this->loadTeachers($folder, $attributes, $getCurrent);
+            $subjects[] = [
+                'name'     => $folder->getName(),
+                'codes'    => $folder->getCodes()->getPropertyValues('code'),
+                'folderId' => $folder->getId(),
+                'teachers' => $folder->getTeachers(),
+            ];
+        }
+
+        return $subjects;
+    }
+
+
+    /**
+     * Returns the user's folders for the report's period
+     *
+     * @param User $user
+     * @param StudentAttributes $attributes
+     * @param bool $getCurrent
+     * @return Collection|Folder\Model[]
+     * @throws Exception
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     */
+    private function findEnrolledFolders(User $user, StudentAttributes $attributes, bool $getCurrent): Collection
+    {
+        if ($getCurrent) {
+            // Use current enrollment
+            return $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($user));
+        }
+        // Use historical interaction enrollment
+        $term = $this->termMapper->createModel()
+            ->setStart($attributes->getCurriculumSemesterStart())
+            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+            ->setActualFinish($attributes->getCurriculumSemesterFinish());
+        $folderList = $this->folderMapper->findFoldersWithResponses($user, $term);
+        return $folderList->mergeUnique(
+            $this->folderMapper->findFoldersWithFeedbackToStudent($user, $term),
+            $this->folderMapper->getIdentifierProperty());
+    }
+
+
+    /**
+     * Returns all folder codes for a folder, including archived codes in the folder name
+     *
+     * @param Folder\Model $folder
+     * @param bool $getCurrent
+     * @return array
+     */
+    private function getFolderCodes(Folder\Model $folder, bool $getCurrent): array
+    {
+        $codes = $folder->getCodes()->getPropertyValues('code');
+
+        // If looking at historical, also fetch archived codes from folder name
+        if ($getCurrent) {
+            return $codes;
+        }
+
+        // Extract, eg 'CODE' from 'Folder name with archived [CODE]'
+        if (\preg_match('/\[([^\]]+)\]/', $folder->getName(), $matches)) {
+            \array_shift($matches);
+            $codes = \array_merge($codes, $matches);
+        }
+
+        return $codes;
+    }
+
+
+    /**
+     * Loads teachers onto folder model
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param bool $getCurrent
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \UnderflowException
+     */
+    private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes, bool $getCurrent): void
+    {
+        if ($getCurrent) {
+            // If viewing current, just use SIS values
+            $folder->loadTeachers();
+            return;
+        }
+
+        // If viewing historical, load teachers who gave feedback
+        $assessments = $this->findAssessmentsForFolderAndReport($folder, $attributes);
+        if (!$assessments->count()) {
+            return;
+        }
+
+        $userIds = $this->findTeachersWhoGaveFeedback($assessments);
+        if (!\count($userIds)) {
+            return;
+        }
+
+        $folder->setTeachers($this->userMapper->findByColumn($this->userMapper->getIdentifierColumn(), $userIds));
+    }
+
+
+    /**
+     * Returns a set of assessments that belong to a folder and are due within the report's time period
+     *
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @return Collection
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    private function findAssessmentsForFolderAndReport(Folder\Model $folder, StudentAttributes $attributes): Collection
+    {
+        // Load all users who gave feedback to assessments due during report period
+        $dueDatePb = $this->assessmentMapper->getPredicateBuilder()
+            ->greaterThanOrEqualTo('due_date', $attributes->getCurriculumSemesterStart())
+            ->lessThan('due_date', $attributes->getCurriculumSemesterFinish());
+
+        return $this->assessmentMapper->findAllForFolderId($folder->getId(), $dueDatePb);
+    }
+
+
+    /**
+     * Returns the ids of users who gave feedback to the set of assessments
+     *
+     * @param Collection $assessments
+     * @return int[]
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \UnderflowException
+     */
+    private function findTeachersWhoGaveFeedback(Collection $assessments): array
+    {
+        $pb = $this->assessmentMapper->getPredicateBuilder()
+            ->in('a.id', $assessments->getPropertyValues($this->assessmentMapper->getIdentifierProperty()));
+
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        $sql = "
+            SELECT tc.marking_user_id AS user_id
+            FROM assessment a
+            JOIN task t on a.id = t.assessment_id
+            JOIN task_completion tc on t.id = tc.task_id
+            WHERE {$whereClause}
+              UNION
+            SELECT aa.reviewer_id AS user_id
+            FROM assessment a
+            JOIN assess q ON q.assessment_id = a.id
+            JOIN assess_attempt aa
+            WHERE {$whereClause}
+              UNION
+            SELECT sr.marker AS user_id
+            FROM assessment a
+            JOIN submission_box sb on a.id = sb.assessment_id
+            JOIN submission_return sr on sb.id = sr.box_id
+            WHERE {$whereClause}
+        ";
+        return $this->folderMapper->getDatabase()->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
     }
 
 

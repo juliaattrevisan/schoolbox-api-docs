@@ -21,6 +21,10 @@ use UnexpectedValueException;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+
 
 class Module extends Alaress\Module\Module
 {
@@ -48,7 +52,7 @@ class Module extends Alaress\Module\Module
 
         $canSeeParticipationReport = $this->buildRuleCanViewReport();
 
-        $this->register('GET', '/user/{userId}', 'getReport', $canSeeParticipationReport, $preloadUser);
+        $this->register('GET', '/user/{userId}{/now}', 'getReport', $canSeeParticipationReport, $preloadUser);
     }
 
 
@@ -81,6 +85,9 @@ class Module extends Alaress\Module\Module
             'externalUser'     => $injector->lazyGet('externalUser'),
             'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
             'pastoralMapper'   => $this->getMapperFactory()->getLazy(PastoralMapper::class),
+            'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
+            'termMapper'       => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'assessmentMapper' => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
             'externalDatabase' => $injector->lazyGet('databaseExternal'),
         ];
     }
