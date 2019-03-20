@@ -37,10 +37,7 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <div class="title-section">
-            <h1>{{ action|capitalize }} {{ locale.news }}</h1>
-            {{ indicator.render(article) }}
-        </div>
+        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
         <ul class="meta">
             {% if article.acceptedBy.id %}
                 <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
