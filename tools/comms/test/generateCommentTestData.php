@@ -18,11 +18,12 @@ use Schoolbox\Discussion\Test\DataGenerator;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$opts   = getopt('', ['seed:']);
+$opts   = getopt('v', ['seed:']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Comment Test Data Generator',
     [
-        'seed' => $opts['seed'] ?? null,
+        'verbose' => $opts['v'] ?? [],
+        'seed'    => $opts['seed'] ?? null,
     ]
 );
 
@@ -52,6 +53,7 @@ $kernel->run(new class extends App {
     public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
     {
         $dataGenerator = new DataGenerator(
+            $log,
             Faker\Factory::create(),
             Schoolbox\UserMapper::getInstance(),
             Schoolbox\Comms\News\Mapper::getInstance(),
