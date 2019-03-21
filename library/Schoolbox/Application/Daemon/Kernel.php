@@ -217,7 +217,7 @@ EOL;
 
         try {
             global $argv;
-            $flags = implode(' ', array_slice($argv, 1));
+            $flags = \implode(' ', \array_slice($argv, 1));
             $callable($this->di, $this->loop, $this->logger(), $this->opts, $flags);
         } catch (\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
