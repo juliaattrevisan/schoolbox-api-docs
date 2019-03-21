@@ -71,7 +71,7 @@
             </div>
         </div>
 
-            <template v-if="commentsEnabled">
+            <template v-if="threadEnabled">
                 <template v-if="isPublished">
                     <form action="/" method="post">
                         <label>
@@ -161,23 +161,41 @@
         <A href="#" class="button expand" title="Load more">Load more</A>
     </section>
 </div>
-
+<div id='toaster' class="toast" data-toast></div>
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
+
+{# Don't bother if discussionThread.id is not set (For now) #}
+{% if modifyRoute and article.discussionThread.id %}
 {% autoescape 'js' %}
 <script>
+
+    var postHeaders = {
+        'X-Requested-With' : 'XMLHttpRequest',
+    }
+
     var app = new Vue({
         el: '#comments-section',
         delimiters: ['${', '}'],
         data: {
-            commentsCheckboxEnabled: '{{ (article.commentsAllowed) ? 'checked' : '' }}',
-            commentsEnabled: {{ (article.commentsAllowed == 'checked') ? true : false }},
+            threadCheckboxEnabled: '{{ (article.discussionThread.open) ? 'checked' : '' }}',
+            threadEnabled: {{ (article.discussionThread.open) ? 'true' : 'false' }},
             isPublished: {{ article.isPublic }}
         },
         // define methods under the `methods` object
         methods: {
             enableDisableComments: function (event) {
-                this.$data.commentsEnabled = event.target.checked;
+                this.$data.threadEnabled = event.target.checked;
+
+                var $toast = $('#toaster');
+                $toast.toastActivate({text: 'Saving...'});
+
+                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/enable', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
+                    $toast.toastTimeout({text: 'Saved', duration: 2000});
+                }).catch(function (error) {
+                    console.log(error);
+                    $toast.toastTimeout({text: 'Unable to save', duration: 2000, css: 'alert'});
+                });
             }
         },
         computed: {
@@ -186,3 +204,4 @@
     })
 </script>
 {% endautoescape %}
+{% endif %}
