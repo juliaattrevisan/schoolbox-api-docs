@@ -93,7 +93,10 @@ class Controller extends BaseController
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionPosts/list.twig', ['list' => $responseData])
+                : $this->buildUnthemedHtmlOutput(
+                    '@discussionPosts/list.twig',
+                    ['list' => $responseData, 'thread' => $thread]
+                )
         );
     }
 
