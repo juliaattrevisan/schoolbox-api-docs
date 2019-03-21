@@ -144,13 +144,9 @@ class Controller extends Base
             $lastObservedCapabilityId = $row['capability_id'];
         }
 
-        $oldAssessments = $assessments;
-
-
-
         uasort(
             $assessments,
-            function ($a, $b) {
+            function (array $a, array $b) : int {
                 return strnatcmp($a['name'], $b['name']);
             }
         );
@@ -328,7 +324,7 @@ class Controller extends Base
 
         uasort(
             $students,
-            function ($a, $b) {
+            function (array $a, array $b) : int {
                 return strnatcmp($a['lastname'], $b['lastname']);
             }
         );
