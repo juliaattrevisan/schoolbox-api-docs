@@ -8,7 +8,6 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\MarkScheme;
@@ -312,14 +311,14 @@ class Controller extends Base
                         // This is always just a "total mark" type, so we can work this out ourselves
                         // No need for creating all the models in order to calculate it -
                         // and indeed the overhead in doing so is prohibitive
-                        $humanReadableIndicatorMark = $indicatorNormalisedMark !== null ?
-                            round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark) :
-                            null;
+                        $humanReadableIndicatorMark = $indicatorNormalisedMark !== null
+                            ? round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark)
+                            : null;
                         $percentageIndicatorMark = $indicatorMaxMark !== 0
                             && $indicatorMaxMark !== null
-                            && $indicatorNormalisedMark !== null ?
-                            ($indicatorNormalisedMark / $indicatorMaxMark) * 100 :
-                            null;
+                            && $indicatorNormalisedMark !== null
+                            ? ($indicatorNormalisedMark / $indicatorMaxMark) * 100
+                            : null;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['percentageMark'] = $percentageIndicatorMark;
                     }
