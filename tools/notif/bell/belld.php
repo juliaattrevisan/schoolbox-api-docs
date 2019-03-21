@@ -29,7 +29,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
 
 
 // CREATE BELL APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     try {
         /** @var IConfigLoader $conf */

@@ -32,7 +32,7 @@ require __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // ROUTING APP
-$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, array $flags) {
+$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts, $flags) {
         try {
