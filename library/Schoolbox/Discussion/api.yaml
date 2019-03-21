@@ -100,11 +100,11 @@ paths:
           description: Enable / Disable the thread
         default:
           $ref: '#/components/responses/problem'
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/thread'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/thread'
     parameters:
       - $ref: '#/components/parameters/id'
 
