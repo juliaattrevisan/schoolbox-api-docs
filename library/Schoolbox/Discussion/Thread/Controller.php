@@ -84,19 +84,7 @@ class Controller extends BaseController
      */
     public function getPostsByThread(Model $thread): void
     {
-        $cursor        = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
-        $encodedCursor = $this->request->query->get('cursor');
-        $posts         = $cursor->retrieveResults($encodedCursor);
-        $responseData  = [
-            'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
-            'metadata' => [
-                'cursor' => [
-                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
-                    'next'    => $cursor->retrieveNextCursor($posts),
-                ]
-            ]
-        ];
-
+        $responseData = $this->retrievePostList($thread, $this->request->query->get('cursor'));
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
@@ -178,5 +166,28 @@ class Controller extends BaseController
             $this->jsonDecorator = new Decorator\PropertyDecorator(null, $this->retrieveLinkDecorator());
         }
         return $this->jsonDecorator;
+    }
+
+
+    /**
+     * Retrieve a list of posts as an array for later output.
+     *
+     * @param Model       $thread
+     * @param string|null $encodedCursor
+     * @return array
+     */
+    private function retrievePostList(Model $thread, ?string $encodedCursor): array
+    {
+        $cursor = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
+        $posts  = $cursor->retrieveResults($encodedCursor);
+        return [
+            'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'metadata' => [
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
+                    'next'    => $cursor->retrieveNextCursor($posts),
+                ]
+            ]
+        ];
     }
 }
