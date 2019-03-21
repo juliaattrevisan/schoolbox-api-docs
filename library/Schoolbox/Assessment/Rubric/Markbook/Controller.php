@@ -70,6 +70,12 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Find all the assessments for a given folder, and return them indexed by assessment ID
+     *
+     * @param int $folderId
+     * @return array
+     */
     private function retrieveAssessmentsInFolder(int $folderId) : array
     {
         $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
