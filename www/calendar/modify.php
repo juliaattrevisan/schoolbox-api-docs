@@ -1,6 +1,5 @@
 <?php
 
-use Schoolbox\Application\WebRequest;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 use Schoolbox\Permission\Access\UserAccess;
@@ -14,7 +13,7 @@ if (isset($this)) {
      */
 
     require_once __DIR__ . '/../../conf/core/require.php';
-    $kernel = new WebRequest\Kernel();
+    $kernel = new Schoolbox\Application\WebRequest\Kernel();
 
     /** @var SitePage $page */
     $page = $kernel->getDependencyInjector()->get('sitePage');
