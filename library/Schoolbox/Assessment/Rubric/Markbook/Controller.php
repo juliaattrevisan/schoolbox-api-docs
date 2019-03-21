@@ -238,6 +238,7 @@ class Controller extends Base
      * @return array
      * @param array $students
      * @param int $folderId
+     * @throws /Aura/Router/Exception/RouteNotFound
      */
     private function generateHumanReadableMarks(array $students, int $folderId) : array
     {
@@ -246,7 +247,10 @@ class Controller extends Base
         foreach($students as $studentId => $student) {
 
             foreach($student['assessments'] as $assessmentId => $assessmentMarks) {
-                $summaryLink = '/learning/assessments/' . $assessmentId . '/' . $studentId;
+                $summaryLink =  $this->getRouter()->generate(
+                    'learningAssessment.getSummary',
+                    ['studentId' => $studentId, 'assessmentId' => $assessmentId]
+                );
                 $students[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
 
                 $assessmentMaxMark = $assessmentsInFolder[$assessmentId]['maxMark'];
