@@ -52,6 +52,7 @@ $kernel->run(function (
     $importRecords      = isset($opts['add-records']);
     $importAttachments  = isset($opts['add-attachments']);
     $defaultOwnerId     = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
+    /** @var int|bool $userId The user conducting the import (used in logging) */
     $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
 
     /* Help
@@ -73,10 +74,6 @@ HELP;
 
         exit(0);
     }
-
-    /* The user conducting the import (used in logging)
-     */
-
 
     if (!$userId) {
         $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
