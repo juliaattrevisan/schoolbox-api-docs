@@ -57,6 +57,24 @@ class Controller extends BaseController
 
 
     /**
+     * Get a thread, including its most recent comments.
+     *
+     * @api   GET /threads/{id}
+     * @level 190
+     *
+     * @param Model $thread
+     */
+    public function getThread(Model $thread): void
+    {
+        $this->response->content->set(
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($thread)
+                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $thread])
+        );
+    }
+
+
+    /**
      * Get a list of posts in the given thread.
      *
      * @api   GET /threads/{id}/posts
