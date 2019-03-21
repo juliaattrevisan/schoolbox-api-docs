@@ -14,7 +14,7 @@ const NewsCardList: React.FunctionComponent<INewsCardList> = ({ articles }) => {
         <Card
           key={article.id}
           id={article.id}
-          title={article.title}
+          title={article.title ? article.title : '(untitled)'}
           meta={generateMeta(article)}
           href={article._links.self.href}
           actions={generateCardActions(article)}
