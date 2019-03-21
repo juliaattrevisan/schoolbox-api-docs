@@ -24,7 +24,7 @@ use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel('Pastoral Export', [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::CRITICAL]);
+$kernel = new Daemon\Kernel('Pastoral Export');
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 
