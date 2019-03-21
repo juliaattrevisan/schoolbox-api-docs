@@ -105,9 +105,18 @@ class Grid
      */
     public function calculateMaxValueFromCapabilities(): float
     {
+        // Ignore max value for cap usage, if it's not mark per capability
+        $useMarkPerCapability = false;
+        if ($this->assessment instanceof DueWork && $this->assessment->getMarkPerCapability()) {
+            $useMarkPerCapability = true;
+        }
+
         $maxValues = [];
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            $capabilityUsageMaxValue = $capabilityUsage->getMaxValue();
+            $capabilityUsageMaxValue =
+                $useMarkPerCapability
+                    ? $capabilityUsage->getMaxValue()
+                    : $capabilityUsage->calculateMaxValueFromIndicators();
             if (null !== $capabilityUsageMaxValue) {
                 $maxValues[] = $capabilityUsageMaxValue;
             }
