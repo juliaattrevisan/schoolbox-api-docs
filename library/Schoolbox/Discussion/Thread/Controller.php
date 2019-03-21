@@ -11,6 +11,7 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Post;
+use Schoolbox\Forum\Thread;
 use Schoolbox\Json\Decorator\LinkDecorator;
 
 /**
@@ -37,13 +38,20 @@ class Controller extends BaseController
 
 
     /**
+     * @var Mapper
+     */
+    private $threadMapper;
+
+
+    /**
      * Constructor
      *
      * @param Post\Mapper $postMapper
      */
-    public function __construct(Post\Mapper $postMapper)
+    public function __construct(Post\Mapper $postMapper, Mapper $threadMapper)
     {
         $this->postMapper = $postMapper;
+        $this->threadMapper = $threadMapper;
     }
 
 
@@ -103,6 +111,22 @@ class Controller extends BaseController
                 ? $this->buildJsonOutput($responseData)
                 : $this->buildUnthemedHtmlOutput('@discussionPosts/item.twig', ['item' => $responseData])
         );
+    }
+
+    /**
+     * @api   PUT /threads/{id}/enable
+     * @param Model $thread
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function enableDisableThread(Model $thread): void
+    {
+        $data = $this->request->content->get();
+        $thread->setOpen((bool) $data->threadEnabled);
+
+        $this->threadMapper->save($thread);
+
+        $this->getResponse()->content->set($this->buildJsonOutput('success'));
     }
 
 
