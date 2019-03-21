@@ -216,9 +216,20 @@ class Grid extends TestCase
         $groupUsage1->getIndicatorUsages()[$indicator1->getId()] = $indicatorUsage1;
         $groupUsage1->getIndicatorUsages()[$indicator2->getId()] = $indicatorUsage2;
 
+        // Max values from descriptor:
+        // indicator 1: 2
+        // indicator 2: 3
+        // indicator 6: 5
+        $indicatorUsage1->getDescriptors()[1]                    = (new RubricGrid\Descriptor())->setMaxValue(1);
+        $indicatorUsage1->getDescriptors()[2]                    = (new RubricGrid\Descriptor())->setMaxValue(2);
+        $indicatorUsage2->getDescriptors()[1]                    = (new RubricGrid\Descriptor())->setMaxValue(null);
+        $indicatorUsage2->getDescriptors()[2]                    = (new RubricGrid\Descriptor())->setMaxValue(3);
+
         $groupUsage2                                             = (new RubricGrid\CapabilityUsage($group2))->setMaxValue(3);
         $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
         $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
+        $indicatorUsage6->getDescriptors()[1]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
+        $indicatorUsage6->getDescriptors()[2]                    = (new RubricGrid\Descriptor())->setMaxValue(5);
 
         $dueWork1 = (new DueWork())->setMarkPerCapability(true);
         $grid1    = new RubricGrid\Grid($dueWork1, $rowSet);
@@ -226,7 +237,6 @@ class Grid extends TestCase
         yield 'mark per capability, empty grid' => [$grid1, 0];
 
 
-        // Add descriptors
         $grid2                                          = new RubricGrid\Grid($dueWork1, $rowSet);
         $grid2->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
 
@@ -238,6 +248,25 @@ class Grid extends TestCase
         $grid3->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
         yield 'mark per capability, two group usages' => [$grid3, 18];
+
+
+        $duework2 = (new DueWork())->setMarkPerCapability(false);
+        $grid4    = new RubricGrid\Grid($duework2, $rowSet);
+
+        yield 'no mark per capability, empty grid' => [$grid4, 0];
+
+
+        $grid5                                          = new RubricGrid\Grid($duework2, $rowSet);
+        $grid5->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
+
+        yield 'no mark per capability, one group usage' => [$grid5, 5];
+
+
+        $grid6                                          = new RubricGrid\Grid($duework2, $rowSet);
+        $grid6->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
+        $grid6->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
+
+        yield 'no mark per capability, two group usages' => [$grid6, 10];
     }
 
 
