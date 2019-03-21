@@ -119,9 +119,14 @@ class MarkedGrid
      */
     public function calculateTotalAvailableMarks() : float
     {
-        $totalAvailableMarks = 0.0;
+        // Ignore max value for cap usage, if it's not mark per capability
+        $useMarkPerCapability = $this->grid->isMarkPerCapability();
+        $totalAvailableMarks  = 0.0;
         foreach ($this->iterateCapabilityUsages() as $capabilityUsage) {
-            $totalAvailableMarks += $capabilityUsage->getMaxValue();
+            $totalAvailableMarks +=
+                $useMarkPerCapability
+                    ? $capabilityUsage->getMaxValue()
+                    : $capabilityUsage->calculateMaxValueFromIndicators();
         }
         return $totalAvailableMarks;
     }

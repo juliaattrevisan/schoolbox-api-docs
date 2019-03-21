@@ -29,6 +29,38 @@ class MarkedGrid extends TestCase
      */
     public function getTestRetrieveMarkData(): iterable
     {
+        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(true);
+        yield 'mark-per-capability on' => [
+            $markedGrid,
+            [
+                'normalizedMark'    => 58.33,
+                'scaledMark'        => 7.00,
+                'humanReadableMark' => '7 / 12',
+            ]
+        ];
+
+        $markedGrid = $this->generateTestRetrieveMarkDataMarkedGrid(false);
+        // Indicators used: 4, max mark for each indicator: 8 => max mark = 32
+        yield 'mark-per-capability off' => [
+            $markedGrid,
+            [
+                'normalizedMark'    => 21.88,
+                'scaledMark'        => 7.00,
+                'humanReadableMark' => '7 / 32',
+            ]
+        ];
+    }
+
+
+    /**
+     * Data provider for the data provider: generates a marked grid.
+     *
+     * @param  bool $markPerCapability Is mark-per-capability on?
+     *                                 This affects the grid's total mark.
+     * @return RubricMarkedGrid\MarkedGrid
+     */
+    private function generateTestRetrieveMarkDataMarkedGrid(bool $markPerCapability): RubricMarkedGrid\MarkedGrid
+    {
         // TODO consider generator for this data set
 
         // Build the row set
@@ -55,15 +87,15 @@ class MarkedGrid extends TestCase
 
 
         // Build a grid that uses the row set
-        $dueWork = new DueWork();
+        $dueWork = (new DueWork())->setMarkPerCapability($markPerCapability);
         $grid    = new Grid\Grid($dueWork, $rowSet);
 
         // Build and add levels
-        $level1 = (new Grid\Level())->setId(1)->setName('0');
-        $level2 = (new Grid\Level())->setId(2)->setName('2');
-        $level3 = (new Grid\Level())->setId(3)->setName('4');
-        $level4 = (new Grid\Level())->setId(4)->setName('6');
-        $level5 = (new Grid\Level())->setId(5)->setName('8');
+        $level1                              = (new Grid\Level())->setId(1)->setName('0');
+        $level2                              = (new Grid\Level())->setId(2)->setName('2');
+        $level3                              = (new Grid\Level())->setId(3)->setName('4');
+        $level4                              = (new Grid\Level())->setId(4)->setName('6');
+        $level5                              = (new Grid\Level())->setId(5)->setName('8');
         $grid->getLevels()[$level1->getId()] = $level1;
         $grid->getLevels()[$level2->getId()] = $level2;
         $grid->getLevels()[$level3->getId()] = $level3;
@@ -81,7 +113,7 @@ class MarkedGrid extends TestCase
         // Build descriptors, add to indicators
         $descriptorValue = 0;
         foreach ($grid->getLevels() as $levelId => $level) {
-            $descriptor = (new Grid\Descriptor())
+            $descriptor                                  = (new Grid\Descriptor())
                 ->setId($levelId)
                 ->setDescription((string)$descriptorValue)
                 ->setMinValue((float)$descriptorValue)
@@ -126,14 +158,7 @@ class MarkedGrid extends TestCase
 
         $markedGrid->getCapabilityMarks()[$capability1->getId()] = $capabilityMark1;
         $markedGrid->getCapabilityMarks()[$capability2->getId()] = $capabilityMark2;
-
-        yield [
-            $markedGrid, [
-                'normalizedMark'    => 58.33,
-                'scaledMark'        => 7.00,
-                'humanReadableMark' => '7 / 12',
-            ]
-        ];
+        return $markedGrid;
     }
 
 
