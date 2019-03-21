@@ -45,6 +45,17 @@ paths:
       - $ref: '#/components/parameters/token'
       - $ref: '#/components/parameters/depth'
 
+  /threads/{id}:
+    get:
+      operationId: getThread
+      summary: Returns a thread
+      responses:
+        '200':
+          $ref: '#/components/responses/thread'
+        default:
+          $ref: '#/components/responses/problem'
+
+
   /threads/{id}/posts:
     get:
       operationId: getPostsByThread
@@ -337,6 +348,17 @@ components:
               $ref: '#/components/examples/problemNotFound'
             internalServerError:
               $ref: '#/components/examples/problemInternalServerError'
+
+    thread:
+      description: A thread
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/thread'
+        text/html:
+          schema:
+            type: string
+            description: The thread, rendered into HTML on the server.
 
     postList:
       description: a list of posts
