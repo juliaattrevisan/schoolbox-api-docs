@@ -220,24 +220,24 @@ class Grid extends TestCase
         $indicatorUsage6                                         = new RubricGrid\IndicatorUsage($indicator6);
         $groupUsage2->getIndicatorUsages()[$indicator6->getId()] = $indicatorUsage6;
 
-        $dueWork = new DueWork();
-        $grid1   = new RubricGrid\Grid($dueWork, $rowSet);
+        $dueWork1 = (new DueWork())->setMarkPerCapability(true);
+        $grid1    = new RubricGrid\Grid($dueWork1, $rowSet);
 
-        yield 'empty grid' => [$grid1, 0];
+        yield 'mark per capability, empty grid' => [$grid1, 0];
 
 
         // Add descriptors
-        $grid2                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid2                                          = new RubricGrid\Grid($dueWork1, $rowSet);
         $grid2->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
 
-        yield 'one group usage' => [$grid2, 15];
+        yield 'mark per capability, one group usage' => [$grid2, 15];
 
 
-        $grid3                                          = new RubricGrid\Grid($dueWork, $rowSet);
+        $grid3                                          = new RubricGrid\Grid($dueWork1, $rowSet);
         $grid3->getCapabilityUsages()[$group1->getId()] = $groupUsage1;
         $grid3->getCapabilityUsages()[$group2->getId()] = $groupUsage2;
 
-        yield 'two group usages' => [$grid3, 18];
+        yield 'mark per capability, two group usages' => [$grid3, 18];
     }
 
 
