@@ -47,10 +47,11 @@ class Controller extends BaseController
      * Constructor
      *
      * @param Post\Mapper $postMapper
+     * @param Mapper      $threadMapper
      */
     public function __construct(Post\Mapper $postMapper, Mapper $threadMapper)
     {
-        $this->postMapper = $postMapper;
+        $this->postMapper   = $postMapper;
         $this->threadMapper = $threadMapper;
     }
 
