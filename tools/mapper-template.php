@@ -64,23 +64,25 @@ echo "\nclass {$mapper['model']} {\n";
 
 // properties themselves
 foreach($model as $p) {
-	printf("\n	/** @var %s */\n	protected $%s;\n", $p['type'], $p['property']);
+	printf("\n	/** @var %s */\n	private $%s;\n", $p['type'], $p['property']);
 }
 
 // getters and setters, with return $this; on setters
 foreach($model as $p) {
+  $type = $p['type'] === 'object' ? ucfirst($p['property']) . '\Model' : $p['type'];
 	printf("
 
 	/**
 	 * @param %s $%s
-	 * @return self
+	 * @return \$this
 	 */
-	public function set%s($%s) {
+	public function set%s(%s $%s): self
+	{
 		\$this->%s = $%s;
 		return \$this;
 	}
 ",
-		$p['type'], $p['property'], ucfirst($p['property']), $p['property'], $p['property'], $p['property']
+	  $type, $p['property'], ucfirst($p['property']), $type, $p['property'], $p['property'], $p['property']
 	);
 
 	printf("
@@ -88,11 +90,12 @@ foreach($model as $p) {
 	/**
 	 * @return %s
 	 */
-	public function get%s() {
+	public function get%s(): ?%s
+	{
 		return \$this->%s;
 	}
 ",
-		$p['type'], ucfirst($p['property']), $p['property']
+	  $type, ucfirst($p['property']), $type, $p['property']
 	);
 
 }
