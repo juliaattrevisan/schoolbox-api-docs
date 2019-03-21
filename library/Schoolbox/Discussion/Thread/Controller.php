@@ -188,6 +188,7 @@ class Controller extends BaseController
         return [
             'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
                     'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
                     'next'    => $cursor->retrieveNextCursor($posts),

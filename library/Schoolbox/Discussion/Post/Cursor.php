@@ -82,6 +82,18 @@ class Cursor
 
 
     /**
+     * Retrieve the total number of results that are in the thread, independent
+     * of any cursor.
+     *
+     * @return int
+     */
+    public function retrieveResultCount(): int
+    {
+        return $this->mapper->countByPredicates($this->buildPredicateBuilder());
+    }
+
+
+    /**
      * Retrieve the page of results that $currentCursor points to.
      *
      * @param string|null $currentCursor The current encoded cursor, if there is one.
@@ -89,20 +101,8 @@ class Cursor
      */
     public function retrieveResults(?string $currentCursor): GenericCollection
     {
-        $pb       = $this->mapper->getPredicateBuilder();
-        $threadId = $this->thread->getId();
-        try {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $pb = $pb->equals('discussion_thread_id', $threadId);
-        } catch (\TypeError $e) {
-            // $thread doesn't exist yet
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $pb = $pb->isNull('discussion_thread_id');
-        }
-        $pb = $this->applyCursor($pb, $currentCursor);
-
         return $this->mapper->findByPredicates(
-            $pb,
+            $this->applyCursor($this->buildPredicateBuilder(), $currentCursor),
             [
                 'limit' => self::RESULTS_PER_REQUEST,
                 'order' => [
@@ -216,6 +216,27 @@ class Cursor
     private function decodeCursor(?string $cursor): ?int
     {
         return filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+    }
+
+
+    /**
+     * Create a predicate builder for retrieving the list of posts.
+     *
+     * @return Builder
+     */
+    private function buildPredicateBuilder(): Builder
+    {
+        $pb       = $this->mapper->getPredicateBuilder();
+        $threadId = $this->thread->getId();
+        try {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $pb = $pb->equals('discussion_thread_id', $threadId);
+        } catch (\TypeError $e) {
+            // $thread doesn't exist yet
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $pb = $pb->isNull('discussion_thread_id');
+        }
+        return $pb;
     }
 
 }
