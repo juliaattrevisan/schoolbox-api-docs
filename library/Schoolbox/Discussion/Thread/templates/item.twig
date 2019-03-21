@@ -3,7 +3,7 @@
         <h2>Comments ({{ item.children.metadata.count }})</h2>
     </div>
     <div class="checklist small-6 columns">
-        {% if modifyRoute %}
+        {% if routeLookupIfAuthorized('discussionThreads.enableDisableThread', { id: item.id, thread: item }) %}
             <input id="allow-comments" name="allowComments" type="checkbox" {% if item.open %}checked{% endif %}>
             <label for="allow-comments">Allow comments</label>
         {% endif %}
