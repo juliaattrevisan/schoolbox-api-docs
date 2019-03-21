@@ -26,5 +26,5 @@
         </div>
     {% endif %}
 
-    {% include '@discussionPosts/list.twig' with { list: list } only %}
+    {% include '@discussionPosts/list.twig' with { list: item.children } only %}
 </section>

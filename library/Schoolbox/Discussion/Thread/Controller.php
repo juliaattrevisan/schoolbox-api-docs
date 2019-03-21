@@ -66,10 +66,15 @@ class Controller extends BaseController
      */
     public function getThread(Model $thread): void
     {
+        $responseData             = $thread->jsonSerialize(
+            $this->retrieveJsonDecorator(),
+            $this->retrieveLinkDecorator()
+        );
+        $responseData['children'] = $this->retrievePostList($thread, null);
         $this->response->content->set(
             $this->isJsonRequest()
-                ? $this->buildJsonOutput($thread)
-                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $thread])
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
         );
     }
 
@@ -186,8 +191,8 @@ class Controller extends BaseController
                 'cursor' => [
                     'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
                     'next'    => $cursor->retrieveNextCursor($posts),
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }
