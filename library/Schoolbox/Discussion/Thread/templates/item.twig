@@ -4,7 +4,7 @@
     </div>
     <div class="checklist small-6 columns">
         {% if routeLookupIfAuthorized('discussionThreads.enableDisableThread', { id: item.id, thread: item }) %}
-            <input id="allow-comments" name="allowComments" type="checkbox" {% if item.open %}checked{% endif %}>
+            <input id="allow-comments" name="allowComments" type="checkbox" {% if item.open %}checked{% endif %} v-on:click="enableDisableThread" v-model="threadCheckboxEnabled" />
             <label for="allow-comments">Allow comments</label>
         {% endif %}
     </div>
