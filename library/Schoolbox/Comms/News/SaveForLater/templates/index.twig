@@ -34,7 +34,7 @@
                                     </a>
                                 {% endif %}
 
-                                <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">{{ article.title }}</a></h3>
+                                <h3><a href="{{ routeLookup('commsNews.getDetail', {articleId: article.id}) }}?ref={{ referrer }}">{{ article.title|default('(untitled)') }}</a></h3>
                                 <p class="meta">
                                     Published by
                                     {% if article.author.deletedAt.isNull %}
