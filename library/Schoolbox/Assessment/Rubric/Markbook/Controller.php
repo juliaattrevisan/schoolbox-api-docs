@@ -97,7 +97,8 @@ class Controller extends Base
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN assessment a ON a.id = vrm.assessment_id
             INNER JOIN submission_box sb ON sb.assessment_id = vrm.assessment_id
-            WHERE      var.folder_id=:folderId AND a.deleted_at IS NULL"
+            WHERE      var.folder_id=:folderId AND a.deleted_at IS NULL
+            ORDER BY var.assessment_id, vrm.capability_id, vrm.indicator_id"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
@@ -173,7 +174,7 @@ class Controller extends Base
             INNER JOIN user u ON u.id = vrm.student_id
             INNER JOIN assessment a ON a.id = var.assessment_id
             WHERE      var.folder_id=:folderId AND vrm.feedback_type=:instructorReviewRoute AND vrm.feedback_deleted_at IS NULL AND a.deleted_at IS NULL
-            ORDER BY vrm.student_id, var.assessment_id"
+            ORDER BY vrm.student_id, var.assessment_id, vrm.capability_id, vrm.indicator_id"
         );
 
         $getAuthoritativeMarksInFolderQuery->execute(['folderId' => $folderId, 'instructorReviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
