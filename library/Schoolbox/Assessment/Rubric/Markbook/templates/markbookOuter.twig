@@ -1,12 +1,11 @@
 <h1>Rubric Markbook for {{ folder.name }}</h1>
-<script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
 
 <script>
-    // Use datatables to do fixed headers and left column
-    // Only do this on small up
+    // The only purpose of using this plugin now is to ensure that the last student in the list doesn't get
+    // cut off when the window shrinks.
     $(function() {
         var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
         if ($windowWidthRems >= 40) {
@@ -39,21 +38,27 @@
         padding: 1.25rem;
         color: black;
     }
-
-    #rubric-marksheet-wrapper {
-        overflow-x: scroll;
-    }
-
+    
     #rubric-marksheet-left-headings {
         margin-top: 10rem; /* This is the height of the student headings on the marksheet */
+        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
+        flex-basis: 20%;
+    }
+
+    #rubric-marksheet-wrapper {
+        overflow-x: scroll; /* Allow the user to scroll the mark table horizontally */
+    }
+
+    #table-container {
+        display: flex;
     }
 </style>
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 {% if studentMarks|length %}
-<div class="row">
-    <div class="large-3 columns no-pad">
-        <table id="rubric-marksheet-left-headings">
+<div id="table-container">
+    <div id="rubric-marksheet-left-headings">
+        <table>
             {% for assessmentId, assessment in assessments %}
                 {# Set up the rowspan for the assessment #}
                 {% set capCount = assessment.capabilities|length %}
@@ -91,73 +96,72 @@
             {% endfor %}
         </table>
     </div>
-    {#<div class="large-9 columns no-pad" id="rubric-marksheet-wrapper">#}
-        {#<table class="rubric-marksheet marksheet" data-mark-sheet>#}
-            {#<thead>#}
-                {#<tr class="rotate-headers" data-headers>#}
-                    {#{% for studentId, student in studentMarks %}#}
-                        {#<th>#}
-                            {#<div>#}
-                                {#<span>#}
-                                    {#<a href="{{ student.profileLink }}">#}
-                                        {#{{ student.lastname ~ ', ' ~ student.firstname}}#}
-                                    {#</a>#}
-                                {#</span>#}
-                            {#</div>#}
-                        {#</th>#}
-                    {#{% endfor %}#}
-                {#</tr>#}
-            {#</thead>#}
 
-            {#<tbody>#}
-                {#{% for assessmentId, assessment in assessments %}#}
+    <div id="rubric-marksheet-wrapper">
+        <table class="rubric-marksheet marksheet" data-mark-sheet>
+            <thead>
+                <tr class="rotate-headers" data-headers>
+                    {% for studentId, student in studentMarks %}
+                        <th>
+                            <div>
+                                <span>
+                                    <a href="{{ student.profileLink }}">
+                                        {{ student.lastname ~ ', ' ~ student.firstname}}
+                                    </a>
+                                </span>
+                            </div>
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
 
-                    {# Render capabilities #}
-                    {#{% for capabilityId, capability in assessment.capabilities %}#}
-                        {#<tr class="capability">#}
-                            {#{% for studentId, student in studentMarks %}#}
-                                {#{% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}#}
-                                {#{% set percentageCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].percentageMark %}#}
-                                {#{% set summaryLink = student.assessments[assessmentId].summaryLink %}#}
+            <tbody>
+                {% for assessmentId, assessment in assessments %}
 
-                                {#{% set gradientClass = urgency.marks(percentageCapabilityMark) %}#}
-                                {#{% if capabilityMark is null %}#}
-                                    {#{% set gradientClass = "" %}#}
-                                {#{% endif %}#}
+                    {% for capabilityId, capability in assessment.capabilities %}
+                        <tr class="capability">
+                            {% for studentId, student in studentMarks %}
+                                {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
+                                {% set percentageCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].percentageMark %}
+                                {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                {#<td>#}
-                                    {#<a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'noMark' }}">{{ capabilityMark|default('-') }}</a>#}
-                                {#</td>#}
-                            {#{% endfor %}#}
-                        {#</tr>#}
+                                {% set gradientClass = urgency.marks(percentageCapabilityMark) %}
+                                {% if capabilityMark is null %}
+                                    {% set gradientClass = "" %}
+                                {% endif %}
 
-                        {# Render indicators #}
-                        {#{% for indicatorId, indicator in capability.indicators %}#}
-                            {#<tr class="indicator">#}
-                                {#{% for studentId, student in studentMarks %}#}
-                                    {#{% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}#}
-                                    {#{% set percentageIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].percentageMark %}#}
-                                    {#{% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}#}
-                                    {#{% set summaryLink = student.assessments[assessmentId].summaryLink %}#}
+                                <td>
+                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'noMark' }}">{{ capabilityMark|default('-') }}</a>
+                                </td>
+                            {% endfor %}
+                        </tr>
 
-                                    {#{% set gradientClass = urgency.marks(percentageIndicatorMark) %}#}
-                                    {#{% if percentageIndicatorMark is null %}#}
-                                        {#{% set gradientClass = "" %}#}
-                                    {#{% endif %}#}
+                        {% for indicatorId, indicator in capability.indicators %}
+                            <tr class="indicator">
+                                {% for studentId, student in studentMarks %}
+                                    {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
+                                    {% set percentageIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].percentageMark %}
+                                    {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                    {#<td title="{{ descriptorText|default('-No descriptor text-') }}">#}
-                                        {#<a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'noMark' }}">{{ indicatorMark|default('-') }}</a>#}
-                                    {#</td>#}
-                                {#{% endfor %}#}
-                            {#</tr>#}
-                        {#{% endfor %}#}
-                    {#{% endfor %}#}
+                                    {% set gradientClass = urgency.marks(percentageIndicatorMark) %}
+                                    {% if percentageIndicatorMark is null %}
+                                        {% set gradientClass = "" %}
+                                    {% endif %}
 
-                {#{% endfor %}#}
-            {#</tbody>#}
-        {#</table>#}
+                                    <td title="{{ descriptorText|default('-No descriptor text-') }}">
+                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'noMark' }}">{{ indicatorMark|default('-') }}</a>
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
 
-    {#</div>#}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 </div>
 {% else %}
     <div class="empty-state">
