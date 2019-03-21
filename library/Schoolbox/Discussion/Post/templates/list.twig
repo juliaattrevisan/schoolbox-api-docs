@@ -8,5 +8,8 @@
 
 {# Output metadata #}
 {% if list.metadata.cursor.next %}
-    <button rel="next" data-cursor="{{ list.metadata.cursor.next }}">Load more...</button>
+    <button rel="next"
+            class="expand"
+            title="Load more"
+            data-cursor="{{ list.metadata.cursor.next }}">Load more...</button>
 {% endif %}
