@@ -28,7 +28,8 @@
         margin-top: 10rem;
         white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
     }
-    #rubric-marksheet-left-headings th {
+    #rubric-marksheet-left-headings th, #rubric-marksheet-wrapper tr {
+        /* Ensure browser rounding errors don't result in misaligned rows */
         height: 39px;
     }
     #rubric-marksheet-wrapper {
