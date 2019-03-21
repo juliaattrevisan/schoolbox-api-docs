@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
+use Alaress\Json;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -17,12 +19,13 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 /**
  * Model for discussion threads.
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
 {
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+    use Json\SerializeTrait;
 
 
     /**
@@ -48,5 +51,38 @@ class Model implements ISoftDeletable
     {
         $this->open = $open;
         return $this;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getDefaultJsonMap(): array
+    {
+        $map = [
+            'id',
+            'open',
+            'createdAt',
+            'updatedAt',
+        ];
+        return $map;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getJsonApiLinks(): array
+    {
+        return [
+            'getPosts' => new AuraLink(
+                'discussionThreads.getPostsByThread',
+                ['id' => $this->id, 'thread' => $this,]
+            ),
+            'createPost' => new AuraLink(
+                'discussionThreads.createPostInThread',
+                ['id' => $this->id, 'thread' => $this,]
+            ),
+        ];
     }
 }
