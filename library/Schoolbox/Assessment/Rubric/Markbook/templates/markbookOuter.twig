@@ -20,16 +20,27 @@
     });
 </script>
 <style>
-    .rubric-marksheet tr.capability th {
-        border-right: 1px solid #ededed;
+    #table-container {
+        display: flex;
     }
-    .rubric-marksheet tr.indicator th {
-        padding-left: 2rem;
+    #rubric-marksheet-left-headings {
+        margin-top: 10rem; /* This is the height of the student headings on the marksheet */
+        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
+        flex-basis: 20%;
+    }
+    #rubric-marksheet-wrapper {
+        overflow-x: scroll; /* Allow the user to scroll the mark table horizontally */
+    }
+
+    #rubric-marksheet-left-headings tr.assessment th {
         border-right: 1px solid #ededed;
         font-weight: normal;
     }
-
-    .rubric-marksheet tr.assessment th {
+    #rubric-marksheet-left-headings tr.capability th {
+        border-right: 1px solid #ededed;
+    }
+    #rubric-marksheet-left-headings tr.indicator th {
+        padding-left: 2rem;
         border-right: 1px solid #ededed;
         font-weight: normal;
     }
@@ -37,20 +48,6 @@
     .rubric-marksheet a.noMark {
         padding: 1.25rem;
         color: black;
-    }
-    
-    #rubric-marksheet-left-headings {
-        margin-top: 10rem; /* This is the height of the student headings on the marksheet */
-        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
-        flex-basis: 20%;
-    }
-
-    #rubric-marksheet-wrapper {
-        overflow-x: scroll; /* Allow the user to scroll the mark table horizontally */
-    }
-
-    #table-container {
-        display: flex;
     }
 </style>
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -76,17 +73,19 @@
                             {{ assessment.name }}
                         </a>
                     </th>
-
+                </tr>
                 {# Render capabilities #}
                 {% for capabilityId, capability in assessment.capabilities %}
-                        <th class="capability" style="min-width: 200px;width: 200px;">
+                    <tr class="capability">
+                        <th>
                             {{ capability.name }}
                         </th>
+                    </tr>
 
                     {# Render indicators #}
                     {% for indicatorId, indicator in capability.indicators %}
                         <tr class="indicator">
-                            <th style="min-width: 200px;width: 200px;">
+                            <th>
                                 {{ indicator.name }}
                             </th>
                         </tr>
