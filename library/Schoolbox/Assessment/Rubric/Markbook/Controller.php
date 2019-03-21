@@ -8,6 +8,7 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\MarkScheme;
@@ -75,6 +76,7 @@ class Controller extends Base
      *
      * @param int $folderId
      * @return array
+     * @throws /Aura/Router/Exception/RouteNotFound
      */
     private function retrieveAssessmentsInFolder(int $folderId) : array
     {
@@ -131,7 +133,7 @@ class Controller extends Base
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name' => $row['assessment_name'],
-                'statusLink' => '/learning/assessments/' . $row['assessment_id'] . '/status',
+                'statusLink' => $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $row['assessment_id'] ]),
                 'maxMark' => $row['assessment_max_mark'],
                 'markType' => $row['assessment_mark_type'],
                 'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
