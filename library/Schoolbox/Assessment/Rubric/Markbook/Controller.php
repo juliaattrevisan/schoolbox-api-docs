@@ -189,6 +189,11 @@ class Controller extends Base
         $lastObservedStudentId = null;
 
         foreach ($getAuthoritativeMarksInFolderQuery->getIterator() as $i => $row) {
+            if ($lastObservedStudentId !== $row['student_id']) {
+                // Has the student we're looking at changed? Reset the list of assessments for them
+                $assessmentsForStudent = [];
+            }
+
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
                 // Has the assessment we're looking at changed? Reset the capabilities
                 $capabilityMarks = [];
@@ -197,11 +202,6 @@ class Controller extends Base
             if ($lastObservedCapabilityId !== $row['capability_id']) {
                 // Has the capability we're looking at changed? Reset the indicators
                 $indicatorMarks = [];
-            }
-
-            if ($lastObservedStudentId !== $row['student_id']) {
-                // Has the student we're looking at changed? Reset the list of assessments for them
-                $assessmentsForStudent = [];
             }
 
             $indicatorMarks[$row['indicator_id']] = [
