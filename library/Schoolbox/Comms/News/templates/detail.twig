@@ -136,7 +136,7 @@ Data:
         {% endif %}
 
         {% if deleteRoute %}
-            <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title }}">Delete</a></li>
+            <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}" data-delete="{{ article.title|default('(untitled)') }}">Delete</a></li>
         {% endif %}
 
         {# 'Unpublish' action
