@@ -15,17 +15,16 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Sync\Provisioner\Provisioner;
-
-
-$options = getopt("vr:", array('perform-update', 'instance::'));
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('UPS', [
-    'verbose'  => isset($options['v']) ? $options['v'] : null,
-    'perform'  => isset($options['perform-update']),
-    'roleType' => (isset($options['r']) && in_array($options['r'], [ 'staff', 'student', 'parent' ])) ? $options['r'] : null,
-    'instance' => isset($options['instance']) ? $options['instance'] : null
-]);
+$kernel = new Daemon\Kernel(
+    'UPS',
+    [
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'r:',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['perform-update', 'instance::'],
+    ]
+);
 
 // Signal handling unique to the provisioner
 // (ticks required for pcntl_signal functions to work)
@@ -42,15 +41,12 @@ pcntl_signal(SIGQUIT, $cleanup);
 $kernel->registerExceptionCallback($cleanup);
 
 $kernel->run(
-    function ($di, $loop, $log, $opts) {
-        $instanceId = isset($opts["instance"]) ? $opts["instance"] : INSTANCE_ID;
+    function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
-        /**
-         * @var Di\Container    $di
-         * @var LoopInterface   $loop
-         * @var LoggerInterface $log
-         * @var array           $opts
-         */
+        $perform    = isset($opts['perform-update']);
+        $roleType   = (isset($opts['r']) && in_array($opts['r'], [ 'staff', 'student', 'parent' ])) ? $opts['r'] : null;
+        $instanceId = $opts["instance"] ?? INSTANCE_ID;
+
 
         // define the redis key we'll use for this run
         $di->values['ups.redisKey'] = $instanceId . '.provision.user.' . getmypid();
@@ -67,10 +63,10 @@ $kernel->run(
         // Note that trying to overwrite the logger (and thus destroy the old one)
         // will cause an exit as soon as stdout is written
         // (because stdout is closed when the old logger is destroyed)
-        $ups->run($opts['perform'], $opts['roleType']);
+        $ups->run($perform, $roleType);
 
 
-        if ($opts['perform']) {
+        if ($perform) {
             // we need to manually refresh the routing cache now
             /** @var WritableCache $cache */
             $cache = $di->get('subscriptionCache');

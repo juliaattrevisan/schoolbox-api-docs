@@ -11,7 +11,8 @@ use Schoolbox\Config\Loader;
 use Schoolbox\Resource\Browser\Office365\Tenant;
 
 if (empty($this)) {
-    require_once __DIR__ . '/../../../library/Bootstrap.php';
+    require_once __DIR__ . '/../../../conf/core/require.php';
+    $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     // nope. go away
     SitePage::localRedir('/resources');
 }

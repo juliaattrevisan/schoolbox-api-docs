@@ -12,27 +12,11 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
-use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\MessageList\ListFactory;
-
-
-/** @var array $fields */
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
-
-$opts = getopt('v', $fields);
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel("Worker", [
-    'errors' => E_ALL,
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'fields'  => array_values($fields),
-]);
+$kernel = new Daemon\Kernel("Worker", [Daemon\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 

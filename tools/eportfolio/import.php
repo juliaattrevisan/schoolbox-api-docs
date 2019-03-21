@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Imports eportfolio page layouts from a user to all users within a group.
@@ -15,31 +16,27 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\Daemon;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
-$options = getopt('u:r::U::p::', ['skip-duplicates', 'enable-eportfolio', 'dry-run']);
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose'          => isset($options['v']) ? $options['v'] : null,
-    'errors'           => E_ALL,
-    'userId'           => isset($options['u']) ? $options['u'] : null,
-    'toUserId'         => isset($options['U']) ? $options['U'] : null,
-    'roleId'           => isset($options['r']) ? $options['r'] : null,
-    'importPageId'     => isset($options['p']) ? $options['p'] : null,
-    'skipDuplicates'   => isset($options['skip-duplicates']),
-    'enableEportfolio' => isset($options['enable-eportfolio']),
-    'dryRun'           => isset($options['dry-run']),
-]);
+$kernel = new Daemon\Kernel(
+    'Routing',
+    [
+        Daemon\Kernel::OPTION_ERRORS         => E_ALL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'u:U::r::p::',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['skip-duplicates', 'enable-eportfolio', 'dry-run'],
+    ]
+);
 
-// ROUTING APP
 $kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $options) {
-    $userId = $options['userId'];
-    $toUserId = $options['toUserId'];
-    $roleId = $options['roleId'];
-    $importPageId = $options['importPageId'];
-    $skipDuplicates = $options['skipDuplicates'];
-    $enableEportfolio = $options['enableEportfolio'];
-    $dryRun = $options['dryRun'];
+    $userId           = $options['u'] ?? null;
+    $toUserId         = $options['U'] ?? null;
+    $roleId           = $options['r'] ?? null;
+    $importPageId     = $options['p'] ?? null;
+    $skipDuplicates   = isset($options['skip-duplicates']);
+    $enableEportfolio = isset($options['enable-eportfolio']);
+    $dryRun           = isset($options['dry-run']);
     if (!(isset($userId) && (isset($roleId) || isset($toUserId)))) {
         echo <<<HELP
 Copies ePortfolios from a single user into either another user, or all users

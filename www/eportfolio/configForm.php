@@ -1,14 +1,12 @@
 <?php
 
-/** @var WebRequestKernel $kernel */
-
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
-use Schoolbox\Application\WebRequest\Kernel as WebRequestKernel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
-$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());

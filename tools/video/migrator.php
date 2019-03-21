@@ -9,7 +9,7 @@
  */
 
 use Aura\Di\Container as Injector;
-use Aura\Di\Exception\ServiceNotFound as ServiceNotFound;
+use Aura\Di\Exception\ServiceNotFound;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Config\ConfigMapper;
@@ -17,12 +17,11 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Media Migrator', [
-    'verbose' => [false, false, false],
-]);
+$kernel = new Daemon\Kernel('Media Migrator', [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]);
 
 try {
     $kernel->run(function ($di, $loop, $log, $opts) {

@@ -12,7 +12,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database;
 use Schoolbox\Engagement\Login;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage;
 $output = array();

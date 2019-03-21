@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 /**
@@ -16,11 +17,15 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
 use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', array(
-    'verbose' => array(false, false, false),
-));
+$kernel = new Daemon\Kernel(
+    'DocMan',
+    [
+        Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG,
+    ]
+);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 

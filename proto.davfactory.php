@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -11,8 +10,8 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/library/Bootstrap.php';
-
+require_once __DIR__ . '/conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 class DavFactory {
 

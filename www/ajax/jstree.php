@@ -4,8 +4,8 @@
  * @deprecated this file is deprecated in favour of Schoolbox\Resource\Browser\AbstractController::listNodes()
  */
 
-/** @var Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /** @var SitePage $page */
 $page = $kernel->getDependencyInjector()->get('sitePage');

@@ -6,8 +6,10 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
+use Schoolbox\Application\Daemon;
+
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Skin Builder', array('level'=>200));
+$kernel = new Daemon\Kernel('Skin Builder', [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $logger = $kernel->logger();
 pcntl_signal(SIGCHLD, SIG_DFL);
 

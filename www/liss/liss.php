@@ -8,9 +8,9 @@
  * @version     SVN: $Id$
  */
 
-$kernel = require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-/** @var Schoolbox\Application\WebRequest\Kernel $kernel */
 $externalDb = $kernel->get('databaseExternal');
 $liss = new External_Liss_Server($externalDb);
 

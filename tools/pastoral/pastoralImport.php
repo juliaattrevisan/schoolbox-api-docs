@@ -15,8 +15,9 @@ declare(strict_types=1);
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
-$fields = [
+$appOpts = [
     'help',
     'user:',
     'default-owner:',
@@ -25,14 +26,14 @@ $fields = [
     'add-attachments',
 ];
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
+$kernel = new Daemon\Kernel(
     'Pastoral Import',
     [
-        'verbose' => $opts['v'] ?? [],
-        'errors'  => E_ALL,
-        'opts'    => $opts,
+        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::CRITICAL,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
     ]
 );
 
@@ -42,17 +43,17 @@ $kernel->run(function (
     /** @noinspection PhpUnusedParameterInspection */
     LoopInterface $loop,
     LoggerInterface $log,
-    array $options
+    array $opts
 ) {
 
     /* command-line options
      */
-    $opts               = $options['opts'];
     $importParentAccess = isset($opts['parent-access']);
     $importRecords      = isset($opts['add-records']);
     $importAttachments  = isset($opts['add-attachments']);
-    $defaultOwner       = null;
-    $user               = null;
+    $defaultOwnerId     = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
+    /** @var int|bool $userId The user conducting the import (used in logging) */
+    $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
 
     /* Help
      */
@@ -74,10 +75,6 @@ HELP;
         exit(0);
     }
 
-    /* The user conducting the import (used in logging)
-     */
-    $userId = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
-
     if (!$userId) {
         $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
         exit(0);
@@ -91,10 +88,6 @@ HELP;
         $log->critical('Invalid user id. User not found.');
         exit(0);
     }
-
-    /* The default owner of pastoral records
-     */
-    $defaultOwnerId = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
 
     if (!$defaultOwnerId) {
         $log->critical('Invalid default owner id. Specify a user to whom pastoral records are assigned.');

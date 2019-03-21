@@ -800,7 +800,8 @@ We'll take this opportunity to also load in some test data for later. Here you'l
 <?php
 use Schoolbox\Kingdom\Mapper as KingdomMapper;
 
-$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // For convenience
 

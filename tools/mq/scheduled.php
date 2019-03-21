@@ -1,5 +1,13 @@
 #!/usr/bin/php
 <?php
+/**
+ * The Schedule Daemon.
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
+ * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 
 use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
@@ -21,37 +29,11 @@ use Schoolbox\Realtime\Schedule;
 use Schoolbox\Realtime\Schedule\Persistence\QueueItemMapper;
 use Schoolbox\Realtime\Schedule\Scheduler;
 use Schoolbox\Realtime\Schedule\SchedulerDispatchStrategy;
-
-/**
- * The Schedule Daemon.
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
-
-
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid' ];
-
-$opts = getopt('v', $fields);
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
-$flags = implode(' ', array_slice($argv, 1));
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Schedule', [
-	'verbose' => isset($opts['v']) ? $opts['v'] : null,
-	'errors'  => E_ALL,
-    'fields'  => array_values($fields),
-    'flags'   => $flags
-]);
 
+$kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 $sched = null;
 
 $kernel->registerCustomShutdown(function() use (&$sched) {
@@ -65,7 +47,7 @@ $kernel->registerCustomShutdown(function() use (&$sched) {
 });
 
 // CREATE SCHEDULER APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) use (&$scheduler) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler) {
 
     /** @var Notif $notif */
     $notif = $di->get('notif');
@@ -94,7 +76,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
         $postman        = new Postman($routeBroker, $log);
 
-        $strat          = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $opts['flags']);
+        $strat          = new SchedulerDispatchStrategy($notif, new QueueItemMapper(), $flags);
         $scheduler      = new Scheduler($loop, $strat, $log, new Clock(), $conf, new ResolutionManager(), $postman);
 
         $scheduler->setJitCache(new RedisCache(Redis::getClientInstance(), $log, INSTANCE_ID));

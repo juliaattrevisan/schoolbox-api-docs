@@ -1,5 +1,4 @@
 <?php
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
@@ -7,6 +6,9 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Forum\PostMapper;
 use \Schoolbox\Forum\ThreadMapper;
 use \Schoolbox\Permission\Access\UserAccess;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 $forumHandler = new Forum();

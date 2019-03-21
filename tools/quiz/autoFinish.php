@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 
 /**
@@ -19,10 +20,10 @@
  * @link      http://www.alaress.com.au/
  */
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel("Quiz Attempt Automatic Closer", array('level'=>200));
+$kernel = new Daemon\Kernel("Quiz Attempt Automatic Closer", [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 
 $log             = $kernel->logger();
 $attemptMapper   = QuizAttemptMapper::getInstance();

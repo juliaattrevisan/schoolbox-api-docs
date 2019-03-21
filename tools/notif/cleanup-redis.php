@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -13,19 +14,20 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Filter;
+use Schoolbox\Application\Daemon;
 
-$fields = [ 'perform' ];
+require __DIR__ . '/../../conf/core/require.php';
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
-
-$kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Cleanup', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-]);
+$kernel = new Daemon\Kernel(
+    'Redis Notif Cleanup',
+    [
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['perform'],
+    ]
+);
 
 $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
-    $perform = in_array('perform', $opts['fields']);
+    $perform = \array_key_exists('perform', $opts);
 
     if ($perform) {
         $log->warning('Running in perform mode; matched data will be deleted');

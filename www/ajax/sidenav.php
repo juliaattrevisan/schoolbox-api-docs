@@ -3,10 +3,11 @@
  * Save side menu dock / undock
  */
 
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
-
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 if (\in_array($_POST['state'], ['show', 'hide'], true)) {
     try {

@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Export assessment data for Accellerus import

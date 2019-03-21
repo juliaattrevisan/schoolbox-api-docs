@@ -1,6 +1,7 @@
 <?php
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 

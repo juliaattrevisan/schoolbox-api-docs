@@ -10,10 +10,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-/** @var Kernel $kernel */
-$kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
-
-use Alaress\Application\Kernel;
 use Alaress\Database\Connector\IConnector;
 use Calendar\Event\Collection\CSVExporter;
 use Calendar\Event\Collection\JsonExporter;
@@ -28,6 +24,9 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\UserMapper;
 use Crell\ApiProblem\ApiProblem;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /**
  * Returns the config id for the specified calendar connector.

@@ -13,8 +13,10 @@ use Alaress\Database\Connector\IConnector;
 use Aura\Di\Container as Injector;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Application\Daemon;
 
 const RESULT_FAILED      = 0;
 const RESULT_SUCCESS     = 1;
@@ -22,12 +24,14 @@ const RESULT_FAILED_SIZE = 2;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$options = getopt("v::r::", ['verbose::', 'retry::']);
-
-$kernel = new Schoolbox\Application\Daemon\Kernel('Plagscan Document Migration', [
-    'verbose' => isset($options['v']) || isset($options['verbose']) ? [false, false, false] : null,
-    'retry'   => isset($options['r']) || isset($options['retry']) ? true : false,
-]);
+$kernel = new Daemon\Kernel(
+    'Plagscan Document Migration',
+    [
+        Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'r::',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['retry::'],
+    ]
+);
 
 try {
     /** @var IConfigLoader $config */
@@ -38,18 +42,12 @@ try {
     /** @var IConnector $database */
     $database = $kernel->getDependencyInjector()->get('databaseInternal');
 
-    $kernel->run(function ($di, $loop, $log, $opts) use ($lock, $database) {
-        /** @noinspection PhpUndefinedClassInspection */
-        /**
-         * @var Injector        $di
-         * @var LoopInterface   $loop
-         * @var array           $opts
-         * @var LoggerInterface $log
-         */
+    $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($lock, $database) {
+
+        $retry = isset($opts['r']) || isset($opts['retry']);
 
         // Indicate retry state
-
-        $log->debug('Retry of failed documents is ' . ($opts['retry'] ? 'enabled' : 'disabled'));
+        $log->debug('Retry of failed documents is ' . ($retry ? 'enabled' : 'disabled'));
 
         // Detect if a child process (SIGCHLD) fails to respond, if it does throw the process over to the
         // default kernel signal handler (SIG_DFL) which will take the appropriate default action (ignore it,
@@ -120,7 +118,7 @@ try {
 
                 /** @var array $document */
                 foreach ($documents as $document) {
-                    if (!empty($document['storage_failed_at']) && !$opts['retry']) {
+                    if (!empty($document['storage_failed_at']) && !$retry) {
                         $log->debug("Skipping failed document when migrating `plagscan_document`.`id` {$document["id"]}");
                         $skipped++;
                         continue;

@@ -1,20 +1,23 @@
+#!/usr/bin/php
 <?php
 /**
  * @copyright Copyright 2018, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 declare(strict_types=1);
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Application\Daemon;
 
-
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Alt Source Linkup', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-]);
+require __DIR__ . '/../../../conf/core/require.php';
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    'Alt Source Linkup',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 /** @var IConnector $db */
 $db = $kernel->get('databaseInternal');

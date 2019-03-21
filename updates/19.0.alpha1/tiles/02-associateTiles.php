@@ -15,14 +15,17 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Tile\Component\DashboardTileController;
 use Schoolbox\Tile\Component\HomepageTileController;
+use Schoolbox\Application\Daemon;
 
+require __DIR__ . '/../../../conf/core/require.php';
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
-
-$kernel = new Schoolbox\Application\Daemon\Kernel("Associate Tiles", [
-    'verbose' => [true, true, true],
-    'errors'  => E_ALL,
-]);
+$kernel = new Schoolbox\Application\Daemon\Kernel(
+    "Associate Tiles",
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $app = new class extends App
 {
@@ -135,12 +138,9 @@ $app = new class extends App
     /**
      * Run the app.
      *
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log                           = $log;
         $this->db                            = $di->get('databaseInternal');
@@ -320,7 +320,7 @@ $app = new class extends App
      */
     private function updateTileLayoutHeading(array $component): void
     {
-        $heading = trim($component['componentname']);
+        $heading = trim($component['componentname'] ?? '');
         if ($heading === '') {
             $heading = 'Tiles';
             $this->log->notice(self::INDENT . sprintf('layout has no heading: setting to "%s"', $heading));

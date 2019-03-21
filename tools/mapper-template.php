@@ -8,7 +8,8 @@
  * @version     SVN: $Id$
  */
 
-require_once(__DIR__ . '/../library/Bootstrap.php');
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $opts = getopt('t::');
 
@@ -63,23 +64,25 @@ echo "\nclass {$mapper['model']} {\n";
 
 // properties themselves
 foreach($model as $p) {
-	printf("\n	/** @var %s */\n	protected $%s;\n", $p['type'], $p['property']);
+	printf("\n	/** @var %s */\n	private $%s;\n", $p['type'], $p['property']);
 }
 
 // getters and setters, with return $this; on setters
 foreach($model as $p) {
+  $type = $p['type'] === 'object' ? ucfirst($p['property']) . '\Model' : $p['type'];
 	printf("
 
 	/**
 	 * @param %s $%s
-	 * @return self
+	 * @return \$this
 	 */
-	public function set%s($%s) {
+	public function set%s(%s $%s): self
+	{
 		\$this->%s = $%s;
 		return \$this;
 	}
 ",
-		$p['type'], $p['property'], ucfirst($p['property']), $p['property'], $p['property'], $p['property']
+	  $type, $p['property'], ucfirst($p['property']), $type, $p['property'], $p['property'], $p['property']
 	);
 
 	printf("
@@ -87,11 +90,12 @@ foreach($model as $p) {
 	/**
 	 * @return %s
 	 */
-	public function get%s() {
+	public function get%s(): ?%s
+	{
 		return \$this->%s;
 	}
 ",
-		$p['type'], ucfirst($p['property']), $p['property']
+	  $type, ucfirst($p['property']), $type, $p['property']
 	);
 
 }
@@ -181,38 +185,6 @@ function determineModelType($mapperType) {
 
 	return isset($map[$mapperType]) ? $map[$mapperType] : 'null';
 
-}
-
-/**
- * @param $camel
- * @param string $delim
- * @return string
- */
-function camel2score($camel, $delim = '_') {
-	$xpl = preg_split('/([[:upper:]][[:lower:]]+)/', $camel, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
-	return strtolower(implode($delim, $xpl));
-}
-
-/**
- * @param $score
- * @param string $delim
- * @return string
- */
-function score2camel($score, $delim = '_') {
-	return lcfirst(score2pascal($score, $delim));
-}
-
-/**
- * @param $score
- * @param string $delim
- * @return string
- */
-function score2pascal($score, $delim = '_') {
-	$xpl = explode($delim, $score);
-	foreach($xpl as &$v) {
-		$v = ucfirst($v);
-	}
-	return implode('', $xpl);
 }
 
 

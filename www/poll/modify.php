@@ -1,9 +1,10 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
-
 use \Schoolbox\Breadcrumbs;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $pollHandler = new Poll;
 $groupHandler = new Group(HOMEPAGE_SERVICE);

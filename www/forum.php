@@ -1,7 +1,5 @@
 <?php
 
-require_once SITE_root . '/library/Bootstrap.php';
-
 use \Schoolbox\Breadcrumbs;
 
 $forumHandler = new Forum();

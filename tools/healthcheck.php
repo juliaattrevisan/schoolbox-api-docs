@@ -10,11 +10,10 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Config;
 
-/** @var Kernel $kernel */
-$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $di = $kernel->getDependencyInjector();
 

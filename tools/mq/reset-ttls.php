@@ -12,22 +12,17 @@ use Predis\Collection\Iterator\Keyspace;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
-
-$fields = array('porcelain', 'mem', 'truemem', 'pid');
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$k = new \Schoolbox\Application\Daemon\Kernel('TTL Reset', [
-    'verbose' => [true, true],
-    'errors'  => E_ALL,
-    'fields'  => array_values($fields),
-]);
+$k = new Daemon\Kernel(
+    'TTL Reset',
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::INFO,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 try {
     $k->run(new class extends App {
@@ -39,13 +34,9 @@ try {
         private const NOT_EXIST  = 'DOES NOT EXIST';
 
         /**
-         * @param Di\Container  $di
-         * @param LoopInterface $loop
-         * @param Logger        $log
-         * @param array         $opts
-         * @return void
+         * @inheritdoc
          */
-        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
         {
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');

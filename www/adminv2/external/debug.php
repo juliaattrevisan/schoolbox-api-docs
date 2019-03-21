@@ -7,7 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-//$kernel = require_once '../../../library/Bootstrap.php';
+require_once '../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 //
 //$di = $kernel->getDependencyInjector();
 //

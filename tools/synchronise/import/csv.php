@@ -1,14 +1,13 @@
 #!/usr/bin/php
 <?php
 
-/** @var WebRequest\Kernel $kernel */
-$kernel = require __DIR__ . '/../../../library/Bootstrap.php';
-
 use Alaress\Csv\Reader;
 use Alaress\Lumberjack\Logger;
-use Schoolbox\Application\WebRequest;
 use Schoolbox\External\Importer;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 // Manage options
 $options = getopt('v', ['perform-update', 'user::', 'structure::', 'timetable::', 'enrolment::',]);

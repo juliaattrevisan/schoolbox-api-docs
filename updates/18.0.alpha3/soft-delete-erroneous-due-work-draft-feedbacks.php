@@ -19,12 +19,16 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
+use Schoolbox\Application\Daemon;
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Soft-Delete erroneous DueWork draft feedbacks'", [
-    'verbose' => $opts['v'] ?? null,
-    'errors'  => E_ALL,
-]);
+require __DIR__ . '/../../conf/core/require.php';
+$kernel = new Daemon\Kernel(
+    "'Soft-Delete erroneous DueWork draft feedbacks'",
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 $deletor = new class extends App
 {
@@ -65,15 +69,11 @@ $deletor = new class extends App
 
 
     /**
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
-     * @return void
+     * @inheritdoc
      * @throws Di\Exception\ServiceNotFound
      * @throws PDOException
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log      = $log;
         $this->database = $di->get('databaseInternal');

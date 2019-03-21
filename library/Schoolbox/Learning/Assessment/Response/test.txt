@@ -2,8 +2,8 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
-/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /** @var \Schoolbox\Learning\Assessment\Participant\DataSource $participantDataSource */
 $participantDataSource = $kernel->getDependencyInjector()->get('participantDataSource');

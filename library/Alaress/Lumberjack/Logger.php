@@ -21,22 +21,24 @@ use Psr\Log\LoggerInterface;
 
 class Logger implements LoggerInterface {
 
-    const FIELD_MEM       = 'mem';
-    const FIELD_TRUE_MEM  = 'truemem';
-    const FIELD_PID       = 'pid';
-    const FIELD_LEVEL     = 'level';
-    const FIELD_PORCELAIN = 'porcelain';
+    // Command line options
+    public const FIELD_MEM      = 'mem';        // Prepend a memory usage field to each log item
+    public const FIELD_TRUE_MEM = 'truemem';    // Prepend a true memory usage field to each log item
+    public const FIELD_PID      = 'pid';        // Prepend a PID field to each log item
+
 
     /**
-     * @return array
+     * Returns a set of command line options that will prepend fields to each log item
+     *
+     * @return string[]
      */
-    public static function getAvailableFields() {
-        return array(
-            self::FIELD_LEVEL,
+    public static function getAvailableFields(): array
+    {
+        return [
             self::FIELD_PID,
             self::FIELD_MEM,
             self::FIELD_TRUE_MEM,
-        );
+        ];
     }
 
 

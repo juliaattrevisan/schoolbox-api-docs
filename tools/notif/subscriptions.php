@@ -13,24 +13,22 @@ use Alaress\Routing\IRouter;
 use Alaress\Routing\Router;
 use Aura\Di;
 use Predis\ClientInterface;
-use Psr\Log\LoggerInterface as Logger;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Realtime\Routing\Cache\Redis\ReadCache;
 use Schoolbox\Realtime\Routing\Subscription\Test\NestTestResolver;
+use Schoolbox\Application\Daemon;
 
-$fields = ['user:', 'pattern:'];
+require __DIR__ . '/../../conf/core/require.php';
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
-
-$kernel = new Schoolbox\Application\Daemon\Kernel('Subscription Reader', [
-    'verbose' => array_fill(0, max(2, count($opts['v'] ?? [])), false),
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-    'pattern' => $opts['pattern'] ?? null,
-    'user'    => $opts['user'] ?? null
-]);
+$kernel = new Daemon\Kernel(
+    'Subscription Reader',
+    [
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['user:', 'pattern:'],
+    ]
+);
 
 const HALP = <<<EOF
 Schoolbox Subscription Reader
@@ -66,16 +64,9 @@ try {
         private $redis;
 
         /**
-         * The main() of this "app"
-         *
-         * @param Di\Container  $di
-         * @param LoopInterface $loop
-         * @param Logger        $log
-         * @param array         $opts
-         * @return void
-         * @throws Di\Exception\ServiceNotFound
+         * @inheritdoc
          */
-        public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+        public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
         {
             $this->log   = $log;
             $this->redis = $di->get('redis');

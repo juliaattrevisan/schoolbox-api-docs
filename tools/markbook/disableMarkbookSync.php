@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Lazy way to enable/disable external markbook sync
@@ -7,23 +8,10 @@
  * @link        http://www.alaress.com.au/
  */
 
-use Aura\Di\Container as Injector;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Assessment\Activity;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\User;
 
-require_once __DIR__ . '/../../conf/core/require.php';
 // Setup kernel
-
+require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Schoolbox\Application\Daemon\Kernel('Enable Markbook External Sync');
 
 // Get this kernel started

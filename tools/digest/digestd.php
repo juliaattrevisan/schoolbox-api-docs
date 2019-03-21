@@ -16,7 +16,6 @@ use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Schedule\Trigger\Factory\DigestTriggerFactory;
 use Schoolbox\UserMapper;
 
-
 /**
  * The Digest Daemon.
  *
@@ -25,38 +24,23 @@ use Schoolbox\UserMapper;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
-/**
- * Shut UP, storm!
- * @var array $fields
- */
-$fields = [ 'porcelain', 'mem', 'truemem', 'pid', 'debug-interval:' ];
-
-$opts = getopt('v', $fields);
-
-foreach($fields as $k => $name) {
-    if(!isset($opts[$name])) {
-        unset($fields[$k]);
-    }
-}
-
-$flags = implode(' ', array_slice($argv, 1));
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Digest', [
-	'verbose'        => isset($opts['v']) ? $opts['v'] : null,
-    'fields'         => array_values($fields),
-    'flags'          => $flags,
-    'debug-interval' => isset($opts['debug-interval']) ? $opts['debug-interval'] : null
-]);
 
-
+$kernel = new Daemon\Kernel(
+    'Digest',
+    [
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['debug-interval:'],
+    ]
+);
 
 // CREATE DIGEST APP
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
-    $instance = INSTANCE_ID;
-    $topic    = "digestd.$instance.*";
+    $instance      = INSTANCE_ID;
+    $topic         = "digestd.$instance.*";
+    $debugInterval = $opts['debug-interval'] ?? null;
 
     /** @var IConfigLoader $conf */
     $conf = $di->get('config');
@@ -69,9 +53,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
     $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
     $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
-    $strat      = new DefaultDispatchStrategy($opts['flags']);
+    $strat      = new DefaultDispatchStrategy($flags);
     $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $conf, $log );
-    $factory    = new DigestTriggerFactory($notifier, $clock, $opts['debug-interval']);
+    $factory    = new DigestTriggerFactory($notifier, $clock, $debugInterval);
 
     $scheduler  = new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);
 

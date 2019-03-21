@@ -4,8 +4,8 @@ use Schoolbox\MapperFactory;
 use Schoolbox\RoleMapper;
 use Schoolbox\Resource\Folder;
 
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
-require_once SITE_root . '/www/include/stdfuncs.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /** @var RoleMapper $roleMapper */
 $roleMapper = RoleMapper::getInstance();

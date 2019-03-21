@@ -12,8 +12,8 @@ if (isset($this)) {
     /* Direct access to modify.php -_-
      */
 
-    /** @var Alaress\Application\Kernel $kernel */
-    $kernel = require_once(__DIR__ . '/../../library/Bootstrap.php');
+    require_once __DIR__ . '/../../conf/core/require.php';
+    $kernel = new Schoolbox\Application\WebRequest\Kernel();
 
     /** @var SitePage $page */
     $page = $kernel->getDependencyInjector()->get('sitePage');

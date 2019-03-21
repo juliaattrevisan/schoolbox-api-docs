@@ -8,7 +8,8 @@
  * @link      http://www.alaress.com.au/
  */
 
-require_once __DIR__ . '/../library/Bootstrap.php';
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 if (!isset($argv[1])) {
     fwrite(STDERR, "A username must be provided.\n");

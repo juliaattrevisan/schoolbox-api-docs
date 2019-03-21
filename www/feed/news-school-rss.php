@@ -7,9 +7,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-$kernel = require_once __DIR__ . '/../../library/Bootstrap.php';
-
 use Schoolbox\News\TopicMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage(false);
 

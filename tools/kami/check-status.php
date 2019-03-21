@@ -10,7 +10,6 @@
  */
 declare(strict_types=1);
 
-use Alaress\Database\Connector\IConnector;
 use Alaress\Jitter\Jitter;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
@@ -19,8 +18,11 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
+use Schoolbox\Application\Daemon;
 
-$fields = [
+require __DIR__ . '/../../conf/core/require.php';
+
+$appOpts = [
     'help',
     'perform',
     'dry-run',
@@ -29,14 +31,12 @@ $fields = [
     'base-back-off:',
     'timeout:',
 ];
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
+$kernel = new Daemon\Kernel(
     'Kami Status Checker',
     [
-        'verbose' => $opts['v'] ?? [1,2,3],
-        'errors'  => E_ALL,
-        'opts'    => $opts,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
     ]
 );
 
@@ -46,9 +46,8 @@ $kernel->run(function (
     /** @noinspection PhpUnusedParameterInspection */
     LoopInterface $loop,
     LoggerInterface $log,
-    array $options
+    array $opts
 ) {
-    $opts        = $options['opts'];
     $displayHelp = isset($opts['help']);
     $dryRun      = isset($opts['dry-run']);
     $perform     = isset($opts['perform']);

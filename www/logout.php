@@ -1,7 +1,8 @@
 <?php
 //small script to logout users
 
-require_once('../library/Bootstrap.php');
+require_once '../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 if (Cfg::get('saml_enabled') && Cfg::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
     // Initiate SLO

@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * Plagscan scanner
@@ -16,9 +17,10 @@ use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as Plags
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\ReportTransactor as PlagscanReportTransactor;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', ['level' => 200]);
+$kernel = new Daemon\Kernel('Plagscan Scanner', [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $log = $kernel->logger();
 
 $mapper = PlagscanMapper::getInstance();

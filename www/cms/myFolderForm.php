@@ -3,7 +3,8 @@ use Schoolbox\Resource\My\Folder as MyFolder;
 use Schoolbox\Mapper;
 use Schoolbox\Error;
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page           = new SitePage();
 $myFolderMapper = MyFolder\Mapper::getInstance();

@@ -3,7 +3,7 @@
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 
-require_once '../../library/Bootstrap.php';
+require_once '../../conf/core/require.php';
 
 $dropbox = Schoolbox\Dropbox\Mapper::getInstance();
 $page    = new SitePage();

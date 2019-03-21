@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\Daemon;
 
+use Alaress\Application\WrongSapiException;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -27,6 +28,16 @@ use React\Stomp;
 
 class Kernel extends \Alaress\Application\Kernel
 {
+    // Options keys for $options passed to this Kernel's constructor
+    public const OPTION_LEVEL          = 'level';        // What log level should be reported? Falls back to 'v' if not specified.
+    public const OPTION_ERRORS         = 'errors';       // What level of PHP errors should be reported?
+    public const OPTION_APP_SHORT_OPTS = 'appShortOpts'; // short options used by the app
+    public const OPTION_APP_LONG_OPTS  = 'appLongOpts';  // long options used by the app
+
+    // Command line options recognised by this Daemon kernel
+    public const OPT_VERBOSITY     = 'v';         // What level of verbosity should be logged
+    public const OPT_PORCELAIN     = 'porcelain'; // Should log items be formatted for text file rather than TTL?
+
     const RLIMIT_CORE_FILESIZE = 'core';
     const RLIMIT_CPU_TIME = 'cpu';
     const RLIMIT_DATA_SEGMENT = 'data';
@@ -44,11 +55,21 @@ class Kernel extends \Alaress\Application\Kernel
     /** @var LoopInterface */
     protected $loop;
 
-    /** @var array */
-    protected $opts;
+    /**
+     * All command line options relevant to this kernel, app, and logger
+     * @var array
+     */
+    private $opts;
 
     /** @var LoggerInterface */
     protected $log;
+
+    /**
+     * Was this kernel invoked at a specific log level?
+     *
+     * @var int|null
+     */
+    private $logLevel;
 
     /**
      * Various process limits imposed by the operating system
@@ -61,8 +82,8 @@ class Kernel extends \Alaress\Application\Kernel
     /**
      * Initialise
      *
-     * @param string $name
-     * @param array  $opts
+     * @param string $name The name of this Daemon
+     * @param array  $options Keys are one of the self::OPTION_X constants
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -71,13 +92,16 @@ class Kernel extends \Alaress\Application\Kernel
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\External\Exception
      */
-    public function __construct($name, $opts = [])
+    public function __construct(string $name, array $options = [])
     {
-        $this->setOpts($opts);
+        $this->validateOptions($options);
+        $this->parseCommandLineOpts($options);
+        $this->logLevel = $options[self::OPTION_LEVEL] ?? null;
+
         parent::__construct();
 
         pcntl_signal(SIGCHLD, SIG_IGN);
-        error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
+        error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->name = $name;
 
         $this->loop = $this->di->values['react.loop'] = Factory::create();
@@ -99,15 +123,40 @@ class Kernel extends \Alaress\Application\Kernel
 
 
     /**
-     * @param array $opts
+     * Check that all kernel options are valid
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException If unrecognised kernel options are injected
      */
-    protected function setOpts($opts)
+    private function validateOptions(array $options): void
     {
-        $this->opts = $opts;
-        // If level not set, logging level determined by verbose
-        if (!isset($this->opts['level'])) {
-            $this->opts['level'] = $this->getLoggingLevel();
+        $valid   = [self::OPTION_LEVEL, self::OPTION_ERRORS, self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS];
+        $invalid = [];
+        foreach ($options as $key => $val) {
+            if (!\in_array($key, $valid, true)) {
+                $invalid[$key] = $val;
+            }
         }
+        if (\count($invalid)) {
+            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
+        }
+    }
+
+
+    /**
+     * Processes command line options and any kernel-invocation overrides
+     *
+     * @param array $options
+     */
+    private function parseCommandLineOpts(array $options): void
+    {
+        // Get all Kernel, App, and Logger options from command line
+        $appShortOpts = $options[self::OPTION_APP_SHORT_OPTS] ?? '';
+        $appLongOpts  = $options[self::OPTION_APP_LONG_OPTS] ?? [];
+
+        $shortOpts  = $appShortOpts . self::OPT_VERBOSITY;
+        $longOpts   = \array_merge($appLongOpts, [self::OPT_PORCELAIN], Logger::getAvailableFields());
+        $this->opts = \getopt($shortOpts, $longOpts);
     }
 
     /**
@@ -149,7 +198,7 @@ class Kernel extends \Alaress\Application\Kernel
      */
     public function run($callable = null)
     {
-        if (posix_isatty(STDOUT) && !is_null($this->getOpt('verbose'))) {
+        if (posix_isatty(STDOUT)) {
             echo <<<EOL
 
  ||
@@ -167,7 +216,9 @@ EOL;
         }
 
         try {
-            call_user_func($callable, $this->di, $this->loop, $this->logger(), $this->opts);
+            global $argv;
+            $flags = \implode(' ', \array_slice($argv, 1));
+            $callable($this->di, $this->loop, $this->logger(), $this->opts, $flags);
         } catch (\Schoolbox\External\Exception $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
             throw $e;
@@ -373,9 +424,9 @@ EOL;
      *
      * @return int
      */
-    public function getLoggingLevel()
+    public function getLoggingLevel(): int
     {
-        $v = $this->getOpt('verbose');
+        $v = $this->getOpt(self::OPT_VERBOSITY);
 
         $threshold = 0;
         if (isset($v)) {
@@ -386,10 +437,10 @@ EOL;
         }
 
         $limits = [
-            0 => 500, // nil verbosity: exceptional behaviour only
-            1 => 250, // min verbosity: significant events
-            2 => 200, // mod verbosity: most things
-            3 => 100  // max verbosity: EV-ER-Y-THING...
+            0 => Monolog\Logger::CRITICAL, // nil verbosity: exceptional behaviour only
+            1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
+            2 => Monolog\Logger::INFO,     // mod verbosity: most things
+            3 => Monolog\Logger::DEBUG     // max verbosity: EV-ER-Y-THING...
         ];
         return $limits[$threshold];
     }
@@ -397,14 +448,23 @@ EOL;
 
     /**
      * @return LoggerInterface
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function logger()
+    public function logger(): LoggerInterface
     {
         if (!$this->log instanceof LoggerInterface) {
-            // if verbose output is on
-            $level     = $this->getOpt('level');
-            $fields    = $this->getOpt('fields') ?: [];
-            $porcelain = in_array('porcelain', $fields);
+            // Derive log verbosity
+            $level = $this->logLevel ?? $this->getLoggingLevel();
+
+            // Derive the list of fields to prepend to log items
+            $fields = Logger::getAvailableFields();
+            foreach ($fields as $key => $field) {
+                if (!isset($opts[$field])) {
+                    unset($fields[$key]);
+                }
+            }
+
+            $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
             $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
             // Add Sentry handler into logging system if possible
@@ -420,6 +480,18 @@ EOL;
         }
 
         return $this->log;
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws WrongSapiException
+     */
+    protected function checkServerApiEnvironment(): void
+    {
+        if (PHP_SAPI !== 'cli') {
+            throw new WrongSapiException('Cannot use Daemon Kernel in Web Server environment.');
+        }
     }
 
 

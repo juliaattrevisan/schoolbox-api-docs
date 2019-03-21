@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  * 
@@ -7,7 +8,8 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../../library/Bootstrap.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 if($argc < 3) {
 	die("Usage: php {$argv[0]} <sessionID> <count>\n");

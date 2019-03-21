@@ -3,15 +3,13 @@
  * @deprecated this has been replaced by Schoolbox\User\Password\Reset\Controller
  */
 
-/** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
-$kernel = require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
-
 use Psr\Log\NullLogger;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\External\Connector\ICommunityPortal;
-use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmailFactory;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 $userHandler = new User();

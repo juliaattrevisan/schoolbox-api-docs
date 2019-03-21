@@ -41,15 +41,15 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Zend\Uri\Uri;
-
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = getopt('vp');
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Rubric Usage Cleanup',
     [
-        'verbose' => [true, true, true]
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
     ]
 );
 
@@ -144,12 +144,9 @@ $kernel->run(new class extends App
      * Install all instance vars, and wraps the repair process in a transaction
      * for commit, or rollback (if an error is raised).
      *
-     * @param Di\Container  $di
-     * @param LoopInterface $loop
-     * @param Logger        $log
-     * @param array         $opts
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         // Install logger and DB
         $this->log     = $log;

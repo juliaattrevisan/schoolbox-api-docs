@@ -8,10 +8,12 @@
  * @version     SVN: $Id$
  */
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Breadcrumbs;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 SitePage::extendExecutionTime(300);
 

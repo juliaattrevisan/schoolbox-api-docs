@@ -9,7 +9,8 @@
 
 // enforce SitePage context for authentication
 if(!isset($this)) {
-    require_once('../../../library/Bootstrap.php');
+    require_once __DIR__ . '/../../../conf/core/require.php';
+    $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/modules/tuckshop/enter');
 }
 

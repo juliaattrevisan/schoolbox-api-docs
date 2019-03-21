@@ -61,8 +61,8 @@ use Schoolbox\Pastoral;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../library/Bootstrap.php';
-
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Recursive Undeleter');
 
 $undeleter = new RecursiveUndeleter();
 $undeleter->run();

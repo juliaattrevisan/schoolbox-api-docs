@@ -5,7 +5,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../../library/Bootstrap.php');
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $groupHandler = new Group();
 $userHandler = new User();
 

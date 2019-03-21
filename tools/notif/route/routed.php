@@ -16,7 +16,7 @@ use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Transaction\DispatchTransaction;
 use Aura\Di;
 use Predis\ClientInterface;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\Stomp\Client;
 use Schoolbox\Realtime\MessageList\ListFactory;
@@ -25,22 +25,16 @@ use Schoolbox\Realtime\Routing\DispatchResponder;
 use Schoolbox\Realtime\Routing\DispatchStrategy;
 use Schoolbox\Realtime\Routing\RouteTXRX;
 use Schoolbox\Realtime\Routing\Subscription;
+use Schoolbox\Application\Daemon;
 
-$flags = implode(' ', array_slice($argv, 1));
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+require __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Routing', [
-    'verbose' => isset($opts['v']) ? $opts['v'] : null,
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-    'flags'   => $flags,
-]);
-
+$kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // ROUTING APP
-$kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
-    $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts) {
+    $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts, $flags) {
         try {
             $log->info('Connected to STOMP', [ 'char' => '+' ]);
 
@@ -55,7 +49,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
 
             // also listen for signals
             $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
-            $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($opts['flags']));
+            $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
 
             $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
 

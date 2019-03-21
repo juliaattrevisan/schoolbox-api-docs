@@ -1,6 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 // Open session after bootstrap, otherwise $_SESSION[user] won't be a user.
 $page = new SitePage;
 

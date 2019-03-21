@@ -1,10 +1,7 @@
 <?php
 
-/** @var Kernel $kernel */
-
-use Alaress\Application\Kernel;
-
-$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page         = $kernel->getDependencyInjector()->get('layoutEngine');
 $wikiHandler  = new Wiki;

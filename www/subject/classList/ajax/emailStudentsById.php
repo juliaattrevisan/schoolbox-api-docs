@@ -10,7 +10,8 @@
 
 use Alaress\Mail\AbstractMailer;
 
-require_once('../../../../library/Bootstrap.php');
+require_once __DIR__ . '/../../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 /* avviare la sessione con il solito sitepage
  */

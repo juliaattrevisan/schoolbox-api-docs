@@ -16,7 +16,8 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 
-require_once dirname(__FILE__) . '/../library/Bootstrap.php';
+require_once __DIR__ . '/../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 session_start();
 

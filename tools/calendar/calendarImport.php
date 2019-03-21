@@ -12,23 +12,23 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
 
-$fields = ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'];
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Calendar CSV Import', [
-    'verbose' => [true, true],
-    'errors'  => E_ALL,
-    'fields'  => $opts,
-]
+$kernel = new Daemon\Kernel(
+    'Calendar CSV Import',
+    [
+        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::INFO,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'],
+    ]
 );
 
 
 // ROUTING APP
 $kernel->run(
     function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
-        $opts = $opts['fields'];
 
         $file = null;
         if (isset($opts['help']) || count($opts) == 0) {

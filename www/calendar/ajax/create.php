@@ -16,7 +16,8 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $calendarHandler = new Calendar();
 $page = new SitePage();

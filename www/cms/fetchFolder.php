@@ -11,9 +11,10 @@
 *							                                *
 /************************************************************/
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
-
 use Schoolbox\Application\WebRequest\ShutdownHandler;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage();
 $zip = new ZipFolder($_GET['folder']);

@@ -7,15 +7,14 @@
  * @copyright   2018 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  */
-use Alaress\Database\Connector\IConnector;
 use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
-use Schoolbox\Resource\Storage;
 use Alaress\Image\Transformation;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-define('LOG_LEVEL', 200); // default log level to INFO
+define('LOG_LEVEL', Monolog\Logger::INFO); // default log level to INFO
 define('MAX_WORKERS', 4); // default maximum number of workers
 define('TIME_INTERVAL', 15); // time period in minutes to look up images for processing
 define('LIMIT', 300); // maximum amount of images to be processed
@@ -28,7 +27,12 @@ $maxWorkers = (int)getenv('MAX_WORKERS', true) ?: MAX_WORKERS;
 $timeInterval = (int)getenv('TIME_INTERVAL', true) ?: TIME_INTERVAL;
 $limit = (int)getenv('LIMIT', true) ?: LIMIT;
 
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Image Processor', array('level' => $logLevel));
+$kernel = new Daemon\Kernel(
+    'Image Processor',
+    [
+        Daemon\Kernel::OPTION_LEVEL => $logLevel,
+    ]
+);
 $logger = $kernel->logger();
 
 $logger->info(sprintf("[manager] Starting Image Processor (maxWorkers: %d)", $maxWorkers));

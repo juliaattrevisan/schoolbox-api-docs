@@ -27,16 +27,16 @@ use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Zend\Uri\Uri;
-
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = getopt('vp', ['perform']);
-$kernel = new Schoolbox\Application\Daemon\Kernel(
+$kernel = new Daemon\Kernel(
     'Rubric Repair',
     [
-        'verbose' => $opts['v'] ?? [],
-        'perform' => isset($opts['p']) || isset($opts['perform']),
+        Daemon\Kernel::OPTION_LEVEL          => Monolog\Logger::CRITICAL,
+        Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'p',
+        Daemon\Kernel::OPTION_APP_LONG_OPTS  => ['perform'],
     ]
 );
 
@@ -366,18 +366,15 @@ $kernel->run(new class extends App
      * for commit (if `--perform` is on) or rollback (if it's off, or an error
      * is raised).
      *
-     * @param Di\Container  $di
-     * @param LoopInterface $loop
-     * @param Logger        $log
-     * @param array         $opts
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         // Install logger and DB
         $this->log     = $log;
         $this->db      = $di->get('databaseInternal');
         $this->now     = Alaress_Date_Format::now();
-        $this->perform = $opts['perform'] ?? false;
+        $this->perform = isset($opts['p']) || isset($opts['perform']);
         $config        = $di->get('config');
         $this->fqdn    = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
 

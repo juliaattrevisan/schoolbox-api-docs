@@ -20,17 +20,11 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
-use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
+use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$opts   = getopt('v');
-$kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Pastoral Export',
-    [
-        'verbose' => $opts['v'] ?? [],
-    ]
-);
+$kernel = new Daemon\Kernel('Pastoral Export');
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 

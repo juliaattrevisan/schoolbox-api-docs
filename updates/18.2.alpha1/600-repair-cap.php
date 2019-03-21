@@ -15,13 +15,15 @@ use Schoolbox\Application\Daemon;
 use Psr\Log\LoggerInterface;
 use Alaress\Database;
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
+require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel("Repair 'Custom Assessment Participation' (CAP)", [
-    'verbose' => $opts['v'] ?? [1, 2, 3],
-    'errors'  => E_ALL,
-    'fields'  => array_keys($opts),
-]);
+$kernel = new Daemon\Kernel(
+    "Repair 'Custom Assessment Participation' (CAP)",
+    [
+        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
 
 /**
  * Relevant Business Rules:
@@ -60,7 +62,7 @@ $capRepair = new class extends Daemon\App
     /**
      * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log = $log;
         $this->db  = $di->get('databaseInternal');

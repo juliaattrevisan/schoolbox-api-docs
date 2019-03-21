@@ -40,14 +40,16 @@ class Framework
     /** @var array */
     protected $hooks = [];
 
+
     /**
      * @param Di\Container    $di
      * @param LoopInterface   $loop
      * @param LoggerInterface $log
-     * @param array           $flags
+     * @param string|null     $env
+     * @param string|null     $logDir
      * @param string          $rootDir
      */
-    public function __construct($di, $loop, $log, $flags, $rootDir = SITE_root)
+    public function __construct($di, $loop, $log, string $env = null, string $logDir = null, $rootDir = SITE_root)
     {
         $this->di = $di;
         $this->loop = $loop;
@@ -55,10 +57,10 @@ class Framework
         $this->rootDir = $rootDir;
 
         // on dev servers will be "schoolboxdev"
-        $this->service = empty($flags['env']) ? 'schoolbox' : (string)$flags['env'];
+        $this->service = empty($env) ? 'schoolbox' : $env;
 
         // obtain absolute directory reference
-        $this->logdir  = realpath(empty($flags['logdir']) ? $rootDir . '/data' : $flags['logdir']);
+        $this->logdir  = realpath(empty($logDir) ? $rootDir . '/data' : $logDir);
     }
 
 

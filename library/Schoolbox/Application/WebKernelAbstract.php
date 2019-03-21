@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
+use Alaress\Application\WrongSapiException;
 use \Database;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Crell\ApiProblem\ApiProblem;
@@ -155,6 +156,18 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      */
     protected function registerShutdownHandling(): void {
         ShutdownHandler::instance()->registerFunction([$this, 'shutdownSafely']);
+    }
+
+
+    /**
+     * @inheritdoc
+     * @throws WrongSapiException
+     */
+    protected function checkServerApiEnvironment(): void
+    {
+        if (PHP_SAPI === 'cli') {
+            throw new WrongSapiException('Cannot use Web Kernel in CLI environment.');
+        }
     }
 
 

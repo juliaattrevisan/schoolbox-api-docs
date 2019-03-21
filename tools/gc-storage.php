@@ -25,10 +25,13 @@ $opts    = getopt('pvn:');
 $limit   = isset($opts['n']) ? $opts['n'] : 1000;
 $perform = isset($opts['p']);
 
-error_reporting(E_ALL);
-
 require_once __DIR__ . '/../conf/core/require.php';
-new Daemon\Kernel('Storage Garbage Collection');
+new Daemon\Kernel(
+    'Storage Garbage Collection',
+    [
+        Daemon\Kernel::OPTION_ERRORS => E_ALL
+    ]
+);
 
 $pdo = Database::getInstance();
 
