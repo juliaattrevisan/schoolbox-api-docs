@@ -93,6 +93,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'postMapper' => $this->getMapperFactory()->getLazy(Post\Mapper::class),
+            'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }
 
