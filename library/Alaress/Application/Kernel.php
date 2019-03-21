@@ -295,7 +295,7 @@ abstract class Kernel
      * eg, the Daemon kernel uses Process Control functions, whereas the WebServer kernel requires a request.
      *
      * @see http://php.net/manual/en/function.php-sapi-name.php
-     * @throws \UnexpectedValueException If this Kernel has been constructed in an invalid environment.
+     * @throws WrongSapiException If this Kernel has been constructed in an invalid environment.
      */
     abstract protected function checkServerApiEnvironment(): void;
 

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\Daemon;
 
+use Alaress\Application\WrongSapiException;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -484,12 +485,12 @@ EOL;
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
+     * @throws WrongSapiException
      */
     protected function checkServerApiEnvironment(): void
     {
         if (PHP_SAPI !== 'cli') {
-            throw new \InvalidArgumentException('Cannot use Daemon Kernel in Web Server environment.');
+            throw new WrongSapiException('Cannot use Daemon Kernel in Web Server environment.');
         }
     }
 
