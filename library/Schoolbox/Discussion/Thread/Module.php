@@ -10,6 +10,7 @@ namespace Schoolbox\Discussion\Thread;
 
 use Alaress\Authorizer as Auth;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
@@ -82,6 +83,15 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader): void
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
