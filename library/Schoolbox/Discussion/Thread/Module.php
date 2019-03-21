@@ -66,6 +66,13 @@ class Module extends BaseModule
             $postAuthorizer,
             [$this, 'preloadThread']
         );
+        $this->register(
+            'PUT',
+            '/{id:\d+}/enable',
+            'enableDisableThread',
+            $postAuthorizer,
+            [$this, 'preloadThread']
+        );
     }
 
 
@@ -86,6 +93,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'postMapper' => $this->getMapperFactory()->getLazy(Post\Mapper::class),
+            'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }
 

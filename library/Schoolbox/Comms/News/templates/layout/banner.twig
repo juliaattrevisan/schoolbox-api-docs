@@ -59,37 +59,40 @@
     </section>
 
     <section class="comments content">
-        <div class="row">
-            <div class="small-6 columns">
-                <h2>Comments (11)</h2>
-            </div>
-            <div class="checklist small-6 columns">
-                {% if modifyRoute %}
-                    <input id="allow-comments" name="allowComments" type="checkbox" {% if article.commentsAllowed %}checked{% endif %}>
-                    <label for="allow-comments">Allow comments</label>
-                {% endif %}
-            </div>
-        </div>
-
-        {% if article.commentsAllowed %}
-            {% if article.public %}
-                <form action="/" method="post">
-                    <label>
-                        <textarea id='comment-area' name='comment-area' rows="5"></textarea>
-                    </label>
-                    <input type="submit" value="Post" />
-                </form>
-            {% else %}
-                <div data-alert="" class="alert-box">
-                    <span class="icon-locked">Comments will be available once this article is published.</span>
+        <div id="threads-section">
+            <div class="row">
+                <div class="small-6 columns">
+                    <h2>Comments (11)</h2>
                 </div>
-            {% endif %}
-        {% else %}
-            <!-- Only show alert if comments are locked -->
-            <div data-alert="" class="alert-box">
-                <span class="icon-locked">Comments are currently disabled for this article.</span>
+                <div class="checklist small-6 columns">
+                    {% if modifyRoute or isAuthor and article.discussionThread.id %}
+                        <input id="allow-comments" name="allowComments" type="checkbox" v-on:click="enableDisableThread" v-model="threadCheckboxEnabled" />
+                        <label for="allow-comments">Allow comments</label>
+                    {% endif %}
+                </div>
             </div>
-        {% endif %}
+            <template v-if="threadEnabled">
+                <template v-if="isPublished">
+                    <form action="/" method="post">
+                        <label>
+                            <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+                        </label>
+                        <input type="submit" value="Post" />
+                    </form>
+                </template>
+                <template v-else>
+                    <div data-alert="" class="alert-box">
+                        <span class="icon-locked">Comments will be available once this article is published.</span>
+                    </div>
+                </template>
+            </template>
+            <template v-else>
+                <!-- Only show alert if comments are locked -->
+                <div data-alert="" class="alert-box">
+                    <span class="icon-locked">Comments are currently disabled for this article.</span>
+                </div>
+            </template>
+        </div>
 
         <ul class="information-list social-stream">
             <li class="actions-small-2">
@@ -158,3 +161,44 @@
         <A href="#" class="button expand" title="Load more">Load more</A>
     </section>
 </div>
+<div id='toaster' class="toast" data-toast></div>
+
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+
+{# Don't bother if discussionThread.id is not set (For now) #}
+{% if modifyRoute or isAuthor and article.discussionThread.id %}
+{% autoescape 'js' %}
+<script>
+
+    var postHeaders = {
+        'X-Requested-With' : 'XMLHttpRequest',
+    }
+
+    var app = new Vue({
+        el: '#threads-section',
+        delimiters: ['${', '}'],
+        data: {
+            threadCheckboxEnabled: '{{ (article.discussionThread.open) ? 'checked' : '' }}',
+            threadEnabled: {{ (article.discussionThread.open) ? 'true' : 'false' }},
+            isPublished: {{ article.isPublic }}
+        },
+        // define methods under the `methods` object
+        methods: {
+            enableDisableThread: function (event) {
+                this.$data.threadEnabled = event.target.checked;
+
+                var $toast = $('#toaster');
+                $toast.toastActivate({text: 'Saving...'});
+
+                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/enable', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
+                    $toast.toastTimeout({text: 'Saved', duration: 2000});
+                }).catch(function (error) {
+                    console.log(error);
+                    $toast.toastTimeout({text: 'Unable to save', duration: 2000, css: 'alert'});
+                });
+            }
+        }
+    })
+</script>
+{% endautoescape %}
+{% endif %}
