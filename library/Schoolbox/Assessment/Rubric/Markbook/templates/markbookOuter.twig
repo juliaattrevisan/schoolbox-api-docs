@@ -44,12 +44,16 @@
         padding: 1.25rem;
         color: black;
     }
+
+    #rubric-marksheet-wrapper {
+        overflow-x: scroll;
+    }
 </style>
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 {% if studentMarks|length %}
     <div class="row">
-        <div class="small-12 island">
+        <div class="small-12 island" id="rubric-marksheet-wrapper">
             <table class="rubric-marksheet marksheet" data-mark-sheet>
                 <thead>
                     <tr class="rotate-headers" data-headers>
