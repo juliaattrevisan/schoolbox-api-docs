@@ -155,6 +155,12 @@ class Controller extends Base
         return $assessments;
     }
 
+    /**
+     * Find marks for each student in a folder and return an array indexed by student ID
+     *
+     * @param int $folderId
+     * @return array
+     */
     private function retrieveMarksInFolder(int $folderId) : array
     {
         $getAuthoritativeMarksInFolderQuery = $this->database->prepareQuery(
