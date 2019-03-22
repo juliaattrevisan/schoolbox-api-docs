@@ -198,7 +198,6 @@
             enableDisableThread: function (event) {
                 this.$data.threadEnabled = event.target.checked;
 
-                var $toast = $('#toaster');
                 $toast.toastActivate({text: 'Saving...'});
 
                 axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
@@ -207,9 +206,30 @@
                     // console.log(error);
                     $toast.toastTimeout({text: 'Unable to save', duration: 2000, css: 'alert'});
                 });
+            },
+            getPosts: function() {
+                axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {}).then(function (response) {
+                    this.$data.posts = response;
+                });
+            }
+        },
+        mounted: function() {
+            var self = this;
+
+            axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {}).then(function (response) {
+                self.posts = response.data;
+                self.posts.commentsTotalCount = 'Comments (' + self.posts.metadata.count + ')';
+                console.log(self.posts);
+            });
+        },
+        filters: {
+            fromNow(date) {
+                return moment(date).fromNow();
+            },
+            fullString(date) {
+                return moment(date).format('dddd MMMM Do YYYY h:mma');
             }
         }
     })
 </script>
 {% endautoescape %}
-{% endif %}
