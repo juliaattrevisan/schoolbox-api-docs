@@ -242,6 +242,8 @@ class Controller extends Base
     }
 
     /**
+     * Work out the human readable marks from the raw marks and insert them into the student marks array
+     *
      * @return array
      * @param array $students
      * @param int $folderId
