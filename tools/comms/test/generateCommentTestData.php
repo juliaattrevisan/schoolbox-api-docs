@@ -12,18 +12,18 @@ declare(strict_types=1);
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon\App;
+use Schoolbox\Application\Daemon;
 use Schoolbox\Discussion\Test\DataGenerator;
 
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$opts   = getopt('v', ['seed:']);
 $kernel = new Schoolbox\Application\Daemon\Kernel(
     'Comment Test Data Generator',
     [
-        'verbose' => $opts['v'] ?? [],
-        'seed'    => $opts['seed'] ?? null,
+        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::DEBUG,
+        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
+        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['seed:'],
     ]
 );
 
@@ -41,16 +41,17 @@ if ($answer === 'n') {
 
 
 /** @noinspection PhpUnhandledExceptionInspection */
-$kernel->run(new class extends App {
+$kernel->run(new class extends Daemon\App {
     /**
-     * Generate the test data. Sorry, no logging yet
+     * Generate the test data.
      *
      * @param Di\Container  $di
      * @param LoopInterface $loop
      * @param Logger        $log
      * @param array         $opts
+     * @param string        $flags
      */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
     {
         $dataGenerator = new DataGenerator(
             $log,
