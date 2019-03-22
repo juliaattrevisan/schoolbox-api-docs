@@ -44,7 +44,7 @@ class SegmentSelectizeOption implements JsonSerializable
     private $labels = [];
 
     /**
-     * @var
+     * @var int
      */
     private $entityId;
 
@@ -82,6 +82,8 @@ class SegmentSelectizeOption implements JsonSerializable
     public function setEntityId(int $entityId): void
     {
         $this->entityId = $entityId;
+
+        return $this;
     }
 
     /**
