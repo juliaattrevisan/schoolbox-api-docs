@@ -22,6 +22,7 @@ use Schoolbox\Collection;
  *
  * @package Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group
  * @method Model findByIdWithFallback($identifierValue)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {

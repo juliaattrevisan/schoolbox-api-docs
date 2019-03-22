@@ -286,9 +286,6 @@ class Controller extends Base
                 $stubAssessment->setMaxMark($assessmentMaxMark);
                 $stubAssessment->setMarkType($markType);
                 if ($gradeGroup !== null) {
-                    /**
-                     * @var GradeGroup\Model $gradeGroup
-                     */
                     $stubAssessment->setGradeGroup($gradeGroup);
                 }
 
