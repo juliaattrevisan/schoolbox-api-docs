@@ -27,33 +27,41 @@
             {% endif %}
 
             <span id="audience-container" v-if="audienceBricks.length > 0">
-                    <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
-                            <span v-if="audienceBrick.isComposite()" class="pipe meta">
-                                <a href="#" title="Click to view composite audience" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
-                            </span>
-                        {# has to be on one line or you get weird whitespace #}
-                        <span v-else class="pipe meta">${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span><template v-if="index+1 < audienceBricks.length">, </template>
-                    </template>
+                <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
+                    <span class="pipe meta">
+                        <span v-if="audienceBrick.isComposite()" class="meta">
+                            <a href="#" title="Click to view audience information" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
+                        </span>
 
-                    {# modal #}
-                    <div data-reveal id="audience-composite" class="reveal-modal">
-                        <h2>Complex Audience</h2>
-                        <a class="close-reveal-modal" aria-label="Close">×</a>
-                        <p class="meta" v-if="selectedCompositeBrick.modalData">
-                            This audience segment includes users who are in both one or more of the selected
-                            ${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() } and one or more of the selected
-                            ${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }.
-                        </p>
-                        <div class="audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
-                            <div><b>${ dimensionData.typeLabel.plural }:</b></div>
-                            <div>
+                        {# has to be on one line or you get weird whitespace #}
+                        <span v-else class="meta">${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</span>
+                    </span>
+                </template>
+
+                {# modal #}
+                <div data-reveal id="audience-composite" class="reveal-modal">
+                    <a class="close-reveal-modal" aria-label="Close">×</a>
+                    <p v-if="selectedCompositeBrick.modalData">
+                        This portion of the audience consists of users who are in <strong>both</strong> one or more of these
+                        <strong>${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() }</strong> and one or more of these
+                        <strong>${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }</strong>.
+                    </p>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="small-12 medium-6 columns no-pad audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                            <p><strong>${ dimensionData.typeLabel.plural }</strong></p>
+
+                            <ul>
                                 <template v-for="(label, index) in dimensionData.valueLabels">
-                                    ${ label }<template v-if="index+1 < dimensionData.valueLabels.length">, </template>
+                                <li>${ label }</li>
                                 </template>
-                            </div>
+                            </ul>
                         </div>
                     </div>
-                </span>
+                </div>
+            </span>
         </div>
         {{ article.body|purify }}
     </section>
