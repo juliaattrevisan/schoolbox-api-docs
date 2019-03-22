@@ -84,6 +84,7 @@ class Controller extends Base
             "SELECT var.assessment_id,
             a.title AS assessment_name,
             sb.rubric_group_marks AS assessment_rubric_group_marks,
+            sb.submission_grade_group_id AS assessment_grade_group_id,
             vrm.assessment_mark_type,
             vrm.assessment_max_mark,
             vrm.capability_id,
@@ -137,6 +138,7 @@ class Controller extends Base
                 'statusLink' => $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $row['assessment_id'] ]),
                 'maxMark' => $row['assessment_max_mark'],
                 'markType' => $row['assessment_mark_type'],
+                'gradeGroupId' => $row['assessment_grade_group_id'],
                 'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
                 'capabilities' => $capabilities
             ];
@@ -264,15 +266,8 @@ class Controller extends Base
                 $assessmentUsesMarkPerCap = $assessmentsInFolder[$assessmentId]['usesMarkPerCap'];
 
                 // Create some things the markscheme factory wants our Due Work to have
-                $gradeGroupIdQuery = $this->database->prepareQuery(
-                    "SELECT sb.submission_grade_group_id
-                    FROM submission_box sb
-                    WHERE sb.assessment_id = :assessmentId"
-                );
-                $gradeGroupIdQuery->execute(['assessmentId' => $assessmentId]);
-                $gradeGroupId = $gradeGroupIdQuery->fetchAll(PDO::FETCH_COLUMN);
                 try {
-                    $gradeGroup = $this->gradeGroupMapper->findById($gradeGroupId);
+                    $gradeGroup = $this->gradeGroupMapper->findById($assessmentsInFolder[$assessmentId]['gradeGroupId']);
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $gradeGroup = null;
                 }
