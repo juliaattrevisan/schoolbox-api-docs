@@ -105,14 +105,30 @@ class Grid
      */
     public function calculateMaxValueFromCapabilities(): float
     {
-        $maxValues = [];
+        // Ignore max value for cap usage, if it's not mark per capability
+        $useMarkPerCapability = $this->isMarkPerCapability();
+        $maxValues            = [];
         foreach ($this->capabilityUsages as $capabilityUsage) {
-            $capabilityUsageMaxValue = $capabilityUsage->getMaxValue();
+            $capabilityUsageMaxValue =
+                $useMarkPerCapability
+                    ? $capabilityUsage->getMaxValue()
+                    : $capabilityUsage->calculateMaxValueFromIndicators();
             if (null !== $capabilityUsageMaxValue) {
                 $maxValues[] = $capabilityUsageMaxValue;
             }
         }
         return !empty($maxValues) ? array_sum($maxValues) : 0;
+    }
+
+
+    /**
+     * Does this rubric grid use mark-per-capability?
+     *
+     * @return bool
+     */
+    public function isMarkPerCapability(): bool
+    {
+        return $this->assessment instanceof DueWork && $this->assessment->getMarkPerCapability();
     }
 
 
