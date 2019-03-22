@@ -57,7 +57,7 @@ class Controller extends Base
     public function getMarkbook(Folder\Model $folder): void
     {
         $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
-        $studentMarks = $this->retrieveMarksInFolder($folder->getId());
+        $studentMarks = $this->retrieveMarksInFolder($folder->getId(), $assessments);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -161,9 +161,10 @@ class Controller extends Base
      * Find marks for each student in a folder and return an array indexed by student ID
      *
      * @param int $folderId
+     * @param array $assessmentsInFolder
      * @return array
      */
-    private function retrieveMarksInFolder(int $folderId) : array
+    private function retrieveMarksInFolder(int $folderId, array $assessmentsInFolder) : array
     {
         $getAuthoritativeMarksInFolderQuery = $this->database->prepareQuery(
             "SELECT var.assessment_id,
@@ -238,7 +239,7 @@ class Controller extends Base
             $lastObservedStudentId = $row['student_id'];
         }
 
-        return $this->generateHumanReadableMarks($students, $folderId);
+        return $this->generateHumanReadableMarks($students, $assessmentsInFolder);
     }
 
     /**
@@ -246,12 +247,11 @@ class Controller extends Base
      *
      * @return array
      * @param array $students
-     * @param int $folderId
+     * @param array $assessmentsInFolder
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function generateHumanReadableMarks(array $students, int $folderId) : array
+    private function generateHumanReadableMarks(array $students, array $assessmentsInFolder) : array
     {
-        $assessmentsInFolder = $this->retrieveAssessmentsInFolder($folderId);
         $markSchemeFactory = new MarkScheme\Factory();
 
         foreach($students as $studentId => $student) {
