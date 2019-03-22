@@ -68,7 +68,7 @@ class Module extends BaseModule
         );
         $this->register(
             'PUT',
-            '/{id:\d+}/enable',
+            '/{id:\d+}/status',
             'enableDisableThread',
             $postAuthorizer,
             [$this, 'preloadThread']
