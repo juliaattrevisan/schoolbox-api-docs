@@ -213,12 +213,12 @@ class Controller extends Base
             }
 
             $indicatorMarks[$row['indicator_id']] = [
-                'normalisedMark' => $row['indicator_mark'],
+                'databaseMark' => $row['indicator_mark'],
                 'selectedDescriptorText' => $row['descriptor_name']
             ];
 
             $capabilityMarks[$row['capability_id']] = [
-                'normalisedMark' => $row['capability_mark'],
+                'databaseMark' => $row['capability_mark'],
                 'indicators' => $indicatorMarks
             ];
 
@@ -289,38 +289,38 @@ class Controller extends Base
                 foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
                     $capabilityMaxMark = $capabilityInFolder['maxMark'];
-                    $capabilityNormalisedMark = $capabilityMarks['normalisedMark'];
+                    $capabilityDatabaseMark = $capabilityMarks['databaseMark'];
 
                     $capabilityUsageModel = new CapabilityUsage(new Capability());
                     $capabilityUsageModel->setMaxValue($capabilityMaxMark);
 
                     $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
                     $capabilityMarkModel = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
-                    $capabilityMarkModel->setValue($capabilityNormalisedMark);
+                    $capabilityMarkModel->setValue($capabilityDatabaseMark);
 
                     $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
-                    $percentageCapabilityMark = $capabilityMarkModel->retrieveNormalizedMark();
+                    $normalisedCapabilityMark = $capabilityMarkModel->retrieveNormalizedMark();
                     $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['percentageMark'] = $percentageCapabilityMark;
+                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = $normalisedCapabilityMark;
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                         $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
                         $indicatorMaxMark = $indicatorInFolder['maxMark'];
-                        $indicatorNormalisedMark = $indicatorMarks['normalisedMark'];
+                        $indicatorDatabaseMark = $indicatorMarks['databaseMark'];
 
                         // This is always just a "total mark" type, so we can work this out ourselves
                         // No need for creating all the models in order to calculate it -
                         // and indeed the overhead in doing so is prohibitive
-                        $humanReadableIndicatorMark = $indicatorNormalisedMark !== null
-                            ? round($indicatorNormalisedMark, 2) . ' / ' . round($indicatorMaxMark)
+                        $humanReadableIndicatorMark = $indicatorDatabaseMark !== null
+                            ? round($indicatorDatabaseMark, 2) . ' / ' . round($indicatorMaxMark)
                             : null;
-                        $percentageIndicatorMark = $indicatorMaxMark !== 0
+                        $normalisedIndicatorMark = $indicatorMaxMark !== 0
                             && $indicatorMaxMark !== null
-                            && $indicatorNormalisedMark !== null
-                            ? ($indicatorNormalisedMark / $indicatorMaxMark) * 100
+                            && $indicatorDatabaseMark !== null
+                            ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
                             : null;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['percentageMark'] = $percentageIndicatorMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] = $normalisedIndicatorMark;
                     }
                 }
             }

@@ -125,10 +125,10 @@
                         <tr class="capability">
                             {% for studentId, student in studentMarks %}
                                 {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
-                                {% set percentageCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].percentageMark %}
+                                {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
                                 {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                {% set gradientClass = urgency.marks(percentageCapabilityMark) %}
+                                {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
                                 {% if capabilityMark is null %}
                                     {% set gradientClass = "" %}
                                 {% endif %}
@@ -143,12 +143,12 @@
                             <tr class="indicator">
                                 {% for studentId, student in studentMarks %}
                                     {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
-                                    {% set percentageIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].percentageMark %}
+                                    {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
                                     {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
                                     {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                    {% set gradientClass = urgency.marks(percentageIndicatorMark) %}
-                                    {% if percentageIndicatorMark is null %}
+                                    {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
+                                    {% if normalisedIndicatorMark is null %}
                                         {% set gradientClass = "" %}
                                     {% endif %}
 
