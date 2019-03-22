@@ -248,6 +248,7 @@ class Controller extends Base
     private function generateHumanReadableMarks(array $students, int $folderId) : array
     {
         $assessmentsInFolder = $this->retrieveAssessmentsInFolder($folderId);
+        $markSchemeFactory = new MarkScheme\Factory();
 
         foreach($students as $studentId => $student) {
 
@@ -262,7 +263,6 @@ class Controller extends Base
                 $assessmentMarkType = $assessmentsInFolder[$assessmentId]['markType'];
                 $assessmentUsesMarkPerCap = $assessmentsInFolder[$assessmentId]['usesMarkPerCap'];
 
-                $markSchemeFactory = new MarkScheme\Factory();
                 // Create some things the markscheme factory wants our Due Work to have
                 $gradeGroupIdQuery = $this->database->prepareQuery(
                     "SELECT sb.submission_grade_group_id
