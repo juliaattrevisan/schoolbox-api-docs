@@ -115,7 +115,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/enable
+     * @api   PUT /threads/{id}/status
      * @param Model $thread
      *
      * @throws \Schoolbox\Mapper\Exception

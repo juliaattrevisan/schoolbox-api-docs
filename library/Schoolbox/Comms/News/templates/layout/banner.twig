@@ -173,8 +173,6 @@
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 
-{# Don't bother if discussionThread.id is not set (For now) #}
-{% if modifyRoute or isAuthor and article.discussionThread.id %}
 {% autoescape 'js' %}
 <script>
 
@@ -198,7 +196,7 @@
                 var $toast = $('#toaster');
                 $toast.toastActivate({text: 'Saving...'});
 
-                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/enable', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
+                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: 'Saved', duration: 2000});
                 }).catch(function (error) {
                     console.log(error);
@@ -209,4 +207,3 @@
     })
 </script>
 {% endautoescape %}
-{% endif %}

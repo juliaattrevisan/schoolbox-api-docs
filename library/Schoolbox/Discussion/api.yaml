@@ -80,7 +80,7 @@ paths:
       - $ref: '#/components/parameters/token'
       - $ref: '#/components/parameters/depth'
 
-  /threads/{id}/enable:
+  /threads/{id}/status:
     put:
       operationId: enableDisableThread
       summary: Open or Close commenting thread
