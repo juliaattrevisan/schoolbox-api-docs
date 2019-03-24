@@ -113,62 +113,48 @@ Data:
     </div>
     {% endif %}
     {% for unitSpecId, unitSpec in unitSpecs %}
-        <div class="column small-12">
-            {# Do we have a link to an AAS assessment for this unit? #}
-            {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
-            {% if unitRoute %}
-                <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link" style="color: inherit;"></span>{{ unitSpec.title }}</a></h2>
-            {% else %}
-                <h2 class="subheader">{{ unitSpec.title }}</h2>
-            {% endif %}
+        {# Do we have any data to display for this unit? #}
+        {% set displayUnit =
+            (aasData.data is defined and aasData.data[unitSpecId] is defined) or
+            (aamData.data is defined and aamData.data[unitSpecId] is defined) or
+            (hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined)
+        %}
 
-            {# Were we given AAS data for this unit? #}
-            {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
-                {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId] only %}
-            {% endif %}
-            {# Were we given AAM data for this unit? #}
-            {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
-                {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
-            {% endif %}
+        {% if displayUnit %}
+            <div class="column small-12">
+                {# Do we have a link to an AAS assessment for this unit? #}
+                {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
+                {% if unitRoute %}
+                    <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link" style="color: inherit;"></span>{{ unitSpec.title }}</a></h2>
+                {% else %}
+                    <h2 class="subheader">{{ unitSpec.title }}</h2>
+                {% endif %}
 
-            {# Were we given HSC Task Marks data for this unit? #}
-            {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
-                {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
-            {% endif %}
-        </div>
+                {# Were we given AAS data for this unit? #}
+                {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
+                    {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId] only %}
+                {% endif %}
+                {# Were we given AAM data for this unit? #}
+                {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
+                    {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
+                {% endif %}
 
-        {# Comments always come from the 'MYP AAS' or 'HSC Task Marks' assessments #}
-        {% set commentData = aasData ? aasData.data[unitSpecId].marks : hscTaskMarks.data[unitSpecId] %}
-        {% if commentData.comment %}
-            <div class="column island small-12">
-                <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
-                <section class="content">
-                    <p>{{ commentData.comment | nl2br }}</p>
-                </section>
+                {# Were we given HSC Task Marks data for this unit? #}
+                {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
+                    {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
+                {% endif %}
             </div>
+
+            {# Comments always come from the 'MYP AAS' or 'HSC Task Marks' assessments #}
+            {% set commentData = aasData ? aasData.data[unitSpecId].marks : hscTaskMarks.data[unitSpecId] %}
+            {% if commentData.comment %}
+                <div class="column island small-12">
+                    <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
+                    <section class="content">
+                        <p>{{ commentData.comment | nl2br }}</p>
+                    </section>
+                </div>
+            {% endif %}
         {% endif %}
     {% endfor %}
-</div>
-
-<div class="row">
-    <div class="island small-12">
-        <section class="meta" style="padding-left: 10px;">
-            <h2 class="subheader">Dev Debug data:</h2>
-            <p>user name: {{ user.fullName }}</p>
-            <p>userId: {{ user.id }}</p>
-            <p>folderId: {{ folder.id }}</p>
-            <br>
-            <p>isIb: {{ attributes.isIb ? 'true' : 'false' }}</p>
-            <p>userYearLevel: {{ attributes.yearLevel }}</p>
-            <p>term: {{ attributes.term }}</p>
-            <br>
-            <p>Curriculum Year Level: {{ attributes.curriculumYearLevel }}</p>
-            <p>Curriculum Semester: {{ attributes.curriculumSemester }}</p>
-            <p>Report Start: {{ attributes.reportStart.database }}</p>
-            <p>Report Finish: {{ attributes.reportFinish.database }}</p>
-            <p>isMyp: {% if attributes.isMyp %}true{% else %}false{% endif %}</p>
-            <p>isDp: {% if attributes.isDp %}true{% else %}false{% endif %}</p>
-            <p>isHsc: {% if attributes.isHsc %}true{% else %}false{% endif %}</p>
-        </section>
-    </div>
 </div>
