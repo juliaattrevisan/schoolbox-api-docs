@@ -11,19 +11,17 @@ use Alaress\Database\Statement\IStatement;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Admin\Settings\FieldType\SelectLookup;
 use Schoolbox\Application\Daemon\App;
 use Custom\Tigs;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Pastoral\Type;
+use Schoolbox\Application\Daemon;
 
 
-$opts = require __DIR__ . '/../../../conf/core/require-cli.php';
+$opts = require __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Insert TIGS config'", [
-    'verbose' => $opts['v'] ?? null,
-    'errors'  => E_ALL,
+$kernel = new Daemon\Kernel("'Insert TIGS config'", [
+    Daemon\Kernel::OPTION_ERRORS  => E_ALL,
 ]);
 
 $app = new class extends App
@@ -40,14 +38,9 @@ $app = new class extends App
 
 
     /**
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
-     * @throws PDOException
-     * @throws Di\Exception\ServiceNotFound
+     * @inheritdoc
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
     {
         $this->log      = $log;
         $this->database = $di->get('databaseInternal');
