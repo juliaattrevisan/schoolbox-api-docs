@@ -293,15 +293,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
                 } catch (Schoolbox\Mapper\Exception\Deleted $e) {
                     $submission_box->setAssessmentModel($e->getDeletedObject()); // I also am not thrilled :)
                 }
+                // Fetch and hydrate files
+                $submission_box->setAttachments(
+                    $this->getJoinMapper('files')->findByColumn('box_id', $id)
+                );
             }
         }
-
-
-        // Fetch and hydrate files
-        $submission_box->setAttachments(
-            $this->getJoinMapper('files')->findByColumn('box_id', $id)
-        );
-
 
         if (!($submission_box instanceof SubmissionBox)) {
             throw new Schoolbox\Mapper\Exception('Instance of object not found');

@@ -152,6 +152,15 @@ class Model extends AbstractAssessment implements ISelfAssessable
         /** @var static $clone */
         $clone = parent::cloneForCopy();
 
+        // copy attachments
+        $newFiles = [];
+        foreach ($this->getAttachedFiles() as $file) {
+            $newFiles[] = (new File())
+                ->setStorage($file->getStorage())
+                ->setBasename($file->getBasename());
+        }
+        $clone->setAttachedFiles($newFiles);
+
         /* Ensure any current rubric is NOT linked to new location.
          *
          * Because rubric cloning is so complex, it is handled specifically in the Replicator & Transplantor.
