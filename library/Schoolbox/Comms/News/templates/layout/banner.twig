@@ -144,6 +144,8 @@
         'X-Requested-With' : 'XMLHttpRequest',
     };
 
+    var $toast = $('#toaster');
+
     var app = new Vue({
         el: '#threads-section',
         delimiters: ['${', '}'],
@@ -155,30 +157,41 @@
             commentsTotalCountLabel: undefined,
             cursorNext: '',
             loadMoreIsDisabled: false,
+            loadingCommentsText: 'Loading comments...',
+            commentsLoadedText: 'Comments loaded',
+            errorLoadingCommentsText: 'Unable to load comments',
+            savingText: 'Saving...',
+            savedText: 'Saved',
+            unableToSaveText: 'Unable to save',
         },
         // define methods under the `methods` object
         methods: {
             enableDisableThread: function (event) {
-                this.$data.threadEnabled = event.target.checked;
+                var self = this;
 
-                var $toast = $('#toaster');
-                $toast.toastActivate({text: 'Saving...'});
+                self.$data.threadEnabled = event.target.checked;
+
+                $toast.toastActivate({text: self.savingText});
 
                 axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
-                    $toast.toastTimeout({text: 'Saved', duration: 2000});
+                    $toast.toastTimeout({text: self.savedText, duration: 2000});
                 }).catch(function (error) {
-                    $toast.toastTimeout({text: 'Unable to save', duration: 2000, css: 'alert'});
+                    $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
                 });
             },
             getThread: function() {
                 var self = this;
 
                 self.loadMoreIsDisabled = true;
+
+                $toast.toastActivate({text: self.loadingCommentsText});
+
                 axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {
                     params: {
                         cursor: self.cursorNext
                     }
                 }).then(function (response) {
+
                     var responseData = response.data;
                     var index;
 
@@ -194,6 +207,10 @@
                     if (self.posts.length === responseData.metadata.count) {
                         $('#loadMore').remove();
                     }
+
+                    $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
+                }).catch(function (error) {
+                    $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 });
             }
         },
