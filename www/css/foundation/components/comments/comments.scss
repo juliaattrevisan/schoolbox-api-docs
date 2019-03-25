@@ -1,10 +1,12 @@
 .comments {
   border-top: 1px solid $body-bg;
   padding-top: 2rem;
+  margin-top: 1.5rem;
 
   .comments-threads {
     margin: 1rem auto 0 auto;
     max-width: 45rem;
+    padding: 0 0.75rem 0 0.75rem;
   }
 
   .checklist {
