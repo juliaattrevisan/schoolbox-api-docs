@@ -204,7 +204,7 @@
         methods: {
             changeThreadStatus: function (event) {
                 var self = this;
-                var changeThreadStatusEndpoint = '/threads/' + self.threadId + '/';
+                var changeThreadStatusEndpoint = '/threads/' + String(this.threadId) + '/';
 
                 self.threadEnabled = event.target.checked;
 
