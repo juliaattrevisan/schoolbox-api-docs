@@ -472,9 +472,8 @@ class CliPdfGenerator extends CliTool\App
      */
     private function generateUrlsForStudent(User $student, array $externalStudent, array $excludedClassCodes): array
     {
-        $nowSuffix = $this->now ? "?now={$this->now}" : '';
-        $data = ['userId' => $student->getId()];
-        $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data) . $nowSuffix;
+        $data                   = ['userId' => $student->getId(), 'now' => $this->now,];
+        $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data);
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [$participationReportUrl];
 
@@ -485,8 +484,9 @@ class CliPdfGenerator extends CliTool\App
             $data = [
                 'userId'   => $student->getId(),
                 'folderId' => $folder->getId(),
+                'now'      => $this->now,
             ];
-            $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data) . $nowSuffix;
+            $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data);
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
             $urls[] = $subjectReportUrl;
         }
