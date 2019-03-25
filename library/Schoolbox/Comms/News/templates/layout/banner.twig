@@ -127,6 +127,15 @@
                     </article>
 
                 </li>
+                <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
+                    <div class="list-item">
+                        <div class="small-12 card skeleton">
+                            <div class="img"></div>
+                            <h3></h3>
+                            <p class="meta"></p>
+                        </div>
+                    </div>
+                </li>
             </ul>
             <a v-on:click="getThread" class="button expand" :disabled="loadMoreIsDisabled" id="loadMore">Load More</a>
         </div>
@@ -163,6 +172,7 @@
             savingText: 'Saving...',
             savedText: 'Saved',
             unableToSaveText: 'Unable to save',
+            articlesLoading: true,
         },
         // define methods under the `methods` object
         methods: {
@@ -183,6 +193,7 @@
                 var self = this;
 
                 self.loadMoreIsDisabled = true;
+                self.articlesLoading = true;
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
@@ -195,6 +206,7 @@
                     var responseData = response.data;
                     var index;
 
+                    self.articlesLoading = false;
                     self.commentsTotalCountLabel = 'Comments (' + responseData.metadata.count + ')';
                     self.cursorNext = responseData.metadata.cursor.next;
 
