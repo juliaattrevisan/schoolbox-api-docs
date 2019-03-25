@@ -180,4 +180,23 @@ abstract class App
     {
         return $this->config;
     }
+
+
+    /**
+     * Reads a line of input from STDIN, without echoing to STDOUT
+     *
+     * @see https://stackoverflow.com/questions/187736/command-line-password-prompt-in-php
+     * @param string $prompt
+     * @return string
+     */
+    protected function readPassword(string $prompt): string
+    {
+        echo $prompt;
+        \system('stty -echo');
+        $password = \trim(\fgets(STDIN));
+        \system('stty echo');
+        // add a new line since the users CR didn't echo
+        echo "\n";
+        return $password;
+    }
 }

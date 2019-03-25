@@ -663,7 +663,7 @@ class CliPdfGenerator extends CliTool\App
             }
             $remaining = $maxAttempts - $attempts + 1;
             $this->getLogger()->debug("Requesting password, ($remaining attempts remaining)");
-            $password = \readline("Please provide your password ($remaining attempts remaining): ");
+            $password = $this->readPassword("Please provide your password ($remaining attempts remaining): ");
             // TODO use regex
             if ($password) {
                 $this->getLogger()->info("Password provided, attempting login");
