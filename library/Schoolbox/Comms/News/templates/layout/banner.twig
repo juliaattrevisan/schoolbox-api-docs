@@ -119,7 +119,6 @@
                         </div>
                     </div>
                     <nav>
-
                         <a href="#" class="icon-delete no-text" title="Delete post" v-if="post._links.delete.auth"></a>
                         <a href="#" class="icon-reply no-text" title="Add Reply"></a>
                     </nav>
@@ -130,7 +129,7 @@
 
                 </li>
             </ul>
-            <a v-on:click="getThread" class="button expand" title="Load more" :disabled="loadMoreIsDisabled">Load more</a>
+            <a v-on:click="getThread" class="button expand" :disabled="loadMoreIsDisabled" id="loadMore">Load More</a>
         </div>
     </section>
 </div>
@@ -174,19 +173,26 @@
             getThread: function() {
                 var self = this;
 
+                self.loadMoreIsDisabled = true;
                 axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {
                     params: {
-                        cursor: self.cursor
+                        cursor: self.cursorNext
                     }
                 }).then(function (response) {
                     var responseData = response.data;
                     var index;
 
-                    self.commentsTotalCount = 'Comments (' + responseData.metadata.count + ')';
-                    self.cursor = responseData.metadata.cursor.next;
+                    self.commentsTotalCountLabel = 'Comments (' + responseData.metadata.count + ')';
+                    self.cursorNext = responseData.metadata.cursor.next;
 
                     for (index = 0; index < responseData.data.length; index++) {
                         self.posts.push(responseData.data[index]);
+                    }
+
+                    self.loadMoreIsDisabled = false;
+
+                    if (self.posts.length === responseData.metadata.count) {
+                        self.loadMoreIsDisabled = true;
                     }
                 });
             }
