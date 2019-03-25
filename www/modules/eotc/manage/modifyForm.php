@@ -203,9 +203,9 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $event->setCampusCollection(new Collection($_POST['campus']));
     $event->setRoleCollection(new Collection($_POST['role']));
 
-    /* Store metadata
+    /* Remove files and only re-add what was in the form
      */
-    $event->setMetadata($metadata);
+    $metadata->setRamsFiles(new Collection());
 
     if (\count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
         try {
@@ -219,8 +219,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
             exit;
         }
 
-        $event->getMetadata()->setRamsFiles(new Collection($files));
+        $metadata->setRamsFiles(new Collection($files));
     }
+
+    /* Store metadata
+     */
+    $event->setMetadata($metadata);
 
     /* If promoting an event, set to the next status
      * This is a special case for event authors and In Principle status
