@@ -275,8 +275,7 @@ class Controller extends Base
             if ($segment->isSimple()) {
                 $encodedValue = $codec->encodeValue($segment->getEntityValue());
 
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment))
-                    ->setEntityId((int) $segment->getEntityValue());
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
             } else {
                 foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());

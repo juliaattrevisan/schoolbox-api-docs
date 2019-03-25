@@ -1169,6 +1169,7 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
      */
     this.onAddSegment = function(selectize, bricks, key, name, $item, segmentValueLabels){
 
+        console.log(atob(codec.decode(key).getEntityValue()));
         var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels, $item.entityId),
             brickCandidates = [];
 
