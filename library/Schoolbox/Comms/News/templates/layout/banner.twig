@@ -177,8 +177,8 @@
 <script>
 
     var postHeaders = {
-        'X-Requested-With' : 'XMLHttpRequest',
-    }
+        'X-Requested-With' : 'XMLHttpRequest'
+    };
 
     var app = new Vue({
         el: '#threads-section',
@@ -186,7 +186,7 @@
         data: {
             threadCheckboxEnabled: '{{ (article.discussionThread.open) ? 'checked' : '' }}',
             threadEnabled: {{ (article.discussionThread.open) ? 'true' : 'false' }},
-            isPublished: {{ article.isPublic }}
+            isPublished: {{ article.isPublic ? 'true' : 'false' }}
         },
         // define methods under the `methods` object
         methods: {

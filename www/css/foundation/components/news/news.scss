@@ -17,12 +17,12 @@
         margin-right: 0;
     }
     .article > .meta {
-        border-bottom: 1px solid #9a9a9a;
+        border-bottom: 1px solid $gainsboro;
         margin: 0 0 2rem;
         padding-bottom: .5rem;
     }
     .comments {
-        border-top: 1px solid $body-bg;
+        border-top: 1px solid $base;
         margin-top: 2rem;
         padding-top: 2rem;
     }
@@ -40,18 +40,26 @@
 }
 
 .title-section {
-    align-items: flex-start;
-    display: flex;
     margin-bottom: 1rem;
 
     h1 {
         flex: 1 auto;
         margin-bottom: 0;
     }
+
+    @media #{$medium-up} {
+        align-items: flex-start;
+        display: flex;
+    }
+
     .label {
-        flex: 0 auto;
-        margin: ($h1-font-size * .3) 0 0 2rem;
         @media #{$small-only} {
+            margin-top: 0.5rem;
+            width: 100%;
+        }
+        @media #{$medium-up} {
+            flex: 0 auto;
+            margin: ($h1-font-size * .3) 0 0 2rem;
             margin-top: ($h1-font-size - $h1-font-reduction) * .3;
         }
     }
