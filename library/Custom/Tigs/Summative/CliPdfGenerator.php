@@ -415,6 +415,7 @@ class CliPdfGenerator extends CliTool\App
      * Generate a PDF report for a single user and returns the filename
      *
      * @param User     $student
+     * @param array    $externalStudent
      * @param string   $sessionHash
      * @param string[] $excludedClassCodes
      * @param string   $tempDir
@@ -423,6 +424,7 @@ class CliPdfGenerator extends CliTool\App
      * @throws \InvalidArgumentException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
      */
     private function generatePdf(User $student, array $externalStudent, string $sessionHash, array $excludedClassCodes, string $tempDir): string
     {
