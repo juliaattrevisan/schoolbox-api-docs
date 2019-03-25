@@ -93,18 +93,12 @@
         var scaledMark = this.attr('data-scaled-mark'),
             max        = this.attr('data-max'),
             percentage = parseFloat(scaledMark / max * 100),
-            $el        = this;
+            $el        = this,
+            rev        = [];
 
         if (isNaN(percentage)) {
             percentage = 0;
         }
-
-        // If sum isn't a whole number: round to 2dp
-        if(percentage % 1 !== 0){
-            percentage = Number(percentage.toFixed(2));
-        }
-
-        var rev = [];
 
         // iterate the config and push the data into a reversible array
         $.each(conf, function (lowerBound, caption) {
