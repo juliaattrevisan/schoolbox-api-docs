@@ -31,16 +31,16 @@ class Kernel extends CliKernelAbstract
     /* System resources available in $this->getSoftLimit() and $this->getHardLimit()
      * @see posix_getrlimit()
      */
-    const RLIMIT_CORE_FILESIZE = 'core';
-    const RLIMIT_CPU_TIME = 'cpu';
-    const RLIMIT_DATA_SEGMENT = 'data';
-    const RLIMIT_FILESIZE = 'filesize';
-    const RLIMIT_FILE_DESCRIPTORS = 'openfiles';
-    const RLIMIT_PROCESSES = 'maxproc';
-    const RLIMIT_MEMORY_LOCK = 'memlock';
-    const RLIMIT_RESIDENT_SET = 'rss';
-    const RLIMIT_STACK_SIZE = 'stack';
-    const RLIMIT_TOTAL_MEMORY = 'totalmem';
+    public const RLIMIT_CORE_FILESIZE = 'core';
+    public const RLIMIT_CPU_TIME = 'cpu';
+    public const RLIMIT_DATA_SEGMENT = 'data';
+    public const RLIMIT_FILESIZE = 'filesize';
+    public const RLIMIT_FILE_DESCRIPTORS = 'openfiles';
+    public const RLIMIT_PROCESSES = 'maxproc';
+    public const RLIMIT_MEMORY_LOCK = 'memlock';
+    public const RLIMIT_RESIDENT_SET = 'rss';
+    public const RLIMIT_STACK_SIZE = 'stack';
+    public const RLIMIT_TOTAL_MEMORY = 'totalmem';
 
     /** @var string */
     private $name;
