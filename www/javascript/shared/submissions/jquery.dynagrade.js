@@ -101,7 +101,7 @@
 
         // If sum isn't a whole number: round to 2dp
         if(percentage % 1 !== 0){
-            percentage = percentage.toFixed(2);
+            percentage = Number(percentage.toFixed(2));
         }
 
         var rev = [];
@@ -120,7 +120,7 @@
         // now we can iterate that list in reverse to map the percentage to a letter grade
         $.each(rev, function (k, v) {
 
-            var lowerBound = v[0],
+            var lowerBound = Number(v[0]),
                 caption    = v[1];
 
             // bound is too high, ignore this one
