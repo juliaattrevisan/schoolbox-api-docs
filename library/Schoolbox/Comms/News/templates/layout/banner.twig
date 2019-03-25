@@ -69,40 +69,39 @@
 <div class="small-12 island">
     <section class="discussion content">
         <div class="discussion-threads">
-            <div id="threads-section">
-                <div class="row">
-                    <div class="small-6 columns">
-                        <h2>Comments (11)</h2>
-                    </div>
-                    <div class="checklist small-6 columns">
-                        {% if modifyRoute or isAuthor and article.discussionThread.id %}
-                            <input id="allow-comments" name="allowComments" type="checkbox" v-on:click="enableDisableThread" v-model="threadCheckboxEnabled" />
-                            <label for="allow-comments">Allow comments</label>
-                        {% endif %}
-                    </div>
+        <div id="threads-section">
+            <div class="row">
+                <div class="small-6 columns">
+                    <h2>${ commentsTotalCountLabel }</h2>
                 </div>
-                <template v-if="threadEnabled">
-                    <template v-if="isPublished">
-                        <form action="/" method="post">
-                            <label>
-                                <textarea id='comment-area' name='comment-area' rows="5"></textarea>
-                            </label>
-                            <input type="submit" value="Post" />
-                        </form>
-                    </template>
-                    <template v-else>
-                        <div data-alert="" class="alert-box">
-                            <span class="icon-locked">Comments will be available once this article is published.</span>
-                        </div>
-                    </template>
+                <div class="checklist small-6 columns">
+                    {% if modifyRoute or isAuthor and article.discussionThread.id %}
+                        <input id="allow-comments" name="allowComments" type="checkbox" v-on:click="enableDisableThread" v-model="threadCheckboxEnabled"  />
+                        <label for="allow-comments">Allow comments</label>
+                    {% endif %}
+                </div>
+            </div>
+            <template v-if="threadEnabled">
+                <template v-if="isPublished">
+                    <form action="/" method="post">
+                        <label>
+                            <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+                        </label>
+                        <input type="submit" value="Post" />
+                    </form>
                 </template>
                 <template v-else>
-                    <!-- Only show alert if comments are locked -->
                     <div data-alert="" class="alert-box">
-                        <span class="icon-locked">Comments are currently disabled for this article.</span>
+                        <span class="icon-locked">Comments will be available once this article is published.</span>
                     </div>
                 </template>
-            </div>
+            </template>
+            <template v-else>
+                <!-- Only show alert if comments are locked -->
+                <div data-alert="" class="alert-box">
+                    <span class="icon-locked">Comments are currently disabled for this article.</span>
+                </div>
+            </template>
 
             <ul class="information-list social-stream">
                 <li class="actions-small-2" v-for="post in posts">
@@ -131,6 +130,7 @@
             </ul>
             <a v-on:click="getThread" class="button expand" :disabled="loadMoreIsDisabled" id="loadMore">Load More</a>
         </div>
+        </div>
     </section>
 </div>
 <div id='toaster' class="toast" data-toast></div>
@@ -148,9 +148,9 @@
         el: '#threads-section',
         delimiters: ['${', '}'],
         data: {
-            threadCheckboxEnabled: '{{ (article.discussionThread.open) ? 'checked' : '' }}',
-            threadEnabled: {{ (article.discussionThread.open) ? 'true' : 'false' }},
-            isPublished: {{ article.isPublic }},
+            threadCheckboxEnabled: Boolean({{ article.discussionThread.open }}),
+            threadEnabled: Boolean({{ article.discussionThread.open }}),
+            isPublished: Boolean({{ article.isPublic }}),
             posts: [],
             commentsTotalCountLabel: undefined,
             cursorNext: '',
@@ -202,10 +202,10 @@
         },
         filters: {
             fromNow(date) {
-                return moment(date).fromNow();
+                return moment(date.database).fromNow();
             },
             fullString(date) {
-                return moment(date).format('dddd MMMM Do YYYY h:mma');
+                return moment(date.database).format(dateDisplayFormats.momentJsDatetime);
             }
         }
     })
