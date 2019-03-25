@@ -55,6 +55,23 @@ paths:
         default:
           $ref: '#/components/responses/problem'
 
+    post:
+      operationId: createThread
+      summary: Creates a thread
+      responses:
+        '201':
+          description: The thread that was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/thread'
+        default:
+          $ref: '#/components/responses/problem'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/thread'
 
   /threads/{id}/posts:
     get:
