@@ -76,7 +76,7 @@
                 </div>
                 <div class="checklist small-6 columns">
                     {% if modifyRoute or isAuthor and article.discussionThread.id %}
-                        <input id="allow-comments" name="allowComments" type="checkbox" v-on:click="enableDisableThread" v-model="threadCheckboxEnabled"  />
+                        <input id="allow-comments" name="allowComments" type="checkbox" v-on:click="enableDisableThread" v-model="threadCheckboxEnabled" />
                         <label for="allow-comments">Allow comments</label>
                     {% endif %}
                 </div>
