@@ -24,6 +24,10 @@ use Schoolbox\Application\CliKernelAbstract;
 class Kernel extends CliKernelAbstract
 {
 
+    // Options keys for $options passed to this Kernel's constructor
+    public const OPTION_ERRORS    = 'errors';  // PHP error reporting level
+    public const OPTION_LEVEL_MIN = 'level';   // Don't log at less than this level
+
     // Command line short options recognised by this kernel
     private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
@@ -74,9 +78,8 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @param App      $app
-     * @param int|null $minLogLevel Allow invoking script to force the App to not log below this level
-     * @param int|null $errorLevel
+     * @param App   $app
+     * @param array $options Keys are one of the self::OPTION_X constants
      * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -86,11 +89,12 @@ class Kernel extends CliKernelAbstract
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException
      */
-    public function __construct(App $app, int $minLogLevel = null, int $errorLevel = E_ALL ^ E_NOTICE)
+    public function __construct(App $app, array $options = [])
     {
+        $this->validateOptions($options);
         $this->app         = $app;
-        $this->minLogLevel = $minLogLevel;
-        \error_reporting($errorLevel);
+        $this->minLogLevel = $options[self::OPTION_LEVEL_MIN] ?? null;
+        \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
         $this->parseCommandLineOptions($app);
         $this->outStream = $this->getOutputStream();
@@ -198,6 +202,28 @@ class Kernel extends CliKernelAbstract
         $this->addRavenHandler($logger);
 
         return $logger;
+    }
+
+
+    /**
+     * Check that all kernel options are valid
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException If unrecognised kernel options are injected
+     * @todo 19.1 abstract across both CLI and Daemon kernels
+     */
+    private function validateOptions(array $options): void
+    {
+        $valid   = [self::OPTION_LEVEL_MIN, self::OPTION_ERRORS];
+        $invalid = [];
+        foreach ($options as $key => $val) {
+            if (!\in_array($key, $valid, true)) {
+                $invalid[$key] = $val;
+            }
+        }
+        if (\count($invalid)) {
+            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
+        }
     }
 
 
