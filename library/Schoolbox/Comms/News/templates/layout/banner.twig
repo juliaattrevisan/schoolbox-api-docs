@@ -105,14 +105,17 @@
             </div>
 
             <ul class="information-list social-stream">
-                <li class="actions-small-2">
+                <li class="actions-small-2" v-for="post in posts">
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="#" title="View Profile">
-                                <img src="/portrait.php?userId=507&amp;size=square64" alt="Ms Jana Reed">
-                            </a>
-                            <p><a href="/search/user/25" title="View Profile">Ms Jana Reed</a></p>
-                            <p class="meta" title="Friday March 9th 2018 11:22am">Posted 1 year ago</p>
+                            <a :href="'/search/user/' + post.author.id" title="View Profile">
+                                <img :src="'/portrait.php?userId=' + post.author.externalId + '&size=square64'"></a>
+                            <p>
+                                <a :href="'/search/user/' + post.author.id" title="View Profile">
+                                    ${ post.author.title + ' ' + post.author.firstname + ' ' + post.author.lastname }
+                                </a>
+                            </p>
+                            <p class="meta" :title="post.createdAt | fullString ">Posted ${ post.createdAt | fromNow }</p>
                         </div>
                     </div>
                     <nav>
@@ -120,55 +123,12 @@
                         <a href="#" class="icon-reply no-text" title="Add Reply"></a>
                     </nav>
                     <article>
-                        <p>My group will be working on the balcony scene for the scene presentation task, what scenes are others doing?</p>
+                        <p v-html="post.content"></p>
                     </article>
 
-                    <!-- Reply -->
-                    <ul class="information-list reply">
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a href="/search/user/22" title="View Profile">
-                                        <img src="/portrait.php?userId=499&amp;size=square32" alt="Mr Jack Coles">
-                                    </a>
-                                    <p>
-                                        <a href="#" title="View Profile">Mr Jack Coles</a>
-                                        <span class="pipe meta" title="Wednesday March 13th 2019 2:42pm">Replied 1 minute ago</span>
-                                    </p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a class="icon-delete" href="#" title="Delete Comment"></a>
-                            </nav>
-                            <article>
-                                <p>Cosmic ocean trillion Apollonius of Perga great turbulent clouds a still more glorious
-                                    dawn awaits tesseract. Jean-François Champollion at the edge of forever Cambrian
-                                    explosion courage of our questions gathered by gravity laws of physics.</p>
-                            </article>
-                        </li>
-                    </ul>
-                    <!-- Reply -->
-                </li>
-                <li class="actions-small-2">
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <a href="#" title="View Profile">
-                                <img src="/portrait.php?userId=499&amp;size=square64" alt="Mr Jack Coles">
-                            </a>
-                            <p><a href="#" title="View Profile">Mr Jack Coles</a></p>
-                            <p class="meta" title="Wednesday March 13th 2019 2:42pm">Posted 10 seconds ago</p>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="#" class="icon-delete no-text" title="Delete post"></a>
-                        <a href="#" class="icon-reply no-text" title="Add Reply"></a>
-                    </nav>
-                    <article data-body="">
-                        <p>How far away a mote of dust suspended in a sunbeam a mote of dust suspended in a sunbeam across the centuries gathered by gravity?</p>
-                    </article>
                 </li>
             </ul>
-            <a href="#" class="button expand" title="Load more">Load more</a>
+            <a v-on:click="getThread" class="button expand" title="Load more" :disabled="loadMoreIsDisabled">Load more</a>
         </div>
     </section>
 </div>
@@ -183,44 +143,54 @@
         'X-Requested-With' : 'XMLHttpRequest',
     };
 
-    // Get the list of comments
-
     var app = new Vue({
         el: '#threads-section',
         delimiters: ['${', '}'],
         data: {
             threadCheckboxEnabled: '{{ (article.discussionThread.open) ? 'checked' : '' }}',
-            threadEnabled: Boolean({{ article.discussionThread.open }}),
-            isPublished: Boolean({{ article.isPublic }})
+            threadEnabled: {{ (article.discussionThread.open) ? 'true' : 'false' }},
+            isPublished: {{ article.isPublic }},
+            posts: [],
+            commentsTotalCountLabel: undefined,
+            cursorNext: '',
+            loadMoreIsDisabled: false,
         },
         // define methods under the `methods` object
         methods: {
             enableDisableThread: function (event) {
                 this.$data.threadEnabled = event.target.checked;
 
+                var $toast = $('#toaster');
                 $toast.toastActivate({text: 'Saving...'});
 
                 axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: 'Saved', duration: 2000});
                 }).catch(function (error) {
-                    // console.log(error);
                     $toast.toastTimeout({text: 'Unable to save', duration: 2000, css: 'alert'});
                 });
             },
-            getPosts: function() {
-                axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {}).then(function (response) {
-                    this.$data.posts = response;
+            getThread: function() {
+                var self = this;
+
+                axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {
+                    params: {
+                        cursor: self.cursor
+                    }
+                }).then(function (response) {
+                    var responseData = response.data;
+                    var index;
+
+                    self.commentsTotalCount = 'Comments (' + responseData.metadata.count + ')';
+                    self.cursor = responseData.metadata.cursor.next;
+
+                    for (index = 0; index < responseData.data.length; index++) {
+                        self.posts.push(responseData.data[index]);
+                    }
                 });
             }
         },
         mounted: function() {
-            var self = this;
-
-            axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {}).then(function (response) {
-                self.posts = response.data;
-                self.posts.commentsTotalCount = 'Comments (' + self.posts.metadata.count + ')';
-                console.log(self.posts);
-            });
+            this.getThread();
         },
         filters: {
             fromNow(date) {
