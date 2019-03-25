@@ -746,7 +746,12 @@ class CliPdfGenerator extends CliTool\App
      */
     private function printHelp(): void
     {
-        $file            = $_SERVER['PWD'] . ltrim($_SERVER['SCRIPT_NAME'], '.');
+        // Did user specify absolute filename?
+        if (\strpos($_SERVER['SCRIPT_NAME'], '/') === 0) {
+            $file = $_SERVER['SCRIPT_NAME'];
+        } else {
+            $file = $_SERVER['PWD'] . '/' . \ltrim($_SERVER['SCRIPT_NAME'], '.');
+        }
         $defaultMaxFails = self::DEFAULT_MAX_FAILS;
         $defaultJsDelay  = self::DEFAULT_JS_DELAY;
 
