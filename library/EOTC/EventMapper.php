@@ -443,14 +443,25 @@ class EventMapper extends CalendarEventMapper
         if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
             return;
         }
+        $event->setMetadata($metadata);
+
+
 
         $metadataMapper = EventMetadataMapper::getInstance();
-        $metadataMapper->save($metadata);
+        new \Alaress_Probe('aaa', $event->getMetadata()); // correct version of metadata
+        $metadataMapper->save($event->getMetadata());
 
         /* Something about metadataMapper->save() clears the ramsFiles property
          * of the metadata instance when it's part of an $event instance (idk why)
+         *
+         * Somehow $event->getMetadata() returns a cached version of the metadata that
+         * was in $event when it was first hydrated - even if we manually set it in line 446!
          */
-        $event->setMetadata($metadata);
+//        $event->setMetadata($event->getMetadata());
+
+
+        new \Alaress_Probe('bbb', $event->getMetadata()); // cached version of metadata
+        die();
         $metadataMapper->saveRelation($event);
 
         /* Clear and recreate other relations
@@ -472,6 +483,8 @@ class EventMapper extends CalendarEventMapper
 
         $metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
         $metadataMapper->createResourceBookings($event->getMetadata());
+
+
     }
 
 
