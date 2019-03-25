@@ -207,21 +207,19 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
      */
     $event->setMetadata($metadata);
 
-    if ($event->getMetadata()->getRamsRequired()) {
-        if (count($_POST['attachment'])) {
-            try {
-                $factory = new CollectorFactory();
-                $files   = $factory->build($_POST['attachment'])->getAll();
-            } catch (MapperException $e) {
-                error(ErrorMapper::ERROR_FILE_NOT_FOUND);
-                exit; // shut UP, storm.
-            } catch (\InvalidArgumentException $e) {
-                error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-                exit;
-            }
-
-            $event->getMetadata()->setRamsFiles(new Collection($files));
+    if (\count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
+        try {
+            $factory = new CollectorFactory();
+            $files   = $factory->build($_POST['attachment'])->getAll();
+        } catch (MapperException $e) {
+            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            exit; // shut UP, storm.
+        } catch (\InvalidArgumentException $e) {
+            error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
+            exit;
         }
+
+        $event->getMetadata()->setRamsFiles(new Collection($files));
     }
 
     /* If promoting an event, set to the next status

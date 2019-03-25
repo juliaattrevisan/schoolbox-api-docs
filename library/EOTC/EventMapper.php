@@ -443,12 +443,18 @@ class EventMapper extends CalendarEventMapper
         if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
             return;
         }
-        $event->setMetadata($metadata);
 
         $metadataMapper = EventMetadataMapper::getInstance();
-        $metadataMapper->save($event->getMetadata());
+        $metadataMapper->save($metadata);
+
+        /* Something about metadataMapper->save() clears the ramsFiles property
+         * of the metadata instance when it's part of an $event instance (idk why)
+         */
+        $event->setMetadata($metadata);
         $metadataMapper->saveRelation($event);
 
+        /* Clear and recreate other relations
+         */
         $this->deleteCampusRelations($event);
         $this->createCampus($event);
 
