@@ -38,7 +38,18 @@ abstract class Base implements IBroker
     /** @var Collector The debugging collector */
     protected $collector = null;
 
-    /** @var array $databaseAttributes Optional PDO database attributes that can be set after connection */
+    /**
+     * Optional PDO connection options, set when constructing the PDO object.
+     *
+     * @var array
+     */
+    protected $connectionOptions = [];
+
+    /**
+     * Optional PDO database attributes, set after constructing the PDO object.
+     *
+     * @var array
+     */
     protected $databaseAttributes = [];
 
     /** @var array $postConnectQueries Optional SQL queries to be run after connection */
@@ -98,7 +109,7 @@ abstract class Base implements IBroker
             'LoginTimeout' => self::LOGIN_TIMEOUT
         ];
 
-        $connectOptions += $this->databaseAttributes;
+        $connectOptions += $this->connectionOptions;
         // Due to ambiguity in PDO specification, the PDO_SQLSRV driver doesn't respect the PDO::ATTR_TIMEOUT variable as indicated
         // in the Microsoft blog post (https://blogs.msdn.microsoft.com/brian_swan/2010/04/27/design-decisions-in-the-pdo-driver-for-sql-server/)
         //
@@ -139,6 +150,10 @@ abstract class Base implements IBroker
         // These will only get called if the child class overrides the values- don't *think*
         // we need these to be parameters as they're really just there to get the database in a
         // state where our functions operate as expected
+
+        foreach ($this->databaseAttributes as $attribute => $value) {
+            $this->pdo->setAttribute($attribute, $value);
+        }
 
         foreach ($this->postConnectQueries as $sql) {
             $this->pdo->exec($sql);
