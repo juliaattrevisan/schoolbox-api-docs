@@ -291,7 +291,7 @@ th, td{
 	margin: 0;
 	text-align: center;
 }
-@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $input-border-color, $active-color: $content-ui-foreground) {
+@mixin fancy-check($label-class: false, $checkbox-size: 1.5rem, $checkbox-margin: 0.5rem, $icon-size: 1rem, $hover-color: $form-bg-hover-color, $active-color: $content-ui-foreground) {
 
     $checkbox-inner-size: $checkbox-size - (2 * $input-border-width);
     $label-selector: "label";
