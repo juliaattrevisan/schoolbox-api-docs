@@ -443,28 +443,18 @@ class EventMapper extends CalendarEventMapper
         if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
             return;
         }
-        $event->setMetadata($metadata);
 
-
-
-        $metadataMapper = EventMetadataMapper::getInstance();
-        new \Alaress_Probe('aaa', $event->getMetadata()); // correct version of metadata
-        $metadataMapper->save($event->getMetadata());
-
-        /* Something about metadataMapper->save() clears the ramsFiles property
-         * of the metadata instance when it's part of an $event instance (idk why)
-         *
-         * Somehow $event->getMetadata() returns a cached version of the metadata that
+        /* Somehow $event->getMetadata() returns a cached version of the metadata that
          * was in $event when it was first hydrated - even if we manually set it in line 446!
+         *
+         * This prevents you from adding files to a new event; it will always set it back to
+         * the empty metadata that spawned with $event due to strange caching
          */
-//        $event->setMetadata($event->getMetadata());
-
-
-        new \Alaress_Probe('bbb', $event->getMetadata()); // cached version of metadata
-        die();
+        $metadataMapper = EventMetadataMapper::getInstance();
+        $metadataMapper->save($metadata);
         $metadataMapper->saveRelation($event);
 
-        /* Clear and recreate other relations
+        /* Clear and recreate other relations with most recent $metadata instance
          */
         $this->deleteCampusRelations($event);
         $this->createCampus($event);
@@ -472,19 +462,22 @@ class EventMapper extends CalendarEventMapper
         $this->deleteRoleRelations($event);
         $this->createRole($event);
 
-        $metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
-        $metadataMapper->createStaffAttendees($event->getMetadata());
+        $metadataMapper->deleteStaffAttendeesRelations($metadata);
+        $metadataMapper->createStaffAttendees($metadata);
 
-        $metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
-        $metadataMapper->createStudentAttendees($event->getMetadata());
+        $metadataMapper->deleteStudentAttendeesRelations($metadata);
+        $metadataMapper->createStudentAttendees($metadata);
 
-        $metadataMapper->deleteFilesRelations($event->getMetadata());
-        $metadataMapper->createFiles($event->getMetadata());
+        $metadataMapper->deleteFilesRelations($metadata);
+        $metadataMapper->createFiles($metadata);
 
-        $metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
-        $metadataMapper->createResourceBookings($event->getMetadata());
+        $metadataMapper->deleteResourceBookingsRelations($metadata);
+        $metadataMapper->createResourceBookings($metadata);
 
-
+        /* ...set it after all the mutations and persistence has occurred
+         * That should prevent spectral caching
+         */
+        $event->setMetadata($metadata);
     }
 
 
