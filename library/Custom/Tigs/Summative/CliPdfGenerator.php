@@ -318,12 +318,12 @@ class CliPdfGenerator extends CliTool\App
      */
     private function getExcludedClassCodes(): array
     {
-        // TODO Read and explode config value. See SA-8310
-        $excluded = ['12KayakA', '02EN2', 'U15CRIC_A', 'SSP', '02EN1'];
-        $wrap     = function (string $code): string {
-            return "'$code'";
+        // Trim and remove empty items
+        $excluded        = \array_filter(\array_map('\trim', \explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES) ?? '')));
+        $singleQuoteWrap = function (string $code): string {
+            return \sprintf("'%s'", $code);
         };
-        $this->getLogger()->debug("Class code exclusions: " . \implode(', ', \array_map($wrap, $excluded)));
+        $this->getLogger()->debug("Class code exclusions: " . \implode(', ', \array_map($singleQuoteWrap, $excluded)));
         return $excluded;
     }
 
