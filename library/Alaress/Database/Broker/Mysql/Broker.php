@@ -81,8 +81,8 @@ class Broker extends Base
     {
         // Enable persistent connection if not in debug mode
 
-        $this->databaseAttributes = [PDO::ATTR_PERSISTENT         => isset($options['debug']) ? $options['debug'] : false,
-                                     PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4'];
+        $this->connectionOptions  = [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',];
+        $this->databaseAttributes = [PDO::ATTR_PERSISTENT         => $options['debug'] ?? false,];
 
         return parent::connect($options);
     }
