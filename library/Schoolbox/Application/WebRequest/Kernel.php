@@ -488,7 +488,6 @@ class Kernel extends WebKernelAbstract
             $di        = $this->getDependencyInjector();
             $config    = $di->get('config');
             $fqdn      = trim($config->get('site_hostname').".".$config->get('site_domain'), ';.');
-//echo($fqdn);
             $csrfCheck = new HeaderCheck($_SERVER, $fqdn);
             if (!$csrfCheck->verifyRequestOrigin()) {
                 // Let's just say 403 Forbidden for now
