@@ -233,7 +233,7 @@
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
-                axios.get('/threads/' + self.threadId + '/posts/', {
+                axios.get('/threads/' + String(self.threadId) + '/posts/', {
                     params: {
                         cursor: self.cursorNext
                     }
