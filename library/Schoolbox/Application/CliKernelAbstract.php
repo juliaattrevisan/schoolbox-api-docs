@@ -12,7 +12,7 @@ use Alaress\Exception\IO\IOException;
 use ErrorException;
 use Monolog\Handler\RavenHandler;
 use PDOException;
-//use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
 use Raven_Client;
@@ -22,10 +22,8 @@ use Alaress\Lumberjack;
 
 /**
  * Common implementation for all Cli Kernels
- * @todo develop version should use the interfaced method. But that requires SA-8248
  */
-//abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements \Psr\Log\LoggerAwareInterface
-abstract class CliKernelAbstract extends \Alaress\Application\Kernel
+abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements LoggerAwareInterface
 {
 
     // Exit Statuses.
@@ -34,8 +32,43 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
     public const EXIT_STATUS_KERNEL_ERROR = 1;   // Problem in kernel, may have been caused by App
     public const EXIT_STATUS_APP_ERROR    = 2;   // Problem in App
 
+    // Options keys for $options passed to this Kernel's constructor
+    public const OPTION_ERRORS    = 'errors';  // What level of PHP errors should be reported?
+    public const OPTION_LEVEL     = 'level';   // If specified, kernel will not log at a lower verbosity than this.
+
+    // Command line options common to all CLI Kernels
+    public const OPT_LONG_PORCELAIN      = 'porcelain'; // Should log items be formatted for text file rather than TTL?
+                                                        // If set, causes field name to be prefixed to field value to enable logs to be parsable by scripts
+                                                        // eg '[!][2019-02-26 00:29:22.72907][13746]' would become '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'
+    public const OPT_SHORT_VERBOSITY     = 'v';         // What level of verbosity should be logged
+
     /** @var LoggerInterface */
     private $logger;
+
+
+    /**
+     * If set, don't log at less than this verbosity/level
+     *
+     * @var null|int
+     */
+    private $minLogLevel;
+
+
+    /**
+     * @param int|null $minLogLevel
+     * @throws RuntimeException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \InvalidArgumentException
+     * @throws \Schoolbox\External\Exception
+     */
+    public function __construct(?int $minLogLevel)
+    {
+        $this->minLogLevel = $minLogLevel;
+        parent::__construct();
+    }
 
 
     /**
@@ -55,7 +88,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 
     /**
      * @param \Exception $e
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function onException($e): void
     {
@@ -73,8 +105,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 
     /**
      * Check if it was a fatal error that shut us down, and if it was, advise as such
-     *
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function onShutdown(): void
     {
@@ -168,11 +198,83 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
 
 
     /**
+     * Check that all kernel options are valid
+     *
+     * @param array $options
+     * @throws \InvalidArgumentException If unrecognised kernel options are injected
+     */
+    protected function validateOptions(array $options): void
+    {
+        $valid   = $this->getValidConstructionOptions();
+        $invalid = [];
+        foreach ($options as $key => $val) {
+            if (!\in_array($key, $valid, true)) {
+                $invalid[$key] = $val;
+            }
+        }
+        if (\count($invalid)) {
+            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
+        }
+    }
+
+
+    /**
+     * Returns the set of construction options that are valid for the kernel
+     *
+     * @return string[]
+     */
+    protected function getValidConstructionOptions(): array
+    {
+        return [self::OPTION_LEVEL, self::OPTION_ERRORS];
+    }
+
+
+    /**
+     * Returns the set of short command line opts recognised by this Kernel
+     *
+     * @return string[]
+     */
+    protected function getKernelShortOpts(): array
+    {
+        return [self::OPT_SHORT_VERBOSITY];
+    }
+
+
+    /**
+     * Returns the set of long command line opts recognised by this Kernel
+     *
+     * @return string[]
+     */
+    protected function getKernelLongOpts(): array
+    {
+        return \array_merge(Lumberjack\Logger::getAvailableFields(), [self::OPT_LONG_PORCELAIN]);
+    }
+
+
+    /**
      * Creates a default logger, suitable for this Kernel
      *
      * @return LoggerInterface
      */
     abstract protected function createDefaultLogger(): LoggerInterface;
+
+
+    /**
+     * Returns the level to log at, selecting the most verbose of:
+     * 1. command-line verbosity
+     * 2. Kernel construction arg
+     *
+     * @param null|bool|array $v Value of command line -v option
+     * @return int
+     */
+    protected function getLoggingLevel($v): int
+    {
+        $levels = [$this->getLoggingLevelFromVerbosity($v)];
+        if ($this->minLogLevel) {
+            $levels[] = $this->minLogLevel;
+        }
+        return \min($levels);
+    }
 
 
     /**
@@ -285,8 +387,36 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel
         $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
         /** @var Monolog\Formatter\LineFormatter $formatter */
         $formatter = $ravenHandler->getFormatter();
-        $formatter->includeStacktraces(true);
+        $formatter->includeStacktraces();
         $logger->pushHandler($ravenHandler);
         return true;
+    }
+
+
+    /**
+     * Determine logging level via verbose setting
+     * verbose is set by -vvv.  Each v represents a value in an array.
+     * So -v is level 1, -vv is level 2, -vvv is level 3
+     *
+     * @param null|bool|array $v
+     * @return int
+     */
+    private function getLoggingLevelFromVerbosity($v): int
+    {
+        if (null === $v) {
+            $threshold = 0;
+        } elseif (!\is_array($v)) {
+            $threshold = 1;
+        } else {
+            $threshold = \min(3, \count($v));
+        }
+
+        $limits = [
+            0 => Monolog\Logger::CRITICAL, // nil verbosity: exceptional behaviour only
+            1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
+            2 => Monolog\Logger::INFO,     // mod verbosity: most things
+            3 => Monolog\Logger::DEBUG,     // max verbosity: EV-ER-Y-THING...
+        ];
+        return $limits[$threshold];
     }
 }

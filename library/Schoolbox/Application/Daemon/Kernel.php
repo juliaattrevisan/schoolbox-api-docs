@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Application\WrongSapiException;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -26,16 +25,8 @@ use Schoolbox\Application\CliKernelAbstract;
 class Kernel extends CliKernelAbstract
 {
     // Options keys for $options passed to this Kernel's constructor
-    public const OPTION_LEVEL          = 'level';        // What log level should be reported? Falls back to 'v' if not specified.
-    public const OPTION_ERRORS         = 'errors';       // What level of PHP errors should be reported?
     public const OPTION_APP_SHORT_OPTS = 'appShortOpts'; // short options used by the app
     public const OPTION_APP_LONG_OPTS  = 'appLongOpts';  // long options used by the app
-
-    // Command line options recognised by this Daemon kernel
-    public const OPT_VERBOSITY     = 'v';         // What level of verbosity should be logged
-    public const OPT_PORCELAIN     = 'porcelain'; // Should log items be formatted for text file rather than TTL?
-                                                  // If set, causes field name to be prefixed to field value to enable logs to be parsable by scripts
-                                                  // eg '[!][2019-02-26 00:29:22.72907][13746]' would become '[!][@550][2019-02-26 00:29:22.72907][pid:13746]'
 
     /* System resources available in $this->getSoftLimit() and $this->getHardLimit()
      * @see posix_getrlimit()
@@ -58,7 +49,7 @@ class Kernel extends CliKernelAbstract
     private $loop;
 
     /**
-     * All options injected into this Daemon kernel.
+     * All command line options for this Daemon kernel, logger, and app.
      *
      * Used for:
      * 1. Controlling logging behaviour
@@ -68,13 +59,6 @@ class Kernel extends CliKernelAbstract
      */
     private $opts;
 
-
-    /**
-     * Was this kernel invoked at a specific log level?
-     *
-     * @var int|null
-     */
-    private $logLevel;
 
     /**
      * Various process limits imposed by the operating system
@@ -104,9 +88,8 @@ class Kernel extends CliKernelAbstract
     {
         $this->validateOptions($options);
         $this->parseCommandLineOpts($options);
-        $this->logLevel = $options[self::OPTION_LEVEL] ?? null;
 
-        parent::__construct();
+        parent::__construct($options[self::OPTION_LEVEL] ?? null);
 
         pcntl_signal(SIGCHLD, SIG_IGN);
         error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
@@ -122,23 +105,11 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * Check that all kernel options are valid
-     *
-     * @param array $options
-     * @throws \InvalidArgumentException If unrecognised kernel options are injected
+     * @inheritdoc
      */
-    private function validateOptions(array $options): void
+    protected function getValidConstructionOptions(): array
     {
-        $valid   = [self::OPTION_LEVEL, self::OPTION_ERRORS, self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS];
-        $invalid = [];
-        foreach ($options as $key => $val) {
-            if (!\in_array($key, $valid, true)) {
-                $invalid[$key] = $val;
-            }
-        }
-        if (\count($invalid)) {
-            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
-        }
+        return \array_merge(parent::getValidConstructionOptions(), [self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS]);
     }
 
 
@@ -153,18 +124,19 @@ class Kernel extends CliKernelAbstract
         $appShortOpts = $options[self::OPTION_APP_SHORT_OPTS] ?? '';
         $appLongOpts  = $options[self::OPTION_APP_LONG_OPTS] ?? [];
 
-        $shortOpts  = $appShortOpts . self::OPT_VERBOSITY;
-        $longOpts   = \array_merge($appLongOpts, [self::OPT_PORCELAIN], Logger::getAvailableFields());
+        $shortOpts  = $appShortOpts . \implode('', $this->getKernelShortOpts());
+        $longOpts   = \array_merge($appLongOpts, $this->getKernelLongOpts());
         $this->opts = \getopt($shortOpts, $longOpts);
     }
+
 
     /**
      * @param string $name
      * @return mixed
      */
-    private function getOpt($name)
+    private function getOpt(string $name)
     {
-        return isset($this->opts[$name]) ? $this->opts[$name] : null;
+        return $this->opts[$name] ?? null;
     }
 
 
@@ -211,7 +183,7 @@ class Kernel extends CliKernelAbstract
      * @throws Exception
      * @throws \Schoolbox\External\Exception
      */
-    public function run($callable = null)
+    public function run($callable = null): void
     {
         if (posix_isatty(STDOUT)) {
             echo <<<EOL
@@ -268,7 +240,6 @@ EOL;
      * @throws PDOException
      * @throws RangeException
      * @throws RuntimeException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
@@ -342,42 +313,12 @@ EOL;
 
 
     /**
-     * Determine logging level via verbose setting
-     * verbose is set by -vvv.  Each v represents a value in an array.
-     * So -v is level 1, -vv is level 2, -vvv is level 3
-     *
-     * @return int
-     */
-    private function getLoggingLevel()
-    {
-        $v = $this->getOpt(self::OPT_VERBOSITY);
-
-        $threshold = 0;
-        if (isset($v)) {
-            $threshold = 1;
-            if (is_array($v)) {
-                $threshold = min(3, count($v));
-            }
-        }
-
-        $limits = [
-            0 => Monolog\Logger::CRITICAL, // nil verbosity: exceptional behaviour only
-            1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
-            2 => Monolog\Logger::INFO,     // mod verbosity: most things
-            3 => Monolog\Logger::DEBUG     // max verbosity: EV-ER-Y-THING...
-        ];
-        return $limits[$threshold];
-    }
-
-
-    /**
      * @return LoggerInterface
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     protected function createDefaultLogger(): LoggerInterface
     {
-        // Derive log verbosity
-        $level = $this->logLevel ?? $this->getLoggingLevel();
+        $level = $this->getLoggingLevel($this->getOpt(self::OPT_SHORT_VERBOSITY));
 
         // Derive the list of fields to prepend to log items
         $fields = Logger::getAvailableFields();
@@ -387,23 +328,12 @@ EOL;
             }
         }
 
-        $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
+        $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->opts);
         $logger = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
         $this->addRavenHandler($logger);
 
         return $logger;
-    }
-
-    /**
-     * @inheritdoc
-     * @throws WrongSapiException
-     */
-    protected function checkServerApiEnvironment(): void
-    {
-        if (PHP_SAPI !== 'cli') {
-            throw new WrongSapiException('Cannot use Daemon Kernel in Web Server environment.');
-        }
     }
 
 

@@ -10,7 +10,6 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Lumberjack;
 use ErrorException;
 use InvalidArgumentException;
-use Monolog;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 
@@ -23,15 +22,9 @@ use Schoolbox\Application\CliKernelAbstract;
  */
 class Kernel extends CliKernelAbstract
 {
-
-    // Options keys for $options passed to this Kernel's constructor
-    public const OPTION_ERRORS    = 'errors';  // PHP error reporting level
-    public const OPTION_LEVEL_MIN = 'level';   // Don't log at less than this level
-
     // Command line short options recognised by this kernel
     private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
-    private const OPT_SHORT_VERBOSITY  = 'v';  // CLI option that verbosity, unless overridden. @see Lumberjack\Logger::FIELD_LEVEL
     private const OPT_SHORT_PERFORM    = 'p';  // CLI option to indicate the App short be run in 'perform' mode
 
     // By default, all apps run in 'dry-run' mode, unless either:
@@ -52,7 +45,7 @@ class Kernel extends CliKernelAbstract
      *
      * @var bool[]|string[]|array[]
      */
-    private $kernelOptions;
+    private $kernelOpts;
 
     /**
      * These are passed back to the CLI app
@@ -64,7 +57,7 @@ class Kernel extends CliKernelAbstract
      *
      * @var array
      */
-    private $appOptions;
+    private $appOpts;
 
     /**
      * The resource to which the App should stream output
@@ -72,9 +65,6 @@ class Kernel extends CliKernelAbstract
      * @var resource
      */
     private $outStream;
-
-    /** @var null|int */
-    private $minLogLevel;
 
 
     /**
@@ -92,14 +82,13 @@ class Kernel extends CliKernelAbstract
     public function __construct(App $app, array $options = [])
     {
         $this->validateOptions($options);
-        $this->app         = $app;
-        $this->minLogLevel = $options[self::OPTION_LEVEL_MIN] ?? null;
+        $this->app = $app;
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
         $this->parseCommandLineOptions($app);
         $this->outStream = $this->getOutputStream();
 
-        parent::__construct();
+        parent::__construct($options[self::OPTION_LEVEL] ?? null);
     }
 
 
@@ -112,39 +101,8 @@ class Kernel extends CliKernelAbstract
     public function runApp(bool $forcePerform = false): void
     {
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
-        $this->app->setup($this->appOptions, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
+        $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
-    }
-
-
-    /**
-     * Load the core configuration file(s)
-     *
-     * @return void
-     */
-    protected function loadConfiguration(): void
-    {
-        // TODO remove this once SA-8248 is merged
-    }
-
-
-    /**
-     * Set the include path
-     *
-     * @return void
-     */
-    protected function setIncludePath(): void
-    {
-        // TODO remove this once SA-8248 is merged
-    }
-
-
-    /**
-     * Normal (ie non-Kernel) class loading
-     */
-    protected function registerAutoLoading(): void
-    {
-        // TODO remove this once SA-8248 is merged
     }
 
 
@@ -183,47 +141,21 @@ class Kernel extends CliKernelAbstract
             $outStream = STDERR;
         }
 
-        // At what level should we log? Order of preference:
-        // 1. Kernel construction
-        // 2. Log level command line option
-        // 3. Verbosity command line option
-        if ($this->minLogLevel) {
-            $level = $this->minLogLevel;
-        } else {
-            $commandLineLevel = $this->getKernelOpt(Lumberjack\Logger::FIELD_LEVEL);
-            $level            = $commandLineLevel !== null
-                ? (int)$commandLineLevel
-                : $this->getLoggingLevelFromVerbosity();
+        $level = $this->getLoggingLevel($this->getKernelOpt(self::OPT_SHORT_VERBOSITY));
+
+        // Derive the list of fields to prepend to log items
+        $fields = Lumberjack\Logger::getAvailableFields();
+        foreach ($fields as $key => $field) {
+            if (!\array_key_exists($field, $this->kernelOpts)) {
+                unset($fields[$key]);
+            }
         }
 
-        $fields    = \array_keys($this->kernelOptions);
-        $porcelain = $this->getKernelOpt(Lumberjack\Logger::FIELD_PORCELAIN);
+        $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->kernelOpts);
         $logger    = new Lumberjack\Logger($outStream, null, $level, $fields, $porcelain);
         $this->addRavenHandler($logger);
 
         return $logger;
-    }
-
-
-    /**
-     * Check that all kernel options are valid
-     *
-     * @param array $options
-     * @throws \InvalidArgumentException If unrecognised kernel options are injected
-     * @todo 19.1 abstract across both CLI and Daemon kernels
-     */
-    private function validateOptions(array $options): void
-    {
-        $valid   = [self::OPTION_LEVEL_MIN, self::OPTION_ERRORS];
-        $invalid = [];
-        foreach ($options as $key => $val) {
-            if (!\in_array($key, $valid, true)) {
-                $invalid[$key] = $val;
-            }
-        }
-        if (\count($invalid)) {
-            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
-        }
     }
 
 
@@ -250,52 +182,43 @@ class Kernel extends CliKernelAbstract
     }
 
 
+    /**
+     * @inheritdoc
+     */
+    protected function getKernelShortOpts(): array
+    {
+        return \array_merge(
+            parent::getKernelShortOpts(),
+            [
+                self::OPT_SHORT_OUT_STREAM,
+                self::OPT_SHORT_ERR_STREAM,
+                self::OPT_SHORT_PERFORM,
+            ]
+        );
+    }
+
 
     /**
-     * Determine logging level via verbose setting
-     * verbose is set by -vvv.  Each v represents a value in an array.
-     * So -v is level 1, -vv is level 2, -vvv is level 3
-     *
-     * @return int
-     * @todo merge and lawn mow this and Daemon\Kernel::getLoggingLevel()
-     * @todo need to delete the intermediate 'verbose' option, instead just use 'v'
+     * @inheritdoc
      */
-    private function getLoggingLevelFromVerbosity(): int
+    protected function getKernelLongOpts(): array
     {
-        $v = $this->getKernelOpt(self::OPT_SHORT_VERBOSITY);
-
-        if (!$v) {
-            $threshold = 0;
-        } elseif (!\is_array($v)) {
-            $threshold = 1;
-        } else {
-            $threshold = \min(3, \count($v));
-        }
-
-        $limits = [
-            0 => Monolog\Logger::CRITICAL,
-            1 => Monolog\Logger::NOTICE,
-            2 => Monolog\Logger::INFO,
-            3 => Monolog\Logger::DEBUG,
-        ];
-        return $limits[$threshold];
+        return \array_merge(parent::getKernelLongOpts(), [self::OPT_LONG_PERFORM]);
     }
 
-    private function getKernelShortOpts(): array
-    {
-        return [self::OPT_SHORT_OUT_STREAM, self::OPT_SHORT_ERR_STREAM, self::OPT_SHORT_VERBOSITY, self::OPT_SHORT_PERFORM];
-    }
 
-    private function getKernelLongOpts(): array
+    /**
+     * @throws InvalidArgumentException
+     * @throws \Aura\Di\Exception
+     * @throws \Aura\Di\Exception\ContainerLocked
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Di\Exception\ServiceNotObject
+     * @throws \RuntimeException
+     */
+    protected function installDependencies(): void
     {
-        return [
-            self::OPT_LONG_PERFORM,
-            Lumberjack\Logger::FIELD_MEM,
-            Lumberjack\Logger::FIELD_TRUE_MEM,
-            Lumberjack\Logger::FIELD_PID,
-            Lumberjack\Logger::FIELD_LEVEL,
-            Lumberjack\Logger::FIELD_PORCELAIN,
-        ];
+        parent::installDependencies();
+        $this->initModules();
     }
 
 
@@ -325,20 +248,20 @@ class Kernel extends CliKernelAbstract
         );
 
         // Extract the kernel options
-        $this->kernelOptions = [];
+        $this->kernelOpts = [];
         foreach (\array_merge($kernelShortOpts, $kernelLongOpts) as $kernelOption) {
             $trimmedKernelOption = \rtrim($kernelOption, ':');
             if (\array_key_exists($trimmedKernelOption, $allOpts)) {
-                $this->kernelOptions[$trimmedKernelOption] = $allOpts[$trimmedKernelOption];
+                $this->kernelOpts[$trimmedKernelOption] = $allOpts[$trimmedKernelOption];
             }
         }
 
         // Extract the app options
-        $this->appOptions = [];
+        $this->appOpts = [];
         foreach (\array_merge($appShortOpts, $appLongOpts) as $appOption) {
             $trimmedAppOption = \rtrim($appOption, ':');
             if (\array_key_exists($trimmedAppOption, $allOpts)) {
-                $this->appOptions[$trimmedAppOption] = $allOpts[$trimmedAppOption];
+                $this->appOpts[$trimmedAppOption] = $allOpts[$trimmedAppOption];
             }
         }
     }
@@ -392,30 +315,15 @@ class Kernel extends CliKernelAbstract
         // Does this option accept values?
         if (\preg_match('/:$/', $name)) {
             // return the value
-            return $this->kernelOptions[\rtrim($name, ':')] ?? null;
+            return $this->kernelOpts[\rtrim($name, ':')] ?? null;
         }
 
         // Does not accept values, and not specified
-        if(!\array_key_exists($name, $this->kernelOptions)){
+        if(!\array_key_exists($name, $this->kernelOpts)){
             return false;
         }
 
         // Does not accept values, but specified at least once.
-        return \is_array($this->kernelOptions[$name]) ? $this->kernelOptions[$name] : true;
-    }
-
-
-    /**
-     * @throws InvalidArgumentException
-     * @throws \Aura\Di\Exception
-     * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Di\Exception\ServiceNotObject
-     * @throws \RuntimeException
-     */
-    protected function installDependencies(): void
-    {
-        parent::installDependencies();
-        $this->initModules();
+        return \is_array($this->kernelOpts[$name]) ? $this->kernelOpts[$name] : true;
     }
 }
