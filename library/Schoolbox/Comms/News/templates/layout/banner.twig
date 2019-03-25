@@ -185,8 +185,8 @@
         delimiters: ['${', '}'],
         data: {
             threadCheckboxEnabled: '{{ (article.discussionThread.open) ? 'checked' : '' }}',
-            threadEnabled: {{ (article.discussionThread.open) ? 'true' : 'false' }},
-            isPublished: {{ article.isPublic ? 'true' : 'false' }}
+            threadEnabled: Boolean({{ article.discussionThread.open }}),
+            isPublished: Boolean({{ article.isPublic }})
         },
         // define methods under the `methods` object
         methods: {
