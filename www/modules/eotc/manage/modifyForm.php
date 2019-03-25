@@ -181,6 +181,25 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     $metadata->setResourceBookings($resourceBookingCollection);
 
+    /* Remove files and only re-add what was in the form
+     */
+    $metadata->setRamsFiles(new Collection());
+
+    if (\count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
+        try {
+            $factory = new CollectorFactory();
+            $files   = $factory->build($_POST['attachment'])->getAll();
+        } catch (MapperException $e) {
+            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
+            exit; // shut UP, storm.
+        } catch (\InvalidArgumentException $e) {
+            error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
+            exit;
+        }
+
+        $metadata->setRamsFiles(new Collection($files));
+    }
+
     /* Spawned further up
      */
     $event->setAuthor($author);
@@ -202,25 +221,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
      */
     $event->setCampusCollection(new Collection($_POST['campus']));
     $event->setRoleCollection(new Collection($_POST['role']));
-
-    /* Remove files and only re-add what was in the form
-     */
-    $metadata->setRamsFiles(new Collection());
-
-    if (\count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
-        try {
-            $factory = new CollectorFactory();
-            $files   = $factory->build($_POST['attachment'])->getAll();
-        } catch (MapperException $e) {
-            error(ErrorMapper::ERROR_FILE_NOT_FOUND);
-            exit; // shut UP, storm.
-        } catch (\InvalidArgumentException $e) {
-            error(ErrorMapper::ERROR_FILE_UPLOAD_INCOMPLETE);
-            exit;
-        }
-
-        $metadata->setRamsFiles(new Collection($files));
-    }
 
     /* Store metadata
      */
