@@ -771,7 +771,7 @@ class External_Pcschools_User implements External_UserInterface
     public function findPeriod() {
         $query = "SELECT TIME_PERIOD, SUB_PERIOD FROM dbo.CALENDAR WHERE DATE = :now";
         $period = $this->getDatabase()->getRow($query, [':now'=>date('ymd')]);
-        if ($period['TIME_PERIOD'] == 0 || $period['SUBJECT_PERIOD'] == 0) {
+        if ($period['TIME_PERIOD'] == 0 || $period['SUB_PERIOD'] == 0) {
             $query = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
             $altPeriod = $this->getDatabase()->getRow($query);
             $period['TIME_PERIOD'] = $period['TIME_PERIOD'] ?: $altPeriod['TIME_PERIOD'];
