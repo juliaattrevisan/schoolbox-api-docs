@@ -243,8 +243,11 @@ class CliPdfGenerator extends CliTool\App
         $tempDir             = $this->createTempDir();
         $pdfFilenames        = [];
         $consecutiveFailures = 0;
+        $index               = 1;
+        $count               = $students->count();
 
         foreach ($students as $student) {
+            $this->getLogger()->notice(\sprintf("Processing student %s of %s", $index++, $count));
             if($consecutiveFailures >= $this->maxFailures){
                 $this->getLogger()->error("$consecutiveFailures consecutive failures, giving up...");
                 break;
