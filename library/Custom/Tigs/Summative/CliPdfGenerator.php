@@ -212,7 +212,7 @@ class CliPdfGenerator extends CliTool\App
 
         if ($maxFailures === null) {
             $this->maxFailures = self::DEFAULT_MAX_FAILS;
-        } elseif(!\is_numeric($maxFailures)) {
+        } elseif(!\is_numeric($maxFailures) || $maxFailures < 0) {
             $this->getLogger()->alert("Invalid 'max-failures' option: '$maxFailures'");
             $valid = false;
         } else {
