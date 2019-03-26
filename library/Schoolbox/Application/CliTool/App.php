@@ -183,7 +183,22 @@ abstract class App
 
 
     /**
-     * Reads a line of input from STDIN, without echoing to STDOUT
+     * Reads a line of input from STDIN, prompting on STDERR
+     *
+     * @param string $prompt
+     * @return string
+     */
+    protected function readLine(string $prompt): string
+    {
+        \fwrite(STDERR, $prompt);
+        return \readline();
+    }
+
+
+    /**
+     * Reads a line of input from STDIN, prompting on STDERR
+     *
+     * If STDIN is a TTY, then suppresses echo
      *
      * @see https://stackoverflow.com/questions/187736/command-line-password-prompt-in-php
      * @param string $prompt
@@ -191,12 +206,17 @@ abstract class App
      */
     protected function readPassword(string $prompt): string
     {
-        echo $prompt;
-        \system('stty -echo');
+        $isInteractive = \posix_isatty(STDIN);
+        \fwrite(STDERR, $prompt);
+        if ($isInteractive) {
+            \system('stty -echo');
+        }
         $password = \trim(\fgets(STDIN));
-        \system('stty echo');
+        if ($isInteractive) {
+            \system('stty echo');
+        }
         // add a new line since the users CR didn't echo
-        echo "\n";
+        \fwrite(STDERR, "\n");
         return $password;
     }
 }

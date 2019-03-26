@@ -654,7 +654,7 @@ class CliPdfGenerator extends CliTool\App
         $username = null;
         while (true) {
             $this->getLogger()->debug("Requesting username");
-            $username = \trim(\readline('Please provide a schoolbox username: '));
+            $username = \trim($this->readLine('Please provide a schoolbox username: '));
             // TODO use a regex
             if ($username) {
                 $this->getLogger()->debug("Username set to '$username'");
