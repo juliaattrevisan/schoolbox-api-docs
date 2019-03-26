@@ -22,6 +22,14 @@ package=${instdir##*/};
 
 curdir=`pwd`;
 
+error() {
+	# Display an error message in red then exit with error code
+	echo -e "\033[38;5;1m"
+	echo -e "Error: $errmsg\n";
+	echo -e "\033[39m";
+	exit 1;
+}
+
 echo -e "\nSchoolbox Restore";
 
 if [ ! -f $conffile ];
@@ -54,13 +62,7 @@ echo "*****                PROCEED WITH EXTREME CAUTION!!!                *****"
 echo "*************************************************************************";
 echo -e "\033[39m";
 
-error() {
-	# Display an error message in red then exit with error code
-	echo -e "\033[38;5;1m"
-	echo -e "Error: $errmsg\n";
-	echo -e "\033[39m";
-	exit 1;
-}
+
 
 readconf() {
 	# Collect Credentials from $tempconfile
@@ -84,10 +86,37 @@ readsqlconfig() {
 	tempsqlamqpvhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='amqp_vhost'" 2>/dev/null`;
 	tempsqlwebsocketport=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port'" 2>/dev/null`;
 	tempsqlwebsocketportssl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='websocket_port_ssl'" 2>/dev/null`;
+
+    #External DB Config
 	tempsqlexternaldbhost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_host'" 2>/dev/null`;
+    tempsqlexternaldbuser=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_user'" 2>/dev/null`;
+	tempsqlexternaldbpassword=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_passwd'" 2>/dev/null`;
+	tempsqlexternaldbdb=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_db_db'" 2>/dev/null`;
 	tempsqlexternalportal=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='external_portal'" 2>/dev/null`;
+
+    #SAML Config
+	tempsqlsamlssourl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_sso_url'" 2>/dev/null`;
+	tempsqlsamlidpmetadataurl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_idp_metadata_url'" 2>/dev/null`;
+	tempsqlsamlenabled=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_enabled'" 2>/dev/null`;
+	tempsqlsamlsloenabled=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_slo_enabled'" 2>/dev/null`;
+	tempsqlsamlslourl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_slo_url'" 2>/dev/null`;
+	tempsqlsamllogouturl=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_logout_url'" 2>/dev/null`;
 	tempsqlsamlprivate=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_private_cert'" 2>/dev/null`;
 	tempsqlsamlpublic=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_public_cert'" 2>/dev/null`;
+	tempsqlsamlidpcertificate=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='saml_idp_certificate'" 2>/dev/null`;
+
+    #LDAP Config
+	tempsqlldapenable=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_enable'" 2>/dev/null`;
+	tempsqlldaphost=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_host'" 2>/dev/null`;
+	tempsqlldapuser=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_user'" 2>/dev/null`;
+	tempsqlldappass=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_pass'" 2>/dev/null`;
+	tempsqlldapbase=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_base'" 2>/dev/null`;
+	tempsqlldaphostalt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_host_alt'" 2>/dev/null`;
+	tempsqlldapuseralt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_user_alt'" 2>/dev/null`;
+	tempsqlldapbasealt=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_base_alt'" 2>/dev/null`;
+	tempsqlldapusername=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='ldap_username'" 2>/dev/null`;
+
+
 }
 
 setsqlconfig() {
@@ -99,14 +128,40 @@ setsqlconfig() {
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlamqpvhost' WHERE name='amqp_vhost'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketport' WHERE name='websocket_port'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlwebsocketportssl' WHERE name='websocket_port_ssl'";
+
+    #External DB Config
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbhost' WHERE name='external_db_host'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbuser' WHERE name='external_db_user'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbpassword' WHERE name='external_db_passwd'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternaldbdb' WHERE name='external_db_db'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlexternalportal' WHERE name='external_portal'";
+
+    #SAML Config
+    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlssourl' WHERE name='saml_sso_url'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlidpmetadataurl' WHERE name='saml_idp_metadata_url'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlenabled' WHERE name='saml_enabled'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlsloenabled' WHERE name='saml_slo_enabled'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlslourl' WHERE name='saml_slo_url'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamllogouturl' WHERE name='saml_logout_url'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlprivate' WHERE name='saml_private_cert'";
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlpublic' WHERE name='saml_public_cert'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlidpcertificate' WHERE name='saml_idp_certificate'";
+
+    #LDAP Config
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapenable' WHERE name='ldap_enable'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldaphost' WHERE name='ldap_host'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapuser' WHERE name='ldap_user'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldappass' WHERE name='ldap_pass'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapbase' WHERE name='ldap_base'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldaphostalt' WHERE name='ldap_host_alt'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapuseralt' WHERE name='ldap_user_alt'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapbasealt' WHERE name='ldap_base_alt'";
+	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlldapusername' WHERE name='ldap_username'";
+
 }
 
 truncateTables() {
-    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry'";
+    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry";
 }
 
 tempconffile="$conffile";
