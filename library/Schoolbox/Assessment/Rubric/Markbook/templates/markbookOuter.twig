@@ -25,16 +25,30 @@
 
 <table id="fixed-width-table">
     <thead>
-        <tr>
-            <th class="column-1" title="Assessment 1 with a fairly long long long title">
-                <a href="">Assessment 1 with a fairly long long long title</a>
-            </th>
-            <th class="column-2" title="Capability with a really really really really really really really long title">Capability with a really really really really really really really long title</th>
-        </tr>
-        <tr>
-            <th class="column-1">&nbsp;</th>
-            <th class="column-2" title="Indicator with an even longer longer longer longer longer longer longer longer longer longer longer longer longer title">Indicator with an even longer longer longer longer longer longer longer longer longer longer longer longer longer title</th>
-        </tr>
+        {% for assessmentId, assessment in assessments %}
+            {% for capabilityId, capability in assessment.capabilities %}
+
+                <tr>
+                    {% if loop.index == 1 %}
+                        <th class="column-1" title="{{ assessment.name }}">
+                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
+                        </th>
+                    {% else %}
+                        <th class="column-1">&nbsp;</th>
+                    {% endif %}
+
+                    <th class="column-2" title="{{ capability.name }}">{{ capability.name }}</th>
+                </tr>
+
+                {% for indicatorId, indicator in capability.indicators %}
+                    <tr>
+                        <th class="column-1">&nbsp;</th>
+                        <th class="column-2" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                    </tr>
+                {% endfor %}
+
+            {% endfor %}
+        {% endfor %}
     </thead>
 </table>
 
