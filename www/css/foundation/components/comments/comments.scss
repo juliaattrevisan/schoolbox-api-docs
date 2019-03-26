@@ -1,18 +1,16 @@
 .comments {
   border-top: 1px solid $body-bg;
-  padding-top: 2rem;
   margin-top: 1.5rem;
+  padding-top: 2rem;
 
-  /* Fixed width centered container for comment threads
-   */
+   // Fixed width centered container for comment threads
   .comments-threads {
-    margin: 1rem auto 0 auto;
+    margin: 1rem auto 0;
     max-width: 45rem;
-    padding: 0 0.75rem 0 0.75rem;
+    padding: 0 .75rem;
   }
 
-  /* Allow Comments checkbox
-   */
+  // Allow Comments checkbox
   .checklist {
     display: flex;
     flex-flow: row-reverse;
