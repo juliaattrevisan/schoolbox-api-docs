@@ -168,7 +168,6 @@ class CliPdfGenerator extends CliTool\App
      * Parses options and returns whether all options are valid
      *
      * @return bool
-     * @throws \InvalidArgumentException
      */
     private function parseAppOptions(): bool
     {
@@ -184,19 +183,31 @@ class CliPdfGenerator extends CliTool\App
 
         if ($this->sessionHash) {
             $this->getLogger()->info('Command-line session hash supplied, validating...');
-            $options  = [
-                'headers'         => [
-                    'Origin' => $this->fqdn,
-                    'cookie' => \sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $this->sessionHash),
-                ],
-                'allow_redirects' => false,
-            ];
-            $response = (new Client())->get("https://{$this->fqdn}", $options);
-            $code     = $response->getStatusCode();
-            $this->getLogger()->info("Response Code: $code");
-            if (200 !== $code) {
-                $this->getLogger()->alert("Invalid session 'hash' option: '$this->sessionHash'. Got response code: $code");
+            $redis = \Alaress\Redis::getClientInstance();
+            if (!$redis) {
+                $this->getLogger()->alert("Unable to fetch redis client");
                 $valid = false;
+            } else {
+                $redisData = $redis->get(\sprintf('%s%s', PipeManager::REDIS_SESSION_PREFIX, $this->sessionHash));
+                if (null === $redisData) {
+                    $this->getLogger()->alert("No redis data found for hash: {$this->sessionHash}");
+                    $valid = false;
+                } else {
+                    \session_start();
+                    \session_decode($redisData);
+                    /** @var User $user */
+                    $user = $_SESSION['user'] ?? null;
+                    \session_unset();
+                    if (!$user) {
+                        $this->getLogger()->alert("No user object found in session data");
+                        $valid = false;
+                    } elseif (!$user->isSuperuser()) {
+                        $this->getLogger()->alert("Session user '{$user->getUsername()}' is not a superuser");
+                        $valid = false;
+                    } else {
+                        $this->getLogger()->notice("Session user '{$user->getUsername()}' IS a superuser, user is authorised");
+                    }
+                }
             }
         }
 
