@@ -153,11 +153,11 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $clone = parent::cloneForCopy();
 
         // copy attachments
-        $newFiles = [];
+        $newFiles = new Collection();
         foreach ($this->getAttachedFiles() as $file) {
-            $newFiles[] = (new File())
+            $newFiles->add((new File())
                 ->setStorage($file->getStorage())
-                ->setBasename($file->getBasename());
+                ->setBasename($file->getBasename()));
         }
         $clone->setAttachedFiles($newFiles);
 
