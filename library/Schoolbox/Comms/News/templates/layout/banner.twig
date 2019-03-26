@@ -164,6 +164,7 @@
             isPublished: Boolean({{ article.isPublic }}),
             posts: [],
             commentsTotalCountLabel: undefined,
+            totalCommentsCount: 0,
             cursorNext: '',
             loadMoreIsDisabled: false,
             loadingCommentsText: 'Loading comments...',
@@ -207,7 +208,8 @@
                     var index;
 
                     self.articlesLoading = false;
-                    self.commentsTotalCountLabel = 'Comments (' + responseData.metadata.count + ')';
+                    self.totalCommentsCount = responseData.metadata.count;
+                    self.commentsTotalCountLabel = 'Comments (' + self.totalCommentsCount + ')';
                     self.cursorNext = responseData.metadata.cursor.next;
 
                     for (index = 0; index < responseData.data.length; index++) {
