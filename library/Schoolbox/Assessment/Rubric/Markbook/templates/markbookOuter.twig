@@ -75,14 +75,14 @@
                 {# Render assessments #}
                 <tr class="assessment">
                     <th rowspan="{{ rowspan+1 }}">
-                        <a href="{{ assessment.statusLink }}">
+                        <a title="{{ assessment.name }}" href="{{ assessment.statusLink }}">
                             {{ assessment.name }}
                         </a>
                     </th>
                 </tr>
                 {# Render capabilities #}
                 {% for capabilityId, capability in assessment.capabilities %}
-                    <tr class="capability">
+                    <tr title="{{ capability.name }}" class="capability">
                         <th>
                             {{ capability.name }}
                         </th>
@@ -90,7 +90,7 @@
 
                     {# Render indicators #}
                     {% for indicatorId, indicator in capability.indicators %}
-                        <tr class="indicator">
+                        <tr title="{{ indicator.name }}" class="indicator">
                             <th>
                                 {{ indicator.name }}
                             </th>
