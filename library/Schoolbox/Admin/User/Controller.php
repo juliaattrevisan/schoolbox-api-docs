@@ -192,7 +192,9 @@ class Controller extends Base
             'name' => 'Curriculum',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
-                'write' => true
+                'read' => false,
+                'write' => true,
+                'moderate' => false
             ]
         ],
         UserAccess::SERVICE_PASTORAL => [
