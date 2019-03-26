@@ -97,8 +97,9 @@ class NesaScoreGraph extends BaseComponent
         $markData    = self::BASE_MARKS;
         $studentMark = null;
         $error       = null;
+        $hideComponent = false; // Don't hide if we error out
         try {
-            [$markData, $studentMark] = $this->collateMarks($this->collateAssessables());
+            [$markData, $studentMark, $hideComponent] = $this->collateMarks($this->collateAssessables());
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
         }
@@ -106,6 +107,7 @@ class NesaScoreGraph extends BaseComponent
         $context = [
             'data'         => $markData,
             'studentValue' => $studentMark,
+            'hideComponent' => $hideComponent,
         ];
         if (isset($error)) {
             $context['error'] = $error;
@@ -202,13 +204,15 @@ class NesaScoreGraph extends BaseComponent
      *
      * @param array $assessables A set of assessments, from `$this->collateAssessments`.
      * @return array 0: all marks; [mark value => number of students with this mark]
-     *                           1: the mark this student received, if any
+     *               1: the mark this student received, if any
+     *               2: should we hide the whole component?
      * @throws UnexpectedValueException if a folder has more or less than one MYP/DP assessment
      */
     private function collateMarks(array $assessables): array
     {
         $markData    = self::BASE_MARKS;
         $studentMark = null;
+        $hideComponent = true;
         foreach ($assessables as $folderId => $folderAssessments) {
             /**
              * @var Folder\Model    $folder
@@ -245,6 +249,12 @@ class NesaScoreGraph extends BaseComponent
                 continue;
             }
 
+            // Is assessment for currently-viewed class, and are grades visible to current user?
+            if ($this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                // Show the component, regardless of whether there are marks yet.
+                $hideComponent = false;
+            }
+
             foreach ($assessment->getAllParticipants() as $participant) {
                 $feedback = $participant->getAuthoritativeFeedback(true);
                 if (!$feedback) {
@@ -272,6 +282,6 @@ class NesaScoreGraph extends BaseComponent
             }
         }
 
-        return [$markData, $studentMark];
+        return [$markData, $studentMark, $hideComponent];
     }
 }
