@@ -24,6 +24,8 @@
         display: flex;
     }
     #rubric-marksheet-left-headings {
+        flex: 0 0 300px;
+        overflow: hidden;
         margin-top: 10rem; /* This is the height of the student headings on the marksheet */
         white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
     }
@@ -72,7 +74,7 @@
 
                 {# Render assessments #}
                 <tr class="assessment">
-                    <th rowspan="{{ rowspan+1 }}" style="min-width: 200px;width: 200px;">
+                    <th rowspan="{{ rowspan+1 }}">
                         <a href="{{ assessment.statusLink }}">
                             {{ assessment.name }}
                         </a>
