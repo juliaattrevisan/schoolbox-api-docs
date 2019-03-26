@@ -2,100 +2,110 @@
 Renders a MYP/DP graph.
 
 Data:
-    error:        string   - Optional. If present, the reason why we can't render the component
-    studentValue: int|null - Optional. The student's mark for the IB graph assessment
-    data:         array    - The results to render. key: column, value: height
+    error:          string             - Optional. If present, the reason why we can't render the component
+    studentValue:   int|null           - Optional. The student's mark for the IB graph assessment
+    studentComment: string|null        - Optional. The student's comment for the IB graph assessment
+    data:           array              - The results to render. key: column, value: height
+    useComment:     bool               - Whether to render the student's comment, instead of the graph
+    hideComponent:  bool               - Whether this whole component should be hidden (used by including template)
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% set gradientClass = urgency.marks(studentValue / 7 * 100) %}
+
+<h2 class="subheader">{{ header }}</h2>
 
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
-    {% if studentValue is not null %}
-        {# TODO style this properly, of course #}
-        <div class="{{ gradientClass }}-bg">
-            <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
-        </div>
-    {% endif %}
+    {% if useComment %}
+        <blockquote>{{ studentComment }}</blockquote>
+    {% else %}
 
-    {% autoescape 'js' %}
-    <script type="text/javascript">
+        {% if studentValue is not null %}
+            {# TODO style this properly, of course #}
+            <div class="{{ gradientClass }}-bg">
+                <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
+            </div>
+        {% endif %}
+
+        {% autoescape 'js' %}
+        <script type="text/javascript">
 
 
-        $(function(){
+            $(function(){
 
-            var rawData = {{ data|json_encode|raw }},
-                studentValue = Number("{{ studentValue }}");
+                var rawData = {{ data|json_encode|raw }},
+                    studentValue = Number("{{ studentValue }}");
 
-            {#
-                Convert into object format so we can add css classes for colour gradients.
-                @see https://api.highcharts.com/highcharts/series.column.data
-            #}
-            var data = [];
-            for(var key in rawData){
-                if(!rawData.hasOwnProperty(key)){
-                    continue;
+                {#
+                    Convert into object format so we can add css classes for colour gradients.
+                    @see https://api.highcharts.com/highcharts/series.column.data
+                #}
+                var data = [];
+                for(var key in rawData){
+                    if(!rawData.hasOwnProperty(key)){
+                        continue;
+                    }
+                    var column = {
+                        x: Object.keys(rawData).length + 1 - Number(key), // Reverse order, highest value first
+                        y: rawData[key],
+                        name: rawData[key]
+                    };
+                    if(studentValue === Number(key)){
+                        column.className = '{{ gradientClass }}-bg';
+                    } else {
+                        column.color = '#454549';
+                    }
+                    data.push(column);
                 }
-                var column = {
-                    x: Object.keys(rawData).length + 1 - Number(key), // Reverse order, highest value first
-                    y: rawData[key],
-                    name: rawData[key]
-                };
-                if(studentValue === Number(key)){
-                    column.className = '{{ gradientClass }}-bg';
-                } else {
-                    column.color = '#454549';
-                }
-                data.push(column);
-            }
 
-            $("#ib-graph").highcharts({
-                legend: {
-                    enabled: false
-                },
-                credits: {
-                    enabled: false
-                },
-                title: {
-                    text: null
-                },
-                tooltip: {
-                    enabled: false
-                },
-                xAxis: {
+                $("#ib-graph").highcharts({
+                    legend: {
+                        enabled: false
+                    },
+                    credits: {
+                        enabled: false
+                    },
                     title: {
                         text: null
                     },
-                    min: 0.5,
-                    tickInterval: 1,
-                    max: 7.5,
-                    labels: {
-                        formatter: function() {
-                            return Object.keys(rawData).length + 1 - this.pos;
-                        }
-                    }
-                },
-                yAxis: {
-                    title: {
-                        text: '# Students (Cohort)'
+                    tooltip: {
+                        enabled: false
                     },
-                    allowDecimals: false
-                },
-                series: [
-                    {
-                        type: 'column',
-                        data: data,
-                        label: {
-                            enabled: false
+                    xAxis: {
+                        title: {
+                            text: null
+                        },
+                        min: 0.5,
+                        tickInterval: 1,
+                        max: 7.5,
+                        labels: {
+                            formatter: function() {
+                                return Object.keys(rawData).length + 1 - this.pos;
+                            }
                         }
-                    }
-                ]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '# Students (Cohort)'
+                        },
+                        allowDecimals: false
+                    },
+                    series: [
+                        {
+                            type: 'column',
+                            data: data,
+                            label: {
+                                enabled: false
+                            }
+                        }
+                    ]
+                });
             });
-        });
-    </script>
-    {% endautoescape %}
-    {# TODO style this properly #}
-    <div id="ib-graph" style="margin-bottom: 30px;"></div>
+        </script>
+        {% endautoescape %}
+        {# TODO style this properly #}
+        <div id="ib-graph" style="margin-bottom: 30px;"></div>
+    {% endif %}
 {% endif %}
