@@ -54,9 +54,10 @@
     /**** Styles to force the width of the 2 left columns ****/
     #left-columns {
         margin-top: 10rem; /* This is the height of the student headings on the marksheet */
-
         table-layout: fixed; /* Required in order for a fixed width to be set */
         width: 350px;
+        flex: 0 0; /* Fixes an IE bug */
+        border-collapse: separate; /* Fixes an IE bug, see https://stackoverflow.com/questions/9949396/css-box-shadow-not-working-in-ie */
     }
     #left-columns.drop-shadow {
         /* Drop shadow to make it easier to understand what's going on when scrolling the other table */
@@ -64,7 +65,9 @@
         -moz-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
         box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
 
-        /* Make sure we can see the drop shadow */
+        /* Make sure we can see the drop shadow.
+        For some reason, this only works if applied to #left-columns.drop-shadow;
+        otherwise something overrides it */
         z-index: 1;
     }
     .column-1, .column-2 {
