@@ -3,174 +3,209 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
 
-<script>
-    // The only purpose of using this plugin now is to ensure that the last student in the list doesn't get
-    // cut off when the window shrinks.
-    $(function() {
-        var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
-        if ($windowWidthRems >= 40) {
-            $('[data-mark-sheet]').DataTable({
-                scrollCollapse: true,
-                paging: false,
-                bFilter: false,
-                bInfo: false,
-                ordering: false
-            });
-        }
-    });
-</script>
 <style>
-    #table-container {
-        display: flex;
+    #fixed-width-table {
+        table-layout: fixed;
+        width: 240px;
+        white-space: nowrap;
     }
-    #rubric-marksheet-left-headings {
-        flex: 0 0 300px;
+
+    .column-1, .column-2 {
         overflow: hidden;
-        margin-top: 10rem; /* This is the height of the student headings on the marksheet */
-        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
-    }
-    #rubric-marksheet-left-headings th, #rubric-marksheet-wrapper tr {
-        /* Ensure browser rounding errors don't result in misaligned rows */
-        height: 39px;
-    }
-    #rubric-marksheet-wrapper {
-        overflow-x: auto; /* Allow the user to scroll the mark table horizontally */
-        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
+        text-overflow: ellipsis;
     }
 
-    #rubric-marksheet-left-headings tr.assessment th {
-        border-right: 1px solid #ededed;
-        font-weight: normal;
+    .column-1 {
+        width: 100px;
     }
-    #rubric-marksheet-left-headings tr.capability th {
-        border-right: 1px solid #ededed;
-    }
-    #rubric-marksheet-left-headings tr.indicator th {
-        padding-left: 2rem;
-        border-right: 1px solid #ededed;
-        font-weight: normal;
-    }
-
-    .rubric-marksheet a.noMark {
-        padding: 0.5rem 1.25rem 0.5rem 1.25rem;
-        color: black;
+    .column-2 {
+        width: 140px;
     }
 </style>
-{% import '@learning/macro/urgency.twig' as urgency %}
 
-{% if studentMarks|length %}
-<div id="table-container">
-    <div id="rubric-marksheet-left-headings">
-        <table>
-            {% for assessmentId, assessment in assessments %}
+<table id="fixed-width-table">
+    <thead>
+        <tr>
+            <th class="column-1" title="Assessment 1 with a fairly long long long title">
+                <a href="">Assessment 1 with a fairly long long long title</a>
+            </th>
+            <th class="column-2" title="Capability with a really really really really really really really long title">Capability with a really really really really really really really long title</th>
+        </tr>
+        <tr>
+            <th class="column-1">&nbsp;</th>
+            <th class="column-2" title="Indicator with an even longer longer longer longer longer longer longer longer longer longer longer longer longer title">Indicator with an even longer longer longer longer longer longer longer longer longer longer longer longer longer title</th>
+        </tr>
+    </thead>
+</table>
+
+{#<script>#}
+    {#// The only purpose of using this plugin now is to ensure that the last student in the list doesn't get#}
+    {#// cut off when the window shrinks.#}
+    {#$(function() {#}
+        {#var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));#}
+        {#if ($windowWidthRems >= 40) {#}
+            {#$('[data-mark-sheet]').DataTable({#}
+                {#scrollCollapse: true,#}
+                {#paging: false,#}
+                {#bFilter: false,#}
+                {#bInfo: false,#}
+                {#ordering: false#}
+            {#});#}
+        {#}#}
+    {#});#}
+{#</script>#}
+{#<style>#}
+    {##table-container {#}
+        {#display: flex;#}
+    {#}#}
+    {##rubric-marksheet-left-headings {#}
+        {#flex: 0 0 300px;#}
+        {#overflow: hidden;#}
+        {#margin-top: 10rem; /* This is the height of the student headings on the marksheet */#}
+        {#white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */#}
+    {#}#}
+    {##rubric-marksheet-left-headings th, #rubric-marksheet-wrapper tr {#}
+        {#/* Ensure browser rounding errors don't result in misaligned rows */#}
+        {#height: 39px;#}
+    {#}#}
+    {##rubric-marksheet-wrapper {#}
+        {#overflow-x: auto; /* Allow the user to scroll the mark table horizontally */#}
+        {#white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */#}
+    {#}#}
+
+    {##rubric-marksheet-left-headings tr.assessment th {#}
+        {#border-right: 1px solid #ededed;#}
+        {#font-weight: normal;#}
+    {#}#}
+    {##rubric-marksheet-left-headings tr.capability th {#}
+        {#border-right: 1px solid #ededed;#}
+    {#}#}
+    {##rubric-marksheet-left-headings tr.indicator th {#}
+        {#padding-left: 2rem;#}
+        {#border-right: 1px solid #ededed;#}
+        {#font-weight: normal;#}
+    {#}#}
+
+    {#.rubric-marksheet a.noMark {#}
+        {#padding: 0.5rem 1.25rem 0.5rem 1.25rem;#}
+        {#color: black;#}
+    {#}#}
+{#</style>#}
+{#{% import '@learning/macro/urgency.twig' as urgency %}#}
+
+{#{% if studentMarks|length %}#}
+{#<div id="table-container">#}
+    {#<div id="rubric-marksheet-left-headings">#}
+        {#<table>#}
+            {#{% for assessmentId, assessment in assessments %}#}
                 {# Set up the rowspan for the assessment #}
-                {% set capCount = assessment.capabilities|length %}
-                {% set rowspan = capCount %}
+                {#{% set capCount = assessment.capabilities|length %}#}
+                {#{% set rowspan = capCount %}#}
 
-                {% for capability in assessment.capabilities %}
-                    {% set indCount = capability.indicators|length %}
-                    {% set rowspan = rowspan + indCount %}
-                {% endfor %}
+                {#{% for capability in assessment.capabilities %}#}
+                    {#{% set indCount = capability.indicators|length %}#}
+                    {#{% set rowspan = rowspan + indCount %}#}
+                {#{% endfor %}#}
 
                 {# Render assessments #}
-                <tr class="assessment">
-                    <th rowspan="{{ rowspan+1 }}">
-                        <a title="{{ assessment.name }}" href="{{ assessment.statusLink }}">
-                            {{ assessment.name }}
-                        </a>
-                    </th>
-                </tr>
+                {#<tr class="assessment">#}
+                    {#<th rowspan="{{ rowspan+1 }}">#}
+                        {#<a title="{{ assessment.name }}" href="{{ assessment.statusLink }}">#}
+                            {#{{ assessment.name }}#}
+                        {#</a>#}
+                    {#</th>#}
+                {#</tr>#}
                 {# Render capabilities #}
-                {% for capabilityId, capability in assessment.capabilities %}
-                    <tr title="{{ capability.name }}" class="capability">
-                        <th>
-                            {{ capability.name }}
-                        </th>
-                    </tr>
+                {#{% for capabilityId, capability in assessment.capabilities %}#}
+                    {#<tr title="{{ capability.name }}" class="capability">#}
+                        {#<th>#}
+                            {#{{ capability.name }}#}
+                        {#</th>#}
+                    {#</tr>#}
 
                     {# Render indicators #}
-                    {% for indicatorId, indicator in capability.indicators %}
-                        <tr title="{{ indicator.name }}" class="indicator">
-                            <th>
-                                {{ indicator.name }}
-                            </th>
-                        </tr>
-                    {% endfor %}
-                {% endfor %}
+                    {#{% for indicatorId, indicator in capability.indicators %}#}
+                        {#<tr title="{{ indicator.name }}" class="indicator">#}
+                            {#<th>#}
+                                {#{{ indicator.name }}#}
+                            {#</th>#}
+                        {#</tr>#}
+                    {#{% endfor %}#}
+                {#{% endfor %}#}
 
-            {% endfor %}
-        </table>
-    </div>
+            {#{% endfor %}#}
+        {#</table>#}
+    {#</div>#}
 
-    <div id="rubric-marksheet-wrapper">
-        <table class="rubric-marksheet marksheet" data-mark-sheet>
-            <thead>
-                <tr class="rotate-headers" data-headers>
-                    {% for studentId, student in studentMarks %}
-                        <th>
-                            <div>
-                                <span>
-                                    <a href="{{ student.profileLink }}">
-                                        {{ student.lastname ~ ', ' ~ student.firstname}}
-                                    </a>
-                                </span>
-                            </div>
-                        </th>
-                    {% endfor %}
-                </tr>
-            </thead>
+    {#<div id="rubric-marksheet-wrapper">#}
+        {#<table class="rubric-marksheet marksheet" data-mark-sheet>#}
+            {#<thead>#}
+                {#<tr class="rotate-headers" data-headers>#}
+                    {#{% for studentId, student in studentMarks %}#}
+                        {#<th>#}
+                            {#<div>#}
+                                {#<span>#}
+                                    {#<a href="{{ student.profileLink }}">#}
+                                        {#{{ student.lastname ~ ', ' ~ student.firstname}}#}
+                                    {#</a>#}
+                                {#</span>#}
+                            {#</div>#}
+                        {#</th>#}
+                    {#{% endfor %}#}
+                {#</tr>#}
+            {#</thead>#}
 
-            <tbody>
-                {% for assessmentId, assessment in assessments %}
+            {#<tbody>#}
+                {#{% for assessmentId, assessment in assessments %}#}
 
-                    {% for capabilityId, capability in assessment.capabilities %}
-                        <tr class="capability">
-                            {% for studentId, student in studentMarks %}
-                                {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
-                                {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
-                                {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+                    {#{% for capabilityId, capability in assessment.capabilities %}#}
+                        {#<tr class="capability">#}
+                            {#{% for studentId, student in studentMarks %}#}
+                                {#{% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}#}
+                                {#{% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}#}
+                                {#{% set summaryLink = student.assessments[assessmentId].summaryLink %}#}
 
-                                {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
-                                {% if capabilityMark is null %}
-                                    {% set gradientClass = "" %}
-                                {% endif %}
+                                {#{% set gradientClass = urgency.marks(normalisedCapabilityMark) %}#}
+                                {#{% if capabilityMark is null %}#}
+                                    {#{% set gradientClass = "" %}#}
+                                {#{% endif %}#}
 
-                                <td>
-                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'noMark' }}">{{ capabilityMark|default('-') }}</a>
-                                </td>
-                            {% endfor %}
-                        </tr>
+                                {#<td>#}
+                                    {#<a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'noMark' }}">{{ capabilityMark|default('-') }}</a>#}
+                                {#</td>#}
+                            {#{% endfor %}#}
+                        {#</tr>#}
 
-                        {% for indicatorId, indicator in capability.indicators %}
-                            <tr class="indicator">
-                                {% for studentId, student in studentMarks %}
-                                    {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
-                                    {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
-                                    {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
-                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+                        {#{% for indicatorId, indicator in capability.indicators %}#}
+                            {#<tr class="indicator">#}
+                                {#{% for studentId, student in studentMarks %}#}
+                                    {#{% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}#}
+                                    {#{% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}#}
+                                    {#{% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}#}
+                                    {#{% set summaryLink = student.assessments[assessmentId].summaryLink %}#}
 
-                                    {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
-                                    {% if normalisedIndicatorMark is null %}
-                                        {% set gradientClass = "" %}
-                                    {% endif %}
+                                    {#{% set gradientClass = urgency.marks(normalisedIndicatorMark) %}#}
+                                    {#{% if normalisedIndicatorMark is null %}#}
+                                        {#{% set gradientClass = "" %}#}
+                                    {#{% endif %}#}
 
-                                    <td title="{{ descriptorText|default('-No descriptor text-') }}">
-                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'noMark' }}">{{ indicatorMark|default('-') }}</a>
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    {% endfor %}
+                                    {#<td title="{{ descriptorText|default('-No descriptor text-') }}">#}
+                                        {#<a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'noMark' }}">{{ indicatorMark|default('-') }}</a>#}
+                                    {#</td>#}
+                                {#{% endfor %}#}
+                            {#</tr>#}
+                        {#{% endfor %}#}
+                    {#{% endfor %}#}
 
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                {#{% endfor %}#}
+            {#</tbody>#}
+        {#</table>#}
+    {#</div>#}
 
-</div>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-progress"></i>
-        <p>There are no rubric marks for this folder.</p>
-    </div>
-{% endif %}
+{#</div>#}
+{#{% else %}#}
+    {#<div class="empty-state">#}
+        {#<i class="icon-progress"></i>#}
+        {#<p>There are no rubric marks for this folder.</p>#}
+    {#</div>#}
+{#{% endif %}#}
