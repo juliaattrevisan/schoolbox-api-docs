@@ -19,6 +19,17 @@
             });
         }
     });
+
+    $(function() {
+        $("#rubric-marksheet-wrapper").scroll(function(e) {
+            var scrollAmount = e.target.scrollLeft;
+            if (scrollAmount > 10 && !$("#left-columns").hasClass(".drop-shadow")) {
+                $("#left-columns").addClass("drop-shadow");
+            } else {
+                $("#left-columns").removeClass("drop-shadow");
+            }
+        });
+    });
 </script>
 
 <style>
@@ -44,6 +55,15 @@
 
         table-layout: fixed; /* Required in order for a fixed width to be set */
         width: 350px;
+    }
+    #left-columns.drop-shadow {
+        /* Drop shadow to make it easier to understand what's going on when scrolling the other table */
+        -webkit-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
+        -moz-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
+        box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
+
+        /* Make sure we can see the drop shadow */
+        z-index: 1;
     }
     .column-1, .column-2 {
         overflow: hidden;
