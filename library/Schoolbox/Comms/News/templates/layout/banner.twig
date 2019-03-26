@@ -174,7 +174,7 @@
             savedText: 'Saved',
             unableToSaveText: 'Unable to save',
             commentsLoading: true,
-            showLoadMoreButton: true,
+            showLoadMoreButton: false,
         },
         // define methods under the `methods` object
         methods: {
@@ -208,7 +208,6 @@
                     var responseData = response.data;
                     var index;
 
-                    self.commentsLoading = false;
                     self.totalCommentsCount = responseData.metadata.count;
                     self.cursorNext = responseData.metadata.cursor.next;
 
@@ -216,17 +215,15 @@
                         self.posts.push(responseData.data[index]);
                     }
 
+                    self.commentsLoading = false;
                     self.loadMoreIsDisabled = false;
                     self.showCommentsCount = true;
-
-                    if (self.posts.length === responseData.metadata.count) {
-                        self.showLoadMoreButton = false;
-                    }
+                    self.showLoadMoreButton = self.posts.length < responseData.metadata.count;
 
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
                     self.commentsLoading = false;
-                    self.loadMoreIsDisabled = false;
+                    self.showLoadMoreButton = false;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 });
             }
