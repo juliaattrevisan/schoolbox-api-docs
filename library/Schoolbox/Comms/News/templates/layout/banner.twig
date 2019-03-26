@@ -72,7 +72,7 @@
         <div id="threads-section">
             <div class="row">
                 <div class="small-6 columns">
-                    <h2>${ commentsTotalCountLabel }</h2>
+                    <h2 v-if="showCommentsCount">Comments (${ totalCommentsCount })</h2>
                 </div>
                 <div class="checklist small-6 columns">
                     {% if modifyRoute or isAuthor and article.discussionThread.id %}
@@ -127,7 +127,7 @@
                     </article>
 
                 </li>
-                <li class="actions-small-1" v-if="articlesLoading" v-for="n in 3">
+                <li class="actions-small-1" v-if="commentsLoading" v-for="n in 3">
                     <div class="list-item">
                         <div class="small-12 card skeleton">
                             <div class="img"></div>
@@ -137,7 +137,7 @@
                     </div>
                 </li>
             </ul>
-            <a v-on:click="getThread" class="button expand" :disabled="loadMoreIsDisabled" id="loadMore">Load More</a>
+            <a v-on:click="getThread" v-if="showLoadMoreButton" class="button expand" :disabled="loadMoreIsDisabled">Load More</a>
         </div>
         </div>
     </section>
@@ -148,7 +148,7 @@
 
 {% autoescape 'js' %}
 <script>
-
+    
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
     };
@@ -163,7 +163,7 @@
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
             posts: [],
-            commentsTotalCountLabel: undefined,
+            showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
             loadMoreIsDisabled: false,
@@ -173,18 +173,19 @@
             savingText: 'Saving...',
             savedText: 'Saved',
             unableToSaveText: 'Unable to save',
-            articlesLoading: true,
+            commentsLoading: true,
+            showLoadMoreButton: true,
         },
         // define methods under the `methods` object
         methods: {
             enableDisableThread: function (event) {
                 var self = this;
 
-                self.$data.threadEnabled = event.target.checked;
+                self.threadEnabled = event.target.checked;
 
                 $toast.toastActivate({text: self.savingText});
 
-                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: this.$data.threadEnabled}, { headers: postHeaders }).then(function () {
+                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: self.threadEnabled}, { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: self.savedText, duration: 2000});
                 }).catch(function (error) {
                     $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
@@ -194,7 +195,7 @@
                 var self = this;
 
                 self.loadMoreIsDisabled = true;
-                self.articlesLoading = true;
+                self.commentsLoading = true;
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
@@ -207,9 +208,8 @@
                     var responseData = response.data;
                     var index;
 
-                    self.articlesLoading = false;
+                    self.commentsLoading = false;
                     self.totalCommentsCount = responseData.metadata.count;
-                    self.commentsTotalCountLabel = 'Comments (' + self.totalCommentsCount + ')';
                     self.cursorNext = responseData.metadata.cursor.next;
 
                     for (index = 0; index < responseData.data.length; index++) {
@@ -217,9 +217,10 @@
                     }
 
                     self.loadMoreIsDisabled = false;
+                    self.showCommentsCount = true;
 
                     if (self.posts.length === responseData.metadata.count) {
-                        $('#loadMore').remove();
+                        self.showLoadMoreButton = false;
                     }
 
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
