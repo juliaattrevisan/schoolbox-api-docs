@@ -5,9 +5,9 @@
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
 
 <script>
-    // The only purpose of using this plugin now is to ensure that the last student in the list doesn't get
-    // cut off when the window shrinks.
     $(function() {
+        // The only purpose of using this plugin now is to ensure that the last student in the list doesn't get
+        // cut off when the window shrinks.
         var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
         if ($windowWidthRems >= 40) {
             $('[data-mark-sheet]').DataTable({
@@ -18,15 +18,17 @@
                 ordering: false
             });
         }
-    });
 
-    $(function() {
+        // Hide/show a drop shadow when scrolling the markbook horizontally
+        // The shadow only appears when you have scrolled past a certain threshold
         $("#rubric-marksheet-wrapper").scroll(function(e) {
-            var scrollAmount = e.target.scrollLeft;
-            if (scrollAmount > 10 && !$("#left-columns").hasClass(".drop-shadow")) {
-                $("#left-columns").addClass("drop-shadow");
+            const scrollAmount = e.target.scrollLeft;
+            const scrollPixelThreshold = 10;
+            const $leftColumns = $("#left-columns");
+            if (scrollAmount > scrollPixelThreshold && !$leftColumns.hasClass(".drop-shadow")) {
+                $leftColumns.addClass("drop-shadow");
             } else {
-                $("#left-columns").removeClass("drop-shadow");
+                $leftColumns.removeClass("drop-shadow");
             }
         });
     });
