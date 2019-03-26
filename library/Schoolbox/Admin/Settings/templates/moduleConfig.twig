@@ -82,11 +82,7 @@
                                 <div class="small-12 columns">
                                 <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
                                 <span data-tooltip class="has-tip tip-top hint" title="{{ data.description }}">?</span>
-                                {% if not data.editable %}
-                                    <p>{{ data.value }}</p>
-                                {% else %}
                                     {% include '@settings/fieldType/' ~ setting.template with data only %}
-                                {% endif %}
                                 </div>
                             {% endif %}
                         {% endfor %}
