@@ -6,20 +6,37 @@
 <style>
     #fixed-width-table {
         table-layout: fixed;
-        width: 240px;
+        width: 350px;
         white-space: nowrap;
     }
-
     .column-1, .column-2 {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
     .column-1 {
-        width: 100px;
+        width: 150px;
     }
     .column-2 {
-        width: 140px;
+        width: 200px;
+    }
+
+    #fixed-width-table .placeholder,
+    #fixed-width-table .assessment,
+    #fixed-width-table .capability,
+    #fixed-width-table .indicator {
+        border-right: 1px solid #ededed;
+    }
+    #fixed-width-table .placeholder {
+        border-bottom: none;
+    }
+    #fixed-width-table .assessment {
+        font-weight: normal;
+        border-top: 1px solid #ededed;
+        border-bottom: none;
+    }
+    #fixed-width-table .indicator {
+        padding-left: 2rem;
+        font-weight: normal;
     }
 </style>
 
@@ -30,20 +47,20 @@
 
                 <tr>
                     {% if loop.index == 1 %}
-                        <th class="column-1" title="{{ assessment.name }}">
+                        <th class="column-1 assessment" title="{{ assessment.name }}">
                             <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
                         </th>
                     {% else %}
-                        <th class="column-1">&nbsp;</th>
+                        <th class="column-1 placeholder">&nbsp;</th>
                     {% endif %}
 
-                    <th class="column-2" title="{{ capability.name }}">{{ capability.name }}</th>
+                    <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
                 </tr>
 
                 {% for indicatorId, indicator in capability.indicators %}
                     <tr>
-                        <th class="column-1">&nbsp;</th>
-                        <th class="column-2" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                        <th class="column-1 placeholder">&nbsp;</th>
+                        <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
                     </tr>
                 {% endfor %}
 
