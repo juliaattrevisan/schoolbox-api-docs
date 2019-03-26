@@ -168,6 +168,7 @@ class CliPdfGenerator extends CliTool\App
      * Parses options and returns whether all options are valid
      *
      * @return bool
+     * @throws \InvalidArgumentException
      */
     private function parseAppOptions(): bool
     {
@@ -180,6 +181,24 @@ class CliPdfGenerator extends CliTool\App
         $this->now         = $this->getOpt(self::OPT_LONG_NOW);
         $maxFailures       = $this->getOpt(self::OPT_LONG_MAX_FAILS);
         $jsDelay           = $this->getOpt(self::OPT_LONG_JS_DELAY);
+
+        if ($this->sessionHash) {
+            $this->getLogger()->info('Command-line session hash supplied, validating...');
+            $options  = [
+                'headers'         => [
+                    'Origin' => $this->fqdn,
+                    'cookie' => \sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $this->sessionHash),
+                ],
+                'allow_redirects' => false,
+            ];
+            $response = (new Client())->get("https://{$this->fqdn}", $options);
+            $code     = $response->getStatusCode();
+            $this->getLogger()->info("Response Code: $code");
+            if (200 !== $code) {
+                $this->getLogger()->alert("Invalid session 'hash' option: '$this->sessionHash'. Got response code: $code");
+                $valid = false;
+            }
+        }
 
         if ($this->curriculum && !\in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
             $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
