@@ -21,7 +21,7 @@
 
         // Hide/show a drop shadow when scrolling the markbook horizontally
         // The shadow only appears when you have scrolled past a certain threshold
-        $("#rubric-marksheet-wrapper").scroll(function(e) {
+        $("#rubric-marksheet-container").scroll(function(e) {
             const scrollAmount = e.target.scrollLeft;
             const scrollPixelThreshold = 10;
             const $leftColumns = $("#left-columns");
@@ -46,8 +46,9 @@
         /* Enforce a fixed height to ensure rows always match up */
         height: 39px;
     }
-    #rubric-marksheet-wrapper {
-        /* Allow the user to scroll the mark table horizontally (has to be applied to wrapper div, not table) */
+    /* Renamed from "wrapper" to "container" to avoid confusion with an ID DataTables generates -_- */
+    #rubric-marksheet-container {
+        /* Allow the user to scroll the mark table horizontally (has to be applied to container div, not table) */
         overflow-x: auto;
     }
 
@@ -159,7 +160,7 @@
         </thead>
     </table>
 
-    <div id="rubric-marksheet-wrapper">
+    <div id="rubric-marksheet-container">
         {# Marksheet class IS being used; do not delete it #}
         <table id="rubric-marksheet" class="marksheet" data-mark-sheet>
             <thead>
