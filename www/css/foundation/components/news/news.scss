@@ -20,6 +20,15 @@
         margin: 0 0 2rem;
         padding-bottom: .5rem;
     }
+
+    // Padding on the top of the article so headings and images don't get
+    // squished up against the top edge of the island
+    .content:first-child {
+        padding-top: 1.5rem;
+    }
+    .content:last-child {
+        padding-bottom: 1.5rem;
+    }
 }
 
 .title-section {

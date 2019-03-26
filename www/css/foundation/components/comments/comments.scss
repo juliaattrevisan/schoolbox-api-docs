@@ -13,12 +13,4 @@
     display: flex;
     flex-flow: row-reverse;
   }
-
-  // Padding
-  &.content:first-child {
-    padding-top: 1.5rem;
-  }
-  &.content:last-child {
-    padding-bottom: 1.5rem;
-  }
 }
