@@ -481,7 +481,9 @@ abstract class AbstractMailer implements IMailer
      */
     public static function standardiseEmailSeparator($string)
     {
-        return str_replace(',', \chr(self::EMAIL_SEPARATOR_CODE), $string);
+        // Do not replace comma symbols inside "".
+        // Double quotes on header are being set on homepage/classList.html. It should be safe to say that we can use to regex?
+        return preg_replace('/,(?=(?:[^"]*"[^"]*")*[^"]*$)/', \chr(self::EMAIL_SEPARATOR_CODE), $string);
     }
 
     /**
