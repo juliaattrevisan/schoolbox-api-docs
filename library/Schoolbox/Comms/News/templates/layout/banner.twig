@@ -225,6 +225,8 @@
 
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
+                    self.commentsLoading = false;
+                    self.loadMoreIsDisabled = false;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 });
             }
