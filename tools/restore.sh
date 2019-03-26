@@ -105,6 +105,10 @@ setsqlconfig() {
 	mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='$tempsqlsamlpublic' WHERE name='saml_public_cert'";
 }
 
+truncateTables() {
+    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry'";
+}
+
 tempconffile="$conffile";
 readconf;
 
@@ -582,6 +586,7 @@ then
 	setmailcatcher;
 	setsqlconfig;
 	setdebugstacktrace;
+	truncateTables;
 fi
 if [ "$package" = 'schoolboxdev' ];
 then
@@ -590,6 +595,7 @@ then
 	setmailcatcher;
 	setsqlconfig;
 	setdebugstacktrace;
+	truncateTables;
 fi
 
 # Restart apache
