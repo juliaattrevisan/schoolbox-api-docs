@@ -444,15 +444,16 @@ class EventMapper extends CalendarEventMapper
             return;
         }
 
-        /* Somehow $event->getMetadata() returns a cached version of the metadata that
-         * was in $event when it was first hydrated - even if we manually set it in line 446!
+        /* Sequential Dependency due to Mapper Cache
          *
-         * This prevents you from adding files to a new event; it will always set it back to
-         * the empty metadata that spawned with $event due to strange caching
+         * $event gets refetched from its cached version when metadataMapper->save() occurs
+         * If you do operations in the wrong order, it can overwrite your campus/role selections
+         * with what was previously there, undoing any of your changes
+         *
+         * Therefore we save the $event modifications first, then we save the $metadata ones
+         * to avoid the refetch problem. Then we assign the metadata instance to the event itself
+         * because that was also refetched
          */
-        $metadataMapper = EventMetadataMapper::getInstance();
-        $metadataMapper->save($metadata);
-        $metadataMapper->saveRelation($event);
 
         /* Clear and recreate other relations with most recent $metadata instance
          */
@@ -461,6 +462,8 @@ class EventMapper extends CalendarEventMapper
 
         $this->deleteRoleRelations($event);
         $this->createRole($event);
+
+        $metadataMapper = EventMetadataMapper::getInstance();
 
         $metadataMapper->deleteStaffAttendeesRelations($metadata);
         $metadataMapper->createStaffAttendees($metadata);
@@ -478,6 +481,15 @@ class EventMapper extends CalendarEventMapper
          * That should prevent spectral caching
          */
         $event->setMetadata($metadata);
+
+        /* Somehow $event->getMetadata() returns a cached version of the metadata that
+         * was in $event when it was first hydrated - even if we manually set it in line 446!
+         *
+         * This prevents you from adding files to a new event; it will always set it back to
+         * the empty metadata that spawned with $event due to strange caching
+         */
+        $metadataMapper->save($metadata);
+        $metadataMapper->saveRelation($event);
     }
 
 
