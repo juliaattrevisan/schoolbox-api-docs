@@ -55,7 +55,8 @@
     #left-columns {
         margin-top: 10.04rem; /* This is the height of the student headings on the marksheet, plus a tiny tweak (ugh) */
         table-layout: fixed; /* Required in order for a fixed width to be set */
-        width: 350px;
+        min-width: 350px;
+        width: 40%; /* Let it expand if there's room */
         flex: 0 0; /* Fixes an IE bug */
         border-collapse: separate; /* Fixes an IE bug, see https://stackoverflow.com/questions/9949396/css-box-shadow-not-working-in-ie */
     }
@@ -134,7 +135,8 @@
                     {% if loop.index == 1 %}
                         <th class="column-1 assessment has-tip" data-tooltip aria-haspopup="true" title="{{ assessment.name }}">
                             {# On touchscreens we can't tap to view the tooltip without being sent to the link.
-                            In this case it's more important to see the tooltip than to follow the link, so I got rid of it #}
+                            In this case it's more important to see the tooltip than to follow the link, so I got rid of it.
+                            You can get to it from the submission history links anyway. #}
                             {#<a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>#}
                             {{ assessment.name }}
                         </th>
