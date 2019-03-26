@@ -25,24 +25,25 @@
     #table-container {
         display: flex;
     }
-
-    #fixed-width-table th, #rubric-marksheet-wrapper tr {
-        /* Ensure browser rounding errors don't result in misaligned rows by enforcing a fixed height */
+    #left-columns, #rubric-marksheet {
+        /* Ensures rows in each table stay in line with each other */
+        white-space: nowrap;
+    }
+    #left-columns tr, #rubric-marksheet tr {
+        /* Enforce a fixed height to ensure rows always match up */
         height: 39px;
     }
-
     #rubric-marksheet-wrapper {
-        overflow-x: auto; /* Allow the user to scroll the mark table horizontally */
-        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
+        /* Allow the user to scroll the mark table horizontally (has to be applied to wrapper div, not table) */
+        overflow-x: auto;
     }
 
     /**** Styles to force the width of the 2 left columns ****/
-    #fixed-width-table {
+    #left-columns {
         margin-top: 10rem; /* This is the height of the student headings on the marksheet */
 
         table-layout: fixed; /* Required in order for a fixed width to be set */
         width: 350px;
-        white-space: nowrap; /* Ensures rows in this table stay in line with rows in mark table */
     }
     .column-1, .column-2 {
         overflow: hidden;
@@ -56,67 +57,66 @@
     }
 
     /**** Style the assessment/cap/indicator headings ****/
-    #fixed-width-table .placeholder,
-    #fixed-width-table .assessment,
-    #fixed-width-table .capability,
-    #fixed-width-table .indicator {
+    #left-columns .placeholder,
+    #left-columns .assessment,
+    #left-columns .capability,
+    #left-columns .indicator {
         border-right: 1px solid #ededed;
     }
-    #fixed-width-table .placeholder {
+    #left-columns .placeholder, #left-columns .assessment {
         border-bottom: none;
     }
-    #fixed-width-table .assessment {
+    #left-columns .assessment {
         font-weight: normal;
         border-top: 1px solid #ededed;
-        border-bottom: none;
     }
-    #fixed-width-table .indicator {
+    #left-columns .indicator {
         padding-left: 2rem;
         font-weight: normal;
     }
 
     /**** Style the marksheet ****/
-    .rubric-marksheet a.noMark {
-        padding: 0.5rem 1.25rem 0.5rem 1.25rem;
+    #rubric-marksheet a.no-mark {
+        padding: 0.5rem 1.25rem 0.5rem 1.25rem; /* Makes it easier to click on the dashes */
         color: black; /* Without this, the dashes would be blue by default since they're links */
     }
 </style>
 
 {% if studentMarks|length %}
 <div id="table-container">
-    <div id="rubric-marksheet-left-headings">
-        <table id="fixed-width-table">
-            <thead>
-            {% for assessmentId, assessment in assessments %}
-                {% for capabilityId, capability in assessment.capabilities %}
 
+    <table id="left-columns">
+        <thead>
+        {% for assessmentId, assessment in assessments %}
+            {% for capabilityId, capability in assessment.capabilities %}
+
+                <tr>
+                    {% if loop.index == 1 %}
+                        <th class="column-1 assessment" title="{{ assessment.name }}">
+                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
+                        </th>
+                    {% else %}
+                        <th class="column-1 placeholder">&nbsp;</th>
+                    {% endif %}
+
+                    <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
+                </tr>
+
+                {% for indicatorId, indicator in capability.indicators %}
                     <tr>
-                        {% if loop.index == 1 %}
-                            <th class="column-1 assessment" title="{{ assessment.name }}">
-                                <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
-                            </th>
-                        {% else %}
-                            <th class="column-1 placeholder">&nbsp;</th>
-                        {% endif %}
-
-                        <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
+                        <th class="column-1 placeholder">&nbsp;</th>
+                        <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
                     </tr>
-
-                    {% for indicatorId, indicator in capability.indicators %}
-                        <tr>
-                            <th class="column-1 placeholder">&nbsp;</th>
-                            <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
-                        </tr>
-                    {% endfor %}
-
                 {% endfor %}
+
             {% endfor %}
-            </thead>
-        </table>
-    </div>
+        {% endfor %}
+        </thead>
+    </table>
 
     <div id="rubric-marksheet-wrapper">
-        <table class="rubric-marksheet marksheet" data-mark-sheet>
+        {# Marksheet class IS being used; do not delete it #}
+        <table id="rubric-marksheet" class="marksheet" data-mark-sheet>
             <thead>
                 <tr class="rotate-headers" data-headers>
                     {% for studentId, student in studentMarks %}
@@ -149,7 +149,7 @@
                                 {% endif %}
 
                                 <td>
-                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'noMark' }}">{{ capabilityMark|default('-') }}</a>
+                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
                                 </td>
                             {% endfor %}
                         </tr>
@@ -168,7 +168,7 @@
                                     {% endif %}
 
                                     <td title="{{ descriptorText|default('-No descriptor text-') }}">
-                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'noMark' }}">{{ indicatorMark|default('-') }}</a>
+                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ indicatorMark|default('-') }}</a>
                                     </td>
                                 {% endfor %}
                             </tr>
