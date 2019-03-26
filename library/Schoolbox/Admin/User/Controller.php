@@ -207,7 +207,7 @@ class Controller extends Base
             ]
         ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
-            'name' => 'Sports Administrator',
+            'name' => 'Fixtures',
             'identifier' => self::IDENTIFIER_NONE,
             'availability' => [
                 'read' => false,
