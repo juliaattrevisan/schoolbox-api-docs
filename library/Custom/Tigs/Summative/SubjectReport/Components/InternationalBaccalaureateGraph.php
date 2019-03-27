@@ -322,7 +322,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
 
                 // What kind of assessment is this?
                 $mark     = null;
-                $comment  = null;
                 $feedback = $participant->getAuthoritativeFeedback(true);
                 if (!$feedback) {
                     // No visible feedback for this user?
@@ -358,7 +357,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
                     }
                 } else {
                     $mark = $feedback->getHumanReadableMark();
-                    $comment = $feedback->getComment();
                     if (preg_match('#(\d)#', $mark, $matches)) {
                         $mark = (int)$matches[1];
                     } else {
@@ -370,7 +368,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
                 // has participation record in a different class in this cohort.
                 if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                     $studentMark = $mark;
-                    $studentComment = $comment;
+                    $studentComment = $feedback->getComment();
                     $hideComponent = false;
                 }
 
