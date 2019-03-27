@@ -6,19 +6,6 @@
 
 <script>
     $(function() {
-        // The only purpose of using this plugin now is to ensure that the last student in the list doesn't get
-        // cut off when the window shrinks.
-        var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
-        if ($windowWidthRems >= 40) {
-            $('[data-mark-sheet]').DataTable({
-                scrollCollapse: true,
-                paging: false,
-                bFilter: false,
-                bInfo: false,
-                ordering: false
-            });
-        }
-
         // Hide/show a drop shadow when scrolling the markbook horizontally
         // The shadow only appears when you have scrolled past a certain threshold
         $("#rubric-marksheet-container").scroll(function(e) {
@@ -50,6 +37,8 @@
     #rubric-marksheet-container {
         /* Allow the user to scroll the mark table horizontally (has to be applied to container div, not table) */
         overflow-x: auto;
+        /* Make room for diagonal student */
+        padding-right: 11rem;
     }
 
     /**** Styles to force the width of the 2 left columns ****/
@@ -121,6 +110,17 @@
     #rubric-marksheet a.no-mark {
         padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
         color: black; /* Without this, the dashes would be blue by default since they're links */
+    }
+
+
+    .marksheet thead tr:first-child th:last-child {
+        /* For some reason we have a style in our marksheet SASS that causes the last student to be cut off.
+        This undoes that.
+        Previously this was being undone somehow by initialising the DataTables plugin, but it's better
+        to fix the CSS (especially since DataTables crashes catastrophically in IE and Firefox on large datasets;
+        fixing the CSS allows us to remove the DataTables completely)
+         */
+        padding-right: 0rem !important;
     }
 </style>
 
