@@ -11,5 +11,5 @@ use Custom\Tigs\Summative\CliPdfGenerator;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new CliPdfGenerator(), [CliTool\Kernel::OPTION_RUN_AS_ROOT => false]);
+$kernel = new CliTool\Kernel(new CliPdfGenerator(), false);
 $kernel->runApp();

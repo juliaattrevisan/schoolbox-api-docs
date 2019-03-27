@@ -22,11 +22,6 @@ use Schoolbox\Application\CliKernelAbstract;
  */
 class Kernel extends CliKernelAbstract
 {
-
-    // Options keys for $options passed to this Kernel's constructor
-    public const OPTION_RUN_AS_ROOT    = 'root'; // Should the kernel check that the system user is root, non-root?
-                                                 // Option value must be a boolean
-
     // Command line short options recognised by this kernel
     private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
@@ -73,8 +68,9 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @param App   $app
-     * @param array $options Keys are one of the self::OPTION_X constants
+     * @param App       $app
+     * @param bool|null $runAsRoot [TRUE => Must be run as root, FALSE => must not be, NULL => either)
+     * @param array     $options Keys are one of the self::OPTION_X constants
      * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -84,10 +80,10 @@ class Kernel extends CliKernelAbstract
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException
      */
-    public function __construct(App $app, array $options = [])
+    public function __construct(App $app, ?bool $runAsRoot, array $options = [])
     {
         $this->validateOptions($options);
-        $this->checkSystemUserRootStatus($options[self::OPTION_RUN_AS_ROOT] ?? null);
+        $this->checkSystemUserRootStatus($runAsRoot);
         $this->app = $app;
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
@@ -109,15 +105,6 @@ class Kernel extends CliKernelAbstract
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getValidConstructionOptions(): array
-    {
-        return \array_merge(parent::getValidConstructionOptions(), [self::OPTION_RUN_AS_ROOT]);
     }
 
 
@@ -186,7 +173,7 @@ class Kernel extends CliKernelAbstract
         if (null === $runAsRoot) {
             return;
         }
-        $isRoot = \posix_getuid() === 0;
+        $isRoot = $this->isRunAsSuperuser();
 
         if ($runAsRoot && !$isRoot) {
             throw new \UnexpectedValueException('Kernel options indicate it SHOULD be run as root, but is NOT');

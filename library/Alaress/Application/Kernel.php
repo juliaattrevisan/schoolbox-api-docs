@@ -177,6 +177,17 @@ abstract class Kernel
 
 
     /**
+     * Returns whether the current PHP process is being run by the system root user
+     *
+     * @return bool
+     */
+    protected function isRunAsSuperuser(): bool
+    {
+        return \posix_getuid() === 0;
+    }
+
+
+    /**
      * Initialise connections to databases, etc.
      *
      * @return void
