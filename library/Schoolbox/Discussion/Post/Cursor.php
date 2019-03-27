@@ -13,6 +13,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class Cursor
@@ -86,6 +87,7 @@ class Cursor
      * of any cursor.
      *
      * @return int
+     * @throws MapperException if the query fails
      */
     public function retrieveResultCount(): int
     {
@@ -98,6 +100,7 @@ class Cursor
      *
      * @param string|null $currentCursor The current encoded cursor, if there is one.
      * @return GenericCollection
+     * @throws MapperException if the query fails
      */
     public function retrieveResults(?string $currentCursor): GenericCollection
     {
