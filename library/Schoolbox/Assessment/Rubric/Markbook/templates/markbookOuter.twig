@@ -194,7 +194,7 @@
                                     {% set gradientClass = "" %}
                                 {% endif %}
 
-                                <td>
+                                <td class="has-tip" data-tooltip data-options="disable_for_touch:true" aria-haspopup="true" title="{{ capability.name }}">
                                     <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
                                 </td>
                             {% endfor %}
