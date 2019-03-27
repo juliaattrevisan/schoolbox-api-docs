@@ -6,9 +6,10 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\Application\CliTool;
 use Custom\Tigs\Summative\CliPdfGenerator;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\CliTool\Kernel(new CliPdfGenerator());
+$kernel = new CliTool\Kernel(new CliPdfGenerator(), [CliTool\Kernel::OPTION_RUN_AS_ROOT => false]);
 $kernel->runApp();

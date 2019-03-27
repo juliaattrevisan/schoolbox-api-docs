@@ -22,6 +22,11 @@ use Schoolbox\Application\CliKernelAbstract;
  */
 class Kernel extends CliKernelAbstract
 {
+
+    // Options keys for $options passed to this Kernel's constructor
+    public const OPTION_RUN_AS_ROOT    = 'root'; // Should the kernel check that the system user is root, non-root?
+                                                 // Option value must be a boolean
+
     // Command line short options recognised by this kernel
     private const OPT_SHORT_OUT_STREAM = 'o:'; // CLI option to allow output to be written to a file, rather than STDOUT
     private const OPT_SHORT_ERR_STREAM = 'l:'; // CLI option to allow logs to be written to a file, rather than STDERR
@@ -82,6 +87,7 @@ class Kernel extends CliKernelAbstract
     public function __construct(App $app, array $options = [])
     {
         $this->validateOptions($options);
+        $this->checkSystemUserRootStatus($options[self::OPTION_RUN_AS_ROOT] ?? null);
         $this->app = $app;
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
@@ -103,6 +109,15 @@ class Kernel extends CliKernelAbstract
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    protected function getValidConstructionOptions(): array
+    {
+        return \array_merge(parent::getValidConstructionOptions(), [self::OPTION_RUN_AS_ROOT]);
     }
 
 
@@ -156,6 +171,29 @@ class Kernel extends CliKernelAbstract
         $this->addRavenHandler($logger);
 
         return $logger;
+    }
+
+
+    /**
+     * Checks that the kernel is being run by a user with root status equal to what the code specifies as being appropriate
+     *
+     * @param bool|null $runAsRoot
+     * @throws \UnexpectedValueException
+     */
+    private function checkSystemUserRootStatus(?bool $runAsRoot): void
+    {
+        // If not specified, or NULL, we are done.
+        if (null === $runAsRoot) {
+            return;
+        }
+        $isRoot = \posix_getuid() === 0;
+
+        if ($runAsRoot && !$isRoot) {
+            throw new \UnexpectedValueException('Kernel options indicate it SHOULD be run as root, but is NOT');
+        }
+        if (!$runAsRoot && $isRoot) {
+            throw new \UnexpectedValueException('Kernel options indicate it should NOT be run as root, but IS');
+        }
     }
 
 
