@@ -83,7 +83,7 @@ class Broker extends Base
 
         $this->connectionOptions  = [
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4',
-            PDO::ATTR_PERSISTENT         => $options['debug'] ?? false,
+            PDO::ATTR_PERSISTENT         => false,
         ];
 
         return parent::connect($options);
