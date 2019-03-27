@@ -241,12 +241,13 @@ class Controller extends Base
      * If the logged in user is a member of a staff, filtering will be skipped.
      *
      * @param Model $article
+     * @param boolean $hideIndividualUsers
      * @return array
      * @throws MapperException\InsufficientHydrationException
      * @throws UnexpectedValueException
      * @throws UnknownEntityTypeException
      */
-    private function getAudienceSegments(Model $article) :array
+    private function getAudienceSegments(Model $article, $hideIndividualUsers = false) :array
     {
         $audienceSegments = [];
 
@@ -260,7 +261,9 @@ class Controller extends Base
 
         foreach ($article->getAudience() as $segment) {
 
-            if(!$this->isAudienceVisibleToUser($segment, $this->getUser())){
+            if (($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
+                || !$this->isAudienceVisibleToUser($segment, $this->getUser())) {
+
                 continue;
             }
 
@@ -607,7 +610,7 @@ class Controller extends Base
                 'moderationEnabled'     => $moderationEnabled,
                 'isSavedForLater'       => $isSavedForLater,
                 'returnUrl'             => $this->getExplicitReturnUrl(),
-                'encodedSegments'       => $this->getAudienceSegments($article),
+                'encodedSegments'       => $this->getAudienceSegments($article, true),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
                 'isPublishable'         => $this->generateValidSubmittedArticleSpec()->isSatisfiedBy($article),
