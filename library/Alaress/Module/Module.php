@@ -589,11 +589,13 @@ class Module {
         return $this;
     }
 
+    /** @noinspection PhpDocMissingThrowsInspection */
     /**
      * @return MapperFactory
      */
-    protected function getMapperFactory()
+    protected function getMapperFactory(): MapperFactory
     {
+        /** @noinspection PhpUnhandledExceptionInspection */
         return $this->getInjector()->get('mapperFactory');
     }
 
