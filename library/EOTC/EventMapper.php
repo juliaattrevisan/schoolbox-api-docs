@@ -443,29 +443,53 @@ class EventMapper extends CalendarEventMapper
         if (!($metadata instanceof EventMetadata && $event instanceof Event)) {
             return;
         }
-        $event->setMetadata($metadata);
 
-        $metadataMapper = EventMetadataMapper::getInstance();
-        $metadataMapper->save($event->getMetadata());
-        $metadataMapper->saveRelation($event);
+        /* Sequential Dependency due to Mapper Cache
+         *
+         * $event gets refetched from its cached version when metadataMapper->save() occurs
+         * If you do operations in the wrong order, it can overwrite your campus/role selections
+         * with what was previously there, undoing any of your changes
+         *
+         * Therefore we save the $event modifications first, then we save the $metadata ones
+         * to avoid the refetch problem. Then we assign the metadata instance to the event itself
+         * because that was also refetched
+         */
 
+        /* Clear and recreate other relations with most recent $metadata instance
+         */
         $this->deleteCampusRelations($event);
         $this->createCampus($event);
 
         $this->deleteRoleRelations($event);
         $this->createRole($event);
 
-        $metadataMapper->deleteStaffAttendeesRelations($event->getMetadata());
-        $metadataMapper->createStaffAttendees($event->getMetadata());
+        $metadataMapper = EventMetadataMapper::getInstance();
 
-        $metadataMapper->deleteStudentAttendeesRelations($event->getMetadata());
-        $metadataMapper->createStudentAttendees($event->getMetadata());
+        $metadataMapper->deleteStaffAttendeesRelations($metadata);
+        $metadataMapper->createStaffAttendees($metadata);
 
-        $metadataMapper->deleteFilesRelations($event->getMetadata());
-        $metadataMapper->createFiles($event->getMetadata());
+        $metadataMapper->deleteStudentAttendeesRelations($metadata);
+        $metadataMapper->createStudentAttendees($metadata);
 
-        $metadataMapper->deleteResourceBookingsRelations($event->getMetadata());
-        $metadataMapper->createResourceBookings($event->getMetadata());
+        $metadataMapper->deleteFilesRelations($metadata);
+        $metadataMapper->createFiles($metadata);
+
+        $metadataMapper->deleteResourceBookingsRelations($metadata);
+        $metadataMapper->createResourceBookings($metadata);
+
+        /* ...set it after all the mutations and persistence has occurred
+         * That should prevent spectral caching
+         */
+        $event->setMetadata($metadata);
+
+        /* Somehow $event->getMetadata() returns a cached version of the metadata that
+         * was in $event when it was first hydrated - even if we manually set it in line 446!
+         *
+         * This prevents you from adding files to a new event; it will always set it back to
+         * the empty metadata that spawned with $event due to strange caching
+         */
+        $metadataMapper->save($metadata);
+        $metadataMapper->saveRelation($event);
     }
 
 
