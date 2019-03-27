@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Post;
 
 use Alaress\Web\Controller\Base as BaseController;
+use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -46,10 +47,13 @@ class Controller extends BaseController
     /**
      * Get a list of posts with the given parent post.
      *
+     * TODO implement this endpoint
+     *
      * @api   GET /posts/{id}/posts
      * @level 190
      *
      * @param Model $post
+     * @throws NotFound This is not yet implemented
      */
     public function getPostsByParent(Model $post): void
     {
@@ -65,6 +69,8 @@ class Controller extends BaseController
      * @level 190
      *
      * @param Model $post
+     * @throws MapperException
+     * @throws InvalidStatusCode if somehow 204 becomes an invalid status code?!
      */
     public function deletePost(Model $post): void
     {
