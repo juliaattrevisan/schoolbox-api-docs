@@ -15,7 +15,6 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-use Schoolbox\GenericCollection;
 use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Role;
@@ -131,11 +130,13 @@ class CliPdfGenerator extends CliTool\App
      * @throws RuntimeException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
-     * @throws \UnderflowException
-     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnderflowException
      */
     public function run(): void
     {
@@ -258,44 +259,39 @@ class CliPdfGenerator extends CliTool\App
      *
      * @throws RuntimeException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \InvalidArgumentException
-     * @throws \UnderflowException
-     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnderflowException
      */
     private function execute(): void
     {
         $excludedClassCodes  = $this->getExcludedClassCodes();
         $sessionHash         = $this->getSessionHash();
-        $students            = $this->getStudents();
-        $maxIdLength         = $this->calculateMaxIdLength($students);
+        $studentsIds         = $this->getStudentIds();
+        $maxIdLength         = $this->calculateMaxIdLength($studentsIds);
         $tempDir             = $this->createTempDir();
         $pdfFilenames        = [];
         $consecutiveFailures = 0;
         $index               = 1;
-        $count               = $students->count();
+        $count               = \count($studentsIds);
 
-        foreach ($students as $student) {
+        foreach ($studentsIds as $studentId) {
             $this->getLogger()->notice(\sprintf("Processing student %s of %s", $index++, $count));
             if($consecutiveFailures >= $this->maxFailures){
                 $this->getLogger()->error("$consecutiveFailures consecutive failures, giving up...");
                 break;
             }
-            if (!$student->getExternalId()) {
-                $this->getLogger()->info("Skipping user (id: {$student->getId()}). External ID is empty");
-                continue;
-            }
+            $student = $this->userMapper->findById($studentId);
             $externalStudent = $this->externalUser->getStudent($student->getExternalId());
             if (!$this->isRelevantCurriculum($externalStudent)) {
-                $this->getLogger()->info("Skipping user (id: {$student->getId()}). Irrelevant curriculum type");
+                $this->getLogger()->info("Skipping user (id: {$student->getExternalId()}). Irrelevant curriculum type");
                 continue;
             }
-            $message = \sprintf(
-                "Printing PDF for student. (id: %{$maxIdLength}d), (externalId: %-s)",
-                $student->getId(),
-                $student->getExternalId()
-            );
+            $message = \sprintf("Printing PDF for student. (id: %{$maxIdLength}d), (externalId: %-s)", $studentId, $student->getExternalId());
             $this->getLogger()->notice($message);
             try {
                 $pdfFilenames[]      = $this->generatePdf($student, $externalStudent, $sessionHash, $excludedClassCodes, $tempDir);
@@ -315,14 +311,14 @@ class CliPdfGenerator extends CliTool\App
     /**
      * Returns the length of the largest user.id in the collection
      *
-     * @param GenericCollection|User[] $students
+     * @param int[] $studentIds
      * @return int
      */
-    private function calculateMaxIdLength(GenericCollection $students): int
+    private function calculateMaxIdLength(array $studentIds): int
     {
         $maxUserId = 0;
-        foreach ($students as $student) {
-            $maxUserId = \max($maxUserId, $student->getId());
+        foreach ($studentIds as $studentId) {
+            $maxUserId = \max($maxUserId, $studentId);
         }
         return (int)\max(1, \ceil(\log10($maxUserId + 1)));
     }
@@ -389,32 +385,59 @@ class CliPdfGenerator extends CliTool\App
 
 
     /**
-     * Returns the external ids of all students for whom we are to print PDFs
+     * Returns the internal ids of all students for whom we are to print PDFs
      *
-     * @return User[]|GenericCollection
+     * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    private function getStudents(): GenericCollection
+    private function getStudentIds(): array
     {
-        $message = \sprintf("Fetching users from schoolbox with role type of '%s' and user.year between 7 and 12", Role::STUDENT);
-        $pb      = $this->userMapper->getPredicateBuilder()
-                                    ->equals('g.group_type', Role::STUDENT)
-                                    ->in('year', ['7', '8', '9', '10', '11', '12']); // Cannot use BETWEEN as this is stored as a VARCHAR in database
+        $pb           = $this->userMapper->getPredicateBuilder();
+        $messageParts = [];
 
+        // Only students
+        $pb->equals('g.group_type', Role::STUDENT);
+        $messageParts[] = \sprintf("role type of '%s'", Role::STUDENT);
+
+        // Years 7-12 (Cannot use BETWEEN as `user`.`year` is stored as a VARCHAR in database)
+        $pb->in('u.year', ['7', '8', '9', '10', '11', '12']);
+        $messageParts[] = "user.year between 7 and 12";
+
+        // Who have an external id
+        $pb->notNull('u.synergy_id');
+        $messageParts[] = "a non-null external id";
+
+        // And are not deleted
+        $pb->isNull('u.deleted_at');
+        $messageParts[] = "not soft-deleted";
+
+        // optional user.id filter
         if ($this->studentId) {
-            $pb->equals('id', $this->studentId);
-            $message .= \sprintf(" and user.id of '%d'", $this->studentId);
+            $pb->equals('u.id', $this->studentId);
+            $messageParts[] = \sprintf("user.id of '%d'", $this->studentId);
         }
 
+        // optional year level filter
         if ($this->yearLevel) {
-            $pb->equals('year', $this->yearLevel);
-            $message .= \sprintf(" and user.year of '%s'", $this->yearLevel);
+            $pb->equals('u.year', $this->yearLevel);
+            $messageParts[] = \sprintf("user.year of '%s'", $this->yearLevel);
         }
-        $this->getLogger()->info($message);
-        $students = $this->userMapper->findByPredicates($pb);
-        $this->getLogger()->info("{$students->count()} students found");
-        return $students;
+
+        $this->getLogger()->info("Fetching users from schoolbox with" . \implode(' and ', $messageParts));
+        $db = $this->userMapper->getDatabase();
+        $whereClause = \implode(' AND ', $pb->getWhere());
+
+        $sql = "
+            SELECT u.id
+            FROM `user` u
+            JOIN `groups` g on u.group_id = g.id
+            WHERE {$whereClause}
+        ";
+
+        $externalIds = $db->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
+        $this->getLogger()->info(\sprintf("%d students found", \count($externalIds)));
+        return $externalIds;
     }
 
 
