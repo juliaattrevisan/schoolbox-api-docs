@@ -104,7 +104,7 @@
             </template>
 
             <ul class="information-list social-stream">
-                <li class="actions-small-2" v-for="post in posts">
+                <li class="actions-small-2" v-for="(post, index) in posts">
                     <div class="list-item">
                         <div class="card small-12">
                             <a :href="'/search/user/' + post.author.id" title="View Profile">
@@ -118,7 +118,7 @@
                         </div>
                     </div>
                     <nav>
-                        {#<a href="#" class="icon-delete no-text" title="Delete post" v-if="post._links.delete.auth"></a>#}
+                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete post" v-if="post._links.delete.auth" v-on:click="deleteComment(post.id, index)"></a>
                         {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}
                     </nav>
 
@@ -138,6 +138,15 @@
                 </li>
             </ul>
             <a @click="getThread" v-if="showLoadMoreButton" class="button expand" :disabled="! loadMoreIsEnabled">Show previous comments</a>
+            <div id='confirm-delete' class="reveal-modal" data-reveal title="Delete Comment">
+                <h2>Please Confirm</h2>
+                <p>Are you sure you want to delete this comment?</p>
+
+                <ul class="flex-list buttons">
+                    <li><a v-on:click="deleteComment(commentIdToDelete, commentIndexToDelete, true)" class="button icon-approve submit">OK</a></li>
+                    <li><a v-on:click="closeModal" class="button icon-close">Cancel</a></li>
+                </ul>
+            </div>
         </div>
         </div>
     </section>
@@ -148,7 +157,7 @@
 
 {% autoescape 'js' %}
 <script>
-    
+
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
     };
@@ -175,6 +184,12 @@
             unableToSaveText: 'Unable to save',
             showSkeletonLoader: true,
             showLoadMoreButton: false,
+            deletingCommentText: 'Deleting comment...',
+            commentDeletedText: 'Comment deleted',
+            errorDeletingCommentText: 'Unable to delete comment',
+            articlesLoading: true,
+            commentIdToDelete: undefined,
+            commentIndexToDelete: undefined,
         },
         // define methods under the `methods` object
         methods: {
@@ -244,6 +259,35 @@
                     self.loadMoreIsEnabled = true;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 });
+            },
+            deleteComment: function(id, index, confirmed = false) {
+                var self = this;
+
+                self.commentIdToDelete = id;
+                self.commentIndexToDelete = index;
+
+                if (confirmed) {
+                    $toast.toastActivate({text: self.deletingCommentText});
+
+                    axios.delete('/posts/'+ self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
+                        self.posts.splice(self.commentIndexToDelete, 1);
+                        self.totalCommentsCount--;
+                        self.commentsTotalCountLabel = 'Comments (' + self.totalCommentsCount + ')';
+                        $toast.toastTimeout({text: self.commentDeletedText, duration: 2000});
+
+                        // Automatically load more threads if there are three comments that's left in the display lists.
+                        if (self.posts.length === 3) {
+                            self.getThread();
+                        }
+
+                        self.closeModal();
+                    }).catch(function (error) {
+                        $toast.toastTimeout({text: self.errorDeletingCommentText, duration: 2000, css: 'alert'});
+                    });
+                }
+            },
+            closeModal: function() {
+                $('#confirm-delete').foundation('reveal', 'close');
             }
         },
         mounted: function() {
