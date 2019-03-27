@@ -435,9 +435,18 @@ class CliPdfGenerator extends CliTool\App
             WHERE {$whereClause}
         ";
 
-        $externalIds = $db->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
-        $this->getLogger()->info(\sprintf("%d students found", \count($externalIds)));
-        return $externalIds;
+        $studentIds = $db->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
+        $this->getLogger()->info(\sprintf("%d students found", \count($studentIds)));
+        if (\count($studentIds) > 200) {
+            $message = \sprintf(
+                "Generating PDFs for a large number of students may cause the server to run out of memory. " .
+                "Recommend using '%s' and '%s' command-line flags to reduce the student count",
+                self::OPT_LONG_YEAR_LEVEL,
+                self::OPT_LONG_CURRICULUM
+            );
+            $this->getLogger()->warning($message);
+        }
+        return $studentIds;
     }
 
 
