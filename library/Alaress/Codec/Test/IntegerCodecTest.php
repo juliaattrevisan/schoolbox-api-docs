@@ -58,4 +58,36 @@ class IntegerCodecTest extends TestCase
         $codec = new IntegerCodec();
         $this->assertSame($rawValue, $codec->decode($encodedValue));
     }
+
+
+    /**
+     * Test that encoding then decoding a value results in the same value.
+     *
+     * @covers       \Alaress\Codec\IntegerCodec::encode
+     * @covers       \Alaress\Codec\IntegerCodec::decode
+     * @dataProvider getTestEncodeData
+     * @param int|null $rawValue
+     */
+    public function testLosslessEncode(?int $rawValue): void
+    {
+        $codec = new IntegerCodec();
+        $this->assertSame($rawValue, $codec->decode($codec->encode($rawValue)));
+    }
+
+
+    /**
+     * Test that decoding then encoding a value results in the same encoded
+     * value.
+     *
+     * @covers       \Alaress\Codec\IntegerCodec::encode
+     * @covers       \Alaress\Codec\IntegerCodec::decode
+     * @dataProvider getTestEncodeData
+     * @param int|null    $rawValue     Unused:
+     * @param string|null $encodedValue
+     */
+    public function testLosslessDecode(?int $rawValue, ?string $encodedValue): void
+    {
+        $codec = new IntegerCodec();
+        $this->assertSame($encodedValue, $codec->encode($codec->decode($encodedValue)));
+    }
 }
