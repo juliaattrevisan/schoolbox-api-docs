@@ -32,17 +32,10 @@
                         <span v-if="audienceBrick.isComposite()" class="meta">
                             <a href="#" title="Click to view audience information" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
                         </span>
-
-                        {# has to be on one line or you get weird whitespace #}
-                        <span v-else>
-                            <template v-if="audienceBrick.entityType === 'folder'">
-                                <a v-bind:href="'/homepage/' + audienceBrick.entityId">${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }</a>
-                            </template>
-                            <template v-else>
-                                ${ audienceBrick.modifierLabel.length > 0 ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel : audienceBrick.nameLabel }
-                            </template>
-                        </span><template v-if="index+1 < audienceBricks.length">, </template>
-                    </template>
+                        <span v-else-if="brickHref(audienceBrick)"><a :href="brickHref(audienceBrick)">${ brickName(audienceBrick) }</a></span>
+                        <span v-else>${ brickName(audienceBrick) }</span> {#- Dessicate -#}
+                        <template v-if="index+1 < audienceBricks.length">, </template>
+                </template>
 
                 {# modal #}
                 <div data-reveal id="audience-composite" class="reveal-modal">
