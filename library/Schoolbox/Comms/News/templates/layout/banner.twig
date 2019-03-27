@@ -232,6 +232,7 @@
                 }).catch(function (error) {
                     self.commentsLoading = false;
                     self.showLoadMoreButton = false;
+                    self.showCommentsCount = true;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 });
             }
