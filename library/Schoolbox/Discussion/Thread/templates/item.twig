@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="small-6 columns">
+        <h2>Comments ({{ item.children.metadata.count }})</h2>
+    </div>
+    <div class="checklist small-6 columns">
+        {% if routeLookupIfAuthorized('discussionThreads.enableDisableThread', { id: item.id, thread: item }) %}
+            <input id="allow-comments" name="allowComments" type="checkbox" {% if item.open %}checked{% endif %} v-on:click="enableDisableThread" v-model="threadCheckboxEnabled" />
+            <label for="allow-comments">Allow comments</label>
+        {% endif %}
+    </div>
+</div>
+
+{# TODO figure if there's any point with the concept of comments being public #}
+<template v-if="threadEnabled">
+    <form action="/" method="post">
+        <label>
+            <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+        </label>
+        <input type="submit" value="Post" />
+    </form>
+</template>
+<template v-else>
+    <div data-alert="" class="alert-box">
+        <span class="icon-locked">Comments are currently disabled for this article.</span>
+    </div>
+</template>
+
+{#
+{% if item.open %}
+    <form action="/" method="post">
+        <label>
+            <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+        </label>
+        <input type="submit" value="Post" />
+    </form>
+{% else %}
+    <div data-alert="" class="alert-box">
+        <span class="icon-locked">Comments are currently disabled for this article.</span>
+    </div>
+{% endif %}
+#}
+
+{% include '@discussionPosts/list.twig' with { list: item.children } only %}

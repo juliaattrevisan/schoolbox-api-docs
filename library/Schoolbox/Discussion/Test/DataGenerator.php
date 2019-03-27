@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Test;
 
 use Faker;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Post;
 use Schoolbox\Discussion\Thread;
@@ -21,6 +22,12 @@ use Schoolbox\UserMapper;
  */
 class DataGenerator
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
+
+
     /**
      * @var Faker\Generator
      */
@@ -54,6 +61,7 @@ class DataGenerator
     /**
      * Constructor
      *
+     * @param LoggerInterface $log
      * @param Faker\Generator $faker
      * @param UserMapper      $userMapper
      * @param News\Mapper     $articleMapper
@@ -61,12 +69,14 @@ class DataGenerator
      * @param Post\Mapper     $postMapper
      */
     public function __construct(
+        LoggerInterface $log,
         Faker\Generator $faker,
         UserMapper $userMapper,
         News\Mapper $articleMapper,
         Thread\Mapper $threadMapper,
         Post\Mapper $postMapper
     ) {
+        $this->log           = $log;
         $this->faker         = $faker;
         $this->userMapper    = $userMapper;
         $this->articleMapper = $articleMapper;
@@ -89,6 +99,7 @@ class DataGenerator
 
 
         // Delete all the old threads and posts
+        $this->log->notice('Soft-deleting all existing threads and comments');
         $this->threadMapper->delete($this->threadMapper->findAll());
 
 
@@ -108,6 +119,15 @@ class DataGenerator
         // Build threads and posts for each article
         /** @var News\Model[] $articlesForDiscussion */
         foreach ($articlesForDiscussion as $article) {
+            $commentCount = $this->faker->numberBetween(1, 100);
+            $this->log->notice(
+                sprintf(
+                    'Adding %d comments for article #%d (%s)',
+                    $commentCount,
+                    $article->getId(),
+                    $article->getTitle()
+                )
+            );
             // Build a single thread
             $thread = $this->threadMapper->createModel()
                 ->setOpen(true);
@@ -115,7 +135,7 @@ class DataGenerator
             // Build a bunch of comments
             // Need to be able to override created date for all of them though?
             $posts = $this->postMapper->createCollection();
-            foreach (range(1, $this->faker->numberBetween(1, 100)) as $_) {
+            foreach (range(1, $commentCount) as $_) {
                 $post = $this->postMapper->createModel()
                     ->setAuthor($this->faker->randomElement($authors))
                     ->setThread($thread)

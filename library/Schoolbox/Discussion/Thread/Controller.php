@@ -57,6 +57,29 @@ class Controller extends BaseController
 
 
     /**
+     * Get a thread, including its most recent comments.
+     *
+     * @api   GET /threads/{id}
+     * @level 190
+     *
+     * @param Model $thread
+     */
+    public function getThread(Model $thread): void
+    {
+        $responseData             = $thread->jsonSerialize(
+            $this->retrieveJsonDecorator(),
+            $this->retrieveLinkDecorator()
+        );
+        $responseData['children'] = $this->retrievePostList($thread, null);
+        $this->response->content->set(
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
+        );
+    }
+
+
+    /**
      * Get a list of posts in the given thread.
      *
      * @api   GET /threads/{id}/posts
@@ -66,23 +89,14 @@ class Controller extends BaseController
      */
     public function getPostsByThread(Model $thread): void
     {
-        $cursor        = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
-        $encodedCursor = $this->request->query->get('cursor');
-        $posts         = $cursor->retrieveResults($encodedCursor);
-        $responseData  = [
-            'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
-            'metadata' => [
-                'cursor' => [
-                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
-                    'next'    => $cursor->retrieveNextCursor($posts),
-                ]
-            ]
-        ];
-
+        $responseData = $this->retrievePostList($thread, $this->request->query->get('cursor'));
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionPosts/list.twig', ['list' => $responseData])
+                : $this->buildUnthemedHtmlOutput(
+                    '@discussionPosts/list.twig',
+                    ['list' => $responseData, 'thread' => $thread]
+                )
         );
     }
 
@@ -115,21 +129,43 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/status
+     * @api   PUT /threads/{id}/open
      * @param Model $thread
      *
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function enableDisableThread(Model $thread): void
+    public function openThread(Model $thread): void
     {
-        $data = $this->request->content->get();
-        $thread->setOpen((bool) $data->threadEnabled);
-
-        $this->threadMapper->save($thread);
-
-        $this->getResponse()->content->set($this->buildJsonOutput('success'));
+        $this->setThreadStatus($thread, true);
     }
 
+    /**
+     * @api   PUT /threads/{id}/close
+     * @param Model $thread
+     *
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function closeThread(Model $thread): void
+    {
+        $this->setThreadStatus($thread, false);
+    }
+
+    /**
+     * @param Model $thread
+     * @param bool  $value
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Web\Exception\InvalidStatusCode
+     */
+    private function setThreadStatus(Model $thread, bool $value): void
+    {
+        $thread->setOpen($value);
+        $this->threadMapper->save($thread);
+
+        $this->response->status->setCode(204);
+    }
 
     /**
      * Retrieve this class' link decorator.
@@ -160,5 +196,29 @@ class Controller extends BaseController
             $this->jsonDecorator = new Decorator\PropertyDecorator(null, $this->retrieveLinkDecorator());
         }
         return $this->jsonDecorator;
+    }
+
+
+    /**
+     * Retrieve a list of posts as an array for later output.
+     *
+     * @param Model       $thread
+     * @param string|null $encodedCursor
+     * @return array
+     */
+    private function retrievePostList(Model $thread, ?string $encodedCursor): array
+    {
+        $cursor = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
+        $posts  = $cursor->retrieveResults($encodedCursor);
+        return [
+            'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
+                    'next'    => $cursor->retrieveNextCursor($posts),
+                ],
+            ],
+        ];
     }
 }
