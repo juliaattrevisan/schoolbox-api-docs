@@ -8,9 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
-use PDOStatement;
 use Schoolbox\Discussion\Post;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -37,7 +35,7 @@ class Mapper extends BaseMapper
             [
                 'mapper'    => Post\Mapper::class,
                 'this_key'  => 'id',
-                'other_key' => 'discussion_thread_id'
+                'other_key' => 'discussion_thread_id',
             ]
         );
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteThreads']);
@@ -48,6 +46,7 @@ class Mapper extends BaseMapper
      * Post-delete for threads: delete all posts within as well.
      *
      * @param Model $model
+     * @throws BaseMapper\Exception if a query fails
      */
     public function deleteThreads(Model $model): void
     {
