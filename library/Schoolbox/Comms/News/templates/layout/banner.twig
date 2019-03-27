@@ -76,7 +76,7 @@
                 </div>
                 <div class="checklist small-6 columns">
                     {% if modifyRoute or isAuthor and article.discussionThread.id %}
-                        <input id="allow-comments" name="allowComments" type="checkbox" @click="enableDisableThread" v-model="threadCheckboxEnabled" />
+                        <input id="allow-comments" name="allowComments" type="checkbox" @click="changeThreadStatus" v-model="threadCheckboxEnabled" />
                         <label for="allow-comments">Allow comments</label>
                     {% endif %}
                 </div>
@@ -178,16 +178,24 @@
         },
         // define methods under the `methods` object
         methods: {
-            enableDisableThread: function (event) {
+            changeThreadStatus: function (event) {
                 var self = this;
+                var changeThreadStatusEndpoint = '/threads/' + {{ article.discussionThread.id }} + '/';
 
                 self.threadEnabled = event.target.checked;
 
+                if (self.threadEnabled) {
+                    changeThreadStatusEndpoint += 'open';
+                } else {
+                    changeThreadStatusEndpoint += 'close';
+                }
+
                 $toast.toastActivate({text: self.savingText});
 
-                axios.put('/threads/'+ {{ article.discussionThread.id }} +'/status', {threadEnabled: self.threadEnabled}, { headers: postHeaders }).then(function () {
+                axios.put(changeThreadStatusEndpoint, {}, { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: self.savedText, duration: 2000});
                 }).catch(function (error) {
+                    console.log(error);
                     $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
                 });
             },
