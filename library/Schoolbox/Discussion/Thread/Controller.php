@@ -228,8 +228,8 @@ class Controller extends BaseController
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
-                    'next'    => $cursor->retrieveNextCursor($posts),
+                    'current' => $encodedCursor ?? $cursor->current($posts),
+                    'next'    => $cursor->next($posts),
                 ],
             ],
         ];

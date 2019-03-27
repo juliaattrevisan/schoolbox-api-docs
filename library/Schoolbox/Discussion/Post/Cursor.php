@@ -122,7 +122,7 @@ class Cursor
      * @param GenericCollection $collection
      * @return string|null
      */
-    public function retrieveCurrentCursor(GenericCollection $collection): ?string
+    public function current(GenericCollection $collection): ?string
     {
         $currentCursor = null;
         $firstRecord   = $collection->first();
@@ -152,7 +152,7 @@ class Cursor
      * @param GenericCollection $collection
      * @return string|null
      */
-    public function retrieveNextCursor(GenericCollection $collection): ?string
+    public function next(GenericCollection $collection): ?string
     {
         $nextCursor  = null;
         $lastRecord  = $collection->last();
