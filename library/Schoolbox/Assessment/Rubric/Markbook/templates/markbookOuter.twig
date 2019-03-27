@@ -71,16 +71,6 @@
         width: 200px;
     }
 
-    /**** Remove weird default tooltip styling ****/
-    #left-columns .has-tip, #rubric-marksheet .has-tip {
-        border-bottom: 1px solid #ededed;
-    }
-    #rubric-marksheet .has-tip {
-        font-weight: normal;
-    }
-    #left-columns .has-tip:hover, #rubric-marksheet .has-tip:hover {
-        color: black;
-    }
 
     /**** Style the assessment/cap/indicator headings ****/
     #left-columns .placeholder,
@@ -133,7 +123,7 @@
 
                 <tr>
                     {% if loop.index == 1 %}
-                        <th class="column-1 assessment has-tip" data-tooltip aria-haspopup="true" title="{{ assessment.name }}">
+                        <th class="column-1 assessment" title="{{ assessment.name }}">
                             {# On touchscreens we can't tap to view the tooltip without being sent to the link.
                             In this case it's more important to see the tooltip than to follow the link, so I got rid of it.
                             You can get to it from the submission history links anyway. #}
@@ -144,13 +134,13 @@
                         <th class="column-1 placeholder">&nbsp;</th>
                     {% endif %}
 
-                    <th class="column-2 capability has-tip" data-tooltip aria-haspopup="true" title="{{ capability.name }}">{{ capability.name }}</th>
+                    <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
                 </tr>
 
                 {% for indicatorId, indicator in capability.indicators %}
                     <tr>
                         <th class="column-1 placeholder">&nbsp;</th>
-                        <th class="column-2 indicator has-tip" data-tooltip aria-haspopup="true" title="{{ indicator.name }}">{{ indicator.name }}</th>
+                        <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
                     </tr>
                 {% endfor %}
 
@@ -193,7 +183,7 @@
                                     {% set gradientClass = "" %}
                                 {% endif %}
 
-                                <td class="has-tip" data-tooltip data-options="disable_for_touch:true" aria-haspopup="true" title="{{ capability.name }}">
+                                <td title="{{ capability.name }}">
                                     <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
                                 </td>
                             {% endfor %}
@@ -212,11 +202,7 @@
                                         {% set gradientClass = "" %}
                                     {% endif %}
 
-                                    {# Although it is possible to apply the tooltip to an anchor tag, doing so conflicts with
-                                    the grade-ient CSS in a major way.
-                                    We have to disable the tooltip for touchscreens, otherwise it will show briefly,
-                                     then confusingly redirect the user to the link #}
-                                    <td class="has-tip" data-tooltip data-options="disable_for_touch:true" aria-haspopup="true" title="{{ descriptorText|default('-No descriptor text-') }}">
+                                    <td title="{{ descriptorText|default('-No descriptor text-') }}">
                                         <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ indicatorMark|default('-') }}</a>
                                     </td>
                                 {% endfor %}
