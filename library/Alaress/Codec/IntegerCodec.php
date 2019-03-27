@@ -15,23 +15,39 @@ namespace Alaress\Codec;
 class IntegerCodec implements ICodec
 {
     /**
+     * @inheritdoc
+     *
      * @param int|null $rawValue
      * @return string|null
+     * @throws \TypeError if $rawValue isn't an int or null
      */
     public function encode($rawValue): ?string
     {
-        return isset($rawValue) ? base64_encode((string)$rawValue) : null;
+        if (!isset($rawValue)) {
+            return null;
+        }
+        if (!is_int($rawValue)) {
+            throw new \TypeError('Only integer values may be encoded by this codec');
+        }
+        return base64_encode((string)$rawValue);
     }
 
 
     /**
+     * @inheritdoc
+     *
      * @param string|null $encodedValue
      * @return int|null
+     * @throws \TypeError if $encodedValue isn't a string or null
      */
     public function decode($encodedValue): ?int
     {
-        return isset($encodedValue)
-            ? filter_var(base64_decode($encodedValue), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE)
-            : null;
+        if (!isset($encodedValue)) {
+            return null;
+        }
+        if (!is_string($encodedValue)) {
+            throw new \TypeError('Only string values may be decoded by this codec');
+        }
+        return filter_var(base64_decode($encodedValue), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 }

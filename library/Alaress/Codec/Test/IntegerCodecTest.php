@@ -35,6 +35,38 @@ class IntegerCodecTest extends TestCase
 
 
     /**
+     * Get data for `testInvalidRawValue`.
+     *
+     * @return iterable
+     */
+    public function getTestInvalidRawValueData(): iterable
+    {
+        yield 'string'   => ['1'];
+        yield 'object'   => [new \stdClass()];
+        yield 'array'    => [[1,2,3]];
+        yield 'bool'     => [false];
+        yield 'float'    => [1.2];
+        yield 'resource' => [STDIN];
+    }
+
+
+    /**
+     * Get data for `testInvalidEncodedValue`.
+     *
+     * @return iterable
+     */
+    public function getTestInvalidEncodedValueData(): iterable
+    {
+        yield 'int'      => [1];
+        yield 'object'   => [new \stdClass()];
+        yield 'array'    => [[1,2,3]];
+        yield 'bool'     => [false];
+        yield 'float'    => [1.2];
+        yield 'resource' => [STDIN];
+    }
+
+
+    /**
      * @covers       \Alaress\Codec\IntegerCodec::encode
      * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
@@ -82,12 +114,42 @@ class IntegerCodecTest extends TestCase
      * @covers       \Alaress\Codec\IntegerCodec::encode
      * @covers       \Alaress\Codec\IntegerCodec::decode
      * @dataProvider getTestEncodeData
-     * @param int|null    $rawValue     Unused:
+     * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
     public function testLosslessDecode(?int $rawValue, ?string $encodedValue): void
     {
         $codec = new IntegerCodec();
         $this->assertSame($encodedValue, $codec->encode($codec->decode($encodedValue)));
+    }
+
+
+    /**
+     * Test that attempting to encode a non-integer raises an error.
+     *
+     * @covers            \Alaress\Codec\IntegerCodec::encode
+     * @expectedException \TypeError
+     * @dataProvider      getTestInvalidRawValueData
+     * @param mixed $rawValue
+     */
+    public function testInvalidRawValue($rawValue): void
+    {
+        $codec = new IntegerCodec();
+        $codec->encode($rawValue);
+    }
+
+
+    /**
+     * Test that attempting to decode a non-string raises an error.
+     *
+     * @covers            \Alaress\Codec\IntegerCodec::decode
+     * @expectedException \TypeError
+     * @dataProvider      getTestInvalidEncodedValueData
+     * @param mixed $encodedValue
+     */
+    public function testInvalidEncodedValue($encodedValue): void
+    {
+        $codec = new IntegerCodec();
+        $codec->decode($encodedValue);
     }
 }
