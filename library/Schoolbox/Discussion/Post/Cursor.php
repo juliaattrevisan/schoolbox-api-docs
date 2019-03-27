@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
+use Alaress\Codec\ICodec;
+use Alaress\Codec\IntegerCodec;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
@@ -58,6 +60,14 @@ class Cursor
 
 
     /**
+     * The codec implementation used for the cursor.
+     *
+     * @var ICodec
+     */
+    private $codec;
+
+
+    /**
      * Constructor
      *
      * @param Mapper       $mapper
@@ -79,6 +89,7 @@ class Cursor
             );
         }
         $this->order = $order;
+        $this->codec = new IntegerCodec();
     }
 
 
@@ -143,7 +154,7 @@ class Cursor
             } elseif ($this->order === self::ORDER_DESC) {
                 $previousPageCursorId++;
             }
-            $currentCursor = $this->encodeCursor($previousPageCursorId);
+            $currentCursor = $this->codec->encode($previousPageCursorId);
         }
         return $currentCursor;
     }
@@ -163,7 +174,7 @@ class Cursor
 
         // The next cursor points to the last record.
         if ($lastRecord && method_exists($lastRecord, $getIdMethod)) {
-            $nextCursor = $this->encodeCursor($lastRecord->$getIdMethod());
+            $nextCursor = $this->codec->encode($lastRecord->$getIdMethod());
         }
         return $nextCursor;
 
@@ -181,7 +192,7 @@ class Cursor
     private function applyCursor(Builder $builder, ?string $cursor): Builder
     {
         if (isset($cursor)) {
-            $lastId = $this->decodeCursor($cursor);
+            $lastId = $this->codec->decode($cursor);
             if (isset($lastId) && $lastId > 0) {
                 if ($this->order === self::ORDER_ASC) {
                     // Ascending: get only items greater than last ID
@@ -195,30 +206,6 @@ class Cursor
             }
         }
         return $builder;
-    }
-
-
-    /**
-     * Encode a cursor in a form which is passable in a query string.
-     *
-     * @param int|null $id
-     * @return string|null
-     */
-    private function encodeCursor(?int $id): ?string
-    {
-        return isset($id) ? base64_encode((string)$id) : null;
-    }
-
-
-    /**
-     * Decode a cursor that was passed in a query string.
-     *
-     * @param string|null $cursor
-     * @return int|null
-     */
-    private function decodeCursor(?string $cursor): ?int
-    {
-        return filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 
 
