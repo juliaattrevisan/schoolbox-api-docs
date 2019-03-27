@@ -19,7 +19,7 @@ Data:
 {% else %}
 
     {% if useComment %}
-        <blockquote>{{ studentComment }}</blockquote>
+        <blockquote>{{ studentComment|nl2br }}</blockquote>
     {% else %}
 
         {% if studentValue is not null %}
