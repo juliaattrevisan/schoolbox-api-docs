@@ -458,33 +458,34 @@ class CliPdfGenerator extends CliTool\App
      */
     private function generatePdf(User $student, array $externalStudent, string $sessionHash, array $excludedClassCodes, string $tempDir): string
     {
-        $urls = $this->generateUrlsForStudent($student, $externalStudent, $excludedClassCodes);
+        $filename = "{$tempDir}/{$student->getExternalId()}.pdf";
+        $this->getLogger()->debug("Attempting to create temp PDF file: $filename");
+        $fp = \fopen($filename, 'wb');
+        if (!$fp) {
+            throw new RuntimeException("Unable to create file: '{$filename}'");
+        }
 
+        $urls = $this->generateUrlsForStudent($student, $externalStudent, $excludedClassCodes);
         $this->getLogger()->info("Generating PDF...");
         $javascriptDelayMs = $this->jsDelay;
         $maxAttempts       = 10;
         $attempts          = 0;
-        $output            = null;
-        $previous          = null;
-        while (!$output) {
+        $previousException = null;
+        while (true) {
             if ($attempts++ >= $maxAttempts) {
-                throw new RuntimeException("Unable to generate report after $maxAttempts attempts, skipping", 0, $previous);
+                throw new RuntimeException("Unable to generate report after $maxAttempts attempts, skipping", 0, $previousException);
             }
             try {
-                $output = $this->snapshotUrlsToPdf($urls, $sessionHash, $javascriptDelayMs);
+                $this->snapshotUrlsToPdf($urls, $sessionHash, $fp, $javascriptDelayMs);
+                break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
                 $this->getLogger()->warning($e->getTraceAsString());
                 $javascriptDelayMs *= 2;
-                $previous          = $e;
+                $previousException = $e;
             }
         }
-        $filename = "{$tempDir}/{$student->getExternalId()}.pdf";
-        $fp       = \fopen($filename, 'wb');
-        if (!$fp) {
-            throw new RuntimeException("Unable to create file: '{$filename}'");
-        }
-        \fwrite($fp, $output);
+
         $this->getLogger()->info("Wrote PDF to '$filename'");
         return $filename;
     }
@@ -551,28 +552,28 @@ class CliPdfGenerator extends CliTool\App
     }
 
 
-    /** @noinspection PhpDocRedundantThrowsInspection (the call to $snappy->getOutput() can throw) */
+    /** @noinspection PhpDocRedundantThrowsInspection (the call to $snappy->getOutput() can throw a RuntimeException)) */
     /**
      * Attempts to snapshot a set of URLs as a PDF, and return the PDF contents
      *
-     * @param array  $urls
-     * @param string $sessionHash
-     * @param int    $javascriptDelayMs
-     * @return string
+     * @param array    $urls
+     * @param string   $sessionHash
+     * @param resource $fp The temp file to write the PDF to
+     * @param int      $javascriptDelayMs
      * @throws RuntimeException If unable to generate the PDF contents
      * @throws \InvalidArgumentException
      */
-    private function snapshotUrlsToPdf(array $urls, string $sessionHash, int $javascriptDelayMs): string
+    private function snapshotUrlsToPdf(array $urls, string $sessionHash, $fp, int $javascriptDelayMs): void
     {
         $this->getLogger()->debug("Setting 'javascript-delay' to $javascriptDelayMs ms");
 
-        // @see https://wkhtmltopdf.org/usage/wkhtmltopdf.txt
+        // @see https://wkhtmltopdf.org/usage/wkhtmltopdf.txt for list of options
         $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
         $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
         $snappy->setOption('orientation', 'Landscape');
         $snappy->setOption('javascript-delay', $javascriptDelayMs);
 
-        return $snappy->getOutput($urls);
+        \fwrite($fp, $snappy->getOutput($urls));
     }
 
 
