@@ -124,7 +124,7 @@
     }
 </style>
 
-{% if studentMarks|length %}
+{% if assessments|length %}
 <div id="table-container">
 
     <table id="left-columns">
@@ -165,7 +165,7 @@
         <table id="rubric-marksheet" class="marksheet" data-mark-sheet>
             <thead>
                 <tr class="rotate-headers" data-headers>
-                    {% for studentId, student in studentMarks %}
+                    {% for studentId, student in students %}
                         <th>
                             <div>
                                 <span>
@@ -184,7 +184,7 @@
 
                     {% for capabilityId, capability in assessment.capabilities %}
                         <tr class="capability">
-                            {% for studentId, student in studentMarks %}
+                            {% for studentId, student in students %}
                                 {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
                                 {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
                                 {% set summaryLink = student.assessments[assessmentId].summaryLink %}
@@ -202,7 +202,7 @@
 
                         {% for indicatorId, indicator in capability.indicators %}
                             <tr class="indicator">
-                                {% for studentId, student in studentMarks %}
+                                {% for studentId, student in students %}
                                     {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
                                     {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
                                     {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}

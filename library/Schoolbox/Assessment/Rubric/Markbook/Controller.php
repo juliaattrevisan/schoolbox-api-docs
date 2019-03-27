@@ -91,13 +91,13 @@ class Controller extends Base
     public function getMarkbook(Folder\Model $folder): void
     {
         $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
-        $studentMarks = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
+        $students = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookOuter.twig',
                 [
-                    'studentMarks' => $studentMarks,
+                    'students' => $students,
                     'assessments' => $assessments,
                     'folder' => $folder
                 ]
