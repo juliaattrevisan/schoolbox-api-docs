@@ -15,10 +15,13 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
-use PDO;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\UserMapper;
+use External_ClassInterface;
 
 class Controller extends Base
 {
@@ -26,8 +29,14 @@ class Controller extends Base
     /**
      * @var IConnector
      */
-    private $database;
+    private $internalDb;
 
+    /**
+     * Data source for class lists
+     *
+     * @var External_ClassInterface
+     */
+    protected $externalDb;
 
     /**
      * @var GradeGroup\Mapper
@@ -35,15 +44,40 @@ class Controller extends Base
     private $gradeGroupMapper;
 
     /**
+     * Data source for group lists
+     *
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * Data source for users themselves
+     *
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * Constructor
      *
-     * @param IConnector $database
+     * @param External_ClassInterface $externalDb
+     * @param IConnector $internalDb
      * @param GradeGroup\Mapper $gradeGroupMapper
+     * @param UserAccessMapper        $userAccessMapper
+     * @param UserMapper              $userMapper
      */
-    public function __construct(IConnector $database, GradeGroup\Mapper $gradeGroupMapper)
-    {
-        $this->database = $database;
-        $this->gradeGroupMapper = $gradeGroupMapper;
+    public function __construct(
+        IConnector $internalDb,
+        GradeGroup\Mapper $gradeGroupMapper,
+        External_ClassInterface $externalDb,
+        UserAccessMapper $userAccessMapper,
+        UserMapper $userMapper
+    ) {
+        $this->externalDb         = $externalDb;
+        $this->internalDb         = $internalDb;
+        $this->gradeGroupMapper   = $gradeGroupMapper;
+        $this->userAccessMapper   = $userAccessMapper;
+        $this->userMapper         = $userMapper;
     }
 
     /**
@@ -57,7 +91,7 @@ class Controller extends Base
     public function getMarkbook(Folder\Model $folder): void
     {
         $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
-        $studentMarks = $this->retrieveMarksInFolder($folder->getId(), $assessments);
+        $studentMarks = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -71,6 +105,15 @@ class Controller extends Base
         );
     }
 
+    public function retrieveAllUsersInFolder(Folder\Model $folder) {
+        $usersInClass = $this->externalDb->getStudents($folder->getCodeString());
+        $hydratedUsersInClass = $this->userMapper->findByColumn('synergy_id', array_column($usersInClass, 'synergy_id'));
+        $usersInGroup = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true);
+
+        // Combine class and group members
+        return $hydratedUsersInClass->mergeUnique($usersInGroup, 'id');
+    }
+
     /**
      * Find all the assessments for a given folder, and return them indexed by assessment ID
      *
@@ -80,7 +123,7 @@ class Controller extends Base
      */
     private function retrieveAssessmentsInFolder(int $folderId) : array
     {
-        $getAllAssessmentsInFolderQuery = $this->database->prepareQuery(
+        $getAllAssessmentsInFolderQuery = $this->internalDb->prepareQuery(
             "SELECT var.assessment_id,
             a.title AS assessment_name,
             sb.rubric_group_marks AS assessment_rubric_group_marks,
@@ -158,15 +201,15 @@ class Controller extends Base
     }
 
     /**
-     * Find marks for each student in a folder and return an array indexed by student ID
+     * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
-     * @param int $folderId
+     * @param Folder\Model $folder
      * @param array $assessmentsInFolder
      * @return array
      */
-    private function retrieveMarksInFolder(int $folderId, array $assessmentsInFolder) : array
+    private function retrieveStudentsAndMarksInFolder(Folder\Model $folder, array $assessmentsInFolder) : array
     {
-        $getAuthoritativeMarksInFolderQuery = $this->database->prepareQuery(
+        $getAuthoritativeMarksInFolderQuery = $this->internalDb->prepareQuery(
             "SELECT var.assessment_id,
             vrm.student_id,
             u.firstname AS student_firstname,
@@ -185,7 +228,7 @@ class Controller extends Base
             ORDER BY vrm.student_id, var.assessment_id, vrm.capability_id, vrm.indicator_id"
         );
 
-        $getAuthoritativeMarksInFolderQuery->execute(['folderId' => $folderId, 'instructorReviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
+        $getAuthoritativeMarksInFolderQuery->execute(['folderId' => $folder->getId(), 'instructorReviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
 
         $students = [];
         $assessmentsForStudent = [];
@@ -237,6 +280,20 @@ class Controller extends Base
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
             $lastObservedStudentId = $row['student_id'];
+        }
+
+        // Combine students who have marks with those who are in the class or group, but have no marks yet
+        $allUsersInFolder = $this->retrieveAllUsersInFolder($folder);
+        foreach($allUsersInFolder as $user) {
+            $userId = $user->getId();
+            if (! isset($students[$userId])) {
+                $students[$userId] = [
+                    'firstname' => $user->getFirstname(),
+                    'lastname' => $user->getLastname(),
+                    'profileLink' => '/search/user/' . $userId,
+                    'assessments' => []
+                ];
+            }
         }
 
         return $this->generateHumanReadableMarks($students, $assessmentsInFolder);
