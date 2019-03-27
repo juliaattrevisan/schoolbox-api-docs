@@ -136,10 +136,7 @@ class Controller extends BaseController
      */
     public function openThread(Model $thread): void
     {
-        $thread->setOpen(true);
-        $this->threadMapper->save($thread);
-
-        $this->getResponse()->content->set($this->buildJsonOutput('success'));
+        $this->setThreadStatus($thread, true);
     }
 
     /**
@@ -150,7 +147,18 @@ class Controller extends BaseController
      */
     public function closeThread(Model $thread): void
     {
-        $thread->setOpen(false);
+        $this->setThreadStatus($thread, false);
+    }
+
+    /**
+     * @param Model $thread
+     * @param bool  $value
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function setThreadStatus(Model $thread, bool $value): void
+    {
+        $thread->setOpen($value);
         $this->threadMapper->save($thread);
 
         $this->getResponse()->content->set($this->buildJsonOutput('success'));
