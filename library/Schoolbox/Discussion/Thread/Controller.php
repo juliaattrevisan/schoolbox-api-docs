@@ -132,6 +132,7 @@ class Controller extends BaseController
      * @api   PUT /threads/{id}/open
      * @param Model $thread
      *
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
     public function openThread(Model $thread): void
@@ -143,6 +144,7 @@ class Controller extends BaseController
      * @api   PUT /threads/{id}/close
      * @param Model $thread
      *
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \Schoolbox\Mapper\Exception
      */
     public function closeThread(Model $thread): void
@@ -155,13 +157,14 @@ class Controller extends BaseController
      * @param bool  $value
      *
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Web\Exception\InvalidStatusCode
      */
     private function setThreadStatus(Model $thread, bool $value): void
     {
         $thread->setOpen($value);
         $this->threadMapper->save($thread);
 
-        $this->getResponse()->content->set($this->buildJsonOutput('success'));
+        $this->response->status->setCode(204);
     }
 
     /**
