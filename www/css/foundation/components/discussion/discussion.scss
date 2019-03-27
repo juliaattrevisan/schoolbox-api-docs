@@ -1,0 +1,18 @@
+.discussion {
+  border-top: 1px solid $body-bg;
+  margin-top: 1.5rem;
+  padding-top: 2rem;
+
+   // Fixed width centered container for discussion threads
+  .discussion-threads {
+    margin: 1rem auto 0;
+    max-width: 45rem;
+    padding: 0 .75rem;
+  }
+
+  // "Allow Comments" checkbox
+  .checklist {
+    display: flex;
+    flex-flow: row-reverse;
+  }
+}

@@ -7,8 +7,7 @@
     .banner img {
         align-self: center;
     }
-    .article,
-    .comments {
+    .article {
         margin: 0 auto;
         max-width: 45rem;
     }
@@ -21,16 +20,9 @@
         margin: 0 0 2rem;
         padding-bottom: .5rem;
     }
-    .comments {
-        border-top: 1px solid $base;
-        margin-top: 2rem;
-        padding-top: 2rem;
-    }
-    .comments .checklist {
-        display: flex;
-        flex-flow: row-reverse;
-    }
-    // Padding
+
+    // Padding on the top of the article so headings and images don't get
+    // squished up against the top edge of the island
     .content:first-child {
         padding-top: 1.5rem;
     }
