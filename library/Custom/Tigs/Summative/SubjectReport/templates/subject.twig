@@ -89,8 +89,9 @@ Data:
 <div class="row">
     <div class="column small-12 medium-6">
         {% if ibGraphData %}
-            <h2 class="subheader">{{ ibGraphData.header }}</h2>
-            {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibGraphData only %}
+            {% if not ibGraphData.hideComponent %}
+                {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibGraphData only %}
+            {% endif %}
         {% elseif hscRankData %}
             {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData only %}
         {% else %}

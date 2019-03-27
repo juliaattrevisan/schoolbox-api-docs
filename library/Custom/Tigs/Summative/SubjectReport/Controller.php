@@ -34,7 +34,6 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnexpectedValueException;
 use Schoolbox\Filter\Filters;
 use PDO;
-use Aura\Web\Request;
 use Schoolbox\Resource\Textbox;
 
 class Controller extends Web\Controller\Base
