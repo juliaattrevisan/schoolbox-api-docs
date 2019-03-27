@@ -108,22 +108,22 @@ paths:
     parameters:
       - $ref: '#/components/parameters/id'
 
-    /threads/{id}/close:
-      put:
-        operationId: closeThread
-          summary: Close commenting thread
-          responses:
-            '200':
-              description: Disable the thread
-            default:
-              $ref: '#/components/responses/problem'
-          requestBody:
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/thread'
-      parameters:
-        - $ref: '#/components/parameters/id'
+  /threads/{id}/close:
+    put:
+      operationId: closeThread
+      summary: Close commenting thread
+      responses:
+        '200':
+          description: Disable the thread
+        default:
+          $ref: '#/components/responses/problem'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/thread'
+    parameters:
+      - $ref: '#/components/parameters/id'
 
 components:
   schemas:
