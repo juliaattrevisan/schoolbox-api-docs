@@ -91,13 +91,13 @@ paths:
       - $ref: '#/components/parameters/token'
       - $ref: '#/components/parameters/depth'
 
-  /threads/{id}/status:
+  /threads/{id}/open:
     put:
-      operationId: enableDisableThread
-      summary: Open or Close commenting thread
+      operationId: openThread
+      summary: Open commenting thread
       responses:
         '200':
-          description: Enable / Disable the thread
+          description: Enable the thread
         default:
           $ref: '#/components/responses/problem'
       requestBody:
@@ -107,6 +107,23 @@ paths:
               $ref: '#/components/schemas/thread'
     parameters:
       - $ref: '#/components/parameters/id'
+
+    /threads/{id}/close:
+      put:
+        operationId: closeThread
+          summary: Close commenting thread
+          responses:
+            '200':
+              description: Disable the thread
+            default:
+              $ref: '#/components/responses/problem'
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/thread'
+      parameters:
+        - $ref: '#/components/parameters/id'
 
 components:
   schemas:

@@ -129,21 +129,32 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/status
+     * @api   PUT /threads/{id}/open
      * @param Model $thread
      *
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function enableDisableThread(Model $thread): void
+    public function openThread(Model $thread): void
     {
-        $data = $this->request->content->get();
-        $thread->setOpen((bool) $data->threadEnabled);
-
+        $thread->setOpen(true);
         $this->threadMapper->save($thread);
 
         $this->getResponse()->content->set($this->buildJsonOutput('success'));
     }
 
+    /**
+     * @api   PUT /threads/{id}/close
+     * @param Model $thread
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function closeThread(Model $thread): void
+    {
+        $thread->setOpen(false);
+        $this->threadMapper->save($thread);
+
+        $this->getResponse()->content->set($this->buildJsonOutput('success'));
+    }
 
     /**
      * Retrieve this class' link decorator.
