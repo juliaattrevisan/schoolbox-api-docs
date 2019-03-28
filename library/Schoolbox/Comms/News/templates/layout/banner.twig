@@ -72,7 +72,7 @@
         <div id="threads-section">
             <div class="row">
                 <div class="small-6 columns">
-                    <h2 v-if="showCommentsCount">Comments (${ totalCommentsCount })</h2>
+                    <h2>Comments <span v-if="showCommentsCount">(${ totalCommentsCount })</span></h2>
                 </div>
                 <div class="checklist small-6 columns">
                     {% if modifyRoute or isAuthor and article.discussionThread.id %}
