@@ -148,19 +148,20 @@ class DataSource
      *
      * @param Collection|IAssessable[] $assessments
      * @param User|null                $user            If specified, only load this user's interactions
+     * @param bool                     $withExcluded    Set to false to exclude excluded non-member participants
      * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to derive project participant collection
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null, $withExcluded = true): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $user);
+        $this->findForAssessmentCollection($assessableWithDescendants, $user, $withExcluded);
 
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
@@ -185,11 +186,12 @@ class DataSource
      *
      * @param IAssessable[]|GenericCollection $assessments     Indexed by assessment.id
      * @param null|User                       $user            If specified, only load this user's interactions
+     * @param bool                            $withExcluded    Set to false to exclude excluded non-member participants
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
+    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null, $withExcluded = true): void
     {
         // Clear all participation from $assessments
         $this->clearParticipants($assessments);
@@ -210,7 +212,7 @@ class DataSource
 
         // We do need excluded participants to be present to determine whether to whether to
         // insert students as dynamic participants.
-        $this->loadDynamicPlanParticipants($dynamicPlans);
+        $this->loadDynamicPlanParticipants($dynamicPlans, $withExcluded);
 
         // Add Responses
         $this->loadResponses(
@@ -228,22 +230,35 @@ class DataSource
 
     /**
      * @param PlanObject[]|GenericCollection $dynamicPlans
+     * @param bool                           $withExcluded    Set to false to exclude excluded non-member participants
      * @throws UnexpectedValueException If unable to merge student collections
      */
-    private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans): void
+    private function loadDynamicPlanParticipants(GenericCollection $dynamicPlans, $withExcluded = true): void
     {
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
-            $assessment           = $dynamicPlan->getAssessable();
+            $assessment = $dynamicPlan->getAssessable();
+            // this potentially contains non-class/group members
             $explicitParticipants = $assessment->getAllParticipants();
 
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
             foreach ($this->findAllStudentsForAssessment($assessment) as $user) {
                 // Is this user already an explicit participant? (Either an inclusion or exclusion)
                 if ($explicitParticipants->keyExists($user->getId())) {
+                    // remove participant found
+                    $explicitParticipants->offsetUnset($user->getId());
                     continue;
                 }
                 $dynamicPlan->getParticipants()[$user->getId()] = new ParticipantObject($user, $dynamicPlan);
+            }
+
+            // Remove non-member excluded participants
+            if (!$withExcluded && ($explicitParticipants->count() > 0)) {
+                foreach ($explicitParticipants as $nonMemberId => $nonMember) {
+                    if ($nonMember->isExcluded()) {
+                        $dynamicPlan->getParticipants()->offsetUnset($nonMemberId);
+                    }
+                }
             }
         }
     }
@@ -285,7 +300,8 @@ class DataSource
                 try {
                     $participantUser = $assessable->getParticipant($responseUser);
                 } catch (UnexpectedValueException $e) {
-                    throw new DomainException($e);
+                    // responseUser is likely to have been excluded
+                    continue;
                 }
                 if (!$participantUser->isExcluded()) {
                     // Don't load interactions for excluded participants.
@@ -319,7 +335,8 @@ class DataSource
                 try {
                     $participant = $assessment->getParticipant($feedbackUser);
                 } catch (UnexpectedValueException $e) {
-                    throw new DomainException($e);
+                    // responseUser is likely to have been excluded
+                    continue;
                 }
                 if ($participant->isExcluded()) {
                     // Don't load interactions for excluded participants.
