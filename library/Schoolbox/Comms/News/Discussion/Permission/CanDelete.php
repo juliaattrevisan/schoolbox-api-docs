@@ -40,11 +40,11 @@ class CanDelete extends BaseStrategy
 
 
     /**
-     * @param mixed $object
-     * @param User  $user
+     * @param mixed     $object The object that is related to the thread
+     * @param User|null $user
      * @return bool
      */
-    public function hasPermission($object, User $user): bool
+    public function hasPermission($object, ?User $user): bool
     {
         if (!$object instanceof News\Model) {
             return false;

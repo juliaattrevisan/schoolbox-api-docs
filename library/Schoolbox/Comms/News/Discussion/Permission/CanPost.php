@@ -42,10 +42,10 @@ class CanPost extends BaseStrategy
 
     /**
      * @param mixed $object
-     * @param User  $user
+     * @param User|null $user
      * @return bool
      */
-    public function hasPermission($object, User $user): bool
+    public function hasPermission($object, ?User $user): bool
     {
         if (!$object instanceof News\Model) {
             return false;

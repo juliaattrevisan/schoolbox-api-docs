@@ -34,9 +34,9 @@ interface IStrategy
      *
      * Implies `retrieveAssociations` returned something.
      *
-     * @param mixed $object The object that is related to the thread
-     * @param User  $user
+     * @param mixed     $object The object that is related to the thread
+     * @param User|null $user
      * @return bool
      */
-    public function hasPermission($object, User $user): bool;
+    public function hasPermission($object, ?User $user): bool;
 }
