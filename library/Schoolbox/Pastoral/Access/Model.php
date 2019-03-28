@@ -89,6 +89,11 @@ class Model implements ISoftDeletable
     /**
      * Returns the accessLevel granted by this record to the specified user via 'User' access
      *
+     * In the case where the referenced role has a roleType of 'staff', there is an intentional difference between
+     * the set of users who have access to the record via this rule, and the set of users who will receive
+     * notifications via this rule. The latter is a subset of the first, being only those staff who teach classes
+     * the student is enrolled in.
+     *
      * @param User $user
      * @return int|null
      */
