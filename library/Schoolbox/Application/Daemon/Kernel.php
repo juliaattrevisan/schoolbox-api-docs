@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Application\WrongSapiException;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -20,63 +19,56 @@ use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-use Monolog\Handler\RavenHandler;
-use Monolog;
-use Raven_Client;
-use Database;
 use React\Stomp;
+use Schoolbox\Application\CliKernelAbstract;
 
-class Kernel extends \Alaress\Application\Kernel
+class Kernel extends CliKernelAbstract
 {
     // Options keys for $options passed to this Kernel's constructor
-    public const OPTION_LEVEL          = 'level';        // What log level should be reported? Falls back to 'v' if not specified.
-    public const OPTION_ERRORS         = 'errors';       // What level of PHP errors should be reported?
     public const OPTION_APP_SHORT_OPTS = 'appShortOpts'; // short options used by the app
     public const OPTION_APP_LONG_OPTS  = 'appLongOpts';  // long options used by the app
 
-    // Command line options recognised by this Daemon kernel
-    public const OPT_VERBOSITY     = 'v';         // What level of verbosity should be logged
-    public const OPT_PORCELAIN     = 'porcelain'; // Should log items be formatted for text file rather than TTL?
-
-    const RLIMIT_CORE_FILESIZE = 'core';
-    const RLIMIT_CPU_TIME = 'cpu';
-    const RLIMIT_DATA_SEGMENT = 'data';
-    const RLIMIT_FILESIZE = 'filesize';
-    const RLIMIT_FILE_DESCRIPTORS = 'openfiles';
-    const RLIMIT_PROCESSES = 'maxproc';
-    const RLIMIT_MEMORY_LOCK = 'memlock';
-    const RLIMIT_RESIDENT_SET = 'rss';
-    const RLIMIT_STACK_SIZE = 'stack';
-    const RLIMIT_TOTAL_MEMORY = 'totalmem';
+    /* System resources available in $this->getSoftLimit() and $this->getHardLimit()
+     * @see posix_getrlimit()
+     */
+    public const RLIMIT_CORE_FILESIZE = 'core';
+    public const RLIMIT_CPU_TIME = 'cpu';
+    public const RLIMIT_DATA_SEGMENT = 'data';
+    public const RLIMIT_FILESIZE = 'filesize';
+    public const RLIMIT_FILE_DESCRIPTORS = 'openfiles';
+    public const RLIMIT_PROCESSES = 'maxproc';
+    public const RLIMIT_MEMORY_LOCK = 'memlock';
+    public const RLIMIT_RESIDENT_SET = 'rss';
+    public const RLIMIT_STACK_SIZE = 'stack';
+    public const RLIMIT_TOTAL_MEMORY = 'totalmem';
 
     /** @var string */
-    protected $name;
+    private $name;
 
     /** @var LoopInterface */
-    protected $loop;
+    private $loop;
 
     /**
-     * All command line options relevant to this kernel, app, and logger
+     * All command line options for this Daemon kernel, logger, and app.
+     *
+     * Used for:
+     * 1. Controlling logging behaviour
+     * 2. Passed back into the run() function for function/App-specific config
+     *
      * @var array
      */
     private $opts;
 
-    /** @var LoggerInterface */
-    protected $log;
-
-    /**
-     * Was this kernel invoked at a specific log level?
-     *
-     * @var int|null
-     */
-    private $logLevel;
 
     /**
      * Various process limits imposed by the operating system
      *
-     * @var string[][]
+     * Will be NULL if unlimited
+     *
+     * @see self::RLIMIT_* constants above
+     * @var string[][]|null[][]
      */
-    protected $limits;
+    private $limits;
 
 
     /**
@@ -96,9 +88,8 @@ class Kernel extends \Alaress\Application\Kernel
     {
         $this->validateOptions($options);
         $this->parseCommandLineOpts($options);
-        $this->logLevel = $options[self::OPTION_LEVEL] ?? null;
 
-        parent::__construct();
+        parent::__construct($options[self::OPTION_LEVEL] ?? null);
 
         pcntl_signal(SIGCHLD, SIG_IGN);
         error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
@@ -114,32 +105,11 @@ class Kernel extends \Alaress\Application\Kernel
 
 
     /**
-     * @return LoopInterface
+     * @inheritdoc
      */
-    public function getLoop()
+    protected function getValidConstructionOptions(): array
     {
-        return $this->loop;
-    }
-
-
-    /**
-     * Check that all kernel options are valid
-     *
-     * @param array $options
-     * @throws \InvalidArgumentException If unrecognised kernel options are injected
-     */
-    private function validateOptions(array $options): void
-    {
-        $valid   = [self::OPTION_LEVEL, self::OPTION_ERRORS, self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS];
-        $invalid = [];
-        foreach ($options as $key => $val) {
-            if (!\in_array($key, $valid, true)) {
-                $invalid[$key] = $val;
-            }
-        }
-        if (\count($invalid)) {
-            throw new \InvalidArgumentException("Unrecognised Kernel options: " . \print_r($invalid, true));
-        }
+        return \array_merge(parent::getValidConstructionOptions(), [self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS]);
     }
 
 
@@ -154,37 +124,54 @@ class Kernel extends \Alaress\Application\Kernel
         $appShortOpts = $options[self::OPTION_APP_SHORT_OPTS] ?? '';
         $appLongOpts  = $options[self::OPTION_APP_LONG_OPTS] ?? [];
 
-        $shortOpts  = $appShortOpts . self::OPT_VERBOSITY;
-        $longOpts   = \array_merge($appLongOpts, [self::OPT_PORCELAIN], Logger::getAvailableFields());
+        $shortOpts  = $appShortOpts . \implode('', $this->getKernelShortOpts());
+        $longOpts   = \array_merge($appLongOpts, $this->getKernelLongOpts());
         $this->opts = \getopt($shortOpts, $longOpts);
     }
+
 
     /**
      * @param string $name
      * @return mixed
      */
-    public function getOpt($name)
+    private function getOpt(string $name)
     {
-        return isset($this->opts[$name]) ? $this->opts[$name] : null;
+        return $this->opts[$name] ?? null;
     }
 
 
     /**
      * @param string $attribute
-     * @return string
+     * @return string|null
+     * @throws \InvalidArgumentException If passed an unknown process attribute
+     * @throws \UnexpectedValueException If no hard limit known for process attribute
      */
-    public function getHardLimit($attribute)
+    public function getHardLimit(string $attribute): ?string
     {
+        if (!\array_key_exists($attribute, $this->limits)) {
+            throw new \InvalidArgumentException("Unknown process attribute: '{$attribute}'");
+        }
+        if (!\array_key_exists('hard', $this->limits[$attribute])) {
+            throw new \UnexpectedValueException("No known 'hard' limit for: '{$attribute}'");
+        }
         return $this->limits[$attribute]['hard'];
     }
 
 
     /**
      * @param string $attribute
-     * @return string
+     * @return string|null
+     * @throws \InvalidArgumentException If passed an unknown process attribute
+     * @throws \UnexpectedValueException If no soft limit known for process attribute
      */
-    public function getSoftLimit($attribute)
+    public function getSoftLimit(string $attribute): ?string
     {
+        if (!\array_key_exists($attribute, $this->limits)) {
+            throw new \InvalidArgumentException("Unknown process attribute: '{$attribute}'");
+        }
+        if (!\array_key_exists('soft', $this->limits[$attribute])) {
+            throw new \UnexpectedValueException("No known 'soft' limit for: '{$attribute}'");
+        }
         return $this->limits[$attribute]['soft'];
     }
 
@@ -196,7 +183,7 @@ class Kernel extends \Alaress\Application\Kernel
      * @throws Exception
      * @throws \Schoolbox\External\Exception
      */
-    public function run($callable = null)
+    public function run($callable = null): void
     {
         if (posix_isatty(STDOUT)) {
             echo <<<EOL
@@ -228,7 +215,7 @@ EOL;
         }
 
         try {
-            $this->getLoop()->run();
+            $this->loop->run();
             $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
             $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
@@ -242,59 +229,19 @@ EOL;
 
 
     /**
-     * @param int    $errNum
-     * @param string $errStr
-     * @param string $errFile
-     * @param int    $errLine
-     * @return bool
-     * @throws ErrorException
-     */
-    public function onError($errNum, $errStr, $errFile, $errLine)
-    {
-        if (!(error_reporting() & $errNum)) {
-            // This error code is not included in error_reporting
-            return true;
-        }
-
-
-        switch ($errNum) {
-            case E_RECOVERABLE_ERROR:
-                // for any of these errors, we want an exception we can catch
-                $this->logger()->info("$errStr - $errFile::$errLine", ['char' => 'e']);
-                throw new ErrorException($errStr, 0, $errNum, $errFile, $errLine);
-
-            case E_NOTICE:
-            case E_USER_NOTICE:
-            case E_WARNING:
-            case E_USER_WARNING:
-                // this will throw an exception if it needs to
-                $this->onWarning($errNum, $errStr, $errFile, $errLine);
-                return true;
-
-            case E_STRICT:
-            case E_DEPRECATED:
-            case E_USER_DEPRECATED:
-                $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
-                return true;
-
-            default:
-                // we don't know how to deal with this, so let the stock error handler deal with it
-                $this->logger()->error("Don't know how to handle $errStr");
-                return false;
-        }
-    }
-
-
-    /**
      * Handle specific kinds of warnings differently
      *
      * @param int    $errNum
      * @param string $errStr
      * @param string $errFile
      * @param int    $errLine
-     * @throws Exception
+     * @throws ErrorException
+     * @throws IOException
+     * @throws PDOException
+     * @throws RangeException
+     * @throws RuntimeException
      */
-    protected function onWarning($errNum, $errStr, $errFile, $errLine)
+    protected function onWarning($errNum, $errStr, $errFile, $errLine): void
     {
         if (strpos($errStr, 'stream_select') === 0) {
             // this is fine to be let through
@@ -366,187 +313,27 @@ EOL;
 
 
     /**
-     * @param Exception $e
-     */
-    public function onException($e)
-    {
-        $this->callExceptionCallbacks($e);
-        try {
-            $this->logger()->alert('FATAL ' . get_class($e) . ': ' . $e->getMessage() . ' on line ' . $e->getLine() . ' in ' . $e->getFile(), ['exception'=>$e]);
-        } catch (IOException $e) {
-            // can't do anything, STDOUT has been closed
-        }
-        exit;
-    }
-
-
-    /**
-     * Check if it was a fatal error that shut us down, and if it was, advise as such
-     */
-    public function onShutdown()
-    {
-        $error = error_get_last();
-
-        // only report if the last error was one of these
-        $cases = [
-            E_ERROR         => 'Fatal',
-            E_CORE_ERROR    => 'Core',
-            E_USER_ERROR    => 'Fatal user',
-            E_COMPILE_ERROR => 'Compilation',
-        ];
-
-        if (is_callable($this->shutdown)) {
-            call_user_func($this->shutdown);
-        }
-
-        // don't report anything
-        if (!isset($cases[$error['type']])) {
-            exit(0);
-        }
-
-        // report
-        $message = sprintf('%s error: %s in %s:%s', $cases[$error['type']], $error['message'], $error['file'],
-            $error['line']);
-        try {
-            $this->logger()->alert($message);
-        } catch (IOException $e) {
-            // can't do anything, STDOUT has been closed
-        }
-
-        exit(1);
-    }
-
-
-    /**
-     * Determine logging level via verbose setting
-     * verbose is set by -vvv.  Each v represents a value in an array.
-     * So -v is level 1, -vv is level 2, -vvv is level 3
-     *
-     * @return int
-     */
-    public function getLoggingLevel(): int
-    {
-        $v = $this->getOpt(self::OPT_VERBOSITY);
-
-        $threshold = 0;
-        if (isset($v)) {
-            $threshold = 1;
-            if (is_array($v)) {
-                $threshold = min(3, count($v));
-            }
-        }
-
-        $limits = [
-            0 => Monolog\Logger::CRITICAL, // nil verbosity: exceptional behaviour only
-            1 => Monolog\Logger::NOTICE,   // min verbosity: significant events
-            2 => Monolog\Logger::INFO,     // mod verbosity: most things
-            3 => Monolog\Logger::DEBUG     // max verbosity: EV-ER-Y-THING...
-        ];
-        return $limits[$threshold];
-    }
-
-
-    /**
      * @return LoggerInterface
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function logger(): LoggerInterface
+    protected function createDefaultLogger(): LoggerInterface
     {
-        if (!$this->log instanceof LoggerInterface) {
-            // Derive log verbosity
-            $level = $this->logLevel ?? $this->getLoggingLevel();
+        $level = $this->getLoggingLevel($this->getOpt(self::OPT_SHORT_VERBOSITY));
 
-            // Derive the list of fields to prepend to log items
-            $fields = Logger::getAvailableFields();
-            foreach ($fields as $key => $field) {
-                if (!isset($opts[$field])) {
-                    unset($fields[$key]);
-                }
-            }
-
-            $porcelain = \array_key_exists(self::OPT_PORCELAIN, $this->opts);
-            $this->log = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
-
-            // Add Sentry handler into logging system if possible
-            if ($this->getDependencyInjector()->has('sentry')) {
-                /** @var Raven_Client $ravenClient */
-                $ravenClient  = $this->getDependencyInjector()->get('sentry');
-                $ravenHandler = new RavenHandler($ravenClient, Monolog\Logger::CRITICAL);
-                /** @var Monolog\Formatter\LineFormatter $formatter */
-                $formatter = $ravenHandler->getFormatter();
-                $formatter->includeStacktraces(true);
-                $this->log->pushHandler($ravenHandler);
+        // Derive the list of fields to prepend to log items
+        $fields = Logger::getAvailableFields();
+        foreach ($fields as $key => $field) {
+            if (!isset($this->opts[$field])) {
+                unset($fields[$key]);
             }
         }
 
-        return $this->log;
-    }
+        $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->opts);
+        $logger = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
+        $this->addRavenHandler($logger);
 
-    /**
-     * @inheritdoc
-     * @throws WrongSapiException
-     */
-    protected function checkServerApiEnvironment(): void
-    {
-        if (PHP_SAPI !== 'cli') {
-            throw new WrongSapiException('Cannot use Daemon Kernel in Web Server environment.');
-        }
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function initialiseDebugging(): void
-    {
-        // no debugging
-    }
-
-
-    /**
-     * Register any error handling required
-     *
-     * @return void
-     */
-    protected function registerErrorHandling(): void
-    {
-        set_error_handler([$this, 'onError']);
-    }
-
-
-    /**
-     * Register any out-the-top exception handling required
-     *
-     * @return void
-     */
-    protected function registerExceptionHandling(): void
-    {
-        set_exception_handler([$this, 'onException']);
-    }
-
-
-    /**
-     * Register any shutdown handling required
-     *
-     * @return void
-     */
-    protected function registerShutdownHandling(): void
-    {
-        register_shutdown_function([$this, 'onShutdown']);
-    }
-
-
-    /**
-     * Initialise connections to databases, etc.
-     *
-     * @return void
-     * @throws \Schoolbox\External\Exception
-     */
-    protected function initialiseExternalConnections(): void
-    {
-        // MySQL connection configuration
-        Database::getInstance()->connect(SQL_dsn, SQL_user, SQL_passwd, array('throw' => true));
+        return $logger;
     }
 
 

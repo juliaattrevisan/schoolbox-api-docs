@@ -29,7 +29,7 @@
     "require": {
         "gggeek/phpxmlrpc": "0.1.0",
         "zendframework/zendservice-apple-apns": "~1.0",
-        "symfony/http-foundation": "~3.3.10",
+        "symfony/http-foundation": "~3.4.9",
         "league/oauth2-client": "~2.2.1",
         "sabre/dav": "~3.2.2",
         "sabre/vobject" : "~4.1.2",
@@ -73,8 +73,10 @@
         "onelogin/php-saml": "^2.12",
         "karriere/json-decoder": "^2.1.1",
         "crell/api-problem": "^3.0",
+        "knplabs/knp-snappy": "^1.1",
         "ext-redis": "*",
-        "ext-readline": "*"
+        "ext-readline": "*",
+        "ext-zip": "*"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

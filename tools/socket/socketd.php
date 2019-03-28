@@ -50,7 +50,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $stratBuilder = new ConfiguredDispatchStrategyBuilder((new ConfigurationReader($conf))->readConfig());
 
-    $delim = \array_key_exists(Daemon\Kernel::OPT_PORCELAIN, $opts) ? ' ' : "\n    ";
+    $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
 
     $log->info(implode($delim, [ 'Using strategy:' ] + $stratBuilder->summarise()), [ 'char' => '+' ]);
 
