@@ -130,18 +130,25 @@ class Controller extends Base
             sb.submission_grade_group_id AS assessment_grade_group_id,
             vrm.assessment_mark_type,
             vrm.assessment_max_mark,
-            vrm.capability_id,
-            vrm.capability_name,
+            rgu.rubric_group_id AS capability_id,
+            rg.name AS capability_name,
             vrm.capability_max_value,
-            vrm.indicator_id,
-            vrm.indicator_name,
+            rcu.criterion_id AS indicator_id,
+            rc.name AS indicator_name,
             vrm.indicator_max_value
-            FROM       v_rubric_mark vrm
-            INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
-            INNER JOIN assessment a ON a.id = vrm.assessment_id
-            INNER JOIN submission_box sb ON sb.assessment_id = vrm.assessment_id
+            FROM       v_assessment_relation var
+            INNER JOIN assessment a ON a.id = var.assessment_id
+            INNER JOIN submission_box sb ON sb.assessment_id = a.id
+            INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
+            INNER JOIN rubric_group rg ON rgu.rubric_group_id = rg.id
+            INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
+            INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
+                   AND rc.rubric_group_id = rg.id
+            LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = var.assessment_id
+                   AND vrm.capability_id = rgu.rubric_group_id
+                   AND vrm.indicator_id = rcu.criterion_id
             WHERE      var.folder_id=:folderId AND a.deleted_at IS NULL
-            ORDER BY var.assessment_id, vrm.capability_id, vrm.indicator_id"
+            ORDER BY var.assessment_id, rgu.rubric_group_id, rcu.criterion_id"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
