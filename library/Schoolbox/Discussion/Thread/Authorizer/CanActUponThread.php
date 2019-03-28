@@ -52,9 +52,6 @@ abstract class CanActUponThread implements IAuthorizationRule
             if (!$post instanceof Post\Model) {
                 throw new \InvalidArgumentException('Could not find thread in either "thread" or "post" param');
             }
-            if ($this->validateAgainstPost($post, $user)) {
-                return true;
-            }
             $thread = $post->getThread();
         }
 
@@ -71,16 +68,6 @@ abstract class CanActUponThread implements IAuthorizationRule
 
         throw new Failure\Unauthorized();
     }
-
-
-    /**
-     * Is this thread action allowed for this particular post?
-     *
-     * @param Post\Model $post
-     * @param User|null  $user
-     * @return bool
-     */
-    abstract protected function validateAgainstPost(Post\Model $post, ?User $user): bool;
 
 
     /**
