@@ -127,7 +127,7 @@
                     </article>
 
                 </li>
-                <li class="actions-small-1" v-if="commentsLoading" v-for="n in 3">
+                <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
                     <div class="list-item">
                         <div class="small-12 card skeleton">
                             <div class="img"></div>
@@ -173,7 +173,7 @@
             savingText: 'Saving...',
             savedText: 'Saved',
             unableToSaveText: 'Unable to save',
-            commentsLoading: true,
+            showSkeletonLoader: true,
             showLoadMoreButton: false,
         },
         // define methods under the `methods` object
@@ -195,7 +195,6 @@
                 axios.put(changeThreadStatusEndpoint, {}, { headers: postHeaders }).then(function () {
                     $toast.toastTimeout({text: self.savedText, duration: 2000});
                 }).catch(function (error) {
-                    console.log(error);
                     $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
                 });
             },
@@ -203,7 +202,7 @@
                 var self = this;
 
                 self.loadMoreIsDisabled = true;
-                self.commentsLoading = true;
+                self.showSkeletonLoader = true;
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
@@ -223,14 +222,24 @@
                         self.posts.push(responseData.data[index]);
                     }
 
-                    self.commentsLoading = false;
+                    // Hide skeleton loader once the request is done
+                    self.showSkeletonLoader = false;
+                    // Enable back load more button once the request is done
                     self.loadMoreIsDisabled = false;
+                    // Make comments count visible when the request is done
                     self.showCommentsCount = true;
+
+                    /**
+                     * TODO: Maybe the API should return a metadata that will let the front-end know if there's still
+                     * a next page to render rather than comparing the value of the length and the comment's total count?
+                     *
+                     * Do not show load more button when all the comments has been loaded
+                     */
                     self.showLoadMoreButton = self.posts.length < responseData.metadata.count;
 
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
-                    self.commentsLoading = false;
+                    self.showSkeletonLoader = false;
                     self.showLoadMoreButton = false;
                     self.showCommentsCount = true;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
