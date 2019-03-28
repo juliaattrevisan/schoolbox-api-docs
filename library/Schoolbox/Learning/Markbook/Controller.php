@@ -324,7 +324,7 @@ class Controller extends Base
     {
         // Fetch assessments & participants
         $assessments = $this->assessmentMapperProxy->findAllByIds($assessmentIds);
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, false);
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessments, null, true);
 
         // Build a markbook
         $markbook = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
