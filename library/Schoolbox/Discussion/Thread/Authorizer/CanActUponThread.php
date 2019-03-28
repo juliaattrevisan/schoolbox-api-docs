@@ -10,7 +10,6 @@ namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Post;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\User;
@@ -21,29 +20,29 @@ use Schoolbox\User;
  * This rule checks where the thread is in use, and verifies whether the
  * requesting user has permission to act upon that place.
  */
-abstract class CanActUponThread implements IAuthorizationRule
+class CanActUponThread implements IAuthorizationRule
 {
     /**
-     * @var News\Mapper
+     * @var IStrategy[]
      */
-    private $articleMapper;
+    private $strategies;
 
 
     /**
      * Constructor
      *
-     * @param News\Mapper $articleMapper
+     * @param IStrategy ...$strategies
      */
-    public function __construct(News\Mapper $articleMapper)
+    public function __construct(IStrategy... $strategies)
     {
-        $this->articleMapper = $articleMapper;
+        $this->strategies = $strategies;
     }
 
 
     /**
      * @inheritdoc
      */
-    public function authorize(array $params = [], User $user = null): bool
+    public function authorize(array $params = [], User $user = null): void
     {
         // Extract thread from params: first "thread", then out of "post"
         $thread = $params['thread'] ?? null;
@@ -55,28 +54,17 @@ abstract class CanActUponThread implements IAuthorizationRule
             $thread = $post->getThread();
         }
 
-        // Search for the thread in all the places it could be.
-        // Right now: that's only comms.
+        // Search for the thread in all the strategies.
         // (A thread should only be used in one place, but it's possible to
         //  check multiples.)
-        $articles = $this->articleMapper->findByColumn('discussion_thread_id', $thread->getId());
-        foreach ($articles as $article) {
-            if ($this->validateAgainstCommsArticle($article, $user)) {
-                return true;
+        foreach ($this->strategies as $strategy) {
+            foreach ($strategy->retrieveAssociations($thread) as $association) {
+                if ($strategy->hasPermission($association, $user)) {
+                    return;
+                }
             }
         }
 
-        throw new Failure\Unauthorized();
+        throw new Failure\Unauthorized('Could not authorize access to thread');
     }
-
-
-    /**
-     * Is this thread action allowed for threads that are associated with this
-     * article?
-     *
-     * @param  News\Model $article
-     * @param  User|null  $user
-     * @return bool
-     */
-    abstract protected function validateAgainstCommsArticle(News\Model $article, ?User $user): bool;
 }
