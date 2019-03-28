@@ -274,6 +274,7 @@ class Controller extends Base
             // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
             if ($segment->isSimple()) {
                 $encodedValue = $codec->encodeValue($segment->getEntityValue());
+
                 $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
             } else {
                 foreach ($segment->getChildren() as $child) {

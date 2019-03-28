@@ -80,6 +80,16 @@ function Codec() {
         return decodeSimple(encodedString);
     };
 
+    /**
+     * Decodes an encoded value. Must match the server-side Codec implementation
+     *
+     * @param {string} encodedValue
+     * @returns {null|string}
+     */
+    this.decodeEncodedValue = function(encodedValue) {
+        return JSON.parse(atob(encodedValue)) ;
+    };
+
     /** @param {Segment} segment */
     var encodeSimple = function (segment) {
         return encodeSimpleParts(segment.getEntityType(), segment.getEntityValue(), segment.getModifier());
@@ -1166,7 +1176,6 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
      * @return boolean
      */
     this.onAddSegment = function(selectize, bricks, key, name, $item, segmentValueLabels){
-
         var newBrick        = new Brick(codec.decode(key), this.entityTypeLabelMap, segmentValueLabels),
             brickCandidates = [];
 

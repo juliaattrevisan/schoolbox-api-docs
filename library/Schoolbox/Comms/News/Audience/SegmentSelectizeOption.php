@@ -61,6 +61,7 @@ class SegmentSelectizeOption implements JsonSerializable
      * @param string $entityType
      * @param string $encodedValue
      * @param string $label
+     *
      */
     public function addLabel(string $entityType, string $encodedValue, string $label): void
     {
@@ -74,9 +75,9 @@ class SegmentSelectizeOption implements JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'key'    => $this->key,
-            'name'   => $this->name,
-            'labels' => $this->labels,
+            'key'       => $this->key,
+            'name'      => $this->name,
+            'labels'    => $this->labels,
         ];
     }
 }

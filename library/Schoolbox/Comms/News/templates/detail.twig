@@ -330,6 +330,25 @@ Data:
                 this.selectedCompositeBrick = audienceBrick;
                 // Show modal
                 $('#audience-composite').foundation('reveal', 'open');
+            },
+            brickHref: function(audienceBrick) {
+                // Only bricks with a single folder dimensions, and a single value, have a href
+                if(audienceBrick.getDimensions().length !== 1){
+                    return '';
+                }
+                var soleDimension = audienceBrick.getDimensions()[0];
+                if(soleDimension.getEntityType() === 'folder' && soleDimension.getEntityValues().length === 1){
+                    var decodedValue = codec.decodeEncodedValue(soleDimension.getEntityValues()[0]);
+                    return typeof decodedValue == 'string'
+                        ? '/homepage/' + decodedValue
+                        : '' ;
+                }
+                return '';
+            },
+            brickName: function(audienceBrick) {
+                return audienceBrick.modifierLabel.length > 0
+                    ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel
+                    : audienceBrick.nameLabel;
             }
         }
     });
