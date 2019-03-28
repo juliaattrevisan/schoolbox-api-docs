@@ -10,7 +10,7 @@ Data:
     hideComponent:  bool               - Whether this whole component should be hidden (used by including template)
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% set gradientClass = urgency.marks(studentMark / 7 * 100) %}
+{% set gradientClass = studentMark is null ? '' : urgency.marks(studentMark / 7 * 100) ~ '-bg' %}
 
 <h2 class="subheader">{{ header }}</h2>
 
@@ -18,16 +18,14 @@ Data:
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
+    {# TODO style this properly, of course #}
+    <div {% if gradientClass %}class="{{ gradientClass }}"{% endif %}>
+        <h3 style="{% if gradientClass %}color: white; {% endif %}text-align: center; margin-bottom: 0;">{{ studentMark|default('-') }}</h3>
+    </div>
+
     {% if useComment %}
         <blockquote>{{ studentComment|nl2br }}</blockquote>
     {% else %}
-
-        {% if studentMark is not null %}
-            {# TODO style this properly, of course #}
-            <div class="{{ gradientClass }}-bg">
-                <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentMark }}</h3>
-            </div>
-        {% endif %}
 
         {% autoescape 'js' %}
         <script type="text/javascript">
@@ -53,7 +51,7 @@ Data:
                         name: rawData[key]
                     };
                     if(studentMark === Number(key)){
-                        column.className = '{{ gradientClass }}-bg';
+                        column.className = '{{ gradientClass }}';
                     } else {
                         column.color = '#454549';
                     }
