@@ -265,17 +265,20 @@
                 self.commentIdToDelete = id;
                 self.commentIndexToDelete = index;
 
+                // If the user has agreed to delete the comment...
                 if (confirmed) {
                     $toast.toastActivate({text: self.deletingCommentText});
 
                     axios.delete('/posts/'+ self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
                         self.posts.splice(self.commentIndexToDelete, 1);
+
+                        // On successful delete, reduce the total comments count in the UI without hitting the backend
                         self.totalCommentsCount--;
-                        self.commentsTotalCountLabel = 'Comments (' + self.totalCommentsCount + ')';
+
                         $toast.toastTimeout({text: self.commentDeletedText, duration: 2000});
 
-                        // Automatically load more threads if there are three comments that's left in the display lists.
-                        if (self.posts.length === 3) {
+                        // Automatically trigger show previous comments to show the next set of records when the list has gone down to 0
+                        if (self.posts.length < 1 && self.totalCommentsCount > 0) {
                             self.getThread();
                         }
 
