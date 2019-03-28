@@ -49,6 +49,26 @@ class AccessLevelCensor
 
 
     /**
+     * Filters record and record content that the specified user is not permitted to view.
+     *
+     * * Records the user is NOT permitted to see are removed completely from graph, becoming NULL
+     * * Records the user IS permitted to see have their content filtered appropriately
+     *
+     * Public-facing recursive driver.
+     *
+     * @param Model $record A pastoral records
+     * @param User  $user   The user who is trying to view them
+     * @return null|Model
+     * @throws InsufficientHydrationException
+     */
+    public function filterRecordForUser(Model $record, User $user): ?Model
+    {
+        $resultCache = new Collection();
+        return $this->filterRecordForUserRecursive($record, $user, $resultCache);
+    }
+
+
+    /**
      * Recursively filter a record and its related records.
      *
      * * Records the user is NOT permitted to see are removed completely from graph, becoming NULL

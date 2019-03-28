@@ -9,9 +9,10 @@
 namespace Schoolbox\Permission\Access;
 
 
+use Schoolbox\BaseModel;
 use Schoolbox\User;
 
-class UserAccess
+class UserAccess extends BaseModel
 {
 
     /**
