@@ -15,8 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Post;
-use Schoolbox\Discussion\Thread\Authorizer\CanGetFromThread;
-use Schoolbox\Discussion\Thread\Authorizer\CanPostIntoThread;
+use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
 
 /**
  * Module for discussion thread requests.
@@ -36,18 +35,22 @@ class Module extends BaseModule
     {
         /** @var Auth\Authorizer $authorizer */
         /** @var News\Mapper     $newsMapper */
-        $authorizer       = $this->getInjector()->get('authorizer');
-        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
-        $getAuthorizer    = new Auth\Rule\Any(
+        $authorizer     = $this->getInjector()->get('authorizer');
+        $newsMapper     = $this->getMapperFactory()->get(News\Mapper::class);
+        $getAuthorizer  = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new CanGetFromThread($authorizer, $newsMapper);
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanGet($authorizer, $newsMapper)
+                );
             })
         );
-        $postAuthorizer   = new Auth\Rule\Any(
+        $postAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new CanPostIntoThread($authorizer, $newsMapper);
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanPost($authorizer, $newsMapper)
+                );
             })
         );
 
@@ -116,7 +119,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'postMapper' => $this->getMapperFactory()->getLazy(Post\Mapper::class),
+            'postMapper'   => $this->getMapperFactory()->getLazy(Post\Mapper::class),
             'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }

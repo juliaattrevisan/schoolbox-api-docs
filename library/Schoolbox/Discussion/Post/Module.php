@@ -42,14 +42,18 @@ class Module extends BaseModule
             new Auth\Rule\IsSuperuser(),
             new IsPostAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new Thread\Authorizer\CanDeleteFromThread($authorizer, $newsMapper);
+                return new Thread\Authorizer\CanActUponThread(
+                    new News\Discussion\Permission\CanDelete($authorizer, $newsMapper)
+                );
             })
         );
         $getAuthorizer    = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new IsPostAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new Thread\Authorizer\CanGetFromThread($authorizer, $newsMapper);
+                return new Thread\Authorizer\CanActUponThread(
+                    new News\Discussion\Permission\CanGet($authorizer, $newsMapper)
+                );
             })
         );
 
