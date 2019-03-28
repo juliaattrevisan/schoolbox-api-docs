@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Post\Authorizer\IsPostAuthor;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -39,12 +40,14 @@ class Module extends BaseModule
         $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
         $deleteAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
+            new IsPostAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
                 return new Thread\Authorizer\CanDeleteFromThread($authorizer, $newsMapper);
             })
         );
         $getAuthorizer    = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
+            new IsPostAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
                 return new Thread\Authorizer\CanGetFromThread($authorizer, $newsMapper);
             })
