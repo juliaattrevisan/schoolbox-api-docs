@@ -34,7 +34,7 @@
                         </span>
                         <span v-else-if="brickHref(audienceBrick)"><a :href="brickHref(audienceBrick)">${ brickName(audienceBrick) }</a></span>
                         <span v-else>${ brickName(audienceBrick) }</span> {#- Dessicate -#}
-                        <template v-if="index+1 < audienceBricks.length">, </template>
+                    </span>
                 </template>
 
                 {# modal #}
