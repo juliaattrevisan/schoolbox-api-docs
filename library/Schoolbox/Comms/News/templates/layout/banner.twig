@@ -137,7 +137,7 @@
                     </div>
                 </li>
             </ul>
-            <a @click="getThread" v-if="showLoadMoreButton" class="button expand" :disabled="loadMoreIsDisabled">Show previous comments</a>
+            <a @click="getThread" v-if="showLoadMoreButton" class="button expand" :disabled="! loadMoreIsEnabled">Show previous comments</a>
         </div>
         </div>
     </section>
@@ -166,7 +166,7 @@
             showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
-            loadMoreIsDisabled: false,
+            loadMoreIsEnabled: false,
             loadingCommentsText: 'Loading comments...',
             commentsLoadedText: 'Comments loaded',
             errorLoadingCommentsText: 'Unable to load comments',
@@ -201,7 +201,7 @@
             getThread: function() {
                 var self = this;
 
-                self.loadMoreIsDisabled = true;
+                self.loadMoreIsEnabled = false;
                 self.showSkeletonLoader = true;
 
                 $toast.toastActivate({text: self.loadingCommentsText});
@@ -225,13 +225,13 @@
                     // Hide skeleton loader once the request is done
                     self.showSkeletonLoader = false;
                     // Enable back load more button once the request is done
-                    self.loadMoreIsDisabled = false;
+                    self.loadMoreIsEnabled = true;
                     // Make comments count visible when the request is done
                     self.showCommentsCount = true;
 
                     /**
                      * TODO: Maybe the API should return a metadata that will let the front-end know if there's still
-                     * a next page to render rather than comparing the value of the length and the comment's total count?
+                     * a next page to render rather than comparing the value of the length of array and the comment's total count?
                      *
                      * Do not show load more button when all the comments has been loaded
                      */
@@ -240,8 +240,8 @@
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
                     self.showSkeletonLoader = false;
-                    self.showLoadMoreButton = false;
                     self.showCommentsCount = true;
+                    self.loadMoreIsEnabled = true;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 });
             }
