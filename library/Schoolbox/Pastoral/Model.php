@@ -73,8 +73,12 @@ class Model extends BaseModel implements ISoftDeletable
     /** @var null|float */
     protected $points;
 
-    /** @var User */
-    protected $owner;
+    /**
+     * The user who created the record.
+     *
+     * @var User
+     */
+    private $owner;
 
     /** @var null|User Null if imported from SIS */
     private $modifiedBy;
