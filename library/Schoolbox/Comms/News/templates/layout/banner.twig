@@ -82,11 +82,11 @@
             </div>
             <template v-if="threadEnabled">
                 <template v-if="isPublished">
-                    <form action="/" method="post">
+                    <form>
                         <label>
-                            <textarea id='comment-area' name='comment-area' rows="5"></textarea>
+                            <textarea id='comment-area' name='comment-area' rows="5" v-model="comment" required></textarea>
                         </label>
-                        <input type="submit" value="Post" />
+                        <a class="button submit" @click="postComment" :disabled="! postCommentButtonIsEnabled">Post Comment</a>
                     </form>
                 </template>
                 <template v-else>
@@ -188,6 +188,11 @@
             articlesLoading: true,
             commentIdToDelete: undefined,
             commentIndexToDelete: undefined,
+            comment: '',
+            postingCommentText: 'Posting comment...',
+            commentHasBeenAddedText: 'Comment has been added',
+            errorAddingCommentText: 'Unable to post comment',
+            postCommentButtonIsEnabled: true,
         },
         // define methods under the `methods` object
         methods: {
@@ -289,6 +294,36 @@
             },
             closeModal: function() {
                 $('#confirm-delete').foundation('reveal', 'close');
+            },
+            postComment: function() {
+                var self = this;
+
+                if (self.comment !== '') {
+                    $toast.toastActivate({text: self.postingCommentText});
+
+                    self.postCommentButtonIsEnabled = false;
+
+                    axios.post('/threads/' + {{ article.discussionThread.id }} + '/posts', {
+                        params: {
+                            content: self.comment,
+                        }
+                    }).then(function (response) {
+
+                        var responseData = response.data;
+                        // Add the latest comment into the top of array
+                        self.posts.splice(0,0, responseData);
+                        // On successful comment posting, add one into the total comments count in the UI without hitting the backend
+                        self.totalCommentsCount++;
+
+                        $toast.toastTimeout({text: self.commentHasBeenAddedText, duration: 2000});
+
+                        // Bring post comment components back to their original states
+                        self.postCommentButtonIsEnabled = true;
+                        self.comment = '';
+                    }).catch(function (error) {
+                        $toast.toastTimeout({text: self.errorAddingCommentText, duration: 2000, css: 'alert'});
+                    });
+                }
             }
         },
         mounted: function() {

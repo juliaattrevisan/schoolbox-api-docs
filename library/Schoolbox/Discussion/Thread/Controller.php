@@ -108,15 +108,18 @@ class Controller extends BaseController
      * @level 190
      *
      * @param Model $thread
+     *
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function createPostInThread(Model $thread): void
     {
         /** @var \stdClass $data */
         $data = $this->request->content->get();
+
         $post = $this->postMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
-            ->setContent($data->content);
+            ->setContent($data->params->content);
 
         $this->postMapper->save($post);
 
