@@ -153,7 +153,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
         $context = [
             'header'         => $header,
             'data'           => $markData,
-            'studentValue'   => $studentMark,
+            'studentMark'    => $studentMark,
             'studentComment' => $studentComment,
             'useComment'     => $this->getAttributes()->isDp(),
             'hideComponent'  => $hideComponent,
