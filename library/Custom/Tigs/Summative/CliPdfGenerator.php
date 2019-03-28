@@ -194,13 +194,19 @@ class CliPdfGenerator extends CliTool\App
                     $this->getLogger()->alert("No redis data found for hash: {$this->sessionHash}");
                     $valid = false;
                 } else {
+                    // TODO This is too low-level and implementation specific.
+                    // TODO It should be abstracted out.
                     \session_start();
                     \session_decode($redisData);
                     /** @var User $user */
-                    $user = $_SESSION['user'] ?? null;
+                    $user     = $_SESSION['user'] ?? null;
+                    $lastTime = $_SESSION['lasttime'] ?? null;
                     \session_unset();
                     if (!$user) {
                         $this->getLogger()->alert("No user object found in session data");
+                        $valid = false;
+                    } elseif(!$lastTime || time() - $lastTime > $this->getConfig()->get('session_length')) {
+                        $this->getLogger()->alert("Session has expired");
                         $valid = false;
                     } elseif (!$user->isSuperuser()) {
                         $this->getLogger()->alert("Session user '{$user->getUsername()}' is not a superuser");
