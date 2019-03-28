@@ -317,6 +317,10 @@ class InternationalBaccalaureateGraph extends BaseComponent
                 continue;
             }
 
+            // Is viewer permitted to see this assessment and its grades, and assessment is for this folder?
+            if ($this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                $hideComponent = false;
+            }
 
             foreach ($assessment->getAllParticipants() as $participant) {
 
@@ -369,7 +373,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
                 if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                     $studentMark = $mark;
                     $studentComment = $feedback->getComment();
-                    $hideComponent = false;
                 }
 
                 // NULL marks do not contribute
