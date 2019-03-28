@@ -16,14 +16,16 @@ use Schoolbox\Collection;
  * Responsible for stripping the content/relationships from a pastoral record that a
  * specific user does not have sufficient permission to access.
  *
- * ** THIS WILL BY DESIGN MUTATE THE PASTORAL MODELS PASSED TO IT **
+ * ** THIS WILL INTENTIONALLY MUTATE THE PASTORAL MODELS PASSED TO IT **
  */
 class AccessLevelCensor
 {
 
     /**
-     * Filter records from the collection if the current user doesn't have access to them.
-     * If the user is not in the audience and is not the owner, they can't see the record.
+     * Filters records and record content that the specified user is not permitted to view.
+     *
+     * * Records the user is NOT permitted to see are removed completely from graph, becoming NULL
+     * * Records the user IS permitted to see have their content filtered appropriately
      *
      * Public-facing recursive driver.
      *
@@ -35,8 +37,9 @@ class AccessLevelCensor
      */
     public function filterRecordsForUser(Collection $records, User $user): Collection
     {
+        $resultCache = new Collection();
         foreach ($records as $idx => $record) {
-            $filteredRecord = $this->filterRecordForUserRecursive($record, $user, new Collection());
+            $filteredRecord = $this->filterRecordForUserRecursive($record, $user, $resultCache);
             if (!$filteredRecord) {
                 $records->offsetUnset($idx);
             }
@@ -46,9 +49,14 @@ class AccessLevelCensor
 
 
     /**
-     * @param Model      $record
-     * @param User       $user
-     * @param Collection $resultCache Indexed by the object's hash id
+     * Recursively filter a record and its related records.
+     *
+     * * Records the user is NOT permitted to see are removed completely from graph, becoming NULL
+     * * Records the user IS permitted to see have their content filtered appropriately
+     *
+     * @param Model                     $record
+     * @param User                      $user
+     * @param Collection|null[]|Model[] $resultCache Indexed by the object's hash id
      * @return Model|null
      * @throws InsufficientHydrationException
      */
@@ -79,10 +87,11 @@ class AccessLevelCensor
             }));
         }
 
-        // And filter the comments on the record, because this is planet Earth and we don't trust anybody
+        // And filter the comments on the record
         $this->filterCommentsForUser($record->getComments(), $user);
 
         // Set the 'updatedAtDisplay' value now that we have all of the comments
+        // TODO - This does not belong in this class. This is a presentation concern, not a filtering concern.
         foreach ($record->getComments() as $comment) {
             if ($comment->getUpdatedAt()->gt($record->getUpdatedAtDisplay())) {
                 // Found a newer comment, update the record with the date/time, and author of the comment
@@ -106,8 +115,7 @@ class AccessLevelCensor
 
 
     /**
-     * Filter records from the collection if the current user doesn't have access to them.
-     * If the user is not in the audience and is not the owner, they can't see the record.
+     * Removes comments that the specified user is not permitted to view
      *
      * @param Collection|Model[] $comments A list of pastoral comments
      * @param User               $user     The user who is trying to view them
