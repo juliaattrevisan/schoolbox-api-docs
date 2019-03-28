@@ -113,7 +113,7 @@
     }
 </style>
 
-{% if assessments|length %}
+{% if assessments|length and students|length %}
 <div id="table-container">
 
     <table id="left-columns">
@@ -215,6 +215,10 @@
 {% else %}
     <div class="empty-state">
         <i class="icon-progress"></i>
-        <p>There are no rubric marks for this folder.</p>
+        {% if not assessments|length %}
+            <p>There are no assessments that use a rubric in this folder.</p>
+        {% else %}
+            <p>There are no students in this folder.</p>
+        {% endif %}
     </div>
 {% endif %}
