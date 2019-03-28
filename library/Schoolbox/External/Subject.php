@@ -11,7 +11,9 @@
 
 namespace Schoolbox\External;
 
-class Subject {
+use Schoolbox\BaseModel;
+
+class Subject extends BaseModel {
 	/**
 	 * @var int
 	 */

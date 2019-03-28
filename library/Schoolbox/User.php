@@ -26,7 +26,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Pastoral;
 
-class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
+class User extends BaseModel implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 {
     use CreatedAtDate;
     use UpdatedAtDate;

@@ -8,7 +8,7 @@
  */
 namespace Schoolbox;
 
-class Campus implements ValueLabelInterface {
+class Campus extends BaseModel implements ValueLabelInterface {
 
 	/** @var string */
     private $name;
