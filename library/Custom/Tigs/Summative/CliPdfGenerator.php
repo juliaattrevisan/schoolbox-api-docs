@@ -437,15 +437,6 @@ class CliPdfGenerator extends CliTool\App
 
         $studentIds = $db->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
         $this->getLogger()->info(\sprintf("%d students found", \count($studentIds)));
-        if (\count($studentIds) > 200) {
-            $message = \sprintf(
-                "Generating PDFs for a large number of students may cause the server to run out of memory. " .
-                "Recommend using '%s' and '%s' command-line flags to reduce the student count",
-                self::OPT_LONG_YEAR_LEVEL,
-                self::OPT_LONG_CURRICULUM
-            );
-            $this->getLogger()->warning($message);
-        }
         return $studentIds;
     }
 
@@ -650,14 +641,29 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("Creating temp zip archive: $zipFilename");
         $zipArchive->open($zipFilename, ZipArchive::CREATE);
 
+        // To avoid exceeding open file limit, may need to batch zip
+        $openFileLimit = (int)\exec('ulimit -n');
+        $batchSize     = \round($openFileLimit - 20, -2); // buffer of 20, round to nearest 100
+        $this->getLogger()->debug(sprintf('Open file limit: %d, setting batch size to %d', $openFileLimit, $batchSize));
+        $batchIndex = 1;
+        $batches    = \ceil(\count($pdfFilenames) / $batchSize);
         foreach ($pdfFilenames as $pdfFilename) {
+            if ($batchIndex++ % $batchSize === 0) {
+                $batchCount = (int)($batchIndex / $batchSize);
+                $this->getLogger()->info("Writing zip batch $batchCount/$batches...");
+                $zipArchive->close();
+                $zipArchive->open($zipFilename);
+            }
             $this->getLogger()->debug("Adding PDF file to zip archive: $pdfFilename");
             $zipArchive->addFile($pdfFilename, \basename($pdfFilename));
         }
+        $this->getLogger()->info("Writing zip batch $batches/$batches...");
         $zipArchive->close();
 
         $this->getLogger()->debug("Writing zip archive to output stream");
-        \fwrite($this->getOutStream(), \file_get_contents($zipFilename));
+        if (false === \stream_copy_to_stream(\fopen($zipFilename, 'rb'), $this->getOutStream())) {
+            $this->getLogger()->error('Unable to write zip archive to output stream');
+        }
 
         $this->getLogger()->debug("Deleting zip archive: $zipFilename");
         \unlink($zipFilename);
