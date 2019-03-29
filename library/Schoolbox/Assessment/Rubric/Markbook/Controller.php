@@ -124,31 +124,27 @@ class Controller extends Base
     private function retrieveAssessmentsInFolder(int $folderId) : array
     {
         $getAllAssessmentsInFolderQuery = $this->internalDb->prepareQuery(
-            "SELECT var.assessment_id,
+            "SELECT a.assessment_id,
             a.title AS assessment_name,
             sb.rubric_group_marks AS assessment_rubric_group_marks,
             sb.submission_grade_group_id AS assessment_grade_group_id,
-            vrm.assessment_mark_type,
-            vrm.assessment_max_mark,
+            sb.assessment_mark_type,
+            sb.assessment_max_mark,
+            sb.capability_max_value,
+            sb.indicator_max_value,
             rgu.rubric_group_id AS capability_id,
             rg.name AS capability_name,
-            vrm.capability_max_value,
             rcu.criterion_id AS indicator_id,
             rc.name AS indicator_name,
-            vrm.indicator_max_value
-            FROM       v_assessment_relation var
-            INNER JOIN assessment a ON a.id = var.assessment_id
+            FROM       assessment a
             INNER JOIN submission_box sb ON sb.assessment_id = a.id
             INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
             INNER JOIN rubric_group rg ON rgu.rubric_group_id = rg.id
             INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
                    AND rc.rubric_group_id = rg.id
-            LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = var.assessment_id
-                   AND vrm.capability_id = rgu.rubric_group_id
-                   AND vrm.indicator_id = rcu.criterion_id
-            WHERE      var.folder_id=:folderId AND a.deleted_at IS NULL
-            ORDER BY var.assessment_id, rgu.rubric_group_id, rcu.criterion_id"
+            WHERE      a.category=:folderId AND a.deleted_at IS NULL
+            ORDER BY a.assessment_id, rgu.rubric_group_id, rcu.criterion_id"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
@@ -337,6 +333,8 @@ class Controller extends Base
                 } catch (\Schoolbox\Mapper\Exception $e) {
                     $gradeGroup = null;
                 }
+
+                // TODO assessmentMarkType is null.
                 $markType = new MarkType();
                 $markType->setId($assessmentMarkType);
 
