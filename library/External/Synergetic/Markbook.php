@@ -597,7 +597,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         $markValue = null === $mark
             ? self::NO_MARK_GIVEN
-            : round($mark);
+            : round($mark,2);
 
         $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment));
 
