@@ -502,6 +502,7 @@ class CliPdfGenerator extends CliTool\App
         $previousException = null;
         while (true) {
             if ($attempts++ >= $maxAttempts) {
+                \unlink($filename);
                 throw new RuntimeException("Unable to generate report after $maxAttempts attempts, skipping", 0, $previousException);
             }
             try {
