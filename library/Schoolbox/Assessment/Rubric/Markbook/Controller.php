@@ -124,18 +124,18 @@ class Controller extends Base
     private function retrieveAssessmentsInFolder(int $folderId) : array
     {
         $getAllAssessmentsInFolderQuery = $this->internalDb->prepareQuery(
-            "SELECT a.assessment_id,
+            "SELECT a.id as assessment_id,
             a.title AS assessment_name,
             sb.rubric_group_marks AS assessment_rubric_group_marks,
             sb.submission_grade_group_id AS assessment_grade_group_id,
-            sb.assessment_mark_type,
-            sb.assessment_max_mark,
-            sb.capability_max_value,
-            sb.indicator_max_value,
+            sb.mark_type as assessment_mark_type,
+            sb.max_mark as assessment_max_mark,
             rgu.rubric_group_id AS capability_id,
+            vrm.capability_max_value as capability_max_value,
             rg.name AS capability_name,
             rcu.criterion_id AS indicator_id,
-            rc.name AS indicator_name,
+            vrm.indicator_max_value as indicator_max_value,
+            rc.name AS indicator_name
             FROM       assessment a
             INNER JOIN submission_box sb ON sb.assessment_id = a.id
             INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
@@ -143,8 +143,11 @@ class Controller extends Base
             INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
                    AND rc.rubric_group_id = rg.id
-            WHERE      a.category=:folderId AND a.deleted_at IS NULL
-            ORDER BY a.assessment_id, rgu.rubric_group_id, rcu.criterion_id"
+            LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = a.id
+                   AND vrm.capability_id = rgu.rubric_group_id
+                   AND vrm.indicator_id = rcu.criterion_id
+            WHERE      sb.category=:folderId AND a.deleted_at IS NULL
+            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
