@@ -86,7 +86,7 @@
                         <label>
                             <textarea id='comment-area' name='comment-area' rows="5" v-model="comment" required></textarea>
                         </label>
-                        <a class="button submit" @click="postComment" :disabled="! postCommentButtonIsEnabled">Post Comment</a>
+                        <a class="button submit" @click="postComment" :disabled="! postCommentButtonIsEnabled || comment.trim() === ''">Post Comment</a>
                     </form>
                 </template>
                 <template v-else>
