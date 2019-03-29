@@ -141,8 +141,8 @@
                 <p>Are you sure you want to delete this comment?</p>
 
                 <ul class="flex-list buttons">
-                    <li><a v-on:click="deleteComment(commentIdToDelete, commentIndexToDelete, true)" class="button icon-approve submit">OK</a></li>
-                    <li><a v-on:click="closeModal" class="button icon-close">Cancel</a></li>
+                    <li><a v-on:click="deleteComment(commentIdToDelete, commentIndexToDelete, true)" class="button icon-approve submit" :disabled="! confirmDeleteButton">OK</a></li>
+                    <li><a v-on:click="closeModal" class="button icon-close" :disabled="! cancelDeleteButton">Cancel</a></li>
                 </ul>
             </div>
         </div>
@@ -188,6 +188,8 @@
             articlesLoading: true,
             commentIdToDelete: undefined,
             commentIndexToDelete: undefined,
+            confirmDeleteButton: true,
+            cancelDeleteButton: true,
             comment: '',
             postingCommentText: 'Posting comment...',
             commentHasBeenAddedText: 'Comment has been added',
@@ -271,6 +273,11 @@
 
                 // If the user has agreed to delete the comment...
                 if (confirmed) {
+                    // Disable 'OK' and 'CANCEL' button from the delete confirmation modal temporarily while the delete request is being processed
+                    // 'CANCEL' button will be disabled while the request is being processed so that, the users won't have a wrong understanding that they can still cancel the request
+                    self.confirmDeleteButton = false;
+                    self.cancelDeleteButton = false;
+
                     $toast.toastActivate({text: self.deletingCommentText});
 
                     axios.delete('/posts/'+ self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
@@ -278,6 +285,10 @@
 
                         // On successful delete, reduce the total comments count in the UI without hitting the backend
                         self.totalCommentsCount--;
+
+                        // Bring 'OK' and 'CANCEL' button from the delete confirmation modal back to it's original state
+                        self.confirmDeleteButton = true;
+                        self.cancelDeleteButton = true;
 
                         $toast.toastTimeout({text: self.commentDeletedText, duration: 2000});
 
@@ -288,6 +299,9 @@
 
                         self.closeModal();
                     }).catch(function (error) {
+                        self.confirmDeleteButton = true;
+                        self.cancelDeleteButton = true;
+
                         $toast.toastTimeout({text: self.errorDeletingCommentText, duration: 2000, css: 'alert'});
                     });
                 }
