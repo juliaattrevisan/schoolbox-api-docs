@@ -170,6 +170,10 @@
         delimiters: ['${', '}'],
         data: {
             threadId: Number({{ article.discussionThread.id }}),
+            threadContext: {
+                type: 'comms',
+                id: Number({{ article.id }})
+            },
             threadCheckboxEnabled: Boolean({{ article.discussionThread.open }}),
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
