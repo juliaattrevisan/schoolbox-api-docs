@@ -291,13 +291,9 @@ class CliPdfGenerator extends CliTool\App
                 $this->getLogger()->error("$consecutiveFailures consecutive failures, giving up...");
                 break;
             }
-            $student = $this->userMapper->findById($studentId);
+            $student         = $this->userMapper->findById($studentId);
             $externalStudent = $this->externalUser->getStudent($student->getExternalId());
-            if (!$this->isRelevantCurriculum($externalStudent)) {
-                $this->getLogger()->info("Skipping user (id: {$student->getExternalId()}). Irrelevant curriculum type");
-                continue;
-            }
-            $message = \sprintf("Printing PDF for student. (id: %{$maxIdLength}d), (externalId: %-s)", $studentId, $student->getExternalId());
+            $message         = \sprintf("Printing PDF for student. (id: %{$maxIdLength}d), (externalId: %-s)", $studentId, $student->getExternalId());
             $this->getLogger()->notice($message);
             try {
                 $pdfFilenames[]      = $this->generatePdf($student, $externalStudent, $sessionHash, $excludedClassCodes, $tempDir);
@@ -442,6 +438,20 @@ class CliPdfGenerator extends CliTool\App
         ";
 
         $studentIds = $db->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
+
+        // Apply curriculum filter
+        if ($this->curriculum) {
+            $this->getLogger()->info("Filtering to students with curriculum: '{$this->curriculum}'");
+            foreach ($studentIds as $idx => $studentId) {
+                /** @var User $user */
+                $user            = $this->userMapper->findByColumn('id', $studentId)->first();
+                $externalStudent = $this->externalUser->getStudent($user->getExternalId());
+                if (!$this->isRelevantCurriculum($externalStudent)) {
+                    unset($studentIds[$idx]);
+                }
+            }
+        }
+
         $this->getLogger()->info(\sprintf("%d students found", \count($studentIds)));
         return $studentIds;
     }
