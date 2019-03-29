@@ -1037,12 +1037,14 @@ class Controller extends Base
      * @param PastoralModel $record    The record to persist
      * @param bool          $isPrivate Is this a private or public attachment?
      */
-    private function persistAttachments(PastoralModel $record, RequestValues $post, bool $isPrivate)
+    private function persistAttachments(PastoralModel $record, RequestValues $post, bool $isPrivate): void
     {
         $attachzone = $isPrivate ? self::ATTACHZONE_PRIVATE : self::ATTACHZONE_PUBLIC;
 
         // preparation
-        $oldAttachments = $record->getAttachments()->filterBy('private', $isPrivate);
+        $oldAttachments = $this->pastoralAttachmentMapper
+            ->findByColumn('pastoral_id', $record->getId())
+            ->filterBy('private', $isPrivate);
         $newAttachments = $this->pastoralAttachmentMapper->createCollection();
         $diffMethod = function (PastoralAttachmentModel $a, PastoralAttachmentModel $b) {
             return $a->getStorage()->getHash() === $b->getStorage()->getHash();
