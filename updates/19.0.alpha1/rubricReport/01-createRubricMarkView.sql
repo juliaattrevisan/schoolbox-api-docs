@@ -29,6 +29,7 @@ CREATE OR REPLACE VIEW v_rubric_mark AS
     -- Indicator max: must be derived unfortunately.
     -- Can anyone think of a more efficient way to do this?
     (
+      -- TODO this does not work when blank descriptors are present
       SELECT MAX(rd2.max_value)
       FROM       rubric_descriptor rd2
         INNER JOIN rubric_level      rl2 ON rd2.level_id = rl2.id

@@ -352,21 +352,28 @@ class Controller extends Base
                 }
 
                 foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
-                    $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
-                    $capabilityMaxMark = $capabilityInFolder['maxMark'];
                     $capabilityDatabaseMark = $capabilityMarks['databaseMark'];
+                    $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
 
-                    $capabilityUsageModel = new CapabilityUsage(new Capability());
-                    $capabilityUsageModel->setMaxValue($capabilityMaxMark);
+                    if ($capabilityDatabaseMark !== null) {
+                        // TODO how can capabilityMaxMark be null while there is a capabilityDatabaseMark?
+                        $capabilityMaxMark = $capabilityInFolder['maxMark'];
 
-                    $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
-                    $capabilityMarkModel = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
-                    $capabilityMarkModel->setValue($capabilityDatabaseMark);
+                        $capabilityUsageModel = new CapabilityUsage(new Capability());
+                        $capabilityUsageModel->setMaxValue($capabilityMaxMark);
 
-                    $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
-                    $normalisedCapabilityMark = $capabilityMarkModel->retrieveNormalizedMark();
-                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                    $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = $normalisedCapabilityMark;
+                        $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
+                        $capabilityMarkModel = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
+                        $capabilityMarkModel->setValue($capabilityDatabaseMark);
+
+                        $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
+                        $normalisedCapabilityMark = $capabilityMarkModel->retrieveNormalizedMark();
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = $normalisedCapabilityMark;
+                    } else {
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = null;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = null;
+                    }
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
                         $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
