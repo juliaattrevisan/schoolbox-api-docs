@@ -68,12 +68,12 @@ class HscAssessmentRank extends BaseComponent
 
 
     /**
-     * Returns an array indexed by unitSpec.id
+     * Returns an array of data, or NULL if component should not be shown at all
      *
-     * @return array
+     * @return null|array
      * @throws UnexpectedValueException
      */
-    public function toContext(): array
+    public function toContext(): ?array
     {
         // Group cohort assessments per class
         /** @var Collection|GenericCollection[]|IAssessable[][] $cohortAssessmentsPerClass */
@@ -82,7 +82,7 @@ class HscAssessmentRank extends BaseComponent
         });
 
         // Check that this class has an instance of the expected work type
-        $classAssessments = $cohortAssessmentsPerClass[$this->folder->getId()];
+        $classAssessments = $cohortAssessmentsPerClass[$this->folder->getId()] ?? null;
         if (!$classAssessments) {
             throw new UnexpectedValueException("No 'HSC Assessment Rank' assessment found for class");
         }
@@ -107,7 +107,20 @@ class HscAssessmentRank extends BaseComponent
             }
         }
 
-        $feedback       = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]->first());
+        /** @var IAssessable $classAssessment */
+        $classAssessment = $cohortAssessmentsPerClass[$this->folder->getId()]->first();
+
+        // Did we find an assessment, but it shouldn't be visible to the current viewer?
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->viewer, true, null, false)) {
+            return null;
+        }
+
+        // Is grade visibility off for the current viewer?
+        if (!$classAssessment->isFeedbackVisibleToUser($this->viewer)) {
+            return null;
+        }
+
+        $feedback       = $this->findStudentFeedback($classAssessment);
         $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
         $cohortMarks    = $this->deriveCohortMarks($this->cohortAssessments);
         $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
@@ -138,12 +151,6 @@ class HscAssessmentRank extends BaseComponent
      */
     private function findStudentFeedback(IAssessable $assessable): ?IFeedback
     {
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessable, $this->viewer, true, null, false)) {
-            return null;
-        }
-        if (!$assessable->isFeedbackVisibleToUser($this->viewer)) {
-            return null;
-        }
         $participant = $assessable->getParticipantIfExtant($this->student);
         if (!$participant) {
             return null;
