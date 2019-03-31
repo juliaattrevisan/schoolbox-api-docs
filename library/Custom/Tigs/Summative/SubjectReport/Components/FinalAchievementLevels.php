@@ -165,6 +165,11 @@ class FinalAchievementLevels extends BaseComponent
             return null;
         }
 
+        // Is grade visibility off for the current viewer?
+        if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
+            return null;
+        }
+
         return ['data' => $this->buildAssessmentData($assessment, $assessment->getParticipant($this->student))];
     }
 
@@ -188,8 +193,8 @@ class FinalAchievementLevels extends BaseComponent
         /** @var DueWork\Feedback\Model $feedback */
         $feedback = $participant->getAuthoritativeFeedback(true);
 
-        // No feedback, or feedback should not be visible?
-        if (!$feedback || !$dueWork->isFeedbackVisibleToUser($this->viewer)) {
+        // No feedback?
+        if (!$feedback) {
             foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
                 $capabilityName = $capabilityUsage->getCapability()->getName();
                 foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
