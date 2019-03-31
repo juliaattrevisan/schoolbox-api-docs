@@ -90,7 +90,6 @@ class NesaScoreGraph extends BaseComponent
      * Generates and returns a data structure, suitable for passing to twig.
      *
      * @return array
-     * @throws LogicException
      */
     public function toContext(): array
     {
