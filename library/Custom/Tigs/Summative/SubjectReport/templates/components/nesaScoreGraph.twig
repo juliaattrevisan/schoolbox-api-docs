@@ -10,18 +10,19 @@ Data:
 
 {# Convert A-E to a normalised value for gradient colours #}
 {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
-{% set gradientClass = urgency.marks(studentMarks[studentMark] / studentMarks | length * 100) %}
+{% set normalisedMark = studentMarks[studentMark] / (studentMarks | length) * 100 %}
+{% set gradientClass = studentMark is null ? '' : urgency.marks(normalisedMark) ~ '-bg' %}
 
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
-    {% if studentMark is not null %}
-        {# TODO style this properly, of course #}
-        <div class="{{ gradientClass }}-bg">
-            <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentMark }}</h3>
-        </div>
-    {% endif %}
+
+    {# TODO style this properly, of course #}
+    <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>
+        <h3 style="{% if gradientClass %}color: white; {% endif %}text-align: center; margin-bottom: 0;">{{ studentMark|default('-') }}</h3>
+    </div>
+
 
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -55,7 +56,7 @@ Data:
                         name: key
                     };
                     if (studentMark === key) {
-                        column.className = '{{ gradientClass }}-bg';
+                        column.className = '{{ gradientClass }}';
                     } else {
                         column.color = '#454549';
                     }
