@@ -3,14 +3,14 @@ Renders a MYP/DP graph.
 
 Data:
     error:          string             - Optional. If present, the reason why we can't render the component
-    studentValue:   int|null           - Optional. The student's mark for the IB graph assessment
+    studentMark:    int|null           - Optional. The student's mark for the IB graph assessment
     studentComment: string|null        - Optional. The student's comment for the IB graph assessment
     data:           array              - The results to render. key: column, value: height
     useComment:     bool               - Whether to render the student's comment, instead of the graph
     hideComponent:  bool               - Whether this whole component should be hidden (used by including template)
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
-{% set gradientClass = urgency.marks(studentValue / 7 * 100) %}
+{% set gradientClass = studentMark is null ? '' : urgency.marks(studentMark / 7 * 100) ~ '-bg' %}
 
 <h2 class="subheader">{{ header }}</h2>
 
@@ -18,16 +18,14 @@ Data:
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
+    {# TODO style this properly, of course #}
+    <div {% if gradientClass %}class="{{ gradientClass }}"{% endif %}>
+        <h3 style="{% if gradientClass %}color: white; {% endif %}text-align: center; margin-bottom: 0;">{{ studentMark|default('-') }}</h3>
+    </div>
+
     {% if useComment %}
         <blockquote>{{ studentComment|nl2br }}</blockquote>
     {% else %}
-
-        {% if studentValue is not null %}
-            {# TODO style this properly, of course #}
-            <div class="{{ gradientClass }}-bg">
-                <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
-            </div>
-        {% endif %}
 
         {% autoescape 'js' %}
         <script type="text/javascript">
@@ -36,7 +34,7 @@ Data:
             $(function(){
 
                 var rawData = {{ data|json_encode|raw }},
-                    studentValue = Number("{{ studentValue }}");
+                    studentMark = Number("{{ studentMark }}");
 
                 {#
                     Convert into object format so we can add css classes for colour gradients.
@@ -52,8 +50,8 @@ Data:
                         y: rawData[key],
                         name: rawData[key]
                     };
-                    if(studentValue === Number(key)){
-                        column.className = '{{ gradientClass }}-bg';
+                    if(studentMark === Number(key)){
+                        column.className = '{{ gradientClass }}';
                     } else {
                         column.color = '#454549';
                     }
