@@ -43,7 +43,7 @@ class Module extends BaseModule
             new IsPostAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanDelete($authorizer, $newsMapper)
+                    new News\Discussion\Permission\CanModerate($authorizer, $newsMapper)
                 );
             })
         );

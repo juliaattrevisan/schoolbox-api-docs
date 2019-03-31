@@ -13,15 +13,19 @@ use Schoolbox\Comms\News;
 use Schoolbox\User;
 
 /**
- * Authorization rule for whether a user may delete from a discussion thread
- * for a comms article.
+ * Authorization rule for whether a user may moderate a discussion thread for
+ * a comms article.
  *
- * A user may delete comments if any of the following are true:
- * * they are the author
+ * Moderation responsibilities are:
+ * * enabling/disabling posting of comments
+ * * deleting comments
+ *
+ * A user may moderate the thread if any of the following are true:
+ * * they authored the article
  * * they approved the article
  * * they have modify rights on the article
  */
-class CanDelete extends BaseStrategy
+class CanModerate extends BaseStrategy
 {
     /**
      * @var Authorizer
