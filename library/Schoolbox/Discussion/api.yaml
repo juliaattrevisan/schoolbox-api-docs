@@ -167,7 +167,8 @@ components:
         updated:
           $ref: '#/components/schemas/dateTime'
         children:
-          $ref: '#/components/schemas/postList'
+          allOf:
+            - $ref: '#/components/schemas/postList'
           description: A list of direct child posts of this thread
       required:
         - id
@@ -189,9 +190,9 @@ components:
           type: string
           enum: [comms]
         id:
-          $ref: '#/components/schemas/id'
-          description:
-            The ID of the item
+          allOf:
+            - $ref: '#/components/schemas/id'
+          description: The ID of the item
 
     post:
       title: Post
@@ -204,7 +205,8 @@ components:
           $ref: '#/components/schemas/thread'
           # Usually a post will be retrieved within the context of a thread
         author:
-          $ref: '#/components/schemas/user'
+          allOf:
+            - $ref: '#/components/schemas/user'
           nullable: true
         content:
           type: string
@@ -213,13 +215,15 @@ components:
         updated:
           $ref: '#/components/schemas/dateTime'
         parent:
-          $ref: '#/components/schemas/post'
+          allOf:
+            - $ref: '#/components/schemas/post'
           description: |
             The direct parent of this post, if there is one.
             If there is none, this post is a top-level comment within a thread.
           nullable: true
         children:
-          $ref: '#/components/schemas/postList'
+          allOf:
+            - $ref: '#/components/schemas/postList'
           description: A list of direct children of this post
         visibility:
           description: |
