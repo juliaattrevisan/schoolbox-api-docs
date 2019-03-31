@@ -3,23 +3,23 @@ Renders a NESA Score graph.
 
 Data:
     error:        string   - Optional. If present, the reason why we can't render the component
-    studentValue: int|null - Optional. The student's mark for the NESA graph assessment
+    studentMark:  int|null - Optional. The student's mark for the NESA graph assessment
     data:         array    - The results to render. key: column, value: height
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
 {# Convert A-E to a normalised value for gradient colours #}
-{% set studentValues = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
-{% set gradientClass = urgency.marks(studentValues[studentValue] / studentValues | length * 100) %}
+{% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
+{% set gradientClass = urgency.marks(studentMarks[studentMark] / studentMarks | length * 100) %}
 
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
-    {% if studentValue is not null %}
+    {% if studentMark is not null %}
         {# TODO style this properly, of course #}
         <div class="{{ gradientClass }}-bg">
-            <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentValue }}</h3>
+            <h3 style="color: white; text-align: center; margin-bottom: 0;">{{ studentMark }}</h3>
         </div>
     {% endif %}
 
@@ -29,15 +29,15 @@ Data:
             $(function () {
 
                 var rawData = {{ data|json_encode|raw }},
-                    studentValue = "{{ studentValue }}",
-                    studentValues = {{ studentValues|json_encode|raw }},
-                    studentValuesInverted = {};
+                    studentMark = "{{ studentMark }}",
+                    studentMarks = {{ studentMarks|json_encode|raw }},
+                    studentMarksInverted = {};
 
-                for (var key in studentValues) {
-                    if (!studentValues.hasOwnProperty(key)) {
+                for (var key in studentMarks) {
+                    if (!studentMarks.hasOwnProperty(key)) {
                         continue;
                     }
-                    studentValuesInverted[Object.keys(studentValues).length + 1 - studentValues[key]] = key;
+                    studentMarksInverted[Object.keys(studentMarks).length + 1 - studentMarks[key]] = key;
                 }
 
                 {#
@@ -50,11 +50,11 @@ Data:
                         continue;
                     }
                     var column = {
-                        x: Object.keys(studentValues).length + 1 - studentValues[key],
+                        x: Object.keys(studentMarks).length + 1 - studentMarks[key],
                         y: rawData[key],
                         name: key
                     };
-                    if (studentValue === key) {
+                    if (studentMark === key) {
                         column.className = '{{ gradientClass }}-bg';
                     } else {
                         column.color = '#454549';
@@ -79,7 +79,7 @@ Data:
                         title: {
                             text: null
                         },
-                        categories: studentValuesInverted
+                        categories: studentMarksInverted
                     },
                     yAxis: {
                         title: {

@@ -93,9 +93,9 @@ class NesaScoreGraph extends BaseComponent
      */
     public function toContext(): array
     {
-        $markData    = self::BASE_MARKS;
-        $studentMark = null;
-        $error       = null;
+        $markData      = self::BASE_MARKS;
+        $studentMark   = null;
+        $error         = null;
         $hideComponent = false; // Don't hide if we error out
         try {
             [$markData, $studentMark, $hideComponent] = $this->collateMarks($this->collateAssessables());
@@ -104,8 +104,8 @@ class NesaScoreGraph extends BaseComponent
         }
 
         $context = [
-            'data'         => $markData,
-            'studentValue' => $studentMark,
+            'data'          => $markData,
+            'studentMark'   => $studentMark,
             'hideComponent' => $hideComponent,
         ];
         if (isset($error)) {
