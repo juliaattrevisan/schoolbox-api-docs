@@ -200,6 +200,11 @@ class AcademicAchievementSummary extends BaseComponent
             return null;
         }
 
+        // Is grade visibility off for the current viewer?
+        if (!$dueWork->isFeedbackVisibleToUser($this->viewer)) {
+            return null;
+        }
+
         return [
             'link'  => $this->getAasLink($dueWork),
             'marks' => $this->getMarks($dueWork, $dueWork->getParticipant($this->student)),
@@ -247,8 +252,8 @@ class AcademicAchievementSummary extends BaseComponent
         /** @var DueWork\Feedback\Model $feedback */
         $feedback = $participant->getAuthoritativeFeedback(true);
 
-        // No feedback, or feedback should not be visible?
-        if (!$feedback || !$dueWork->isFeedbackVisibleToUser($this->viewer)) {
+        // No feedback?
+        if (!$feedback) {
             foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
                 $capabilityName         = $capabilityUsage->getCapability()->getName();
                 $marks['rubric'][$capabilityName] = '';
