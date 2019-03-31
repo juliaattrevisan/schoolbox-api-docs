@@ -134,7 +134,7 @@ class AcademicAchievementMatrix extends BaseComponent
     {
         $aamAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aamWorkTypeId)
                                ->filter(function (IAssessable $assessable) {
-                                   return $this->isDueWithinReportWindow($assessable);
+                                   return $this->isDueWithinReportWindow($assessable) && $assessable->isParticipant($this->student);
                                });
 
         // Did we find 2+ AAM assessments in this unit?
