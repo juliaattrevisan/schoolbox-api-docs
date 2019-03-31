@@ -53,6 +53,14 @@ class Module extends BaseModule
                 );
             })
         );
+        $moderateAuthorizer = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanModerate($authorizer, $newsMapper)
+                );
+            })
+        );
 
 
         // Routes
@@ -81,14 +89,14 @@ class Module extends BaseModule
             'PUT',
             '/{id:\d+}/open',
             'openThread',
-            $postAuthorizer,
+            $moderateAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'PUT',
             '/{id:\d+}/close',
             'closeThread',
-            $postAuthorizer,
+            $moderateAuthorizer,
             [$this, 'preloadThread']
         );
     }
