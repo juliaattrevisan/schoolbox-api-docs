@@ -320,6 +320,7 @@ class Controller extends Web\Controller\Base
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException
      */
     private function buildAcademicAchievementSummaryData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): array
     {

@@ -20,6 +20,7 @@ use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Aura\Router;
 use Schoolbox\Resource\Folder;
+use UnexpectedValueException;
 
 /**
  * Responsible for generating data that can be used by a template to render the
@@ -98,6 +99,7 @@ class AcademicAchievementSummary extends BaseComponent
      * @return array
      * @throws Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
+     * @throws UnexpectedValueException
      */
     public function toContext(): array
     {
@@ -124,12 +126,13 @@ class AcademicAchievementSummary extends BaseComponent
      * @return array|null
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
+     * @throws UnexpectedValueException
      */
     private function buildUnitData(UnitSpec\Model $unitSpec): ?array
     {
         $aasAssessables = $this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->aasWorkTypeId)
                                ->filter(function (IAssessable $assessable) {
-                                   return $this->isDueWithinReportWindow($assessable);
+                                   return $this->isDueWithinReportWindow($assessable) && $assessable->isParticipant($this->student);
                                });
 
         // Did we find 2+ AAS assessments in this unit?
@@ -188,6 +191,7 @@ class AcademicAchievementSummary extends BaseComponent
      * @return null|array
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
+     * @throws UnexpectedValueException
      */
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
@@ -196,15 +200,9 @@ class AcademicAchievementSummary extends BaseComponent
             return null;
         }
 
-        // Don't render if student is not a participant
-        $participant = $dueWork->getParticipantIfExtant($this->student);
-        if (!$participant || $participant->isExcluded()) {
-            return null;
-        }
-
         return [
             'link'  => $this->getAasLink($dueWork),
-            'marks' => $this->getMarks($dueWork, $participant),
+            'marks' => $this->getMarks($dueWork, $dueWork->getParticipant($this->student)),
         ];
     }
 
