@@ -115,7 +115,7 @@ class FinalAchievementLevels extends BaseComponent
             $falAssessables = $falAssessables->merge($this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->falWorkTypeId));
         }
         $falAssessables = $falAssessables->filter(function (IAssessable $assessable) {
-            return $this->isDueWithinReportWindow($assessable);
+            return $this->isDueWithinReportWindow($assessable) && $assessable->isParticipant($this->student);
         });
 
         // Did we find 2+ FAL assessments in this class?
@@ -165,13 +165,7 @@ class FinalAchievementLevels extends BaseComponent
             return null;
         }
 
-        // Don't render if student is not a participant, or has been excluded
-        $participant = $assessment->getParticipantIfExtant($this->student);
-        if (!$participant || $participant->isExcluded()) {
-            return null;
-        }
-
-        return ['data' => $this->buildAssessmentData($assessment, $participant)];
+        return ['data' => $this->buildAssessmentData($assessment, $assessment->getParticipant($this->student))];
     }
 
 
