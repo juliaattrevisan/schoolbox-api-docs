@@ -184,6 +184,11 @@ class AcademicAchievementMatrix extends BaseComponent
             return null;
         }
 
+        // Is grade visibility off for the current viewer?
+        if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
+            return null;
+        }
+
         return $this->buildAssessmentData($assessment);
     }
 
@@ -204,7 +209,7 @@ class AcademicAchievementMatrix extends BaseComponent
 
         // Load rubric marks if they exist and current user is permitted to view grades
         $participant = $dueWork->getParticipantIfExtant($this->student);
-        if ($participant && !$participant->isExcluded() && $dueWork->isFeedbackVisibleToUser($this->viewer)) {
+        if ($participant && !$participant->isExcluded()) {
             /** @var DueWork\Feedback\Model $feedback */
             $feedback = $participant->getAuthoritativeFeedback(true);
             if ($feedback) {
