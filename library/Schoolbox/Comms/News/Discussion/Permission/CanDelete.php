@@ -16,7 +16,10 @@ use Schoolbox\User;
  * Authorization rule for whether a user may delete from a discussion thread
  * for a comms article.
  *
- * If a user can modify a comms article, they can delete its comments.
+ * A user may delete comments if any of the following are true:
+ * * they are the author
+ * * they approved the article
+ * * they have modify rights on the article
  */
 class CanDelete extends BaseStrategy
 {
@@ -49,6 +52,18 @@ class CanDelete extends BaseStrategy
         if (!$object instanceof News\Model) {
             return false;
         }
+
+        if ($user) {
+            $author = $object->getAuthor();
+            if ($author && $user->getId() === $author->getId()) {
+                return true;
+            }
+            $acceptor = $object->getAcceptedBy();
+            if ($acceptor && $user->getId() === $acceptor->getId()) {
+                return true;
+            }
+        }
+
         return $this->authorizer->isPathAuthorizedForUser(
             'commsNews.postUpdate',
             ['articleId' => $object->getId(), 'article' => $object],
