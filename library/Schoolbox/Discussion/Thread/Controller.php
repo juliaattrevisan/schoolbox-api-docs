@@ -126,7 +126,7 @@ class Controller extends BaseController
         $post = $this->postMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
-            ->setContent($data->params->content);
+            ->setContent($data->content);
 
         $this->postMapper->save($post);
 

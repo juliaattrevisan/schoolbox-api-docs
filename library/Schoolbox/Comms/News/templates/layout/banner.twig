@@ -84,7 +84,7 @@
                 <template v-if="isPublished">
                     <form>
                         <label>
-                            <textarea id='comment-area' name='comment-area' rows="5" v-model="comment" required></textarea>
+                            <textarea id="comment" name="comment" rows="5" v-model="comment" required></textarea>
                         </label>
                         <a class="button submit" @click="postComment" :disabled="! postCommentButtonIsEnabled || comment.trim() === ''">Post Comment</a>
                     </form>
@@ -151,11 +151,14 @@
 </div>
 <div id='toaster' class="toast" data-toast></div>
 
+<script src="/javascript/ckeditor/ckeditor.js"></script>
+<script src="/javascript/shared/editor/jquery.editor.js"></script>
+
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 
 {% autoescape 'js' %}
 <script>
-
+    
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
     };
@@ -213,6 +216,9 @@
                 $toast.toastActivate({text: self.savingText});
 
                 axios.put(changeThreadStatusEndpoint, {}, { headers: postHeaders }).then(function () {
+                    if (self.threadEnabled) {
+                        self.loadCkEditor();
+                    }
                     $toast.toastTimeout({text: self.savedText, duration: 2000});
                 }).catch(function (error) {
                     $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
@@ -318,9 +324,7 @@
                     self.postCommentButtonIsEnabled = false;
 
                     axios.post('/threads/' + {{ article.discussionThread.id }} + '/posts', {
-                        params: {
-                            content: self.comment,
-                        }
+                        content: self.comment
                     }).then(function (response) {
 
                         var responseData = response.data;
@@ -331,17 +335,44 @@
 
                         $toast.toastTimeout({text: self.commentHasBeenAddedText, duration: 2000});
 
-                        // Bring post comment components back to their original states
+                        // Bring post comment components back to their original states and reset CKEditor content on successful request
                         self.postCommentButtonIsEnabled = true;
                         self.comment = '';
+                        CKEDITOR.instances['comment'].setData(self.comment);
+
                     }).catch(function (error) {
                         $toast.toastTimeout({text: self.errorAddingCommentText, duration: 2000, css: 'alert'});
                     });
                 }
+            },
+            loadCkEditor: function () {
+                var self = this;
+
+                $.fn.alaressEditor({
+                    targetElements: $('#comment'),
+                    removePlugins: 'autoembed,uploadimage,schoolboxiframe,link',
+                    toolbarGroups: [
+                        {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                        {name: 'links', groups: ['links']},
+                        /* Custom schoolbox-specific plugin stuff can go here
+                         * This is a hole into which you may put once-off abilities
+                         * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                         * This is typically not used for anything else for now
+                         */
+                        {name: 'schoolbox', groups: ['schoolboxlink']},
+                    ],
+                    on: {
+                        change: function( evt ) {
+                            // Bind the content of ckeditor into the comment model on change
+                            self.comment = CKEDITOR.instances['comment'].getData();
+                        }
+                    }
+                });
             }
         },
         mounted: function() {
             this.getThread();
+            this.loadCkEditor();
         },
         filters: {
             fromNow(date) {
