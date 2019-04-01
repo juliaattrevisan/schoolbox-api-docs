@@ -351,9 +351,11 @@
                 $.fn.alaressEditor({
                     targetElements: $('#comment'),
                     removePlugins: 'autoembed,uploadimage,schoolboxiframe,link',
+                    removeButtons: 'Strike,Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                     toolbarGroups: [
                         {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                         {name: 'links', groups: ['links']},
+                        {name: 'insert', groups: ['insert']},
                         /* Custom schoolbox-specific plugin stuff can go here
                          * This is a hole into which you may put once-off abilities
                          * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
