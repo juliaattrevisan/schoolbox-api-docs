@@ -19,13 +19,13 @@ use Schoolbox\User;
 interface IStrategy
 {
     /**
-     * Does this strategy know of any associations between this thread? If so,
-     * return them.
+     * Does this strategy know how to find associations between this thread?
+     * If so, return them.
      *
      * @param ThreadModel $thread
      * @return iterable
      */
-    public function retrieveAssociations(ThreadModel $thread): iterable;
+    public function findAssociations(ThreadModel $thread): iterable;
 
 
     /**

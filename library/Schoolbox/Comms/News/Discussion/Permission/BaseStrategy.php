@@ -39,7 +39,7 @@ abstract class BaseStrategy implements IStrategy
      * @param ThreadModel $thread
      * @return iterable
      */
-    public function retrieveAssociations(ThreadModel $thread): iterable
+    public function findAssociations(ThreadModel $thread): iterable
     {
         return $this->context->findAssociations($thread);
     }

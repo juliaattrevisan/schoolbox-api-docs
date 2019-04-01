@@ -58,7 +58,7 @@ class CanActUponThread implements IAuthorizationRule
         // (A thread should only be used in one place, but it's possible to
         //  check multiples.)
         foreach ($this->strategies as $strategy) {
-            foreach ($strategy->retrieveAssociations($thread) as $association) {
+            foreach ($strategy->findAssociations($thread) as $association) {
                 if ($strategy->hasPermission($association, $user)) {
                     return;
                 }
