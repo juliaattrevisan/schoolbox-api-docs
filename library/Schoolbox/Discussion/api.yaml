@@ -55,6 +55,7 @@ paths:
         default:
           $ref: '#/components/responses/problem'
 
+  /threads:
     post:
       operationId: createThread
       summary: Creates a thread
