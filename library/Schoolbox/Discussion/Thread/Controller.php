@@ -66,7 +66,7 @@ class Controller extends BaseController
      */
     public function getThread(Model $thread): void
     {
-        $this->buildResponse($thread);
+        $this->buildResponse($thread, true);
     }
 
 
@@ -86,7 +86,7 @@ class Controller extends BaseController
         $thread = $this->threadMapper->createModel()
             ->setOpen(true);
         $this->threadMapper->save($thread);
-        $this->buildResponse($thread);
+        $this->buildResponse($thread, false);
     }
 
 
@@ -252,14 +252,17 @@ class Controller extends BaseController
      * `$this->response->content`.
      *
      * @param Model $thread
+     * @param bool  $loadChildren
      */
-    private function buildResponse(Model $thread): void
+    private function buildResponse(Model $thread, bool $loadChildren): void
     {
         $responseData             = $thread->jsonSerialize(
             $this->retrieveJsonDecorator(),
             $this->retrieveLinkDecorator()
         );
-        $responseData['children'] = $this->retrievePostList($thread, null);
+        $responseData['children'] = $loadChildren
+            ? $this->retrievePostList($thread, null)
+            : [];
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
