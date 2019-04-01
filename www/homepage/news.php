@@ -10,7 +10,9 @@
 /** @var SitePage $this */
 
 if(isset($this->arg[1]) && is_numeric($this->arg[1])) {
-    $article_id = $this->db->getOne("SELECT migration_id FROM subject_news WHERE id = {$this->db->smartQuote($this->arg[1])}");
+    /** @var \Alaress\Database\Connector\IConnector $db */
+    $db = $this->getDi()->get('databaseInternal');
+    $article_id = $db->executeQuery("SELECT migration_id FROM subject_news WHERE id = ?", [$this->arg[1]])->fetchColumn();
     $this::localRedir('/news/' . $article_id);
 } else {
     $this->pageNotFound();
