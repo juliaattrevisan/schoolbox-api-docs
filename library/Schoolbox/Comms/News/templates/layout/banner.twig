@@ -169,6 +169,7 @@
         el: '#threads-section',
         delimiters: ['${', '}'],
         data: {
+            threadId: Number({{ article.discussionThread.id }}),
             threadCheckboxEnabled: Boolean({{ article.discussionThread.open }}),
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
@@ -203,7 +204,7 @@
         methods: {
             changeThreadStatus: function (event) {
                 var self = this;
-                var changeThreadStatusEndpoint = '/threads/' + {{ article.discussionThread.id }} + '/';
+                var changeThreadStatusEndpoint = '/threads/' + self.threadId + '/';
 
                 self.threadEnabled = event.target.checked;
 
@@ -232,7 +233,7 @@
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
-                axios.get('/threads/' + {{ article.discussionThread.id }} + '/posts/', {
+                axios.get('/threads/' + self.threadId + '/posts/', {
                     params: {
                         cursor: self.cursorNext
                     }
@@ -323,7 +324,7 @@
 
                     self.postCommentButtonIsEnabled = false;
 
-                    axios.post('/threads/' + {{ article.discussionThread.id }} + '/posts', {
+                    axios.post('/threads/' + self.threadId + '/posts', {
                         content: self.comment
                     }).then(function (response) {
 
