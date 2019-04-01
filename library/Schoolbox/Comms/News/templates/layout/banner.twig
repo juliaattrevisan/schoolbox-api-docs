@@ -213,21 +213,30 @@
                 self.threadEnabled = event.target.checked;
 
 
-                // Activate toast early, because the associate thread action
-                // has things to do
-                $toast.toastActivate({text: self.savingText});
-                var associateThreadAction;
+                var changeThreadStatusAction;
                 if (self.threadId) {
-                    // I already have a thread ID: always proceed
-                    associateThreadAction = new Promise(function(resolve) {
-                        resolve();
+                    // I already have a thread ID: switch it on/off
+                    changeThreadStatusAction = new Promise(function(resolve, reject) {
+                        var changeThreadStatusEndpoint = '/threads/' + String(self.threadId) + '/';
+
+                        if (self.threadEnabled) {
+                            changeThreadStatusEndpoint += 'open';
+                        } else {
+                            changeThreadStatusEndpoint += 'close';
+                        }
+
+                        axios.put(changeThreadStatusEndpoint, {}, { headers: postHeaders }).then(function () {
+                            resolve();
+                        }).catch(function (error) {
+                            reject(error);
+                        });
                     });
                 } else {
                     // No thread ID.
                     // 1: create a new thread
                     // 2: associate it with this context
                     // 3: set this object's thread ID
-                    associateThreadAction = new Promise(function(resolve, reject) {
+                    changeThreadStatusAction = new Promise(function(resolve, reject) {
                         axios
                             .post(self.createThreadEndpoint, { open: self.threadEnabled }, { headers: postHeaders })
                             .then(function (response) {
@@ -242,37 +251,25 @@
                                         self.threadId = threadId;
                                         resolve();
                                     })
-                                    .catch(function () {
-                                        reject(Error('Could not create thread!'));
+                                    .catch(function (error) {
+                                        reject(error);
                                     })
                             })
                             .catch(function () {
-                                reject(Error('Could not create thread!'));
+                                reject(error);
                             });
                     });
                 }
 
 
-                // Actually run the promise, and if it succeeds toggle the
-                // thread's status
-                associateThreadAction
+                // Actually run the promise, setting the toast accordingly
+                $toast.toastActivate({text: self.savingText});
+                changeThreadStatusAction
                     .then(function () {
-                        var changeThreadStatusEndpoint = '/threads/' + String(self.threadId) + '/';
-
                         if (self.threadEnabled) {
-                            changeThreadStatusEndpoint += 'open';
-                        } else {
-                            changeThreadStatusEndpoint += 'close';
+                            self.loadCkEditor();
                         }
-
-                        axios.put(changeThreadStatusEndpoint, {}, { headers: postHeaders }).then(function () {
-                            if (self.threadEnabled) {
-                                self.loadCkEditor();
-                            }
-                            $toast.toastTimeout({text: self.savedText, duration: 2000});
-                        }).catch(function (error) {
-                            reject(error);
-                        });
+                        $toast.toastTimeout({text: self.savedText, duration: 2000});
                     })
                     .catch(function (error) {
                         $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
