@@ -144,8 +144,6 @@ class Controller extends Base
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
                    AND rc.rubric_group_id = rg.id
             LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = a.id
-                   AND vrm.capability_id = rgu.rubric_group_id
-                   AND vrm.indicator_id = rcu.criterion_id
             WHERE      sb.category=:folderId AND a.deleted_at IS NULL
             ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
@@ -355,58 +353,6 @@ class Controller extends Base
                     $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
 
                     if ($capabilityDatabaseMark !== null) {
-                        /* TODO capability max is coming back null in some cases, when it shouldn't
-                            but the following raw queries suggest everything is fine:
-
-                            select sb.name, rg.id as capability_id, rgu.max_value as capability_max
-                            from rubric_group_usage rgu
-                            inner join rubric_group rg on rgu.rubric_group_id = rg.id
-                            inner join submission_box sb on rgu.submission_box_id = sb.id
-                            inner join assessment a on a.id = sb.assessment_id
-                            where a.id=378;
-
-                            select * from rubric_group_usage rgu where rgu.submission_box_id = 91;
-
-                            select * from v_rubric_mark where assessment_id=378;
-                         */
-                        /* TODO observe different, incorrect results from the following:
-                            but if you change the left join to an inner join, the row with the invalid data goes away.
-
-                            SELECT a.id as assessment_id,
-                            a.title AS assessment_name,
-                            sb.rubric_group_marks AS assessment_rubric_group_marks,
-                            sb.submission_grade_group_id AS assessment_grade_group_id,
-                            sb.mark_type as assessment_mark_type,
-                            sb.max_mark as assessment_max_mark,
-                            rgu.rubric_group_id AS capability_id,
-                            vrm.capability_max_value as capability_max_value,
-                            rg.name AS capability_name,
-                            rcu.criterion_id AS indicator_id,
-                            vrm.indicator_max_value as indicator_max_value,
-                            rc.name AS indicator_name
-                            FROM       assessment a
-                            INNER JOIN submission_box sb ON sb.assessment_id = a.id
-                            INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
-                            INNER JOIN rubric_group rg ON rgu.rubric_group_id = rg.id
-                            INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
-                            INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
-                                   AND rc.rubric_group_id = rg.id
-                            LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = a.id
-                                   AND vrm.capability_id = rgu.rubric_group_id
-                                   AND vrm.indicator_id = rcu.criterion_id
-                            WHERE      a.id = 378 AND a.deleted_at IS NULL
-                            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id;
-
-                        /* TODO the left join is adding an additional indicator which is breaking things, yet according to
-                            this query indicator 159 IS used on the assessment:
-                        
-                            select sb.name, rc.id as indicator_id
-                            from rubric_criterion_usage rcu
-                            inner join rubric_criterion rc on rcu.criterion_id = rc.id
-                            inner join submission_box sb on rcu.submission_box_id = sb.id
-                            inner join assessment a on a.id = sb.assessment_id
-                            where a.id=378;
-                         */
                         $capabilityMaxMark = $capabilityInFolder['maxMark'];
 
                         $capabilityUsageModel = new CapabilityUsage(new Capability());
