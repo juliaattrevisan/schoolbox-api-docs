@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Realtime\MessageList;
 
-use Alaress\Async\Notification\Instance\Instance;
 use Predis\ClientInterface;
 use Predis\Command\RawCommand;
+use Predis\Response\ServerException;
 
 /**
  * An event object based list interface.
@@ -52,12 +52,31 @@ class EventObjectList extends AbstractList
         }
 
         // delete one by one
+        $useUnlink = true;
         foreach ($idList as $key) {
-            $this->redis->executeCommand(new RawCommand(['UNLINK', $key]));
+            if ($useUnlink) {
+                try {
+                    $this->redis->executeCommand(new RawCommand(['UNLINK', $key]));
+                } catch (ServerException $e) {
+                    $useUnlink = false;
+                    $this->redis->del([$key]);
+                }
+            } else {
+                $this->redis->del([$key]);
+            }
         }
 
         // delete this set
-        $this->redis->executeCommand(new RawCommand(['UNLINK', $this->getRedisSetKey()]));
+        if ($useUnlink) {
+            try {
+                $this->redis->executeCommand(new RawCommand(['UNLINK', $this->getRedisSetKey()]));
+            } catch (ServerException $e) {
+                $this->redis->del([$this->getRedisSetKey()]);
+            }
+        } else {
+            $this->redis->del([$this->getRedisSetKey()]);
+        }
+
         return;
     }
 
