@@ -193,6 +193,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
      */
     public const ERROR_COMMS_NEWS_INVALID_TOPIC = 224;
 
+    public const ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED = 225;
+
 
     /**
      * Setup mapping

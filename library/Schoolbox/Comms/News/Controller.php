@@ -26,6 +26,7 @@ use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -106,6 +107,9 @@ class Controller extends Base
     /** @var Thread\Mapper */
     private $threadMapper;
 
+    /** @var ErrorMapper */
+    private $errorMapper;
+
     private const DEFAULT_SEARCH_LIMIT = 10;
 
 
@@ -122,6 +126,7 @@ class Controller extends Base
      * @param Audience\UserResolver            $userResolver
      * @param Audience\Segment\StrategyFactory $strategyFactory
      * @param Thread\Mapper                    $threadMapper
+     * @param ErrorMapper                      $errorMapper
      */
     public function __construct(
         Mapper $newsMapper,
@@ -135,7 +140,8 @@ class Controller extends Base
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
         Audience\Segment\StrategyFactory $strategyFactory,
-        Thread\Mapper $threadMapper
+        Thread\Mapper $threadMapper,
+        ErrorMapper $errorMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -149,6 +155,7 @@ class Controller extends Base
         $this->userResolver               = $userResolver;
         $this->strategyFactory            = $strategyFactory;
         $this->threadMapper               = $threadMapper;
+        $this->errorMapper                = $errorMapper;
     }
 
 
@@ -537,9 +544,14 @@ class Controller extends Base
      */
     public function postAssociateWithDiscussionThread(Model $article): void
     {
-        /** @var Thread\Model $discussionThread */
-        $discussionThread = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
-        $article->setDiscussionThread($discussionThread);
+        /** @var Thread\Model $thread */
+        $thread = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
+        if ($this->threadMapper->isThreadAlreadyAssociated($thread)) {
+            // Can't re-associate a thread
+            $this->errorMapper->generateException(ErrorMapper::ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED);
+        }
+
+        $article->setDiscussionThread($thread);
         $this->newsMapper->save($article);
 
         // No point responding with any content
@@ -966,8 +978,6 @@ class Controller extends Base
      */
     private function getBasicFolderDetailsById(int $folderId) :?array
     {
-        $errorMapper = \Schoolbox\Error\Mapper::getInstance();
-
         try {
             $folder = $this->folderMapper->findCheaplyById($folderId);
 
@@ -977,7 +987,7 @@ class Controller extends Base
             ];
 
         } catch (MapperException $e) {
-            throw $errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
     }
 

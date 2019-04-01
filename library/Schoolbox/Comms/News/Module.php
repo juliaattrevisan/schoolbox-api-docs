@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
@@ -235,6 +236,7 @@ class Module extends BaseModule
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
             'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
+            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
         ];
     }
 
