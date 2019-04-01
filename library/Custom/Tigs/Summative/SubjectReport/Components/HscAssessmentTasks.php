@@ -139,6 +139,11 @@ class HscAssessmentTasks extends BaseComponent
             return null;
         }
 
+        // Is grade visibility off for the current viewer?
+        if (!$classAssessment->isFeedbackVisibleToUser($this->viewer)) {
+            return null;
+        }
+
         // Ensure there is only 1 such assessment per UnitSpec imported to a class
         $cohortAssessmentsPerFolder = $cohortAssessments->groupByCallback(function (IAssessable $assessable) {
             return $assessable->getBaseContext()->getFolder()->getId();
