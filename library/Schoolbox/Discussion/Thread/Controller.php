@@ -66,16 +66,7 @@ class Controller extends BaseController
      */
     public function getThread(Model $thread): void
     {
-        $responseData             = $thread->jsonSerialize(
-            $this->retrieveJsonDecorator(),
-            $this->retrieveLinkDecorator()
-        );
-        $responseData['children'] = $this->retrievePostList($thread, null);
-        $this->response->content->set(
-            $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
-        );
+        $this->buildResponse($thread);
     }
 
 
@@ -92,8 +83,10 @@ class Controller extends BaseController
      */
     public function createThread(): void
     {
-        $thread = $this->threadMapper->createModel();
+        $thread = $this->threadMapper->createModel()
+            ->setOpen(true);
         $this->threadMapper->save($thread);
+        $this->buildResponse($thread);
     }
 
 
@@ -251,5 +244,26 @@ class Controller extends BaseController
                 ],
             ],
         ];
+    }
+
+
+    /**
+     * Builds a response for this thread, putting it into
+     * `$this->response->content`.
+     *
+     * @param Model $thread
+     */
+    private function buildResponse(Model $thread): void
+    {
+        $responseData             = $thread->jsonSerialize(
+            $this->retrieveJsonDecorator(),
+            $this->retrieveLinkDecorator()
+        );
+        $responseData['children'] = $this->retrievePostList($thread, null);
+        $this->response->content->set(
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
+        );
     }
 }
