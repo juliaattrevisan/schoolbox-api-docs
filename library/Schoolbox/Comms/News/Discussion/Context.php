@@ -4,12 +4,13 @@
  * @link      http://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
+namespace Schoolbox\Comms\News\Discussion;
+
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
-
-declare(strict_types=1);
-
 
 /**
  * Discussion threads context for comms articles.
@@ -51,7 +52,7 @@ class Context implements IContext
     /**
      * @inheritDoc
      *
-     * @param  int $id
+     * @param int $id
      * @return mixed|News\Model
      * @throws \Schoolbox\Mapper\Exception         if fetch failed
      * @throws \Schoolbox\Mapper\Exception\Deleted if object was deleted
