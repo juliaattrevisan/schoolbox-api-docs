@@ -81,6 +81,12 @@ class Module extends BaseModule
         );
         $this->register(
             'POST',
+            '',
+            'createThread',
+            new Auth\Rule\IsLoggedIn()
+        );
+        $this->register(
+            'POST',
             '/{id:\d+}/posts',
             'createPostInThread',
             $postAuthorizer,

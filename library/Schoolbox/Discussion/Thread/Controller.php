@@ -80,6 +80,24 @@ class Controller extends BaseController
 
 
     /**
+     * Create a new thread.
+     *
+     * This thread is created in an orphaned state: it is not associated with
+     * any particular context. It's the responsibility of the client to
+     * associate it with something.
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     * @api   GET /threads/{id}/posts
+     * @level 190
+     */
+    public function createThread(): void
+    {
+        $thread = $this->threadMapper->createModel();
+        $this->threadMapper->save($thread);
+    }
+
+
+    /**
      * Get a list of posts in the given thread.
      *
      * @api   GET /threads/{id}/posts
