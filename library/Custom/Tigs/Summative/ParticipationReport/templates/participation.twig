@@ -161,6 +161,7 @@ Data:
 </div>
 
 {% for i in 1..2 %}
+    {% if deansComments[i] %}
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Dean's Comment - Semester {{ i }}</h2>
@@ -169,6 +170,7 @@ Data:
             </section>
         </div>
     </div>
+    {% endif %}
 {% endfor %}
 
 <div class="row">
