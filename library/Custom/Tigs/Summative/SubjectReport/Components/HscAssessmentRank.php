@@ -160,7 +160,7 @@ class HscAssessmentRank extends BaseComponent
 
 
     /**
-     * Returns all normalised marks for the cohort. Ignores feedback visibility
+     * Returns all normalised marks for the cohort. Respects assessment's grade visibility
      *
      * @param GenericCollection|IAssessable[] $cohortAssessments
      * @return float[]
@@ -169,6 +169,9 @@ class HscAssessmentRank extends BaseComponent
     {
         $cohortMarks = [];
         foreach ($cohortAssessments as $assessable) {
+            if (!$assessable->isFeedbackVisibleToUser($this->viewer)) {
+                continue;
+            }
             foreach ($assessable->getAllParticipants() as $participant) {
                 $authFeedback = $participant->getAuthoritativeFeedback(true);
                 if (!$authFeedback) {
