@@ -204,7 +204,7 @@
             errorAddingCommentText: 'Unable to post comment',
             postCommentButtonIsEnabled: true,
             createThreadEndpoint: "{{ routeLookup('discussionThreads.createThread') }}",
-            associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread') }}",
+            associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {id: article.id}) }}",
         },
         // define methods under the `methods` object
         methods: {
@@ -280,6 +280,14 @@
             },
             getThread: function() {
                 var self = this;
+
+                // Short-circuit if no thread ID
+                if (!self.threadId) {
+                    self.showSkeletonLoader = false;
+                    self.loadMoreIsEnabled = true;
+                    self.showCommentsCount = true;
+                    return;
+                }
 
                 self.loadMoreIsEnabled = false;
                 self.showSkeletonLoader = true;
