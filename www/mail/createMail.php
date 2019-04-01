@@ -5,7 +5,7 @@
  *                                                           *
  ************************************************************/
 //enable users to send email
-use Alaress\Mail\AbstractMailer;
+use Alaress\Mail\Codec;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -67,7 +67,7 @@ if (Cfg::get('mail_enable') == 1) {
     }
 
     foreach ($addressLists['replyto'] as $replyToKey => $replyTo) {
-        $addressLists['replyto'][$replyToKey] = str_replace(\chr(AbstractMailer::COMMA_REPLACEMENT), ',', $replyTo);
+        $addressLists['replyto'][$replyToKey] = Codec::decode($replyTo);
     }
 
     $output = array(
