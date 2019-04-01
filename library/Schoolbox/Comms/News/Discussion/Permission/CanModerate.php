@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\User;
 
 /**
@@ -36,12 +37,12 @@ class CanModerate extends BaseStrategy
     /**
      * Constructor
      *
-     * @param Authorizer  $authorizer
-     * @param News\Mapper $mapper
+     * @param Authorizer $authorizer
+     * @param IContext   $context
      */
-    public function __construct(Authorizer $authorizer, News\Mapper $mapper)
+    public function __construct(Authorizer $authorizer, IContext $context)
     {
-        parent::__construct($mapper);
+        parent::__construct($context);
         $this->authorizer = $authorizer;
     }
 

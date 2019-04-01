@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Discussion\Permission;
 
-use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
 
 /**
@@ -19,19 +19,19 @@ use Schoolbox\Discussion\Thread\Model as ThreadModel;
 abstract class BaseStrategy implements IStrategy
 {
     /**
-     * @var Mapper
+     * @var IContext
      */
-    private $mapper;
+    private $context;
 
 
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param IContext $context
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(IContext $context)
     {
-        $this->mapper = $mapper;
+        $this->context = $context;
     }
 
 
@@ -41,6 +41,6 @@ abstract class BaseStrategy implements IStrategy
      */
     public function retrieveAssociations(ThreadModel $thread): iterable
     {
-        return $this->mapper->findByColumn('discussion_thread_id', $thread->getId());
+        return $this->context->findAssociations($thread);
     }
 }

@@ -37,27 +37,28 @@ class Module extends BaseModule
         /** @var News\Mapper     $newsMapper */
         $authorizer     = $this->getInjector()->get('authorizer');
         $newsMapper     = $this->getMapperFactory()->get(News\Mapper::class);
+        $commsContext   = new News\Discussion\Context($newsMapper);
         $getAuthorizer  = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new CanActUponThread(
-                    new News\Discussion\Permission\CanGet($authorizer, $newsMapper)
+                    new News\Discussion\Permission\CanGet($authorizer, $commsContext)
                 );
             })
         );
         $postAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new CanActUponThread(
-                    new News\Discussion\Permission\CanPost($authorizer, $newsMapper)
+                    new News\Discussion\Permission\CanPost($authorizer, $commsContext)
                 );
             })
         );
         $moderateAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new CanActUponThread(
-                    new News\Discussion\Permission\CanModerate($authorizer, $newsMapper)
+                    new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
                 );
             })
         );

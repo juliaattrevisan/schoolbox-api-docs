@@ -38,21 +38,22 @@ class Module extends BaseModule
         /** @var News\Mapper     $newsMapper */
         $authorizer       = $this->getInjector()->get('authorizer');
         $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
+        $commsContext     = new News\Discussion\Context($newsMapper);
         $deleteAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new IsPostAuthor(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanModerate($authorizer, $newsMapper)
+                    new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
                 );
             })
         );
         $getAuthorizer    = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new IsPostAuthor(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanGet($authorizer, $newsMapper)
+                    new News\Discussion\Permission\CanGet($authorizer, $commsContext)
                 );
             })
         );
