@@ -83,8 +83,10 @@ class Controller extends BaseController
      */
     public function createThread(): void
     {
+        /** @var \stdClass $data */
+        $data   = $this->request->content->get();
         $thread = $this->threadMapper->createModel()
-            ->setOpen(true);
+            ->setOpen($data->open);
         $this->threadMapper->save($thread);
         $this->buildResponse($thread, false);
     }
