@@ -204,7 +204,7 @@
             errorAddingCommentText: 'Unable to post comment',
             postCommentButtonIsEnabled: true,
             createThreadEndpoint: "{{ routeLookup('discussionThreads.createThread') }}",
-            associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {id: article.id}) }}",
+            associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {articleId: article.id}) }}",
         },
         // define methods under the `methods` object
         methods: {
