@@ -428,16 +428,17 @@ class DataSource
     /**
      * Removes participation objects for students who are excluded and
      * don't have a class/group relationship to the assessment's folder.
+     *
      * @param IAssessable[]|GenericCollection $assessments
      * @throws UnexpectedValueException If unable to merge student collections
      */
     private function removeExcluded(GenericCollection $assessments): void
     {
         foreach ($assessments as $assessment) {
-            $allStudents = $this->findAllStudentsForAssessment($assessment);
+            $currentMembers = $this->findAllStudentsForAssessment($assessment);
             foreach ($assessment->getPlans() as $plan) {
                 foreach ($plan->getParticipants() as $userId => $participant) {
-                    if ($participant->isExcluded() && !$allStudents->offsetExists($userId)) {
+                    if ($participant->isExcluded() && !$currentMembers->offsetExists($userId)) {
                         $plan->getParticipants()->offsetUnset($userId);
                     }
                 }
