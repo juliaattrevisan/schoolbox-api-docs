@@ -43,6 +43,19 @@ class Mapper extends BaseMapper
 
 
     /**
+     * Is the given thread already associated with a context?
+     *
+     * @param Model $thread
+     * @return bool
+     */
+    public function isThreadAlreadyAssociated(Model $thread): bool
+    {
+        // TODO consider moving into a context object (\Schoolbox\Discussion\Thread\Context\IContext)
+        return $this->getJoinMapper('posts')->countByColumn('discussion_thread_id', $thread->getId()) > 0;
+    }
+
+
+    /**
      * Post-delete for threads: delete all posts within as well.
      *
      * @param Model $model
