@@ -233,6 +233,9 @@ class DataSource
 
 
     /**
+     * Adds participation objects for students who have a class/group relationship
+     * to the assessment's folder and do not have an explicit participation record.
+     *
      * @param PlanObject[]|GenericCollection $dynamicPlans
      * @throws UnexpectedValueException If unable to merge student collections
      */
