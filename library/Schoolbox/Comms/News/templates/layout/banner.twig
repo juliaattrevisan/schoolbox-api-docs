@@ -341,6 +341,7 @@
                         CKEDITOR.instances['comment'].setData(self.comment);
 
                     }).catch(function (error) {
+                        self.postCommentButtonIsEnabled = true;
                         $toast.toastTimeout({text: self.errorAddingCommentText, duration: 2000, css: 'alert'});
                     });
                 }
