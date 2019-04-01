@@ -100,7 +100,7 @@ Data:
     </div>
 
     <div class="column small-12 medium-6">
-        {% if nesaGraphData %}
+        {% if nesaGraphData and not nesaGraphData.hideComponent %}
             <h2 class="subheader">NESA Score</h2>
             {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData only %}
         {% else %}
