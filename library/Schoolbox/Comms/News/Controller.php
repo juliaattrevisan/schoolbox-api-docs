@@ -9,9 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule\All;
-use Alaress\Authorizer\Rule\HasServicePermission;
-use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
@@ -28,6 +25,7 @@ use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Discussion\Thread;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -105,6 +103,9 @@ class Controller extends Base
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
 
+    /** @var Thread\Mapper */
+    private $threadMapper;
+
     private const DEFAULT_SEARCH_LIMIT = 10;
 
 
@@ -120,6 +121,7 @@ class Controller extends Base
      * @param Audience\ArticleResolver         $articleResolver
      * @param Audience\UserResolver            $userResolver
      * @param Audience\Segment\StrategyFactory $strategyFactory
+     * @param Thread\Mapper                    $threadMapper
      */
     public function __construct(
         Mapper $newsMapper,
@@ -132,7 +134,8 @@ class Controller extends Base
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
-        Audience\Segment\StrategyFactory $strategyFactory
+        Audience\Segment\StrategyFactory $strategyFactory,
+        Thread\Mapper $threadMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -145,6 +148,7 @@ class Controller extends Base
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
         $this->strategyFactory            = $strategyFactory;
+        $this->threadMapper               = $threadMapper;
     }
 
 
@@ -517,6 +521,29 @@ class Controller extends Base
             $this->getResponse()->redirect->afterPost($nextStep);
             return;
         }
+    }
+
+
+    /**
+     * Associate this article with a discussion thread (passed in $post['discussionThreadId']).
+     *
+     * @api POST /news/{articleId}/associateWithThread/{discussionThreadId}
+     * @level 19.0
+     *
+     * @param Model $article
+     * @throws MapperException                       if save, or retrieval of the thread, failed
+     * @throws MapperException\Deleted               if the thread was deleted
+     * @throws \Aura\Web\Exception\InvalidStatusCode if somehow 204 becomes invalid?
+     */
+    public function postAssociateWithDiscussionThread(Model $article): void
+    {
+        /** @var Thread\Model $discussionThread */
+        $discussionThread = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
+        $article->setDiscussionThread($discussionThread);
+        $this->newsMapper->save($article);
+
+        // No point responding with any content
+        $this->response->status->setCode(204);
     }
 
 

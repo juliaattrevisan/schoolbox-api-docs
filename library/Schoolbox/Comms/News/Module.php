@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
@@ -164,6 +165,13 @@ class Module extends BaseModule
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticle);             // Update news article
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticle);
+        $this->register(
+            'POST',
+            '/news/{articleId:\d+}/associateWithThread/{discussionThreadId:\d+}',
+            'postAssociateWithDiscussionThread',
+            $canModify,
+            $preloadArticle
+        );
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
@@ -226,6 +234,7 @@ class Module extends BaseModule
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
+            'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
         ];
     }
 
