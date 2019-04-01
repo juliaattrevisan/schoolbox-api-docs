@@ -154,7 +154,7 @@ class DataSource
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to derive project participant collection
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null, $removeExcluded = false): Collection
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null, bool $removeExcluded = false): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
@@ -191,7 +191,7 @@ class DataSource
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null, $removeExcluded = false): void
+    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null, bool $removeExcluded = false): void
     {
         // Clear all participation from $assessments
         $this->clearParticipants($assessments);
