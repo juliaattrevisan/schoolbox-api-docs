@@ -168,7 +168,7 @@ class Module extends BaseModule
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticle);
         $this->register(
             'POST',
-            '/news/{articleId:\d+}/associateWithThread/{discussionThreadId:\d+}',
+            '/{id:\d+}/associateWithThread',
             'postAssociateWithDiscussionThread',
             $canModify,
             $preloadArticle
