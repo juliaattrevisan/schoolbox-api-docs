@@ -203,22 +203,71 @@
             commentHasBeenAddedText: 'Comment has been added',
             errorAddingCommentText: 'Unable to post comment',
             postCommentButtonIsEnabled: true,
+            createThreadEndpoint: "{{ routeLookup('discussionThreads.createThread') }}",
+            associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread') }}",
         },
         // define methods under the `methods` object
         methods: {
             changeThreadStatus: function (event) {
                 var self = this;
-                var changeThreadStatusEndpoint = '/threads/' + String(this.threadId) + '/';
-
                 self.threadEnabled = event.target.checked;
+
+
+                // Activate toast early, because the associator has things to do
+                $toast.toastActivate({text: self.savingText});
+
+
+                // Only if the thread isn't associated:
+                // 1: get the thread ID, or create a new one
+                // 2: associate it with this context
+                // 3: set this object's thread ID
+                if (!self.threadId) {
+                    var getThreadIdAction = new Promise(function(resolve, reject) {
+                        axios
+                            .post(self.createThreadEndpoint, { open: self.threadEnabled }, { headers: postHeaders })
+                            .then(function (response) {
+                                var threadId = response.data.id,
+                                    params   = new URLSearchParams();
+                                params.append('discussionThreadId', threadId);
+                                axios
+                                    .post(self.associateThreadEndpoint, params, { headers: postHeaders })
+                                    .then(function () {
+                                        resolve(threadId);
+                                    })
+                                    .catch(function () {
+                                        reject(Error('Could not create thread!'));
+                                    })
+                            })
+                            .catch(function () {
+                                reject(Error('Could not create thread!'));
+                            });
+                    });
+
+                    getThreadIdAction
+                        .then(function (threadId) {
+                            self.threadId = threadId;
+                        })
+                        .catch(function (error) {
+                            $toast.toastTimeout({text: self.unableToSaveText, duration: 2000, css: 'alert'});
+                        });
+                }
+
+
+                // Still no thread ID: exit
+                if (!self.threadId) {
+                    return;
+                }
+
+
+                // Now I'm sure there's a thread and it's associated:
+                // enable/disable the thread
+                var changeThreadStatusEndpoint = '/threads/' + String(this.threadId) + '/';
 
                 if (self.threadEnabled) {
                     changeThreadStatusEndpoint += 'open';
                 } else {
                     changeThreadStatusEndpoint += 'close';
                 }
-
-                $toast.toastActivate({text: self.savingText});
 
                 axios.put(changeThreadStatusEndpoint, {}, { headers: postHeaders }).then(function () {
                     if (self.threadEnabled) {
