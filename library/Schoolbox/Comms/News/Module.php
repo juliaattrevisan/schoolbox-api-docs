@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Comms\News;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
@@ -16,6 +17,8 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Comms\News\Discussion\Context;
+use Schoolbox\Comms\News\Discussion\Permission\CanModerate;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -23,6 +26,7 @@ use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 class Module extends BaseModule
 {
@@ -131,6 +135,16 @@ class Module extends BaseModule
             );
         });
 
+        // Associating a discussion thread with a comms article:
+        // Use the authorizer the discussion thread uses.
+        $canAssociate = new Rule\Callback(function ($params, ?User $user) {
+            $authorizer = $this->getInjector()->get('authorizer');
+            $rule       = new CanModerate($authorizer, new Context($this->getMapperFactory()->get(Mapper::class)));
+            if (!$rule->hasPermission($params['article'], $user)) {
+                throw new Unauthorized('User does not have permission to associate a thread with this article');
+            }
+        });
+
         $viewRecipients = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -170,7 +184,7 @@ class Module extends BaseModule
             'POST',
             '/{articleId:\d+}/associateWithThread',
             'postAssociateWithDiscussionThread',
-            $canModify,
+            $canAssociate,
             $preloadArticle
         );
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
