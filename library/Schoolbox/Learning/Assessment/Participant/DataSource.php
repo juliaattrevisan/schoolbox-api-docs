@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -148,19 +147,20 @@ class DataSource
      *
      * @param Collection|IAssessable[] $assessments
      * @param User|null                $user            If specified, only load this user's interactions
+     * @param bool                     $removeExcluded  Set to true to exclude excluded non-member participants
      * @return Collection|IAssessable[] $assessments, with participation loaded.
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
      * @throws UnexpectedValueException If unable to derive project participant collection
      */
-    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null): Collection
+    public function loadParticipationIntoAssessmentCollection(Collection $assessments, User $user = null, bool $removeExcluded = false): Collection
     {
         /** @var Collection|IAssessable[] $assessableWithDescendants */
         $assessableWithDescendants = new GenericCollection(IAssessable::class);
         $this->mergeSubAssessments($assessableWithDescendants, $assessments);
 
         // Load participants for all assessments, plus activities in projects
-        $this->findForAssessmentCollection($assessableWithDescendants, $user);
+        $this->findForAssessmentCollection($assessableWithDescendants, $user, $removeExcluded);
 
         // Insert project participant objects into any project
         foreach ($assessableWithDescendants as $assessable) {
@@ -185,11 +185,12 @@ class DataSource
      *
      * @param IAssessable[]|GenericCollection $assessments     Indexed by assessment.id
      * @param null|User                       $user            If specified, only load this user's interactions
+     * @param bool                            $removeExcluded  Set to true to exclude excluded non-member participants
      * @throws UnexpectedValueException If unable to merge student collections
      * @throws DomainException If user has interaction but not participant record
      * @throws DefinitionException If unable to locate a specified mapper join
      */
-    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null): void
+    protected function findForAssessmentCollection(GenericCollection $assessments, User $user = null, bool $removeExcluded = false): void
     {
         // Clear all participation from $assessments
         $this->clearParticipants($assessments);
@@ -223,10 +224,17 @@ class DataSource
             $assessments,
             $this->feedbackDataSource->findForAssessmentCollection($assessments, $user)
         );
+
+        if ($removeExcluded) {
+            $this->removeExcluded($assessments);
+        }
     }
 
 
     /**
+     * Adds participation objects for students who have a class/group relationship
+     * to the assessment's folder and do not have an explicit participation record.
+     *
      * @param PlanObject[]|GenericCollection $dynamicPlans
      * @throws UnexpectedValueException If unable to merge student collections
      */
@@ -234,7 +242,7 @@ class DataSource
     {
         // Load dynamic participants into dynamic plans
         foreach ($dynamicPlans as $dynamicPlan) {
-            $assessment           = $dynamicPlan->getAssessable();
+            $assessment = $dynamicPlan->getAssessable();
             $explicitParticipants = $assessment->getAllParticipants();
 
             // It's acceptable to findAllStudents in a loop for now, because the list is cached
@@ -376,16 +384,16 @@ class DataSource
      * Finds all students who are participating in this assessment by virtue of class/group membership
      *
      * @param IAssessable $assessment
-     * @return Collection|User[]
+     * @return Collection|User[] indexed by userId
      * @throws UnexpectedValueException If unable to merge student collections
      */
     protected function findAllStudentsForAssessment(IAssessable $assessment)
     {
         $students = new Collection();
 
-        $context = $assessment->getContext();
-        if ($context instanceof UnitSpecification\Model) {
-            // Unit specifications have no participants
+        $context = $assessment->getBaseContext();
+        if ($assessment->isSpecification()) {
+            // Assessment specifications have no participants
             return $students;
         }
 
@@ -398,7 +406,7 @@ class DataSource
                 // Class members: convert to list of users
                 $classCodes = $this->externalDb->getStudents($folder->getCodeString());
                 if (!empty($classCodes)) {
-                    $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')));
+                    $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')))->indexBy('id');
                 }
             }
 
@@ -407,12 +415,34 @@ class DataSource
             $students = $students->mergeUnique(
                 $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true),
                 'id'
-            );
+            )->indexBy('id');
 
             $this->cacheForFolder[$folder->getId()] = $students;
 
         }
         return $this->cacheForFolder[$folder->getId()];
+    }
+
+
+    /**
+     * Removes participation objects for students who are excluded and
+     * don't have a class/group relationship to the assessment's folder.
+     *
+     * @param IAssessable[]|GenericCollection $assessments
+     * @throws UnexpectedValueException If unable to merge student collections
+     */
+    private function removeExcluded(GenericCollection $assessments): void
+    {
+        foreach ($assessments as $assessment) {
+            $currentMembers = $this->findAllStudentsForAssessment($assessment);
+            foreach ($assessment->getPlans() as $plan) {
+                foreach ($plan->getParticipants() as $userId => $participant) {
+                    if ($participant->isExcluded() && !$currentMembers->offsetExists($userId)) {
+                        $plan->getParticipants()->offsetUnset($userId);
+                    }
+                }
+            }
+        }
     }
 
 

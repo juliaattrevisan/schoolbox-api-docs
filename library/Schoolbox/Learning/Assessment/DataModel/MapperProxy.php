@@ -1168,6 +1168,7 @@ class MapperProxy
      *
      * @param Collection $collection
      * @param User       $user            If specified, only load this user's interactions
+     * @param bool       $removeExcluded  Set to true to exclude excluded non-member participants
      * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -1175,11 +1176,13 @@ class MapperProxy
      */
     public function loadParticipantsIntoAssessmentCollection(
         Collection $collection,
-        User $user = null
+        User $user = null,
+        bool $removeExcluded = false
     ) {
         return $this->participantDataSource->loadParticipationIntoAssessmentCollection(
             $collection,
-            $user
+            $user,
+            $removeExcluded
         );
     }
 
