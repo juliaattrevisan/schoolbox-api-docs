@@ -20,7 +20,6 @@ use Schoolbox\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -392,9 +391,9 @@ class DataSource
     {
         $students = new Collection();
 
-        $context = $assessment->getContext();
-        if ($context instanceof UnitSpecification\Model) {
-            // Unit specifications have no participants
+        $context = $assessment->getBaseContext();
+        if ($assessment->isSpecification()) {
+            // Assessment specifications have no participants
             return $students;
         }
 
