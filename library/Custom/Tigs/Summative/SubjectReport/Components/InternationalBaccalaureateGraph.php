@@ -141,9 +141,9 @@ class InternationalBaccalaureateGraph extends BaseComponent
         $studentComment = null;
         $error       = null;
         $header      = $this->generateHeader();
-        $hideComponent = false; // If exceptions occur, we need to show component so we can see those errors
+        $showComponent = true; // If exceptions occur, we need to show component so we can see those errors
         try {
-            [$markData, $studentMark, $studentComment, $hideComponent] = $this->collateMarks($this->collateAssessments());
+            [$markData, $studentMark, $studentComment, $showComponent] = $this->collateMarks($this->collateAssessments());
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
         } catch (MapperException $e) {
@@ -156,7 +156,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
             'studentMark'    => $studentMark,
             'studentComment' => $studentComment,
             'useComment'     => $this->getAttributes()->isDp(),
-            'hideComponent'  => $hideComponent,
+            'showComponent'  => $showComponent,
         ];
         if (isset($error)) {
             $context['error'] = $error;
@@ -269,7 +269,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
      * @return array 0: all marks; [mark value => number of students with this mark]
      *               1: the mark this student received, if any
      *               2: the comment this student received, if any
-     *               3: Whether we should hide this component completely
+     *               3: Whether we should show this component at all
      * @throws \Schoolbox\Mapper\Exception
      * @throws UnexpectedValueException if a folder has more or less than one MYP/DP assessment
      * @throws Router\Exception\RouteNotFound
@@ -279,7 +279,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
         $markData    = self::BASE_MARKS;
         $studentMark = null;
         $studentComment = null;
-        $hideComponent = true;
+        $showComponent = false;
         foreach ($ibAssessments as $folderId => $folderAssessments) {
             /**
              * @var Folder\Model    $folder
@@ -319,7 +319,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
 
             // Is viewer permitted to see this assessment and its grades, and assessment is for this folder?
             if ($this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                $hideComponent = false;
+                $showComponent = true;
             }
 
             foreach ($assessment->getAllParticipants() as $participant) {
@@ -388,7 +388,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
                 $markData[$mark]++;
             }
         }
-        return [$markData, $studentMark, $studentComment, $hideComponent];
+        return [$markData, $studentMark, $studentComment, $showComponent];
     }
 
 
