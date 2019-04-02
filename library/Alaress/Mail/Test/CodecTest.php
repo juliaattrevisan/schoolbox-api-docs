@@ -9,7 +9,6 @@ namespace Alaress\Mail\Test;
 
 use Alaress\Mail\Codec;
 use PHPUnit\Framework\TestCase;
-use PHPUnit\Util\Type;
 
 class CodecTest extends TestCase
 {
@@ -31,6 +30,30 @@ class CodecTest extends TestCase
     public function testDecode($input, $expected)
     {
         $this->assertEquals($expected, Codec::decode($input));
+    }
+
+    /**
+     * @dataProvider provider_dataIsNull
+     * @param $input
+     * @param $expected
+     *
+     * @expectedException \TypeError
+     */
+    public function testInvalidDecodeData($input, $expected)
+    {
+        $this->assertEquals($expected, Codec::decode($input));
+    }
+
+    /**
+     * @dataProvider provider_dataIsNull
+     * @param $input
+     * @param $expected
+     *
+     * @expectedException \TypeError
+     */
+    public function testInvalidEncodeData($input, $expected)
+    {
+        $this->assertEquals($expected, Codec::encode($input));
     }
 
     /**
@@ -63,7 +86,19 @@ class CodecTest extends TestCase
             [
                 '"English 3, 4, "But this is just, a trick" (and another, trick, yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
                 '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
-            ]
+            ],
+            [
+                'test@test.com; test@test.com',
+                'test@test.com; test@test.com'
+            ],
+            [
+                'test@test.com, test@test.com',
+                'test@test.com test@test.com'
+            ],
+            [
+                '',
+                ''
+            ],
         ];
     }
 
@@ -71,8 +106,8 @@ class CodecTest extends TestCase
      * Convert 0x1B to commas
      * @return array
      */
-    public function provider_testDecode() {
-
+    public function provider_testDecode()
+    {
         return [
             [
                 '"English 3 4 (EN344 EN123)" <alaress@schoolbox.com.au>',
@@ -97,6 +132,32 @@ class CodecTest extends TestCase
             [
                 '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>',
                 '"English 3, 4, "But this is just, a trick" (and another, trick, yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>'
+            ],
+            [
+                'test@test.com; test@test.com',
+                'test@test.com; test@test.com'
+            ],
+            [
+                'test@test.com test@test.com',
+                'test@test.com, test@test.com'
+            ],
+            [
+                '',
+                ''
+            ],
+        ];
+    }
+
+    /**
+     * What is the data is null? It should give us a TypeError
+     * @return array
+     */
+    public function provider_dataIsNull()
+    {
+        return [
+            [
+                null,
+                false,
             ]
         ];
     }
