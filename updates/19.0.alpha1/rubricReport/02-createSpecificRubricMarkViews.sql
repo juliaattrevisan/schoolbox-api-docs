@@ -1,6 +1,6 @@
 -- Specific views for capability and indicator marks only.
 CREATE OR REPLACE VIEW v_rubric_capability_mark AS
-SELECT DISTINCT
+  SELECT DISTINCT
     -- Assessment fields
     assessment_id,
     assessment_mark_type,
@@ -20,11 +20,11 @@ SELECT DISTINCT
     capability_sequence,
     capability_max_value,
     capability_mark
-FROM v_rubric_mark;
+  FROM v_rubric_mark;
 
 
 CREATE OR REPLACE VIEW v_rubric_indicator_mark AS
-SELECT DISTINCT
+  SELECT DISTINCT
     -- Assessment fields
     assessment_id,
     assessment_mark_type,
@@ -53,4 +53,4 @@ SELECT DISTINCT
     descriptor_id,
     descriptor_name,
     descriptor_max_value
-FROM v_rubric_mark;
+  FROM v_rubric_mark;
