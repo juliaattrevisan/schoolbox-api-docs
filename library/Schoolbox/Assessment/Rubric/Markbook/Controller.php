@@ -146,7 +146,7 @@ class Controller extends Base
             LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = a.id
                   AND vrm.indicator_id = rc.id
                   AND vrm.capability_id = rg.id
-            INNER JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = vrm.assessment_id
+            LEFT JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = vrm.assessment_id
                   AND vmrf.student_id = vrm.student_id
                   AND vmrf.feedback_id = vrm.feedback_id
                   AND vmrf.feedback_table = 'submission_return'
