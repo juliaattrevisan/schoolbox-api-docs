@@ -90,24 +90,23 @@ class NesaScoreGraph extends BaseComponent
      * Generates and returns a data structure, suitable for passing to twig.
      *
      * @return array
-     * @throws LogicException
      */
     public function toContext(): array
     {
-        $markData    = self::BASE_MARKS;
-        $studentMark = null;
-        $error       = null;
-        $hideComponent = false; // Don't hide if we error out
+        $markData      = self::BASE_MARKS;
+        $studentMark   = null;
+        $error         = null;
+        $showComponent = false; // Show if we error out
         try {
-            [$markData, $studentMark, $hideComponent] = $this->collateMarks($this->collateAssessables());
+            [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables());
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
         }
 
         $context = [
-            'data'         => $markData,
-            'studentValue' => $studentMark,
-            'hideComponent' => $hideComponent,
+            'data'          => $markData,
+            'studentMark'   => $studentMark,
+            'showComponent' => $showComponent,
         ];
         if (isset($error)) {
             $context['error'] = $error;
@@ -205,14 +204,14 @@ class NesaScoreGraph extends BaseComponent
      * @param array $assessables A set of assessments, from `$this->collateAssessments`.
      * @return array 0: all marks; [mark value => number of students with this mark]
      *               1: the mark this student received, if any
-     *               2: should we hide the whole component?
+     *               2: should we show the component at all?
      * @throws UnexpectedValueException if a folder has more or less than one MYP/DP assessment
      */
     private function collateMarks(array $assessables): array
     {
         $markData    = self::BASE_MARKS;
         $studentMark = null;
-        $hideComponent = true;
+        $showComponent = false;
         foreach ($assessables as $folderId => $folderAssessments) {
             /**
              * @var Folder\Model    $folder
@@ -252,7 +251,7 @@ class NesaScoreGraph extends BaseComponent
             // Is assessment for currently-viewed class, and are grades visible to current user?
             if ($this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
                 // Show the component, regardless of whether there are marks yet.
-                $hideComponent = false;
+                $showComponent = true;
             }
 
             foreach ($assessment->getAllParticipants() as $participant) {
@@ -282,6 +281,6 @@ class NesaScoreGraph extends BaseComponent
             }
         }
 
-        return [$markData, $studentMark, $hideComponent];
+        return [$markData, $studentMark, $showComponent];
     }
 }

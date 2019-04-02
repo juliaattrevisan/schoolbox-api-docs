@@ -115,7 +115,7 @@ class FinalAchievementLevels extends BaseComponent
             $falAssessables = $falAssessables->merge($this->findAssessmentsForFolderAndWorkType($unitSpec, $this->folder, $this->falWorkTypeId));
         }
         $falAssessables = $falAssessables->filter(function (IAssessable $assessable) {
-            return $this->isDueWithinReportWindow($assessable);
+            return $this->isDueWithinReportWindow($assessable) && $assessable->isParticipant($this->student);
         });
 
         // Did we find 2+ FAL assessments in this class?
@@ -165,13 +165,12 @@ class FinalAchievementLevels extends BaseComponent
             return null;
         }
 
-        // Don't render if student is not a participant, or has been excluded
-        $participant = $assessment->getParticipantIfExtant($this->student);
-        if (!$participant || $participant->isExcluded()) {
+        // Is grade visibility off for the current viewer?
+        if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
             return null;
         }
 
-        return ['data' => $this->buildAssessmentData($assessment, $participant)];
+        return ['data' => $this->buildAssessmentData($assessment, $assessment->getParticipant($this->student))];
     }
 
 
@@ -194,8 +193,8 @@ class FinalAchievementLevels extends BaseComponent
         /** @var DueWork\Feedback\Model $feedback */
         $feedback = $participant->getAuthoritativeFeedback(true);
 
-        // No feedback, or feedback should not be visible?
-        if (!$feedback || !$dueWork->isFeedbackVisibleToUser($this->viewer)) {
+        // No feedback?
+        if (!$feedback) {
             foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
                 $capabilityName = $capabilityUsage->getCapability()->getName();
                 foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {

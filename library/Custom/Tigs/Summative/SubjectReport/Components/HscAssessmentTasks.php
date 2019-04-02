@@ -139,6 +139,11 @@ class HscAssessmentTasks extends BaseComponent
             return null;
         }
 
+        // Is grade visibility off for the current viewer?
+        if (!$classAssessment->isFeedbackVisibleToUser($this->viewer)) {
+            return null;
+        }
+
         // Ensure there is only 1 such assessment per UnitSpec imported to a class
         $cohortAssessmentsPerFolder = $cohortAssessments->groupByCallback(function (IAssessable $assessable) {
             return $assessable->getBaseContext()->getFolder()->getId();
@@ -195,7 +200,7 @@ class HscAssessmentTasks extends BaseComponent
 
 
     /**
-     * Returns all normalised marks for the cohort. Ignores feedback visibility
+     * Returns all normalised marks for the cohort. Respects assessment's grade visibility
      *
      * @param GenericCollection|IAssessable[] $cohortAssessments
      * @return float[]
@@ -204,6 +209,9 @@ class HscAssessmentTasks extends BaseComponent
     {
         $cohortMarks = [];
         foreach ($cohortAssessments as $assessable) {
+            if (!$assessable->isFeedbackVisibleToUser($this->viewer)) {
+                continue;
+            }
             foreach ($assessable->getAllParticipants() as $participant) {
                 $authFeedback = $participant->getAuthoritativeFeedback(true);
                 if (!$authFeedback) {
