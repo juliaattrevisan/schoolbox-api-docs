@@ -89,4 +89,38 @@ class ValidationTest extends TestCase
             ],
         ];
     }
+
+
+    /**
+     * You should also test for error states that your code may raise.
+     * Use the `@expectedException` annotation to verify which exception class
+     * you expect your code to raise.
+     *
+     * @dataProvider getTestErrorRaisedData
+     * @expectedException \TypeError
+     */
+    public function testErrorRaised($input): void
+    {
+        $test = function (int $b) { return $b + 1; };
+        $test($input);
+    }
+
+
+    /**
+     * Data provider for `testErrorRaised`.
+     *
+     * @return array
+     */
+    public function getTestErrorRaisedData(): array
+    {
+        return [
+            1.5,
+            null,
+            'a string',
+            '1.5',
+            new \stdClass(),
+            [],
+            STDOUT,
+        ];
+    }
 }
