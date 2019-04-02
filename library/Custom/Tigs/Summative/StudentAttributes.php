@@ -40,7 +40,7 @@ class StudentAttributes
     private $term;
 
     /** @var int */
-    private $curriculumYear;
+    private $nowYear;
 
     /** @var int */
     private $curriculumYearLevel;
@@ -84,7 +84,7 @@ class StudentAttributes
         $this->firstDateTerm4Relative   = $config->get(Config::_TIGS_START_TERM_4);
         $this->yearLevel                = $this->deriveUserYearLevel($user);
         $this->isIb                     = (bool)$ibFlag; // If unknown (NULL), assume FALSE
-        $this->curriculumYear           = (int)$now->getUsingFormat('Y'); // TODO this is wrong, need to cover w/ unit tests
+        $this->nowYear                  = (int)$now->getUsingFormat('Y'); // TODO this is wrong, need to cover w/ unit tests
         $this->term                     = $this->deriveTerm($now);
         $this->curriculumYearLevel      = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
         $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
@@ -124,7 +124,7 @@ class StudentAttributes
     private function deriveTerm(Alaress_Date_Format $now): int
     {
         // Current Term + Semester
-        $nowYear = $this->curriculumYear;
+        $nowYear = $this->nowYear;
         $firstDayTerm2 = new Alaress_Date_Format(\strtotime($this->firstDateTerm2Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
         $firstDayTerm3 = new Alaress_Date_Format(\strtotime($this->firstDateTerm3Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
         $firstDayTerm4 = new Alaress_Date_Format(\strtotime($this->firstDateTerm4Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
@@ -204,7 +204,7 @@ class StudentAttributes
      */
     private function deriveCurriculumSemesterStartDate(int $yearLevel, int $term): Alaress_Date_Format
     {
-        $nowYear = $this->curriculumYear;
+        $nowYear = $this->nowYear;
 
         if ($yearLevel === 11 && $term === 4) {
             $start = $this->firstDateTerm4Relative . " $nowYear";
@@ -238,7 +238,7 @@ class StudentAttributes
     {
         $isYear11 = $yearLevel === 11;
         $isYear12 = $yearLevel === 12;
-        $nowYear = $this->curriculumYear;
+        $nowYear  = $this->nowYear;
 
         if ($isYear11 && $term === 3) {
             $end = $this->firstDateTerm4Relative . " $nowYear";
@@ -268,7 +268,7 @@ class StudentAttributes
      */
     private function deriveCurriculumYearStartDate(int $yearLevel, int $term): Alaress_Date_Format
     {
-        $nowYear = $this->curriculumYear;
+        $nowYear = $this->nowYear;
 
         if ($yearLevel >= 7 && $yearLevel <= 10) {
             $start = $this->firstDateTerm1Relative . " $nowYear";
@@ -299,7 +299,7 @@ class StudentAttributes
      */
     private function deriveCurriculumYearFinishDate(int $yearLevel, int $term): Alaress_Date_Format
     {
-        $nowYear = $this->curriculumYear;
+        $nowYear = $this->nowYear;
 
         if ($yearLevel === 11) {
             if (4 !== $term) {
