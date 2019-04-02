@@ -352,10 +352,11 @@
 
                 $.fn.alaressEditor({
                     targetElements: $('#comment'),
-                    removePlugins: 'autoembed,uploadimage,schoolboxiframe,link',
-                    removeButtons: 'Strike,Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                    removePlugins: 'uploadimage,link,schoolboxanchor',
+                    removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed,JustifyCenter,JustifyBlock',
                     toolbarGroups: [
                         {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                        {name: 'paragraph',  groups: [ 'list', 'blocks', 'align']},
                         {name: 'links', groups: ['links']},
                         {name: 'insert', groups: ['insert']},
                         /* Custom schoolbox-specific plugin stuff can go here
