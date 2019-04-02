@@ -67,6 +67,19 @@ class IntegerCodecTest extends TestCase
 
 
     /**
+     * Get data for `testInvalidEncodedValue`.
+     *
+     * @return iterable
+     */
+    public function getTestEncodedValueDecodesToNonIntegerErrorData(): iterable
+    {
+        yield 'float 4.5'  => ['NC41'];
+        yield 'string 4e4' => ['NGU0'];
+        yield 'string xxx' => ['eHh4'];
+    }
+
+
+    /**
      * @covers       \Alaress\Codec\IntegerCodec::encode
      * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
@@ -148,6 +161,22 @@ class IntegerCodecTest extends TestCase
      * @param mixed $encodedValue
      */
     public function testInvalidEncodedValue($encodedValue): void
+    {
+        $codec = new IntegerCodec();
+        $codec->decode($encodedValue);
+    }
+
+
+    /**
+     * Test that attempting to decode a value that decodes to a non-integer
+     * raises an error.
+     *
+     * @covers            \Alaress\Codec\IntegerCodec::decode
+     * @expectedException \UnexpectedValueException
+     * @dataProvider      getTestEncodedValueDecodesToNonIntegerErrorData
+     * @param mixed $encodedValue
+     */
+    public function testEncodedValueDecodesToNonIntegerError($encodedValue): void
     {
         $codec = new IntegerCodec();
         $codec->decode($encodedValue);

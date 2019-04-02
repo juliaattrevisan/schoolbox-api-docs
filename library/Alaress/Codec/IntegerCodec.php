@@ -38,7 +38,9 @@ class IntegerCodec implements ICodec
      *
      * @param string|null $encodedValue
      * @return int|null
-     * @throws \TypeError if $encodedValue isn't a string or null
+     * @throws \TypeError                if $encodedValue isn't a string or null
+     * @throws \UnexpectedValueException if $encodedValue is a string, but
+     *                                   decodes to a non-integer
      */
     public function decode($encodedValue): ?int
     {
@@ -48,6 +50,18 @@ class IntegerCodec implements ICodec
         if (!is_string($encodedValue)) {
             throw new \TypeError('Only string values may be decoded by this codec');
         }
-        return filter_var(base64_decode($encodedValue), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $decodedValue = base64_decode($encodedValue);
+
+        // Special cases:
+        // empty string: return null
+        if ($decodedValue === '') {
+            return null;
+        }
+
+        $rawValue = filter_var($decodedValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        if (!isset($rawValue)) {
+            throw new \UnexpectedValueException('Encoded value did not decode to an integer');
+        }
+        return $rawValue;
     }
 }
