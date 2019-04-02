@@ -1013,7 +1013,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Designed to work with the output from `\External_User::getSubjectList`.
      *
      * @param array $subjectList Contains "code" and "campusCode" keys
-     * @return Collection|Model[]
+     * @return GenericCollection|Model[]
      */
     public function findAllBySubjectList($subjectList)
     {
