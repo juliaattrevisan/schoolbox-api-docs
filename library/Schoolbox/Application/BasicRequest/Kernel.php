@@ -203,7 +203,9 @@ class Kernel extends WebKernelAbstract
         });
 
         // initialise session
-        $di->get('session')->start();
+        /** @var \Alaress\Session\Session $session */
+        $session = $di->get('session');
+        $session->start();
 
         // install sentry
         $sentryToken = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';

@@ -434,7 +434,9 @@ class Kernel extends WebKernelAbstract
         });
 
         // initialise session
-        $di->get('session')->start();
+        /** @var \Alaress\Session\Session $session */
+        $session = $di->get('session');
+        $session->start();
 
         $this->initModules();
     }

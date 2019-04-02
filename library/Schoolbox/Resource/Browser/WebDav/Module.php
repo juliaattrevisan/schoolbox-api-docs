@@ -33,7 +33,9 @@ class Module extends AbstractModule
         $lazyDav = $ci->lazy(function () use ($ci) {
             // open session first, because webdav factory needs session to
             // determine user's permissions
-            $ci->get('session')->start();
+            /** @var \Alaress\Session\Session $session */
+            $session = $ci->get('session');
+            $session->start();
             try {
                 return PortfolioWebDAV::factory();
             } catch (\UnexpectedValueException $e) {
