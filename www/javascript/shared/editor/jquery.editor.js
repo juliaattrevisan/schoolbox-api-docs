@@ -404,7 +404,6 @@
                      */
                     event.removeListener();
                 }
-
             });
         }
 	};
