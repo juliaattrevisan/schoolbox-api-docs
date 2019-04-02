@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Alaress_Date_Format;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -17,11 +18,17 @@ use InvalidArgumentException;
 class StudentAttributes
 {
 
-    // Hardcoded term dates for now
-    private const FIRST_DAY_TERM1_RELATIVE = '1 January';
-    private const FIRST_DAY_TERM2_RELATIVE = '1 April';
-    private const FIRST_DAY_TERM3_RELATIVE = '1 July';
-    private const FIRST_DAY_TERM4_RELATIVE = '1 October';
+    /** @var string */
+    private $firstDateTerm1Relative;
+
+    /** @var string */
+    private $firstDateTerm2Relative;
+
+    /** @var string */
+    private $firstDateTerm3Relative;
+
+    /** @var string */
+    private $firstDateTerm4Relative;
 
     /** @var int */
     private $yearLevel;
@@ -55,12 +62,14 @@ class StudentAttributes
 
 
     /**
-     * @param User        $user
-     * @param string|null $ibFlag
-     * @param string|null $nowOverride Enable now() simulation for testing
+     * @param IConfigLoader $config
+     * @param User          $user
+     * @param string|null   $ibFlag
+     * @param string|null   $nowOverride Enable now() simulation for testing
      * @throws InvalidArgumentException
      */
     public function __construct(
+        IConfigLoader $config,
         User $user,
         ?string $ibFlag = null,
         ?string $nowOverride = null
@@ -69,9 +78,13 @@ class StudentAttributes
             ? new Alaress_Date_Format(\strtotime($nowOverride), Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now();
 
+        $this->firstDateTerm1Relative   = $config->get(Config::_TIGS_START_TERM_1);
+        $this->firstDateTerm2Relative   = $config->get(Config::_TIGS_START_TERM_2);
+        $this->firstDateTerm3Relative   = $config->get(Config::_TIGS_START_TERM_3);
+        $this->firstDateTerm4Relative   = $config->get(Config::_TIGS_START_TERM_4);
         $this->yearLevel                = $this->deriveUserYearLevel($user);
         $this->isIb                     = (bool)$ibFlag; // If unknown (NULL), assume FALSE
-        $this->curriculumYear           = (int)$now->getUsingFormat('Y');
+        $this->curriculumYear           = (int)$now->getUsingFormat('Y'); // TODO this is wrong, need to cover w/ unit tests
         $this->term                     = $this->deriveTerm($now);
         $this->curriculumYearLevel      = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
         $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
@@ -112,9 +125,9 @@ class StudentAttributes
     {
         // Current Term + Semester
         $nowYear = $this->curriculumYear;
-        $firstDayTerm2 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM2_RELATIVE . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
-        $firstDayTerm3 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM3_RELATIVE . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
-        $firstDayTerm4 = new Alaress_Date_Format(\strtotime(self::FIRST_DAY_TERM4_RELATIVE . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
+        $firstDayTerm2 = new Alaress_Date_Format(\strtotime($this->firstDateTerm2Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
+        $firstDayTerm3 = new Alaress_Date_Format(\strtotime($this->firstDateTerm3Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
+        $firstDayTerm4 = new Alaress_Date_Format(\strtotime($this->firstDateTerm4Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
         if ($now->lt($firstDayTerm2)) {
             return 1;
         }
@@ -194,19 +207,19 @@ class StudentAttributes
         $nowYear = $this->curriculumYear;
 
         if ($yearLevel === 11 && $term === 4) {
-            $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            $start = $this->firstDateTerm4Relative . " $nowYear";
         } elseif ($yearLevel === 12) {
             if ($term === 1) {
                 $nowYear--;
-                $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+                $start = $this->firstDateTerm4Relative . " $nowYear";
             } else {
-                $start = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
+                $start = $this->firstDateTerm2Relative . " $nowYear";
             }
         } elseif (\in_array($term, [1, 2], true)) {
-            $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $start = $this->firstDateTerm1Relative . " $nowYear";
         } else {
             // Terms 3+4
-            $start = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
+            $start = $this->firstDateTerm3Relative . " $nowYear";
         }
 
         return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
@@ -228,17 +241,17 @@ class StudentAttributes
         $nowYear = $this->curriculumYear;
 
         if ($isYear11 && $term === 3) {
-            $end = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            $end = $this->firstDateTerm4Relative . " $nowYear";
         } elseif ($isYear11 && $term === 4) {
             $nowYear++;
-            $end = self::FIRST_DAY_TERM2_RELATIVE  . " $nowYear";
+            $end = $this->firstDateTerm2Relative  . " $nowYear";
         } elseif ($isYear12 && $term === 1) {
-            $end = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
+            $end = $this->firstDateTerm2Relative . " $nowYear";
         } elseif (($isYear12 && $term === 2 )|| \in_array($term, [3, 4], true)) {
             $nowYear++;
-            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $end = $this->firstDateTerm1Relative . " $nowYear";
         } else {
-            $end = self::FIRST_DAY_TERM3_RELATIVE . " $nowYear";
+            $end = $this->firstDateTerm3Relative . " $nowYear";
         }
 
         return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
@@ -258,18 +271,18 @@ class StudentAttributes
         $nowYear = $this->curriculumYear;
 
         if ($yearLevel >= 7 && $yearLevel <= 10) {
-            $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $start = $this->firstDateTerm1Relative . " $nowYear";
         } elseif ($yearLevel === 11) {
             if ($term !== 4) {
-                $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+                $start = $this->firstDateTerm1Relative . " $nowYear";
             } else {
-                $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+                $start = $this->firstDateTerm4Relative . " $nowYear";
             }
         } elseif ($term === 1) {
             $nowYear--;
-            $start = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+            $start = $this->firstDateTerm4Relative . " $nowYear";
         } else {
-            $start = self::FIRST_DAY_TERM2_RELATIVE . " $nowYear";
+            $start = $this->firstDateTerm2Relative . " $nowYear";
         }
 
         return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
@@ -290,14 +303,14 @@ class StudentAttributes
 
         if ($yearLevel === 11) {
             if (4 !== $term) {
-                $end = self::FIRST_DAY_TERM4_RELATIVE . " $nowYear";
+                $end = $this->firstDateTerm4Relative . " $nowYear";
             } else {
                 $nowYear += 2;
-                $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+                $end = $this->firstDateTerm1Relative . " $nowYear";
             }
         } else {
             $nowYear++;
-            $end = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
+            $end = $this->firstDateTerm1Relative . " $nowYear";
         }
 
         return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
