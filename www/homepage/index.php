@@ -7,6 +7,8 @@
  * @version     SVN: $Id$
  *
  */
+
+use Alaress\Mail\Formatter;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\Learning\Assessment\Redirect;
@@ -371,8 +373,9 @@ else {
 }
 
 $allWidths = $homepageHandler->getColumnWidths();
+
 $this->setVar(array(
-    'HEADING' => Scrub::text($folder->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
+    'HEADING' => Formatter::header($folder->getName(), $codeString),
     'HEADING_JS' => json_encode($folder->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
     'CODE' => urlencode(urlencode($folder->getCodeString())),
     'ID' => $folder->getId(),
