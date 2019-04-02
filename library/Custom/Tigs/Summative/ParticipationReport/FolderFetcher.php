@@ -1,0 +1,80 @@
+<?php
+/**
+ * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+declare(strict_types=1);
+
+namespace Custom\Tigs\Summative\ParticipationReport;
+
+use Custom\Tigs\Summative\StudentAttributes;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
+use External_UserInterface;
+use Schoolbox\User;
+use Schoolbox\Assessment\Term;
+use InvalidArgumentException;
+use Schoolbox\Mapper;
+use UnexpectedValueException;
+
+/**
+ * Responsible for fetching the set of folders a student is/was enrolled in
+ */
+class FolderFetcher
+{
+
+    /** @var Folder\Mapper */
+    private $folderMapper;
+
+    /** @var External_UserInterface */
+    private $externalUser;
+
+
+    /**
+     * @param Folder\Mapper          $folderMapper
+     * @param External_UserInterface $externalUser
+     */
+    public function __construct(Folder\Mapper $folderMapper, External_UserInterface $externalUser)
+    {
+        $this->folderMapper = $folderMapper;
+        $this->externalUser = $externalUser;
+    }
+
+
+    /**
+     * Returns the set of folders a user was enrolled in at the given point in time.
+     *
+     * If $nowOverride is NULL, returns current enrolled folders
+     *
+     * Folders are indexed, and sorted by name (ignoring case)
+     *
+     * @param User              $student
+     * @param StudentAttributes $attributes
+     * @param string|null       $nowOverride
+     * @return GenericCollection|Folder\Model[]
+     * @throws Mapper\DefinitionException
+     * @throws UnexpectedValueException
+     */
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride): GenericCollection
+    {
+        if (null === $nowOverride) {
+            $folders = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
+        } else {
+            $term          = (new Term\Model())
+                ->setStart($attributes->getCurriculumSemesterStart())
+                ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+                ->setActualFinish($attributes->getCurriculumSemesterFinish());
+
+            $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
+            $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
+            $folders       = $withResponses->mergeUnique($withFeedback, $this->folderMapper->getIdentifierProperty());
+        }
+
+        $folders->indexBy($this->folderMapper->getIdentifierProperty())
+                ->sortByCallback(static function (Folder\Model $a, Folder\Model $b): int {
+                    return \strnatcasecmp($a->getName(), $b->getName());
+                }, true);
+
+        return $folders;
+    }
+}
