@@ -5,6 +5,8 @@
  *                                                           *
  ************************************************************/
 //enable users to send email
+use Alaress\Mail\Codec;
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -62,6 +64,10 @@ if (Cfg::get('mail_enable') == 1) {
         $page->parse('alert_box_block', 'alert_box', false);
     } else {
         $page->setVar('alert_box_block', '');
+    }
+
+    foreach ($addressLists['replyto'] as $replyToKey => $replyTo) {
+        $addressLists['replyto'][$replyToKey] = Codec::decode($replyTo);
     }
 
     $output = array(

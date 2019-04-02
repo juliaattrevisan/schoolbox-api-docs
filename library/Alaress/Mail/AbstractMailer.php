@@ -439,10 +439,13 @@ abstract class AbstractMailer implements IMailer
      */
     private static function parseValidEmailAddresses($emails): array
     {
-        $emailAddresses = implode(',', $emails);
+        foreach ($emails as $email) {
+            $emailAddresses[] = Codec::encode($email);
+        }
+
         $defaultHost = self::getConfig()->get('site_hostname') . '.' . self::getConfig()->get('site_domain');
 
-        return imap_rfc822_parse_adrlist($emailAddresses, $defaultHost);
+        return imap_rfc822_parse_adrlist(implode(',', $emailAddresses), $defaultHost);
     }
 
     /**
