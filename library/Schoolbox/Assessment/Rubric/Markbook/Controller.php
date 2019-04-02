@@ -136,16 +136,22 @@ class Controller extends Base
             rcu.criterion_id AS indicator_id,
             vrm.indicator_max_value as indicator_max_value,
             rc.name AS indicator_name
-            FROM       assessment a
+            FROM  assessment a
             INNER JOIN submission_box sb ON sb.assessment_id = a.id
             INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
             INNER JOIN rubric_group rg ON rgu.rubric_group_id = rg.id
             INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
-                   AND rc.rubric_group_id = rg.id
+                  AND rc.rubric_group_id = rg.id
             LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = a.id
-            WHERE      sb.category=:folderId AND a.deleted_at IS NULL
-            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
+                  AND vrm.indicator_id = rc.id
+                  AND vrm.capability_id = rg.id
+            INNER JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = vrm.assessment_id
+                  AND vmrf.student_id = vrm.student_id
+                  AND vmrf.feedback_id = vrm.feedback_id
+                  AND vmrf.feedback_table = 'submission_return'
+            WHERE sb.category=:folderId AND a.deleted_at IS NULL
+            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id;"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
