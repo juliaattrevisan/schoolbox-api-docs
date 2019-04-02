@@ -131,10 +131,8 @@ class Controller extends Base
             sb.mark_type as assessment_mark_type,
             sb.max_mark as assessment_max_mark,
             rgu.rubric_group_id AS capability_id,
-            vrm.capability_max_value as capability_max_value,
             rg.name AS capability_name,
             rcu.criterion_id AS indicator_id,
-            vrm.indicator_max_value as indicator_max_value,
             rc.name AS indicator_name
             FROM  assessment a
             INNER JOIN submission_box sb ON sb.assessment_id = a.id
@@ -143,12 +141,6 @@ class Controller extends Base
             INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
                   AND rc.rubric_group_id = rg.id
-            LEFT  JOIN v_rubric_mark vrm ON vrm.assessment_id = a.id
-                  AND vrm.indicator_id = rc.id
-                  AND vrm.capability_id = rg.id
-            LEFT JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = vrm.assessment_id
-                  AND vmrf.student_id = vrm.student_id
-                  AND vmrf.feedback_id = vrm.feedback_id
             WHERE sb.category=:folderId AND a.deleted_at IS NULL
             ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
@@ -175,12 +167,10 @@ class Controller extends Base
 
             $indicators[$row['indicator_id']] = [
                 'name' => $row['indicator_name'],
-                'maxMark' => $row['indicator_max_value'],
             ];
 
             $capabilities[$row['capability_id']] = [
                 'name' => $row['capability_name'],
-                'maxMark' => $row['capability_max_value'],
                 'indicators' => $indicators
             ];
 
@@ -227,7 +217,9 @@ class Controller extends Base
             vrm.capability_mark,
             vrm.indicator_id,
             vrm.indicator_mark,
-            vrm.descriptor_name
+            vrm.descriptor_name,
+            vrm.capability_max_value,
+            vrm.indicator_max_value
             FROM       v_rubric_mark vrm
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
             INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id 
@@ -268,11 +260,13 @@ class Controller extends Base
 
             $indicatorMarks[$row['indicator_id']] = [
                 'databaseMark' => $row['indicator_mark'],
+                'maxMark'      => $row['indicator_max_value'],
                 'selectedDescriptorText' => $row['descriptor_name']
             ];
 
             $capabilityMarks[$row['capability_id']] = [
                 'databaseMark' => $row['capability_mark'],
+                'maxMark'       => $row['capability_max_value'],
                 'indicators' => $indicatorMarks
             ];
 
@@ -357,10 +351,9 @@ class Controller extends Base
 
                 foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $capabilityMarks['databaseMark'];
-                    $capabilityInFolder = $assessmentsInFolder[$assessmentId]['capabilities'][$capabilityId];
 
                     if ($capabilityDatabaseMark !== null) {
-                        $capabilityMaxMark = $capabilityInFolder['maxMark'];
+                        $capabilityMaxMark = $capabilityMarks['maxMark'];
 
                         $capabilityUsageModel = new CapabilityUsage(new Capability());
                         $capabilityUsageModel->setMaxValue($capabilityMaxMark);
@@ -379,8 +372,7 @@ class Controller extends Base
                     }
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
-                        $indicatorInFolder = $capabilityInFolder['indicators'][$indicatorId];
-                        $indicatorMaxMark = $indicatorInFolder['maxMark'];
+                        $indicatorMaxMark = $indicatorMarks['maxMark'];
                         $indicatorDatabaseMark = $indicatorMarks['databaseMark'];
 
                         // This is always just a "total mark" type, so we can work this out ourselves
