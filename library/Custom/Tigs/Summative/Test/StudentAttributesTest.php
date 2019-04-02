@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 /**
  * @covers \Custom\Tigs\Summative\StudentAttributes
@@ -26,6 +27,7 @@ class StudentAttributesTest extends TestCase
      * @param     $validYear
      * @param int $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testValidYearLevel($validYear, int $expected): void
     {
@@ -40,6 +42,7 @@ class StudentAttributesTest extends TestCase
      * @dataProvider providerInvalidYearLevel
      * @param $invalidYear
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @expectedException InvalidArgumentException
      */
     public function testInvalidYearLevel($invalidYear): void
@@ -54,6 +57,7 @@ class StudentAttributesTest extends TestCase
      * @param string|null $ibFlag
      * @param bool        $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testIsIb(?string $ibFlag, bool $expected): void
     {
@@ -70,6 +74,7 @@ class StudentAttributesTest extends TestCase
      * @param string $ibFlag
      * @param bool   $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testIsMyp(int $yearLevel, string $ibFlag, bool $expected): void
     {
@@ -86,6 +91,7 @@ class StudentAttributesTest extends TestCase
      * @param string $ibFlag
      * @param bool   $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testDp(int $yearLevel, string $ibFlag, bool $expected): void
     {
@@ -102,6 +108,7 @@ class StudentAttributesTest extends TestCase
      * @param string $ibFlag
      * @param bool   $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testHsc(int $yearLevel, string $ibFlag, bool $expected): void
     {
@@ -118,6 +125,7 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @dataProvider providerTermDerivation
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testTermDerivation(string $yearLevel, string $date, int $expected): void
     {
@@ -134,6 +142,7 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @dataProvider providerCurriculumYearLevelNowOverride
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testCurriculumYearLevelNowOverride(string $yearLevel, string $date, int $expected): void
     {
@@ -150,6 +159,7 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @dataProvider providerCurriculumSemesterNowOverride
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testCurriculumSemesterNowOverride(string $yearLevel, string $date, int $expected): void
     {
@@ -165,6 +175,7 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumSemesterStartNowOverride
      */
     public function testReportCurriculumSemesterStartNowOverride(string $yearLevel, string $date, string $expected): void
@@ -181,6 +192,7 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumSemesterFinishNowOverride
      */
     public function testCurriculumSemesterFinishNowOverride(string $yearLevel, string $date, string $expected): void
@@ -196,6 +208,7 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumYearStartNowOverride
      */
     public function testReportCurriculumYearStartNowOverride(string $yearLevel, string $date, string $expected): void
@@ -212,6 +225,7 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumYearFinishNowOverride
      */
     public function testCurriculumYearFinishNowOverride(string $yearLevel, string $date, string $expected): void
