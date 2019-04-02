@@ -257,7 +257,7 @@ class StudentAttributes
     {
         $nowYear = $this->curriculumYear;
 
-        if ($yearLevel === 10) {
+        if ($yearLevel >= 7 && $yearLevel <= 10) {
             $start = self::FIRST_DAY_TERM1_RELATIVE . " $nowYear";
         } elseif ($yearLevel === 11) {
             if ($term !== 4) {

@@ -236,8 +236,8 @@ class Controller extends Web\Controller\Base
 
         $params = [
             'student_id' => $user->getExternalId(),
-            'start'      => $attributes->getCurriculumYearStart()->getDatabaseDate(),
-            'finish'     => $attributes->getCurriculumYearFinish()->getDatabaseDate(),
+            'start'      => $attributes->getCurriculumYearStart()->getDatabase(),
+            'finish'     => $attributes->getCurriculumYearFinish()->getDatabase(),
         ];
 
         $awards = new GenericCollection(Award::class);
