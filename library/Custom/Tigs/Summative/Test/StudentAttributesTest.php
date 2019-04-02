@@ -7,8 +7,10 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Test;
 
+use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use InvalidArgumentException;
 
@@ -28,7 +30,7 @@ class StudentAttributesTest extends TestCase
     public function testValidYearLevel($validYear, int $expected): void
     {
         $user       = (new User())->setYear($validYear);
-        $attributes = new StudentAttributes($user);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user);
 
         $this->assertSame($expected, $attributes->getYearLevel());
     }
@@ -43,7 +45,7 @@ class StudentAttributesTest extends TestCase
     public function testInvalidYearLevel($invalidYear): void
     {
         $user = (new User())->setYear($invalidYear);
-        new StudentAttributes($user);
+        new StudentAttributes($this->getConfigLoader(), $user);
     }
 
 
@@ -56,7 +58,7 @@ class StudentAttributesTest extends TestCase
     public function testIsIb(?string $ibFlag, bool $expected): void
     {
         $user = (new User())->setYear(10);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isIb());
     }
@@ -72,7 +74,7 @@ class StudentAttributesTest extends TestCase
     public function testIsMyp(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isMyp());
     }
@@ -88,7 +90,7 @@ class StudentAttributesTest extends TestCase
     public function testDp(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isDp());
     }
@@ -104,7 +106,7 @@ class StudentAttributesTest extends TestCase
     public function testHsc(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isHsc());
     }
@@ -120,7 +122,7 @@ class StudentAttributesTest extends TestCase
     public function testTermDerivation(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getTerm());
     }
@@ -136,7 +138,7 @@ class StudentAttributesTest extends TestCase
     public function testCurriculumYearLevelNowOverride(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearLevel());
     }
@@ -152,7 +154,7 @@ class StudentAttributesTest extends TestCase
     public function testCurriculumSemesterNowOverride(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemester());
     }
@@ -168,7 +170,7 @@ class StudentAttributesTest extends TestCase
     public function testReportCurriculumSemesterStartNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemesterStart()->getDatabaseDate());
     }
@@ -184,7 +186,7 @@ class StudentAttributesTest extends TestCase
     public function testCurriculumSemesterFinishNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemesterFinish()->getDatabaseDate());
     }
@@ -199,7 +201,7 @@ class StudentAttributesTest extends TestCase
     public function testReportCurriculumYearStartNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearStart()->getDatabaseDate());
     }
@@ -215,7 +217,7 @@ class StudentAttributesTest extends TestCase
     public function testCurriculumYearFinishNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearFinish()->getDatabaseDate());
     }
@@ -491,5 +493,39 @@ class StudentAttributesTest extends TestCase
             ['12', '2010-07-10', '2010-12-31'],  // Term 3
             ['12', '2010-10-10', '2010-12-31'],  // Term 4
         ];
+    }
+
+    // ============== Helpers ==================
+
+
+    /**
+     * Returns a config loader with valid relative dates
+     *
+     * @return IConfigLoader
+     */
+    private function getConfigLoader(): IConfigLoader
+    {
+        return new class() implements IConfigLoader
+        {
+
+            /** @inheritDoc */
+            public function get($var)
+            {
+                $data = [
+                    Config::_TIGS_START_TERM_1 => '1 January',
+                    Config::_TIGS_START_TERM_2 => '1 April',
+                    Config::_TIGS_START_TERM_3 => '1 July',
+                    Config::_TIGS_START_TERM_4 => '1 October',
+                ];
+                return $data[$var] ?? null;
+            }
+
+
+            /**  @inheritDoc */
+            public function dropCache(): void
+            {
+                // noop
+            }
+        };
     }
 }
