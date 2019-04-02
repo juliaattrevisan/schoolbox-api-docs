@@ -1199,6 +1199,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public function getYear()
     {
+        // TODO this is returning a string, not an int. Need to add cast here and remove cast from usages if appropriate.
         return $this->getUsingFormat('Y');
     }
 
