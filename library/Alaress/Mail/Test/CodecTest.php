@@ -9,28 +9,28 @@ namespace Alaress\Mail\Test;
 
 use Alaress\Mail\Codec;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Util\Type;
 
 class CodecTest extends TestCase
 {
     /**
      * @dataProvider provider_testEncode
+     * @param $input
      * @param $expected
-     * @param $result
      */
-    public function testEncode($expected, $result)
+    public function testEncode($input, $expected)
     {
-
-        $this->assertEquals($expected, Codec::encode($result));
+        $this->assertEquals($expected, Codec::encode($input));
     }
 
     /**
      * @dataProvider provider_testDecode
+     * @param $input
      * @param $expected
-     * @param $result
      */
-    public function testDecode($expected, $result)
+    public function testDecode($input, $expected)
     {
-        $this->assertEquals($expected, Codec::decode($result));
+        $this->assertEquals($expected, Codec::decode($input));
     }
 
     /**
@@ -39,6 +39,40 @@ class CodecTest extends TestCase
      */
     public function provider_testEncode()
     {
+        return [
+            [
+                '"English 3 4 (EN344, EN123)" <alaress@schoolbox.com.au>',
+                '"English 3 4 (EN344 EN123)" <alaress@schoolbox.com.au>'
+            ],
+            [
+                '"English 3 4 (EN344,ENGU4A)" <alaress@schoolbox.com.au>, "English 5 6 (EN56,ENGU4A)" <alaress@schoolbox.com.au>',
+                '"English 3 4 (EN344ENGU4A)" <alaress@schoolbox.com.au> "English 5 6 (EN56ENGU4A)" <alaress@schoolbox.com.au>'
+            ],
+            [
+                '"English 3 4 "But this is just, a trick" (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
+                '"English 3 4 "But this is just a trick" (EN344ENGU4A)" <alaress@schoolbox.com.au>'
+            ],
+            [
+                '"English 3 4 "But this is just, a trick" (and another, trick yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
+                '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
+            ],
+            [
+                '"English 3, 4 "But this is just, a trick" (and another, trick yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
+                '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
+            ],
+            [
+                '"English 3, 4, "But this is just, a trick" (and another, trick, yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
+                '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
+            ]
+        ];
+    }
+
+    /**
+     * Convert 0x1B to commas
+     * @return array
+     */
+    public function provider_testDecode() {
+
         return [
             [
                 '"English 3 4 (EN344 EN123)" <alaress@schoolbox.com.au>',
@@ -63,64 +97,27 @@ class CodecTest extends TestCase
             [
                 '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>',
                 '"English 3, 4, "But this is just, a trick" (and another, trick, yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>'
-            ],
+            ]
         ];
     }
-
-    /**
-     * Convert 0x1B to commas
-     * @return array
-     */
-    public function provider_testDecode() {
-
-        return [
-            [
-                '"English 3 4 (EN344, EN123)" <alaress@schoolbox.com.au>',
-                '"English 3 4 (EN344 EN123)" <alaress@schoolbox.com.au>'
-            ],
-            [
-                '"English 3 4 (EN344,ENGU4A)" <alaress@schoolbox.com.au>, "English 5 6 (EN56,ENGU4A)" <alaress@schoolbox.com.au>',
-                '"English 3 4 (EN344ENGU4A)" <alaress@schoolbox.com.au> "English 5 6 (EN56ENGU4A)" <alaress@schoolbox.com.au>'
-
-            ],
-            [
-                '"English 3 4 "But this is just, a trick" (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
-                '"English 3 4 "But this is just a trick" (EN344ENGU4A)" <alaress@schoolbox.com.au>'
-
-            ],
-            [
-                '"English 3 4 "But this is just, a trick" (and another, trick yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
-                '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
-            ],
-            [
-                '"English 3, 4 "But this is just, a trick" (and another, trick yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
-                '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
-            ],
-            [
-                '"English 3, 4, "But this is just, a trick" (and another, trick, yo!) (EN344,ENGU4A)" <alaress@schoolbox.com.au>',
-                '"English 3 4 "But this is just a trick" (and another trick yo!) (EN344ENGU4A)" <alaress@schoolbox.com.au>'
-            ],
-        ];
-    }
-
 
     /**
      * @dataProvider  provider_testDecode
+     * @param $input
      * @param $expected
-     * @param $result
      */
-    public function testLosslessDecoded($expected, $result)
+    public function testLosslessDecoded($input, $expected)
     {
-        $this->assertEquals($expected, Codec::decode(Codec::encode(Codec::decode(Codec::encode($result)))));
+        $this->assertEquals($expected, Codec::decode(Codec::encode(Codec::decode(Codec::encode($input)))));
     }
 
     /**
      * @dataProvider  provider_testEncode
+     * @param $input
      * @param $expected
-     * @param $result
      */
-    public function testLosslessEncoded($expected, $result)
+    public function testLosslessEncoded($input, $expected)
     {
-        $this->assertEquals($expected, Codec::encode(Codec::decode(Codec::encode(Codec::decode($result)))));
+        $this->assertEquals($expected, Codec::encode(Codec::decode(Codec::encode(Codec::decode($input)))));
     }
 }
