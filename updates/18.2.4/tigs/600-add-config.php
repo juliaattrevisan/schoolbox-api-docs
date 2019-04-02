@@ -119,7 +119,7 @@ $app = new class extends InsertHelper
 $options = [CliTool\Kernel::OPTION_LEVEL_MIN => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 try {
-    (new Schoolbox\Application\CliTool\Kernel($app, false, $options))->runApp();
+    (new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
 } catch (Throwable $e) {
     /** @noinspection PhpUnhandledExceptionInspection */
     throw $e;
