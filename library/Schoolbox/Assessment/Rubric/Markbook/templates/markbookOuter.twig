@@ -179,7 +179,7 @@
                                     {% set gradientClass = "" %}
                                 {% endif %}
 
-                                <td title="{{ capability.name }}">
+                                <td>
                                     <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
                                 </td>
                             {% endfor %}
