@@ -20,31 +20,31 @@ class ExternalEvents extends Base implements IExternalEvents
     /**
      * Student product code
      */
-    const STUDENT_PRODUCT_CODE = 'TSCPDC';
+    private const STUDENT_PRODUCT_CODE = 'TSCPDC';
 
     /**
      * Staff product code
      */
-    const STAFF_PRODUCT_CODE = 'TIAPDC';
+    private const STAFF_PRODUCT_CODE = 'TIAPDC';
 
     /**
      * Parent product code
      */
-    const PARENT_PRODUCT_CODE = 'PIAPDC';
+    private const PARENT_PRODUCT_CODE = 'PIAPDC';
 
     /**
      * Public product code
      */
-    const PUBLIC_PRODUCT_CODE = 'PUBPDC';
+    private const PUBLIC_PRODUCT_CODE = 'PUBPDC';
 
     /**
      * Build a query to get events for a given $productCode
      * If $productCode is null, obtain personal events instead
      *
-     * @param $productCode
+     * @param null|string $productCode
      * @return string
      */
-    private function buildQueryForProductCode($productCode)
+    private function buildQueryForProductCode(?string $productCode): string
     {
         /* Anatomy of a query
          */
@@ -69,11 +69,11 @@ class ExternalEvents extends Base implements IExternalEvents
             FROM eventcalendar ec
         ";
 
-        $catdefsQuery = "
+        $catdefsQuery = '
             LEFT JOIN eventcatdefs ecd ON ec.cat_num = ecd.cat_num
-        ";
+        ';
 
-        $whereQuery = "
+        $whereQuery = '
             NOT (
                 CASE 
                     WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
@@ -84,11 +84,11 @@ class ExternalEvents extends Base implements IExternalEvents
                     ELSE ec.start_date 
                 END >= :endTime 
             )
-        ";
+        ';
 
         /* Personal Events
          */
-        if ($productCode == null) {
+        if (null === $productCode) {
             return "(
                 {$selectQuery}
                 {$catdefsQuery}
