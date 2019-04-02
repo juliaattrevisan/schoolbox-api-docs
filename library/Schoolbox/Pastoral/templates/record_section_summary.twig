@@ -2,10 +2,10 @@
 
 <div class="profile content">
     <div class="row no-margin">
-        <div class="small-12 medium-2 columns no-pad">
+        <div class="small-12 medium-2 large-1 columns no-pad">
             {{ profile.imageSquare200(record.student) }}
         </div>
-        <div class="small-12 medium-10 columns">
+        <div class="small-12 medium-10 large-11 columns">
             <dl class="profile">
                 <dt class="small-12 medium-3">Created By:</dt>
                 <dd class="small-12 medium-9"><a href="{{ profile.link(record.owner) }}">{{ record.owner.fullName }}</a></dd>
@@ -30,11 +30,11 @@
                         <dd class="small-12 medium-9">{{ record.severity.name }}</dd>
                     {% endif %}
 
-                    <dt class="small-12 medium-3">Record Type:</dt>
+                    <dt class="small-12 medium-3">Type:</dt>
                     <dd class="small-12 medium-9">{{ record.type.name }}</dd>
 
                     {% if record.subtype.name is not empty %}
-                        <dt class="small-12 medium-3">Record Sub-Type:</dt>
+                        <dt class="small-12 medium-3">Sub-Type:</dt>
                         <dd class="small-12 medium-9">{{ record.subtype.name }}</dd>
                     {% endif %}
 
