@@ -14,6 +14,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
+use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -236,34 +237,28 @@ class Module extends Alaress\Module\Module
      *
      * @param User         $user
      * @param Folder\Model $folder
-     * @param string|null  $now
+     * @param string|null  $nowOverride
      * @return bool
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
      * @throws UnexpectedValueException
      * @throws InvalidPath
      */
-    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $now): bool
+    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride): bool
     {
-        if ($now !== null) {
+        if ($nowOverride !== null) {
             // This is pretty heavy, but exists primarily for testing. It is (hopefully) unlikely the client
             // will ever attempt to reconstruct historical views
             try {
-                $attributes = new StudentAttributes($user, null, $now);
+                $attributes = new StudentAttributes($user, null, $nowOverride);
             } catch (InvalidArgumentException $e) {
-                throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$now}", 0, $e);
+                throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
             }
-            $term = $this->getTermMapper()
-                ->createModel()
-                ->setStart($attributes->getCurriculumSemesterStart())
-                ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
-                ->setActualFinish($attributes->getCurriculumSemesterFinish());
-            $withResponses = $this->getFolderMapper()->findFoldersWithResponses($user, $term);
-            $withFeedback = $this->getFolderMapper()->findFoldersWithFeedbackToStudent($user, $term);
-            $folderList = $withResponses->mergeUnique($withFeedback, $this->getFolderMapper()->getIdentifierProperty());
+            $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
+            $folders = $fetcher->findForStudent($user, $attributes, $nowOverride);
+
             /** @var Folder\Model $involvedFolder */
-            foreach ($folderList as $involvedFolder) {
+            foreach ($folders as $involvedFolder) {
                 if ($involvedFolder->getId() === $folder->getId()) {
                     return true;
                 }

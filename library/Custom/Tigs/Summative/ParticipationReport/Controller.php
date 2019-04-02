@@ -107,7 +107,7 @@ class Controller extends Web\Controller\Base
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
-        $subjectList   = $this->getSubjectList($user, $attributes, \is_null($now));
+        $subjectList   = $this->getSubjectList($user, $attributes, $now);
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes);
 
@@ -347,22 +347,19 @@ class Controller extends Web\Controller\Base
      *
      * @param User              $user
      * @param StudentAttributes $attributes
-     * @param bool       $getCurrent
+     * @param null|string       $nowOverride
      * @return array
-     * @throws Exception
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
      * @throws \DomainException
      */
-    private function getSubjectList(User $user, StudentAttributes $attributes, bool $getCurrent): array
+    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $nowOverride): array
     {
-        $folders = $this->findEnrolledFolders($user, $attributes, $getCurrent);
-
-        $folders->sortByCallback(function (Folder\Model $a, Folder\Model $b): int {
-            return \strnatcmp($a->getName(), $b->getName());
-        }, true);
+        $getCurrent = null === $nowOverride;
+        $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
+        $folders    = $fetcher->findForStudent($user, $attributes, $nowOverride);
 
         $excluded = \array_map('trim', \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
         $subjects = [];
@@ -383,35 +380,6 @@ class Controller extends Web\Controller\Base
         }
 
         return $subjects;
-    }
-
-
-    /**
-     * Returns the user's folders for the report's period
-     *
-     * @param User $user
-     * @param StudentAttributes $attributes
-     * @param bool $getCurrent
-     * @return Collection|Folder\Model[]
-     * @throws Exception
-     * @throws UnexpectedValueException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     */
-    private function findEnrolledFolders(User $user, StudentAttributes $attributes, bool $getCurrent): Collection
-    {
-        if ($getCurrent) {
-            // Use current enrollment
-            return $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($user));
-        }
-        // Use historical interaction enrollment
-        $term = $this->termMapper->createModel()
-            ->setStart($attributes->getCurriculumSemesterStart())
-            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
-            ->setActualFinish($attributes->getCurriculumSemesterFinish());
-        $folderList = $this->folderMapper->findFoldersWithResponses($user, $term);
-        return $folderList->mergeUnique(
-            $this->folderMapper->findFoldersWithFeedbackToStudent($user, $term),
-            $this->folderMapper->getIdentifierProperty());
     }
 
 

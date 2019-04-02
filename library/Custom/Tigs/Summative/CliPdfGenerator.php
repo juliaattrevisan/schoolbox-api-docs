@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Aura\Router\Router;
+use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
 use Knp\Snappy\Pdf;
 use RuntimeException;
@@ -22,7 +23,6 @@ use Schoolbox\UserMapper;
 use GuzzleHttp\Client;
 use Schoolbox\User;
 use ZipArchive;
-use Schoolbox\Assessment\Term;
 
 /**
  * A CLI App for batch printing PDFs to an archive
@@ -66,7 +66,7 @@ class CliPdfGenerator extends CliTool\App
     private $curriculum;
 
     /** @var null|string */
-    private $now;
+    private $nowOverride;
 
     /** @var UserMapper */
     private $userMapper;
@@ -88,6 +88,9 @@ class CliPdfGenerator extends CliTool\App
 
     /** @var int */
     private $maxFailures;
+
+    /** @var FolderFetcher */
+    private $folderFetcher;
 
     /**
      * How many milliseconds to let javascript to run before snapping page.
@@ -154,12 +157,13 @@ class CliPdfGenerator extends CliTool\App
 
         $di = $this->getDi();
         /** @var MapperFactory $mapperFactory */
-        $mapperFactory      = $this->getDi()->get('mapperFactory');
-        $this->userMapper   = $mapperFactory->get(UserMapper::class);
-        $this->folderMapper = $mapperFactory->get(Folder\Mapper::class);
-        $this->externalUser = $di->get('externalUser');
-        $this->fqdn         = \trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
-        $this->router       = $di->get('router');
+        $mapperFactory       = $this->getDi()->get('mapperFactory');
+        $this->userMapper    = $mapperFactory->get(UserMapper::class);
+        $this->folderMapper  = $mapperFactory->get(Folder\Mapper::class);
+        $this->externalUser  = $di->get('externalUser');
+        $this->fqdn          = \trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
+        $this->router        = $di->get('router');
+        $this->folderFetcher = new FolderFetcher($this->folderMapper, $this->externalUser);
 
         $this->execute();
     }
@@ -178,7 +182,7 @@ class CliPdfGenerator extends CliTool\App
         $this->studentId   = $this->getOpt(self::OPT_LONG_STUDENT_ID);
         $this->yearLevel   = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
         $this->curriculum  = $this->getOpt(self::OPT_LONG_CURRICULUM);
-        $this->now         = $this->getOpt(self::OPT_LONG_NOW);
+        $this->nowOverride = $this->getOpt(self::OPT_LONG_NOW);
         $maxFailures       = $this->getOpt(self::OPT_LONG_MAX_FAILS);
         $jsDelay           = $this->getOpt(self::OPT_LONG_JS_DELAY);
 
@@ -223,8 +227,8 @@ class CliPdfGenerator extends CliTool\App
             $valid = false;
         }
 
-        if ($this->now && false === strtotime($this->now)) {
-            $this->getLogger()->alert("Invalid 'now' option: '$this->now'");
+        if ($this->nowOverride && false === \strtotime($this->nowOverride)) {
+            $this->getLogger()->alert("Invalid 'now' option: '$this->nowOverride'");
             $valid = false;
         }
 
@@ -254,7 +258,7 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("    curriculum: {$this->curriculum}");
         $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
         $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
-        $this->getLogger()->debug("    now: {$this->now}");
+        $this->getLogger()->debug("    now: {$this->nowOverride}");
 
         return $valid;
     }
@@ -545,7 +549,7 @@ class CliPdfGenerator extends CliTool\App
      */
     private function generateUrlsForStudent(User $student, array $externalStudent, array $excludedClassCodes): array
     {
-        $data                   = ['userId' => $student->getId(), 'now' => $this->now,];
+        $data                   = ['userId' => $student->getId(), 'now' => $this->nowOverride,];
         $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data);
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [$participationReportUrl];
@@ -557,7 +561,7 @@ class CliPdfGenerator extends CliTool\App
             $data = [
                 'userId'   => $student->getId(),
                 'folderId' => $folder->getId(),
-                'now'      => $this->now,
+                'now'      => $this->nowOverride,
             ];
             $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data);
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
@@ -579,18 +583,8 @@ class CliPdfGenerator extends CliTool\App
      */
     private function getClassFolders(User $student, array $externalStudent): Collection
     {
-        if (null === $this->now) {
-            return $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
-        }
-        $attributes    = new StudentAttributes($student, $externalStudent['StudentIBFlag'], $this->now);
-        $term          = (new Term\Model())
-            ->setStart($attributes->getCurriculumSemesterStart())
-            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
-            ->setActualFinish($attributes->getCurriculumSemesterFinish());
-        $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
-        $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
-
-        return $this->folderMapper->createCollection()->mergeUnique($withResponses, 'id')->mergeUnique($withFeedback, 'id');
+        $attributes = new StudentAttributes($student, $externalStudent['StudentIBFlag'], $this->nowOverride);
+        return $this->folderFetcher->findForStudent($student, $attributes, $this->nowOverride);
     }
 
 
