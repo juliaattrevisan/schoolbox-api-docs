@@ -101,7 +101,7 @@ class Controller extends Web\Controller\Base
     public function getReport(User $user, ?string $now): void
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
-        $attributes      = new StudentAttributes($user, $externalStudent['StudentIBFlag'], $now);
+        $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $now);
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);

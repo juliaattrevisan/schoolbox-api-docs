@@ -112,6 +112,7 @@ class Controller extends Web\Controller\Base
     public function getReport(User $user, Folder\Model $folder, ?string $now): void
     {
         $attributes = new StudentAttributes(
+            $this->getConfigLoader(),
             $user,
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
             $now
