@@ -149,7 +149,6 @@ class Controller extends Base
             LEFT JOIN v_most_recent_feedback vmrf ON vmrf.assessment_id = vrm.assessment_id
                   AND vmrf.student_id = vrm.student_id
                   AND vmrf.feedback_id = vrm.feedback_id
-                  AND vmrf.feedback_table = 'submission_return'
             WHERE sb.category=:folderId AND a.deleted_at IS NULL
             ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
