@@ -151,7 +151,7 @@ class Controller extends Base
                   AND vmrf.feedback_id = vrm.feedback_id
                   AND vmrf.feedback_table = 'submission_return'
             WHERE sb.category=:folderId AND a.deleted_at IS NULL
-            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id;"
+            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
 
         $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
