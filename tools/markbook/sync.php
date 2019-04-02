@@ -325,7 +325,7 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
                         if (empty($mark)) {
                             $mark = 'Unmarked';
                         } else {
-                            $mark = round($mark);
+                            $mark = round($mark,2);
                         }
 
                         $name = str_pad("{$student['firstname']} {$student['lastname']} ({$student['synergy_id']}):", 26, " ");
