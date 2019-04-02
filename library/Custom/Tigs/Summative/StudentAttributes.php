@@ -346,13 +346,6 @@ class StudentAttributes
         return $this->term;
     }
 
-    /**
-     * @return int
-     */
-    public function getCurriculumYear(): int
-    {
-        return $this->curriculumYear;
-    }
 
     /**
      * @return int
