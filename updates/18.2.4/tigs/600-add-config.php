@@ -10,6 +10,7 @@ use Schoolbox\Application\CliTool;
 use Custom\Tigs;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\InsertHelper;
+use Alaress\Database;
 
 $opts = require __DIR__ . '/../../../conf/core/require-cli.php';
 
@@ -55,6 +56,7 @@ $app = new class extends InsertHelper
      * @param int    $term
      * @param string $name
      * @param string $value
+     * @throws Database\Exception
      */
     private function insertRelativeDateConfig(int $term, string $name, string $value): void
     {
@@ -86,8 +88,9 @@ $app = new class extends InsertHelper
      * @param bool        $hidden
      * @param bool        $required
      * @param string      $module
+     * @throws Database\Exception
      */
-    public function insertConfig(
+    private function insertConfig(
         string $name,
         ?string $value,
         string $title,

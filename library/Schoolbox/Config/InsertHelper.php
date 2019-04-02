@@ -43,7 +43,7 @@ abstract class InsertHelper extends CliTool\App
         try {
             $this->insertConfigItems();
             $database->commit();
-        } catch (\Alaress\Database\Exception $e) {
+        } catch (Database\Exception $e) {
             $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
             $database->rollBack();
         }
@@ -66,6 +66,8 @@ abstract class InsertHelper extends CliTool\App
      *
      * We cannot put this in the abstract as during the update process, the schema and code may be out of sync.
      * The schema-specific values must exist in the extending class.
+     *
+     * @throws Database\Exception
      */
     abstract protected function insertConfigItems(): void;
 
