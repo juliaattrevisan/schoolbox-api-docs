@@ -45,7 +45,11 @@ class StudentAttributes
     /** @var int */
     private $curriculumYearLevel;
 
-    /** @var int */
+    /**
+     * The semester ordinal, either 1 or 2
+     *
+     * @var int
+     */
     private $curriculumSemester;
 
     /** @var Alaress_Date_Format */
@@ -84,7 +88,7 @@ class StudentAttributes
         $this->firstDateTerm4Relative   = $config->get(Config::_TIGS_START_TERM_4);
         $this->yearLevel                = $this->deriveUserYearLevel($user);
         $this->isIb                     = (bool)$ibFlag; // If unknown (NULL), assume FALSE
-        $this->nowYear                  = (int)$now->getUsingFormat('Y'); // TODO this is wrong, need to cover w/ unit tests
+        $this->nowYear                  = (int)$now->getUsingFormat('Y');
         $this->term                     = $this->deriveTerm($now);
         $this->curriculumYearLevel      = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
         $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
@@ -278,11 +282,9 @@ class StudentAttributes
             } else {
                 $start = $this->firstDateTerm4Relative . " $nowYear";
             }
-        } elseif ($term === 1) {
+        } else {
             $nowYear--;
             $start = $this->firstDateTerm4Relative . " $nowYear";
-        } else {
-            $start = $this->firstDateTerm2Relative . " $nowYear";
         }
 
         return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
@@ -410,23 +412,24 @@ class StudentAttributes
 
     /**
      * Returns two semesters with start and finish dates
-     * @return array
+     * @return Semester[]
      */
     public function getCurriculumSemesters(): array
     {
-        $semesters = [1 => [], 2 => []];
-
         if ($this->getCurriculumSemester() === 1) {
-            $semesters[1]['start'] = $this->getCurriculumSemesterStart();
+            $semesters[1]['start']  = $this->getCurriculumSemesterStart();
             $semesters[1]['finish'] = $this->getCurriculumSemesterFinish();
-            $semesters[2]['start'] = (clone $this->getCurriculumSemesterFinish())->addDays(1)->startOfDay();
+            $semesters[2]['start']  = (clone $this->getCurriculumSemesterFinish())->addDays(1)->startOfDay();
             $semesters[2]['finish'] = $this->getCurriculumYearFinish();
         } else {
-            $semesters[1]['start'] = $this->getCurriculumYearStart();
+            $semesters[1]['start']  = $this->getCurriculumYearStart();
             $semesters[1]['finish'] = (clone $this->getCurriculumSemesterStart())->addDays(-1)->endOfDay();
-            $semesters[2]['start'] = $this->getCurriculumSemesterStart();
+            $semesters[2]['start']  = $this->getCurriculumSemesterStart();
             $semesters[2]['finish'] = $this->getCurriculumSemesterFinish();
         }
-        return $semesters;
+        return [
+            1 => new Semester(1, $semesters[1]['start'], $semesters[1]['finish']),
+            2 => new Semester(2, $semesters[2]['start'], $semesters[2]['finish']),
+        ];
     }
 }
