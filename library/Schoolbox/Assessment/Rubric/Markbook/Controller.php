@@ -231,7 +231,9 @@ class Controller extends Base
             vrm.descriptor_name
             FROM       v_rubric_mark vrm
             INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
-            INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id AND vrm.student_id = vmrf.student_id
+            INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id 
+                AND vrm.student_id = vmrf.student_id
+                AND vrm.feedback_id = vmrf.feedback_id
             INNER JOIN user u ON u.id = vrm.student_id
             INNER JOIN assessment a ON a.id = var.assessment_id
             WHERE      var.folder_id=:folderId AND vrm.feedback_type=:instructorReviewRoute AND vrm.feedback_deleted_at IS NULL AND a.deleted_at IS NULL
