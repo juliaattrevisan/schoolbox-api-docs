@@ -568,9 +568,11 @@ class CliPdfGenerator extends CliTool\App
 
 
     /**
+     * Returns the set of folders a user is/was enrolled in
+     *
      * @param User  $student
      * @param array $externalStudent
-     * @return Collection
+     * @return Collection|Folder\Model[]
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
