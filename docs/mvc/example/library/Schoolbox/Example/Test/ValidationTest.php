@@ -1,5 +1,4 @@
 <?php
-
 /**
  * ValidationTest
  *
@@ -9,6 +8,9 @@
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
+// All new classes should use strict typing.
+declare(strict_types=1);
 
 namespace Schoolbox\Example\Test;
 
@@ -101,6 +103,7 @@ class ValidationTest extends TestCase
      */
     public function testErrorRaised($input): void
     {
+        // Substitute this with the method call that is supposed to fail.
         $test = function (int $b) { return $b + 1; };
         $test($input);
     }
