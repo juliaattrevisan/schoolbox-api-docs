@@ -20,6 +20,7 @@ use Alaress\Database\Statement\IStatement;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress\Database\Statement\StoredProcedure\IStoredProcedure;
 use DebugBar\DataCollector\PDO as DebugPDO;
+use PDOException;
 use PDOStatement;
 
 interface IBroker extends IQuoter
@@ -162,6 +163,8 @@ interface IBroker extends IQuoter
      * Commit database transaction
      *
      * @return bool
+     * @throws PDOException If there is no active transaction.
+     *                      Note: An exception is raised even when the PDO::ATTR_ERRMODE attribute is not PDO::ERRMODE_EXCEPTION.
      */
     public function commit();
 

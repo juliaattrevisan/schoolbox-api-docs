@@ -189,6 +189,8 @@ interface IConnector extends IQuoter
      * Commit current transaction to database
      *
      * @return bool Returns TRUE on success or FALSE on failure
+     * @throws PDOException If there is no active transaction.
+     *                      Note: An exception is raised even when the PDO::ATTR_ERRMODE attribute is not PDO::ERRMODE_EXCEPTION.
      */
     public function commit();
 
