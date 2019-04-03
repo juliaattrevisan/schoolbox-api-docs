@@ -60,13 +60,6 @@ class Module extends BaseModule
             })
         );
 
-        $postAuthorizer    = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new Thread\Authorizer\CanPostIntoThread($authorizer, $newsMapper);
-            })
-        );
-
         // Routes
         $this->register(
             'DELETE',
@@ -81,12 +74,6 @@ class Module extends BaseModule
             'getCommentsByParent',
             $getAuthorizer,
             [$this, 'preloadComment']
-        );
-        $this->register(
-            'POST',
-            '/{id:\d+}/comments',
-            'createCommentInThread',
-            $postAuthorizer
         );
     }
 
