@@ -44,7 +44,7 @@ class BaseComponent
         $dueDate      = $assessable->getDueAt();
         $reportStart  = $this->attributes->getCurriculumSemesterStart();
         $reportFinish = $this->attributes->getCurriculumSemesterFinish();
-        return $dueDate->gte($reportStart) && $dueDate->lt($reportFinish);
+        return $dueDate->gte($reportStart) && $dueDate->lte($reportFinish);
     }
 
 
