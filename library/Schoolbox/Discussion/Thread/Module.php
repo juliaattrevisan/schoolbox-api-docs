@@ -14,7 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
 
 /**
@@ -136,7 +136,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'postMapper'   => $this->getMapperFactory()->getLazy(Post\Mapper::class),
+            'postMapper'   => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
             'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }

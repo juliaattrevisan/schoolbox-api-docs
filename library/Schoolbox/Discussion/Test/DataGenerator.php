@@ -11,7 +11,7 @@ namespace Schoolbox\Discussion\Test;
 use Faker;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\UserMapper;
 
@@ -53,7 +53,7 @@ class DataGenerator
 
 
     /**
-     * @var Post\Mapper
+     * @var Comment\Mapper
      */
     private $postMapper;
 
@@ -66,7 +66,7 @@ class DataGenerator
      * @param UserMapper      $userMapper
      * @param News\Mapper     $articleMapper
      * @param Thread\Mapper   $threadMapper
-     * @param Post\Mapper     $postMapper
+     * @param Comment\Mapper  $postMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -74,7 +74,7 @@ class DataGenerator
         UserMapper $userMapper,
         News\Mapper $articleMapper,
         Thread\Mapper $threadMapper,
-        Post\Mapper $postMapper
+        Comment\Mapper $postMapper
     ) {
         $this->log           = $log;
         $this->faker         = $faker;

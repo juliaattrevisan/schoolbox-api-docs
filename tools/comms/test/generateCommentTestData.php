@@ -59,7 +59,7 @@ $kernel->run(new class extends Daemon\App {
             Schoolbox\UserMapper::getInstance(),
             Schoolbox\Comms\News\Mapper::getInstance(),
             Schoolbox\Discussion\Thread\Mapper::getInstance(),
-            Schoolbox\Discussion\Post\Mapper::getInstance()
+            Schoolbox\Discussion\Comment\Mapper::getInstance()
         );
 
         $dataGenerator->generateTestData(

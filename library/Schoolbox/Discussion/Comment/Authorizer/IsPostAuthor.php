@@ -6,11 +6,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post\Authorizer;
+namespace Schoolbox\Discussion\Comment\Authorizer;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\User;
 
 /**
@@ -28,7 +28,7 @@ class IsPostAuthor implements IAuthorizationRule
     public function authorize(array $params = [], User $user = null): void
     {
         $post = $params['post'] ?? null;
-        if (!$post instanceof Post\Model) {
+        if (!$post instanceof Comment\Model) {
             throw new Unauthorized('Could not find post in "post" param');
         }
 

@@ -10,7 +10,7 @@ namespace Schoolbox\Discussion\Thread;
 
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
 
@@ -20,7 +20,7 @@ use Scrub;
 class Controller extends BaseController
 {
     /**
-     * @var Post\Mapper
+     * @var Comment\Mapper
      */
     private $postMapper;
 
@@ -46,10 +46,10 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Post\Mapper $postMapper
-     * @param Mapper      $threadMapper
+     * @param Comment\Mapper $postMapper
+     * @param Mapper         $threadMapper
      */
-    public function __construct(Post\Mapper $postMapper, Mapper $threadMapper)
+    public function __construct(Comment\Mapper $postMapper, Mapper $threadMapper)
     {
         $this->postMapper   = $postMapper;
         $this->threadMapper = $threadMapper;
@@ -234,7 +234,7 @@ class Controller extends BaseController
      */
     private function retrievePostList(Model $thread, ?string $encodedCursor): array
     {
-        $cursor = new Post\Cursor($this->postMapper, $thread, Post\Cursor::ORDER_DESC);
+        $cursor = new Comment\Cursor($this->postMapper, $thread, Comment\Cursor::ORDER_DESC);
         $posts  = $cursor->retrieveResults($encodedCursor);
         return [
             'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),

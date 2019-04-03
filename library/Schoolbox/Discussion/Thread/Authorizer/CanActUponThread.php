@@ -10,7 +10,7 @@ namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\User;
 
@@ -48,7 +48,7 @@ class CanActUponThread implements IAuthorizationRule
         $thread = $params['thread'] ?? null;
         if (!$thread instanceof Thread\Model) {
             $post = $params['post'] ?? null;
-            if (!$post instanceof Post\Model) {
+            if (!$post instanceof Comment\Model) {
                 throw new \InvalidArgumentException('Could not find thread in either "thread" or "post" param');
             }
             $thread = $post->getThread();

@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Json;
 use Schoolbox\Discussion\Thread;

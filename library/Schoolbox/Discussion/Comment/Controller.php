@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Web\Exception\InvalidStatusCode;

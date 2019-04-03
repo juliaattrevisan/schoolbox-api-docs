@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread;
 
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'posts',
             [
-                'mapper'    => Post\Mapper::class,
+                'mapper'    => Comment\Mapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'discussion_thread_id',
             ]

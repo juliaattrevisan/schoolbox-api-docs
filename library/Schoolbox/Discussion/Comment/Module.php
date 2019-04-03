@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Authorizer as Auth;
 use Alaress\Module\Module as BaseModule;
@@ -14,7 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Post\Authorizer\IsPostAuthor;
+use Schoolbox\Discussion\Comment\Authorizer\IsPostAuthor;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
