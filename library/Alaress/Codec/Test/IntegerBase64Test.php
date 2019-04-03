@@ -25,7 +25,6 @@ class IntegerBase64Test extends TestCase
      */
     public function getTestEncodeData(): iterable
     {
-        yield 'null'   => [null,   null];
         yield '0'      => [0,      'MA=='];
         yield '1'      => [1,      'MQ=='];
         yield '-1'     => [-1,     'LTE='];
@@ -41,6 +40,7 @@ class IntegerBase64Test extends TestCase
      */
     public function getTestInvalidRawValueData(): iterable
     {
+        yield 'null'        => [null];
         yield 'emptyString' => [''];
         yield 'string'      => ['1'];
         yield 'object'      => [new \stdClass()];
@@ -58,6 +58,7 @@ class IntegerBase64Test extends TestCase
      */
     public function getTestInvalidEncodedValueData(): iterable
     {
+        yield 'null'     => [null];
         yield 'int'      => [1];
         yield 'object'   => [new \stdClass()];
         yield 'array'    => [[1,2,3]];

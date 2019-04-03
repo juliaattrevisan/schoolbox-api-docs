@@ -19,15 +19,12 @@ class Base64 implements ICodec
     /**
      * @inheritdoc
      *
-     * @param int|null $rawValue
-     * @return string|null
+     * @param int $rawValue
+     * @return string
      * @throws \TypeError if $rawValue isn't an int or null
      */
-    public function encode($rawValue): ?string
+    public function encode($rawValue): string
     {
-        if (!isset($rawValue)) {
-            return null;
-        }
         if (!is_int($rawValue)) {
             throw new \TypeError('Only integer values may be encoded by this codec');
         }
@@ -44,11 +41,8 @@ class Base64 implements ICodec
      * @throws \UnexpectedValueException if $encodedValue is a string, but
      *                                   decodes to a non-integer
      */
-    public function decode($encodedValue): ?int
+    public function decode($encodedValue): int
     {
-        if (!isset($encodedValue)) {
-            return null;
-        }
         if (!is_string($encodedValue)) {
             throw new \TypeError('Only string values may be decoded by this codec');
         }
