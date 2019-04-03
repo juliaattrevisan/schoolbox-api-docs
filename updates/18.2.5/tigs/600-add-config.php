@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Custom\Tigs;
+use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\InsertHelper;
 use Alaress\Database;
@@ -112,9 +113,5 @@ $app = new class extends InsertHelper
 
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
-try {
-    (new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
-} catch (Throwable $e) {
-    /** @noinspection PhpUnhandledExceptionInspection */
-    throw $e;
-}
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
