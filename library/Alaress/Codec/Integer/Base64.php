@@ -35,8 +35,8 @@ class Base64 implements ICodec
     /**
      * @inheritdoc
      *
-     * @param string|null $encodedValue
-     * @return int|null
+     * @param string $encodedValue
+     * @return int
      * @throws \TypeError                if $encodedValue isn't a string or null
      * @throws \UnexpectedValueException if $encodedValue is a string, but
      *                                   decodes to a non-integer
