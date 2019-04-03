@@ -6,7 +6,6 @@
  ************************************************************/
 //ClassList object..displays class list with most recent visit
 
-use Alaress\Mail\Formatter;
 use Schoolbox\Resource\Folder\Log\Model as Log;
 use \Schoolbox\Breadcrumbs;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -93,12 +92,11 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
 
     $now = new Alaress_Date_Format();
     $this->setVar(array(
-        'SUBJECTNAME' => Formatter::header($category->getName(), $code),
+        'SUBJECTNAME' => Scrub::text($category->getName()) . ($code ? ' (' . $code . ')' : ''),
         'CLASS_CODE' => $code,
         'TODAY'     => $now->getURLDate(),
         'select_all_block' => '',
     ));
-
     if ($canEmail) {
         $this->parse('select_all_block', 'select_all');
         $this->parse('housemaster_email_block', 'housemaster_email');
