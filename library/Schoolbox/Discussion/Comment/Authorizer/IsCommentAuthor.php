@@ -16,7 +16,7 @@ use Schoolbox\User;
 /**
  * Authorizer for determining whether a user is the author of a comment.
  */
-class IsPostAuthor implements IAuthorizationRule
+class IsCommentAuthor implements IAuthorizationRule
 {
     /**
      * @inheritdoc

@@ -14,7 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Comment\Authorizer\IsPostAuthor;
+use Schoolbox\Discussion\Comment\Authorizer\IsCommentAuthor;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -43,7 +43,7 @@ class Module extends BaseModule
         $commsContext     = new News\Discussion\Context($threadMapper, $newsMapper);
         $deleteAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new IsPostAuthor(),
+            new IsCommentAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new Thread\Authorizer\CanActUponThread(
                     new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
@@ -52,7 +52,7 @@ class Module extends BaseModule
         );
         $getAuthorizer    = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new IsPostAuthor(),
+            new IsCommentAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new Thread\Authorizer\CanActUponThread(
                     new News\Discussion\Permission\CanGet($authorizer, $commsContext)
