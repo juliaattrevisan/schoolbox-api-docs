@@ -88,6 +88,7 @@ class Context implements IContext
      *
      * @param Thread\Model $thread
      * @param mixed        $object
+     * @throws \TypeError                  if $object isn't a News\Model
      * @throws \Schoolbox\Mapper\Exception if save failed
      * @throws \UnexpectedValueException   if either $thread or $object is
      *                                     associated with something else
