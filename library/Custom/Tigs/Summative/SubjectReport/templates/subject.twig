@@ -147,7 +147,14 @@ Data:
             </div>
 
             {# Comments always come from the 'MYP AAS' or 'HSC Task Marks' assessments #}
-            {% set commentData = aasData ? aasData.data[unitSpecId].marks : hscTaskMarks.data[unitSpecId] %}
+
+            {% if attributes.isDp %}
+                {% set commentData = aamData.data[unitSpecId] %}
+            {% elseif attributes.isHsc %}
+                {% set commentData = hscTaskMarks.data[unitSpecId] %}
+            {% elseif attributes.isMyp %}
+                {% set commentData = aasData.data[unitSpecId].marks %}
+            {% endif %}
             {% if commentData.comment %}
                 <div class="column island small-12">
                     <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
