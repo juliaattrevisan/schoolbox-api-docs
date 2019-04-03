@@ -41,12 +41,13 @@ class IntegerCodecTest extends TestCase
      */
     public function getTestInvalidRawValueData(): iterable
     {
-        yield 'string'   => ['1'];
-        yield 'object'   => [new \stdClass()];
-        yield 'array'    => [[1,2,3]];
-        yield 'bool'     => [false];
-        yield 'float'    => [1.2];
-        yield 'resource' => [STDIN];
+        yield 'emptyString' => [''];
+        yield 'string'      => ['1'];
+        yield 'object'      => [new \stdClass()];
+        yield 'array'       => [[1,2,3]];
+        yield 'bool'        => [false];
+        yield 'float'       => [1.2];
+        yield 'resource'    => [STDIN];
     }
 
 
@@ -73,9 +74,10 @@ class IntegerCodecTest extends TestCase
      */
     public function getTestEncodedValueDecodesToNonIntegerErrorData(): iterable
     {
-        yield 'float 4.5'  => ['NC41'];
-        yield 'string 4e4' => ['NGU0'];
-        yield 'string xxx' => ['eHh4'];
+        yield 'emptyString' => [''];
+        yield 'float 4.5'   => ['NC41'];
+        yield 'string 4e4'  => ['NGU0'];
+        yield 'string xxx'  => ['eHh4'];
     }
 
 

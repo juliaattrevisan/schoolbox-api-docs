@@ -50,15 +50,7 @@ class IntegerCodec implements ICodec
         if (!is_string($encodedValue)) {
             throw new \TypeError('Only string values may be decoded by this codec');
         }
-        $decodedValue = base64_decode($encodedValue);
-
-        // Special cases:
-        // empty string: return null
-        if ($decodedValue === '') {
-            return null;
-        }
-
-        $rawValue = filter_var($decodedValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $rawValue = filter_var(base64_decode($encodedValue), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
         if (!isset($rawValue)) {
             throw new \UnexpectedValueException('Encoded value did not decode to an integer');
         }
