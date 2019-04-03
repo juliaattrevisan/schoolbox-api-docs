@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Comms\News;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
@@ -16,11 +17,16 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
+use Schoolbox\Comms\News\Discussion\Context;
+use Schoolbox\Comms\News\Discussion\Permission\CanModerate;
+use Schoolbox\Discussion\Thread;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\News\TopicMapper;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 class Module extends BaseModule
 {
@@ -129,6 +135,22 @@ class Module extends BaseModule
             );
         });
 
+        // Associating a discussion thread with a comms article:
+        // Use the authorizer the discussion thread uses.
+        $canAssociate = new Rule\Callback(function ($params, ?User $user) {
+            $authorizer = $this->getInjector()->get('authorizer');
+            $rule       = new CanModerate(
+                $authorizer,
+                new Context(
+                    $this->getMapperFactory()->get(Thread\Mapper::class),
+                    $this->getMapperFactory()->get(Mapper::class)
+                )
+            );
+            if (!$rule->hasPermission($params['article'], $user)) {
+                throw new Unauthorized('User does not have permission to associate a thread with this article');
+            }
+        });
+
         $viewRecipients = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -164,6 +186,13 @@ class Module extends BaseModule
         $this->register('GET', '/topics', 'getTopics', $loggedIn);                                               // (async) Get a list of topics to chooze
         $this->register('GET', '/{articleId:\d+}/update', 'getUpdate', $canModify, $preloadArticle);             // Update news article
         $this->register('POST', '/{articleId:\d+}', 'postUpdate', $canModify, $preloadArticle);
+        $this->register(
+            'POST',
+            '/{articleId:\d+}/associateWithThread',
+            'postAssociateWithDiscussionThread',
+            $canAssociate,
+            $preloadArticle
+        );
         $this->register('GET', '/{articleId:\d+}/recipients', 'getRecipients', $viewRecipients, $preloadArticle);// Find out who will receive this article
         $this->register('POST', '/{articleId:\d+}/delete', 'postDelete', $canModify, $preloadArticle);           // Delete article
         $this->register('GET', '/{articleId:\d+}', 'getDetail', $readerPerms, $preloadArticle);                  // View news article
@@ -226,6 +255,8 @@ class Module extends BaseModule
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
             'userResolver'               => $injector->lazyGet('commsNewsUserResolver'),
             'strategyFactory'            => $injector->lazyGet('commsNewsAudienceStrategyFactory'),
+            'threadMapper'               => $this->getMapperFactory()->getLazy(Thread\Mapper::class),
+            'errorMapper'                => $this->getMapperFactory()->getLazy(ErrorMapper::class),
         ];
     }
 

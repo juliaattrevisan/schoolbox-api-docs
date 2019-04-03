@@ -9,9 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Failure\Unauthorized;
-use Alaress\Authorizer\Rule\All;
-use Alaress\Authorizer\Rule\HasServicePermission;
-use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
@@ -22,12 +19,15 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Discussion\Context;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Discussion\Thread;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -105,6 +105,12 @@ class Controller extends Base
     /** @var Audience\Segment\StrategyFactory */
     private $strategyFactory;
 
+    /** @var Thread\Mapper */
+    private $threadMapper;
+
+    /** @var ErrorMapper */
+    private $errorMapper;
+
     private const DEFAULT_SEARCH_LIMIT = 10;
 
 
@@ -120,6 +126,8 @@ class Controller extends Base
      * @param Audience\ArticleResolver         $articleResolver
      * @param Audience\UserResolver            $userResolver
      * @param Audience\Segment\StrategyFactory $strategyFactory
+     * @param Thread\Mapper                    $threadMapper
+     * @param ErrorMapper                      $errorMapper
      */
     public function __construct(
         Mapper $newsMapper,
@@ -132,7 +140,9 @@ class Controller extends Base
         IConnector $databaseInternal,
         Audience\ArticleResolver $articleResolver,
         Audience\UserResolver $userResolver,
-        Audience\Segment\StrategyFactory $strategyFactory
+        Audience\Segment\StrategyFactory $strategyFactory,
+        Thread\Mapper $threadMapper,
+        ErrorMapper $errorMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -145,6 +155,8 @@ class Controller extends Base
         $this->articleResolver            = $articleResolver;
         $this->userResolver               = $userResolver;
         $this->strategyFactory            = $strategyFactory;
+        $this->threadMapper               = $threadMapper;
+        $this->errorMapper                = $errorMapper;
     }
 
 
@@ -517,6 +529,34 @@ class Controller extends Base
             $this->getResponse()->redirect->afterPost($nextStep);
             return;
         }
+    }
+
+
+    /**
+     * Associate this article with a discussion thread (passed in $post['discussionThreadId']).
+     *
+     * @api POST /news/{articleId}/associateWithThread/{discussionThreadId}
+     * @level 19.0
+     *
+     * @param Model $article
+     * @throws MapperException                            if save, or retrieval of the thread, failed
+     * @throws MapperException\Deleted                    if the thread was deleted
+     * @throws \Aura\Web\Exception\InvalidStatusCode      if somehow 204 becomes invalid?
+     * @throws \Schoolbox\Application\Exception\Exception if an error gets raised
+     */
+    public function postAssociateWithDiscussionThread(Model $article): void
+    {
+        /** @var Thread\Model $thread */
+        $thread  = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
+        $context = new Context($this->threadMapper, $this->newsMapper);
+        try {
+            $context->associate($thread, $article);
+        } catch (\UnexpectedValueException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED, $e);
+        }
+
+        // No point responding with any content
+        $this->response->status->setCode(204);
     }
 
 
@@ -939,8 +979,6 @@ class Controller extends Base
      */
     private function getBasicFolderDetailsById(int $folderId) :?array
     {
-        $errorMapper = \Schoolbox\Error\Mapper::getInstance();
-
         try {
             $folder = $this->folderMapper->findCheaplyById($folderId);
 
@@ -950,7 +988,7 @@ class Controller extends Base
             ];
 
         } catch (MapperException $e) {
-            throw $errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
         }
     }
 

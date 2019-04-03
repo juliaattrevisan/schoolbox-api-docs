@@ -15,8 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Post;
-use Schoolbox\Discussion\Thread\Authorizer\CanGetFromThread;
-use Schoolbox\Discussion\Thread\Authorizer\CanPostIntoThread;
+use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
 
 /**
  * Module for discussion thread requests.
@@ -36,18 +35,33 @@ class Module extends BaseModule
     {
         /** @var Auth\Authorizer $authorizer */
         /** @var News\Mapper     $newsMapper */
-        $authorizer       = $this->getInjector()->get('authorizer');
-        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
-        $getAuthorizer    = new Auth\Rule\Any(
+        /** @var Mapper          $threadMapper */
+        $authorizer     = $this->getInjector()->get('authorizer');
+        $newsMapper     = $this->getMapperFactory()->get(News\Mapper::class);
+        $threadMapper   = $this->getMapperFactory()->get(Mapper::class);
+        $commsContext   = new News\Discussion\Context($threadMapper, $newsMapper);
+        $getAuthorizer  = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new CanGetFromThread($authorizer, $newsMapper);
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanGet($authorizer, $commsContext)
+                );
             })
         );
-        $postAuthorizer   = new Auth\Rule\Any(
+        $postAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new CanPostIntoThread($authorizer, $newsMapper);
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanPost($authorizer, $commsContext)
+                );
+            })
+        );
+        $moderateAuthorizer = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
+                );
             })
         );
 
@@ -69,6 +83,12 @@ class Module extends BaseModule
         );
         $this->register(
             'POST',
+            '',
+            'createThread',
+            new Auth\Rule\IsLoggedIn()
+        );
+        $this->register(
+            'POST',
             '/{id:\d+}/posts',
             'createPostInThread',
             $postAuthorizer,
@@ -78,14 +98,14 @@ class Module extends BaseModule
             'PUT',
             '/{id:\d+}/open',
             'openThread',
-            $postAuthorizer,
+            $moderateAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'PUT',
             '/{id:\d+}/close',
             'closeThread',
-            $postAuthorizer,
+            $moderateAuthorizer,
             [$this, 'preloadThread']
         );
     }
@@ -116,7 +136,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'postMapper' => $this->getMapperFactory()->getLazy(Post\Mapper::class),
+            'postMapper'   => $this->getMapperFactory()->getLazy(Post\Mapper::class),
             'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }

@@ -8,11 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Post;
 
+use Alaress\Codec\ICodec;
+use Alaress\Codec\Integer\Base64;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class Cursor
@@ -57,6 +60,14 @@ class Cursor
 
 
     /**
+     * The codec implementation used for the cursor.
+     *
+     * @var ICodec
+     */
+    private $codec;
+
+
+    /**
      * Constructor
      *
      * @param Mapper       $mapper
@@ -78,6 +89,7 @@ class Cursor
             );
         }
         $this->order = $order;
+        $this->codec = new Base64();
     }
 
 
@@ -86,6 +98,7 @@ class Cursor
      * of any cursor.
      *
      * @return int
+     * @throws MapperException if the query fails
      */
     public function retrieveResultCount(): int
     {
@@ -98,6 +111,7 @@ class Cursor
      *
      * @param string|null $currentCursor The current encoded cursor, if there is one.
      * @return GenericCollection
+     * @throws MapperException if the query fails
      */
     public function retrieveResults(?string $currentCursor): GenericCollection
     {
@@ -122,7 +136,7 @@ class Cursor
      * @param GenericCollection $collection
      * @return string|null
      */
-    public function retrieveCurrentCursor(GenericCollection $collection): ?string
+    public function current(GenericCollection $collection): ?string
     {
         $currentCursor = null;
         $firstRecord   = $collection->first();
@@ -140,7 +154,7 @@ class Cursor
             } elseif ($this->order === self::ORDER_DESC) {
                 $previousPageCursorId++;
             }
-            $currentCursor = $this->encodeCursor($previousPageCursorId);
+            $currentCursor = $this->codec->encode($previousPageCursorId);
         }
         return $currentCursor;
     }
@@ -152,7 +166,7 @@ class Cursor
      * @param GenericCollection $collection
      * @return string|null
      */
-    public function retrieveNextCursor(GenericCollection $collection): ?string
+    public function next(GenericCollection $collection): ?string
     {
         $nextCursor  = null;
         $lastRecord  = $collection->last();
@@ -160,7 +174,7 @@ class Cursor
 
         // The next cursor points to the last record.
         if ($lastRecord && method_exists($lastRecord, $getIdMethod)) {
-            $nextCursor = $this->encodeCursor($lastRecord->$getIdMethod());
+            $nextCursor = $this->codec->encode($lastRecord->$getIdMethod());
         }
         return $nextCursor;
 
@@ -177,8 +191,8 @@ class Cursor
      */
     private function applyCursor(Builder $builder, ?string $cursor): Builder
     {
-        if (isset($cursor)) {
-            $lastId = $this->decodeCursor($cursor);
+        if (isset($cursor) && $cursor !== '') {
+            $lastId = $this->codec->decode($cursor);
             if (isset($lastId) && $lastId > 0) {
                 if ($this->order === self::ORDER_ASC) {
                     // Ascending: get only items greater than last ID
@@ -192,30 +206,6 @@ class Cursor
             }
         }
         return $builder;
-    }
-
-
-    /**
-     * Encode a cursor in a form which is passable in a query string.
-     *
-     * @param int|null $id
-     * @return string|null
-     */
-    private function encodeCursor(?int $id): ?string
-    {
-        return isset($id) ? base64_encode((string)$id) : null;
-    }
-
-
-    /**
-     * Decode a cursor that was passed in a query string.
-     *
-     * @param string|null $cursor
-     * @return int|null
-     */
-    private function decodeCursor(?string $cursor): ?int
-    {
-        return filter_var(base64_decode($cursor), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
     }
 
 

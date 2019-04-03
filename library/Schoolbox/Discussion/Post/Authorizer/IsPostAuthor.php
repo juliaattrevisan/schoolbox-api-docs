@@ -1,0 +1,42 @@
+<?php
+/**
+ * @copyright Copyright 2019, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Discussion\Post\Authorizer;
+
+use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Authorizer\Rule\IAuthorizationRule;
+use Schoolbox\Discussion\Post;
+use Schoolbox\User;
+
+/**
+ * Authorizer for determining whether a user is the author of a post.
+ */
+class IsPostAuthor implements IAuthorizationRule
+{
+    /**
+     * @inheritdoc
+     *
+     * @param array     $params
+     * @param User|null $user
+     * @return void
+     */
+    public function authorize(array $params = [], User $user = null): void
+    {
+        $post = $params['post'] ?? null;
+        if (!$post instanceof Post\Model) {
+            throw new Unauthorized('Could not find post in "post" param');
+        }
+
+        $author = $post->getAuthor();
+        if ($user && $author && $user->getId() === $author->getId()) {
+            return;
+        }
+
+        throw new Unauthorized('Current user is not author of post');
+    }
+}

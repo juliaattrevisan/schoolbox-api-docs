@@ -66,16 +66,29 @@ class Controller extends BaseController
      */
     public function getThread(Model $thread): void
     {
-        $responseData             = $thread->jsonSerialize(
-            $this->retrieveJsonDecorator(),
-            $this->retrieveLinkDecorator()
-        );
-        $responseData['children'] = $this->retrievePostList($thread, null);
-        $this->response->content->set(
-            $this->isJsonRequest()
-                ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
-        );
+        $this->buildResponse($thread, true);
+    }
+
+
+    /**
+     * Create a new thread.
+     *
+     * This thread is created in an orphaned state: it is not associated with
+     * any particular context. It's the responsibility of the client to
+     * associate it with something.
+     *
+     * @throws \Schoolbox\Mapper\Exception
+     * @api   GET /threads/{id}/posts
+     * @level 190
+     */
+    public function createThread(): void
+    {
+        /** @var \stdClass $data */
+        $data   = $this->request->content->get();
+        $thread = $this->threadMapper->createModel()
+            ->setOpen($data->open);
+        $this->threadMapper->save($thread);
+        $this->buildResponse($thread, false);
     }
 
 
@@ -228,10 +241,34 @@ class Controller extends BaseController
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    'current' => $encodedCursor ?? $cursor->retrieveCurrentCursor($posts),
-                    'next'    => $cursor->retrieveNextCursor($posts),
+                    'current' => $encodedCursor ?? $cursor->current($posts),
+                    'next'    => $cursor->next($posts),
                 ],
             ],
         ];
+    }
+
+
+    /**
+     * Builds a response for this thread, putting it into
+     * `$this->response->content`.
+     *
+     * @param Model $thread
+     * @param bool  $loadChildren
+     */
+    private function buildResponse(Model $thread, bool $loadChildren): void
+    {
+        $responseData             = $thread->jsonSerialize(
+            $this->retrieveJsonDecorator(),
+            $this->retrieveLinkDecorator()
+        );
+        $responseData['children'] = $loadChildren
+            ? $this->retrievePostList($thread, null)
+            : [];
+        $this->response->content->set(
+            $this->isJsonRequest()
+                ? $this->buildJsonOutput($responseData)
+                : $this->buildUnthemedHtmlOutput('@discussionThreads/item.twig', ['item' => $responseData])
+        );
     }
 }

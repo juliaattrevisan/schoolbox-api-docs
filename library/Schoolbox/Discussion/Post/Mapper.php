@@ -42,6 +42,7 @@ class Mapper extends BaseMapper
      * Overridden to join on thread and author.
      *
      * @return string
+     * @throws BaseMapper\DefinitionException if somehow a join doesn't exist?
      */
     protected function getSelectString()
     {
@@ -58,6 +59,7 @@ class Mapper extends BaseMapper
      * Overridden to join on thread and author.
      *
      * @return string
+     * @throws BaseMapper\DefinitionException if somehow a join doesn't exist?
      */
     protected function getFromString()
     {
@@ -74,6 +76,7 @@ class Mapper extends BaseMapper
      *
      * @param PDOStatement $statement
      * @return \Schoolbox\GenericCollection
+     * @throws BaseMapper\Exception if a hydration fails
      */
     protected function hydrateSelect(PDOStatement $statement)
     {

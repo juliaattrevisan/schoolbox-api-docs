@@ -14,6 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Post\Authorizer\IsPostAuthor;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -35,18 +36,27 @@ class Module extends BaseModule
     {
         /** @var Auth\Authorizer $authorizer */
         /** @var News\Mapper     $newsMapper */
+        /** @var Thread\Mapper   $threadMapper */
         $authorizer       = $this->getInjector()->get('authorizer');
         $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
+        $threadMapper     = $this->getMapperFactory()->get(Thread\Mapper::class);
+        $commsContext     = new News\Discussion\Context($threadMapper, $newsMapper);
         $deleteAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new Thread\Authorizer\CanDeleteFromThread($authorizer, $newsMapper);
+            new IsPostAuthor(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
+                return new Thread\Authorizer\CanActUponThread(
+                    new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
+                );
             })
         );
         $getAuthorizer    = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
-                return new Thread\Authorizer\CanGetFromThread($authorizer, $newsMapper);
+            new IsPostAuthor(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
+                return new Thread\Authorizer\CanActUponThread(
+                    new News\Discussion\Permission\CanGet($authorizer, $commsContext)
+                );
             })
         );
 
