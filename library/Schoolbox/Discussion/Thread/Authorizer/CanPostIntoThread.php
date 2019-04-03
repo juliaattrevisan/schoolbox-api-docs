@@ -63,7 +63,8 @@ class CanPostIntoThread extends CanActUponThread
      */
     protected function validateAgainstCommsArticle(News\Model $article, ?User $user): bool
     {
-        if (!$article->getDiscussionThread()->getOpen()) {
+        $thread = $article->getDiscussionThread();
+        if (!($thread && $thread->getOpen())) {
             return false;
         }
         return $this->baseAuthorizer->isPathAuthorizedForUser(
