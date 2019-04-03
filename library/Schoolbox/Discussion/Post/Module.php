@@ -50,6 +50,13 @@ class Module extends BaseModule
             })
         );
 
+        $postAuthorizer    = new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () use ($authorizer, $newsMapper) {
+                return new Thread\Authorizer\CanPostIntoThread($authorizer, $newsMapper);
+            })
+        );
+
         // Routes
         $this->register(
             'DELETE',
@@ -64,6 +71,12 @@ class Module extends BaseModule
             'getPostsByParent',
             $getAuthorizer,
             [$this, 'preloadPost']
+        );
+        $this->register(
+            'POST',
+            '/{id:\d+}/posts',
+            'createPostInThread',
+            $postAuthorizer
         );
     }
 

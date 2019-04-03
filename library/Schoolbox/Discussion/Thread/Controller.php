@@ -11,8 +11,8 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Post;
-use Schoolbox\Forum\Thread;
 use Schoolbox\Json\Decorator\LinkDecorator;
+use Scrub;
 
 /**
  * Controller for thread-related API requests.
@@ -90,6 +90,12 @@ class Controller extends BaseController
     public function getPostsByThread(Model $thread): void
     {
         $responseData = $this->retrievePostList($thread, $this->request->query->get('cursor'));
+
+        // Clean-up every content before returning the result
+        foreach ($responseData['data'] as $key => $data) {
+            $responseData['data'][$key]['content'] = Scrub::html($data['content']);
+        }
+
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
@@ -108,11 +114,14 @@ class Controller extends BaseController
      * @level 190
      *
      * @param Model $thread
+     *
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function createPostInThread(Model $thread): void
     {
         /** @var \stdClass $data */
         $data = $this->request->content->get();
+
         $post = $this->postMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
@@ -121,6 +130,10 @@ class Controller extends BaseController
         $this->postMapper->save($post);
 
         $responseData = $post->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
+
+        // Clean-up content before returning the result
+        $responseData['content'] = Scrub::html($responseData['content']);
+
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
