@@ -139,7 +139,13 @@ class Module extends BaseModule
         // Use the authorizer the discussion thread uses.
         $canAssociate = new Rule\Callback(function ($params, ?User $user) {
             $authorizer = $this->getInjector()->get('authorizer');
-            $rule       = new CanModerate($authorizer, new Context($this->getMapperFactory()->get(Mapper::class)));
+            $rule       = new CanModerate(
+                $authorizer,
+                new Context(
+                    $this->getMapperFactory()->get(Thread\Mapper::class),
+                    $this->getMapperFactory()->get(Mapper::class)
+                )
+            );
             if (!$rule->hasPermission($params['article'], $user)) {
                 throw new Unauthorized('User does not have permission to associate a thread with this article');
             }

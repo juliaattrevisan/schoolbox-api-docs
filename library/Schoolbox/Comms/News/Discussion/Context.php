@@ -35,11 +35,13 @@ class Context implements IContext
     /**
      * Constructor
      *
-     * @param News\Mapper $mapper
+     * @param Thread\Mapper $threadMapper
+     * @param News\Mapper   $mapper
      */
-    public function __construct(News\Mapper $mapper)
+    public function __construct(Thread\Mapper $threadMapper, News\Mapper $mapper)
     {
-        $this->mapper = $mapper;
+        $this->threadMapper = $threadMapper;
+        $this->mapper       = $mapper;
     }
 
 
@@ -87,6 +89,8 @@ class Context implements IContext
      * @param Thread\Model $thread
      * @param mixed        $object
      * @throws \Schoolbox\Mapper\Exception if save failed
+     * @throws \UnexpectedValueException   if either $thread or $object is
+     *                                     associated with something else
      */
     public function associate(Thread\Model $thread, $object): void
     {
@@ -94,7 +98,12 @@ class Context implements IContext
             throw new \TypeError('$object must be a ' . News\Model::class);
         }
 
-        // Don't allow this to be associated with a different thread
+        // Don't allow the thread to be associated with more than one object
+        if ($this->threadMapper->isThreadAlreadyAssociated($thread)) {
+            throw new \UnexpectedValueException('$thread is already associated with an object');
+        }
+
+        // Don't allow the object to be associated with a different thread
         if ($object->getDiscussionThread()) {
             throw new \UnexpectedValueException('$object is already associated with a thread');
         }

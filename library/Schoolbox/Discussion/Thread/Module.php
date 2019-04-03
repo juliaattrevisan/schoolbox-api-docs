@@ -35,9 +35,11 @@ class Module extends BaseModule
     {
         /** @var Auth\Authorizer $authorizer */
         /** @var News\Mapper     $newsMapper */
+        /** @var Mapper          $threadMapper */
         $authorizer     = $this->getInjector()->get('authorizer');
         $newsMapper     = $this->getMapperFactory()->get(News\Mapper::class);
-        $commsContext   = new News\Discussion\Context($newsMapper);
+        $threadMapper   = $this->getMapperFactory()->get(Mapper::class);
+        $commsContext   = new News\Discussion\Context($threadMapper, $newsMapper);
         $getAuthorizer  = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {

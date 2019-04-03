@@ -539,21 +539,21 @@ class Controller extends Base
      * @level 19.0
      *
      * @param Model $article
-     * @throws MapperException                       if save, or retrieval of the thread, failed
-     * @throws MapperException\Deleted               if the thread was deleted
-     * @throws \Aura\Web\Exception\InvalidStatusCode if somehow 204 becomes invalid?
+     * @throws MapperException                            if save, or retrieval of the thread, failed
+     * @throws MapperException\Deleted                    if the thread was deleted
+     * @throws \Aura\Web\Exception\InvalidStatusCode      if somehow 204 becomes invalid?
+     * @throws \Schoolbox\Application\Exception\Exception if an error gets raised
      */
     public function postAssociateWithDiscussionThread(Model $article): void
     {
         /** @var Thread\Model $thread */
-        $thread = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
-        if ($this->threadMapper->isThreadAlreadyAssociated($thread)) {
-            // Can't re-associate a thread
-            $this->errorMapper->generateException(ErrorMapper::ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED);
+        $thread  = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
+        $context = new Context($this->threadMapper, $this->newsMapper);
+        try {
+            $context->associate($thread, $article);
+        } catch (\UnexpectedValueException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED, $e);
         }
-
-        $context = new Context($this->newsMapper);
-        $context->associate($thread, $article);
 
         // No point responding with any content
         $this->response->status->setCode(204);

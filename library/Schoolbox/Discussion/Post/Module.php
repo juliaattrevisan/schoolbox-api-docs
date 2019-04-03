@@ -36,9 +36,11 @@ class Module extends BaseModule
     {
         /** @var Auth\Authorizer $authorizer */
         /** @var News\Mapper     $newsMapper */
+        /** @var Thread\Mapper   $threadMapper */
         $authorizer       = $this->getInjector()->get('authorizer');
         $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
-        $commsContext     = new News\Discussion\Context($newsMapper);
+        $threadMapper     = $this->getMapperFactory()->get(Thread\Mapper::class);
+        $commsContext     = new News\Discussion\Context($threadMapper, $newsMapper);
         $deleteAuthorizer = new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
             new IsPostAuthor(),
