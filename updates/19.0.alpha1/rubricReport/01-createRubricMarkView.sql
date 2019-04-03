@@ -66,7 +66,7 @@ CREATE OR REPLACE VIEW v_rubric_mark AS
                                               AND rgm.id              = rdm.rubric_group_mark_id
 
   -- Only valid rubric marks
-  WHERE (rgm.valid IS TRUE OR rdm.valid IS TRUE)
+  WHERE a.deleted_at is null AND (rgm.valid IS TRUE OR rdm.valid IS TRUE)
 
   ORDER BY
     a.id            ASC,
