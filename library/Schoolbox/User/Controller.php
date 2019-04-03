@@ -47,6 +47,7 @@ class Controller extends Base
     /**
      * Function to transfer to another user (impersonate), stores your previous session for later return
      *
+     * @api /user/switch/{userId}
      * @param User $user
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
@@ -75,10 +76,14 @@ class Controller extends Base
         $this->getResponse()->redirect->found('/');
     }
 
+
     /**
-     * Return to your previous session, after imper
+     * Return to your previous session, after impersonation
+     *
+     * @api /user/recoverSession
      */
-    public function recoverSession() {
+    public function recoverSession(): void
+    {
         $_SESSION = $_SESSION['previous'];
         $this->getResponse()->redirect->found('/');
     }
