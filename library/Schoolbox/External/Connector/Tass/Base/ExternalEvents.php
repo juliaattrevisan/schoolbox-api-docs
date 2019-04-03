@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector\Tass\Base;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\User;
@@ -46,6 +47,23 @@ class ExternalEvents extends Base implements IExternalEvents
      */
     private function buildQueryForProductCode(?string $productCode): string
     {
+
+        /* STUFF()
+         * Inject a string into another string
+         * https://www.w3schools.com/sql/func_sqlserver_stuff.asp
+         *
+         * James and I decided that we could concat the multiple event types assigned in TASS using STUFF().
+         * This creates a comma-separated representation of multiple event types e.g. "Sporting, General, Academic".
+         * This will never match to any schoolbox event type and will fall into the default type set in admin.
+         * The default type is specified in admin > calendar > subscribe > external db.
+         *
+         * Anyone using this connector as originally designed should remain unaffected ie. BTAC Tim Gardiner.
+         * That is, anyone importing events with one event type.
+         *
+         * Schoolbox doesn't support multiple event types and even if we wanted to do that, the task is enormous.
+         * All the other variants of aggregation in MSSQL are all really fiddly and prevent you from doing what we need.
+         */
+
         /* Anatomy of a query
          */
         $selectQuery = "
@@ -55,7 +73,8 @@ class ExternalEvents extends Base implements IExternalEvents
                 ec.event_name AS title,
                 ec.event_desc AS comment,
                 ec.room_code AS room,
-                ecd.cat_desc as type,
+                LTRIM(RTRIM(STUFF((SELECT ', ' + LTRIM(RTRIM(ecd.cat_desc))
+                    FROM eventcatdefs ecd WHERE ec.cat_num = ecd.cat_num FOR XML PATH('')), 1 , 1 , ''))) AS type,
                 CASE 
                     WHEN ec.start_time IS NOT NULL THEN ec.start_date + CAST(ec.start_time AS TIME(0))
                     ELSE ec.start_date 
@@ -69,9 +88,6 @@ class ExternalEvents extends Base implements IExternalEvents
             FROM eventcalendar ec
         ";
 
-        $catdefsQuery = '
-            LEFT JOIN eventcatdefs ecd ON ec.cat_num = ecd.cat_num
-        ';
 
         $whereQuery = '
             NOT (
@@ -91,7 +107,6 @@ class ExternalEvents extends Base implements IExternalEvents
         if (null === $productCode) {
             return "(
                 {$selectQuery}
-                {$catdefsQuery}
                 WHERE 
                     ec.entry_code = :externalId AND
                     {$whereQuery}
@@ -106,14 +121,15 @@ class ExternalEvents extends Base implements IExternalEvents
                     ON et.event_id = ec.event_id 
                     AND ec.cmpy_code = et.cmpy_code
                     AND prod_code = '{$productCode}'
-                {$catdefsQuery} 
                 WHERE 
                 {$whereQuery}
             )";
     }
 
+
     /**
      * @inheritdoc
+     * @throws InvalidArgumentException
      */
     public function getExternalEvents(User $user, $startDate, $endDate)
     {
