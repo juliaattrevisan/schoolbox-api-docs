@@ -6,13 +6,15 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Codec;
+namespace Alaress\Codec\Integer;
+
+use Alaress\Codec\ICodec;
 
 /**
- * A basic codec for encoding and decoding an integer into an obfuscated string
+ * A codec for encoding and decoding an integer into an obfuscated base64 string
  * value.
  */
-class IntegerCodec implements ICodec
+class Base64 implements ICodec
 {
     /**
      * @inheritdoc

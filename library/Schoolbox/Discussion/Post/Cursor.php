@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Post;
 
 use Alaress\Codec\ICodec;
-use Alaress\Codec\IntegerCodec;
+use Alaress\Codec\Integer\Base64;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
@@ -89,7 +89,7 @@ class Cursor
             );
         }
         $this->order = $order;
-        $this->codec = new IntegerCodec();
+        $this->codec = new Base64();
     }
 
 

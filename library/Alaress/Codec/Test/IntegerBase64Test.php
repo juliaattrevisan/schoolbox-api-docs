@@ -8,15 +8,15 @@ declare(strict_types=1);
 
 namespace Alaress\Codec\Test;
 
-use Alaress\Codec\IntegerCodec;
+use Alaress\Codec\Integer\Base64;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Test class for `IntegerCodec`.
+ * Test class for the integer-base64 codec.
  *
- * @covers \Alaress\Codec\IntegerCodec
+ * @covers \Alaress\Codec\Integer\Base64
  */
-class IntegerCodecTest extends TestCase
+class IntegerBase64Test extends TestCase
 {
     /**
      * Get data for `testEncode` and `testDecode`.
@@ -82,27 +82,27 @@ class IntegerCodecTest extends TestCase
 
 
     /**
-     * @covers       \Alaress\Codec\IntegerCodec::encode
+     * @covers       \Alaress\Codec\Integer\Base64::encode
      * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
     public function testEncode(?int $rawValue, ?string $encodedValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $this->assertSame($encodedValue, $codec->encode($rawValue));
     }
 
 
     /**
-     * @covers       \Alaress\Codec\IntegerCodec::decode
+     * @covers       \Alaress\Codec\Integer\Base64::decode
      * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
     public function testDecode(?int $rawValue, ?string $encodedValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $this->assertSame($rawValue, $codec->decode($encodedValue));
     }
 
@@ -110,14 +110,14 @@ class IntegerCodecTest extends TestCase
     /**
      * Test that encoding then decoding a value results in the same value.
      *
-     * @covers       \Alaress\Codec\IntegerCodec::encode
-     * @covers       \Alaress\Codec\IntegerCodec::decode
+     * @covers       \Alaress\Codec\Integer\Base64::encode
+     * @covers       \Alaress\Codec\Integer\Base64::decode
      * @dataProvider getTestEncodeData
      * @param int|null $rawValue
      */
     public function testLosslessEncode(?int $rawValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $this->assertSame($rawValue, $codec->decode($codec->encode($rawValue)));
     }
 
@@ -126,15 +126,15 @@ class IntegerCodecTest extends TestCase
      * Test that decoding then encoding a value results in the same encoded
      * value.
      *
-     * @covers       \Alaress\Codec\IntegerCodec::encode
-     * @covers       \Alaress\Codec\IntegerCodec::decode
+     * @covers       \Alaress\Codec\Integer\Base64::encode
+     * @covers       \Alaress\Codec\Integer\Base64::decode
      * @dataProvider getTestEncodeData
      * @param int|null    $rawValue
      * @param string|null $encodedValue
      */
     public function testLosslessDecode(?int $rawValue, ?string $encodedValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $this->assertSame($encodedValue, $codec->encode($codec->decode($encodedValue)));
     }
 
@@ -142,14 +142,14 @@ class IntegerCodecTest extends TestCase
     /**
      * Test that attempting to encode a non-integer raises an error.
      *
-     * @covers            \Alaress\Codec\IntegerCodec::encode
+     * @covers            \Alaress\Codec\Integer\Base64::encode
      * @expectedException \TypeError
      * @dataProvider      getTestInvalidRawValueData
      * @param mixed $rawValue
      */
     public function testInvalidRawValue($rawValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $codec->encode($rawValue);
     }
 
@@ -157,14 +157,14 @@ class IntegerCodecTest extends TestCase
     /**
      * Test that attempting to decode a non-string raises an error.
      *
-     * @covers            \Alaress\Codec\IntegerCodec::decode
+     * @covers            \Alaress\Codec\Integer\Base64::decode
      * @expectedException \TypeError
      * @dataProvider      getTestInvalidEncodedValueData
      * @param mixed $encodedValue
      */
     public function testInvalidEncodedValue($encodedValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $codec->decode($encodedValue);
     }
 
@@ -173,14 +173,14 @@ class IntegerCodecTest extends TestCase
      * Test that attempting to decode a value that decodes to a non-integer
      * raises an error.
      *
-     * @covers            \Alaress\Codec\IntegerCodec::decode
+     * @covers            \Alaress\Codec\Integer\Base64::decode
      * @expectedException \UnexpectedValueException
      * @dataProvider      getTestEncodedValueDecodesToNonIntegerErrorData
      * @param mixed $encodedValue
      */
     public function testEncodedValueDecodesToNonIntegerError($encodedValue): void
     {
-        $codec = new IntegerCodec();
+        $codec = new Base64();
         $codec->decode($encodedValue);
     }
 }
