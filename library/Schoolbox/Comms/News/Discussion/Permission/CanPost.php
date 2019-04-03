@@ -51,7 +51,8 @@ class CanPost extends BaseStrategy
         if (!$object instanceof News\Model) {
             return false;
         }
-        if (!$object->getCommentsAllowed()) {
+        $thread = $object->getDiscussionThread();
+        if (!($thread && $thread->getOpen())) {
             return false;
         }
         return $this->authorizer->isPathAuthorizedForUser(
