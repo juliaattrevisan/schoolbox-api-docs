@@ -30,7 +30,8 @@ interface IContext
 
 
     /**
-     * Find an item by ID.
+     * Find an item by its ID, which this context knows how to associate with a
+     * thread.
      *
      * @param $id
      * @return mixed
@@ -43,7 +44,8 @@ interface IContext
      * return them.
      *
      * @param ThreadModel $thread
-     * @return iterable
+     * @return iterable A collection of objects, of a type which this context
+     *                  knows how to associate with a thread.
      */
     public function findAssociations(ThreadModel $thread): iterable;
 
