@@ -46,7 +46,7 @@ class Module extends BaseModule
             new IsCommentAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
+                    new News\Discussion\Permission\CanModerateThread($authorizer, $commsContext)
                 );
             })
         );
@@ -55,7 +55,7 @@ class Module extends BaseModule
             new IsCommentAuthor(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanGet($authorizer, $commsContext)
+                    new News\Discussion\Permission\CanGetComments($authorizer, $commsContext)
                 );
             })
         );

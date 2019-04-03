@@ -18,7 +18,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
 use Schoolbox\Comms\News\Discussion\Context;
-use Schoolbox\Comms\News\Discussion\Permission\CanModerate;
+use Schoolbox\Comms\News\Discussion\Permission\CanModerateThread;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -139,7 +139,7 @@ class Module extends BaseModule
         // Use the authorizer the discussion thread uses.
         $canAssociate = new Rule\Callback(function ($params, ?User $user) {
             $authorizer = $this->getInjector()->get('authorizer');
-            $rule       = new CanModerate(
+            $rule       = new CanModerateThread(
                 $authorizer,
                 new Context(
                     $this->getMapperFactory()->get(Thread\Mapper::class),
