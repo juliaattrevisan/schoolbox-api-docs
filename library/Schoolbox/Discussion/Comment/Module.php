@@ -19,14 +19,14 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * Module for discussion post requests.
+ * Module for discussion comment requests.
  */
 class Module extends BaseModule
 {
     /**
      * @var string
      */
-    protected $basename = 'discussionPosts';
+    protected $basename = 'discussionComments';
 
 
     /**
@@ -71,21 +71,21 @@ class Module extends BaseModule
         $this->register(
             'DELETE',
             '/{id:\d+}',
-            'deletePost',
+            'deleteComment',
             $deleteAuthorizer,
-            [$this, 'preloadPostAllowDeleted']
+            [$this, 'preloadCommentAllowDeleted']
         );
         $this->register(
             'GET',
-            '/{id:\d+}/posts',
-            'getPostsByParent',
+            '/{id:\d+}/comments',
+            'getCommentsByParent',
             $getAuthorizer,
-            [$this, 'preloadPost']
+            [$this, 'preloadComment']
         );
         $this->register(
             'POST',
-            '/{id:\d+}/posts',
-            'createPostInThread',
+            '/{id:\d+}/comments',
+            'createCommentInThread',
             $postAuthorizer
         );
     }
@@ -123,35 +123,35 @@ class Module extends BaseModule
 
 
     /**
-     * Preload the requested post.
+     * Preload the requested comment.
      *
      * @param array $params
      * @return array
-     * @throws MapperException         if the post never existed
-     * @throws MapperException\Deleted if the post has been deleted
+     * @throws MapperException         if the comment never existed
+     * @throws MapperException\Deleted if the comment has been deleted
      */
-    public function preloadPost(array $params): array
+    public function preloadComment(array $params): array
     {
         return [
-            'post' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+            'comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
         ];
     }
 
 
     /**
-     * Preload the requested post. If the post was deleted, it is still
+     * Preload the requested comment. If the comment was deleted, it is still
      * preloaded.
      *
      * @param array $params
      * @return array
-     * @throws MapperException if the post never existed
+     * @throws MapperException if the comment never existed
      */
-    public function preloadPostAllowDeleted(array $params): array
+    public function preloadCommentAllowDeleted(array $params): array
     {
         try {
-            return $this->preloadPost($params);
+            return $this->preloadComment($params);
         } catch (MapperException\Deleted $e) {
-            return ['post' => $e->getDeletedObject(),];
+            return ['comment' => $e->getDeletedObject(),];
         }
     }
 }

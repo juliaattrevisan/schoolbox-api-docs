@@ -14,7 +14,7 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\User;
 
 /**
- * Authorizer for determining whether a user is the author of a post.
+ * Authorizer for determining whether a user is the author of a comment.
  */
 class IsPostAuthor implements IAuthorizationRule
 {
@@ -27,16 +27,16 @@ class IsPostAuthor implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null): void
     {
-        $post = $params['post'] ?? null;
-        if (!$post instanceof Comment\Model) {
-            throw new Unauthorized('Could not find post in "post" param');
+        $comment = $params['comment'] ?? null;
+        if (!$comment instanceof Comment\Model) {
+            throw new Unauthorized('Could not find comment in "comment" param');
         }
 
-        $author = $post->getAuthor();
+        $author = $comment->getAuthor();
         if ($user && $author && $user->getId() === $author->getId()) {
             return;
         }
 
-        throw new Unauthorized('Current user is not author of post');
+        throw new Unauthorized('Current user is not author of comment');
     }
 }

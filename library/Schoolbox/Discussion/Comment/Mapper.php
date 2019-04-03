@@ -15,7 +15,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * Mapper for posts in discussion threads.
+ * Mapper for comments in discussion threads.
  *
  * @method Model createModel($idValue = null)
  */

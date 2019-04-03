@@ -32,7 +32,7 @@ instead of a context type and ID, a URL reference
 is stored.
 end note
 
-object discussion_post {
+object discussion_thread_comment {
     <<PK>> id: int
     discussion_thread_id: int
     author_id: int
@@ -60,9 +60,9 @@ object user {
     ...
 }
 
-discussion_thread -r-{ discussion_post : discussion_thread_id >
+discussion_thread -r-{ discussion_thread_comment : discussion_thread_id >
 
-discussion_post }-r- user : author_id <
+discussion_thread_comment }-r- user : author_id <
 
 discussion_thread -d- comms_news_article : discussion_thread_id >
 

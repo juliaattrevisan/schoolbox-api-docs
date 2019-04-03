@@ -15,8 +15,8 @@ and could also become the backend for threads in new contexts:
 Migration notes
 * Blogs don't require an extension of the proposed structure
 * Forums require multiple threads per item
-* Socialstream requires at least two levels of post nesting, maybe also changes to how posts are formatted
-* Grades requires extension of permissions on threads (who can post? Parents of student? Teachers? The student themselves?)
+* Socialstream requires at least two levels of comment nesting, maybe also changes to how posts are formatted
+* Grades requires extension of permissions on threads (who can post comments? Parents of student? Teachers? The student themselves?)
 * Assessments require the same extension of permissions as grades do?
 
 

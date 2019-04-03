@@ -55,7 +55,7 @@ class DataGenerator
     /**
      * @var Comment\Mapper
      */
-    private $postMapper;
+    private $commentMapper;
 
 
     /**
@@ -66,7 +66,7 @@ class DataGenerator
      * @param UserMapper      $userMapper
      * @param News\Mapper     $articleMapper
      * @param Thread\Mapper   $threadMapper
-     * @param Comment\Mapper  $postMapper
+     * @param Comment\Mapper  $commentMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -74,14 +74,14 @@ class DataGenerator
         UserMapper $userMapper,
         News\Mapper $articleMapper,
         Thread\Mapper $threadMapper,
-        Comment\Mapper $postMapper
+        Comment\Mapper $commentMapper
     ) {
         $this->log           = $log;
         $this->faker         = $faker;
         $this->userMapper    = $userMapper;
         $this->articleMapper = $articleMapper;
         $this->threadMapper  = $threadMapper;
-        $this->postMapper    = $postMapper;
+        $this->commentMapper = $commentMapper;
     }
 
 
@@ -98,12 +98,12 @@ class DataGenerator
         }
 
 
-        // Delete all the old threads and posts
+        // Delete all the old threads and comments
         $this->log->notice('Soft-deleting all existing threads and comments');
         $this->threadMapper->delete($this->threadMapper->findAll());
 
 
-        // Who may author a post?
+        // Who may author a comment?
         $authors = $this->userMapper->findAll()->getAll();
 
 
@@ -116,7 +116,7 @@ class DataGenerator
         );
 
 
-        // Build threads and posts for each article
+        // Build threads and comments for each article
         /** @var News\Model[] $articlesForDiscussion */
         foreach ($articlesForDiscussion as $article) {
             $commentCount = $this->faker->numberBetween(1, 100);
@@ -134,17 +134,17 @@ class DataGenerator
 
             // Build a bunch of comments
             // Need to be able to override created date for all of them though?
-            $posts = $this->postMapper->createCollection();
+            $comments = $this->commentMapper->createCollection();
             foreach (range(1, $commentCount) as $_) {
-                $post = $this->postMapper->createModel()
+                $comment = $this->commentMapper->createModel()
                     ->setAuthor($this->faker->randomElement($authors))
                     ->setThread($thread)
                     ->setContent($this->randomArticle($this->faker->numberBetween(1, 4)));
-                $posts->add($post);
+                $comments->add($comment);
             }
 
             $this->threadMapper->save($thread);
-            $this->postMapper->save($posts);
+            $this->commentMapper->save($comments);
 
 
             // And add the thread to the comms article
