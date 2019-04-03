@@ -454,6 +454,32 @@ components:
         format: int32
         minimum: 1
 
+    contextType:
+      name:        contextType
+      in:          path
+      description: |
+        The type of item that a thread is associated with.
+        Used in conjunction with contextId to find the item with which a thread
+        is assciated.
+
+        Currently, only comms is supported, but it is intended that other
+        contexts will be introduced.
+      required:    true
+      schema:
+        type: string
+        enum: [comms]
+
+    contextId:
+      name:        contextId
+      in:          path
+      description: |
+        The unique ID of the item that a thread is associated with.
+         Used in conjunction with contextType to find the item with which a
+         thread is assciated.
+      required:    true
+      schema:
+        $ref: '#/components/schemas/id'
+
     limit:
       name:        sort
       in:          query
