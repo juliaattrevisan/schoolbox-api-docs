@@ -191,7 +191,7 @@ class Cursor
      */
     private function applyCursor(Builder $builder, ?string $cursor): Builder
     {
-        if (isset($cursor)) {
+        if (isset($cursor) && $cursor !== '') {
             $lastId = $this->codec->decode($cursor);
             if (isset($lastId) && $lastId > 0) {
                 if ($this->order === self::ORDER_ASC) {
