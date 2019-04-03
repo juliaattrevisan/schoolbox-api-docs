@@ -87,6 +87,12 @@ class Context implements IContext
         if (!$object instanceof News\Model) {
             throw new \TypeError('$object must be a ' . News\Model::class);
         }
+
+        // Don't allow this to be associated with a different thread
+        if ($object->getDiscussionThread()) {
+            throw new \UnexpectedValueException('$object is already associated with a thread');
+        }
+
         $object->setDiscussionThread($thread);
         $this->mapper->save($object);
     }

@@ -19,6 +19,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Discussion\Context;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
@@ -551,8 +552,8 @@ class Controller extends Base
             $this->errorMapper->generateException(ErrorMapper::ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED);
         }
 
-        $article->setDiscussionThread($thread);
-        $this->newsMapper->save($article);
+        $context = new Context($this->newsMapper);
+        $context->associate($thread, $article);
 
         // No point responding with any content
         $this->response->status->setCode(204);
