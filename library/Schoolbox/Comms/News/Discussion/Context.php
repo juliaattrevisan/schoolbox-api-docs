@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Discussion;
 
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread\Context\IContext;
-use Schoolbox\Discussion\Thread\Model as ThreadModel;
+use Schoolbox\Discussion\Thread;
 
 /**
  * Discussion threads context for comms articles.
@@ -24,6 +24,12 @@ class Context implements IContext
      * @var News\Mapper
      */
     private $mapper;
+
+
+    /**
+     * @var Thread\Mapper
+     */
+    private $threadMapper;
 
 
     /**
@@ -66,10 +72,10 @@ class Context implements IContext
     /**
      * @inheritDoc
      *
-     * @param ThreadModel $thread
+     * @param Thread\Model $thread
      * @return iterable|News\Model[]
      */
-    public function findAssociations(ThreadModel $thread): iterable
+    public function findAssociations(Thread\Model $thread): iterable
     {
         return $this->mapper->findByColumn('discussion_thread_id', $thread->getId());
     }
@@ -78,11 +84,11 @@ class Context implements IContext
     /**
      * @inheritDoc
      *
-     * @param ThreadModel $thread
-     * @param mixed       $object
+     * @param Thread\Model $thread
+     * @param mixed        $object
      * @throws \Schoolbox\Mapper\Exception if save failed
      */
-    public function associate(ThreadModel $thread, $object): void
+    public function associate(Thread\Model $thread, $object): void
     {
         if (!$object instanceof News\Model) {
             throw new \TypeError('$object must be a ' . News\Model::class);
