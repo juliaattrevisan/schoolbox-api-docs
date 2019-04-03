@@ -25,8 +25,8 @@ class Discussion implements ModuleConfigInterface
      */
     public function configure($kernel): void
     {
-        $postModule = new Comment\Module($kernel->getDependencyInjector());
-        $postModule->init('/posts');
+        $commentModule = new Comment\Module($kernel->getDependencyInjector());
+        $commentModule->init('/comments');
 
         $threadModule = new Thread\Module($kernel->getDependencyInjector());
         $threadModule->init('/threads');
