@@ -74,12 +74,18 @@ class GarbageCollector
     /**
      * Returns a list of hashes that are considered stale.
      * Main class logic.
-     *
+     * @var string $hash       If set, target this specific hash for cleanup
      * @return array
      */
-    public function getStale()
+    public function getStale($hash = null)
     {
-        $statement  = $this->mapper->getDatabase()->query("SELECT `hash` FROM `storage` WHERE `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, $this->limit");
+        if( $hash ) {
+            $statement = $this->mapper->getDatabase()->query("SELECT `hash` FROM `storage` WHERE `hash` = :hash", ['hash'=>$hash]);
+        }
+        else {
+            $statement = $this->mapper->getDatabase()->query("SELECT `hash` FROM `storage` WHERE `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0,:limit", ['limit'=>$this->limit]);
+        }
+
         $this->list = [];
 
         // start by populating with all hashes
@@ -104,11 +110,12 @@ class GarbageCollector
 
     /**
      * Delete all stale hashes
+     * @var string $hash       If set, target this specific hash for cleanup
      * @return int
      */
-    public function purge()
+    public function purge($hash = null)
     {
-        $purge = $this->getStale();
+        $purge = $this->getStale($hash);
 
         $this->preserve(array_diff($this->list, $purge));
 
