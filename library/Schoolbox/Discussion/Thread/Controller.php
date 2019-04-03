@@ -22,7 +22,7 @@ class Controller extends BaseController
     /**
      * @var Comment\Mapper
      */
-    private $postMapper;
+    private $commentMapper;
 
 
     /**
@@ -46,13 +46,13 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param Comment\Mapper $postMapper
+     * @param Comment\Mapper $commentMapper
      * @param Mapper         $threadMapper
      */
-    public function __construct(Comment\Mapper $postMapper, Mapper $threadMapper)
+    public function __construct(Comment\Mapper $commentMapper, Mapper $threadMapper)
     {
-        $this->postMapper   = $postMapper;
-        $this->threadMapper = $threadMapper;
+        $this->commentMapper = $commentMapper;
+        $this->threadMapper  = $threadMapper;
     }
 
 
@@ -78,7 +78,7 @@ class Controller extends BaseController
      * associate it with something.
      *
      * @throws \Schoolbox\Mapper\Exception
-     * @api   GET /threads/{id}/posts
+     * @api   GET /threads/{id}/comments
      * @level 190
      */
     public function createThread(): void
@@ -93,16 +93,16 @@ class Controller extends BaseController
 
 
     /**
-     * Get a list of posts in the given thread.
+     * Get a list of comments in the given thread.
      *
-     * @api   GET /threads/{id}/posts
+     * @api   GET /threads/{id}/comments
      * @level 190
      *
      * @param Model $thread
      */
-    public function getPostsByThread(Model $thread): void
+    public function getCommentsByThread(Model $thread): void
     {
-        $responseData = $this->retrievePostList($thread, $this->request->query->get('cursor'));
+        $responseData = $this->retrieveCommentList($thread, $this->request->query->get('cursor'));
 
         // Clean-up every content before returning the result
         foreach ($responseData['data'] as $key => $data) {
@@ -113,7 +113,7 @@ class Controller extends BaseController
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
                 : $this->buildUnthemedHtmlOutput(
-                    '@discussionPosts/list.twig',
+                    '@discussionComments/list.twig',
                     ['list' => $responseData, 'thread' => $thread]
                 )
         );
@@ -121,28 +121,28 @@ class Controller extends BaseController
 
 
     /**
-     * Post to a thread.
+     * Comment to a thread.
      *
-     * @api   POST /threads/{id}/posts
+     * @api   POST /threads/{id}/comments
      * @level 190
      *
      * @param Model $thread
      *
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function createPostInThread(Model $thread): void
+    public function createCommentInThread(Model $thread): void
     {
         /** @var \stdClass $data */
         $data = $this->request->content->get();
 
-        $post = $this->postMapper->createModel()
+        $comment = $this->commentMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
             ->setContent($data->content);
 
-        $this->postMapper->save($post);
+        $this->commentMapper->save($comment);
 
-        $responseData = $post->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
+        $responseData = $comment->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
 
         // Clean-up content before returning the result
         $responseData['content'] = Scrub::html($responseData['content']);
@@ -150,7 +150,7 @@ class Controller extends BaseController
         $this->response->content->set(
             $this->isJsonRequest()
                 ? $this->buildJsonOutput($responseData)
-                : $this->buildUnthemedHtmlOutput('@discussionPosts/item.twig', ['item' => $responseData])
+                : $this->buildUnthemedHtmlOutput('@discussionComments/item.twig', ['item' => $responseData])
         );
     }
 
@@ -226,23 +226,23 @@ class Controller extends BaseController
 
 
     /**
-     * Retrieve a list of posts as an array for later output.
+     * Retrieve a list of comments as an array for later output.
      *
      * @param Model       $thread
      * @param string|null $encodedCursor
      * @return array
      */
-    private function retrievePostList(Model $thread, ?string $encodedCursor): array
+    private function retrieveCommentList(Model $thread, ?string $encodedCursor): array
     {
-        $cursor = new Comment\Cursor($this->postMapper, $thread, Comment\Cursor::ORDER_DESC);
-        $posts  = $cursor->retrieveResults($encodedCursor);
+        $cursor   = new Comment\Cursor($this->commentMapper, $thread, Comment\Cursor::ORDER_DESC);
+        $comments = $cursor->retrieveResults($encodedCursor);
         return [
-            'data'     => $posts->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'data'     => $comments->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
-                    'current' => $encodedCursor ?? $cursor->current($posts),
-                    'next'    => $cursor->next($posts),
+                    'current' => $encodedCursor ?? $cursor->current($comments),
+                    'next'    => $cursor->next($comments),
                 ],
             ],
         ];
@@ -263,7 +263,7 @@ class Controller extends BaseController
             $this->retrieveLinkDecorator()
         );
         $responseData['children'] = $loadChildren
-            ? $this->retrievePostList($thread, null)
+            ? $this->retrieveCommentList($thread, null)
             : [];
         $this->response->content->set(
             $this->isJsonRequest()

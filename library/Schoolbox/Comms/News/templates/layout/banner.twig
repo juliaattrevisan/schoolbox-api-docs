@@ -101,26 +101,26 @@
             </template>
 
             <ul class="information-list social-stream">
-                <li class="actions-small-2" v-for="(post, index) in posts">
+                <li class="actions-small-2" v-for="(comment, index) in comments">
                     <div class="list-item">
                         <div class="card small-12">
-                            <a :href="'/search/user/' + post.author.id" title="View Profile">
-                                <img :src="'/portrait.php?userId=' + post.author.externalId + '&size=square64'"></a>
+                            <a :href="'/search/user/' + comment.author.id" title="View Profile">
+                                <img :src="'/portrait.php?userId=' + comment.author.externalId + '&size=square64'"></a>
                             <p>
-                                <a :href="'/search/user/' + post.author.id" title="View Profile">
-                                    ${ post.author.title + ' ' + post.author.firstname + ' ' + post.author.lastname }
+                                <a :href="'/search/user/' + comment.author.id" title="View Profile">
+                                    ${ comment.author.title + ' ' + comment.author.firstname + ' ' + comment.author.lastname }
                                 </a>
                             </p>
-                            <p class="meta" :title="post.createdAt | fullString ">Posted ${ post.createdAt | fromNow }</p>
+                            <p class="meta" :title="comment.createdAt | fullString ">Posted ${ comment.createdAt | fromNow }</p>
                         </div>
                     </div>
                     <nav>
-                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" v-if="post._links.delete.auth" v-on:click="deleteComment(post.id, index)"></a>
+                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" v-if="comment._links.delete.auth" v-on:click="deleteComment(comment.id, index)"></a>
                         {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}
                     </nav>
 
                     <article>
-                        <p v-html="post.content"></p>
+                        <p v-html="comment.content"></p>
                     </article>
                 </li>
                 <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
@@ -172,7 +172,7 @@
             threadCheckboxEnabled: Boolean({{ article.discussionThread.open }}),
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
-            posts: [],
+            comments: [],
             showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
@@ -286,7 +286,7 @@
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
-                axios.get('/threads/' + String(self.threadId) + '/posts/', {
+                axios.get('/threads/' + String(self.threadId) + '/comments/', {
                     params: {
                         cursor: self.cursorNext
                     }
@@ -299,7 +299,7 @@
                     self.cursorNext = responseData.metadata.cursor.next;
 
                     for (index = 0; index < responseData.data.length; index++) {
-                        self.posts.push(responseData.data[index]);
+                        self.comments.push(responseData.data[index]);
                     }
 
                     // Hide skeleton loader once the request is done
@@ -315,7 +315,7 @@
                      *
                      * Do not show load more button when all the comments has been loaded
                      */
-                    self.showLoadMoreButton = self.posts.length < responseData.metadata.count;
+                    self.showLoadMoreButton = self.comments.length < responseData.metadata.count;
 
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
@@ -340,8 +340,8 @@
 
                     $toast.toastActivate({text: self.deletingCommentText});
 
-                    axios.delete('/posts/'+ self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
-                        self.posts.splice(self.commentIndexToDelete, 1);
+                    axios.delete('/comments/'+ self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
+                        self.comments.splice(self.commentIndexToDelete, 1);
 
                         // On successful delete, reduce the total comments count in the UI without hitting the backend
                         self.totalCommentsCount--;
@@ -353,7 +353,7 @@
                         $toast.toastTimeout({text: self.commentDeletedText, duration: 2000});
 
                         // Automatically trigger show previous comments to show the next set of records when the list has gone down to 0
-                        if (self.posts.length < 1 && self.totalCommentsCount > 0) {
+                        if (self.comments.length < 1 && self.totalCommentsCount > 0) {
                             self.getThread();
                         }
 
@@ -377,13 +377,13 @@
 
                     self.postCommentButtonIsEnabled = false;
 
-                    axios.post('/threads/' + self.threadId + '/posts', {
+                    axios.post('/threads/' + self.threadId + '/comments', {
                         content: self.comment
                     }).then(function (response) {
 
                         var responseData = response.data;
                         // Add the latest comment into the top of array
-                        self.posts.splice(0,0, responseData);
+                        self.comments.splice(0,0, responseData);
                         // On successful comment posting, add one into the total comments count in the UI without hitting the backend
                         self.totalCommentsCount++;
 

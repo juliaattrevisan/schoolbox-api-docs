@@ -31,7 +31,7 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->hasJoin(
-            'posts',
+            'comments',
             [
                 'mapper'    => Comment\Mapper::class,
                 'this_key'  => 'id',
@@ -51,18 +51,18 @@ class Mapper extends BaseMapper
     public function isThreadAlreadyAssociated(Model $thread): bool
     {
         // TODO consider moving into a context object (\Schoolbox\Discussion\Thread\Context\IContext)
-        return $this->getJoinMapper('posts')->countByColumn('discussion_thread_id', $thread->getId()) > 0;
+        return $this->getJoinMapper('comments')->countByColumn('discussion_thread_id', $thread->getId()) > 0;
     }
 
 
     /**
-     * Post-delete for threads: delete all posts within as well.
+     * Post-delete for threads: delete all comments within as well.
      *
      * @param Model $model
      * @throws BaseMapper\Exception if a query fails
      */
     public function deleteThreads(Model $model): void
     {
-        $this->getJoinMapper('posts')->deleteByColumn('discussion_thread_id', $model->getId());
+        $this->getJoinMapper('comments')->deleteByColumn('discussion_thread_id', $model->getId());
     }
 }
