@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Alaress\Web\Output\DataGenerator;
 
 use Alaress\Session\Session;
+use Alaress\Session\ImpersonationCheck;
 use Schoolbox\User as UserModel;
 
 /**
@@ -47,23 +48,12 @@ class User implements IDataGenerator
      */
     public function generate(?array $chromeData = []): array
     {
-        $previousUser = null;
-        $impersonated = false;
-        if ($this->currentUser) {
-            $previousData = $this->session->get('previous');
-            $previousUser = $previousData['user'] ?? null;
-            if ($previousUser instanceof UserModel) {
-                if ($previousUser->isSuperuser()) {
-                    $impersonated = true;
-                }
-            } else {
-                $previousUser = null;
-            }
-        }
+        $previousData = $this->session->get('previous');
+
         return [
             'current'        => $this->currentUser,
-            'previous'       => $previousUser,
-            'impersonated'   => $impersonated,
+            'previous'       => $previousData['user'] ?? null,
+            'impersonated'   => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousData),
             'communityLogin' => $this->session->get('communityLogin'),
         ];
     }

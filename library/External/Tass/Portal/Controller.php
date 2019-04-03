@@ -10,6 +10,7 @@ namespace External\Tass\Portal;
 
 use Alaress;
 use Aura\Web\Exception\InvalidStatusCode;
+use Alaress\Session\ImpersonationCheck;
 use Schoolbox\User;
 use Schoolbox\Error;
 
@@ -240,23 +241,6 @@ class Controller extends Alaress\Web\Controller\Base
      */
     private function isCurrentUserImpersonated(): bool
     {
-        $previous = $this->getSession()->get('previous');
-        if (!$previous) {
-            return false;
-        }
-        // We need to distinguish between switching to a linked vs non-linked user
-        /** @var User $previousUser */
-        $previousUser = $previous['user'];
-        $currentUser  = $this->getUser();
-
-        foreach ($previousUser->getLinkedUser() as $linkedUser) {
-            if ((int)$linkedUser->getId() === (int)$currentUser->getId()) {
-                // User has merely switched to a linked account, this does not constitute 'impersonation'
-                return false;
-            }
-        }
-
-        // A previous user exists, and current user is not linked to from them. Current user is being impersonated.
-        return true;
+        return (new ImpersonationCheck())->isImpersonated($this->getUser(), $this->getSession()->get('previous'));
     }
 }
