@@ -353,6 +353,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             continue;
                         }
 
+                        $logRecord->setCreatorName($owner->getFullName());
+                        $logRecord->setStudentName($student->getFullName());
+
                         //Find existing records, if they exist you may either delete them or skip them depending on flag
                         $existingRecords = $this->getPastoralMapper()->findByColumn('external_id', $record["PastoralCareSeq"]);
                         if(count($existingRecords)) {
@@ -369,8 +372,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             }
                         }
 
-                        $logRecord->setCreatorName($owner->getFullName());
-                        $logRecord->setStudentName($student->getFullName());
                         $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
                         $this->getPastoralLogMapper()->save($logRecord);
 
