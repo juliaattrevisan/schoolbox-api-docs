@@ -36,7 +36,7 @@ class Controller extends Base
      *
      * @var External_ClassInterface
      */
-    protected $externalDb;
+    private $externalDb;
 
     /**
      * @var GradeGroup\Mapper
@@ -48,14 +48,14 @@ class Controller extends Base
      *
      * @var UserAccessMapper
      */
-    protected $userAccessMapper;
+    private $userAccessMapper;
 
     /**
      * Data source for users themselves
      *
      * @var UserMapper
      */
-    protected $userMapper;
+    private $userMapper;
 
     /**
      * Constructor
