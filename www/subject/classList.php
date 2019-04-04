@@ -141,6 +141,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 'SPECIAL_NEEDS' => $this->getLocalisedTerm('specialNeeds', false, true),
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
                 'TUTORGROUP' => $student["StudentTutorDescription"],
+                'STUDENTFORM' => isset($student["StudentForm"]) ? $student["StudentForm"] : null,
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
             ));
 
