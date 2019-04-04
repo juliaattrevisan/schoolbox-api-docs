@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector\Tass\Base;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\User;
@@ -20,32 +21,49 @@ class ExternalEvents extends Base implements IExternalEvents
     /**
      * Student product code
      */
-    const STUDENT_PRODUCT_CODE = 'TSCPDC';
+    private const STUDENT_PRODUCT_CODE = 'TSCPDC';
 
     /**
      * Staff product code
      */
-    const STAFF_PRODUCT_CODE = 'TIAPDC';
+    private const STAFF_PRODUCT_CODE = 'TIAPDC';
 
     /**
      * Parent product code
      */
-    const PARENT_PRODUCT_CODE = 'PIAPDC';
+    private const PARENT_PRODUCT_CODE = 'PIAPDC';
 
     /**
      * Public product code
      */
-    const PUBLIC_PRODUCT_CODE = 'PUBPDC';
+    private const PUBLIC_PRODUCT_CODE = 'PUBPDC';
 
     /**
      * Build a query to get events for a given $productCode
      * If $productCode is null, obtain personal events instead
      *
-     * @param $productCode
+     * @param null|string $productCode
      * @return string
      */
-    private function buildQueryForProductCode($productCode)
+    private function buildQueryForProductCode(?string $productCode): string
     {
+
+        /* STUFF()
+         * Inject a string into another string
+         * https://www.w3schools.com/sql/func_sqlserver_stuff.asp
+         *
+         * James and I decided that we could concat the multiple event types assigned in TASS using STUFF().
+         * This creates a comma-separated representation of multiple event types e.g. "Sporting, General, Academic".
+         * This will never match to any schoolbox event type and will fall into the default type set in admin.
+         * The default type is specified in admin > calendar > subscribe > external db.
+         *
+         * Anyone using this connector as originally designed should remain unaffected ie. BTAC Tim Gardiner.
+         * That is, anyone importing events with one event type.
+         *
+         * Schoolbox doesn't support multiple event types and even if we wanted to do that, the task is enormous.
+         * All the other variants of aggregation in MSSQL are all really fiddly and prevent you from doing what we need.
+         */
+
         /* Anatomy of a query
          */
         $selectQuery = "
@@ -55,7 +73,8 @@ class ExternalEvents extends Base implements IExternalEvents
                 ec.event_name AS title,
                 ec.event_desc AS comment,
                 ec.room_code AS room,
-                ecd.cat_desc as type,
+                LTRIM(RTRIM(STUFF((SELECT ', ' + LTRIM(RTRIM(ecd.cat_desc))
+                    FROM eventcatdefs ecd WHERE ec.cat_num = ecd.cat_num FOR XML PATH('')), 1 , 1 , ''))) AS type,
                 CASE 
                     WHEN ec.start_time IS NOT NULL THEN ec.start_date + CAST(ec.start_time AS TIME(0))
                     ELSE ec.start_date 
@@ -69,11 +88,8 @@ class ExternalEvents extends Base implements IExternalEvents
             FROM eventcalendar ec
         ";
 
-        $catdefsQuery = "
-            LEFT JOIN eventcatdefs ecd ON ec.cat_num = ecd.cat_num
-        ";
 
-        $whereQuery = "
+        $whereQuery = '
             NOT (
                 CASE 
                     WHEN ec.end_time IS NOT NULL THEN ec.end_date + ec.end_time 
@@ -84,14 +100,13 @@ class ExternalEvents extends Base implements IExternalEvents
                     ELSE ec.start_date 
                 END >= :endTime 
             )
-        ";
+        ';
 
         /* Personal Events
          */
-        if ($productCode == null) {
+        if (null === $productCode) {
             return "(
                 {$selectQuery}
-                {$catdefsQuery}
                 WHERE 
                     ec.entry_code = :externalId AND
                     {$whereQuery}
@@ -106,14 +121,15 @@ class ExternalEvents extends Base implements IExternalEvents
                     ON et.event_id = ec.event_id 
                     AND ec.cmpy_code = et.cmpy_code
                     AND prod_code = '{$productCode}'
-                {$catdefsQuery} 
                 WHERE 
                 {$whereQuery}
             )";
     }
 
+
     /**
      * @inheritdoc
+     * @throws InvalidArgumentException
      */
     public function getExternalEvents(User $user, $startDate, $endDate)
     {
