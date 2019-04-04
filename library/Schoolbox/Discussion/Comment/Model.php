@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Json;
 use Schoolbox\Discussion\Thread;
@@ -19,7 +19,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\User;
 
 /**
- * Model for posts in discussion threads.
+ * Model for comments in discussion threads.
  */
 class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
 {
@@ -134,8 +134,8 @@ class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
     {
         return [
             'delete' => new AuraLink(
-                'discussionPosts.deletePost',
-                ['id' => $this->id, 'post' => $this,]
+                'discussionComments.deleteComment',
+                ['id' => $this->id, 'comment' => $this,]
             )
         ];
     }

@@ -14,7 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
 
 /**
@@ -44,7 +44,7 @@ class Module extends BaseModule
             new Auth\Rule\IsSuperuser(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new CanActUponThread(
-                    new News\Discussion\Permission\CanGet($authorizer, $commsContext)
+                    new News\Discussion\Permission\CanGetComments($authorizer, $commsContext)
                 );
             })
         );
@@ -52,7 +52,7 @@ class Module extends BaseModule
             new Auth\Rule\IsSuperuser(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new CanActUponThread(
-                    new News\Discussion\Permission\CanPost($authorizer, $commsContext)
+                    new News\Discussion\Permission\CanPostComment($authorizer, $commsContext)
                 );
             })
         );
@@ -60,7 +60,7 @@ class Module extends BaseModule
             new Auth\Rule\IsSuperuser(),
             new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
                 return new CanActUponThread(
-                    new News\Discussion\Permission\CanModerate($authorizer, $commsContext)
+                    new News\Discussion\Permission\CanModerateThread($authorizer, $commsContext)
                 );
             })
         );
@@ -76,8 +76,8 @@ class Module extends BaseModule
         );
         $this->register(
             'GET',
-            '/{id:\d+}/posts',
-            'getPostsByThread',
+            '/{id:\d+}/comments',
+            'getCommentsByThread',
             $getAuthorizer,
             [$this, 'preloadThread']
         );
@@ -89,8 +89,8 @@ class Module extends BaseModule
         );
         $this->register(
             'POST',
-            '/{id:\d+}/posts',
-            'createPostInThread',
+            '/{id:\d+}/comments',
+            'createCommentInThread',
             $postAuthorizer,
             [$this, 'preloadThread']
         );
@@ -136,8 +136,8 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'postMapper'   => $this->getMapperFactory()->getLazy(Post\Mapper::class),
-            'threadMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+            'commentMapper' => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
+            'threadMapper'  => $this->getMapperFactory()->getLazy(Mapper::class),
         ];
     }
 

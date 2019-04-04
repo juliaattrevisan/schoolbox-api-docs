@@ -14,9 +14,9 @@ CREATE TABLE discussion_thread (
 
 
 /**
- * Posts on discussion threads.
+ * Comments on discussion threads.
  */
-CREATE TABLE discussion_post (
+CREATE TABLE discussion_thread_comment (
     id INT(11) NOT NULL AUTO_INCREMENT,
     discussion_thread_id INT(11) UNSIGNED NOT NULL,
     author_id INT(11) UNSIGNED NOT NULL,
@@ -25,13 +25,13 @@ CREATE TABLE discussion_post (
     updated_at DATETIME NOT NULL,
     deleted_at DATETIME DEFAULT NULL,
     PRIMARY KEY (id),
-    KEY fk_discussion_post_discussion_thread_id (discussion_thread_id),
-    KEY fk_discussion_post_author_id (author_id),
-    CONSTRAINT fk_discussion_post_discussion_thread_id
+    KEY fk_discussion_thread_comment_discussion_thread_id (discussion_thread_id),
+    KEY fk_discussion_thread_comment_author_id (author_id),
+    CONSTRAINT fk_discussion_thread_comment_discussion_thread_id
         FOREIGN KEY (discussion_thread_id) REFERENCES discussion_thread (id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION,
-    CONSTRAINT fk_discussion_post_author_id
+    CONSTRAINT fk_discussion_thread_comment_author_id
         FOREIGN KEY (author_id) REFERENCES user (id)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION

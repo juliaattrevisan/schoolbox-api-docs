@@ -14,10 +14,10 @@ info:
 
 paths:
 
-  /posts/{id}:
+  /comments/{id}:
     delete:
-      operationId: deletePost
-      summary: Deletes a post
+      operationId: deleteComment
+      summary: Deletes a comment
       responses:
         '204':
           description: The resource was deleted successfully.
@@ -28,13 +28,13 @@ paths:
       - $ref: '#/components/parameters/id'
       - $ref: '#/components/parameters/token'
 
-  /posts/{id}/posts:
+  /comments/{id}/comments:
     get:
-      operationId: getPostsByParent
-      summary: Returns child posts for a parent post
+      operationId: getCommentsByParent
+      summary: Returns child comments for a parent comment
       responses:
         '200':
-          $ref: '#/components/responses/postList'
+          $ref: '#/components/responses/commentList'
         default:
           $ref: '#/components/responses/problem'
 
@@ -74,33 +74,33 @@ paths:
             schema:
               $ref: '#/components/schemas/thread'
 
-  /threads/{id}/posts:
+  /threads/{id}/comments:
     get:
-      operationId: getPostsByThread
-      summary: Returns posts for a thread
+      operationId: getCommentsByThread
+      summary: Returns comments for a thread
       responses:
         '200':
-          $ref: '#/components/responses/postList'
+          $ref: '#/components/responses/commentList'
         default:
           $ref: '#/components/responses/problem'
 
     post:
-      operationId: createPostInThread
-      summary: Creates a new post
+      operationId: createCommentInThread
+      summary: Creates a new comment
       responses:
         '201':
-          description: The post that was created
+          description: The comment that was created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/post'
+                $ref: '#/components/schemas/comment'
         default:
           $ref: '#/components/responses/problem'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post'
+              $ref: '#/components/schemas/comment'
 
     parameters:
       - $ref: '#/components/parameters/id'
@@ -169,8 +169,8 @@ components:
           $ref: '#/components/schemas/dateTime'
         children:
           allOf:
-            - $ref: '#/components/schemas/postList'
-          description: A list of direct child posts of this thread
+            - $ref: '#/components/schemas/commentList'
+          description: A list of direct child comments of this thread
       required:
         - id
         - open
@@ -196,16 +196,16 @@ components:
 #            - $ref: '#/components/schemas/id'
 #          description: The ID of the item
 
-    post:
-      title: Post
-      description: Common fields for discussion posts
+    comment:
+      title: Comment
+      description: Common fields for discussion comments
       type: object
       properties:
         id:
           $ref: '#/components/schemas/id'
         thread:
           $ref: '#/components/schemas/thread'
-          # Usually a post will be retrieved within the context of a thread
+          # Usually a comment will be retrieved within the context of a thread
         author:
           allOf:
             - $ref: '#/components/schemas/user'
@@ -218,15 +218,15 @@ components:
           $ref: '#/components/schemas/dateTime'
         parent:
           allOf:
-            - $ref: '#/components/schemas/post'
+            - $ref: '#/components/schemas/comment'
           description: |
-            The direct parent of this post, if there is one.
-            If there is none, this post is a top-level comment within a thread.
+            The direct parent of this comment, if there is one.
+            If there is none, this comment is a top-level comment within a thread.
           nullable: true
         children:
           allOf:
-            - $ref: '#/components/schemas/postList'
-          description: A list of direct children of this post
+            - $ref: '#/components/schemas/commentList'
+          description: A list of direct children of this comment
         visibility:
           description: |
             Which role types may view this comment? If not set, assume all role
@@ -336,16 +336,16 @@ components:
             - current
             - next
 
-    postList:
-      title: Post list
-      description: A list of posts
+    commentList:
+      title: Comment list
+      description: A list of comments
       readOnly: true
       type: object
       properties:
         data:
           type: array
           items:
-            $ref: '#/components/schemas/post'
+            $ref: '#/components/schemas/comment'
         metadata:
           $ref: '#/components/schemas/listMetadata'
 
@@ -424,23 +424,23 @@ components:
             type: string
             description: The thread, rendered into HTML on the server.
 
-    postList:
-      description: a list of posts
+    commentList:
+      description: a list of comments
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/postList'
+            $ref: '#/components/schemas/commentList'
           examples:
             empty:
-              $ref: '#/components/examples/postListEmpty'
+              $ref: '#/components/examples/commentListEmpty'
             one:
-              $ref: '#/components/examples/postListOne'
+              $ref: '#/components/examples/commentListOne'
             many:
-              $ref: '#/components/examples/postListMany'
+              $ref: '#/components/examples/commentListMany'
         text/html:
           schema:
             type: string
-            description: The list of posts, rendered into HTML on the server.
+            description: The list of comments, rendered into HTML on the server.
 
 
   parameters:
@@ -487,7 +487,7 @@ components:
       name:        depth
       in:          query
       description: |
-        Number of levels to descend when retrieving child posts.
+        Number of levels to descend when retrieving child comments.
       required: false
       schema:
         type: integer
@@ -497,7 +497,7 @@ components:
         maximum: 3
 
   examples:
-    postListEmpty:
+    commentListEmpty:
       value:
         data: []
         metadata:
@@ -505,7 +505,7 @@ components:
             current: bbb
             next: ccc
 
-    postListOne:
+    commentListOne:
       value:
         # Frustratingly, sub-keys of example values don't follow $ref
         data:
@@ -542,7 +542,7 @@ components:
             current: bbb
             next: ccc
 
-    postListMany:
+    commentListMany:
       value:
         data:
           - id: 2

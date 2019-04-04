@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Web\Exception\InvalidStatusCode;
@@ -15,7 +15,7 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * Controller for post-related API requests.
+ * Controller for comment-related API requests.
  */
 class Controller extends BaseController
 {
@@ -45,17 +45,17 @@ class Controller extends BaseController
 
 
     /**
-     * Get a list of posts with the given parent post.
+     * Get a list of comments with the given parent comment.
      *
      * TODO implement this endpoint
      *
-     * @api   GET /posts/{id}/posts
+     * @api   GET /comments/{id}/comments
      * @level 190
      *
-     * @param Model $post
+     * @param Model $comment
      * @throws NotFound This is not yet implemented
      */
-    public function getPostsByParent(Model $post): void
+    public function getCommentsByParent(Model $comment): void
     {
         // 404 for now I guess?
         throw new NotFound();
@@ -63,19 +63,19 @@ class Controller extends BaseController
 
 
     /**
-     * Delete a post.
+     * Delete a comment.
      *
-     * @api   DELETE /posts/{id}
+     * @api   DELETE /comments/{id}
      * @level 190
      *
-     * @param Model $post
+     * @param Model $comment
      * @throws MapperException
      * @throws InvalidStatusCode if somehow 204 becomes an invalid status code?!
      */
-    public function deletePost(Model $post): void
+    public function deleteComment(Model $comment): void
     {
-        if (!$post->isDeleted()) {
-            $this->mapper->delete($post);
+        if (!$comment->isDeleted()) {
+            $this->mapper->delete($comment);
         }
         $this->response->status->setCode(204);
     }

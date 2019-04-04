@@ -6,17 +6,17 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post\Authorizer;
+namespace Schoolbox\Discussion\Comment\Authorizer;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Discussion\Post;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\User;
 
 /**
- * Authorizer for determining whether a user is the author of a post.
+ * Authorizer for determining whether a user is the author of a comment.
  */
-class IsPostAuthor implements IAuthorizationRule
+class IsCommentAuthor implements IAuthorizationRule
 {
     /**
      * @inheritdoc
@@ -27,16 +27,16 @@ class IsPostAuthor implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null): void
     {
-        $post = $params['post'] ?? null;
-        if (!$post instanceof Post\Model) {
-            throw new Unauthorized('Could not find post in "post" param');
+        $comment = $params['comment'] ?? null;
+        if (!$comment instanceof Comment\Model) {
+            throw new Unauthorized('Could not find comment in "comment" param');
         }
 
-        $author = $post->getAuthor();
+        $author = $comment->getAuthor();
         if ($user && $author && $user->getId() === $author->getId()) {
             return;
         }
 
-        throw new Unauthorized('Current user is not author of post');
+        throw new Unauthorized('Current user is not author of comment');
     }
 }

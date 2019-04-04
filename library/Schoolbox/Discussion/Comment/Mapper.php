@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use PDOStatement;
 use Schoolbox\Discussion\Thread;
@@ -15,7 +15,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * Mapper for posts in discussion threads.
+ * Mapper for comments in discussion threads.
  *
  * @method Model createModel($idValue = null)
  */
@@ -26,7 +26,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('discussion_post');
+        $this->hasTable('discussion_thread_comment');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('discussion_thread_id', Thread\Mapper::class, 'id', null, null, 'thread', 'thread');

@@ -1,4 +1,4 @@
-<li class="actions-small-2" data-id="{{ item.id }}" data-type="post">
+<li class="actions-small-2" data-id="{{ item.id }}" data-type="comment">
     <div class="list-item">
         <div class="card small-12">
             <a href="{{ item.author._links.profile.href }}" title="View Profile">
@@ -11,7 +11,7 @@
         </div>
     </div>
     <nav>
-        <a href="#" class="icon-delete no-text" title="Delete post"></a>
+        <a href="#" class="icon-delete no-text" title="Delete comment"></a>
         <a href="#" class="icon-reply no-text" title="Add Reply"></a>
     </nav>
     <article>
@@ -20,7 +20,7 @@
 
     {# Replies: not yet implemented #}
     {#
-    {% include '@discussionPosts/list.twig' with {
+    {% include '@discussionComments/list.twig' with {
         list:  item.children,
         class: 'reply'
     } only %}

@@ -25,39 +25,39 @@
  */
 
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as StudentSubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Discussion;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Folder\Code as FolderCode;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\DataModel\Project;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use \Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Quiz;
+use Schoolbox\Learning\Quiz\Attempt as QuizAttempt;
+use Schoolbox\Learning\Quiz\Attempt\Answer as QuizAnswer;
 use Schoolbox\Learning\Quiz\Section as QuizSection;
 use Schoolbox\Learning\Quiz\Section\Question as QuizQuestion;
 use Schoolbox\Learning\Quiz\Section\Question\Solution as QuizSolution;
-use Schoolbox\Learning\Quiz\Attempt as QuizAttempt;
-use Schoolbox\Learning\Quiz\Attempt\Answer as QuizAnswer;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Learning\Assessment\DataModel\Project;
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as StudentSubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
-use Schoolbox\Resource\File;
-use Schoolbox\Resource\LinkMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Mapper;
 use Schoolbox\Pastoral;
+use Schoolbox\Resource\File;
+use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Code as FolderCode;
+use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 
@@ -243,24 +243,24 @@ class RecursiveUndeleter
             Pastoral\Access\Mapper::class => 'role_id',
             Pastoral\Audience\Mapper::class => 'role_id',
         ],
-        Pastoral\Group\Mapper::class    => [
+        Pastoral\Group\Mapper::class        => [
             Pastoral\Access\Mapper::class => 'group_id',
             Pastoral\Audience\Mapper::class => 'group_id',
             Pastoral\Group\Member\Mapper::class => 'group_id',
         ],
-        Pastoral\Type\Mapper::class     => [
+        Pastoral\Type\Mapper::class         => [
             Pastoral\Audience\Mapper::class => 'type_id',
         ],
-        Pastoral\SubType\Mapper::class  => [
+        Pastoral\SubType\Mapper::class      => [
             Pastoral\Audience\Mapper::class => 'subtype_id',
         ],
-        Pastoral\Access\Mapper::class   => [],
-        Pastoral\Audience\Mapper::class => [],
+        Pastoral\Access\Mapper::class       => [],
+        Pastoral\Audience\Mapper::class     => [],
         Pastoral\Group\Member\Mapper::class => [],
-        Discussion\Thread\Mapper::class => [
-            Discussion\Post\Mapper::class => 'discussion_thread_id',
+        Discussion\Thread\Mapper::class     => [
+            Discussion\Comment\Mapper::class => 'discussion_thread_id',
         ],
-        Discussion\Post\Mapper::class => [],
+        Discussion\Comment\Mapper::class    => [],
     ];
 
 

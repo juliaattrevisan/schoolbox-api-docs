@@ -75,12 +75,12 @@ class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
     public function getJsonApiLinks(): array
     {
         return [
-            'getPosts' => new AuraLink(
-                'discussionThreads.getPostsByThread',
+            'getComments' => new AuraLink(
+                'discussionThreads.getCommentsByThread',
                 ['id' => $this->id, 'thread' => $this,]
             ),
-            'createPost' => new AuraLink(
-                'discussionThreads.createPostInThread',
+            'createComment' => new AuraLink(
+                'discussionThreads.createCommentInThread',
                 ['id' => $this->id, 'thread' => $this,]
             ),
         ];

@@ -1,7 +1,7 @@
 {% if list.data is not empty %}
     <ul class="information-list {{ class ?? 'social-stream' }}" data-id="{{ thread.id }}" data-type="thread">
         {% for item in list.data %}
-            {% include '@discussionPosts/item.twig' with {item: item} only %}
+            {% include '@discussionComments/item.twig' with {item: item} only %}
         {% endfor %}
     </ul>
 {% endif %}

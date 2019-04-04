@@ -20,7 +20,7 @@ use Schoolbox\User;
  * If a user can view a comms article, they can post comments, unless comments
  * are closed.
  */
-class CanPost extends BaseStrategy
+class CanPostComment extends BaseStrategy
 {
     /**
      * @var Authorizer

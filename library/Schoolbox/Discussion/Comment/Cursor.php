@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Post;
+namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Integer\Base64;
@@ -23,7 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 class Cursor
 {
     /**
-     * The number of posts to return per request.
+     * The number of comments to return per request.
      */
     private const RESULTS_PER_REQUEST = 10;
 
@@ -44,7 +44,7 @@ class Cursor
 
 
     /**
-     * The thread for which to retrieve posts.
+     * The thread for which to retrieve comments.
      *
      * @var Thread\Model
      */
@@ -52,7 +52,7 @@ class Cursor
 
 
     /**
-     * The order in which to retrieve posts.
+     * The order in which to retrieve comments.
      *
      * @var string
      */
@@ -210,7 +210,7 @@ class Cursor
 
 
     /**
-     * Create a predicate builder for retrieving the list of posts.
+     * Create a predicate builder for retrieving the list of comments.
      *
      * @return Builder
      */
