@@ -90,7 +90,7 @@ Data:
             {% for award in awards %}
                 <tr>
                     <td>{{ award.name }}</td>
-                    <td>{{ award.detail }}</td>
+                    <td>{{ award.detail | nl2br }}</td>
                 </tr>
             {% endfor %}
             </tbody>
