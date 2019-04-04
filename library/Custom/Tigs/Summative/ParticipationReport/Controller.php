@@ -101,7 +101,7 @@ class Controller extends Web\Controller\Base
     public function getReport(User $user, ?string $now): void
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
-        $attributes      = new StudentAttributes($user, $externalStudent['StudentIBFlag'], $now);
+        $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $now);
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
@@ -300,14 +300,10 @@ class Controller extends Web\Controller\Base
     private function getAbsenceData(User $user, StudentAttributes $attributes): array
     {
         $semesters = $attributes->getCurriculumSemesters();
-        /** @var \Alaress_Date_Format $start1 */
-        $start1 = $semesters[1]['start'];
-        /** @var \Alaress_Date_Format $finish1 */
-        $finish1 = $semesters[1]['finish'];
-        /** @var \Alaress_Date_Format $start2 */
-        $start2 = $semesters[2]['start'];
-        /** @var \Alaress_Date_Format $finish2 */
-        $finish2 = $semesters[2]['finish'];
+        $start1    = $semesters[1]->getStart();
+        $finish1   = $semesters[1]->getFinish();
+        $start2    = $semesters[2]->getStart();
+        $finish2   = $semesters[2]->getFinish();
 
         $pb1 = $this->externalDatabase->buildPredicateBuilder('t1');
         $pb1->equals('t1.ID', $user->getExternalId())
@@ -512,8 +508,8 @@ class Controller extends Web\Controller\Base
 
         // initialise
         $deansComment = [];
-        foreach (\array_keys($semesters) as $semester) {
-            $deansComment[$semester] = '';
+        foreach ($semesters as  $semester) {
+            $deansComment[$semester->getOrdinal()] = '';
         }
 
         $pastoralType = $this->getConfigLoader()->get(Config::_TIGS_PASTORAL_TYPE);
@@ -531,11 +527,9 @@ class Controller extends Web\Controller\Base
         $records = $this->pastoralMapper->findByPredicates($pb, ['order' => ['created_at' => 'desc']]);
 
         // get latest record in each semester
-        foreach ($semesters as $semester => $dates) {
-            /** @var \Alaress_Date_Format $start */
-            $start = $dates['start'];
-            /** @var \Alaress_Date_Format $finish */
-            $finish = $dates['finish'];
+        foreach ($semesters as $semester) {
+            $start = $semester->getStart();
+            $finish = $semester->getFinish();
 
             $firstRecord = $records->filter(
                 function (Pastoral $record) use ($start, $finish) {
@@ -543,7 +537,7 @@ class Controller extends Web\Controller\Base
                 }
             )->first();
             if ($firstRecord) {
-                $deansComment[$semester] = $firstRecord->getBodyPublic();
+                $deansComment[$semester->getOrdinal()] = $firstRecord->getBodyPublic();
             }
         }
         return $deansComment;

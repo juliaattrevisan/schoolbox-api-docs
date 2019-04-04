@@ -583,7 +583,7 @@ class CliPdfGenerator extends CliTool\App
      */
     private function getClassFolders(User $student, array $externalStudent): Collection
     {
-        $attributes = new StudentAttributes($student, $externalStudent['StudentIBFlag'], $this->nowOverride);
+        $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->nowOverride);
         return $this->folderFetcher->findForStudent($student, $attributes, $this->nowOverride);
     }
 

@@ -7,10 +7,13 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Test;
 
+use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 /**
  * @covers \Custom\Tigs\Summative\StudentAttributes
@@ -24,11 +27,12 @@ class StudentAttributesTest extends TestCase
      * @param     $validYear
      * @param int $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testValidYearLevel($validYear, int $expected): void
     {
         $user       = (new User())->setYear($validYear);
-        $attributes = new StudentAttributes($user);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user);
 
         $this->assertSame($expected, $attributes->getYearLevel());
     }
@@ -38,12 +42,13 @@ class StudentAttributesTest extends TestCase
      * @dataProvider providerInvalidYearLevel
      * @param $invalidYear
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @expectedException InvalidArgumentException
      */
     public function testInvalidYearLevel($invalidYear): void
     {
         $user = (new User())->setYear($invalidYear);
-        new StudentAttributes($user);
+        new StudentAttributes($this->getConfigLoader(), $user);
     }
 
 
@@ -52,11 +57,12 @@ class StudentAttributesTest extends TestCase
      * @param string|null $ibFlag
      * @param bool        $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testIsIb(?string $ibFlag, bool $expected): void
     {
         $user = (new User())->setYear(10);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isIb());
     }
@@ -68,11 +74,12 @@ class StudentAttributesTest extends TestCase
      * @param string $ibFlag
      * @param bool   $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testIsMyp(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isMyp());
     }
@@ -84,11 +91,12 @@ class StudentAttributesTest extends TestCase
      * @param string $ibFlag
      * @param bool   $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testDp(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isDp());
     }
@@ -100,11 +108,12 @@ class StudentAttributesTest extends TestCase
      * @param string $ibFlag
      * @param bool   $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testHsc(int $yearLevel, string $ibFlag, bool $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, $ibFlag);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, $ibFlag);
 
         $this->assertSame($expected, $attributes->isHsc());
     }
@@ -116,11 +125,12 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @dataProvider providerTermDerivation
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testTermDerivation(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getTerm());
     }
@@ -132,11 +142,12 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @dataProvider providerCurriculumYearLevelNowOverride
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testCurriculumYearLevelNowOverride(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearLevel());
     }
@@ -148,11 +159,12 @@ class StudentAttributesTest extends TestCase
      * @param int    $expected
      * @dataProvider providerCurriculumSemesterNowOverride
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testCurriculumSemesterNowOverride(string $yearLevel, string $date, int $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemester());
     }
@@ -163,12 +175,13 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumSemesterStartNowOverride
      */
     public function testReportCurriculumSemesterStartNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemesterStart()->getDatabaseDate());
     }
@@ -179,12 +192,13 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumSemesterFinishNowOverride
      */
     public function testCurriculumSemesterFinishNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumSemesterFinish()->getDatabaseDate());
     }
@@ -194,12 +208,13 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumYearStartNowOverride
      */
     public function testReportCurriculumYearStartNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearStart()->getDatabaseDate());
     }
@@ -210,14 +225,38 @@ class StudentAttributesTest extends TestCase
      * @param string $date
      * @param string $expected
      * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @dataProvider providerCurriculumYearFinishNowOverride
      */
     public function testCurriculumYearFinishNowOverride(string $yearLevel, string $date, string $expected): void
     {
         $user       = (new User())->setYear($yearLevel);
-        $attributes = new StudentAttributes($user, null, $date);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
 
         $this->assertSame($expected, $attributes->getCurriculumYearFinish()->getDatabaseDate());
+    }
+
+
+    /**
+     * @dataProvider providerCurriculumSemesters
+     * @param string $yearLevel
+     * @param string $date
+     * @param string $s1Start
+     * @param string $s1Finish
+     * @param string $s2Start
+     * @param string $s2Finish
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     */
+    public function testCurriculumSemesters(string $yearLevel, string $date, string $s1Start, string $s1Finish, string $s2Start, string $s2Finish): void
+    {
+        $user       = (new User())->setYear($yearLevel);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $date);
+
+        $this->assertEquals($s1Start, $attributes->getCurriculumSemesters()[1]->getStart()->getDatabase());
+        $this->assertEquals($s1Finish, $attributes->getCurriculumSemesters()[1]->getFinish()->getDatabase());
+        $this->assertEquals($s2Start, $attributes->getCurriculumSemesters()[2]->getStart()->getDatabase());
+        $this->assertEquals($s2Finish, $attributes->getCurriculumSemesters()[2]->getFinish()->getDatabase());
     }
 
 
@@ -340,6 +379,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, now, term
         return [
+            ['07', '2010-01-10', 1],
+            ['07', '2010-04-10', 2],
+            ['07', '2010-07-10', 3],
+            ['07', '2010-10-10', 4],
+            ['08', '2010-01-10', 1],
+            ['08', '2010-04-10', 2],
+            ['08', '2010-07-10', 3],
+            ['08', '2010-10-10', 4],
+            ['09', '2010-01-10', 1],
+            ['09', '2010-04-10', 2],
+            ['09', '2010-07-10', 3],
+            ['09', '2010-10-10', 4],
             ['10', '2010-01-10', 1],
             ['10', '2010-04-10', 2],
             ['10', '2010-07-10', 3],
@@ -363,6 +414,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, yearLevel
         return [
+            ['07', '2010-01-10',  7],
+            ['07', '2010-04-10',  7],
+            ['07', '2010-07-10',  7],
+            ['07', '2010-10-10',  7],
+            ['08', '2010-01-10',  8],
+            ['08', '2010-04-10',  8],
+            ['08', '2010-07-10',  8],
+            ['08', '2010-10-10',  8],
+            ['09', '2010-01-10',  9],
+            ['09', '2010-04-10',  9],
+            ['09', '2010-07-10',  9],
+            ['09', '2010-10-10',  9],
             ['10', '2010-01-10', 10],
             ['10', '2010-04-10', 10],
             ['10', '2010-07-10', 10],
@@ -386,6 +449,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, now, curriculumSemester
         return [
+            ['07', '2018-01-10', 1],
+            ['07', '2018-04-10', 1],
+            ['07', '2018-07-10', 2],
+            ['07', '2018-10-10', 2],
+            ['08', '2018-01-10', 1],
+            ['08', '2018-04-10', 1],
+            ['08', '2018-07-10', 2],
+            ['08', '2018-10-10', 2],
+            ['09', '2018-01-10', 1],
+            ['09', '2018-04-10', 1],
+            ['09', '2018-07-10', 2],
+            ['09', '2018-10-10', 2],
             ['10', '2018-01-10', 1],
             ['10', '2018-04-10', 1],
             ['10', '2018-07-10', 2],
@@ -409,6 +484,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, now, curriculumSemesterStart
         return [
+            ['07', '2010-01-10', '2010-01-01'],  // Term 1
+            ['07', '2010-04-10', '2010-01-01'],  // Term 2
+            ['07', '2010-07-10', '2010-07-01'],  // Term 3
+            ['07', '2010-10-10', '2010-07-01'],  // Term 4
+            ['08', '2010-01-10', '2010-01-01'],  // Term 1
+            ['08', '2010-04-10', '2010-01-01'],  // Term 2
+            ['08', '2010-07-10', '2010-07-01'],  // Term 3
+            ['08', '2010-10-10', '2010-07-01'],  // Term 4
+            ['09', '2010-01-10', '2010-01-01'],  // Term 1
+            ['09', '2010-04-10', '2010-01-01'],  // Term 2
+            ['09', '2010-07-10', '2010-07-01'],  // Term 3
+            ['09', '2010-10-10', '2010-07-01'],  // Term 4
             ['10', '2010-01-10', '2010-01-01'],  // Term 1
             ['10', '2010-04-10', '2010-01-01'],  // Term 2
             ['10', '2010-07-10', '2010-07-01'],  // Term 3
@@ -432,6 +519,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, now, curriculumSemesterFinish
         return [
+            ['07', '2010-01-10', '2010-06-30'],  // Term 1
+            ['07', '2010-04-10', '2010-06-30'],  // Term 2
+            ['07', '2010-07-10', '2010-12-31'],  // Term 3
+            ['07', '2010-10-10', '2010-12-31'],  // Term 4
+            ['08', '2010-01-10', '2010-06-30'],  // Term 1
+            ['08', '2010-04-10', '2010-06-30'],  // Term 2
+            ['08', '2010-07-10', '2010-12-31'],  // Term 3
+            ['08', '2010-10-10', '2010-12-31'],  // Term 4
+            ['09', '2010-01-10', '2010-06-30'],  // Term 1
+            ['09', '2010-04-10', '2010-06-30'],  // Term 2
+            ['09', '2010-07-10', '2010-12-31'],  // Term 3
+            ['09', '2010-10-10', '2010-12-31'],  // Term 4
             ['10', '2010-01-10', '2010-06-30'],  // Term 1
             ['10', '2010-04-10', '2010-06-30'],  // Term 2
             ['10', '2010-07-10', '2010-12-31'],  // Term 3
@@ -455,6 +554,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, now, curriculumYearStart
         return [
+            ['07', '2010-01-10', '2010-01-01'],  // Term 1
+            ['07', '2010-04-10', '2010-01-01'],  // Term 2
+            ['07', '2010-07-10', '2010-01-01'],  // Term 3
+            ['07', '2010-10-10', '2010-01-01'],  // Term 4
+            ['08', '2010-01-10', '2010-01-01'],  // Term 1
+            ['08', '2010-04-10', '2010-01-01'],  // Term 2
+            ['08', '2010-07-10', '2010-01-01'],  // Term 3
+            ['08', '2010-10-10', '2010-01-01'],  // Term 4
+            ['09', '2010-01-10', '2010-01-01'],  // Term 1
+            ['09', '2010-04-10', '2010-01-01'],  // Term 2
+            ['09', '2010-07-10', '2010-01-01'],  // Term 3
+            ['09', '2010-10-10', '2010-01-01'],  // Term 4
             ['10', '2010-01-10', '2010-01-01'],  // Term 1
             ['10', '2010-04-10', '2010-01-01'],  // Term 2
             ['10', '2010-07-10', '2010-01-01'],  // Term 3
@@ -464,9 +575,9 @@ class StudentAttributesTest extends TestCase
             ['11', '2010-07-10', '2010-01-01'],  // Term 3
             ['11', '2010-10-10', '2010-10-01'],  // Term 4
             ['12', '2010-01-10', '2009-10-01'],  // Term 1
-            ['12', '2010-04-10', '2010-04-01'],  // Term 2
-            ['12', '2010-07-10', '2010-04-01'],  // Term 3
-            ['12', '2010-10-10', '2010-04-01'],  // Term 4
+            ['12', '2010-04-10', '2009-10-01'],  // Term 2
+            ['12', '2010-07-10', '2009-10-01'],  // Term 3
+            ['12', '2010-10-10', '2009-10-01'],  // Term 4
         ];
     }
 
@@ -478,6 +589,18 @@ class StudentAttributesTest extends TestCase
     {
         // yearLevel, now, curriculumYearFinish
         return [
+            ['07', '2010-01-10', '2010-12-31'],  // Term 1
+            ['07', '2010-04-10', '2010-12-31'],  // Term 2
+            ['07', '2010-07-10', '2010-12-31'],  // Term 3
+            ['07', '2010-10-10', '2010-12-31'],  // Term 4
+            ['08', '2010-01-10', '2010-12-31'],  // Term 1
+            ['08', '2010-04-10', '2010-12-31'],  // Term 2
+            ['08', '2010-07-10', '2010-12-31'],  // Term 3
+            ['08', '2010-10-10', '2010-12-31'],  // Term 4
+            ['09', '2010-01-10', '2010-12-31'],  // Term 1
+            ['09', '2010-04-10', '2010-12-31'],  // Term 2
+            ['09', '2010-07-10', '2010-12-31'],  // Term 3
+            ['09', '2010-10-10', '2010-12-31'],  // Term 4
             ['10', '2010-01-10', '2010-12-31'],  // Term 1
             ['10', '2010-04-10', '2010-12-31'],  // Term 2
             ['10', '2010-07-10', '2010-12-31'],  // Term 3
@@ -491,5 +614,73 @@ class StudentAttributesTest extends TestCase
             ['12', '2010-07-10', '2010-12-31'],  // Term 3
             ['12', '2010-10-10', '2010-12-31'],  // Term 4
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function providerCurriculumSemesters(): array
+    {
+        // $yearLevel, $date, $s1Start, $s1Finish, $s2Start, $s2Finish
+        return [
+            ['07', '2010-01-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 1
+            ['07', '2010-04-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 2
+            ['07', '2010-07-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 3
+            ['07', '2010-10-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 4
+            ['08', '2010-01-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 1
+            ['08', '2010-04-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 2
+            ['08', '2010-07-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 3
+            ['08', '2010-10-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 4
+            ['09', '2010-01-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 1
+            ['09', '2010-04-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 2
+            ['09', '2010-07-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 3
+            ['09', '2010-10-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 4
+            ['10', '2010-01-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 1
+            ['10', '2010-04-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 2
+            ['10', '2010-07-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 3
+            ['10', '2010-10-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-12-31 23:59:59'],  // Term 4
+            ['11', '2010-01-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-09-30 23:59:59'],  // Term 1
+            ['11', '2010-04-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-09-30 23:59:59'],  // Term 2
+            ['11', '2010-07-15', '2010-01-01 00:00:00', '2010-06-30 23:59:59', '2010-07-01 00:00:00', '2010-09-30 23:59:59'],  // Term 3
+            ['11', '2010-10-15', '2010-10-01 00:00:00', '2011-03-31 23:59:59', '2011-04-01 00:00:00', '2011-12-31 23:59:59'],  // Term 4
+            ['12', '2010-01-15', '2009-10-01 00:00:00', '2010-03-31 23:59:59', '2010-04-01 00:00:00', '2010-12-31 23:59:59'],  // Term 1
+            ['12', '2010-04-15', '2009-10-01 00:00:00', '2010-03-31 23:59:59', '2010-04-01 00:00:00', '2010-12-31 23:59:59'],  // Term 2
+            ['12', '2010-07-15', '2009-10-01 00:00:00', '2010-03-31 23:59:59', '2010-04-01 00:00:00', '2010-12-31 23:59:59'],  // Term 3
+            ['12', '2010-10-15', '2009-10-01 00:00:00', '2010-03-31 23:59:59', '2010-04-01 00:00:00', '2010-12-31 23:59:59'],  // Term 4
+        ];
+    }
+
+    // ============== Helpers ==================
+
+
+    /**
+     * Returns a config loader with valid relative dates
+     *
+     * @return IConfigLoader
+     */
+    private function getConfigLoader(): IConfigLoader
+    {
+        return new class() implements IConfigLoader
+        {
+
+            /** @inheritDoc */
+            public function get($var)
+            {
+                $data = [
+                    Config::_TIGS_START_TERM_1 => '1 January',
+                    Config::_TIGS_START_TERM_2 => '1 April',
+                    Config::_TIGS_START_TERM_3 => '1 July',
+                    Config::_TIGS_START_TERM_4 => '1 October',
+                ];
+                return $data[$var] ?? null;
+            }
+
+
+            /**  @inheritDoc */
+            public function dropCache(): void
+            {
+                // noop
+            }
+        };
     }
 }

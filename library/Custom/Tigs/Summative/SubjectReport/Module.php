@@ -250,7 +250,7 @@ class Module extends Alaress\Module\Module
             // This is pretty heavy, but exists primarily for testing. It is (hopefully) unlikely the client
             // will ever attempt to reconstruct historical views
             try {
-                $attributes = new StudentAttributes($user, null, $nowOverride);
+                $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
             } catch (InvalidArgumentException $e) {
                 throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
             }

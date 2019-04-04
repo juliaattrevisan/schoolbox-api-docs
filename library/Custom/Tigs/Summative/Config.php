@@ -32,4 +32,8 @@ class Config
     public const _TIGS_GRADES_INFO_YEAR_12_IB = self::PREFIX_TIGS_CRP . 'grades_info_year_12_ib';
     public const _TIGS_GRADES_INFO_YEAR_12_HSC = self::PREFIX_TIGS_CRP . 'grades_info_year_12_hsc';
     public const _TIGS_EXCLUDED_CLASS_CODES = self::PREFIX_TIGS_CRP . 'excluded_class_codes';
+    public const _TIGS_START_TERM_1 = self::PREFIX_TIGS_CRP . 'start_term_1';
+    public const _TIGS_START_TERM_2 = self::PREFIX_TIGS_CRP . 'start_term_2';
+    public const _TIGS_START_TERM_3 = self::PREFIX_TIGS_CRP . 'start_term_3';
+    public const _TIGS_START_TERM_4 = self::PREFIX_TIGS_CRP . 'start_term_4';
 }
