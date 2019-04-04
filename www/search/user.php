@@ -1,8 +1,8 @@
 <?php
 
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Alaress\Mail\AbstractMailer;
-use Embera\Providers\Screenr;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -29,6 +29,18 @@ use Schoolbox\User as SchoolboxUser;
 function renderParent(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator)
 {
     $externalUser = $synUserHandler->getParent($user['synergy_id']);
+    $enrolments = $synUserHandler->getEnrolledStudents($user['synergy_id']);
+    $students = new Collection();
+
+    if (\is_array($enrolments)) {
+        foreach ($enrolments as $child) {
+            try {
+                $students->add($userMapper->findByExternalId($child['RelatedID']));
+            } catch (Exception $e) {
+                // noop
+            }
+        }
+    }
 
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
@@ -60,6 +72,7 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
                 'user'           => $user,
                 'externalUser'   => $externalUser,
                 'spouse'         => $spouse,
+                'students'       => $students,
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $authenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),

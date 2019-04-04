@@ -70,8 +70,9 @@
                                     </dd>
                                 {% endif %}
                             {% endif %}
-
                             {% if showDetails %}
+                                <dt class="small-12 medium-3">Role:</dt>
+                                <dd class="small-12 medium-9">{{ user.role.name }}</dd>
                                 {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
                                     <dt class="small-12">Partner:</dt>
                                     <dd class="small-12">
@@ -102,6 +103,17 @@
                                         </div>
                                     </dd>
                                 {% endif %}
+                            {% endif %}
+                            {% if isStaff and not user.getHideContacts %}
+                                <dt class="small-12">Students:</dt>
+                                <dd class="small-12">
+                                    {% for student in students %}
+                                        <div class="card small-12">
+                                            <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64">
+                                            <a href="/search/user/{{ student.id }}"><p>{{ student.formatName }}</p></a>
+                                        </div>
+                                    {% endfor %}
+                                </dd>
                             {% endif %}
                         </dl>
                     </div>
