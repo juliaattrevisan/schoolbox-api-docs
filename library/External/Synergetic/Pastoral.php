@@ -36,6 +36,15 @@ use Schoolbox\UserMapper;
 
 class External_Synergetic_Pastoral implements External_PastoralInterface
 {
+
+    /**
+     * A style for converting data types
+     *
+     * @var int
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?view=sql-server-2017
+     */
+    private const STYLE_ODBC_CANONICAL_WITH_MILLISECONDS = 121; // yyyy-mm-dd hh:mi:ss.mmm(24h);
+
     use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
 
@@ -109,6 +118,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     protected function getSqlPastoralSelect(): string
     {
+        $style = self::STYLE_ODBC_CANONICAL_WITH_MILLISECONDS;
+
         return "
         SELECT        dbo.tPastoralCare.PastoralCareSeq, 
                       dbo.tPastoralCare.ID, 
@@ -125,9 +136,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                       dbo.tPastoralCare.ClassificationCode, 
                       dbo.tPastoralCare.IsFollowUpFlag, 
                       dbo.tPastoralCare.FollowUpDate, 
-                      CONVERT(varchar, dbo.tPastoralCare.CreatedDate, 121) AS CreatedDate,
+                      CONVERT(varchar, dbo.tPastoralCare.CreatedDate, {$style}) AS CreatedDate,
                       dbo.tPastoralCare.CreatedByID, 
-                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, 121) AS ModifiedDate, 
+                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, {$style}) AS ModifiedDate, 
                       dbo.tPastoralCare.ModifiedByID,
                       dbo.tPastoralCare.EmailSentDate, 
                       dbo.tPastoralCare.EmailSentByID, 
