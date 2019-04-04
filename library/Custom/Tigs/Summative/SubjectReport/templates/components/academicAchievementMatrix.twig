@@ -13,31 +13,34 @@ Data:
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
-    <p>Typical indicators of a student’s performance at each level are outlined below.</p>
-    <table>
-        <thead>
-        <tr>
-            <td></td>
-            {% for level in grid.levels %}
-                <td>{{ level.name }}</td>
-            {% endfor %}
-        </tr>
-        </thead>
-        <tbody>
-        {% for capabilityUsage in grid.capabilityUsages %}
-            {% for indicatorUsage in capabilityUsage.indicatorUsages %}
-                <tr>
-                    <th>{{ indicatorUsage.indicator.name }}</th>
+    <p>Typical indicators of a student's performance at each level are outlined below.</p>
 
-                    {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
-                    {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
+    <div class="scrollable">
+        <table>
+            <thead>
+            <tr>
+                <td></td>
+                {% for level in grid.levels %}
+                    <td>{{ level.name }}</td>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for capabilityUsage in grid.capabilityUsages %}
+                {% for indicatorUsage in capabilityUsage.indicatorUsages %}
+                    <tr>
+                        <th>{{ indicatorUsage.indicator.name }}</th>
 
-                    {% for descriptor in indicatorUsage.descriptors %}
-                        <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description }}</td>
-                    {% endfor %}
-                </tr>
+                        {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
+                        {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
+
+                        {% for descriptor in indicatorUsage.descriptors %}
+                            <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
             {% endfor %}
-        {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 {% endif %}

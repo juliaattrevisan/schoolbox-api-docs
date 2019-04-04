@@ -14,20 +14,22 @@ Data:
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
-    <table>
-      <tbody>
-        <tr>
-            <th>Student Mark %</th>
-            <td>{{ studentMark|default('-') }}</td>
-        </tr>
-        <tr>
-            <th>Cohort Rank</th>
-            <td>{{ cohortRank|default('-') }}</td>
-        </tr>
-        <tr>
-            <th>Cohort Average %</th>
-            <td>{{ cohortAverage }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="scrollable">
+        <table>
+            <tbody>
+                <tr>
+                    <th>Student Mark %</th>
+                    <td>{{ studentMark|default('-') }}</td>
+                </tr>
+                <tr>
+                    <th>Cohort Rank</th>
+                    <td>{{ cohortRank|default('-') }}</td>
+                </tr>
+                <tr>
+                    <th>Cohort Average %</th>
+                    <td>{{ cohortAverage }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endif %}
