@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
+use Schoolbox\Discussion\Thread\Context\IContext;
 
 /**
  * Module for discussion thread requests.
@@ -29,41 +30,101 @@ class Module extends BaseModule
 
 
     /**
+     * Builds a context object for retrieving and persisting objects that are
+     * related to a discussion thread.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return IContext
+     */
+    protected function buildContext(): IContext
+    {
+        /** @var News\Mapper $newsMapper */
+        /** @var Mapper      $threadMapper */
+        $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
+        $threadMapper = $this->getMapperFactory()->get(Mapper::class);
+        return new News\Discussion\Context($threadMapper, $newsMapper);
+    }
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to read
+     * comments in this thread.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
+    {
+        return new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () {
+                /** @var Auth\Authorizer $authorizer */
+                $authorizer = $this->getInjector()->get('authorizer');
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanGetComments($authorizer, $this->buildContext())
+                );
+            })
+        );
+    }
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to post
+     * comments in this thread.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    protected function buildPostCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
+    {
+        return new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () {
+                /** @var Auth\Authorizer $authorizer */
+                $authorizer = $this->getInjector()->get('authorizer');
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanPostComment($authorizer, $this->buildContext())
+                );
+            })
+        );
+    }
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to
+     * moderate this thread, including deleting comments that another user
+     * has made.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    protected function buildModerateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule
+    {
+        return new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new Auth\Rule\LazyCallback(function () {
+                /** @var Auth\Authorizer $authorizer */
+                $authorizer = $this->getInjector()->get('authorizer');
+                return new CanActUponThread(
+                    new News\Discussion\Permission\CanModerateThread($authorizer, $this->buildContext())
+                );
+            })
+        );
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function registerRoutes(): void
     {
-        /** @var Auth\Authorizer $authorizer */
-        /** @var News\Mapper     $newsMapper */
-        /** @var Mapper          $threadMapper */
-        $authorizer     = $this->getInjector()->get('authorizer');
-        $newsMapper     = $this->getMapperFactory()->get(News\Mapper::class);
-        $threadMapper   = $this->getMapperFactory()->get(Mapper::class);
-        $commsContext   = new News\Discussion\Context($threadMapper, $newsMapper);
-        $getAuthorizer  = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $commsContext)
-                );
-            })
-        );
-        $postAuthorizer = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanPostComment($authorizer, $commsContext)
-                );
-            })
-        );
-        $moderateAuthorizer = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $commsContext)
-                );
-            })
-        );
+        $getAuthorizer      = $this->buildGetCommentsAuthorizationRule();
+        $postAuthorizer     = $this->buildPostCommentsAuthorizationRule();
+        $moderateAuthorizer = $this->buildModerateThreadAuthorizationRule();
 
 
         // Routes
