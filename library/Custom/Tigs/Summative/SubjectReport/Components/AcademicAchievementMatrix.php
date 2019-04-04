@@ -215,6 +215,12 @@ class AcademicAchievementMatrix extends BaseComponent
             if ($feedback) {
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
                 $data['markedGrid'] = $feedback->getRubricMarkedGrid();
+
+                // DP students' comments will come from this assessment
+                if ($this->getAttributes()->isDp()) {
+                    $data['comment']   = $feedback->getComment();
+                    $data['commentBy'] = $feedback->getReviewer();
+                }
             }
         }
         return $data;
