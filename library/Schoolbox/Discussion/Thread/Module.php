@@ -94,6 +94,21 @@ class Module extends BaseModule
 
 
     /**
+     * Builds an authorization rule for whether a user has permission to create
+     * a thread.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    protected function buildCreateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule
+    {
+        // TODO add a preloader that fetches the context, and authorize against that
+        return new Auth\Rule\IsLoggedIn();
+    }
+
+
+    /**
      * Builds an authorization rule for whether a user has permission to
      * moderate this thread, including deleting comments that another user
      * has made.
@@ -130,41 +145,41 @@ class Module extends BaseModule
         // Routes
         $this->register(
             'GET',
-            '/{id:\d+}',
+            '/{contextId}/{id:\d+}',
             'getThread',
             $getAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'GET',
-            '/{id:\d+}/comments',
+            '/{contextId}/{id:\d+}/comments',
             'getCommentsByThread',
             $getAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'POST',
-            '',
+            '/{contextId}',
             'createThread',
-            new Auth\Rule\IsLoggedIn()
+            $this->buildCreateThreadAuthorizationRule()
         );
         $this->register(
             'POST',
-            '/{id:\d+}/comments',
+            '/{contextId}/{id:\d+}/comments',
             'createCommentInThread',
             $postAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'PUT',
-            '/{id:\d+}/open',
+            '/{contextId}/{id:\d+}/open',
             'openThread',
             $moderateAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'PUT',
-            '/{id:\d+}/close',
+            '/{contextId}/{id:\d+}/close',
             'closeThread',
             $moderateAuthorizer,
             [$this, 'preloadThread']
