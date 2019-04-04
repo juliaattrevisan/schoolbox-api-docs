@@ -109,6 +109,7 @@ class Controller extends Base
             $defaultOwner       = $this->getUserMapper()->findById($post["defaultOwnerId"]);
             $importParentAccess = $post["importParentAccess"] === 'on';
             $importRecords      = $post["importRecords"] === 'on';
+            $deleteRecords      = $post["deleteRecords"] === 'on';
             $importAttachments  = $post["importAttachments"] === 'on';
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
@@ -127,8 +128,8 @@ class Controller extends Base
                 'message'        => true,
             ],
             'postOutput' => [
-                function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments) {
-                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, true);
+                function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
+                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
                 },
             ],
         ]);
