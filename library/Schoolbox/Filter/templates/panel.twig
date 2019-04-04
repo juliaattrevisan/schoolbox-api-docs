@@ -401,7 +401,7 @@ Usage:
          */
         function showFilterLoader() {
             $filterLoaderIcon.prop('disabled', false);
-            $filterLoaderIcon.css('opacity', 1);
+            $filterLoaderIcon.css('display', 'inline-block');
         }
 
         /**
@@ -409,7 +409,7 @@ Usage:
          */
         function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
-            $filterLoaderIcon.css('opacity', 0);
+            $filterLoaderIcon.css('display', 'none');
         }
 
         /**
@@ -457,15 +457,16 @@ Usage:
 <div class="row">
     <div class="small-12 island" id="filter_panel">
         <section>
-            <div class="filter-interaction">
-                <div id="panel-summary" class="small-12 columns">
-                    <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
+            <div class="filter-interaction small-12 columns">
+                <div id="panel-summary">
+                    <label><span id="filter-loader" class="loader" title="Request sent ..."></span>Showing:</label>
+                    <div id="applied_filters" data-applied-filters></div>
                 </div>
             </div>
             <div class="small-12 column no-pad">
 
                 {# HIDABLE CONTENT #}
-                <ul class="flex-list flex-wrap">
+                <ul class="filters flex-list flex-wrap">
                     {% set countComponents = 0 %}
                     {% for component in panel.components %}
                         {% set template = component.template %}
@@ -482,8 +483,10 @@ Usage:
                             <p>No filters are user-configurable on this page.</p>
                         </div>
                     {% endif %}
-                    <li class="filter-component"><a class="button" id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a></li>
-                    <li class="filter-component">
+                    <li class="filter-component btn">
+                        <a class="button" id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a>
+                    </li>
+                    <li class="filter-component btn">
                         <input id="submit_button"
                                type="submit"
                                data-value="Apply Filters"

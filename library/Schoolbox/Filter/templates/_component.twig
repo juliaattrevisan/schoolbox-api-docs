@@ -12,9 +12,15 @@
     {% block scripts %}{% endblock %}
 
     {% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
+    {% set isEmpty = (isUserConfigurable and 0 == roleSelections | length) %}
 
     {% if isUserConfigurable %}
-        <span data-dropdown="filter-component-{{ definition.filter.id }}" aria-controls="{{ definition.filter.id }}" aria-expanded="false" data-filter-name>
+        <span
+                {% if isEmpty %}class="no-option" title="No options available"{% endif %}
+                data-dropdown="filter-component-{{ definition.filter.id }}"
+                aria-controls="{{ definition.filter.id }}"
+                aria-expanded="false"
+                data-filter-name>
             {{ block('filterName') }}
 
             {% if isDisabled %}
@@ -28,12 +34,10 @@
         {# By default, no available concrete options would mean no entities ever match #}
         {# This intentionally sends an empty string, not an empty array. @see Codec::convertRequestToSelections() #}
         <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-        {% if isUserConfigurable %}
-            <p class="meta">No options available</p>
-        {% endif %}
     {% else %}
+    <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
         {% block userOptions %}
-            <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
+
             {% for selection in roleSelections %}
                 {% include '@filters/_selectionCheckbox.twig' with {
                     roleSelection:      selection,
@@ -42,7 +46,8 @@
                     disabled:           isDisabled
                 } only %}
             {% endfor %}
-            </div>
+
         {% endblock %}
+    </div>
     {% endif %}
 </li>

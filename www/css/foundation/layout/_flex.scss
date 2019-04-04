@@ -7,30 +7,3 @@
 		@include responsive-sides(1, padding);
 	}
 }
-
-.filter-component {
-	text-align: center;
-
-	> span {
-		display: block;
-		padding: 1rem;
-		position: relative;
-
-		&:after {
-			content: '';
-			position: absolute;
-			top: 50%;
-			right: 1rem;
-			transform: translateY(-50%);
-			width: 0;
-			height: 0;
-			border-left: 5px solid transparent;
-			border-right: 5px solid transparent;
-			border-top: 5px solid $black;
-		}
-	}
-	a {
-		font-size: 1rem;
-		width: 100%;
-	}
-}
