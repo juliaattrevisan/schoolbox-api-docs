@@ -68,7 +68,7 @@ Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachmen
     --parent-access:    give parents access to pastoral records
     --add-records:      import pastoral records
     --add-attachments:  import documents associated with pastoral records
-    --delete-records:   if record is already exists, delete it and recreate, otherwise skip
+    --delete-records:   if record exists, delete it and recreate. If not specified only non-existing records will be imported
     --user:             the user id of someone who should be associated with this import (typically a superuser)
     --default-owner:    the user id of someone who should be assigned as owner of pastoral records
     
