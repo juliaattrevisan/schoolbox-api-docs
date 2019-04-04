@@ -12,21 +12,23 @@ Data:
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
-    <table>
-        <thead>
-        <tr>
-            <td>Criterion</td>
-            <td>Mark</td>
-        </tr>
-        </thead>
-        <tbody>
-        {% for criterion, mark in data %}
+    <div class="scrollable">
+        <table>
+            <thead>
             <tr>
-                <td>{{ criterion }}</td>
-                <td>{{ mark }}</td>
+                <td>Criterion</td>
+                <td>Mark</td>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for criterion, mark in data %}
+                <tr>
+                    <td>{{ criterion }}</td>
+                    <td>{{ mark }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endif %}
 <br>

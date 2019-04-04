@@ -11,24 +11,26 @@ Data:
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
-    <table>
-        <tbody>
-        {% if assessmentMark is defined %}
+    <div class="scrollable">
+        <table>
+            <tbody>
+            {% if assessmentMark is defined %}
+                <tr>
+                    <th>Assessment Mark</th>
+                    <td>{{ assessmentMark|default('-') }}</td>
+                </tr>
+            {% endif %}
+            {% if assessmentAverage is defined %}
+                <tr>
+                    <th>Assessment Average</th>
+                    <td>{{ assessmentAverage|default('-') }}</td>
+                </tr>
+            {% endif %}
             <tr>
-                <th>Assessment Mark</th>
-                <td>{{ assessmentMark|default('-') }}</td>
+                <th>Assessment Rank</th>
+                <td>{{ assessmentRank|default('-') }}</td>
             </tr>
-        {% endif %}
-        {% if assessmentAverage is defined %}
-            <tr>
-                <th>Assessment Average</th>
-                <td>{{ assessmentAverage|default('-') }}</td>
-            </tr>
-        {% endif %}
-        <tr>
-            <th>Assessment Rank</th>
-            <td>{{ assessmentRank|default('-') }}</td>
-        </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 {% endif %}
