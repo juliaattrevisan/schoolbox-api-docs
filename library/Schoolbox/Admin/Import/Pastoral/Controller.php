@@ -109,6 +109,7 @@ class Controller extends Base
             $defaultOwner       = $this->getUserMapper()->findById($post["defaultOwnerId"]);
             $importParentAccess = $post["importParentAccess"] === 'on';
             $importRecords      = $post["importRecords"] === 'on';
+            $deleteRecords      = $post["deleteRecords"] === 'on';
             $importAttachments  = $post["importAttachments"] === 'on';
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
@@ -127,8 +128,8 @@ class Controller extends Base
                 'message'        => true,
             ],
             'postOutput' => [
-                function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments) {
-                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+                function () use ($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords) {
+                    $this->importCallback($sessionUser, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
                 },
             ],
         ]);
@@ -141,11 +142,11 @@ class Controller extends Base
      * @param User $defaultOwner       Fallback owner when cannot be located in Schoolbox
      * @param bool $importParentAccess Flag indicating if parents should be imported to the pastoral_access table
      */
-    public function importCallback(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
+    public function importCallback(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords)
     {
         try {
             $pastoralExternal = new External_Pastoral();
-            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+            $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
         } catch (Exception $e) {
             //                                  .
             //                                 -|-

@@ -24,6 +24,7 @@ $appOpts = [
     'parent-access',
     'add-records',
     'add-attachments',
+    'delete-records',
 ];
 
 require __DIR__ . '/../../conf/core/require.php';
@@ -51,6 +52,7 @@ $kernel->run(function (
     $importParentAccess = isset($opts['parent-access']);
     $importRecords      = isset($opts['add-records']);
     $importAttachments  = isset($opts['add-attachments']);
+    $deleteRecords      = isset($opts['delete-records']);
     $defaultOwnerId     = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
     /** @var int|bool $userId The user conducting the import (used in logging) */
     $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
@@ -66,6 +68,7 @@ Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachmen
     --parent-access:    give parents access to pastoral records
     --add-records:      import pastoral records
     --add-attachments:  import documents associated with pastoral records
+    --delete-records:   if record exists, delete it and recreate. If not specified only non-existing records will be imported
     --user:             the user id of someone who should be associated with this import (typically a superuser)
     --default-owner:    the user id of someone who should be assigned as owner of pastoral records
     
@@ -119,7 +122,7 @@ HELP;
     $log->info("Beginning import of pastoral records...");
 
     $pastoralExternal = new External_Pastoral();
-    $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments);
+    $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
 
     $lock->release();
 });

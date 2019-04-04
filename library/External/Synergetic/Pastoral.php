@@ -120,9 +120,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                       dbo.tPastoralCare.ClassificationCode, 
                       dbo.tPastoralCare.IsFollowUpFlag, 
                       dbo.tPastoralCare.FollowUpDate, 
-                      dbo.tPastoralCare.CreatedDate, 
+                      CONVERT(varchar, dbo.tPastoralCare.CreatedDate, 121) AS CreatedDate,
                       dbo.tPastoralCare.CreatedByID, 
-                      dbo.tPastoralCare.ModifiedDate, 
+                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, 121) AS ModifiedDate, 
                       dbo.tPastoralCare.ModifiedByID,
                       dbo.tPastoralCare.EmailSentDate, 
                       dbo.tPastoralCare.EmailSentByID, 
@@ -208,7 +208,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments)
+    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords)
     {
         // Give the import 30 minutes to complete and bump up the memory limit just to make sure we don't bomb out
 
@@ -308,20 +308,29 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                             $logRecord->setResult("Skipped Unknown Student ({$record["PastoralCareSeq"]})");
                             $this->getPastoralLogMapper()->save($logRecord);
-
                             continue;
+                        }
+
+                        //Find existing records, if they exist you may either delete them or skip them depending on flag
+                        $existingRecords = $this->getPastoralMapper()->findByColumn('external_id', $record["PastoralCareSeq"]);
+                        if(count($existingRecords)) {
+                            if($deleteRecords) {
+                                // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
+                                // records. Could update the record, but its contents may have deviated it was originally imported, and
+                                // deleting will at least keep that history
+                                $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
+                            }
+                            else {
+                                $logRecord->setResult("Skipped record already exists ({$record["PastoralCareSeq"]})");
+                                $this->getPastoralLogMapper()->save($logRecord);
+                                continue;
+                            }
                         }
 
                         $logRecord->setCreatorName($owner->getFullName());
                         $logRecord->setStudentName($student->getFullName());
                         $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
                         $this->getPastoralLogMapper()->save($logRecord);
-
-                        // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
-                        // records. Could update the record, but its contents may have deviated it was originally imported, and
-                        // deleting will at least keep that history
-
-                        $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
 
                         // Only create record if both public and private aren't blank
 
@@ -336,7 +345,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             $pastoralRecord->setBodyPrivate("<p>{$record["PrivateDetails"]}</p>");
                             $pastoralRecord->setType($this->getPastoralType($record));
                             $pastoralRecord->setSubType($this->getPastoralSubType($record));
-                            $pastoralRecord->setCreatedAt(new Alaress_Date_Format($record['CreatedDate'], Alaress_Date_Format::DATABASE_FORMAT));
+                            $pastoralRecord->setCreatedAt(new Alaress_Date_Format($record['CreatedDate'], Alaress_Date_Format::DATABASE_FORMAT_MS));
                             if ($record['ModifiedByID']) {
                                 $modifier = $this->getSchoolboxUser($record['ModifiedByID']) ?: $defaultOwner;
                                 $pastoralRecord->setModifiedBy($modifier);
@@ -344,7 +353,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                             $modifiedDate = null;
                             if ($record['ModifiedDate']) {
-                                $modifiedDate = new Alaress_Date_Format($record['ModifiedDate'], Alaress_Date_Format::DATABASE_FORMAT);
+                                $modifiedDate = new Alaress_Date_Format($record['ModifiedDate'], Alaress_Date_Format::DATABASE_FORMAT_MS);
                                 $pastoralRecord->setUpdatedAt($modifiedDate);
                             }
 
