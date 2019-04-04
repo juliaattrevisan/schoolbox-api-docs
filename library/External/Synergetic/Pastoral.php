@@ -36,6 +36,15 @@ use Schoolbox\UserMapper;
 
 class External_Synergetic_Pastoral implements External_PastoralInterface
 {
+
+    /**
+     * A style for converting data types
+     *
+     * @var int
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?view=sql-server-2017
+     */
+    private const STYLE_ODBC_CANONICAL_WITH_MILLISECONDS = 121; // yyyy-mm-dd hh:mi:ss.mmm(24h);
+
     use External_MssqlConnector;
     use External_Synergetic_ValidateExternalIdTrait;
 
@@ -101,10 +110,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     const CHARACTER_ENCODING = 'UTF-8';
 
-    // Deduplicate query
 
-    /** @var string $sqlPastoralSelect */
-    protected $sqlPastoralSelect = "
+    /**
+     * Returns a query for finding pastoral records in external system
+     *
+     * @return string
+     */
+    protected function getSqlPastoralSelect(): string
+    {
+        $style = self::STYLE_ODBC_CANONICAL_WITH_MILLISECONDS;
+
+        return "
         SELECT        dbo.tPastoralCare.PastoralCareSeq, 
                       dbo.tPastoralCare.ID, 
                       dbo.tPastoralCare.ClassCode, 
@@ -120,9 +136,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                       dbo.tPastoralCare.ClassificationCode, 
                       dbo.tPastoralCare.IsFollowUpFlag, 
                       dbo.tPastoralCare.FollowUpDate, 
-                      CONVERT(varchar, dbo.tPastoralCare.CreatedDate, 121) AS CreatedDate,
+                      CONVERT(varchar, dbo.tPastoralCare.CreatedDate, {$style}) AS CreatedDate,
                       dbo.tPastoralCare.CreatedByID, 
-                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, 121) AS ModifiedDate, 
+                      CONVERT(varchar, dbo.tPastoralCare.ModifiedDate, {$style}) AS ModifiedDate, 
                       dbo.tPastoralCare.ModifiedByID,
                       dbo.tPastoralCare.EmailSentDate, 
                       dbo.tPastoralCare.EmailSentByID, 
@@ -137,14 +153,40 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         LEFT JOIN     dbo.luPastoralCareCategory ON dbo.tPastoralCare.CategoryCode = dbo.luPastoralCareCategory.Code
         INNER JOIN    dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
         INNER JOIN    dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
-        INNER JOIN    dbo.vStudentsAll ON dbo.vStudentsAll.ID = dbo.tPastoralCare.ID
+        INNER JOIN    dbo.{$this->getStudentViewName()} ON dbo.{$this->getStudentViewName()}.ID = dbo.tPastoralCare.ID
         INNER JOIN    dbo.FileSemesters ON 
-                          dbo.FileSemesters.FileYear = dbo.vStudentsAll.FileYear AND
-                          dbo.FileSemesters.FileSemester = dbo.vStudentsAll.FileSemester AND
-                          dbo.FileSemesters.SystemCurrentFlag = 1 AND 
-                          NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') 
-                                AND DATEDIFF(DAY, vStudentsAll.StudentLeavingDate, GETDATE()) > 0)
+                          dbo.FileSemesters.FileYear = dbo.{$this->getStudentViewName()}.FileYear AND
+                          dbo.FileSemesters.FileSemester = dbo.{$this->getStudentViewName()}.FileSemester AND
+                          dbo.FileSemesters.SystemCurrentFlag = 1
+                          {$this->getExtraFileSemJoinClause()}
     ";
+    }
+
+
+    /**
+     * Returns the name of the database view containing student information
+     *
+     * @return string
+     */
+    protected function getStudentViewName(): string
+    {
+        return 'vStudentsAll';
+    }
+
+
+    /**
+     * Returns any extra clause to apply to the JOIN from `FileSemesters` to the student database view
+     *
+     * @return string
+     */
+    protected function getExtraFileSemJoinClause(): string
+    {
+        return "
+            AND NOT ({$this->getStudentViewName()}.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING')
+            AND DATEDIFF(DAY, {$this->getStudentViewName()}.StudentLeavingDate, GETDATE()) > 0)
+        ";
+    }
+
 
     /** @var Html2Text $htmlConverter */
     protected $htmlConverter;
@@ -190,7 +232,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function getPastoral(Pastoral $pastoral)
     {
-        $query = "{$this->sqlPastoralSelect} WHERE dbo.tPastoralCare.PastoralCareSeq = :externalId";
+        $query = "{$this->getSqlPastoralSelect()} WHERE dbo.tPastoralCare.PastoralCareSeq = :externalId";
 
         return $this->connector->executeQuery($query)->fetch();
     }
@@ -246,7 +288,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             do {
                 $queryRecords = "
-                    {$this->sqlPastoralSelect}
+                    {$this->getSqlPastoralSelect()}
                     WHERE         PastoralCareSeq > {$highestPastoralSeq}
                     ORDER BY      dbo.tPastoralCare.PastoralCareSeq
                 ";
@@ -311,6 +353,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             continue;
                         }
 
+                        $logRecord->setCreatorName($owner->getFullName());
+                        $logRecord->setStudentName($student->getFullName());
+
                         //Find existing records, if they exist you may either delete them or skip them depending on flag
                         $existingRecords = $this->getPastoralMapper()->findByColumn('external_id', $record["PastoralCareSeq"]);
                         if(count($existingRecords)) {
@@ -327,8 +372,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             }
                         }
 
-                        $logRecord->setCreatorName($owner->getFullName());
-                        $logRecord->setStudentName($student->getFullName());
                         $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
                         $this->getPastoralLogMapper()->save($logRecord);
 
