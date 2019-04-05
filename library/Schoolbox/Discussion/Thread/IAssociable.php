@@ -28,7 +28,8 @@ interface IAssociable
      * dissociate it.
      *
      * @param Model|null $discussionThread
-     * @return self
+     * @return mixed Will generally be this object, but that isn't mandated by
+     *               this interface
      */
-    public function setDiscussionThread(?Model $discussionThread): self;
+    public function setDiscussionThread(?Model $discussionThread);
 }
