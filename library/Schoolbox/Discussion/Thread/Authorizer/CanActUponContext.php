@@ -16,12 +16,10 @@ use Schoolbox\User;
 /**
  * Authorization rule for discussion threads.
  *
- * This rule checks where the thread is in use, and verifies whether the
- * requesting user has permission to act upon that place.
- *
- * TODO rename to CanActUponContext
+ * This rule checks whether the user has permission to act upon the thread's
+ * context.
  */
-class CanActUponThread implements IAuthorizationRule
+class CanActUponContext implements IAuthorizationRule
 {
     /**
      * @var IStrategy[]
@@ -45,16 +43,6 @@ class CanActUponThread implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null): void
     {
-//        // Extract thread from params: first "thread", then out of "comment"
-//        $thread = $params['thread'] ?? null;
-//        if (!$thread instanceof Thread\Model) {
-//            $comment = $params['comment'] ?? null;
-//            if (!$comment instanceof Comment\Model) {
-//                throw new \InvalidArgumentException('Could not find thread in either "thread" or "comment" param');
-//            }
-//            $thread = $comment->getThread();
-//        }
-
         // Extract context
         $context = $params['context'] ?? null;
         if (!$context instanceof Thread\Context\IContext) {

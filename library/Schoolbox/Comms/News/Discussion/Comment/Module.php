@@ -54,7 +54,7 @@ class Module extends Comment\Module
             new Auth\Rule\LazyCallback(function () {
                 /** @var Auth\Authorizer $authorizer */
                 $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponThread(
+                return new Thread\Authorizer\CanActUponContext(
                     new News\Discussion\Permission\CanGetComments($authorizer)
                 );
             })
@@ -76,7 +76,7 @@ class Module extends Comment\Module
             new Auth\Rule\LazyCallback(function () {
                 /** @var Auth\Authorizer $authorizer */
                 $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponThread(
+                return new Thread\Authorizer\CanActUponContext(
                     new News\Discussion\Permission\CanModerateThread($authorizer)
                 );
             })
