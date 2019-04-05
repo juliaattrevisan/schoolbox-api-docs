@@ -80,13 +80,19 @@ abstract class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer): void
     {
+        // Currently this route applies to all endpoints.
+        // Eventually it will need to apply only to ones that contain a comment.
         $this->addRoutePermission(
             $authorizer,
             '.*',
             new Auth\Rule\Callback(function (array $params) {
-                if (!$this->buildContext()->isContextForThread($params['thread'], $params['context'])) {
-                    throw new NotFound();
+                $comment = $params['comment'];
+                if ($comment instanceof Model
+                    && $this->buildContext()->isContextForThread($comment->getThread(), $params['context'])
+                ) {
+                    return;
                 }
+                throw new NotFound();
             })
         );
     }
