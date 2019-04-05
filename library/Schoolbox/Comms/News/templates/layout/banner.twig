@@ -238,20 +238,22 @@
                             .post(self.createThreadEndpoint, { open: self.threadEnabled }, { headers: postHeaders })
                             .then(function (response) {
                                 // TODO remove the association step, once creation associates as well
-                                var threadId = response.data.id,
-                                    params   = new URLSearchParams();
-                                params.append('discussionThreadId', threadId);
-                                axios
-                                    .post(self.associateThreadEndpoint, params, { headers: postHeaders })
-                                    .then(function () {
-                                        // We successfully created and associated a thread.
-                                        // Now we can enable/disable it.
-                                        self.threadId = threadId;
-                                        resolve();
-                                    })
-                                    .catch(function (error) {
-                                        reject(error);
-                                    })
+                                // var threadId = response.data.id,
+                                //     params   = new URLSearchParams();
+                                self.threadId = response.data.id;
+                                resolve();
+                                // params.append('discussionThreadId', threadId);
+                                // axios
+                                //     .post(self.associateThreadEndpoint, params, { headers: postHeaders })
+                                //     .then(function () {
+                                //         // We successfully created and associated a thread.
+                                //         // Now we can enable/disable it.
+                                //         self.threadId = threadId;
+                                //         resolve();
+                                //     })
+                                //     .catch(function (error) {
+                                //         reject(error);
+                                //     })
                             })
                             .catch(function () {
                                 reject(error);

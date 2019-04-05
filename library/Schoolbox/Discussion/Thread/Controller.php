@@ -11,6 +11,7 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
 
@@ -44,15 +45,24 @@ class Controller extends BaseController
 
 
     /**
+     * The context object, used for associating a thread to a context.
+     *
+     * @var IContext
+     */
+    private $context;
+
+
+    /**
      * Constructor
      *
      * @param Comment\Mapper $commentMapper
      * @param Mapper         $threadMapper
      */
-    public function __construct(Comment\Mapper $commentMapper, Mapper $threadMapper)
+    public function __construct(Comment\Mapper $commentMapper, Mapper $threadMapper, IContext $context)
     {
         $this->commentMapper = $commentMapper;
         $this->threadMapper  = $threadMapper;
+        $this->context       = $context;
     }
 
 
@@ -86,6 +96,7 @@ class Controller extends BaseController
         $thread = $this->threadMapper->createModel()
             ->setOpen($data->open);
         $this->threadMapper->save($thread);
+        $this->context->associate($thread, $context);
         $this->buildResponse($thread, false);
     }
 
