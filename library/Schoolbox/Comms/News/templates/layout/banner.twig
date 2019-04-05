@@ -199,7 +199,7 @@
             commentHasBeenAddedText: 'Comment has been added',
             errorAddingCommentText: 'Unable to post comment',
             postCommentButtonIsEnabled: true,
-            createThreadEndpoint: "{{ routeLookup('commsDisccusionThread.createThread', {contextId: article.id}) }}",
+            createThreadEndpoint: "{{ routeLookup('commsDiscussionThreads.createThread', {contextId: article.id}) }}",
             associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {articleId: article.id}) }}",
         },
         // define methods under the `methods` object
