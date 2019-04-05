@@ -113,7 +113,7 @@ abstract class Module extends BaseModule
             $authorizer,
             '.*',
             new Auth\Rule\Callback(function (array $params) {
-                if (!$this->buildContext()->isContextForThread($params['context'], $params['thread'])) {
+                if (!$this->buildContext()->isContextForThread($params['thread'], $params['context'])) {
                     throw new NotFound();
                 }
             })
