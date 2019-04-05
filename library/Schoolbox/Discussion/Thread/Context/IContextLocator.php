@@ -10,24 +10,24 @@ namespace Schoolbox\Discussion\Thread\Context;
 
 use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
-use Schoolbox\User;
 
 /**
  * Definition of a thread context.
  *
- * Strategies for validating whether a thread:
- * * is associated with a particular type of item
- * * if associated, whether the current user has permission to act upon it
+ * Contains strategies for:
+ * * finding a thread context, given its ID
+ * * associating a thread with a context
+ * * determining if a thread is associated with a given context
  */
 interface IContextLocator
 {
-    /**
-     * Is this the correct context for objects of this type?
-     *
-     * @param string $contextType
-     * @return bool
-     */
-    public function isContextFor(string $contextType): bool;
+//    /**
+//     * Is this the correct context for objects of this type?
+//     *
+//     * @param string $contextType
+//     * @return bool
+//     */
+//    public function isContextFor(string $contextType): bool;
 
 
     /**
@@ -40,15 +40,15 @@ interface IContextLocator
     public function findById($id): IAssociable;
 
 
-    /**
-     * Does this strategy know of any associations between this thread? If so,
-     * return them.
-     *
-     * @param ThreadModel $thread
-     * @return iterable|IAssociable[] A collection of objects that are
-     *                                associated with this thread.
-     */
-    public function findAssociations(ThreadModel $thread): iterable;
+//    /**
+//     * Does this strategy know of any associations between this thread? If so,
+//     * return them.
+//     *
+//     * @param ThreadModel $thread
+//     * @return iterable|IAssociable[] A collection of objects that are
+//     *                                associated with this thread.
+//     */
+//    public function findAssociations(ThreadModel $thread): iterable;
 
 
     /**
