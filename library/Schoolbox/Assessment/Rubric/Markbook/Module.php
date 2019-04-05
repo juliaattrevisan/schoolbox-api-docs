@@ -24,14 +24,16 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 
 class Module extends BaseModule
 {
+
     protected $basename = 'rubricMarkbook';
+
 
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException
      * @throws NotFound If a class was specified but it does not exist
      */
-    public function registerRoutes() : void
+    public function registerRoutes(): void
     {
         $preloadFolder = function (array $params) {
             try {
@@ -52,7 +54,7 @@ class Module extends BaseModule
                 // Allow staff regardless of access level to the folder
                 new Rule\HasRole(Role::STAFF),
                 // Allow instructors (anyone with write+ access to folder)
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) : int {
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params): int {
                     return (int)$params['folderId'];
                 }, Access::getInstance())
             )
@@ -65,10 +67,11 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector) : void
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
+
 
     /**
      * @param Container|ContainerInterface $injector The dependency injection container.
@@ -77,16 +80,17 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'internalDb' => $injector->lazyGet('databaseInternal'),
+            'internalDb'       => $injector->lazyGet('databaseInternal'),
             'gradeGroupMapper' => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
+            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
         ];
     }
+
 
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) : void
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
