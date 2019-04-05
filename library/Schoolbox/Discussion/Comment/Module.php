@@ -107,14 +107,14 @@ class Module extends BaseModule
         // Routes
         $this->register(
             'DELETE',
-            '/{id:\d+}',
+            '/{contextId}/{id:\d+}',
             'deleteComment',
             $deleteAuthorizer,
             [$this, 'preloadCommentAllowDeleted']
         );
         $this->register(
             'GET',
-            '/{id:\d+}/comments',
+            '/{contextId}/{id:\d+}/comments',
             'getCommentsByParent',
             $getAuthorizer,
             [$this, 'preloadComment']
