@@ -30,35 +30,79 @@ class Module extends BaseModule
 
 
     /**
+     * Builds a context object for retrieving and persisting objects that are
+     * related to a discussion thread.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Thread\Context\IContext
+     */
+    protected function buildContext(): Thread\Context\IContext
+    {
+        /** @var News\Mapper   $newsMapper */
+        /** @var Thread\Mapper $threadMapper */
+        $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
+        $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
+        return new News\Discussion\Context($threadMapper, $newsMapper);
+    }
+
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to read
+     * comments.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
+    {
+        return new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new IsCommentAuthor(),
+            new Auth\Rule\LazyCallback(function () {
+                /** @var Auth\Authorizer $authorizer */
+                $authorizer = $this->getInjector()->get('authorizer');
+                return new Thread\Authorizer\CanActUponThread(
+                    new News\Discussion\Permission\CanGetComments($authorizer, $this->buildContext())
+                );
+            })
+        );
+    }
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to delete
+     * comments.
+     *
+     * TODO make abstract and add to subclasses
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
+    {
+        return new Auth\Rule\Any(
+            new Auth\Rule\IsSuperuser(),
+            new IsCommentAuthor(),
+            new Auth\Rule\LazyCallback(function () {
+                /** @var Auth\Authorizer $authorizer */
+                $authorizer = $this->getInjector()->get('authorizer');
+                return new Thread\Authorizer\CanActUponThread(
+                    new News\Discussion\Permission\CanModerateThread($authorizer, $this->buildContext())
+                );
+            })
+        );
+    }
+
+
+    /**
      * @inheritdoc
      */
     protected function registerRoutes(): void
     {
-        /** @var Auth\Authorizer $authorizer */
-        /** @var News\Mapper     $newsMapper */
-        /** @var Thread\Mapper   $threadMapper */
-        $authorizer       = $this->getInjector()->get('authorizer');
-        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
-        $threadMapper     = $this->getMapperFactory()->get(Thread\Mapper::class);
-        $commsContext     = new News\Discussion\Context($threadMapper, $newsMapper);
-        $deleteAuthorizer = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $commsContext)
-                );
-            })
-        );
-        $getAuthorizer    = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $commsContext)
-                );
-            })
-        );
+        $deleteAuthorizer = $this->buildDeleteCommentsAuthorizationRule();
+        $getAuthorizer    = $this->buildGetCommentsAuthorizationRule();
 
         // Routes
         $this->register(
