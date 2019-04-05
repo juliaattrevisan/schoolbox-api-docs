@@ -25,7 +25,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Alaress_Date_Format;
 
-class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
+class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\IAssociable
 {
     // The discrete, atomic states this article may be in.
     private const STATE_DRAFT                = 1;
