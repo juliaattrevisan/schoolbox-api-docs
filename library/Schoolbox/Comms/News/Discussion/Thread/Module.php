@@ -85,8 +85,6 @@ class Module extends Thread\Module
      * Builds an authorization rule for whether a user has permission to create
      * a thread.
      *
-     * TODO make abstract and add to subclasses
-     *
      * @return Auth\Rule\IAuthorizationRule
      */
     protected function buildCreateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule
