@@ -36,7 +36,12 @@ class Module extends BaseModule
     {
         $preloadFolder = function (array $params) {
             try {
-                return ['folder' => $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId'])];
+                if (($params['folder'] ?? null) instanceof Folder\Model) {
+                    $folder = $params['folder'];
+                } else {
+                    $folder = $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId']);
+                }
+                return ['folder' => $folder];
             } catch (Mapper\Exception $e) {
                 throw new NotFound("No folder found for id: {$params['folderId']}", 0, $e);
             }
@@ -53,7 +58,7 @@ class Module extends BaseModule
                 // Allow staff regardless of access level to the folder
                 new Rule\HasRole(Role::STAFF),
                 // Allow instructors (anyone with write+ access to folder)
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params): int {
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
                     return (int)$params['folderId'];
                 }, Access::getInstance())
             )
