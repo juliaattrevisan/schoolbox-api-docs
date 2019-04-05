@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Context;
 
+use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
 use Schoolbox\User;
 
@@ -34,9 +35,9 @@ interface IContext
      * thread.
      *
      * @param $id
-     * @return mixed
+     * @return IAssociable
      */
-    public function findById($id);
+    public function findById($id): IAssociable;
 
 
     /**
@@ -44,8 +45,8 @@ interface IContext
      * return them.
      *
      * @param ThreadModel $thread
-     * @return iterable A collection of objects, of a type which this context
-     *                  knows how to associate with a thread.
+     * @return iterable|IAssociable[] A collection of objects that are
+     *                                associated with this thread.
      */
     public function findAssociations(ThreadModel $thread): iterable;
 
@@ -54,7 +55,7 @@ interface IContext
      * Associates the given object with the thread.
      *
      * @param ThreadModel $thread
-     * @param mixed       $object
+     * @param IAssociable $object
      */
-    public function associate(ThreadModel $thread, $object): void;
+    public function associate(ThreadModel $thread, IAssociable $object): void;
 }

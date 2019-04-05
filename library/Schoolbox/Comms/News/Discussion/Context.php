@@ -61,11 +61,11 @@ class Context implements IContext
      * @inheritDoc
      *
      * @param int $id
-     * @return mixed|News\Model
+     * @return News\Model
      * @throws \Schoolbox\Mapper\Exception         if fetch failed
      * @throws \Schoolbox\Mapper\Exception\Deleted if object was deleted
      */
-    public function findById($id)
+    public function findById($id): Thread\IAssociable
     {
         return $this->mapper->findById($id);
     }
@@ -87,13 +87,13 @@ class Context implements IContext
      * @inheritDoc
      *
      * @param Thread\Model $thread
-     * @param mixed        $object
+     * @param News\Model   $object
      * @throws \TypeError                  if $object isn't a News\Model
      * @throws \Schoolbox\Mapper\Exception if save failed
      * @throws \UnexpectedValueException   if either $thread or $object is
      *                                     associated with something else
      */
-    public function associate(Thread\Model $thread, $object): void
+    public function associate(Thread\Model $thread, Thread\ IAssociable $object): void
     {
         if (!$object instanceof News\Model) {
             throw new \TypeError('$object must be a ' . News\Model::class);
