@@ -30,7 +30,7 @@ class Module extends BaseModule
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function registerRoutes(): void
     {
@@ -38,7 +38,7 @@ class Module extends BaseModule
             try {
                 return ['folder' => $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId'])];
             } catch (Mapper\Exception $e) {
-                throw new NotFound("No folder found for id: {$params['folderId']}");
+                throw new NotFound("No folder found for id: {$params['folderId']}", 0, $e);
             }
         };
 
