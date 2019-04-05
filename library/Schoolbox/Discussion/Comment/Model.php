@@ -132,11 +132,12 @@ class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
      */
     public function getJsonApiLinks(): array
     {
+        // TODO figure out how to create contextual links
         return [
-            'delete' => new AuraLink(
-                'discussionComments.deleteComment',
-                ['id' => $this->id, 'comment' => $this,]
-            )
+//            'delete' => new AuraLink(
+//                'discussionComments.deleteComment',
+//                ['id' => $this->id, 'comment' => $this,]
+//            ),
         ];
     }
 }
