@@ -44,15 +44,15 @@ class CanActUponThread implements IAuthorizationRule
      */
     public function authorize(array $params = [], User $user = null): void
     {
-        // Extract thread from params: first "thread", then out of "comment"
-        $thread = $params['thread'] ?? null;
-        if (!$thread instanceof Thread\Model) {
-            $comment = $params['comment'] ?? null;
-            if (!$comment instanceof Comment\Model) {
-                throw new \InvalidArgumentException('Could not find thread in either "thread" or "comment" param');
-            }
-            $thread = $comment->getThread();
-        }
+//        // Extract thread from params: first "thread", then out of "comment"
+//        $thread = $params['thread'] ?? null;
+//        if (!$thread instanceof Thread\Model) {
+//            $comment = $params['comment'] ?? null;
+//            if (!$comment instanceof Comment\Model) {
+//                throw new \InvalidArgumentException('Could not find thread in either "thread" or "comment" param');
+//            }
+//            $thread = $comment->getThread();
+//        }
 
         // Extract context
         $context = $params['context'] ?? null;
