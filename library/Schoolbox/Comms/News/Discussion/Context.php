@@ -93,7 +93,7 @@ class Context implements IContext
      * @throws \UnexpectedValueException   if either $thread or $object is
      *                                     associated with something else
      */
-    public function associate(Thread\Model $thread, Thread\ IAssociable $object): void
+    public function associate(Thread\Model $thread, Thread\IAssociable $object): void
     {
         if (!$object instanceof News\Model) {
             throw new \TypeError('$object must be a ' . News\Model::class);
@@ -111,5 +111,19 @@ class Context implements IContext
 
         $object->setDiscussionThread($thread);
         $this->mapper->save($object);
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param Thread\Model       $thread
+     * @param Thread\IAssociable $context
+     * @return bool
+     */
+    public function isContextForThread(Thread\Model $thread, Thread\IAssociable $context): bool
+    {
+        $contextThread = $context->getDiscussionThread();
+        return $contextThread && $thread->getId() === $contextThread->getId();
     }
 }

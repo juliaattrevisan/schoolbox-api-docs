@@ -58,4 +58,14 @@ interface IContext
      * @param IAssociable $object
      */
     public function associate(ThreadModel $thread, IAssociable $object): void;
+
+
+    /**
+     * Is this thread the correct association for this context?
+     *
+     * @param ThreadModel $thread
+     * @param IAssociable $context
+     * @return bool
+     */
+    public function isContextForThread(ThreadModel $thread, IAssociable $context): bool;
 }
