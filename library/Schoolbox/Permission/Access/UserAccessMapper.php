@@ -6,16 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\Builder;
-use Aura\Di\Exception\ServiceNotFound;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Resource\Folder\Code\Mapper as CodeMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -23,7 +20,10 @@ use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-
+use Alaress\Database\Predicate;
+use PDOException;
+use UnderflowException;
+use InvalidArgumentException;
 
 /**
  * Class UserAccessMapper
@@ -294,109 +294,136 @@ class UserAccessMapper extends Mapper
 
 
     /**
+     * Efficiently returns a set of users involved with a folder
+     *
+     * union 2 sources: userAccess, and if synergy, external class
+     *
      * @param FolderModel $folder      Folder codes must be hydrated if $includeSynergy == true
      * @param string      $roleType    If provided, restrict to this role type
      * @param int         $accessType
      * @param bool        $includeSynergy
      * @param bool        $exactAccess If true, only fetch users with exactly $accessType.
      *                                 By default, fetch users with at least $accessType.
-     * @return Collection|User[]
+     * @return GenericCollection|User[]
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws InvalidArgumentException If an unrecognised role type or access level is specified
+     * @todo This doesn't belong on this mapper, and is too complex for a single method. It belong in a testable helper class that depends on:
+     *       * userAccessMapper
+     *       * userMapper
+     *       * external class interface
      */
     public function findUsersInCategory(
-        $folder,
-        $roleType = null,
-        $accessType = UserAccess::ACCESS_READ,
-        $includeSynergy = true,
-        $exactAccess = false
-    ) {
-        // union 3 sources: userAccess, and if synergy, external class and external user
+        FolderModel $folder,
+        string $roleType = null,
+        int $accessType = UserAccess::ACCESS_READ,
+        bool $includeSynergy = true,
+        bool $exactAccess = false
+    ): GenericCollection
+    {
+        if ($roleType && !\in_array($roleType, Role::getRoleTypes(), true)) {
+            throw new InvalidArgumentException("Unrecognised role type: $roleType");
+        }
 
-	    $userRoleMapper = $this->getJoinMapper('user.role');
+        if (!\in_array($accessType, UserAccess::getAccessLevels(), true)) {
+            throw new InvalidArgumentException("Unrecognised access level type: $accessType");
+        }
 
-        // acquire users from internal access definition
-        $query = "
-            SELECT
-                {$this->getJoinColumnString('user', 'u')},
-                {$userRoleMapper->getColumnString('ur')}
-            FROM
-                `{$this->table}` ua
-                INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
-                INNER JOIN {$this->getJoinSql('user.role','u', 'ur', true)}
-            WHERE ua.service = :service
-            AND ua.sid = :serviceId
-        ";
+        /**
+         * @var UserMapper $userMapper
+         * @var RoleMapper $roleMapper
+         */
+        $userMapper     = $this->getJoinMapper('user');
+        $roleMapper     = $this->getJoinMapper('user.role');
+        $userCollection = $userMapper->createCollection();
+
+        // Performance testing appears to indicate there is no material difference between:
+        //   1. UNION of two SELECT statements that each use INNER JOINs, and
+        //   2. A single SELECT using a LEFT JOIN to include users with matching external ids, but who have no tuples in userAccess
+        // However the LEFT JOIN version is more amenable to an ORDER BY clause.
+
+        // If we have no `externalId` consideration, we can optimise to use an INNER JOIN to `userAccess` instead.
+        $userAccessJoinType = 'INNER';
+
+        // Group members (always part of ultimate query)
+        $groupPb = (new Predicate\Builder($this->getDatabase(), 'u'))
+            ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
+            ->equals('ua.sid', $folder->getId());
         if ($exactAccess) {
-            $query .= ' AND ua.type = :access ';
+            $groupPb->equals('ua.type', $accessType);
         } else {
-            $query .= ' AND ua.type >= :access ';
+            $groupPb->greaterThanOrEqualTo('ua.type', $accessType);
         }
-        $params = [
-            'service'   => UserAccess::SERVICE_HOMEPAGE,
-            'serviceId' => $folder->getId(),
-            'access'    => $accessType,
-        ];
-        if (isset($roleType)) {
-            $query .= ' AND ur.group_type = :roleType ';
-            $params['roleType'] = $roleType;
-        }
+        $outerPb = (new Predicate\Builder($this->getDatabase(), 'u'))->all($groupPb);
 
-        $query .= ' ORDER BY ua.type DESC,lastname,firstname';
+        if ($includeSynergy) {
+            // Include students if no role filter, or filtering to students, and caller requested exact READ perm, or at least READ perm or below.
+            $getClassStudents =
+                (!$roleType || $roleType === Role::STUDENT) &&
+                (($exactAccess && $accessType === UserAccess::ACCESS_READ) || (!$exactAccess && $accessType <= UserAccess::ACCESS_READ));
 
-        $stmt = $this->database->prepare($query);
-        $stmt->execute($params);
-        $userCollection = $this->getJoinMapper('user')->createCollection();
+            // Include teachers if no role filter, or filtering to teachers, and caller requested exact WRITE perm, or at least WRITE perm or below.
+            $getClassTeachers =
+                (!$roleType || $roleType === Role::STAFF) &&
+                (($exactAccess && $accessType === UserAccess::ACCESS_WRITE) || (!$exactAccess && $accessType <= UserAccess::ACCESS_WRITE));
 
-        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // add the user represented by this row to the collection
-            $userCollection->add(
-                $this->hydrateJoin($r, 'user', 'u')
-	                    ->setRole($userRoleMapper->hydrate($r, 'ur'))
-            );
-        }
-
-        if (!$includeSynergy) {
-            // no synergy? ok, we're done here
-            return $userCollection;
-        }
-
-        // TODO get rid of these
-        $_DEPRECATED_EXTERNAL_CLASS_HANDLER = new \External_Class();
-
-        // including synergy: intersect the existing collection with synergy-based collections
-
-        // start with a list of students in this category
-        switch($roleType) {
-            case Role::STUDENT:
-                $classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getStudents($folder->getCodeString()) ?: array();
-                break;
-            case Role::STAFF:
-                $classListArray = $_DEPRECATED_EXTERNAL_CLASS_HANDLER->getTeacherName($folder->getCodeString()) ?: array();
-                break;
-            default:
-                $classListArray = array();
-        }
-
-        $synergyIdArray = array();
-
-        // index by synid
-        foreach ($classListArray as $value) {
-            // compensate for <expletive of choice> inconsistent handler return type
-            if (is_array($value)) {
-                $synergyIdArray[$value['synergy_id']] = $value['synergy_id'];
-            } else {
-                $synergyIdArray[$value] = $value;
+            if ($getClassStudents || $getClassTeachers) {
+                $externalClass = new \External_Class();
+                $externalIds   = [];
+                if ($getClassStudents) {
+                    foreach ($externalClass->getStudents($folder->getCodeString()) as $student) {
+                        $externalIds[] = $student['synergy_id'];
+                    }
+                }
+                if ($getClassTeachers) {
+                    foreach ($externalClass->getTeacherName($folder->getCodeString()) as $teacherExternalId) {
+                        $externalIds[] = $teacherExternalId;
+                    }
+                }
+                if (\count($externalIds)) {
+                    // We'll need to change this to a LEFT join to include class members who lack userAccess records.
+                    $userAccessJoinType = 'LEFT';
+                    $outerPb->in('u.synergy_id', $externalIds);
+                    $outerPb = (new Predicate\Builder($this->getDatabase(), 'u'))->any($outerPb);
+                }
             }
         }
 
-        $extUserCollection = UserMapper::getInstance()->findByColumnList(array(
-            'synergy_id' => array_values($synergyIdArray),
-            'group_id'   => RoleMapper::getInstance()->findByColumn('group_type', $roleType)->getColumnValues('id')
-        ));
+        if ($roleType) {
+            $outerPb->equals('g.group_type', $roleType);
+        }
+        $outerPb->isNull('u.deleted_at');
 
-        // merge the two collections
-        $extUserCollection = $extUserCollection->mergeUnique($userCollection, 'id');
-        return $extUserCollection;
-	}
+        $whereClause = \implode(' AND ', $outerPb->getWhere());
+
+        $query = "
+            SELECT
+                {$userMapper->getColumnString('u')},
+                {$roleMapper->getColumnString('g')}
+            FROM
+                {$userMapper->getTable()} u
+                INNER JOIN {$userMapper->getJoinSql('role','u', 'g', true)}
+                {$userAccessJoinType} JOIN {$this->table} ua ON ua.uid = u.id
+            WHERE {$whereClause}
+            ORDER BY ua.type DESC, u.lastname, u.firstname
+        ";
+
+        $stmt = $this->database->prepare($query);
+        $stmt->execute($outerPb->getParams());
+
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            // add the user represented by this row to the collection
+            $userId = $r['u.id'];
+            if (!$userCollection->keyExists($userId)) {
+                $userCollection[$r['u.id']] = $userMapper->hydrate($r, 'u')->setRole($roleMapper->hydrate($r, 'g'));
+            }
+        }
+        return $userCollection;
+    }
 
 
     /**
