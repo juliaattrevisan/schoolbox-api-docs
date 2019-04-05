@@ -70,8 +70,9 @@
                                     </dd>
                                 {% endif %}
                             {% endif %}
-
                             {% if showDetails %}
+                                <dt class="small-12 medium-3">Role:</dt>
+                                <dd class="small-12 medium-9">{{ user.role.name }}</dd>
                                 {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
                                     <dt class="small-12">Partner:</dt>
                                     <dd class="small-12">
@@ -136,3 +137,24 @@
         </section>
     </div>
 </div>
+{% if isStaff and not user.getHideContacts %}
+    <div class="row">
+        <div class="column small-12 medium-6 island">
+            <h2 class="subheader">Students</h2>
+            <section>
+                <ul class="information-list">
+                    {% for student in students %}
+                        <li>
+                            <div class="card small-12">
+                                <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64"
+                                     alt="View Profile">
+                                <a href="/search/user/{{ student.id }}"><p>{{ student.formatName }}</p></a>
+                                <span class="meta">Year {{ student.year }}</span>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+{% endif %}
