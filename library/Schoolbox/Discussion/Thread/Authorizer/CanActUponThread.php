@@ -54,15 +54,24 @@ class CanActUponThread implements IAuthorizationRule
             $thread = $comment->getThread();
         }
 
+        // Extract context
+        $context = $params['context'] ?? null;
+        if (!$context instanceof Thread\IAssociable) {
+            throw new \InvalidArgumentException('"context" param is not an instance of ' . Thread\IAssociable::class);
+        }
+
         // Search for the thread in all the strategies.
         // (A thread should only be used in one place, but it's possible to
         //  check multiples.)
         foreach ($this->strategies as $strategy) {
-            foreach ($strategy->findAssociations($thread) as $association) {
-                if ($strategy->hasPermission($association, $user)) {
-                    return;
-                }
+            if ($strategy->hasPermission($context, $user)) {
+                return;
             }
+//            foreach ($strategy->findAssociations($thread) as $association) {
+//                if ($strategy->hasPermission($association, $user)) {
+//                    return;
+//                }
+//            }
         }
 
         throw new Failure\Unauthorized('Could not authorize access to thread');

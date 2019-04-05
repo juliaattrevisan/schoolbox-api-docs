@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Authorizer;
 
+use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
 use Schoolbox\User;
 
@@ -34,9 +35,9 @@ interface IStrategy
      *
      * Implies `retrieveAssociations` returned something.
      *
-     * @param mixed     $object The object that is related to the thread
-     * @param User|null $user
+     * @param IAssociable $object The object that is related to the thread
+     * @param User|null   $user
      * @return bool
      */
-    public function hasPermission($object, ?User $user): bool;
+    public function hasPermission(IAssociable $object, ?User $user): bool;
 }

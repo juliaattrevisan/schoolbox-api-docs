@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\User;
 
 /**
@@ -48,11 +49,11 @@ class CanModerateThread extends BaseStrategy
 
 
     /**
-     * @param mixed     $object The object that is related to the thread
-     * @param User|null $user
+     * @param IAssociable $object
+     * @param User|null   $user
      * @return bool
      */
-    public function hasPermission($object, ?User $user): bool
+    public function hasPermission(IAssociable $object, ?User $user): bool
     {
         if (!$object instanceof News\Model) {
             return false;
