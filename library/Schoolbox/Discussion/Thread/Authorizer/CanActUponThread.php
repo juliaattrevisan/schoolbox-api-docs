@@ -19,6 +19,8 @@ use Schoolbox\User;
  *
  * This rule checks where the thread is in use, and verifies whether the
  * requesting user has permission to act upon that place.
+ *
+ * TODO rename to CanActUponContext
  */
 class CanActUponThread implements IAuthorizationRule
 {
