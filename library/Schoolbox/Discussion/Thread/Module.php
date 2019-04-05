@@ -145,41 +145,41 @@ class Module extends BaseModule
         // Routes
         $this->register(
             'GET',
-            '/{contextId}/{id:\d+}',
+            '/{id:\d+}',
             'getThread',
             $getAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'GET',
-            '/{contextId}/{id:\d+}/comments',
+            '/{id:\d+}/comments',
             'getCommentsByThread',
             $getAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'POST',
-            '/{contextId}',
+            '',
             'createThread',
             $this->buildCreateThreadAuthorizationRule()
         );
         $this->register(
             'POST',
-            '/{contextId}/{id:\d+}/comments',
+            '/{id:\d+}/comments',
             'createCommentInThread',
             $postAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'PUT',
-            '/{contextId}/{id:\d+}/open',
+            '/{id:\d+}/open',
             'openThread',
             $moderateAuthorizer,
             [$this, 'preloadThread']
         );
         $this->register(
             'PUT',
-            '/{contextId}/{id:\d+}/close',
+            '/{id:\d+}/close',
             'closeThread',
             $moderateAuthorizer,
             [$this, 'preloadThread']
