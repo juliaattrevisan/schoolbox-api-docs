@@ -110,6 +110,7 @@ class External_Synergetic_Class implements External_ClassInterface
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.StudentTutorDescription,
                         vStudentsAll.StudentID as synergy_id,
+                        vStudentsAll.StudentForm,
                         StudentClasses.ClassCampus
         FROM            dbo.StudentClasses StudentClasses
         JOIN dbo.vStudentsAll vStudentsAll ON (
