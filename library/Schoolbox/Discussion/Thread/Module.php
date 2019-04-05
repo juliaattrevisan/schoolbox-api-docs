@@ -109,11 +109,17 @@ abstract class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer): void
     {
+        // All routes except for create
         $this->addRoutePermission(
             $authorizer,
             '.*',
             new Auth\Rule\Callback(function (array $params) {
-                if (!$this->buildContext()->isContextForThread($params['thread'], $params['context'])) {
+                // Only if the thread exists
+                $thread = $params['thread'] ?? null;
+                if (!$thread) {
+                    return;
+                }
+                if (!$this->buildContext()->isContextForThread($thread, $params['context'])) {
                     throw new NotFound();
                 }
             })
@@ -147,6 +153,7 @@ abstract class Module extends BaseModule
         $injector->params[Controller::class] = [
             'commentMapper' => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
             'threadMapper'  => $this->getMapperFactory()->getLazy(Mapper::class),
+            'context'       => $this->buildContext(),
         ];
     }
 
