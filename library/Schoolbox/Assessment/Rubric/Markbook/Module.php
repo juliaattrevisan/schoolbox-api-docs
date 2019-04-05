@@ -21,8 +21,6 @@ use Aura\Di\Container;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\UserMapper;
-use External_Class;
 
 class Module extends BaseModule
 {
@@ -80,9 +78,7 @@ class Module extends BaseModule
     {
         $injector->params[Controller::class] = [
             'internalDb' => $injector->lazyGet('databaseInternal'),
-            'externalDb' => $injector->lazyNew(External_Class::class),
             'gradeGroupMapper' => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
         ];
     }

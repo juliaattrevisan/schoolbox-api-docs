@@ -24,8 +24,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
-use External_ClassInterface;
 use Alaress\Database;
 use InvalidArgumentException;
 use PDOException;
@@ -41,13 +39,6 @@ class Controller extends Base
     private $internalDb;
 
     /**
-     * Data source for class lists
-     *
-     * @var External_ClassInterface
-     */
-    private $externalDb;
-
-    /**
      * @var GradeGroup\Mapper
      */
     private $gradeGroupMapper;
@@ -59,35 +50,23 @@ class Controller extends Base
      */
     private $userAccessMapper;
 
-    /**
-     * Data source for users themselves
-     *
-     * @var UserMapper
-     */
-    private $userMapper;
 
     /**
      * Constructor
      *
-     * @param External_ClassInterface $externalDb
-     * @param IConnector $internalDb
+     * @param IConnector        $internalDb
      * @param GradeGroup\Mapper $gradeGroupMapper
-     * @param UserAccessMapper        $userAccessMapper
-     * @param UserMapper              $userMapper
+     * @param UserAccessMapper  $userAccessMapper
      */
     public function __construct(
         IConnector $internalDb,
         GradeGroup\Mapper $gradeGroupMapper,
-        External_ClassInterface $externalDb,
-        UserAccessMapper $userAccessMapper,
-        UserMapper $userMapper
+        UserAccessMapper $userAccessMapper
     ) {
-        $this->externalDb         = $externalDb;
-        $this->internalDb         = $internalDb;
-        $this->gradeGroupMapper   = $gradeGroupMapper;
-        $this->userAccessMapper   = $userAccessMapper;
-        $this->userMapper         = $userMapper;
-    }
+        $this->internalDb       = $internalDb;
+        $this->gradeGroupMapper = $gradeGroupMapper;
+        $this->userAccessMapper = $userAccessMapper;
+     }
 
 
     /**
