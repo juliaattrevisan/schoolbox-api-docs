@@ -11,7 +11,7 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Discussion\Thread\Context\IAssociable;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Context\IContextLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
@@ -87,10 +87,10 @@ class Controller extends BaseController
      * @api   POST /discussion/{contextType}/{contextId}/threads/
      * @level 190
      *
-     * @param IAssociable $context The item with which to associate the thread
+     * @param IContext $context The item with which to associate the thread
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function createThread(IAssociable $context): void
+    public function createThread(IContext $context): void
     {
         /** @var \stdClass $data */
         $data   = $this->request->content->get();

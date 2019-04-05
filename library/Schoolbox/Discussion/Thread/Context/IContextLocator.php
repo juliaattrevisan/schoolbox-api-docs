@@ -34,9 +34,9 @@ interface IContextLocator
      * thread.
      *
      * @param $id
-     * @return IAssociable
+     * @return IContext
      */
-    public function findById($id): IAssociable;
+    public function findById($id): IContext;
 
 
 //    /**
@@ -54,17 +54,17 @@ interface IContextLocator
      * Associates the given object with the thread.
      *
      * @param ThreadModel $thread
-     * @param IAssociable $object
+     * @param IContext    $object
      */
-    public function associate(ThreadModel $thread, IAssociable $object): void;
+    public function associate(ThreadModel $thread, IContext $object): void;
 
 
     /**
      * Is this thread the correct association for this context?
      *
      * @param ThreadModel $thread
-     * @param IAssociable $context
+     * @param IContext    $context
      * @return bool
      */
-    public function isContextForThread(ThreadModel $thread, IAssociable $context): bool;
+    public function isContextForThread(ThreadModel $thread, IContext $context): bool;
 }

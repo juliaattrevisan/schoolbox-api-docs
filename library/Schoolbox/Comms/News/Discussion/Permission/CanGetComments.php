@@ -11,7 +11,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
-use Schoolbox\Discussion\Thread\Context\IAssociable;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\User;
 
 /**
@@ -40,11 +40,11 @@ class CanGetComments implements IStrategy
 
 
     /**
-     * @param IAssociable $object
-     * @param User|null   $user
+     * @param IContext  $object
+     * @param User|null $user
      * @return bool
      */
-    public function hasPermission(IAssociable $object, ?User $user): bool
+    public function hasPermission(IContext $object, ?User $user): bool
     {
         if (!$object instanceof News\Model) {
             return false;

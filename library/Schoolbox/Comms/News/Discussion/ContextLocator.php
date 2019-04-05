@@ -65,7 +65,7 @@ class ContextLocator implements IContextLocator
      * @throws \Schoolbox\Mapper\Exception         if fetch failed
      * @throws \Schoolbox\Mapper\Exception\Deleted if object was deleted
      */
-    public function findById($id): Thread\Context\IAssociable
+    public function findById($id): Thread\Context\IContext
     {
         return $this->mapper->findById($id);
     }
@@ -93,7 +93,7 @@ class ContextLocator implements IContextLocator
      * @throws \UnexpectedValueException   if either $thread or $object is
      *                                     associated with something else
      */
-    public function associate(Thread\Model $thread, Thread\Context\IAssociable $object): void
+    public function associate(Thread\Model $thread, Thread\Context\IContext $object): void
     {
         if (!$object instanceof News\Model) {
             throw new \TypeError('$object must be a ' . News\Model::class);
@@ -117,11 +117,11 @@ class ContextLocator implements IContextLocator
     /**
      * @inheritDoc
      *
-     * @param Thread\Model                                     $thread
-     * @param \Schoolbox\Discussion\Thread\Context\IAssociable $context
+     * @param Thread\Model                                  $thread
+     * @param \Schoolbox\Discussion\Thread\Context\IContext $context
      * @return bool
      */
-    public function isContextForThread(Thread\Model $thread, Thread\Context\IAssociable $context): bool
+    public function isContextForThread(Thread\Model $thread, Thread\Context\IContext $context): bool
     {
         $contextThread = $context->getDiscussionThread();
         return $contextThread && $thread->getId() === $contextThread->getId();

@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Authorizer;
 
-use Schoolbox\Discussion\Thread\Context\IAssociable;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\User;
 
 /**
@@ -22,9 +22,9 @@ interface IStrategy
      * Does the given user have permission to perform the action, based on the
      * object that is associated with the thread?
      *
-     * @param IAssociable $object The object that is related to the thread
-     * @param User|null   $user
+     * @param IContext  $object The object that is related to the thread
+     * @param User|null $user
      * @return bool
      */
-    public function hasPermission(IAssociable $object, ?User $user): bool;
+    public function hasPermission(IContext $object, ?User $user): bool;
 }
