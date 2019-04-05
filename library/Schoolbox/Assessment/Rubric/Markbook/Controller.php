@@ -26,7 +26,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use External_ClassInterface;
-use Alaress\Database\Predicate;
+use Alaress\Database;
 use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Mapper;
@@ -89,13 +89,21 @@ class Controller extends Base
         $this->userMapper         = $userMapper;
     }
 
+
     /**
      * Displays a list of rubric marks for students in the specified class
      *
      * @api   GET /learning/rubricMarkbook/{folderId}
      * @level 190
      * @param Folder\Model $folder                    Folder for this class
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws PDOException
      * @throws ServiceNotFound                       If unable to locate HTML web Output
+     * @throws UnderflowException
      */
     public function getMarkbook(Folder\Model $folder): void
     {
@@ -122,7 +130,7 @@ class Controller extends Base
      *
      * @param Folder\Model $folder
      * @return GenericCollection|User[]
-     * @throws Predicate\InvalidColumnException
+     * @throws Database\Predicate\InvalidColumnException
      * @throws InvalidArgumentException
      * @throws PDOException
      * @throws Mapper\DefinitionException
@@ -219,14 +227,22 @@ class Controller extends Base
         return $assessments;
     }
 
+
     /**
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
      * @param Folder\Model $folder
-     * @param array $assessmentsInFolder
+     * @param array        $assessmentsInFolder
      * @return array
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws Database\Exception
      */
-    private function retrieveStudentsAndMarksInFolder(Folder\Model $folder, array $assessmentsInFolder) : array
+    private function retrieveStudentsAndMarksInFolder(Folder\Model $folder, array $assessmentsInFolder): array
     {
         $getAuthoritativeMarksInFolderQuery = $this->internalDb->prepareQuery(
             "SELECT var.assessment_id,
@@ -351,7 +367,7 @@ class Controller extends Base
                 // Create some things the markscheme factory wants our Due Work to have
                 try {
                     $gradeGroup = $this->gradeGroupMapper->findById($assessmentsInFolder[$assessmentId]['gradeGroupId']);
-                } catch (\Schoolbox\Mapper\Exception $e) {
+                } catch (Mapper\Exception $e) {
                     $gradeGroup = null;
                 }
 
