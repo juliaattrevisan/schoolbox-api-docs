@@ -15,90 +15,17 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Comment\Authorizer\IsCommentAuthor;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Module for discussion comment requests.
+ *
+ * This is an abstract class, so a concrete implementation must be created for
+ * each place that uses discussion comments.
  */
-class Module extends BaseModule
+abstract class Module extends BaseModule
 {
-    /**
-     * @var string
-     */
-    protected $basename = 'discussionComments';
-
-
-    /**
-     * Builds a context object for retrieving and persisting objects that are
-     * related to a discussion thread.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Thread\Context\IContext
-     */
-    protected function buildContext(): Thread\Context\IContext
-    {
-        /** @var News\Mapper   $newsMapper */
-        /** @var Thread\Mapper $threadMapper */
-        $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
-        $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
-        return new News\Discussion\Context($threadMapper, $newsMapper);
-    }
-
-
-
-    /**
-     * Builds an authorization rule for whether a user has permission to read
-     * comments.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Auth\Rule\IAuthorizationRule
-     */
-    protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
-    {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $this->buildContext())
-                );
-            })
-        );
-    }
-
-
-    /**
-     * Builds an authorization rule for whether a user has permission to delete
-     * comments.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Auth\Rule\IAuthorizationRule
-     */
-    protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
-    {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $this->buildContext())
-                );
-            })
-        );
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -229,4 +156,32 @@ class Module extends BaseModule
             return ['comment' => $e->getDeletedObject(),];
         }
     }
+
+
+    /**
+     * Builds a context object for retrieving and persisting objects that are
+     * related to a discussion thread.
+     *
+     * @return Thread\Context\IContext
+     */
+    abstract protected function buildContext(): Thread\Context\IContext;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to read
+     * comments.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to delete
+     * comments.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
 }

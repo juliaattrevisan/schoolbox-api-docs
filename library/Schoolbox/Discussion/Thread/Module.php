@@ -13,125 +13,17 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
 use Schoolbox\Discussion\Thread\Context\IContext;
 
 /**
  * Module for discussion thread requests.
+ *
+ * This is an abstract class, so a concrete implementation must be created for
+ * each place that uses discussion threads.
  */
-class Module extends BaseModule
+abstract class Module extends BaseModule
 {
-    /**
-     * @var string
-     */
-    protected $basename = 'discussionThreads';
-
-
-    /**
-     * Builds a context object for retrieving and persisting objects that are
-     * related to a discussion thread.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return IContext
-     */
-    protected function buildContext(): IContext
-    {
-        /** @var News\Mapper $newsMapper */
-        /** @var Mapper      $threadMapper */
-        $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
-        $threadMapper = $this->getMapperFactory()->get(Mapper::class);
-        return new News\Discussion\Context($threadMapper, $newsMapper);
-    }
-
-
-    /**
-     * Builds an authorization rule for whether a user has permission to read
-     * comments in this thread.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Auth\Rule\IAuthorizationRule
-     */
-    protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
-    {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $this->buildContext())
-                );
-            })
-        );
-    }
-
-
-    /**
-     * Builds an authorization rule for whether a user has permission to post
-     * comments in this thread.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Auth\Rule\IAuthorizationRule
-     */
-    protected function buildPostCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
-    {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanPostComment($authorizer, $this->buildContext())
-                );
-            })
-        );
-    }
-
-
-    /**
-     * Builds an authorization rule for whether a user has permission to create
-     * a thread.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Auth\Rule\IAuthorizationRule
-     */
-    protected function buildCreateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule
-    {
-        // TODO add a preloader that fetches the context, and authorize against that
-        return new Auth\Rule\IsLoggedIn();
-    }
-
-
-    /**
-     * Builds an authorization rule for whether a user has permission to
-     * moderate this thread, including deleting comments that another user
-     * has made.
-     *
-     * TODO make abstract and add to subclasses
-     *
-     * @return Auth\Rule\IAuthorizationRule
-     */
-    protected function buildModerateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule
-    {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $this->buildContext())
-                );
-            })
-        );
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -231,4 +123,50 @@ class Module extends BaseModule
             'thread' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
         ];
     }
+
+
+    /**
+     * Builds a context object for retrieving and persisting objects that are
+     * related to a discussion thread.
+     *
+     * @return IContext
+     */
+    abstract protected function buildContext(): IContext;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to read
+     * comments in this thread.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to post
+     * comments in this thread.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildPostCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to create
+     * a thread.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildCreateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to
+     * moderate this thread, including deleting comments that another user
+     * has made.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildModerateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule;
 }
