@@ -67,11 +67,6 @@ class CanActUponThread implements IAuthorizationRule
             if ($strategy->hasPermission($context, $user)) {
                 return;
             }
-//            foreach ($strategy->findAssociations($thread) as $association) {
-//                if ($strategy->hasPermission($association, $user)) {
-//                    return;
-//                }
-//            }
         }
 
         throw new Failure\Unauthorized('Could not authorize access to thread');

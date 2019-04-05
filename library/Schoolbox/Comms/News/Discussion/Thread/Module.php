@@ -53,7 +53,7 @@ class Module extends Thread\Module
                 /** @var Auth\Authorizer $authorizer */
                 $authorizer = $this->getInjector()->get('authorizer');
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $this->buildContext())
+                    new News\Discussion\Permission\CanGetComments($authorizer)
                 );
             })
         );
@@ -74,7 +74,7 @@ class Module extends Thread\Module
                 /** @var Auth\Authorizer $authorizer */
                 $authorizer = $this->getInjector()->get('authorizer');
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanPostComment($authorizer, $this->buildContext())
+                    new News\Discussion\Permission\CanPostComment($authorizer)
                 );
             })
         );
@@ -109,7 +109,7 @@ class Module extends Thread\Module
                 /** @var Auth\Authorizer $authorizer */
                 $authorizer = $this->getInjector()->get('authorizer');
                 return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $this->buildContext())
+                    new News\Discussion\Permission\CanModerateThread($authorizer)
                 );
             })
         );

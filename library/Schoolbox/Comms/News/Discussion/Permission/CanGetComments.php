@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
 use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\User;
 
@@ -20,7 +20,7 @@ use Schoolbox\User;
  *
  * If a user can view a comms article, they can read comments.
  */
-class CanGetComments extends BaseStrategy
+class CanGetComments implements IStrategy
 {
     /**
      * @var Authorizer
@@ -32,11 +32,9 @@ class CanGetComments extends BaseStrategy
      * Constructor
      *
      * @param Authorizer $authorizer
-     * @param IContext   $context
      */
-    public function __construct(Authorizer $authorizer, IContext $context)
+    public function __construct(Authorizer $authorizer)
     {
-        parent::__construct($context);
         $this->authorizer = $authorizer;
     }
 

@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
 use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\User;
 
@@ -27,7 +27,7 @@ use Schoolbox\User;
  * * they approved the article
  * * they have modify rights on the article
  */
-class CanModerateThread extends BaseStrategy
+class CanModerateThread implements IStrategy
 {
     /**
      * @var Authorizer
@@ -39,11 +39,9 @@ class CanModerateThread extends BaseStrategy
      * Constructor
      *
      * @param Authorizer $authorizer
-     * @param IContext   $context
      */
-    public function __construct(Authorizer $authorizer, IContext $context)
+    public function __construct(Authorizer $authorizer)
     {
-        parent::__construct($context);
         $this->authorizer = $authorizer;
     }
 

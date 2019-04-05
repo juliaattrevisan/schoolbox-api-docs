@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Schoolbox\Discussion\Thread\IAssociable;
-use Schoolbox\Discussion\Thread\Model as ThreadModel;
 use Schoolbox\User;
 
 /**
@@ -19,16 +18,6 @@ use Schoolbox\User;
  */
 interface IStrategy
 {
-    /**
-     * Does this strategy know how to find associations between this thread?
-     * If so, return them.
-     *
-     * @param ThreadModel $thread
-     * @return iterable
-     */
-    public function findAssociations(ThreadModel $thread): iterable;
-
-
     /**
      * Does the given user have permission to perform the action, based on the
      * object that is associated with the thread?
