@@ -85,12 +85,14 @@ class Module extends Thread\Module
      * Builds an authorization rule for whether a user has permission to create
      * a thread.
      *
+     * (In this case, it's the same permission as the moderate thread rule: it
+     *  likely will be in all cases, but I don't know that for sure.)
+     *
      * @return Auth\Rule\IAuthorizationRule
      */
     protected function buildCreateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        // TODO add a preloader that fetches the context, and authorize against that
-        return new Auth\Rule\IsLoggedIn();
+        return $this->buildModerateThreadAuthorizationRule();
     }
 
 
