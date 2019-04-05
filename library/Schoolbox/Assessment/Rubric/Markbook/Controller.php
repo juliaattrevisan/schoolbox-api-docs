@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
@@ -21,8 +22,15 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use External_ClassInterface;
+use Alaress\Database\Predicate;
+use InvalidArgumentException;
+use PDOException;
+use Schoolbox\Mapper;
+use UnderflowException;
 
 class Controller extends Base
 {
@@ -106,13 +114,24 @@ class Controller extends Base
         );
     }
 
-    public function retrieveAllUsersInFolder(Folder\Model $folder) {
-        $usersInClass = $this->externalDb->getStudents($folder->getCodeString());
-        $hydratedUsersInClass = $this->userMapper->findByColumn('synergy_id', array_column($usersInClass, 'synergy_id'));
-        $usersInGroup = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false, true);
 
-        // Combine class and group members
-        return $hydratedUsersInClass->mergeUnique($usersInGroup, 'id');
+    /**
+     * Returns a collection of users comprised of:
+     * * folder's enrolled students, and
+     * * folder's READ level group members
+     *
+     * @param Folder\Model $folder
+     * @return GenericCollection|User[]
+     * @throws Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws UnderflowException
+     */
+    public function retrieveAllStudentLearnersInFolder(Folder\Model $folder): GenericCollection
+    {
+        return $this->userAccessMapper->findUsersInCategory($folder, Role::STUDENT, UserAccess::ACCESS_READ, true, true);
     }
 
     /**
@@ -288,7 +307,7 @@ class Controller extends Base
         }
 
         // Combine students who have marks with those who are in the class or group, but have no marks yet
-        $allUsersInFolder = $this->retrieveAllUsersInFolder($folder);
+        $allUsersInFolder = $this->retrieveAllStudentLearnersInFolder($folder);
         foreach($allUsersInFolder as $user) {
             $userId = $user->getId();
             if (! isset($students[$userId])) {
