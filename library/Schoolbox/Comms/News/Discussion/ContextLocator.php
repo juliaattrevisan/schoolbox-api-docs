@@ -9,13 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Discussion;
 
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IContextLocator;
 use Schoolbox\Discussion\Thread;
 
 /**
  * Discussion threads context for comms articles.
  */
-class Context implements IContext
+class ContextLocator implements IContextLocator
 {
     public const TYPE = 'comms';
 

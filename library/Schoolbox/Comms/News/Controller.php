@@ -19,7 +19,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Discussion\Context;
+use Schoolbox\Comms\News\Discussion\ContextLocator;
 use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
@@ -548,7 +548,7 @@ class Controller extends Base
     {
         /** @var Thread\Model $thread */
         $thread  = $this->threadMapper->findById($this->request->post->get('discussionThreadId'));
-        $context = new Context($this->threadMapper, $this->newsMapper);
+        $context = new ContextLocator($this->threadMapper, $this->newsMapper);
         try {
             $context->associate($thread, $article);
         } catch (\UnexpectedValueException $e) {

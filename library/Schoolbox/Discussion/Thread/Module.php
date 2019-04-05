@@ -17,7 +17,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IContextLocator;
 
 /**
  * Module for discussion thread requests.
@@ -177,9 +177,9 @@ abstract class Module extends BaseModule
      * Builds a context object for retrieving and persisting objects that are
      * related to a discussion thread.
      *
-     * @return IContext
+     * @return IContextLocator
      */
-    abstract protected function buildContext(): IContext;
+    abstract protected function buildContext(): IContextLocator;
 
 
     /**
