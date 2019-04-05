@@ -59,7 +59,7 @@ class Controller extends BaseController
     /**
      * Get a thread, including its most recent comments.
      *
-     * @api   GET /threads/{id}
+     * @api   GET /discussion/{contextType}/{contextId}/threads/{id}
      * @level 190
      *
      * @param Model $thread
@@ -73,7 +73,7 @@ class Controller extends BaseController
     /**
      * Create a new thread, and associates it with `$context`.
      *
-     * @api   POST /threads/
+     * @api   POST /discussion/{contextType}/{contextId}/threads/
      * @level 190
      *
      * @param IAssociable $context The item with which to associate the thread
@@ -93,7 +93,7 @@ class Controller extends BaseController
     /**
      * Get a list of comments in the given thread.
      *
-     * @api   GET /threads/{id}/comments
+     * @api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @level 190
      *
      * @param Model $thread
@@ -121,7 +121,7 @@ class Controller extends BaseController
     /**
      * Comment to a thread.
      *
-     * @api   POST /threads/{id}/comments
+     * @api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @level 190
      *
      * @param Model $thread
@@ -153,7 +153,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/open
+     * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/open
      * @param Model $thread
      *
      * @throws \Aura\Web\Exception\InvalidStatusCode
@@ -165,7 +165,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/close
+     * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/close
      * @param Model $thread
      *
      * @throws \Aura\Web\Exception\InvalidStatusCode

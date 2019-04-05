@@ -49,7 +49,7 @@ class Controller extends BaseController
      *
      * TODO implement this endpoint
      *
-     * @api   GET /comments/{id}/comments
+     * @api   GET /discussion/{contextType}/{contextId}/comments/{id}/comments
      * @level 190
      *
      * @param Model $comment
@@ -65,7 +65,7 @@ class Controller extends BaseController
     /**
      * Delete a comment.
      *
-     * @api   DELETE /comments/{id}
+     * @api   DELETE /discussion/{contextType}/{contextId}/comments/{id}
      * @level 190
      *
      * @param Model $comment
