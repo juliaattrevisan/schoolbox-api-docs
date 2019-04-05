@@ -24,6 +24,7 @@ class Model
     public const PAGE_GRADES              = 'grades';
     public const PAGE_MARK_BOOK           = 'markbook';
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
+    public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
     public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
 
