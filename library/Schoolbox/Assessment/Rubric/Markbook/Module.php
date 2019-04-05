@@ -31,7 +31,6 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException
-     * @throws NotFound If a class was specified but it does not exist
      */
     public function registerRoutes(): void
     {
