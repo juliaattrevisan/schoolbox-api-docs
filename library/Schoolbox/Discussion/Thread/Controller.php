@@ -11,6 +11,7 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Discussion\Thread\Context\IAssociable;
 use Schoolbox\Discussion\Thread\Context\IContextLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;

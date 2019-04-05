@@ -10,7 +10,6 @@ namespace Schoolbox\Discussion\Thread\Authorizer;
 
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\User;
 
@@ -58,8 +57,8 @@ class CanActUponThread implements IAuthorizationRule
 
         // Extract context
         $context = $params['context'] ?? null;
-        if (!$context instanceof Thread\IAssociable) {
-            throw new \InvalidArgumentException('"context" param is not an instance of ' . Thread\IAssociable::class);
+        if (!$context instanceof Thread\Context\IAssociable) {
+            throw new \InvalidArgumentException('"context" param is not an instance of ' . Thread\Context\IAssociable::class);
         }
 
         // Search for the thread in all the strategies.

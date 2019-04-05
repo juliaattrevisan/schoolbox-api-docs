@@ -11,7 +11,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
-use Schoolbox\Discussion\Thread\IAssociable;
+use Schoolbox\Discussion\Thread\Context\IAssociable;
 use Schoolbox\User;
 
 /**

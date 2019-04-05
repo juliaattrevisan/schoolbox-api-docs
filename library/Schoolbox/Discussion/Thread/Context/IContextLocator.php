@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Context;
 
-use Schoolbox\Discussion\Thread\IAssociable;
 use Schoolbox\Discussion\Thread\Model as ThreadModel;
 
 /**

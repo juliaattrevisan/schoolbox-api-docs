@@ -6,7 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Thread;
+namespace Schoolbox\Discussion\Thread\Context;
+
+use Schoolbox\Discussion\Thread\Model;
 
 /**
  * Interface for models that can be associated with a discussion thread.

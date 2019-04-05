@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Authorizer;
 
-use Schoolbox\Discussion\Thread\IAssociable;
+use Schoolbox\Discussion\Thread\Context\IAssociable;
 use Schoolbox\User;
 
 /**
@@ -21,8 +21,6 @@ interface IStrategy
     /**
      * Does the given user have permission to perform the action, based on the
      * object that is associated with the thread?
-     *
-     * Implies `retrieveAssociations` returned something.
      *
      * @param IAssociable $object The object that is related to the thread
      * @param User|null   $user
