@@ -9,10 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Authorizer as Auth;
+use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Comment\Authorizer\IsCommentAuthor;
 use Schoolbox\Discussion\Thread;
@@ -118,6 +121,47 @@ class Module extends BaseModule
             'getCommentsByParent',
             $getAuthorizer,
             [$this, 'preloadComment']
+        );
+    }
+
+
+    /**
+     * All discussion thread routes have a preloader for fetching the context.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher): void
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) {
+                return [
+                    'context' => $this->buildContext()->findById($params['contextId']),
+                ];
+            }
+        );
+    }
+
+
+    /**
+     * All discussion thread routes must ensure the context found in the
+     * preloader is the same as the context of the requested object.
+     *
+     * @param Authorizer $authorizer
+     */
+    public function initRoutePermissions(Authorizer $authorizer): void
+    {
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Auth\Rule\Callback(function (array $params) {
+                // $params[context] must be recognized by the context?
+                // TODO add an interface for items which may have a discussion thread
+                if (!$this->buildContext()->isContextForThread($params['context'], $params['thread'])) {
+                    throw new NotFound();
+                }
+            })
         );
     }
 
