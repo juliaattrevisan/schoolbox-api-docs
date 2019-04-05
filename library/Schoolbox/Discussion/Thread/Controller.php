@@ -71,17 +71,15 @@ class Controller extends BaseController
 
 
     /**
-     * Create a new thread.
+     * Create a new thread, and associates it with `$context`.
      *
-     * This thread is created in an orphaned state: it is not associated with
-     * any particular context. It's the responsibility of the client to
-     * associate it with something.
-     *
-     * @throws \Schoolbox\Mapper\Exception
-     * @api   GET /threads/{id}/comments
+     * @api   POST /threads/
      * @level 190
+     *
+     * @param IAssociable $context The item with which to associate the thread
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function createThread(): void
+    public function createThread(IAssociable $context): void
     {
         /** @var \stdClass $data */
         $data   = $this->request->content->get();
