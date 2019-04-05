@@ -152,17 +152,17 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer): void
     {
-        $this->addRoutePermission(
-            $authorizer,
-            '.*',
-            new Auth\Rule\Callback(function (array $params) {
-                // $params[context] must be recognized by the context?
-                // TODO add an interface for items which may have a discussion thread
-                if (!$this->buildContext()->isContextForThread($params['context'], $params['thread'])) {
-                    throw new NotFound();
-                }
-            })
-        );
+//        $this->addRoutePermission(
+//            $authorizer,
+//            '.*',
+//            new Auth\Rule\Callback(function (array $params) {
+//                // $params[context] must be recognized by the context?
+//                // TODO add an interface for items which may have a discussion thread
+//                if (!$this->buildContext()->isContextForThread($params['context'], $params['thread'])) {
+//                    throw new NotFound();
+//                }
+//            })
+//        );
     }
 
 
