@@ -104,17 +104,6 @@
                                     </dd>
                                 {% endif %}
                             {% endif %}
-                            {% if isStaff and not user.getHideContacts %}
-                                <dt class="small-12">Students:</dt>
-                                <dd class="small-12">
-                                    {% for student in students %}
-                                        <div class="card small-12">
-                                            <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64">
-                                            <a href="/search/user/{{ student.id }}"><p>{{ student.formatName }}</p></a>
-                                        </div>
-                                    {% endfor %}
-                                </dd>
-                            {% endif %}
                         </dl>
                     </div>
                 </div>
@@ -148,3 +137,24 @@
         </section>
     </div>
 </div>
+{% if isStaff and not user.getHideContacts %}
+    <div class="row">
+        <div class="column small-12 medium-6 island">
+            <h2 class="subheader">Students</h2>
+            <section>
+                <ul class="information-list">
+                    {% for student in students %}
+                        <li>
+                            <div class="card small-12">
+                                <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64"
+                                     alt="View Profile">
+                                <a href="/search/user/{{ student.id }}"><p>{{ student.formatName }}</p></a>
+                                <p class="meta">{{ student.preferredTitle }}</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+    </div>
+{% endif %}
