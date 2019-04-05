@@ -50,7 +50,6 @@ class Mapper extends BaseMapper
      */
     public function isThreadAlreadyAssociated(Model $thread): bool
     {
-        // TODO consider moving into a context object (\Schoolbox\Discussion\Thread\Context\IContext)
         return $this->getJoinMapper('comments')->countByColumn('discussion_thread_id', $thread->getId()) > 0;
     }
 
