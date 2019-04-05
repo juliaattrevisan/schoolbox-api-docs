@@ -115,7 +115,7 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" v-if="comment._links.delete.auth" v-on:click="deleteComment(comment.id, index)"></a>
+                        <a href="#" class="icon-delete no-text" data-reveal-id="confirm-delete" title="Delete comment" {# v-if="comment._links.delete.auth" #} v-on:click="deleteComment(comment.id, index)"></a>
                         {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}
                     </nav>
 
