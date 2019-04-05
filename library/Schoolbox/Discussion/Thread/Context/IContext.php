@@ -18,6 +18,8 @@ use Schoolbox\User;
  * Strategies for validating whether a thread:
  * * is associated with a particular type of item
  * * if associated, whether the current user has permission to act upon it
+ *
+ * TODO rename this to IContextLocator or something? IContext should be what IAssociable is now
  */
 interface IContext
 {
