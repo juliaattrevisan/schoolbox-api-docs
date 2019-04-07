@@ -29,13 +29,13 @@ Data:
             {% for capabilityUsage in grid.capabilityUsages %}
                 {% for indicatorUsage in capabilityUsage.indicatorUsages %}
                     <tr>
-                        <th>{{ indicatorUsage.indicator.name }}</th>
+                        <th>{{ indicatorUsage.indicator.name | nl2br }}</th>
 
                         {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
                         {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
 
                         {% for descriptor in indicatorUsage.descriptors %}
-                            <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description }}</td>
+                            <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description | nl2br }}</td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
