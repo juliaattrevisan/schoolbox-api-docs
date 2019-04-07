@@ -8,31 +8,48 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
-use Aura\Di;
-use Psr\Log\LoggerInterface as Logger;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel(
-    'Calendar CSV Import',
-    [
-        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::INFO,
-        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['help', 'campus:', 'role:', 'file:', 'owner:', 'source::'],
-    ]
-);
-
-
 // ROUTING APP
-$kernel->run(
-    function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel = new CliTool\Kernel(
+    new class extends CliTool\App
+    {
 
-        $file = null;
-        if (isset($opts['help']) || count($opts) == 0) {
-            echo <<<HELP
+        private const OPT_LONG_HELP = 'help';         // print help
+//    --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
+        private const OPT_LONG_FILE = 'file:';
+//    --owner:      The user ID of who the events should be owned by
+        private const OPT_LONG_OWNER = 'owner:';
+//    --campus:     Comma-seperated list of campus IDs that the events should be shown to
+        private const OPT_LONG_CAMPUS = 'campus:';
+//    --role:       Comma-seperated list of role IDs that the events should be shown to
+        private const OPT_LONG_ROLE = 'role:';
+//    --source:     Optional source name, subsequent uploads will delete any events with the same source name
+        private const OPT_LONG_SOURCE = 'source:';
+
+        /** @inheritdoc */
+        public function getLongOpts(): array
+        {
+            return [
+                self::OPT_LONG_HELP,
+                self::OPT_LONG_FILE,
+                self::OPT_LONG_OWNER,
+                self::OPT_LONG_CAMPUS,
+                self::OPT_LONG_ROLE,
+                self::OPT_LONG_SOURCE,
+            ];
+        }
+
+        public function run(): void
+        {
+            $log = $this->getLogger();
+            $file = null;
+            if ($this->getOpt(self::OPT_LONG_HELP)) {
+                echo <<<HELP
 Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source='sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
     --owner:      The user ID of who the events should be owned by
@@ -41,64 +58,66 @@ Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--s
     --source:     Optional source name, subsequent uploads will delete any events with the same source name
     
 HELP;
-            exit;
-        } else {
-            if (!isset($opts['campus'])) {
-                $log->error("No campus specified. (Use --help for example usage)\n");
-                exit(1);
+                exit;
             } else {
-                $campusList = explode(',', $opts['campus']);
+                if (!$this->getOpt(self::OPT_LONG_CAMPUS)) {
+                    $log->error("No campus specified. (Use --help for example usage)\n");
+                    exit(1);
+                } else {
+                    $campusList = explode(',', $this->getOpt(self::OPT_LONG_CAMPUS));
+                }
+
+                if (!$this->getOpt(self::OPT_LONG_ROLE)) {
+                    $log->error("No role specified. (Use --hhelp for example usage)\n");
+                    exit(1);
+                } else {
+                    $groupList = explode(',', $this->getOpt(self::OPT_LONG_ROLE));
+                }
+
+                if (!$this->getOpt(self::OPT_LONG_OWNER)) {
+                    $log->error("No owner id specified. (Use --help for example usage)\n");
+                    exit(1);
+                } else {
+                    $ownerId = $this->getOpt(self::OPT_LONG_OWNER);
+                }
+
+                if (!$this->getOpt(self::OPT_LONG_FILE) && file_exists($this->getOpt(self::OPT_LONG_FILE))) {
+                    $log->error("Specified file not found. (Use --help for example usage)\n");
+                    exit(1);
+                } else {
+                    $file = $this->getOpt(self::OPT_LONG_FILE);
+                }
             }
 
-            if (!isset($opts['role'])) {
-                $log->error("No role specified. (Use --hhelp for example usage)\n");
-                exit(1);
+            //Optional options
+            if (!$this->getOpt(self::OPT_LONG_SOURCE)) {
+                $source = $this->getOpt(self::OPT_LONG_SOURCE);
+                $log->warning('Events with source "' . $source . '" will be deleted' . "\n");
             } else {
-                $groupList = explode(',', $opts['role']);
+                $source = null;
             }
 
-            if (!isset($opts['owner'])) {
-                $log->error("No owner id specified. (Use --help for example usage)\n");
-                exit(1);
-            } else {
-                $ownerId = $opts['owner'];
-            }
+            //Not used in this context
+            $categoryList = [];
 
-            if (!(isset($opts['file']) && file_exists($opts['file']))) {
-                $log->error("Specified file not found. (Use --help for example usage)\n");
+            $bulkHandler = new Bulk_Calendar($file, $source, $ownerId, $categoryList, $groupList, $campusList);
+
+            try {
+
+                $result = $bulkHandler->addCalendar();
+                foreach ($result as $event) {
+                    $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
+                }
+            } catch (Schoolbox\Mapper\Exception $e) {
+                $log->error("User or campus(es) not found unable to load events.\n");
                 exit(1);
-            } else {
-                $file = $opts['file'];
+            } catch (PDOException $e) {
+                $log->error("One of the supplied roles was not found, unable to load events.\n");
+                exit(1);
             }
         }
-
-        //Optional options
-        if (isset($opts['source'])) {
-            $source = $opts['source'];
-            $log->warning('Events with source "' . $source . '" will be deleted' . "\n");
-        } else {
-            $source = null;
-        }
-
-        //Not used in this context
-        $categoryList = null;
-
-        $bulkHandler = new Bulk_Calendar($file, $source, $ownerId, $categoryList, $groupList, $campusList);
-
-        try {
-
-            $result = $bulkHandler->addCalendar();
-            foreach ($result as $event) {
-                $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
-            }
-        } catch (Schoolbox\Mapper\Exception $e) {
-            $log->error("User or campus(es) not found unable to load events.\n");
-            exit(1);
-        } catch (PDOException $e) {
-            $log->error("One of the supplied roles was not found, unable to load events.\n");
-            exit(1);
-        }
-
-    }
+    },
+    false
 );
 
+$kernel->runApp();
