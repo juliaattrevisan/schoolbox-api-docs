@@ -85,7 +85,6 @@ class Controller extends BaseController
      * @param string          $page
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException If a definition class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
@@ -119,7 +118,6 @@ class Controller extends BaseController
      * @throws \PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException If a definition class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      * @throws \UnderflowException

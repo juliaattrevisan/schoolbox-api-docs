@@ -91,7 +91,6 @@ interface IFactoryFactory
      * @param array     $request
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
-     * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
     public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;

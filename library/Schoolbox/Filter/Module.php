@@ -34,7 +34,6 @@ class Module extends AlaressModule
      * @throws NotFound If invalid roleType
      * @throws \InvalidArgumentException
      * @throws ServiceNotFound
-     * @throws \ReflectionException If the filter definition class cannot be found in code base
      */
     protected function registerRoutes(): void
     {

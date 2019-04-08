@@ -62,7 +62,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If unable to find the filter mapper class
-     * @throws \ReflectionException                  If the specified class does not exist
      * @throws \DomainException                      If this class has not defined what entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
@@ -89,7 +88,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If unable to find the filter mapper class
-     * @throws \ReflectionException                  If the specified class does not exist
      * @throws \DomainException                      If this class has not defined what entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
@@ -107,7 +105,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If no filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException                  If the specified class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      * @throws \DomainException                      If attempting to fetch the entity from an abstract factoryFactory
