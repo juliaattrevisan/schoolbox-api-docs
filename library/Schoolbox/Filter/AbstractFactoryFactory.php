@@ -376,28 +376,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
 
 
     /**
-     * Builds a filter factory using the base dependencies, plus any factory-specific ones
-     *
-     * @param            $factoryClass
-     * @param array|null $extraArgs
-     * @return IFactory|object
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException If the specified class does not exist
-     */
-    protected function buildFactory($factoryClass, array $extraArgs = [])
-    {
-        $args = array_merge([
-            'filterOptionMapper'    => $this->getOptionMapper(),
-            'filterDefaultMapper'   => $this->getDefaultsMapper(),
-            'filterSelectionMapper' => $this->getSelectionMapper(),
-        ], $extraArgs);
-
-        $reflector = new \ReflectionClass($factoryClass);
-        return $reflector->newInstanceArgs($args);
-    }
-
-
-    /**
      * @return MapperFactory
      */
     protected function getMapperFactory(): MapperFactory
