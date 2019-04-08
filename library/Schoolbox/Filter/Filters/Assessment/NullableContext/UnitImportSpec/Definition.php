@@ -77,6 +77,7 @@ class Definition extends NullableContext\Definition
         return [
             Page\Model::PAGE_CLASS_MARK_BOOK,
             Page\Model::PAGE_COURSE_MARK_BOOK,
+            Page\Model::PAGE_RUBRIC_MARK_BOOK,
             Page\Model::PAGE_PENDING_ASSESSMENTS,
         ];
     }

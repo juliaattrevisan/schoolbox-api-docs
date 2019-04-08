@@ -98,7 +98,8 @@ class Factory extends NullableContext\Factory
         $folders = $this->folderMapper->createCollection();
 
         // Course-markbook does not insert folders that are related to current user.
-        if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK !== $pageFilter->getPage()) {
+        $fetchInvolved = [Filter\Page\Model::PAGE_CLASS_MARK_BOOK, Filter\Page\Model::PAGE_PENDING_ASSESSMENTS];
+        if (\in_array($pageFilter->getPage(), $fetchInvolved, true)) {
             $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
         }
 
