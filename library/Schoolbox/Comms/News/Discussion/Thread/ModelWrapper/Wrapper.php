@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Discussion\Thread;
+namespace Schoolbox\Comms\News\Discussion\Thread\ModelWrapper;
 
 use Schoolbox\Discussion\Thread\ModelWrapper\BaseWrapper;
 use Schoolbox\Json\Api\AuraLink;
@@ -15,7 +15,7 @@ use Schoolbox\Json\Api\AuraLink;
  * Wrapper for thread models: this one provides links specific to the comms
  * variant of the discussion threads module.
  */
-class ModelWrapper extends BaseWrapper
+class Wrapper extends BaseWrapper
 {
     /**
      * @return array
