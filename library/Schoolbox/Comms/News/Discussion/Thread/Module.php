@@ -40,6 +40,17 @@ class Module extends Thread\Module
 
 
     /**
+     * Builds a factory for building wrappers around thread objects.
+     *
+     * @return Thread\ModelWrapper\IFactory
+     */
+    protected function buildModelWrapperFactory(): Thread\ModelWrapper\IFactory
+    {
+        return new ModelWrapper\Factory();
+    }
+
+
+    /**
      * Builds an authorization rule for whether a user has permission to read
      * comments in this thread.
      *

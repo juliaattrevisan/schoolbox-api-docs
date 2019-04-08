@@ -183,6 +183,17 @@ abstract class Module extends BaseModule
 
 
     /**
+     * Builds a factory for building wrappers around thread models.
+     *
+     * Required so that the controller may render links dependent on the module
+     * that uses the variant.
+     *
+     * @return ModelWrapper\IFactory
+     */
+    abstract protected function buildModelWrapperFactory(): ModelWrapper\IFactory;
+
+
+    /**
      * Builds an authorization rule for whether a user has permission to read
      * comments in this thread.
      *
