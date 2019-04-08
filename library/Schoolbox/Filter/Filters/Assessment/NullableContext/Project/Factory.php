@@ -19,6 +19,10 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Alaress\Database\Predicate;
+use PDOException;
+use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * A factory for building 'Project' filter objects
@@ -252,6 +256,10 @@ class Factory extends NullableContext\Factory
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
+     * @throws Predicate\InvalidColumnException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     private function fetchProjects(GenericCollection $directFolders, GenericCollection $indirectFolders)
     {
@@ -309,7 +317,6 @@ class Factory extends NullableContext\Factory
                     $projects->setOffset($projectId, $this->projectMapper->hydrate($row, 'p'));
                     $projects[$projectId]->setAssessmentModel($assessmentMapper->hydrate($row, 'a'));
                     $projects[$projectId]->getAssessmentModel()->setContextFolder($folderCache[$folderId]);
-                    $projects[$projectId]->setTitle($projects[$projectId]->getAssessmentModel()->getTitle());
                 }
                 if ($folderCodeCode && !$codeCache->offsetExists($folderCodeCode)) {
                     $codeCache->setOffset($folderCodeCode, $folderCodeMapper->hydrate($row, 'fc'));
@@ -364,10 +371,9 @@ class Factory extends NullableContext\Factory
                     $unitImplCache[$unitImplId]->setFolder($folderCache[$folderId]);
                 }
                 if (!$projects->offsetExists($projectId)) {
-                    $projects->setOffset($projectId, $this->projectMapper->hydrate($row, 'p'));
+                    $projects[$projectId] = $this->projectMapper->hydrate($row, 'p');
                     $projects[$projectId]->setAssessmentModel($assessmentMapper->hydrate($row, 'a'));
                     $projects[$projectId]->getAssessmentModel()->setContextUnitImplementation($unitImplCache[$unitImplId]);
-                    $projects[$projectId]->setTitle($projects[$projectId]->getAssessmentModel()->getTitle());
                 }
                 if ($folderCodeCode && !$codeCache->offsetExists($folderCodeCode)) {
                     $codeCache->setOffset($folderCodeCode, $folderCodeMapper->hydrate($row, 'fc'));
