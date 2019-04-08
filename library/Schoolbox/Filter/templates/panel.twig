@@ -450,17 +450,28 @@ Usage:
 {% endautoescape %}
 
 {# Rip outta DOM on load, and remove 'hide' #}
-<span data-applied-filter-tab class="label filter hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter">×</a></span>
+<div data-applied-filter-tab class="small-6 medium-4 large-2 columns hide">
+    <span class="label filter">
+        <span data-filter></span>
+        <a href="#" data-close class="close" title="Remove filter">×</a>
+    </span>
+    <div><p>Option 1</p></div>
+    <div><p>Option 2</p></div>
+    <div><p>Option 3</p></div>
+</div>
 
 <div class="toast" data-alert data-relation="submit-label"></div>
 
 <div class="row">
     <div class="small-12 island" id="filter_panel">
         <section>
-            <div class="filter-interaction small-12 columns">
-                <div id="panel-summary">
-                    <label><span id="filter-loader" class="loader" title="Request sent ..."></span>Showing:</label>
-                    <div id="applied_filters" data-applied-filters></div>
+            <div class="filter-interaction content">
+                <div id="panel-summary" class="row">
+                    <div class="small-12 columns">
+                        <label><span id="filter-loader" class="loader" title="Loading..."></span>Showing:</label>
+                    </div>
+                    <div id="applied_filters" data-applied-filters>
+                    </div>
                 </div>
             </div>
             <div class="small-12 column no-pad">
