@@ -240,7 +240,7 @@ class Controller extends BaseController
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$this->rosettaStone->translate('assessment', true, true)}",
             Page\Model::PAGE_GRADES               => 'Grades',
-            Page\Model::PAGE_MARK_BOOK            => 'Class Markbook',
+            Page\Model::PAGE_CLASS_MARK_BOOK      => 'Class Markbook',
             Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
             Page\Model::PAGE_RUBRIC_MARK_BOOK     => 'Rubric Markbook',
             Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',

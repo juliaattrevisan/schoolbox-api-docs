@@ -43,7 +43,7 @@ class Module extends AlaressModule
         $loadFactoryFactory = function (array $params) {
             switch ($params['page']) {
                 case Page\Model::PAGE_PENDING_ASSESSMENTS:
-                case Page\Model::PAGE_MARK_BOOK:
+                case Page\Model::PAGE_CLASS_MARK_BOOK:
                 case Page\Model::PAGE_COURSE_MARK_BOOK:
                 case Page\Model::PAGE_RUBRIC_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:

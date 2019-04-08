@@ -80,7 +80,7 @@ class KeyConverter extends AbstractKeyConverter
         }
 
         switch ($page) {
-            case Filter\Page\Model::PAGE_MARK_BOOK:
+            case Filter\Page\Model::PAGE_CLASS_MARK_BOOK:
             case Filter\Page\Model::PAGE_COURSE_MARK_BOOK:
                 // Must be staff or instructor
                 $notStaff = !$user->getRole()->isStaff();

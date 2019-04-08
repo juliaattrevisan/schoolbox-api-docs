@@ -22,7 +22,7 @@ class Model
     // These are enums in DB, you will need to update column definition if you add to this list
     public const PAGE_PENDING_ASSESSMENTS = 'pending';
     public const PAGE_GRADES              = 'grades';
-    public const PAGE_MARK_BOOK           = 'markbook';
+    public const PAGE_CLASS_MARK_BOOK     = 'classMarkbook';          // AKA 'teacher markbook'
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
     public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
@@ -55,7 +55,7 @@ class Model
                 Role::PARENT,
                 Role::STUDENT,
             ],
-            self::PAGE_MARK_BOOK            => [
+            self::PAGE_CLASS_MARK_BOOK      => [
                 Role::STAFF,
             ],
             self::PAGE_COURSE_MARK_BOOK     => [

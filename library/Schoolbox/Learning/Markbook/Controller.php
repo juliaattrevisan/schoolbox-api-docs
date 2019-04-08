@@ -148,7 +148,7 @@ class Controller extends Base
         $selection
             ->setFilter($filter)
             ->setUser($this->getUser())
-            ->setPage(Filter\Page\Model::PAGE_MARK_BOOK)
+            ->setPage(Filter\Page\Model::PAGE_CLASS_MARK_BOOK)
             ->setKey($key)
             ->setSelected(true);
         return $selection;
@@ -178,7 +178,7 @@ class Controller extends Base
         if (null === $viewee) {
             $viewee = $this->getUser();
         }
-        $page      = Filter\Page\Model::PAGE_MARK_BOOK;
+        $page      = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
         $route     = $this->getRouter()->generate('learningMarkbook.postMarkbook', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
@@ -266,7 +266,7 @@ class Controller extends Base
     private function convertRequestToFilters(array $request, User $viewee, $saveToDB)
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
-        $page            = Filter\Page\Model::PAGE_MARK_BOOK;
+        $page            = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
         $codec           = $this->filterFactoryFactory->buildCodec();
 
         // Convert Request to Selection models

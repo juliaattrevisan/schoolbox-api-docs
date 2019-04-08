@@ -75,7 +75,7 @@ class Definition extends NullableContext\Definition
     public static function getPages(): array
     {
         return [
-            Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_CLASS_MARK_BOOK,
             Page\Model::PAGE_COURSE_MARK_BOOK,
             Page\Model::PAGE_PENDING_ASSESSMENTS,
         ];
