@@ -103,7 +103,7 @@ class Factory extends NullableContext\Factory
             $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
         }
 
-        /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
+        /* If we inserted any extra folder/s, we need to also insert any units imported to that folder,
          * otherwise any assessments inside units imported to the extra folder will never be visible.
          */
         $extraFolderIds = $this->parseFolderIds($overrides);
