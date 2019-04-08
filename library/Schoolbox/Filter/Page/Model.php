@@ -33,7 +33,7 @@ class Model
      * @param string $page
      * @return string[]
      */
-    public static function getRoleTypesForPage($page)
+    public static function getRoleTypesForPage(string $page): array
     {
         return self::getPageRoleTypes()[$page];
     }
@@ -44,7 +44,7 @@ class Model
      *
      * @return string[][]
      */
-    public static function getPageRoleTypes()
+    public static function getPageRoleTypes(): array
     {
         return [
             self::PAGE_PENDING_ASSESSMENTS  => [
@@ -59,6 +59,9 @@ class Model
                 Role::STAFF,
             ],
             self::PAGE_COURSE_MARK_BOOK     => [
+                Role::STAFF,
+            ],
+            self::PAGE_RUBRIC_MARK_BOOK     => [
                 Role::STAFF,
             ],
             self::PAGE_LEARNING_ANALYTICS   => [
