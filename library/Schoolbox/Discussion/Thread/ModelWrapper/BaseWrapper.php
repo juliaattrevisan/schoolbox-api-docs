@@ -6,10 +6,11 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Thread;
+namespace Schoolbox\Discussion\Thread\ModelWrapper;
 
 use Alaress_Date_Format;
 use Alaress\Json;
+use Schoolbox\Discussion\Thread\Model;
 
 /**
  * Wrapper for thread models, so that they may have links output as part of
@@ -17,7 +18,7 @@ use Alaress\Json;
  *
  * Intended to be extended: subclass this class and implement `getJsonApiLinks`.
  */
-abstract class ModelWrapper implements Json\Serializable, Json\Linkable
+abstract class BaseWrapper implements Json\Serializable, Json\Linkable
 {
     use Json\SerializeTrait;
 

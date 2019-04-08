@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Discussion\Thread;
 
-use Schoolbox\Discussion\Thread\ModelWrapper as BaseWrapper;
+use Schoolbox\Discussion\Thread\ModelWrapper\BaseWrapper;
 use Schoolbox\Json\Api\AuraLink;
 
 /**
