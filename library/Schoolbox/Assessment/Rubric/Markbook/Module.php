@@ -21,6 +21,7 @@ use Aura\Di\Container;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Filter;
 
 class Module extends BaseModule
 {
@@ -65,6 +66,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
+        $this->register('POST', '/{folderId:\d+}', 'postMarkbook', $canViewPage, $preloadFolder);
     }
 
 
@@ -87,6 +89,9 @@ class Module extends BaseModule
             'internalDb'       => $injector->lazyGet('databaseInternal'),
             'gradeGroupMapper' => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
             'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'filterFactoryFactory'  => $injector->lazy(function () {
+                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            }),
         ];
     }
 

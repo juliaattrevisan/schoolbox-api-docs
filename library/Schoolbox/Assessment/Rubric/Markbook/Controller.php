@@ -29,6 +29,11 @@ use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Mapper;
 use UnderflowException;
+use Schoolbox\Filter;
+use Aura\Router;
+use DomainException;
+use ReflectionException;
+use UnexpectedValueException;
 
 class Controller extends Base
 {
@@ -50,23 +55,29 @@ class Controller extends Base
      */
     private $userAccessMapper;
 
+    /** @var Filter\Filters\Assessment\FactoryFactory */
+    private $filterFactoryFactory;
+
 
     /**
      * Constructor
      *
-     * @param IConnector        $internalDb
-     * @param GradeGroup\Mapper $gradeGroupMapper
-     * @param UserAccessMapper  $userAccessMapper
+     * @param IConnector                               $internalDb
+     * @param GradeGroup\Mapper                        $gradeGroupMapper
+     * @param UserAccessMapper                         $userAccessMapper
+     * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      */
     public function __construct(
         IConnector $internalDb,
         GradeGroup\Mapper $gradeGroupMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
     ) {
-        $this->internalDb       = $internalDb;
-        $this->gradeGroupMapper = $gradeGroupMapper;
-        $this->userAccessMapper = $userAccessMapper;
-     }
+        $this->internalDb           = $internalDb;
+        $this->gradeGroupMapper     = $gradeGroupMapper;
+        $this->userAccessMapper     = $userAccessMapper;
+        $this->filterFactoryFactory = $filterFactoryFactory;
+    }
 
 
     /**
@@ -74,28 +85,67 @@ class Controller extends Base
      *
      * @api   GET /learning/rubricMarkbook/{folderId}
      * @level 190
-     * @param Folder\Model $folder                    Folder for this class
+     * @param Folder\Model $folder Folder for this class
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws Router\Exception\RouteNotFound
+     * @throws ServiceNotFound If unable to locate HTML web Output
+     * @throws UnderflowException
+     * @throws DomainException
+     * @throws ReflectionException
+     * @throws UnexpectedValueException
+     */
+    public function getMarkbook(Folder\Model $folder): void
+    {
+        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        unset($queryArgs['page']);
+
+        $page        = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
+        $route       = $this->getRouter()->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@rubricMarkbook/markbookOuter.twig',
+                [
+                    'folder'      => $folder,
+                    'viewee'      => $this->getUser(),
+                    'filterPanel' => $filterPanel,
+                    'page'        => $page,
+                ]
+            )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
+        );
+    }
+
+    /**
+     * Displays a list of rubric marks for students in the specified class
+     *
+     * @api   GET /learning/rubricMarkbook/{folderId}
+     * @level 190
+     * @param Folder\Model $folder Folder for this class
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws PDOException
-     * @throws ServiceNotFound                       If unable to locate HTML web Output
+     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws UnderflowException
      */
-    public function getMarkbook(Folder\Model $folder): void
+    public function postMarkbook(Folder\Model $folder): void
     {
         $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
-        $students = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
-
+        $students    = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
+$test = 1;
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@rubricMarkbook/markbookOuter.twig',
+                '@rubricMarkbook/markbookInner.twig',
                 [
-                    'students' => $students,
+                    'students'    => $students,
                     'assessments' => $assessments,
-                    'folder' => $folder
+                    'folder'      => $folder,
                 ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
@@ -118,7 +168,7 @@ class Controller extends Base
      */
     public function retrieveAllUsersInFolder(Folder\Model $folder): GenericCollection
     {
-        return $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
+            return $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
     }
 
     /**
@@ -131,16 +181,18 @@ class Controller extends Base
     private function retrieveAssessmentsInFolder(int $folderId) : array
     {
         $getAllAssessmentsInFolderQuery = $this->internalDb->prepareQuery(
-            "SELECT a.id as assessment_id,
-            a.title AS assessment_name,
-            sb.rubric_group_marks AS assessment_rubric_group_marks,
-            sb.submission_grade_group_id AS assessment_grade_group_id,
-            sb.mark_type as assessment_mark_type,
-            sb.max_mark as assessment_max_mark,
-            rgu.rubric_group_id AS capability_id,
-            rg.name AS capability_name,
-            rcu.criterion_id AS indicator_id,
-            rc.name AS indicator_name
+            "
+            SELECT
+                a.id AS assessment_id,
+                a.title AS assessment_name,
+                sb.rubric_group_marks AS assessment_rubric_group_marks,
+                sb.submission_grade_group_id AS assessment_grade_group_id,
+                sb.mark_type as assessment_mark_type,
+                sb.max_mark as assessment_max_mark,
+                rgu.rubric_group_id AS capability_id,
+                rg.name AS capability_name,
+                rcu.criterion_id AS indicator_id,
+                rc.name AS indicator_name
             FROM  assessment a
             INNER JOIN submission_box sb ON sb.assessment_id = a.id
             INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
@@ -148,7 +200,7 @@ class Controller extends Base
             INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
                   AND rc.rubric_group_id = rg.id
-            WHERE sb.category=:folderId AND a.deleted_at IS NULL
+            WHERE sb.category = :folderId AND a.deleted_at IS NULL
             ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
 

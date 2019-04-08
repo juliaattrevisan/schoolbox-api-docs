@@ -58,7 +58,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems()
     {
-        return $this->workTypeIds->shallowClone();
+        return $this->workTypeIds->shallowClone()->offsetSet(Definition::KEY_NONE, null);
     }
 
 
