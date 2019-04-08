@@ -8,6 +8,7 @@
 namespace Schoolbox\Filter;
 
 use Schoolbox\Collection;
+use Schoolbox\Column\IColumnType;
 use Schoolbox\IMapper;
 
 /**
@@ -90,6 +91,17 @@ abstract class AbstractIdFinder implements IdFinder
         // (eg, if nullable assessment context filter has both (none) + 1 or more concrete items checked)
         $uniqueIds = array_unique($ids);
         sort($uniqueIds);
+
+        // Respect id data type if configured
+        $identifier = $this->getMapper()->getIdentifier();
+        /** @var IColumnType $hydrator */
+        $hydrator = $identifier ? $identifier['hydrator'] ?? null : null;
+        if ($hydrator) {
+            $uniqueIds = \array_map(static function ($id) use ($hydrator) {
+                return $hydrator->hydrate($id);
+            }, $uniqueIds);
+        }
+
         return $uniqueIds;
     }
 
