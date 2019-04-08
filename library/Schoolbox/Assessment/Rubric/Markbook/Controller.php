@@ -104,8 +104,8 @@ class Controller extends Base
 
     /**
      * Returns a collection of users comprised of:
-     * * folder's enrolled students, and
-     * * folder's READ level group members
+     * * folder's SIS enrolled students (regardless of schoolbox role type), and
+     * * folder's SB READ level group members
      *
      * @param Folder\Model $folder
      * @return GenericCollection|User[]
@@ -116,9 +116,9 @@ class Controller extends Base
      * @throws Mapper\Exception
      * @throws UnderflowException
      */
-    public function retrieveAllStudentLearnersInFolder(Folder\Model $folder): GenericCollection
+    public function retrieveAllUsersInFolder(Folder\Model $folder): GenericCollection
     {
-        return $this->userAccessMapper->findUsersInCategory($folder, Role::STUDENT, UserAccess::ACCESS_READ, true, true);
+        return $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
     }
 
     /**
@@ -302,7 +302,7 @@ class Controller extends Base
         }
 
         // Combine students who have marks with those who are in the class or group, but have no marks yet
-        $allUsersInFolder = $this->retrieveAllStudentLearnersInFolder($folder);
+        $allUsersInFolder = $this->retrieveAllUsersInFolder($folder);
         foreach($allUsersInFolder as $user) {
             $userId = $user->getId();
             if (! isset($students[$userId])) {
