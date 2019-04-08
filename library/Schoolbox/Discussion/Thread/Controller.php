@@ -54,16 +54,31 @@ class Controller extends BaseController
 
 
     /**
+     * The context object, used for associating a thread to a context.
+     *
+     * @var ModelWrapper\IFactory
+     */
+    private $wrapperFactory;
+
+
+    /**
      * Constructor
      *
-     * @param Comment\Mapper $commentMapper
-     * @param Mapper         $threadMapper
+     * @param Comment\Mapper        $commentMapper
+     * @param Mapper                $threadMapper
+     * @param IContextLocator       $context
+     * @param ModelWrapper\IFactory $wrapperFactory
      */
-    public function __construct(Comment\Mapper $commentMapper, Mapper $threadMapper, IContextLocator $context)
-    {
-        $this->commentMapper = $commentMapper;
-        $this->threadMapper  = $threadMapper;
-        $this->context       = $context;
+    public function __construct(
+        Comment\Mapper $commentMapper,
+        Mapper $threadMapper,
+        IContextLocator $context,
+        ModelWrapper\IFactory $wrapperFactory
+    ) {
+        $this->commentMapper  = $commentMapper;
+        $this->threadMapper   = $threadMapper;
+        $this->context        = $context;
+        $this->wrapperFactory = $wrapperFactory;
     }
 
 

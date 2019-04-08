@@ -151,9 +151,10 @@ abstract class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'commentMapper' => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'threadMapper'  => $this->getMapperFactory()->getLazy(Mapper::class),
-            'context'       => $this->buildContext(),
+            'commentMapper'  => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
+            'threadMapper'   => $this->getMapperFactory()->getLazy(Mapper::class),
+            'context'        => $this->buildContext(),
+            'wrapperFactory' => $this->buildModelWrapperFactory(),
         ];
     }
 
