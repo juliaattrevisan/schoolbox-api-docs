@@ -337,6 +337,11 @@ th, td{
 
     }
 
+	+ #{$label-selector}.select-all {
+		border-bottom: 1px solid $gainsboro;
+		padding-bottom: .5rem;
+	}
+
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
@@ -570,11 +575,10 @@ ul.filters {
 		width: 100%;
 	}
 	> div {
-		background-color: $accent-background;
-		padding: 0.375rem 0.875rem;
 		margin-bottom: 1px;
-
 		p {
+			background-color: $accent-background;
+			padding: 0.375rem 0.875rem;
 			font-size: ($base-font-size - 4);
 			font-style: italic;
 			line-height: 1;

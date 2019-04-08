@@ -12,6 +12,7 @@ Usage:
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
 <script type="text/javascript" src="/javascript/shared/jquery.select-multi-checkboxes.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
@@ -88,6 +89,11 @@ Usage:
         });
 
         // ============== Helpers
+
+        {#$("#filter-component-{{ definition.filter.id }}").selectAll({#}
+        {#    selector: "#selectAllFilterOptions",#}
+        {#    checkboxes: "[data-filter-options]"#}
+        {#});#}
 
         /**
          * To ensure each checkbox's original value data attribute is synchronised with the DB, we need to
@@ -455,6 +461,7 @@ Usage:
         <span data-filter></span>
         <a href="#" data-close class="close" title="Remove filter">×</a>
     </span>
+    <div><p>{{ label }}</p></div>
     <div><p>Option 1</p></div>
     <div><p>Option 2</p></div>
     <div><p>Option 3</p></div>
@@ -502,7 +509,7 @@ Usage:
                                type="submit"
                                data-value="Apply Filters"
                                value="Apply Filters"
-                               data-href="{{ panel.route }}" data-working="Submitting ...">
+                               data-href="{{ panel.route }}" data-working="Submitting...">
                     </li>
                 </ul>
 
