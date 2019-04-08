@@ -38,12 +38,7 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * @param Filter\IDefinition                                               $definition
-     * @param User                                                             $user
-     * @param Filter\Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                        $viewee
-     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
      * @throws DefinitionException if join $name isn't on this mapper
      * @throws \UnexpectedValueException
@@ -55,6 +50,7 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         $options = $pageFilter->getOptions();

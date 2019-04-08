@@ -337,7 +337,7 @@ class Controller extends Base
             'subjectId' => $subject->getId(),
         ]);
         $request     = $this->getRequest()->query->getArrayCopy();
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $request);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, \func_get_args(), $request);
 
         /* Build an markbook of assessments that:
          * * Belong to this folder

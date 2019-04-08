@@ -185,7 +185,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $route       = $this->getRouter()->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student, \func_get_args());
 
         // Only get subjects from external if student's timetable isn't hidden.
         // I don't get this logic as class list != timetable, but apparently

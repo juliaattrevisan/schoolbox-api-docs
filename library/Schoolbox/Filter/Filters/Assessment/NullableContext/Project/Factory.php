@@ -83,13 +83,7 @@ class Factory extends NullableContext\Factory
      * * reside in the contexts set by admin
      * * are linked to folders taught by the $viewee
      *
-     * @param Filter\IDefinition                                               $definition
-     * @param User                                                             $user
-     * @param Filter\Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                        $viewee
-     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
-     * @return Filter\IComponent
+     * @inheritDoc
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
      * @throws \InvalidArgumentException If $viewee is null
@@ -101,11 +95,13 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
             throw new \InvalidArgumentException('$viewee cannot be null');
         }
+
         return new Component(
             $definition,
             $user,
@@ -113,7 +109,7 @@ class Factory extends NullableContext\Factory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
-            $this->getProjects($pageFilter, $viewee, $overrides)
+            $this->getProjects($pageFilter, $viewee, $routeArgs, $overrides)
         );
     }
 
@@ -142,17 +138,25 @@ class Factory extends NullableContext\Factory
      * @throws Mapper\Exception If unable to hydrate a row
      * @throws \UnexpectedValueException
      */
-    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, GenericCollection $overrides)
+    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, array $routeArgs, GenericCollection $overrides)
     {
         // Determine which folders we are ultimately interested in getting projects from:
         $options = $pageFilter->getOptions();
 
-        // Course-markbook does not insert folders that are related to current user.
-        if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK !== $pageFilter->getPage()) {
+        // Is this filter being used on a page that renders involved folders?
+        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
             [$directFolders, $indirectFolders] = $this->fetchRelatedFolders($options, $pageFilter, $viewee);
         } else {
             $directFolders   = $this->folderMapper->createCollection();
             $indirectFolders = $this->folderMapper->createCollection();
+        }
+
+        // Is component being used on a page that has a folder in the URL?
+        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
+            /** @var Folder\Model $folder */
+            $folder                            = $routeArgs['folder'];
+            $directFolders[$folder->getId()]   = $folder;
+            $indirectFolders[$folder->getId()] = $folder;
         }
 
         /* If we inserted an extra folder/s, we need to also insert any projects on that folder,

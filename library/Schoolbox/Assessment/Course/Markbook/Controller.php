@@ -134,7 +134,7 @@ class Controller extends WebController\Base
 
         $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
         $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), \func_get_args(), $queryArgs);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@courseMarkbook/courseMarkbookOuter.twig', [

@@ -75,12 +75,7 @@ class Factory extends FolderFilter\Factory
      * * It inserts any folders specified in GET args if user has READ+ perm to them
      * * Inserts any folders where GET-injected UnitImportSpecs reside
      *
-     * @param Filter\IDefinition                                        $definition
-     * @param User                                                      $user
-     * @param Filter\Page\Model                                         $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]           $selections Indexed selection.key
-     * @param null|User                                                 $viewee
-     * @param GenericCollection|Collection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
      * @throws \InvalidArgumentException If $viewee is null
      * @throws \Schoolbox\Mapper\Exception
@@ -92,6 +87,7 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         $folders = $this->getFolderMapper()->createCollection();
@@ -111,6 +107,7 @@ class Factory extends FolderFilter\Factory
         }
 
         // Course Markbook enables insertion of unit-import-specs and their host folders
+        // TODO inspect new $routeArgs to more-reliably determine CourseSpec if on PAGE_COURSE_MARK_BOOK
         if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
             if (null === $folderOverrides) {
                 $folderOverrides = new GenericCollection(Filter\Selection\Model::class);

@@ -116,7 +116,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
         $route       = $this->getRouter()->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), \func_get_args(), $queryArgs);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(

@@ -4,6 +4,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter;
 
@@ -22,6 +23,11 @@ abstract class AbstractFactory implements IFactory
     private $selectionMapper;
 
 
+    /**
+     * @param Page\Option\Mapper          $optionMapper
+     * @param Page\Option\Defaults\Mapper $defaultMapper
+     * @param Selection\Mapper            $selectionMapper
+     */
     public function __construct(
         Page\Option\Mapper $optionMapper,
         Page\Option\Defaults\Mapper $defaultMapper,
@@ -33,13 +39,7 @@ abstract class AbstractFactory implements IFactory
     }
 
     /**
-     * @param IDefinition                                               $definition
-     * @param User                                                      $user
-     * @param Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                 $viewee
-     * @param GenericCollection|GenericCollection[]|Selection\Model[][] $overrides  Indexed filter.id, selection.key
-     * @return IComponent
+     * @inheritDoc
      * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
     public function buildComponent(
@@ -48,6 +48,7 @@ abstract class AbstractFactory implements IFactory
         Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): IComponent {
         return new BaseComponent(

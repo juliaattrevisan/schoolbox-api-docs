@@ -171,10 +171,10 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
+     * @param array     $routeArgs  Any route params, as received by the controller's public API method
      * @param array     $request Indexed by filter.id
      * @return Panel
      * @throws \InvalidArgumentException             If unable to locate Filter mapper class, or required filter definition classes
-     * @throws \ReflectionException                  If the specified class does not exist
      * @throws \DomainException                      If this class has not defined the entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
@@ -182,7 +182,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \UnderflowException                   If we generate an empty PB IN query
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = []): Panel
+    public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel
     {
         // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
         if (array_key_exists('page', $request)) {
@@ -226,6 +226,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
                 $pageFilter,
                 $selections[$filter->getId()],
                 $viewee,
+                $routeArgs,
                 $overrides
             );
         }

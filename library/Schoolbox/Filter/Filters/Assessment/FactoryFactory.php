@@ -4,6 +4,7 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types = 1);
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
@@ -35,15 +36,9 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 
 
     /**
-     * A registry of assessment-filter factories, along with their construction dependencies.
-     *
-     * Registered by filter definition class name.
-     *
-     * @param string $filterDefinitionClass
-     * @return IFactory
-     * @throws InvalidArgumentException if no filter definition class not found, or filter factory not registered
+     * @inheritDoc
      */
-    public function buildFilterFactoryForFilter($filterDefinitionClass): IFactory
+    public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory
     {
         if (!class_exists($filterDefinitionClass)) {
             throw new InvalidArgumentException('No filter definition found for class: ' . $filterDefinitionClass);
@@ -155,7 +150,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper()
                 );
         }
-        throw new \InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
+        throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
 
 
@@ -166,7 +161,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
      * @param null[]|Collection[] $filters
      * @param User                $viewee
      * @return null[]|Collection[]
-     * @throws \InvalidArgumentException    If unable to find specified Mapper class
+     * @throws InvalidArgumentException    If unable to find specified Mapper class
      */
     public function checkTeacherFolders(array $filters, User $viewee): array
     {

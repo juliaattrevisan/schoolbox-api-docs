@@ -30,6 +30,35 @@ class Model
 
 
     /**
+     * Returns the set of pages that display a list of folders related to the viewee
+     *
+     * @return string[]
+     */
+    public static function getInvolvedFoldersPages(): array
+    {
+        return [
+            self::PAGE_PENDING_ASSESSMENTS,
+            self::PAGE_CLASS_MARK_BOOK,
+            self::PAGE_UPCOMING_ASSESSMENTS,
+        ];
+    }
+
+
+    /**
+     * Returns the set of pages where the Controller's public API method has a [folder: Folder\Model] route arg
+     *
+     * @return string[]
+     */
+    public static function getSingleFolderPages(): array
+    {
+        return [
+            self::PAGE_GRADES,
+            self::PAGE_RUBRIC_MARK_BOOK,
+        ];
+    }
+
+
+    /**
      * @param string $page
      * @return string[]
      */

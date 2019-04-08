@@ -11,7 +11,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Filter;
 
-
 /**
  * Responsible for building concrete implementation of the filter interfaces.
  *
@@ -48,6 +47,7 @@ interface IFactory
      * @param Page\Model                                                $pageFilter
      * @param null|GenericCollection|Selection\Model[]                  $selections Indexed selection.key
      * @param null|User                                                 $viewee
+     * @param array                                                     $routeArgs  Controller's public API method args
      * @param GenericCollection|GenericCollection[]|Selection\Model[][] $overrides  Indexed filter.id, selection.key
      * @return IComponent
      */
@@ -57,6 +57,7 @@ interface IFactory
         Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): IComponent;
 

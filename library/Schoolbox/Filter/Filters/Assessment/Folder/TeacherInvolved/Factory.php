@@ -41,12 +41,7 @@ class Factory extends FolderFilter\Factory
      * * It inserts any folders specified in GET args if user has READ+ perm to them
      * * Inserts any folders where GET-injected UnitImportSpecs reside
      *
-     * @param Filter\IDefinition                                        $definition
-     * @param User                                                      $user
-     * @param Filter\Page\Model                                         $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]           $selections Indexed selection.key
-     * @param null|User                                                 $viewee
-     * @param GenericCollection|Collection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
      * @throws \InvalidArgumentException If $viewee is null
      */
@@ -56,6 +51,7 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
