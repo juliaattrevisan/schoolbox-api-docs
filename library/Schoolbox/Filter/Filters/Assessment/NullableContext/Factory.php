@@ -9,6 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Folder;
+use TypeError;
 
 /**
  * These filters may be used on pages that fetch assessments that reside on either:
@@ -20,6 +22,24 @@ use Schoolbox\GenericCollection;
  */
 abstract class Factory extends Filter\AbstractFactory
 {
+
+    /**
+     * Finds a returns the first folder model from an array of route args
+     *
+     * @param array $routeArgs
+     * @return Folder\Model
+     * @throws TypeError If no Folder\Model found
+     */
+    protected function findFolderModel(array $routeArgs): Folder\Model
+    {
+        foreach ($routeArgs as $routeArg) {
+            if ($routeArg instanceof Folder\Model) {
+                return $routeArg;
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Do the overrides indicate any folders are being inserted into the folder filter option list?

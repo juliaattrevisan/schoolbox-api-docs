@@ -153,8 +153,7 @@ class Factory extends NullableContext\Factory
 
         // Is component being used on a page that has a folder in the URL?
         if (\in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
-            /** @var Folder\Model $folder */
-            $folder                            = $routeArgs['folder'];
+            $folder                            = $this->findFolderModel($routeArgs);
             $directFolders[$folder->getId()]   = $folder;
             $indirectFolders[$folder->getId()] = $folder;
         }

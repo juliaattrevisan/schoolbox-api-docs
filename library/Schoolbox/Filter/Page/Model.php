@@ -45,7 +45,7 @@ class Model
 
 
     /**
-     * Returns the set of pages where the Controller's public API method has a [folder: Folder\Model] route arg
+     * Returns the set of pages where the Controller's public API method has a Folder\Model in the route args
      *
      * @return string[]
      */

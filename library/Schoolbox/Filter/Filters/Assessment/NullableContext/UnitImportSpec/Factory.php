@@ -99,8 +99,7 @@ class Factory extends NullableContext\Factory
 
         // Are we in the context of a filtered page that is for a single folder?
         if (\in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
-            /** @var Folder\Model $folder */
-            $folder                    = $routeArgs['folder'];
+            $folder                    = $this->findFolderModel($routeArgs);
             $folders[$folder->getId()] = $folder;
         }
 
