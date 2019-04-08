@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Module extends BaseModule
 {
@@ -86,11 +87,19 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'internalDb'       => $injector->lazyGet('databaseInternal'),
-            'gradeGroupMapper' => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'internalDb'            => $injector->lazyGet('databaseInternal'),
+            'gradeGroupMapper'      => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
+            'userAccessMapper'      => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
             'filterFactoryFactory'  => $injector->lazy(function () {
                 return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            }),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+            'assessmentIdFinder'    => $injector->lazy(function () {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
+                );
             }),
         ];
     }

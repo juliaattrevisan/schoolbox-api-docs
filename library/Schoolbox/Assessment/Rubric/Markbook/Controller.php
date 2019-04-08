@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -22,7 +23,6 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Role;
 use Schoolbox\User;
 use Alaress\Database;
 use InvalidArgumentException;
@@ -58,6 +58,12 @@ class Controller extends Base
     /** @var Filter\Filters\Assessment\FactoryFactory */
     private $filterFactoryFactory;
 
+    /** @var Filter\Selection\Mapper */
+    private $filterSelectionMapper;
+
+    /** @var Filter\Filters\Assessment\IdFinder */
+    private $assessmentIdFinder;
+
 
     /**
      * Constructor
@@ -66,17 +72,23 @@ class Controller extends Base
      * @param GradeGroup\Mapper                        $gradeGroupMapper
      * @param UserAccessMapper                         $userAccessMapper
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+     * @param Filter\Selection\Mapper                  $filterSelectionMapper
+     * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
      */
     public function __construct(
         IConnector $internalDb,
         GradeGroup\Mapper $gradeGroupMapper,
         UserAccessMapper $userAccessMapper,
-        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
+        Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
+        Filter\Selection\Mapper $filterSelectionMapper,
+        Filter\Filters\Assessment\IdFinder $assessmentIdFinder
     ) {
-        $this->internalDb           = $internalDb;
-        $this->gradeGroupMapper     = $gradeGroupMapper;
-        $this->userAccessMapper     = $userAccessMapper;
-        $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->internalDb            = $internalDb;
+        $this->gradeGroupMapper      = $gradeGroupMapper;
+        $this->userAccessMapper      = $userAccessMapper;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterSelectionMapper = $filterSelectionMapper;
+        $this->assessmentIdFinder    = $assessmentIdFinder;
     }
 
 
@@ -119,6 +131,7 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Displays a list of rubric marks for students in the specified class
      *
@@ -127,18 +140,22 @@ class Controller extends Base
      * @param Folder\Model $folder Folder for this class
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
+     * @throws DomainException
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws PDOException
+     * @throws ReflectionException
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function postMarkbook(Folder\Model $folder): void
     {
-        $assessments = $this->retrieveAssessmentsInFolder($folder->getId());
-        $students    = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
-$test = 1;
+        $assessmentIds = $this->getAssessmentIds($folder->getId(), $this->request->post['filter_selection'] ?: []);
+        $assessments   = $this->retrieveAssessmentsInFolder($assessmentIds);
+        $students      = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@rubricMarkbook/markbookInner.twig',
@@ -149,6 +166,41 @@ $test = 1;
                 ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );
+    }
+
+
+    /**
+     * Returns the set of assessments that match the filter panel selections and folder id
+     *
+     * @param int   $folderId
+     * @param array $request
+     * @return array
+     * @throws DomainException
+     * @throws Filter\BrokenFilterException
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws ReflectionException
+     * @throws UnexpectedValueException
+     */
+    private function getAssessmentIds(int $folderId, array $request): array
+    {
+        $page                = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
+        $codec               = $this->filterFactoryFactory->buildCodec();
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+
+        // Assessments must belong to folder, be due-works, and not assessment specs.
+        $keyDueWork = Filter\Filters\Assessment\AssessmentType\Definition::KEY_DUE_WORK;
+        $hardCoded  = [
+            Filter\Filters\Assessment\Folder\StudentInteractions\Definition::class => [$folderId => $folderId],
+            Filter\Filters\Assessment\AssessmentType\Definition::class             => [$keyDueWork => $keyDueWork],
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class   => [],
+        ];
+        $dynamic    = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+        $filters    = \array_merge($hardCoded, $dynamic);
+
+        return $this->assessmentIdFinder->findIdsByFilters($filters);
     }
 
 
@@ -174,12 +226,18 @@ $test = 1;
     /**
      * Find all the assessments for a given folder, and return them indexed by assessment ID
      *
-     * @param int $folderId
+     * @param int[] $assessmentIds
      * @return array
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function retrieveAssessmentsInFolder(int $folderId) : array
+    private function retrieveAssessmentsInFolder(array $assessmentIds) : array
     {
+        if(!\count($assessmentIds)){
+            return [];
+        }
+
+        $bindings = Builder::getBindings($assessmentIds, 'a_id');
+
         $getAllAssessmentsInFolderQuery = $this->internalDb->prepareQuery(
             "
             SELECT
@@ -187,8 +245,8 @@ $test = 1;
                 a.title AS assessment_name,
                 sb.rubric_group_marks AS assessment_rubric_group_marks,
                 sb.submission_grade_group_id AS assessment_grade_group_id,
-                sb.mark_type as assessment_mark_type,
-                sb.max_mark as assessment_max_mark,
+                sb.mark_type AS assessment_mark_type,
+                sb.max_mark AS assessment_max_mark,
                 rgu.rubric_group_id AS capability_id,
                 rg.name AS capability_name,
                 rcu.criterion_id AS indicator_id,
@@ -200,11 +258,11 @@ $test = 1;
             INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
             INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
                   AND rc.rubric_group_id = rg.id
-            WHERE sb.category = :folderId AND a.deleted_at IS NULL
+            WHERE a.id IN ({$bindings->getPlaceholder()})
             ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
         );
 
-        $getAllAssessmentsInFolderQuery->execute(['folderId' => $folderId]);
+        $getAllAssessmentsInFolderQuery->execute($bindings->getParams());
 
         $assessments = [];
         $capabilities = [];
@@ -408,7 +466,7 @@ $test = 1;
                 // Fill out a Due Work with the data we need for the markscheme factory to work
                 $stubAssessment = new DueWork();
                 $stubAssessment->setId($assessmentId);
-                $stubAssessment->setMarkPerCapability($assessmentUsesMarkPerCap);
+                $stubAssessment->setMarkPerCapability((bool)$assessmentUsesMarkPerCap);
                 $stubAssessment->setMaxMark($assessmentMaxMark);
                 $stubAssessment->setMarkType($markType);
                 if ($gradeGroup !== null) {
@@ -419,7 +477,7 @@ $test = 1;
                     $capabilityDatabaseMark = $capabilityMarks['databaseMark'];
 
                     if ($capabilityDatabaseMark !== null) {
-                        $capabilityMaxMark = $capabilityMarks['maxMark'];
+                        $capabilityMaxMark = $capabilityMarks['maxMark'] === null ? null : (float)$capabilityMarks['maxMark'];
 
                         $capabilityUsageModel = new CapabilityUsage(new Capability());
                         $capabilityUsageModel->setMaxValue($capabilityMaxMark);
