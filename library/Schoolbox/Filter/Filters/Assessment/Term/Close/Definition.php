@@ -34,7 +34,7 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         // Not currently exposed in the UI - used just for internal query building
         return [];
