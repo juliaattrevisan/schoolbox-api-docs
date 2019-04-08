@@ -101,4 +101,14 @@ class Mapper extends BaseMapper
         }
         return $collection;
     }
+
+    /** @inheritDoc */
+    protected function raiseNotification($object, $verb, $previous = null)
+    {
+        // TODO: change notifier depending on Context
+        $this->moduleNotifier = 'Schoolbox\Discussion\Comment\NewsNotifier';
+
+        return parent::raiseNotification($object, $verb, $previous);
+    }
+
 }
