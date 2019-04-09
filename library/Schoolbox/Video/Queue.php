@@ -578,25 +578,29 @@ class Queue extends ResourceVideo
     /**
      * Returns the filename of the utility used to perform the media transcode
      *
-     * @return string
+     * @return null|string
      */
-    private function getCommandTranscode()
+    private function getCommandTranscode(): ?string
     {
         if ($this->isCommandAvailable($this->converterExec)) {
             return $this->converterExec;
         }
+
+        return null;
     }
 
     /**
      * Returns the filename of the utility used to retrieve media information
      *
-     * @return string
+     * @return null|string
      */
-    private function getCommandMediaInformation()
+    private function getCommandMediaInformation(): ?string
     {
         if ($this->isCommandAvailable($this->infoExec)) {
             return $this->infoExec;
         }
+
+        return null;
     }
 
     /**
