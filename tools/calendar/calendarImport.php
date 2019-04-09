@@ -29,7 +29,23 @@ $kernel = new CliTool\Kernel(
 //    --role:       Comma-seperated list of role IDs that the events should be shown to
         private const OPT_LONG_ROLE = 'role:';
 //    --source:     Optional source name, subsequent uploads will delete any events with the same source name
-        private const OPT_LONG_SOURCE = 'source::';
+        private const OPT_LONG_SOURCE = 'source:';
+
+
+        /** @var string|null */
+        private $file;
+
+        /** @var string|null */
+        private $ownerId;
+
+        /** @var array|null */
+        private $campusList;
+
+        /** @var array|null */
+        private $roleList;
+
+        /** @var string|null */
+        private $source;
 
         /** @inheritdoc */
         public function getLongOpts(): array
@@ -47,60 +63,29 @@ $kernel = new CliTool\Kernel(
         public function run(): void
         {
             $log = $this->getLogger();
-            $file = null;
-            if ($this->getOpt(self::OPT_LONG_HELP)) {
+
+            if ($this->getOpt(self::OPT_LONG_HELP)  || !$this->parseAppOptions()) {
                 echo <<<HELP
 Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source='sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
     --owner:      The user ID of who the events should be owned by
-    --campus:     Comma-seperated list of campus IDs that the events should be shown to
-    --role:       Comma-seperated list of role IDs that the events should be shown to
+    --campus:     Comma-separated list of campus IDs that the events should be shown to
+    --role:       Comma-separated list of role IDs that the events should be shown to
     --source:     Optional source name, subsequent uploads will delete any events with the same source name
     
 HELP;
                 exit;
-            } else {
-                if (!$this->getOpt(self::OPT_LONG_CAMPUS)) {
-                    $log->error("No campus specified. (Use --help for example usage)\n");
-                    exit(1);
-                } else {
-                    $campusList = explode(',', $this->getOpt(self::OPT_LONG_CAMPUS));
-                }
-
-                if (!$this->getOpt(self::OPT_LONG_ROLE)) {
-                    $log->error("No role specified. (Use --help for example usage)\n");
-                    exit(1);
-                } else {
-                    $groupList = explode(',', $this->getOpt(self::OPT_LONG_ROLE));
-                }
-
-                if (!$this->getOpt(self::OPT_LONG_OWNER)) {
-                    $log->error("No owner id specified. (Use --help for example usage)\n");
-                    exit(1);
-                } else {
-                    $ownerId = $this->getOpt(self::OPT_LONG_OWNER);
-                }
-
-                if (!$this->getOpt(self::OPT_LONG_FILE) && file_exists($this->getOpt(self::OPT_LONG_FILE))) {
-                    $log->error("Specified file not found. (Use --help for example usage)\n");
-                    exit(1);
-                } else {
-                    $file = $this->getOpt(self::OPT_LONG_FILE);
-                }
             }
 
             //Optional options
-            if (!$this->getOpt(self::OPT_LONG_SOURCE)) {
+            if ($this->getOpt(self::OPT_LONG_SOURCE)) {
                 $source = $this->getOpt(self::OPT_LONG_SOURCE);
                 $log->warning('Events with source "' . $source . '" will be deleted' . "\n");
             } else {
                 $source = null;
             }
 
-            //Not used in this context
-            $categoryList = [];
-
-            $bulkHandler = new Bulk_Calendar($file, $source, $ownerId, $categoryList, $groupList, $campusList);
+            $bulkHandler = new Bulk_Calendar($this->file, $source, $this->ownerId, [], $this->roleList, $this->campusList);
 
             try {
 
@@ -115,6 +100,46 @@ HELP;
                 $log->error("One of the supplied roles was not found, unable to load events.\n");
                 exit(1);
             }
+        }
+
+        /**
+         * Parses options and returns whether all options are valid
+         *
+         * @return bool
+         */
+        private function parseAppOptions(): bool
+        {
+            $valid = true;
+
+            if (!$this->getOpt(self::OPT_LONG_CAMPUS)) {
+                $this->getLogger()->error('No campus specified.');
+                $valid = false;
+            } else {
+                $this->campusList = explode(',', $this->getOpt(self::OPT_LONG_CAMPUS));
+            }
+
+            if (!$this->getOpt(self::OPT_LONG_ROLE)) {
+                $this->getLogger()->error('No role specified.');
+                $valid = false;
+            } else {
+                $this->roleList = explode(',', $this->getOpt(self::OPT_LONG_ROLE));
+            }
+
+            if (!$this->getOpt(self::OPT_LONG_OWNER)) {
+                $this->getLogger()->error('No owner id specified.');
+                $valid = false;
+            } else {
+                $this->ownerId = $this->getOpt(self::OPT_LONG_OWNER);
+            }
+
+            if (!$this->getOpt(self::OPT_LONG_FILE) || !file_exists($this->getOpt(self::OPT_LONG_FILE))) {
+                $this->getLogger()->error('Specified file not found.');
+                $valid = false;
+            } else {
+                $this->file = $this->getOpt(self::OPT_LONG_FILE);
+            }
+
+            return $valid;
         }
     },
     false
