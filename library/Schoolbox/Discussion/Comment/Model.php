@@ -11,7 +11,6 @@ namespace Schoolbox\Discussion\Comment;
 use Alaress\Json;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -21,7 +20,7 @@ use Schoolbox\User;
 /**
  * Model for comments in discussion threads.
  */
-class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
+class Model implements ISoftDeletable, Json\Serializable
 {
     use Id;
     use CreatedAtDate;
@@ -124,20 +123,5 @@ class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
             $map['author'] = $this->author->getDefaultJsonMap();
         }
         return $map;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getJsonApiLinks(): array
-    {
-        // TODO figure out how to create contextual links
-        return [
-//            'delete' => new AuraLink(
-//                'discussionComments.deleteComment',
-//                ['id' => $this->id, 'comment' => $this,]
-//            ),
-        ];
     }
 }
