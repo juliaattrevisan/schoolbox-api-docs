@@ -151,10 +151,11 @@ abstract class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'commentMapper'  => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'threadMapper'   => $this->getMapperFactory()->getLazy(Mapper::class),
-            'context'        => $this->buildContext(),
-            'wrapperFactory' => $this->buildModelWrapperFactory(),
+            'commentMapper'         => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
+            'threadMapper'          => $this->getMapperFactory()->getLazy(Mapper::class),
+            'context'               => $this->buildContext(),
+            'wrapperFactory'        => $this->buildModelWrapperFactory(),
+            'commentWrapperFactory' => $this->buildCommentModelWrapperFactory(),
         ];
     }
 
@@ -192,6 +193,17 @@ abstract class Module extends BaseModule
      * @return ModelWrapper\IFactory
      */
     abstract protected function buildModelWrapperFactory(): ModelWrapper\IFactory;
+
+
+    /**
+     * Builds a factory for building wrappers around thread comment models.
+     *
+     * Required so that the controller may render links dependent on the module
+     * that uses the variant.
+     *
+     * @return Comment\ModelWrapper\IFactory
+     */
+    abstract protected function buildCommentModelWrapperFactory(): Comment\ModelWrapper\IFactory;
 
 
     /**

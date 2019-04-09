@@ -54,7 +54,8 @@ class Controller extends BaseController
 
 
     /**
-     * The context object, used for associating a thread to a context.
+     * The model wrapper factory for threads, used to wrap a thread in a
+     * renderer that knows how to create links for its context.
      *
      * @var ModelWrapper\IFactory
      */
@@ -62,23 +63,35 @@ class Controller extends BaseController
 
 
     /**
+     * The model wrapper factory for comments, used to wrap comments in a
+     * thread in a renderer that knows how to create links for its context.
+     *
+     * @var Comment\ModelWrapper\IFactory
+     */
+    private $commentWrapperFactory;
+
+
+    /**
      * Constructor
      *
-     * @param Comment\Mapper        $commentMapper
-     * @param Mapper                $threadMapper
-     * @param IContextLocator       $context
-     * @param ModelWrapper\IFactory $wrapperFactory
+     * @param Comment\Mapper                $commentMapper
+     * @param Mapper                        $threadMapper
+     * @param IContextLocator               $context
+     * @param ModelWrapper\IFactory         $wrapperFactory
+     * @param Comment\ModelWrapper\IFactory $commentWrapperFactory
      */
     public function __construct(
         Comment\Mapper $commentMapper,
         Mapper $threadMapper,
         IContextLocator $context,
-        ModelWrapper\IFactory $wrapperFactory
+        ModelWrapper\IFactory $wrapperFactory,
+        Comment\ModelWrapper\IFactory $commentWrapperFactory
     ) {
-        $this->commentMapper  = $commentMapper;
-        $this->threadMapper   = $threadMapper;
-        $this->context        = $context;
-        $this->wrapperFactory = $wrapperFactory;
+        $this->commentMapper         = $commentMapper;
+        $this->threadMapper          = $threadMapper;
+        $this->context               = $context;
+        $this->wrapperFactory        = $wrapperFactory;
+        $this->commentWrapperFactory = $commentWrapperFactory;
     }
 
 

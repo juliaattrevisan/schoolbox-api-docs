@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Thread;
 
 use Alaress\Authorizer as Auth;
 use Schoolbox\Comms\News;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 
 /**
@@ -47,6 +48,17 @@ class Module extends Thread\Module
     protected function buildModelWrapperFactory(): Thread\ModelWrapper\IFactory
     {
         return new ModelWrapper\Factory();
+    }
+
+
+    /**
+     * Builds a factory for building wrappers around comment objects.
+     *
+     * @return Comment\ModelWrapper\IFactory
+     */
+    protected function buildCommentModelWrapperFactory(): Comment\ModelWrapper\IFactory
+    {
+        return new News\Discussion\Comment\ModelWrapper\Factory();
     }
 
 
