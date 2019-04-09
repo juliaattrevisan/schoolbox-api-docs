@@ -360,7 +360,7 @@ class Controller extends Base
             ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ");
 
-        $getAuthoritativeMarksQuery->execute(array_merge($assessmentPb->getParams(), ['review_route' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]));
+        $params = array_merge($assessmentPb->getParams(), ['review_route' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
 
         $students              = [];
         $assessmentsForStudent = [];
@@ -371,7 +371,7 @@ class Controller extends Base
         $lastObservedCapabilityId = null;
         $lastObservedStudentId    = null;
 
-        foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
+        foreach ($getAuthoritativeMarksQuery->getIterator($params) as $i => $row) {
             if ($lastObservedStudentId !== $row['student_id']) {
                 // Has the student we're looking at changed? Reset the list of assessments for them
                 $assessmentsForStudent = [];
@@ -417,6 +417,7 @@ class Controller extends Base
         }
         return $students;
     }
+
 
     /**
      * Work out the human readable marks from the raw marks and insert them into the student marks array
