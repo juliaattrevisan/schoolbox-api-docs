@@ -1,62 +1,6 @@
-<!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
-<script type="text/javascript" src="/subject/classList/javascript/emailSelected.js"></script>
-<script type="text/javascript">
-    $(function () {
-        var form = $('#contact-table-form');
-
-        // Validators for if no student or parent emails were found
-        $.validator.addMethod(
-            'remote.noStudentEmails',
-            function () {
-                return !(form.data('noStudentEmails'));
-            },
-            'No email addresses were found for the selected students.'
-        );
-        $.validator.addMethod(
-            'remote.noParentEmails',
-            function () {
-                return !(form.data('noParentEmails'));
-            },
-            'No email addresses were found for the parents of the selected students.'
-        );
-        $.validator.addMethod(
-            'remote.noHousemasterEmails',
-            function () {
-                return !(form.data('noHousemasterEmails'));
-            },
-            'No email addresses were found for the housemasters of the selected students.'
-        );
-
-        /* Validate checkbox selections
-         */
-        form.alaressValidate({
-            rules: {
-                "selected[]": {
-                    required: true,
-                    minlength: 1,
-                    'remote.noStudentEmails': true,
-                    'remote.noParentEmails': true,
-                    'remote.noHousemasterEmails': true
-                }
-            },
-            messages: {
-                "selected[]": {
-                    required: "Please select at least one student before sending email",
-                    minlength: "Please select at least one student before sending email"
-                }
-            },
-            errorPlacement: function (error, element) {
-                $('#errors').html(error);
-            }
-        });
-    });
-</script>
-<!-- END custom_head -->
-
 {BREADCRUMB}
 
-<div class="row">
+<div class="row" id="email-class-lists">
     <div class="small-12 island">
         <h1>{SUBJECTNAME}</h1>
         <form id="contact-table-form" class="no-margin">
@@ -65,7 +9,7 @@
                 <tr>
                     <th>
                         <!-- BEGIN select_all -->
-                        <input type="checkbox" id="select-all" data-select-all data-select-all-for-group="students" value=""/>
+                        <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="selectAllStudentsFlag" />
                         <label for="select-all" class="checkbox-label"></label>
                         <!-- END select_all -->
                     </th>
@@ -82,7 +26,7 @@
                 <tr>
                     <td>
                         <!-- BEGIN select_student -->
-                        <input type="checkbox" name="selected[]" id='id-{SYNERGYID}' value="{SYNERGYID}" data-select-all-group="students"/>
+                        <input type="checkbox" id='id-{SYNERGYID}' name="students[]" value="{SYNERGYID}" @click="updateSelectAllStudentsFlag" />
                         <label for="id-{SYNERGYID}" class="checkbox-label"></label>
                         <!-- END select_student -->
                     </td>
@@ -148,112 +92,269 @@
             </table>
         </form>
     </div>
+
+    <div class="checklist small-12 island">
+        <div class="content" style="background-color: #FFF;">
+            <ul class="inline-list no-margin">
+                <template v-for="(group, index) in groups">
+                    <li v-bind:class="index < 1 ? 'no-margin' : ''">
+                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" v-model="group.isChecked" />
+                        <label :for="group.label">{{ group.label.capitalise() }}</label>
+                    </li>
+                </template>
+
+                <li>
+                    <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent>
+                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
+                        <input type="hidden" name="bcc" v-model="emailLists.join(emailDelimiter)" />
+                        <button type="submit" class="button icon-email" :disabled="!allowEmailSendButton" @click="sendEmail">Email Selected Groups</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
+
 <div class="row">
     <div class="small-12 columns">
 
         <div class="content">
-            <script type="text/javascript">
-                $(function () {
-                    function resetValidation(form) {
-                        form.data('noStudentEmails', false)
-                            .data('noParentEmails', false)
-                            .data('noHousemasterEmails', false);
-                    }
-
-                    $('#email-selected-students').click(function (event) {
-                        event.preventDefault();
-                        var form = $('#contact-table-form');
-                        resetValidation(form);
-                        if (form.valid()) {
-                            $('#email-selected-students')
-                                .emailSelected({
-                                    source: $('#contact-table'),
-                                    url: '/subject/classList/ajax/emailStudentsById.php',
-                                    classCode: '{CLASS_CODE}',
-                                    target: $(this).find('input[name=bcc]')
-                                })
-                                .on('emailSelected.noEmail', function () {
-                                    // Trigger the no student email error
-                                    form.data('noStudentEmails', true).valid();
-                                })
-                        }
-                    });
-
-                    $('#email-selected-parents').click(function (event) {
-                        event.preventDefault();
-                        var form = $('#contact-table-form');
-                        resetValidation(form);
-                        if (form.valid()) {
-                            $('#email-selected-parents')
-                                .emailSelected({
-                                    source: $('#contact-table'),
-                                    url: '/subject/classList/ajax/emailParentsById.php',
-                                    classCode: '{CLASS_CODE}',
-                                    target: $(this).find('input[name=bcc]')
-                                })
-                                .on('emailSelected.noEmail', function () {
-                                    // Trigger the no parent email error
-                                    form.data('noParentEmails', true).valid();
-                                })
-                        }
-                    });
-
-                    $('#email-selected-housemasters').click(function (event) {
-                        event.preventDefault();
-                        var form = $('#contact-table-form');
-                        resetValidation(form);
-                        if (form.valid()) {
-                            $('#email-selected-housemasters')
-                                .emailSelected({
-                                    source: $('#contact-table'),
-                                    url: '/subject/classList/ajax/emailHousemastersById.php',
-                                    classCode: '{CLASS_CODE}',
-                                    target: $(this).find('input[name=bcc]')
-                                })
-                                .on('emailSelected.noEmail', function () {
-                                    // Trigger the no housemaster email error
-                                    form.data('noHousemasterEmails', true).valid();
-                                })
-                        }
-                    });
-                });
-            </script>
             <ul class="inline-list no-margin">
                 <!-- BEGIN email_class -->
-                <li class="no-margin">
-                    <form id="email-selected-students" action="/mail/createMail.php" method="post" class="no-margin">
-                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc" value=""/>
-                        <button type="submit" class="button icon-email">Email Selected Students</button>
-                    </form>
-                </li>
+<!--                <li class="no-margin">-->
+<!--                    <form id="email-selected-students" action="/mail/createMail.php" method="post" class="no-margin">-->
+<!--                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>-->
+<!--                        <input type="hidden" name="bcc" value=""/>-->
+<!--                        <button type="submit" class="button icon-email">Email Selected Students</button>-->
+<!--                    </form>-->
+<!--                </li>-->
                 <!-- END email_class -->
 
                 <!-- BEGIN parent_email -->
-                <li class="no-margin">
-                    <form id="email-selected-parents" action="/mail/createMail.php" method="post" class="no-margin">
-                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc" value=""/>
-                        &nbsp;<button type="submit" class="button icon-email">Email Parents of Selected Students</button>
-                    </form>
-                </li>
+<!--                <li class="no-margin">-->
+<!--                    <form id="email-selected-parents" action="/mail/createMail.php" method="post" class="no-margin">-->
+<!--                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>-->
+<!--                        <input type="hidden" name="bcc" value=""/>-->
+<!--                        &nbsp;<button type="submit" class="button icon-email">Email Parents of Selected Students</button>-->
+<!--                    </form>-->
+<!--                </li>-->
                 <!-- END parent_email -->
 
                 <!-- BEGIN housemaster_email -->
-                <li class="no-margin">
-                    <form id="email-selected-housemasters" action="/mail/createMail.php" method="post" class="no-margin">
-                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>
-                        <input type="hidden" name="bcc" value=""/>
-                        &nbsp;<button type="submit" class="button icon-email">Email Housemasters of Selected Students</button>
-                    </form>
-                </li>
+<!--                <li class="no-margin">-->
+<!--                    <form id="email-selected-housemasters" action="/mail/createMail.php" method="post" class="no-margin">-->
+<!--                        <input type="hidden" name="replyto" value="&quot;{SUBJECTNAME}&quot; &lt;{REPLYTO}&gt;"/>-->
+<!--                        <input type="hidden" name="bcc" value=""/>-->
+<!--                        &nbsp;<button type="submit" class="button icon-email">Email Housemasters of Selected Students</button>-->
+<!--                    </form>-->
+<!--                </li>-->
                 <!-- END housemaster_email -->
             </ul>
         </div>
     </div>
 </div>
 
-<div id="errors"></div>
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script type="text/javascript">
+
+    Vue.config.devtools = true;
+
+    var postHeaders = {
+        'X-Requested-With' : 'XMLHttpRequest',
+    };
+
+    var app = new Vue({
+        el: '#email-class-lists',
+        // delimiters: ['${', '}'], We don't need this for now as this page is not on twig yet
+        data: {
+            selectAllStudentsFlag: true,
+            selectedStudentIds: [],
+            allowEmailSendButton: false,
+            studentsCheckboxElements: undefined,
+            groups: [
+                {label: 'students', isChecked: true},
+                {label: 'parents', isChecked: false},
+                {label: 'housemasters', isChecked: false},
+            ],
+            groupsCheckboxElements: [],
+            selectedGroups: [],
+            classCode: '{CLASS_CODE}',
+            emailLists: [],
+            ready: false,
+            emailDelimiter: String.fromCharCode(30),
+            endpointPrefix: '/subject/classList/ajax/',
+        },
+        mounted: function() {
+            var self = this;
+
+            self.studentsCheckboxElements = document.getElementsByName('students[]');
+            self.groupsCheckboxElements = document.getElementsByName('groups[]');
+
+            // On page load, select all students
+            for (var i = 0; i < self.studentsCheckboxElements.length; i++) {
+                self.studentsCheckboxElements[i].checked = true;
+                self.selectedStudentIds.push(self.studentsCheckboxElements[i].value);
+            }
+
+            // On initial load, set group checkboxes to checked if the isChecked value from the array above is true
+            for (var i = 0; i < this.groupsCheckboxElements.length; i++) {
+                if (self.groupsCheckboxElements[i].checked) {
+                    self.selectedGroups.push(self.groupsCheckboxElements[i].value);
+                }
+            }
+
+            this.updateSendEmailButtonState();
+        },
+        methods: {
+            selectAllStudents: function (event) {
+
+                var self = this;
+
+                self.selectedStudentIds.length = 0;
+
+                if (!self.studentsCheckboxElements) {
+                    return;
+                }
+
+                for (var i = 0; i < self.studentsCheckboxElements.length; i++) {
+                    // If select all students has been checked, make all the checkboxes checked as well and add push
+                    // the ids to selectedStudentIds variable. Otherwise, uncheck all of the checkboxes and clear the selectedStudentIds
+                    if (event.target.checked) {
+                        self.studentsCheckboxElements[i].checked = true;
+                        self.selectedStudentIds.push(self.studentsCheckboxElements[i].value);
+                    } else {
+                        self.studentsCheckboxElements[i].checked = false;
+                    }
+                }
+
+                self.updateSendEmailButtonState();
+
+                self.selectAllStudentsFlag = event.target.checked;
+            },
+            updateSelectAllStudentsFlag: function(event)
+            {
+
+                var self = this;
+
+                if (!self.studentsCheckboxElements) {
+                    return;
+                }
+
+                for (var i = 0; i < self.studentsCheckboxElements.length; i++) {
+                    if (self.studentsCheckboxElements[i].checked) {
+                        if (!self.selectedStudentIds.includes(self.studentsCheckboxElements[i].value)) {
+                            self.selectedStudentIds.push(self.studentsCheckboxElements[i].value);
+                        }
+                    } else {
+                        self.selectedStudentIds = self.selectedStudentIds.filter(item => item !== self.studentsCheckboxElements[i].value)
+                    }
+                }
+
+                // See whether all the students are selected. If so make the select all checkbox ticked.
+                if (self.selectedStudentIds.length === self.studentsCheckboxElements.length) {
+                    self.selectAllStudentsFlag = true;
+                } else {
+                    self.selectAllStudentsFlag = false;
+                }
+
+                this.updateSendEmailButtonState();
+            },
+            updateSelectedGroups: function(event)
+            {
+
+                var self = this;
+
+                if (!self.groupsCheckboxElements) {
+                    return;
+                }
+
+                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
+                    if (self.groupsCheckboxElements[i].checked) {
+                        if (!self.selectedGroups.includes(self.groupsCheckboxElements[i].value)) {
+                            self.selectedGroups.push(self.groupsCheckboxElements[i].value);
+                        }
+                    } else {
+                        self.selectedGroups = self.selectedGroups.filter(item => item !== self.groupsCheckboxElements[i].value)
+                    }
+                }
+
+                self.updateSendEmailButtonState();
+            },
+            updateSendEmailButtonState: function()
+            {
+                var self = this;
+
+                self.allowEmailSendButton = self.selectedStudentIds.length > 0 && self.selectedGroups.length > 0;
+            },
+            sendEmail: function(event)
+            {
+                var self = this;
+
+                self.fetchEmails();
+            },
+            async fetchEmails(event)
+            {
+                var self = this;
+
+                var endpoint = '';
+
+                var promises = [];
+
+                self.emailLists = [];
+
+                // While the system is preparing the email lists, disable the button
+                self.allowEmailSendButton = false;
+
+                // Prepare endpoints to requests. Loop through the selected groups.
+                for (var i = 0; i < self.selectedGroups.length; i++) {
+                    var groupname = self.selectedGroups[i];
+
+                    switch(groupname) {
+                        case 'students':
+                            endpoint = 'emailStudentsById.php';
+                            break;
+                        case 'parents':
+                            endpoint = 'emailParentsById.php';
+                            break;
+                        case 'housemasters':
+                            endpoint = 'emailHousemastersById.php';
+                            break;
+                    }
+                    promises.push(self.requestData(event, endpoint));
+                }
+
+                await Promise.all(promises);
+
+                // Once all the requests are done, set the ready flag to true.
+                // The watcher will then trigger the submit
+                // More for watchers: https://vuejs.org/v2/guide/computed.html#Watchers
+                self.ready = true
+            },
+            async requestData(event, endpoint)
+            {
+                var self = this;
+
+                if (endpoint !== '') {
+                    return axios.post(self.endpointPrefix + endpoint,
+                        {classCode: self.classCode, allIds: self.selectedStudentIds},
+                        {headers: postHeaders})
+                        .then(function (response) {
+                            if (response.data[0].length > 0) {
+                                self.emailLists.push(response.data);
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            }
+        },
+        watch: {
+            ready: function(val) {
+                this.$refs.form.submit();
+            }
+        }
+    });
+</script>
 
 

@@ -21,14 +21,20 @@ $externalClass = new External_Class();
 $ids = array();
 $emailString = array();
 
+// Receive the POST payload as JSON string and decode the json into an associative array
+$postData = json_decode(file_get_contents('php://input'), true);
+
 /* Find all the students whose parents we'll need to contact
  */
-$allStudents = $externalClass->getStudents($_POST['classCode']);
-if ($allStudents && count($allStudents) && is_array($_POST['allIds']) && count($_POST['allIds'])) {
+$allStudents = $externalClass->getStudents($postData['classCode']);
+
+if ($allStudents && count($allStudents) && is_array($postData['allIds']) && count($postData['allIds'])) {
+
     $userMapper = new \Schoolbox\UserMapper();
     foreach ($allStudents as $currentStudent) {
-        if (in_array($currentStudent['synergy_id'], $_POST['allIds'])) {
+        if (in_array($currentStudent['synergy_id'], $postData['allIds'], true)) {
             $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
+
             if($user->getEmail()) {
                 $emailString[] = $user->getFormattedEmailDisplay();
             }

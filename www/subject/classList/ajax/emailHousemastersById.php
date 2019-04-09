@@ -24,13 +24,16 @@ $externalHandler = new External_User();
 $ids = [];
 $emailString = [];
 
+// Receive the POST payload as JSON string and decode the json into an associative array
+$postData = json_decode(file_get_contents('php://input'), true);
+
 // Find all the students whose housemasters we'll need to contact...
 
-$allStudents = $externalClass->getStudents($_POST['classCode']);
+$allStudents = $externalClass->getStudents($postData['classCode']);
 
-if ($allStudents && count($allStudents) && is_array($_POST['allIds']) && count($_POST['allIds'])) {
+if ($allStudents && count($allStudents) && is_array($postData['allIds']) && count($postData['allIds'])) {
     foreach ($allStudents as $currentStudent) {
-        if (in_array($currentStudent['synergy_id'], $_POST['allIds'])) {
+        if (in_array($currentStudent['synergy_id'], $postData['allIds'])) {
             $ids[] = $currentStudent['synergy_id'];
         }
     }
