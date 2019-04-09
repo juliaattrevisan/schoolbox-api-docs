@@ -456,15 +456,28 @@ Usage:
 {% endautoescape %}
 
 {# Rip outta DOM on load, and remove 'hide' #}
-<div data-applied-filter-tab class="small-6 medium-4 large-2 columns hide">
+<div data-applied-filter-tab class="hide">
     <span class="label filter">
         <span data-filter></span>
         <a href="#" data-close class="close" title="Remove filter">×</a>
     </span>
-    <div><p>{{ label }}</p></div>
-    <div><p>Option 1</p></div>
-    <div><p>Option 2</p></div>
-    <div><p>Option 3</p></div>
+    <div><p>{ filter option }</p></div>
+    <div><p>{ filter option }</p></div>
+    <div><p>{ filter option }</p></div>
+    <div><p>{ filter option }</p></div>
+    <div>
+        <p><a data-reveal-id="filter-options" title="+ { count } more">+ { count } more</a></p>
+    </div>
+</div>
+
+<div id="filter-options" class="reveal-modal" data-reveal>
+    <h2>Selected filters in { filter name }</h2>
+    <ul>
+        <li>{ filter option }</li>
+        <li>{ filter option }</li>
+        <li>{ filter option }</li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
 
 <div class="toast" data-alert data-relation="submit-label"></div>

@@ -566,8 +566,31 @@ ul.filters {
     }
 }
 
+// flex version of columns for filter results
+[data-applied-filters] {
+	display: flex;
+	flex-flow: row wrap;
+	width: 100%;
+
+	[data-applied-filter-tab] {
+		flex: 0 0 50%;
+		float: none;
+		width: auto;
+		padding-left: .5rem;
+		padding-right: .5rem;
+
+		@media #{$medium-up} {
+			flex: 1 1 0px;
+			padding-left: 1rem;
+			padding-right: 1rem;
+		}
+	}
+}
+
 [data-applied-filter-tab] {
 	margin-bottom: 1rem;
+
+
 
 	.filter {
 		margin: 0 0 1px 0;
@@ -590,9 +613,18 @@ ul.filters {
 	border-right: 1px solid $gainsboro;
 	border-top: 1px solid $gainsboro;
 
+	@media #{$medium-down} {
+		border-right: 0;
+		flex: 0 0 100% !important;
+	}
+
 	&.btn {
 		border: 0;
 		flex: 2 auto;
+
+		@media #{$medium-down} {
+			flex: 0 0 100%;
+		}
 	}
 
 	> span {
@@ -647,6 +679,11 @@ ul.filters {
 		max-height: 268px;
 		overflow-x: hidden;
 		overflow-y: scroll;
+
+		@media #{$medium-down} {
+			max-width: 100%;
+			width: 100% !important;
+		}
 	}
 }
 
