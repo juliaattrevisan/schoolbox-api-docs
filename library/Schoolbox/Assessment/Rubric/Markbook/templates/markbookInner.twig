@@ -2,6 +2,7 @@
     isFiltered   bool        Did the session user request a filtered page view?
     assessments  array       Assessment and rubric data
     students     array       Student and rubric mark data
+    exclusions   int[][]     User ids, grouped by assessment.id
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
@@ -62,44 +63,53 @@
                     {% for capabilityId, capability in assessment.capabilities %}
                         <tr class="capability">
                             {% for studentId, student in students %}
-                                {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
-                                {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
-                                {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
-                                {% if capabilityMark is null %}
-                                    {% set gradientClass = "" %}
+                                {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                <td class="excluded"></td>
+                                {% else %}
+                                    {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
+                                    {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
+                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+
+                                    {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
+                                    {% if capabilityMark is null %}
+                                        {% set gradientClass = "" %}
+                                    {% endif %}
+
+                                    <td>
+                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
+                                    </td>
                                 {% endif %}
-
-                                <td>
-                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
-                                </td>
                             {% endfor %}
                         </tr>
 
                         {% for indicatorId, indicator in capability.indicators %}
                             <tr class="indicator">
                                 {% for studentId, student in students %}
-                                    {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
-                                    {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
-                                    {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
-                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
 
-                                    {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
-                                    {% if normalisedIndicatorMark is null %}
-                                        {% set gradientClass = "" %}
+                                    {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                        <td class="excluded"></td>
+                                    {% else %}
+                                        {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
+                                        {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
+                                        {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                        {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+
+                                        {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
+                                        {% if normalisedIndicatorMark is null %}
+                                            {% set gradientClass = "" %}
+                                        {% endif %}
+
+                                        {% set renderedIndicatorMark = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('-') %}
+
+                                        <td{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
+                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ renderedIndicatorMark }}</a>
+                                        </td>
                                     {% endif %}
-
-                                    {% set renderedIndicatorMark = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('-') %}
-
-                                    <td{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
-                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ renderedIndicatorMark }}</a>
-                                    </td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
                     {% endfor %}
-
                 {% endfor %}
             </tbody>
         </table>

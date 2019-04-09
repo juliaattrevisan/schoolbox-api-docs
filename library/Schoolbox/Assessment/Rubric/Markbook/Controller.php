@@ -164,6 +164,7 @@ class Controller extends Base
         $databaseMarks = $this->retrieveDatabaseMarks($assessments);
         $studentMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($studentMarks, $folder);
+        $exclusions    = $this->getExclusions($assessmentIds);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
@@ -173,6 +174,7 @@ class Controller extends Base
                     'isFiltered'  => $isFiltered,
                     'students'    => $studentMarks,
                     'assessments' => $assessments,
+                    'exclusions'  => $exclusions,
                 ]
             )->getAsString(),
         ]));
@@ -557,5 +559,43 @@ class Controller extends Base
         );
 
         return $studentMarks;
+    }
+
+
+    /**
+     * Returns CAP exclusions, grouped by assessment id
+     *
+     * @param array $assessmentIds
+     * @return int[][]
+     * @throws Database\Exception
+     */
+    private function getExclusions(array $assessmentIds): array
+    {
+        $exclusions = [];
+        if (!count($assessmentIds)) {
+            return $exclusions;
+        }
+
+        $bindings = Database\Predicate\Builder::getBindings($assessmentIds, 'a_id');
+        $sql      = "
+            SELECT
+                a.id      AS assessment_id,
+                p.user_id AS user_id
+            FROM participant p
+            INNER JOIN participant_plan pp ON p.participant_plan_id = pp.id
+            INNER JOIN assessment a        ON pp.assessment_id      = a.id
+            WHERE
+                pp.assessment_id IN ({$bindings->getPlaceholder()}) AND
+                p.excluded_at IS NOT NULL AND
+                pp.deleted_at IS NULL AND
+                a.deleted_at IS NULL;
+        ";
+
+        $statement = $this->internalDb->executeQuery($sql, $bindings->getParams());
+        /** @noinspection PhpAssignmentInConditionInspection */
+        while ($row = $statement->fetch()) {
+            $exclusions[$row['assessment_id']][] = (int)$row['user_id'];
+        }
+        return $exclusions;
     }
 }
