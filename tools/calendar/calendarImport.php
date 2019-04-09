@@ -29,7 +29,7 @@ $kernel = new CliTool\Kernel(
 //    --role:       Comma-seperated list of role IDs that the events should be shown to
         private const OPT_LONG_ROLE = 'role:';
 //    --source:     Optional source name, subsequent uploads will delete any events with the same source name
-        private const OPT_LONG_SOURCE = 'source:';
+        private const OPT_LONG_SOURCE = 'source::';
 
         /** @inheritdoc */
         public function getLongOpts(): array
@@ -68,7 +68,7 @@ HELP;
                 }
 
                 if (!$this->getOpt(self::OPT_LONG_ROLE)) {
-                    $log->error("No role specified. (Use --hhelp for example usage)\n");
+                    $log->error("No role specified. (Use --help for example usage)\n");
                     exit(1);
                 } else {
                     $groupList = explode(',', $this->getOpt(self::OPT_LONG_ROLE));
