@@ -17,8 +17,7 @@ use TypeError;
  * * a single folder, which is part of the URL/route
  * * multiple folders, which are GET params/filter options
  *
- * If the former, the folder model is inserted into the factory at construction time.
- * If the latter, the folder selections are inserted into the factory's buildSelections() method at run-time
+ * In both cases, route args and request params are injected into this factory's buildComponent() method.
  */
 abstract class Factory extends Filter\AbstractFactory
 {
