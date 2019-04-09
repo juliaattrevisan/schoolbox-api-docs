@@ -273,7 +273,8 @@ class Controller extends BaseController
     private function retrieveCommentList(Model $thread, ?string $encodedCursor): array
     {
         $cursor   = new Comment\Cursor($this->commentMapper, $thread, Comment\Cursor::ORDER_DESC);
-        $comments = $cursor->retrieveResults($encodedCursor);
+        $comments = $cursor->retrieveResults($encodedCursor)
+                           ->map([$this->commentWrapperFactory, 'build']);
         return [
             'data'     => $comments->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
@@ -296,7 +297,7 @@ class Controller extends BaseController
      */
     private function buildResponse(Model $thread, bool $loadChildren): void
     {
-        $responseData             = $thread->jsonSerialize(
+        $responseData             = $this->wrapperFactory->build($thread)->jsonSerialize(
             $this->retrieveJsonDecorator(),
             $this->retrieveLinkDecorator()
         );
