@@ -60,6 +60,8 @@ $kernel = new CliTool\Kernel(
             ];
         }
 
+
+        /** @inheritdoc */
         public function run(): void
         {
             $log = $this->getLogger();
