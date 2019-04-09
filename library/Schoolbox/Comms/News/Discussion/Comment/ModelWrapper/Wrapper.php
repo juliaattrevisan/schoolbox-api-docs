@@ -24,7 +24,7 @@ class Wrapper extends BaseWrapper
     {
         return [
             'delete' => new AuraLink(
-                'discussionComments.deleteComment',
+                'commsDiscussionComments.deleteComment',
                 [
                     'id'        => $this->model->getId(),
                     'comment'   => $this->model,
