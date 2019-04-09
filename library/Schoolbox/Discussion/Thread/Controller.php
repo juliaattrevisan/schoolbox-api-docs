@@ -101,11 +101,12 @@ class Controller extends BaseController
      * @api   GET /discussion/{contextType}/{contextId}/threads/{id}
      * @level 190
      *
-     * @param Model $thread
+     * @param Model    $thread
+     * @param IContext $context
      */
-    public function getThread(Model $thread): void
+    public function getThread(Model $thread, IContext $context): void
     {
-        $this->buildResponse($thread, true);
+        $this->buildResponse($thread, $context, true);
     }
 
 
@@ -126,7 +127,7 @@ class Controller extends BaseController
             ->setOpen($data->open);
         $this->threadMapper->save($thread);
         $this->context->associate($thread, $context);
-        $this->buildResponse($thread, false);
+        $this->buildResponse($thread, $context, false);
     }
 
 
@@ -136,11 +137,12 @@ class Controller extends BaseController
      * @api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @level 190
      *
-     * @param Model $thread
+     * @param Model    $thread
+     * @param IContext $context
      */
-    public function getCommentsByThread(Model $thread): void
+    public function getCommentsByThread(Model $thread, IContext $context): void
     {
-        $responseData = $this->retrieveCommentList($thread, $this->request->query->get('cursor'));
+        $responseData = $this->retrieveCommentList($thread, $context, $this->request->query->get('cursor'));
 
         // Clean-up every content before returning the result
         foreach ($responseData['data'] as $key => $data) {
@@ -267,16 +269,17 @@ class Controller extends BaseController
      * Retrieve a list of comments as an array for later output.
      *
      * @param Model       $thread
+     * @param IContext    $context
      * @param string|null $encodedCursor
      * @return array
      */
-    private function retrieveCommentList(Model $thread, ?string $encodedCursor): array
+    private function retrieveCommentList(Model $thread, IContext $context, ?string $encodedCursor): array
     {
         $cursor   = new Comment\Cursor($this->commentMapper, $thread, Comment\Cursor::ORDER_DESC);
-        $comments = $cursor->retrieveResults($encodedCursor)
-                           ->map([$this->commentWrapperFactory, 'build']);
+        $comments = $cursor->retrieveResults($encodedCursor);
         return [
-            'data'     => $comments->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'data'     => $comments->map([$this->commentWrapperFactory, 'build'])
+                                   ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
@@ -292,17 +295,18 @@ class Controller extends BaseController
      * Builds a response for this thread, putting it into
      * `$this->response->content`.
      *
-     * @param Model $thread
-     * @param bool  $loadChildren
+     * @param Model    $thread
+     * @param IContext $context
+     * @param bool     $loadChildren
      */
-    private function buildResponse(Model $thread, bool $loadChildren): void
+    private function buildResponse(Model $thread, IContext $context, bool $loadChildren): void
     {
-        $responseData             = $this->wrapperFactory->build($thread)->jsonSerialize(
+        $responseData             = $this->wrapperFactory->build($thread, $context)->jsonSerialize(
             $this->retrieveJsonDecorator(),
             $this->retrieveLinkDecorator()
         );
         $responseData['children'] = $loadChildren
-            ? $this->retrieveCommentList($thread, null)
+            ? $this->retrieveCommentList($thread, $context, null)
             : [];
         $this->response->content->set(
             $this->isJsonRequest()
