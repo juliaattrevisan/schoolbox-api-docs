@@ -32,7 +32,6 @@ use UnderflowException;
 use Schoolbox\Filter;
 use Aura\Router;
 use DomainException;
-use ReflectionException;
 use UnexpectedValueException;
 
 class Controller extends Base
@@ -106,7 +105,6 @@ class Controller extends Base
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws UnderflowException
      * @throws DomainException
-     * @throws ReflectionException
      * @throws UnexpectedValueException
      */
     public function getMarkbook(Folder\Model $folder): void
@@ -145,7 +143,6 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws PDOException
-     * @throws ReflectionException
      * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws UnderflowException
      * @throws UnexpectedValueException
@@ -180,7 +177,6 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
-     * @throws ReflectionException
      * @throws UnexpectedValueException
      */
     private function getAssessmentIds(int $folderId, array $request): array
