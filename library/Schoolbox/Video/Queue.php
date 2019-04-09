@@ -25,10 +25,8 @@ class Queue extends ResourceVideo
     use UpdatedAtDate;
 
     /** Define external application names we will use */
-    const APPLICATION_AVCONV = 'avconv';
-    const APPLICATION_AVPROBE = 'ffprobe';
-    const APPLICATION_FFMPEG = 'ffmpeg';
-    const APPLICATION_FFPROBE = 'ffprobe';
+    private const APPLICATION_FFMPEG = 'ffmpeg';
+    private const APPLICATION_FFPROBE = 'ffprobe';
 
     /** Maximum allowed timeout for processing video, 1 day */
     const MAX_TIMEOUT = 86400;
@@ -59,16 +57,10 @@ class Queue extends ResourceVideo
     private $processTimeout;
 
     /** @var string $converterExec Primary binary program used for conversion */
-    private $converterExec = self::APPLICATION_AVCONV;
-
-    /** @var string $fallbackConv Secondary fallback used for conversion */
-    private $fallbackConv = self::APPLICATION_FFMPEG;
+    private $converterExec =  self::APPLICATION_FFMPEG;
 
     /** @var string $info Primary binary used to finding out details of provided file */
-    private $infoExec = self::APPLICATION_AVPROBE;
-
-    /** @var string $fallbackInfo Secondary fallback binary for finding out details of provided file */
-    private $fallbackInfo = self::APPLICATION_FFPROBE;
+    private $infoExec = self::APPLICATION_FFPROBE;
 
     /** @var array Array of temporary files created during transcode */
     private $temporaryFiles = [];
@@ -270,7 +262,7 @@ class Queue extends ResourceVideo
 
         $commandMediaInformation           = $this->getCommandMediaInformation();
         $commandTranscode                  = $this->getCommandTranscode();
-        $strictMode                        = $commandTranscode == self::APPLICATION_FFMPEG ? " -strict -2 " : "";
+        $strictMode                        = " -strict -2 ";
         $videoBitrateEscaped               = escapeshellarg("{$this->videoBitrate}k");
         $audioBitrateEscaped               = escapeshellarg("{$this->audioBitrate}k");
         $processTimeoutEscaped             = escapeshellarg($this->processTimeout);
@@ -586,29 +578,29 @@ class Queue extends ResourceVideo
     /**
      * Returns the filename of the utility used to perform the media transcode
      *
-     * @return string
+     * @return null|string
      */
-    private function getCommandTranscode()
+    private function getCommandTranscode(): ?string
     {
         if ($this->isCommandAvailable($this->converterExec)) {
             return $this->converterExec;
-        } else {
-            return $this->fallbackConv;
         }
+
+        return null;
     }
 
     /**
      * Returns the filename of the utility used to retrieve media information
      *
-     * @return string
+     * @return null|string
      */
-    private function getCommandMediaInformation()
+    private function getCommandMediaInformation(): ?string
     {
         if ($this->isCommandAvailable($this->infoExec)) {
             return $this->infoExec;
-        } else {
-            return $this->fallbackInfo;
         }
+
+        return null;
     }
 
     /**

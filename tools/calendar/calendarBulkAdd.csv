@@ -1,0 +1,5 @@
+Start Date,Start Time,Finish Date,Finish Time,All Day,Name,Detail,Location,Type,Publish Date,Attendance
+10/04/2019,21:21,10/04/2019,22:22,0,Cat,The first event,Sydney,1,01/04/2019,1
+15/05/2019,22:22,15/05/2019,23:23,0,Dog,The second event,Melbourne,2,,1
+12/12/2019,,12/12/2019,,1,Horse,The third event,Brisbane,3,,0
+12/12/2019,,12/12/2019,,1,Elephant,The fourth event,Adelaide,1,,0
