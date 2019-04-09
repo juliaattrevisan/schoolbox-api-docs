@@ -90,15 +90,11 @@
                                         {% set gradientClass = "" %}
                                     {% endif %}
 
-                                    {% if descriptorText %}
-                                        <td title="{{ descriptorText }}">
-                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ indicatorMark|default('✓') }}</a>
-                                        </td>
-                                    {% else %}
-                                        <td>
-                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ indicatorMark|default('-') }}</a>
-                                        </td>
-                                    {% endif %}
+                                    {% set renderedIndicatorMark = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('-') %}
+
+                                    <td{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
+                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ renderedIndicatorMark }}</a>
+                                    </td>
                                 {% endfor %}
                             </tr>
                         {% endfor %}
