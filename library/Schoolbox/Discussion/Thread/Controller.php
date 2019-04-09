@@ -278,8 +278,11 @@ class Controller extends BaseController
         $cursor   = new Comment\Cursor($this->commentMapper, $thread, Comment\Cursor::ORDER_DESC);
         $comments = $cursor->retrieveResults($encodedCursor);
         return [
-            'data'     => $comments->map([$this->commentWrapperFactory, 'build'])
-                                   ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'data'     => $comments
+                ->map(function (Comment\Model $comment) use ($context) {
+                    return $this->commentWrapperFactory->build($comment, $context);
+                })
+                ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
