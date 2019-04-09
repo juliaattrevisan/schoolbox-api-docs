@@ -20,7 +20,8 @@ use Schoolbox\Discussion\Thread\Context\IContext;
 class Factory implements IFactory
 {
     /**
-     * @param Model $model
+     * @param Model    $model
+     * @param IContext $context
      * @return BaseWrapper
      */
     public function build(Model $model, IContext $context): BaseWrapper
