@@ -41,6 +41,7 @@ SELECT
   -- Only valid rubric marks
   WHERE
     a.deleted_at IS NULL AND
+    sb.use_rubric IS TRUE AND
     rg.deleted_at IS NULL AND
     rc.deleted_at IS NULL AND
     rd.deleted_at IS NULL

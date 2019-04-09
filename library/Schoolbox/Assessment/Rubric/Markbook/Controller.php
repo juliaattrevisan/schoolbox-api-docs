@@ -8,16 +8,17 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
+use function array_keys;
 use function array_merge;
 use Aura\Di\Exception\ServiceNotFound;
 use function count;
 use function func_get_args;
+use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Column\Boolean;
+use Schoolbox\Column\Decimal;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
@@ -70,12 +71,6 @@ class Controller extends Base
     /** @var Filter\Filters\Assessment\IdFinder */
     private $assessmentIdFinder;
 
-    /** @var Assessment\MapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var RubricMapper */
-    private $rubricMapper;
-
 
     /**
      * Constructor
@@ -86,8 +81,6 @@ class Controller extends Base
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      * @param Filter\Selection\Mapper                  $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
-     * @param Assessment\MapperProxy                   $assessmentMapperProxy
-     * @param RubricMapper                             $rubricMapper
      */
     public function __construct(
         IConnector $internalDb,
@@ -95,9 +88,7 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Assessment\MapperProxy $assessmentMapperProxy,
-        RubricMapper $rubricMapper
+        Filter\Filters\Assessment\IdFinder $assessmentIdFinder
     ) {
         $this->internalDb            = $internalDb;
         $this->gradeGroupMapper      = $gradeGroupMapper;
@@ -105,8 +96,6 @@ class Controller extends Base
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->rubricMapper          = $rubricMapper;
     }
 
 
@@ -164,20 +153,23 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      * @throws UnexpectedValueException
+     * @throws LogicException
      */
     public function postMarkbook(Folder\Model $folder): void
     {
-        $dueWorkAssessmentIds = $this->getDueWorkAssessmentIds($folder->getId(), $this->request->post['filter_selection'] ?: []);
-        $dueWorks             = $this->retrieveDueWorksInFolder($dueWorkAssessmentIds);
-        $students             = $this->retrieveStudentsAndMarksInFolder($folder, $dueWorks);
+        $assessmentIds = $this->getAssessmentIds($folder->getId(), $this->request->post['filter_selection'] ?: []);
+        $assessments   = $this->buildAssessmentData($assessmentIds);
+        $databaseMarks = $this->retrieveDatabaseMarks($assessments);
+        $studentMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
+        $studentMarks  = $this->insertFolderMembers($studentMarks, $folder);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
             'content' => $this->buildUnthemedHtmlOutput(
                 '@rubricMarkbook/markbookInner.twig',
                 [
-                    'students'    => $students,
-                    'assessments' => $dueWorks,
+                    'students'    => $studentMarks,
+                    'assessments' => $assessments,
                 ]
             )->getAsString(),
         ]));
@@ -189,15 +181,16 @@ class Controller extends Base
      *
      * @param int   $folderId
      * @param array $request
-     * @return array
+     * @return int[]
      * @throws DomainException
      * @throws Filter\BrokenFilterException
      * @throws InvalidArgumentException
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
+     * @throws LogicException
      */
-    private function getDueWorkAssessmentIds(int $folderId, array $request): array
+    private function getAssessmentIds(int $folderId, array $request): array
     {
         $page                = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
         $codec               = $this->filterFactoryFactory->buildCodec();
@@ -238,127 +231,147 @@ class Controller extends Base
     }
 
     /**
-     * Find all the assessments for a given folder, and return them indexed by assessment ID
+     * Fetch assessment data, and return it indexed by assessment ID
      *
-     * @param int[] $dueWorkAssessmentIds
+     * @param int[] $assessmentIds
      * @return array
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function retrieveDueWorksInFolder(array $dueWorkAssessmentIds) : array
+    private function buildAssessmentData(array $assessmentIds): array
     {
-        $assessmentData = [];
-        if(!count($dueWorkAssessmentIds)){
-            return $assessmentData;
+        $assessments = [];
+        if(!count($assessmentIds)){
+            return $assessments;
         }
 
-        /** @var DueWork\Model[] $dueWorks */
-        $dueWorks = $this->assessmentMapperProxy->findAllByIds($dueWorkAssessmentIds);
+        $pb  = Database\Predicate\Builder::getBindings($assessmentIds, 'a_id');
+        $sql = "
+            SELECT
+                vr.assessment_id             AS assessment_id,
+                vr.assessment_grade_group_id AS assessment_grade_group_id,
+                sb.name                      AS assessment_name,
+                sb.max_mark                  AS assessment_max_mark,
+                sb.mark_type                 AS assessment_mark_type,
+                sb.submission_grade_group_id AS assessment_grade_group_id,
+                sb.rubric_group_marks        AS assessment_rubric_group_marks,
+                vr.capability_id             AS capability_id,
+                vr.capability_name           AS capability_name,
+                vr.indicator_id              AS indicator_id,
+                vr.indicator_name            AS indicator_name,
+                vr.indicator_max_value       AS indicator_max_value
+            FROM v_rubric vr
+            JOIN submission_box sb ON sb.assessment_id = vr.assessment_id
+            WHERE vr.assessment_id IN ({$pb->getPlaceholder()})
+            ORDER BY vr.assessment_id, vr.capability_id
+        ";
+        $stmt = $this->internalDb->prepareQuery($sql);
 
-        foreach($dueWorks as $dueWork){
-            // TODO write a function on the rubric mapper to do this for a set of assessments in a single query
-            // eg findByPredicate('assessment_id', [1,2,3])
-            $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
-        }
+        $capabilities = [];
+        $indicators   = [];
 
-        foreach($dueWorks as $dueWork){
-            if(!$dueWork->getUseRubric()){
-                // TODO This should be a filter to not load the assessment in the first place if it doesn
-                continue;
+        $lastObservedAssessmentId = null;
+        $lastObservedCapabilityId = null;
+
+        foreach($stmt->getIterator($pb->getParams()) as $row) {
+            if ($lastObservedAssessmentId !== $row['assessment_id']) {
+                // Has the assessment we're looking at changed? Reset the capabilities
+                $capabilities = [];
             }
+
+            if ($lastObservedCapabilityId !== $row['capability_id']) {
+                // Has the capability we're looking at changed? Reset the indicators
+                $indicators = [];
+            }
+
+            $indicators[$row['indicator_id']] = [
+                'name' => $row['indicator_name'],
+            ];
+
+            $capabilities[$row['capability_id']] = [
+                'name'       => $row['capability_name'],
+                'indicators' => $indicators,
+            ];
 
             // Stuff everything about the assessment into an array
-            $assessmentId = $dueWork->getId();
-            $gradeGroup = $dueWork->getGradeGroup();
-
-            /** @var Grid $rubricGrid */
-            $rubricGrid = $dueWork->getRubricGrid();
-
-            $capabilities = [];
-            foreach ($rubricGrid->getCapabilityUsages() as $capabilityUsage) {
-                $indicators = [];
-                foreach($capabilityUsage->getIndicatorUsages() as $indicatorUsage){
-                    $indicator = $indicatorUsage->getIndicator();
-                    $indicators[$indicator->getId()] = [
-                        'name' => $indicator->getName(),
-                    ];
-                }
-                $capability                         = $capabilityUsage->getCapability();
-                $capabilities[$capability->getId()] = [
-                    'name'       => $capability->getName(),
-                    'indicators' => $indicators,
-                ];
-            }
-            $assessmentData[$assessmentId] = [
-                'name'           => $dueWork->getTitle(),
-                'statusLink'     => $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessmentId]),
-                'maxMark'        => $dueWork->getMaxMark(),
-                'markType'       => $dueWork->getMarkType()->getId(),
-                'gradeGroupId'   => $gradeGroup ? $gradeGroup->getId() : null,
-                'usesMarkPerCap' => $rubricGrid->isMarkPerCapability(),
-                'capabilities'   => $capabilities,
+            $assessments[$row['assessment_id']] = [
+                'name'           => $row['assessment_name'],
+                'statusLink'     => $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $row['assessment_id']]),
+                'maxMark'        => $row['assessment_max_mark'],
+                'markType'       => $row['assessment_mark_type'],
+                'gradeGroupId'   => $row['assessment_grade_group_id'],
+                'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
+                'capabilities'   => $capabilities
             ];
+
+            $lastObservedAssessmentId = $row['assessment_id'];
+            $lastObservedCapabilityId = $row['capability_id'];
         }
 
         uasort(
-            $assessmentData,
+            $assessments,
             static function (array $a, array $b): int {
                 return strnatcmp($a['name'], $b['name']);
             }
         );
-        return $assessmentData;
+        return $assessments;
     }
 
 
     /**
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
-     * @param Folder\Model $folder
-     * @param array        $assessmentsInFolder
+     * @param int[] $assessments
      * @return array
-     * @throws InvalidArgumentException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws PDOException
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws UnderflowException
      * @throws Database\Exception
      */
-    private function retrieveStudentsAndMarksInFolder(Folder\Model $folder, array $assessmentsInFolder): array
+    private function retrieveDatabaseMarks(array $assessments): array
     {
-        $getAuthoritativeMarksInFolderQuery = $this->internalDb->prepareQuery(
-            "SELECT var.assessment_id,
-            vrm.student_id,
-            u.firstname AS student_firstname,
-            u.lastname AS student_lastname,
-            vrm.capability_id,
-            vrm.capability_mark,
-            vrm.indicator_id,
-            vrm.indicator_mark,
-            vrm.descriptor_name,
-            vrm.capability_max_value,
-            vrm.indicator_max_value
-            FROM       v_rubric_mark vrm
-            INNER JOIN v_assessment_relation var ON vrm.assessment_id = var.assessment_id
-            INNER JOIN v_most_recent_feedback vmrf ON var.assessment_id = vmrf.assessment_id 
-                AND vrm.student_id = vmrf.student_id
-                AND vrm.feedback_id = vmrf.feedback_id
-            INNER JOIN user u ON u.id = vrm.student_id
-            WHERE      var.folder_id=:folderId AND vrm.feedback_type=:instructorReviewRoute AND vrm.feedback_deleted_at IS NULL
-            ORDER BY vrm.student_id, var.assessment_id, vrm.capability_id, vrm.indicator_id"
-        );
+        $assessmentPb = Database\Predicate\Builder::getBindings(array_keys($assessments), 'a_id');
+        $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
+            SELECT
+                vrm.assessment_id        AS assessment_id,
+                vrm.student_id           AS student_id,
+                u.firstname              AS student_firstname,
+                u.lastname               AS student_lastname,
+                vrm.capability_id        AS capability_id,
+                vrm.capability_mark      AS capability_mark,
+                vrm.capability_max_value AS capability_max_value,
+                vrm.descriptor_name      AS descriptor_name,
+                vrm.indicator_id         AS indicator_id,
+                vrm.indicator_mark       AS indicator_mark,
+                vrm.indicator_max_value  AS indicator_max_value
+            FROM (
+                SELECT
+                    sb.assessment_id,
+                    sr.owner AS student_id,
+                    MAX(sr.published_at) AS max_published_at
+                FROM submission_return sr
+                INNER JOIN submission_box sb on sr.box_id = sb.id
+                WHERE
+                      sr.published_at IS NOT NULL AND
+                      sr.review_route = :review_route
+                GROUP BY sb.assessment_id, sr.owner
+            ) latest_feedback
+            INNER JOIN v_rubric_mark vrm ON vrm.feedback_date = latest_feedback.max_published_at
+            INNER JOIN user u ON vrm.student_id = u.id
+            WHERE
+              vrm.feedback_type = :review_route AND
+              vrm.assessment_id IN ({$assessmentPb->getPlaceholder()})
+            ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
+            ");
 
-        $getAuthoritativeMarksInFolderQuery->execute(['folderId' => $folder->getId(), 'instructorReviewRoute' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
+        $getAuthoritativeMarksQuery->execute(array_merge($assessmentPb->getParams(), ['review_route' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]));
 
-        $students = [];
+        $students              = [];
         $assessmentsForStudent = [];
-        $capabilityMarks = [];
-        $indicatorMarks = [];
+        $capabilityMarks       = [];
+        $indicatorMarks        = [];
 
         $lastObservedAssessmentId = null;
         $lastObservedCapabilityId = null;
-        $lastObservedStudentId = null;
+        $lastObservedStudentId    = null;
 
-        foreach ($getAuthoritativeMarksInFolderQuery->getIterator() as $i => $row) {
+        foreach ($getAuthoritativeMarksQuery->getIterator() as $i => $row) {
             if ($lastObservedStudentId !== $row['student_id']) {
                 // Has the student we're looking at changed? Reset the list of assessments for them
                 $assessmentsForStudent = [];
@@ -375,15 +388,15 @@ class Controller extends Base
             }
 
             $indicatorMarks[$row['indicator_id']] = [
-                'databaseMark' => $row['indicator_mark'],
-                'maxMark'      => $row['indicator_max_value'],
-                'selectedDescriptorText' => $row['descriptor_name']
+                'databaseMark'           => $row['indicator_mark'],
+                'maxMark'                => $row['indicator_max_value'],
+                'selectedDescriptorText' => $row['descriptor_name'],
             ];
 
             $capabilityMarks[$row['capability_id']] = [
                 'databaseMark' => $row['capability_mark'],
-                'maxMark'       => $row['capability_max_value'],
-                'indicators' => $indicatorMarks
+                'maxMark'      => $row['capability_max_value'],
+                'indicators'   => $indicatorMarks,
             ];
 
             $assessmentsForStudent[$row['assessment_id']] = [
@@ -392,44 +405,31 @@ class Controller extends Base
 
             // Stuff everything about the students marks into an array
             $students[$row['student_id']] = [
-                'firstname' => $row['student_firstname'],
-                'lastname' => $row['student_lastname'],
+                'firstname'   => $row['student_firstname'],
+                'lastname'    => $row['student_lastname'],
                 'assessments' => $assessmentsForStudent,
-                'profileLink' => '/search/user/' . $row['student_id']
+                'profileLink' => '/search/user/' . $row['student_id'],
             ];
 
             $lastObservedAssessmentId = $row['assessment_id'];
             $lastObservedCapabilityId = $row['capability_id'];
-            $lastObservedStudentId = $row['student_id'];
+            $lastObservedStudentId    = $row['student_id'];
         }
-
-        // Combine students who have marks with those who are in the class or group, but have no marks yet
-        $allUsersInFolder = $this->retrieveAllUsersInFolder($folder);
-        foreach($allUsersInFolder as $user) {
-            $userId = $user->getId();
-            if (! isset($students[$userId])) {
-                $students[$userId] = [
-                    'firstname' => $user->getFirstname(),
-                    'lastname' => $user->getLastname(),
-                    'profileLink' => '/search/user/' . $userId,
-                    'assessments' => []
-                ];
-            }
-        }
-
-        return $this->generateHumanReadableMarks($students, $assessmentsInFolder);
+        return $students;
     }
 
     /**
      * Work out the human readable marks from the raw marks and insert them into the student marks array
      *
-     * @return array
      * @param array $students
-     * @param array $assessmentsInFolder
+     * @param array $assessments
+     * @return array
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function generateHumanReadableMarks(array $students, array $assessmentsInFolder) : array
+    private function generateHumanReadableMarks(array $students, array $assessments) : array
     {
+        $decimalHydrator   = new Decimal();
+        $booleanHydrator   = new Boolean();
         $markSchemeFactory = new MarkScheme\Factory();
 
         foreach($students as $studentId => $student) {
@@ -441,13 +441,13 @@ class Controller extends Base
                 );
                 $students[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
 
-                $assessmentMaxMark = $assessmentsInFolder[$assessmentId]['maxMark'];
-                $assessmentMarkType = $assessmentsInFolder[$assessmentId]['markType'];
-                $assessmentUsesMarkPerCap = $assessmentsInFolder[$assessmentId]['usesMarkPerCap'];
+                $assessmentMaxMark        = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
+                $assessmentMarkType       = $assessments[$assessmentId]['markType'];
+                $assessmentUsesMarkPerCap = $booleanHydrator->hydrate($assessments[$assessmentId]['usesMarkPerCap']);
 
                 // Create some things the markscheme factory wants our Due Work to have
                 try {
-                    $gradeGroup = $this->gradeGroupMapper->findById($assessmentsInFolder[$assessmentId]['gradeGroupId']);
+                    $gradeGroup = $this->gradeGroupMapper->findById($assessments[$assessmentId]['gradeGroupId']);
                 } catch (Mapper\Exception $e) {
                     $gradeGroup = null;
                 }
@@ -458,7 +458,7 @@ class Controller extends Base
                 // Fill out a Due Work with the data we need for the markscheme factory to work
                 $stubAssessment = new DueWork\Model();
                 $stubAssessment->setId($assessmentId);
-                $stubAssessment->setMarkPerCapability((bool)$assessmentUsesMarkPerCap);
+                $stubAssessment->setMarkPerCapability($assessmentUsesMarkPerCap);
                 $stubAssessment->setMaxMark($assessmentMaxMark);
                 $stubAssessment->setMarkType($markType);
                 if ($gradeGroup !== null) {
@@ -466,10 +466,10 @@ class Controller extends Base
                 }
 
                 foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
-                    $capabilityDatabaseMark = $capabilityMarks['databaseMark'] === null ? null : (float)$capabilityMarks['databaseMark'];
+                    $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
 
                     if ($capabilityDatabaseMark !== null) {
-                        $capabilityMaxMark = $capabilityMarks['maxMark'] === null ? null : (float)$capabilityMarks['maxMark'];
+                        $capabilityMaxMark = $decimalHydrator->hydrate($capabilityMarks['maxMark']);
 
                         $capabilityUsageModel = new CapabilityUsage(new Capability());
                         $capabilityUsageModel->setMaxValue($capabilityMaxMark);
@@ -507,17 +507,47 @@ class Controller extends Base
                     }
                 }
             }
-
         }
-
-        uasort(
-            $students,
-            function (array $a, array $b) : int {
-                return strnatcmp($a['lastname'], $b['lastname']);
-            }
-        );
 
         return $students;
     }
 
+
+    /**
+     * Combine students who have marks with those who are in the class or group, but have no marks yet
+     *
+     * @param array        $studentMarks
+     * @param Folder\Model $folder
+     * @return array
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws InvalidArgumentException
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws PDOException
+     * @throws UnderflowException
+     */
+    private function insertFolderMembers(array $studentMarks, Folder\Model $folder): array
+    {
+        $studentsAndLearners = $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
+        foreach ($studentsAndLearners as $user) {
+            $userId = $user->getId();
+            if (!isset($studentMarks[$userId])) {
+                $studentMarks[$userId] = [
+                    'firstname'   => $user->getFirstname(),
+                    'lastname'    => $user->getLastname(),
+                    'profileLink' => '/search/user/' . $userId,
+                    'assessments' => [],
+                ];
+            }
+        }
+
+        uasort(
+            $studentMarks,
+            static function (array $a, array $b): int {
+                return strnatcmp($a['lastname'], $b['lastname']);
+            }
+        );
+
+        return $studentMarks;
+    }
 }

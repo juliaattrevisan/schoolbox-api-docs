@@ -11,7 +11,6 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
@@ -101,9 +100,7 @@ class Module extends BaseModule
                 return Filter\Filters\Assessment\IdFinder::getInstance(
                     $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
                 );
-            }),
-            'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            })
         ];
     }
 
