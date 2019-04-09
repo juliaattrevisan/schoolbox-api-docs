@@ -441,6 +441,7 @@ class Controller extends Base
         $decimalHydrator   = new Decimal();
         $booleanHydrator   = new Boolean();
         $markSchemeFactory = new MarkScheme\Factory();
+        $totalMarkScheme   = new MarkScheme\TotalMarkFractional(null);
 
         foreach($students as $studentId => $student) {
 
@@ -498,20 +499,17 @@ class Controller extends Base
                     }
 
                     foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
-                        $indicatorMaxMark = $indicatorMarks['maxMark'];
-                        $indicatorDatabaseMark = $indicatorMarks['databaseMark'];
+                        $indicatorMaxMark      = $decimalHydrator->hydrate($indicatorMarks['maxMark']);
+                        $indicatorDatabaseMark = $decimalHydrator->hydrate($indicatorMarks['databaseMark']);
 
-                        // This is always just a "total mark" type, so we can work this out ourselves
-                        // No need for creating all the models in order to calculate it -
-                        // and indeed the overhead in doing so is prohibitive
-                        $humanReadableIndicatorMark = $indicatorDatabaseMark !== null
-                            ? round($indicatorDatabaseMark, 2) . ' / ' . round($indicatorMaxMark)
-                            : null;
-                        $normalisedIndicatorMark = $indicatorMaxMark !== 0
-                            && $indicatorMaxMark !== null
-                            && $indicatorDatabaseMark !== null
+                        $totalMarkScheme->setTotalMark($indicatorMaxMark);
+
+                        $normalisedIndicatorMark = $indicatorMaxMark !== 0 && $indicatorMaxMark !== null && $indicatorDatabaseMark !== null
                             ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
                             : null;
+
+                        $humanReadableIndicatorMark = $totalMarkScheme->getHumanReadableMark($normalisedIndicatorMark);
+
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] = $normalisedIndicatorMark;
                     }
