@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
-use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use function array_merge;
 use Aura\Di\Exception\ServiceNotFound;
@@ -15,13 +14,16 @@ use function count;
 use function func_get_args;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Permission\Access\UserAccess;
@@ -31,6 +33,8 @@ use Alaress\Database;
 use InvalidArgumentException;
 use PDOException;
 use Schoolbox\Mapper;
+use function strnatcmp;
+use function uasort;
 use UnderflowException;
 use Schoolbox\Filter;
 use Aura\Router;
@@ -66,6 +70,12 @@ class Controller extends Base
     /** @var Filter\Filters\Assessment\IdFinder */
     private $assessmentIdFinder;
 
+    /** @var Assessment\MapperProxy */
+    private $assessmentMapperProxy;
+
+    /** @var RubricMapper */
+    private $rubricMapper;
+
 
     /**
      * Constructor
@@ -76,6 +86,8 @@ class Controller extends Base
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      * @param Filter\Selection\Mapper                  $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
+     * @param Assessment\MapperProxy                   $assessmentMapperProxy
+     * @param RubricMapper                             $rubricMapper
      */
     public function __construct(
         IConnector $internalDb,
@@ -83,7 +95,9 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder
+        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        Assessment\MapperProxy $assessmentMapperProxy,
+        RubricMapper $rubricMapper
     ) {
         $this->internalDb            = $internalDb;
         $this->gradeGroupMapper      = $gradeGroupMapper;
@@ -91,6 +105,8 @@ class Controller extends Base
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->assessmentIdFinder    = $assessmentIdFinder;
+        $this->assessmentMapperProxy = $assessmentMapperProxy;
+        $this->rubricMapper          = $rubricMapper;
     }
 
 
@@ -146,26 +162,25 @@ class Controller extends Base
      * @throws Mapper\DefinitionException
      * @throws Mapper\Exception
      * @throws PDOException
-     * @throws ServiceNotFound If unable to locate HTML web Output
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
     public function postMarkbook(Folder\Model $folder): void
     {
-        $assessmentIds = $this->getAssessmentIds($folder->getId(), $this->request->post['filter_selection'] ?: []);
-        $assessments   = $this->retrieveAssessmentsInFolder($assessmentIds);
-        $students      = $this->retrieveStudentsAndMarksInFolder($folder, $assessments);
+        $dueWorkAssessmentIds = $this->getDueWorkAssessmentIds($folder->getId(), $this->request->post['filter_selection'] ?: []);
+        $dueWorks             = $this->retrieveDueWorksInFolder($dueWorkAssessmentIds);
+        $students             = $this->retrieveStudentsAndMarksInFolder($folder, $dueWorks);
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'status'  => 200,
+            'content' => $this->buildUnthemedHtmlOutput(
                 '@rubricMarkbook/markbookInner.twig',
                 [
                     'students'    => $students,
-                    'assessments' => $assessments,
-                    'folder'      => $folder,
+                    'assessments' => $dueWorks,
                 ]
-            )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
-        );
+            )->getAsString(),
+        ]));
     }
 
 
@@ -182,7 +197,7 @@ class Controller extends Base
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
      */
-    private function getAssessmentIds(int $folderId, array $request): array
+    private function getDueWorkAssessmentIds(int $folderId, array $request): array
     {
         $page                = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
         $codec               = $this->filterFactoryFactory->buildCodec();
@@ -225,94 +240,72 @@ class Controller extends Base
     /**
      * Find all the assessments for a given folder, and return them indexed by assessment ID
      *
-     * @param int[] $assessmentIds
+     * @param int[] $dueWorkAssessmentIds
      * @return array
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function retrieveAssessmentsInFolder(array $assessmentIds) : array
+    private function retrieveDueWorksInFolder(array $dueWorkAssessmentIds) : array
     {
-        if(!count($assessmentIds)){
-            return [];
+        $assessmentData = [];
+        if(!count($dueWorkAssessmentIds)){
+            return $assessmentData;
         }
 
-        $bindings = Builder::getBindings($assessmentIds, 'a_id');
+        /** @var DueWork\Model[] $dueWorks */
+        $dueWorks = $this->assessmentMapperProxy->findAllByIds($dueWorkAssessmentIds);
 
-        $getAllAssessmentsInFolderQuery = $this->internalDb->prepareQuery(
-            "
-            SELECT
-                a.id AS assessment_id,
-                a.title AS assessment_name,
-                sb.rubric_group_marks AS assessment_rubric_group_marks,
-                sb.submission_grade_group_id AS assessment_grade_group_id,
-                sb.mark_type AS assessment_mark_type,
-                sb.max_mark AS assessment_max_mark,
-                rgu.rubric_group_id AS capability_id,
-                rg.name AS capability_name,
-                rcu.criterion_id AS indicator_id,
-                rc.name AS indicator_name
-            FROM  assessment a
-            INNER JOIN submission_box sb ON sb.assessment_id = a.id
-            INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
-            INNER JOIN rubric_group rg ON rgu.rubric_group_id = rg.id
-            INNER JOIN rubric_criterion_usage rcu ON sb.id = rcu.submission_box_id
-            INNER JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
-                  AND rc.rubric_group_id = rg.id
-            WHERE a.id IN ({$bindings->getPlaceholder()})
-            ORDER BY a.id, rgu.rubric_group_id, rcu.criterion_id"
-        );
+        foreach($dueWorks as $dueWork){
+            // TODO write a function on the rubric mapper to do this for a set of assessments in a single query
+            // eg findByPredicate('assessment_id', [1,2,3])
+            $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
+        }
 
-        $getAllAssessmentsInFolderQuery->execute($bindings->getParams());
-
-        $assessments = [];
-        $capabilities = [];
-        $indicators = [];
-
-        $lastObservedAssessmentId = null;
-        $lastObservedCapabilityId = null;
-
-        foreach ($getAllAssessmentsInFolderQuery->getIterator() as $i => $row) {
-            if ($lastObservedAssessmentId !== $row['assessment_id']) {
-                // Has the assessment we're looking at changed? Reset the capabilities
-                $capabilities = [];
+        foreach($dueWorks as $dueWork){
+            if(!$dueWork->getUseRubric()){
+                // TODO This should be a filter to not load the assessment in the first place if it doesn
+                continue;
             }
-
-            if ($lastObservedCapabilityId !== $row['capability_id']) {
-                // Has the capability we're looking at changed? Reset the indicators
-                $indicators = [];
-            }
-
-            $indicators[$row['indicator_id']] = [
-                'name' => $row['indicator_name'],
-            ];
-
-            $capabilities[$row['capability_id']] = [
-                'name' => $row['capability_name'],
-                'indicators' => $indicators
-            ];
 
             // Stuff everything about the assessment into an array
-            $assessments[$row['assessment_id']] = [
-                'name' => $row['assessment_name'],
-                'statusLink' => $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $row['assessment_id'] ]),
-                'maxMark' => $row['assessment_max_mark'],
-                'markType' => $row['assessment_mark_type'],
-                'gradeGroupId' => $row['assessment_grade_group_id'],
-                'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
-                'capabilities' => $capabilities
-            ];
+            $assessmentId = $dueWork->getId();
+            $gradeGroup = $dueWork->getGradeGroup();
 
-            $lastObservedAssessmentId = $row['assessment_id'];
-            $lastObservedCapabilityId = $row['capability_id'];
+            /** @var Grid $rubricGrid */
+            $rubricGrid = $dueWork->getRubricGrid();
+
+            $capabilities = [];
+            foreach ($rubricGrid->getCapabilityUsages() as $capabilityUsage) {
+                $indicators = [];
+                foreach($capabilityUsage->getIndicatorUsages() as $indicatorUsage){
+                    $indicator = $indicatorUsage->getIndicator();
+                    $indicators[$indicator->getId()] = [
+                        'name' => $indicator->getName(),
+                    ];
+                }
+                $capability                         = $capabilityUsage->getCapability();
+                $capabilities[$capability->getId()] = [
+                    'name'       => $capability->getName(),
+                    'indicators' => $indicators,
+                ];
+            }
+            $assessmentData[$assessmentId] = [
+                'name'           => $dueWork->getTitle(),
+                'statusLink'     => $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessmentId]),
+                'maxMark'        => $dueWork->getMaxMark(),
+                'markType'       => $dueWork->getMarkType()->getId(),
+                'gradeGroupId'   => $gradeGroup ? $gradeGroup->getId() : null,
+                'usesMarkPerCap' => $rubricGrid->isMarkPerCapability(),
+                'capabilities'   => $capabilities,
+            ];
         }
 
         uasort(
-            $assessments,
-            function (array $a, array $b) : int {
+            $assessmentData,
+            static function (array $a, array $b): int {
                 return strnatcmp($a['name'], $b['name']);
             }
         );
-        
-        return $assessments;
+        return $assessmentData;
     }
 
 
@@ -463,7 +456,7 @@ class Controller extends Base
                 $markType->setId($assessmentMarkType);
 
                 // Fill out a Due Work with the data we need for the markscheme factory to work
-                $stubAssessment = new DueWork();
+                $stubAssessment = new DueWork\Model();
                 $stubAssessment->setId($assessmentId);
                 $stubAssessment->setMarkPerCapability((bool)$assessmentUsesMarkPerCap);
                 $stubAssessment->setMaxMark($assessmentMaxMark);
@@ -473,7 +466,7 @@ class Controller extends Base
                 }
 
                 foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
-                    $capabilityDatabaseMark = $capabilityMarks['databaseMark'];
+                    $capabilityDatabaseMark = $capabilityMarks['databaseMark'] === null ? null : (float)$capabilityMarks['databaseMark'];
 
                     if ($capabilityDatabaseMark !== null) {
                         $capabilityMaxMark = $capabilityMarks['maxMark'] === null ? null : (float)$capabilityMarks['maxMark'];
