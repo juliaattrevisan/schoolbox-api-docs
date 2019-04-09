@@ -243,7 +243,6 @@ class Kernel extends CliKernelAbstract
     protected function installDependencies(): void
     {
         parent::installDependencies();
-        $this->getDependencyInjector()->values['logger'] = $this->logger();
         $this->initModules();
     }
 

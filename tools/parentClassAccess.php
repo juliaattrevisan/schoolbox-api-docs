@@ -48,6 +48,7 @@ $kernel = new CliTool\Kernel(
         }
 
 
+        /** @inheritdoc */
         public function run(): void
         {
             $log = $this->getLogger();
@@ -182,6 +183,7 @@ $kernel = new CliTool\Kernel(
             // Reload cache (if not dry run)
             if (!$dryRun) {
                 /** @var WritableCache $cache */
+                $this->getDi()->values['logger'] = $log;
                 $cache = $this->getDi()->get('subscriptionCache');
 
                 try {
