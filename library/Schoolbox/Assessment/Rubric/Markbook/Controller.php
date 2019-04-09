@@ -157,7 +157,9 @@ class Controller extends Base
      */
     public function postMarkbook(Folder\Model $folder): void
     {
-        $assessmentIds = $this->getAssessmentIds($folder->getId(), $this->request->post['filter_selection'] ?: []);
+        $request       = $this->request->post['filter_selection'] ?: [];
+        $assessmentIds = $this->getAssessmentIds($folder->getId(), $request);
+        $isFiltered    = (new Filter\RequestChecker())->isFilteredRequest($request);
         $assessments   = $this->buildAssessmentData($assessmentIds);
         $databaseMarks = $this->retrieveDatabaseMarks($assessments);
         $studentMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
@@ -168,6 +170,7 @@ class Controller extends Base
             'content' => $this->buildUnthemedHtmlOutput(
                 '@rubricMarkbook/markbookInner.twig',
                 [
+                    'isFiltered'  => $isFiltered,
                     'students'    => $studentMarks,
                     'assessments' => $assessments,
                 ]
@@ -227,7 +230,7 @@ class Controller extends Base
      */
     public function retrieveAllUsersInFolder(Folder\Model $folder): GenericCollection
     {
-            return $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
+        return $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
     }
 
     /**
@@ -326,6 +329,11 @@ class Controller extends Base
      */
     private function retrieveDatabaseMarks(array $assessments): array
     {
+        $students = [];
+        if (!count($assessments)) {
+            return $students;
+        }
+
         $assessmentPb = Database\Predicate\Builder::getBindings(array_keys($assessments), 'a_id');
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
             SELECT
@@ -362,7 +370,6 @@ class Controller extends Base
 
         $params = array_merge($assessmentPb->getParams(), ['review_route' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
 
-        $students              = [];
         $assessmentsForStudent = [];
         $capabilityMarks       = [];
         $indicatorMarks        = [];

@@ -340,7 +340,7 @@ class Controller extends Base
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
             'returnUrl'       => Redirect::queryString($this->getRequest()->query->get('page')),
             'readableFolders' => \array_unique($readableFolders),
-            'isFiltered'      => $this->isFilteredRequest($request),
+            'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
@@ -366,33 +366,5 @@ class Controller extends Base
             $filterIdMap[$definition->getFilter()->getId()] = $definition::getSlug();
         }
         return $filterIdMap;
-    }
-
-
-    /**
-     * Returns whether the payload indicates we are filtering to a sub-set of available upcoming assessments
-     *
-     * @param array $request
-     * @return bool
-     */
-    private function isFilteredRequest(array $request): bool
-    {
-        foreach ($request as $options) {
-            $countSelected = 0;
-            if (!\is_array($options)) {
-                // This will be an empty string when no concrete options are available. eg no READ-level folders.
-                // @see Codec::convertRequestToSelections()
-                continue;
-            }
-            foreach ($options as $option) {
-                if ($option) {
-                    $countSelected++;
-                }
-            }
-            if ($countSelected && $countSelected !== \count($options)) {
-                return true;
-            }
-        }
-        return false;
     }
 }
