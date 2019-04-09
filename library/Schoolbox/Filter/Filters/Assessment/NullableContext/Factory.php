@@ -27,7 +27,7 @@ abstract class Factory extends Filter\AbstractFactory
      *
      * @param array $routeArgs
      * @return Folder\Model
-     * @throws TypeError If no Folder\Model found
+     * @throws TypeError If no Folder\Model found in $routeArgs
      */
     protected function findFolderModel(array $routeArgs): Folder\Model
     {
