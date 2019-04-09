@@ -7,10 +7,15 @@
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use Alaress_Date_Format;
+use function array_intersect;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
-use Schoolbox\Filter\Filters\Assessment\Term as TermFilter;
-use Schoolbox\Filter\Filters\Assessment\WorkType as WorkTypeFilter;
+use Schoolbox\Filter\Filters\Assessment\Term;
+use Schoolbox\Filter\Filters\Assessment\WorkType;
+use UnderflowException;
+use UnexpectedValueException;
 
 
 /**
@@ -45,8 +50,8 @@ class IdFinder extends Filter\AbstractIdFinder
 {
 
     // Which date column does the term filter relate to?
-    const DATE_COL_DUE = 'due_date';
-    const DATE_COL_CLS = 'close_date';
+    private const DATE_COL_DUE = 'due_date';
+    private const DATE_COL_CLS = 'close_date';
 
 
     /**
@@ -55,7 +60,9 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @inheritdoc
      * @throws Filter\BrokenFilterException If filter SQL fragment cannot be built
-     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     protected function buildQuery(array $completeFilters, $deleted)
     {
@@ -79,10 +86,10 @@ class IdFinder extends Filter\AbstractIdFinder
         // Sub-query modifiers
         $aTypes         = $completeFilters[AssessmentType\Definition::class];
         $temporalStates = $completeFilters[TemporalState\Definition::class];
-        $termsDue       = $completeFilters[TermFilter\Due\Definition::class];
-        $termsClose     = $completeFilters[TermFilter\Close\Definition::class];
+        $termsDue       = $completeFilters[Term\Due\Definition::class];
+        $termsClose     = $completeFilters[Term\Close\Definition::class];
         $weightings     = $completeFilters[WeightingType\Definition::class];
-        $workTypeIds    = $completeFilters[WorkTypeFilter\Definition::class];
+        $workTypeIds    = $completeFilters[WorkType\Definition::class];
         $yearsDue       = $completeFilters[YearDue\Definition::class];
 
         list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
@@ -428,6 +435,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param null|Collection|int[] $aTypes
      * @return mixed[]
+     * @throws InvalidColumnException
      */
     private function getClauseAType(Collection $aTypes = null)
     {
@@ -482,6 +490,8 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param null|Collection|int[] $studentFolderIds
      * @param null|Collection|int[] $courseImportFolderIds
      * @return mixed[]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function getClauseFolder(
         Collection $teacherFolderIds = null,
@@ -502,12 +512,12 @@ class IdFinder extends Filter\AbstractIdFinder
         if($studentFolderIds){
             $folderIds = null === $folderIds
                 ? $studentFolderIds
-                : \array_intersect($folderIds, $studentFolderIds->getAll());
+                : array_intersect($folderIds, $studentFolderIds->getAll());
         }
         if($courseImportFolderIds){
             $folderIds = null === $folderIds
                 ? $courseImportFolderIds :
-                \array_intersect($folderIds, $courseImportFolderIds->getAll());
+                array_intersect($folderIds, $courseImportFolderIds->getAll());
         }
 
         $builder = $this->getMapper()->getPredicateBuilder();
@@ -522,6 +532,8 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param null|Collection|int[] $projectIds
      * @return mixed[]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function getClauseProject(Collection $projectIds = null)
     {
@@ -549,7 +561,8 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param string           $dateColumn ['due_date'|'close_date']
      * @return string[]
      * @throws Filter\BrokenFilterException If filter cannot be constructed
-     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function getClauseTerm(Collection $termIds = null, $dateColumn)
     {
@@ -585,7 +598,6 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param string           $dateColumn ['due_date'|'close_date']
      * @return string[]
      * @throws Filter\BrokenFilterException If filter cannot be constructed
-     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
      */
     private function getClauseYear(?Collection $years, $dateColumn)
     {
@@ -607,6 +619,8 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param null|Collection|int[] $unitImplIds
      * @return mixed[]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function getClauseUnitImpl(Collection $unitImplIds = null)
     {
@@ -632,6 +646,8 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param null|Collection|int[] $unitImpSpcIds
      * @return mixed[]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
     {
@@ -659,6 +675,8 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param null|Collection|int[] $unitSpecIds
      * @return mixed[]
+     * @throws InvalidColumnException
+     * @throws UnderflowException
      */
     private function getClauseUnitSpec(Collection $unitSpecIds = null)
     {
@@ -684,6 +702,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param Collection|string[] $weightings (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
+     * @throws InvalidColumnException
      */
     private function getClauseWeighting(Collection $weightings = null)
     {
@@ -710,7 +729,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param Collection|string[] $temporalStates (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     private function getClauseTemporalState(Collection $temporalStates = null): array
     {
@@ -723,7 +742,7 @@ class IdFinder extends Filter\AbstractIdFinder
          * To ensure distinct subsets, we need to treat one limit as inclusive, the other as exclusive
          */
 
-        $now     = \Alaress_Date_Format::now()->getDatabase();
+        $now     = Alaress_Date_Format::now()->getDatabase();
         $orParts = [];
 
         $joinParticipantPlan = false;
@@ -765,7 +784,7 @@ class IdFinder extends Filter\AbstractIdFinder
                     $orParts[]           = '(COALESCE(pp.close_date, a.close_date) <= :now)';
                     break;
                 default:
-                    throw new \UnexpectedValueException("Unrecognised temporal state filter key: '{$temporalState}");
+                    throw new UnexpectedValueException("Unrecognised temporal state filter key: '{$temporalState}");
             }
         }
 
@@ -780,6 +799,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param Collection|int[] $workTypeIds
      * @return mixed[]
+     * @throws InvalidColumnException
      */
     private function getClauseWorkType(Collection $workTypeIds = null)
     {
@@ -814,6 +834,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * @param bool $deleted
      * @return string[]
+     * @throws InvalidColumnException
      */
     private function getClauseDeleted($deleted)
     {
@@ -929,14 +950,14 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Did call explicitly request assessments due in some term, but no terms supplied?
-        $termsDue = $completeFilters[TermFilter\Due\Definition::class];
+        $termsDue = $completeFilters[Term\Due\Definition::class];
         if ($termsDue instanceOf Collection && !$termsDue->count()) {
             // All assessments have due dates
             return true;
         }
 
         // Did call explicitly request assessments close in some term, but no terms supplied?
-        $termsClose = $completeFilters[TermFilter\Close\Definition::class];
+        $termsClose = $completeFilters[Term\Close\Definition::class];
         if ($termsClose instanceOf Collection && !$termsClose->count()) {
             // All assessments have have a close date
             return true;

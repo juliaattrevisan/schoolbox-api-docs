@@ -11,6 +11,7 @@ use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use function func_get_args;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -139,7 +140,7 @@ class Controller extends Base
         $route     = $this->getRouter()->generate('learning.postPendingAssessmentsForUser', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
-        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, \func_get_args(), $queryArgs);
+        $filterPanel = $filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $queryArgs);
 
         $title = 'Pending Assessments';
         if($viewee->getId() !== $this->getUser()->getId()){

@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
+use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Page;
 
@@ -122,7 +123,7 @@ class Definition extends NullableContext\Definition
             case self::KEY_IMPORTED_TO_GROUP:
                 return 'Units imported to groups';
         }
-        throw new \InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
+        throw new InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
     }
 
 

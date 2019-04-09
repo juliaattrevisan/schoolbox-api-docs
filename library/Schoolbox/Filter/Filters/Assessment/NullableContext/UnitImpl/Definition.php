@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImpl;
 
+use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
 /**
@@ -50,7 +51,7 @@ class Definition extends NullableContext\Definition
         if (self::KEY_NONE === $key) {
             return 'None (assessment does reside inside a unit implementation)';
         }
-        throw new \InvalidArgumentException("Unknown 'UnitImpl' filter key: $key");
+        throw new InvalidArgumentException("Unknown 'UnitImpl' filter key: $key");
     }
 
 

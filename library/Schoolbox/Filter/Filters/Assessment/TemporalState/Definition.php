@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 
@@ -116,7 +117,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_CUSTOM_UNPUBLISHED === $key) {
             return 'Custom Plan Publish Date';
         }
-        throw new \InvalidArgumentException("Unknown TemporalState key: $key");
+        throw new InvalidArgumentException("Unknown TemporalState key: $key");
     }
 
 

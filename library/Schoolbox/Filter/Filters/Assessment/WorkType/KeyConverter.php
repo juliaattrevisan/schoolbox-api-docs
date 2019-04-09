@@ -7,9 +7,11 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
+use Schoolbox\User;
 
 
 /**
@@ -40,7 +42,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    public function getItem(string $key, \Schoolbox\User $user, string $page): ?int
+    public function getItem(string $key, User $user, string $page): ?int
     {
         if(Definition::KEY_NONE === $key){
             return null;
@@ -65,10 +67,10 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
+    protected function assertValidKey(string $key, User $user, string $page): void
     {
         if ($key !== Definition::KEY_NONE && !$this->workTypeIds->offsetExists($key)) {
-            throw new \InvalidArgumentException("No WorkType found for key: $key");
+            throw new InvalidArgumentException("No WorkType found for key: $key");
         }
     }
 }

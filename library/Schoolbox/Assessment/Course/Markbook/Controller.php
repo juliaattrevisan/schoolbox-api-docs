@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use function func_get_args;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -134,7 +135,7 @@ class Controller extends WebController\Base
 
         $page        = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
         $route       = $this->getRouter()->generate('courseMarkbook.postMarkbook', ['courseSpecId' => $courseSpec->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), \func_get_args(), $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@courseMarkbook/courseMarkbookOuter.twig', [

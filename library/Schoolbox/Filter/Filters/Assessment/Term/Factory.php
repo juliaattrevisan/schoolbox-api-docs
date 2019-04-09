@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
@@ -83,7 +84,7 @@ abstract class Factory extends AbstractFactory
      */
     protected function getCurrentTerm(GenericCollection $terms): ?Term\Model
     {
-        $now = \Alaress_Date_Format::now();
+        $now = Alaress_Date_Format::now();
         foreach ($terms as $term) {
             if ($term->contains($now)) {
                 return $term;

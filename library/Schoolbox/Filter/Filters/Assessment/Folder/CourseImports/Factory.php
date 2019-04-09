@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
+use function count;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
@@ -17,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Mapper;
 
 /**
  * A factory for building CourseImport 'Folder' filter objects
@@ -169,7 +171,7 @@ class Factory extends FolderFilter\Factory
         $unitSpecFilter    = $this->filterMapper->findByClass($definitionClass)->first();
         $unitSpecOverrides = $overrides[$unitSpecFilter->getId()];
 
-        if (!$unitSpecOverrides || \count($unitSpecOverrides) === 0) {
+        if (!$unitSpecOverrides || count($unitSpecOverrides) === 0) {
             // If no UnitSpecs requested via query args, then no folders require insertion and we are done.
             return;
         }
@@ -211,6 +213,8 @@ class Factory extends FolderFilter\Factory
      * @param Folder\Model                                 $folder
      * @param GenericCollection|Filter\Page\Option\Model[] $options
      * @return bool
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      */
     private function isAvailable(Folder\Model $folder, GenericCollection $options): bool
     {

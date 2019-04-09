@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Page;
 
+use DomainException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Filter;
@@ -136,7 +137,7 @@ class Model
 
 
     /**
-     * @var GenericCollection|\Schoolbox\Filter\Page\Option\Model[]
+     * @var GenericCollection|Option\Model[]
      */
     private $options;
 
@@ -235,7 +236,7 @@ class Model
 
 
     /**
-     * @return GenericCollection|\Schoolbox\Filter\Page\Option\Model[]
+     * @return GenericCollection|Option\Model[]
      */
     public function getOptions()
     {
@@ -244,9 +245,9 @@ class Model
 
 
     /**
-     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $options
+     * @param GenericCollection|Option\Model[] $options
      * @return $this
-     * @throws \UnexpectedValueException If Collection of wrong type
+     * @throws DomainException
      */
     public function setOptions(GenericCollection $options)
     {

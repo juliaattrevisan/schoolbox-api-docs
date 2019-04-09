@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
@@ -42,7 +43,7 @@ class Factory extends FolderFilter\Factory
      * @return Filter\IComponent|FolderFilter\Component
      * @throws DefinitionException if join $name isn't on this mapper
      * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
+     * @throws InvalidArgumentException If neither $selections or $overrides are supplied
      */
     public function buildComponent(
         Filter\IDefinition $definition,
@@ -56,7 +57,7 @@ class Factory extends FolderFilter\Factory
         $options = $pageFilter->getOptions();
 
         if (!$viewee) {
-            throw new \InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
+            throw new InvalidArgumentException('$viewee cannot be null for StudentInteraction filter');
         }
 
         $getClasses = $options[Definition::KEY_CLASSES]->getAvailable() && $viewee->getRole()->isStudent();

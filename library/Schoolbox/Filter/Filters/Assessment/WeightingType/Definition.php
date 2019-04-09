@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 
@@ -84,7 +85,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_WEIGHTED === $key) {
             return 'Weighted';
         }
-        throw new \InvalidArgumentException("Unknown Weighting key: $key");
+        throw new InvalidArgumentException("Unknown Weighting key: $key");
     }
 
 

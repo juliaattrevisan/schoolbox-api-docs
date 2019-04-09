@@ -9,7 +9,10 @@ namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
+use function array_merge;
 use Aura\Di\Exception\ServiceNotFound;
+use function count;
+use function func_get_args;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\GenericCollection;
@@ -114,7 +117,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK;
         $route       = $this->getRouter()->generate('rubricMarkbook.postMarkbook', ['folderId' => $folder->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), \func_get_args(), $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), func_get_args(), $queryArgs);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -194,7 +197,7 @@ class Controller extends Base
             Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class   => [],
         ];
         $dynamic    = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
-        $filters    = \array_merge($hardCoded, $dynamic);
+        $filters    = array_merge($hardCoded, $dynamic);
 
         return $this->assessmentIdFinder->findIdsByFilters($filters);
     }
@@ -228,7 +231,7 @@ class Controller extends Base
      */
     private function retrieveAssessmentsInFolder(array $assessmentIds) : array
     {
-        if(!\count($assessmentIds)){
+        if(!count($assessmentIds)){
             return [];
         }
 

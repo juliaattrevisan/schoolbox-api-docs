@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
+use function func_get_args;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
@@ -185,7 +186,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $route       = $this->getRouter()->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student, \func_get_args());
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student, func_get_args());
 
         // Only get subjects from external if student's timetable isn't hidden.
         // I don't get this logic as class list != timetable, but apparently

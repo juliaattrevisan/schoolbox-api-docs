@@ -7,6 +7,10 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
+use function count;
+use function in_array;
+use InvalidArgumentException;
+use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
@@ -89,9 +93,12 @@ class Factory extends NullableContext\Factory
      *
      * @inheritDoc
      * @throws DefinitionException If unable to find a joined mapper
+     * @throws InvalidArgumentException If $viewee is null
      * @throws Mapper\Exception If unable to hydrate a row
-     * @throws \InvalidArgumentException If $viewee is null
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function buildComponent(
         Filter\IDefinition $definition,
@@ -103,7 +110,7 @@ class Factory extends NullableContext\Factory
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
-            throw new \InvalidArgumentException('$viewee cannot be null');
+            throw new InvalidArgumentException('$viewee cannot be null');
         }
 
         return new Component(
@@ -136,11 +143,15 @@ class Factory extends NullableContext\Factory
     /**
      * @param Filter\Page\Model                                                $pageFilter
      * @param User                                                             $viewee
+     * @param array                                                            $routeArgs
      * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides Indexed by filter.id, selection.key
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     private function getProjects(Filter\Page\Model $pageFilter, User $viewee, array $routeArgs, GenericCollection $overrides)
     {
@@ -148,7 +159,7 @@ class Factory extends NullableContext\Factory
         $options = $pageFilter->getOptions();
 
         // Is this filter being used on a page that renders involved folders?
-        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
+        if (in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
             [$directFolders, $indirectFolders] = $this->fetchRelatedFolders($options, $pageFilter, $viewee);
         } else {
             $directFolders   = $this->folderMapper->createCollection();
@@ -156,7 +167,7 @@ class Factory extends NullableContext\Factory
         }
 
         // Is component being used on a page that has a folder in the URL?
-        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
+        if (in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
             $folder                            = $this->findFolderModel($routeArgs);
             $directFolders[$folder->getId()]   = $folder;
             $indirectFolders[$folder->getId()] = $folder;
@@ -166,7 +177,7 @@ class Factory extends NullableContext\Factory
          * otherwise any assessments inside projects in the extra folder will never be visible.
          */
         $extraFolderIds = $this->parseFolderIds($overrides);
-        if (\count($extraFolderIds)) {
+        if (count($extraFolderIds)) {
             // An inserted folder may be neither a class or group, so look for project
             // on it directly, and via an unitImpl.
             $extraFolders    = $this->folderMapper->findByColumn('id', $extraFolderIds);
@@ -305,7 +316,7 @@ class Factory extends NullableContext\Factory
             $statement->execute($builder->getParams());
 
             /** @noinspection PhpAssignmentInConditionInspection */
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $folderId       = $row['f.id'];
                 $folderCodeCode = $row['fc.code'];
@@ -356,7 +367,7 @@ class Factory extends NullableContext\Factory
             $statement->execute($builder->getParams());
 
             /** @noinspection PhpAssignmentInConditionInspection */
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $unitImplId     = $row['ui.id'];
                 $folderId       = $row['f.id'];

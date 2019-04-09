@@ -9,6 +9,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use function count;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
@@ -213,7 +214,7 @@ class Controller extends BaseController
         /** @var GenericCollection|Model[] $visibleFilters */
         $visibleFilters = $this->filterMapper->findAll()->filter(static function (Model $instance) {
             $definitionClass = $instance->getClass();
-            return \count($definitionClass::getPages()) > 0;
+            return count($definitionClass::getPages()) > 0;
         });
 
         // Group filters by which pages they appear on

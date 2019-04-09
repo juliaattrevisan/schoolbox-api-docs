@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
@@ -43,7 +44,7 @@ class Factory extends FolderFilter\Factory
      *
      * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
-     * @throws \InvalidArgumentException If $viewee is null
+     * @throws InvalidArgumentException If $viewee is null
      */
     public function buildComponent(
         Filter\IDefinition $definition,
@@ -55,7 +56,7 @@ class Factory extends FolderFilter\Factory
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
-            throw new \InvalidArgumentException('Viewee cannot be null');
+            throw new InvalidArgumentException('Viewee cannot be null');
         }
 
         // Should this role type see classes for this page?

@@ -9,6 +9,10 @@
 namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate\Builder;
+use function count;
+use External_Class;
+use function implode;
+use function in_array;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -324,11 +328,11 @@ class UserAccessMapper extends Mapper
         bool $exactAccess = false
     ): GenericCollection
     {
-        if ($roleType && !\in_array($roleType, Role::getRoleTypes(), true)) {
+        if ($roleType && !in_array($roleType, Role::getRoleTypes(), true)) {
             throw new InvalidArgumentException("Unrecognised role type: $roleType");
         }
 
-        if (!\in_array($accessType, UserAccess::getAccessLevels(), true)) {
+        if (!in_array($accessType, UserAccess::getAccessLevels(), true)) {
             throw new InvalidArgumentException("Unrecognised access level type: $accessType");
         }
 
@@ -371,7 +375,7 @@ class UserAccessMapper extends Mapper
                 (($exactAccess && $accessType === UserAccess::ACCESS_WRITE) || (!$exactAccess && $accessType <= UserAccess::ACCESS_WRITE));
 
             if ($getClassStudents || $getClassTeachers) {
-                $externalClass = new \External_Class();
+                $externalClass = new External_Class();
                 $externalIds   = [];
                 if ($getClassStudents) {
                     foreach ($externalClass->getStudents($folder->getCodeString()) as $student) {
@@ -383,7 +387,7 @@ class UserAccessMapper extends Mapper
                         $externalIds[] = $teacherExternalId;
                     }
                 }
-                if (\count($externalIds)) {
+                if (count($externalIds)) {
                     // We'll need to change this to a LEFT join to include class members who lack userAccess records.
                     $userAccessJoinType = 'LEFT';
                     $outerPb->in('u.synergy_id', $externalIds);
@@ -397,7 +401,7 @@ class UserAccessMapper extends Mapper
         }
         $outerPb->isNull('u.deleted_at');
 
-        $whereClause = \implode(' AND ', $outerPb->getWhere());
+        $whereClause = implode(' AND ', $outerPb->getWhere());
 
         $query = "
             SELECT

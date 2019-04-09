@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Filter;
 
+use function array_map;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\IMapper;
@@ -97,7 +99,7 @@ abstract class AbstractIdFinder implements IdFinder
         /** @var IColumnType $hydrator */
         $hydrator = $identifier ? $identifier['hydrator'] ?? null : null;
         if ($hydrator) {
-            $uniqueIds = \array_map(static function ($id) use ($hydrator) {
+            $uniqueIds = array_map(static function ($id) use ($hydrator) {
                 return $hydrator->hydrate($id);
             }, $uniqueIds);
         }
@@ -124,13 +126,13 @@ abstract class AbstractIdFinder implements IdFinder
      * Ensures that any filters passed in are known to this class
      *
      * @param Collection[]|null[]|mixed[][] $filters
-     * @throws \InvalidArgumentException If filter definition class not recognised
+     * @throws InvalidArgumentException If filter definition class not recognised
      */
     protected function checkValidFilterKeys(array $filters)
     {
         foreach ($filters as $filterClass => $val) {
             if (!array_key_exists($filterClass, $this->registry)) {
-                throw new \InvalidArgumentException("Unknown filter: $filterClass");
+                throw new InvalidArgumentException("Unknown filter: $filterClass");
             }
         }
     }
@@ -165,7 +167,7 @@ abstract class AbstractIdFinder implements IdFinder
                 // Enables caller to specify a inject a single object or scalar, and have it normalised here
                 $completeFilters[$filterClass] = new Collection([$value]);
             } else {
-                throw new BrokenFilterException('Unrecognised filter value: ' . gettype($value));
+                throw new BrokenFilterException($filterClass, 'Unrecognised filter value: ' . gettype($value));
             }
         }
 

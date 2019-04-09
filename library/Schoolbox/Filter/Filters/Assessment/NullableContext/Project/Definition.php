@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
+use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 
@@ -100,7 +101,7 @@ class Definition extends NullableContext\Definition
             case self::KEY_ON_UNIT_SPEC:
                 return 'In unit specification';
         }
-        throw new \InvalidArgumentException("Unknown Project filter key: $key");
+        throw new InvalidArgumentException("Unknown Project filter key: $key");
     }
 
 
