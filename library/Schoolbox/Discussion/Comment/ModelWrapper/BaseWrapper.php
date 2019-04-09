@@ -11,6 +11,7 @@ namespace Schoolbox\Discussion\Comment\ModelWrapper;
 use Alaress_Date_Format;
 use Alaress\Json;
 use Schoolbox\Discussion\Comment\Model;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\User;
 
 /**
@@ -31,13 +32,21 @@ abstract class BaseWrapper implements Json\Serializable, Json\Linkable
 
 
     /**
+     * @var IContext
+     */
+    protected $context;
+
+
+    /**
      * Constructor
      *
-     * @param Model $model
+     * @param Model    $model
+     * @param IContext $context
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model, IContext $context)
     {
-        $this->model = $model;
+        $this->model   = $model;
+        $this->context = $context;
     }
 
 

@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Discussion\Comment\ModelWrapper;
 use Schoolbox\Discussion\Comment\Model;
 use Schoolbox\Discussion\Comment\ModelWrapper\BaseWrapper;
 use Schoolbox\Discussion\Comment\ModelWrapper\IFactory;
+use Schoolbox\Discussion\Thread\Context\IContext;
 
 /**
  * Factory for model wrappers for the comms variant of the discussion thread
@@ -22,8 +23,8 @@ class Factory implements IFactory
      * @param Model $model
      * @return BaseWrapper
      */
-    public function build(Model $model): BaseWrapper
+    public function build(Model $model, IContext $context): BaseWrapper
     {
-        return new Wrapper($model);
+        return new Wrapper($model, $context);
     }
 }

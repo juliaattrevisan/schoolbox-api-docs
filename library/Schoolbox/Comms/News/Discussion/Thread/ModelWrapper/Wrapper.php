@@ -22,15 +22,15 @@ class Wrapper extends BaseWrapper
      */
     public function getJsonApiLinks(): array
     {
+        $params = [
+            'id'        => $this->model->getId(),
+            'thread'    => $this->model,
+            'context'   => $this->context,
+            'contextId' => $this->context->getId(),
+        ];
         return [
-            'getComments' => new AuraLink(
-                'commsDiscussionThreads.getCommentsByThread',
-                ['id' => $this->model->getId(), 'thread' => $this->model,]
-            ),
-            'createComment' => new AuraLink(
-                'commsDiscussionThreads.createCommentInThread',
-                ['id' => $this->model->getId(), 'thread' => $this->model,]
-            ),
+            'getComments'   => new AuraLink('commsDiscussionThreads.getCommentsByThread', $params),
+            'createComment' => new AuraLink('commsDiscussionThreads.createCommentInThread', $params),
         ];
     }
 }

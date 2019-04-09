@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Discussion\Thread\ModelWrapper;
 
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Model;
 use Schoolbox\Discussion\Thread\ModelWrapper\BaseWrapper;
 use Schoolbox\Discussion\Thread\ModelWrapper\IFactory;
@@ -19,11 +20,12 @@ use Schoolbox\Discussion\Thread\ModelWrapper\IFactory;
 class Factory implements IFactory
 {
     /**
-     * @param Model $model
+     * @param Model    $model
+     * @param IContext $context
      * @return BaseWrapper
      */
-    public function build(Model $model): BaseWrapper
+    public function build(Model $model, IContext $context): BaseWrapper
     {
-        return new Wrapper($model);
+        return new Wrapper($model, $context);
     }
 }

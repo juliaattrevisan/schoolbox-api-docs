@@ -10,6 +10,7 @@ namespace Schoolbox\Discussion\Thread\ModelWrapper;
 
 use Alaress_Date_Format;
 use Alaress\Json;
+use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Model;
 
 /**
@@ -30,13 +31,21 @@ abstract class BaseWrapper implements Json\Serializable, Json\Linkable
 
 
     /**
+     * @var IContext
+     */
+    protected $context;
+
+
+    /**
      * Constructor
      *
-     * @param Model $model
+     * @param Model    $model
+     * @param IContext $context
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model, IContext $context)
     {
-        $this->model = $model;
+        $this->model   = $model;
+        $this->context = $context;
     }
 
 
