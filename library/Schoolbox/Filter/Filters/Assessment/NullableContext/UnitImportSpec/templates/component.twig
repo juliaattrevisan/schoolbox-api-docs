@@ -25,6 +25,7 @@
 
     {% for course in courseSpecs %}
         {% if isUserConfigurable and not hideCourseTitle %}<p class="course-title">{{ course.title }}</p>{% endif %}
+        <div class="checklist">
         {% for unit in course.units %}
             {% set roleSelection = roleSelections[unit.id] %}
             {% include '@filters/_selectionCheckbox.twig' with {
@@ -34,5 +35,6 @@
                 disabled:           isDisabled
             } only %}
         {% endfor %}
+        </div>
     {% endfor %}
 {% endblock %}
