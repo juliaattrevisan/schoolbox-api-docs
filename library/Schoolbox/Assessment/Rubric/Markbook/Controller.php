@@ -162,8 +162,8 @@ class Controller extends Base
         $isFiltered    = (new Filter\RequestChecker())->isFilteredRequest($request);
         $assessments   = $this->buildAssessmentData($assessmentIds);
         $databaseMarks = $this->retrieveDatabaseMarks($assessments);
-        $studentMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
-        $studentMarks  = $this->insertFolderMembers($studentMarks, $folder);
+        $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
+        $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
