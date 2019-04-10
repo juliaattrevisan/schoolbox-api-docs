@@ -5,124 +5,127 @@
     exclusions   int[][]     User ids, grouped by assessment.id
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
+<div class="row">
+    <div class="small-12 columns">
+        {% if assessments|length %}
+        <div id="table-container">
 
-{% if assessments|length %}
-<div id="table-container">
-
-    <table id="left-columns">
-        <thead>
-        {% for assessmentId, assessment in assessments %}
-            {% for capabilityId, capability in assessment.capabilities %}
-
-                <tr>
-                    {% if loop.index == 1 %}
-                        <th class="column-1 assessment" title="{{ assessment.name }}">
-                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
-                        </th>
-                    {% else %}
-                        <th class="column-1 placeholder">&nbsp;</th>
-                    {% endif %}
-
-                    <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
-                </tr>
-
-                {% for indicatorId, indicator in capability.indicators %}
-                    <tr>
-                        <th class="column-1 placeholder">&nbsp;</th>
-                        <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
-                    </tr>
-                {% endfor %}
-
-            {% endfor %}
-        {% endfor %}
-        </thead>
-    </table>
-
-    <div id="rubric-marksheet-container">
-        {# Marksheet class IS being used; do not delete it #}
-        <table id="rubric-marksheet" class="marksheet" data-mark-sheet>
-            <thead>
-                <tr class="rotate-headers" data-headers>
-                    {% for studentId, student in students %}
-                        <th>
-                            <div>
-                                <span>
-                                    <a href="{{ student.profileLink }}">
-                                        {{ student.lastname ~ ', ' ~ student.firstname}}
-                                    </a>
-                                </span>
-                            </div>
-                        </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-
-            <tbody>
+            <table id="left-columns">
+                <thead>
                 {% for assessmentId, assessment in assessments %}
-
                     {% for capabilityId, capability in assessment.capabilities %}
-                        <tr class="capability">
-                            {% for studentId, student in students %}
 
-                                {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
-                                <td class="excluded"></td>
-                                {% else %}
-                                    {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
-                                    {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
-                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+                        <tr>
+                            {% if loop.index == 1 %}
+                                <th class="column-1 assessment" title="{{ assessment.name }}">
+                                    <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
+                                </th>
+                            {% else %}
+                                <th class="column-1 placeholder">&nbsp;</th>
+                            {% endif %}
 
-                                    {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
-                                    {% if capabilityMark is null %}
-                                        {% set gradientClass = "" %}
-                                    {% endif %}
-
-                                    <td>
-                                        <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
-                                    </td>
-                                {% endif %}
-                            {% endfor %}
+                            <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
                         </tr>
 
                         {% for indicatorId, indicator in capability.indicators %}
-                            <tr class="indicator">
-                                {% for studentId, student in students %}
-
-                                    {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
-                                        <td class="excluded"></td>
-                                    {% else %}
-                                        {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
-                                        {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
-                                        {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
-                                        {% set summaryLink = student.assessments[assessmentId].summaryLink %}
-
-                                        {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
-                                        {% if normalisedIndicatorMark is null %}
-                                            {% set gradientClass = "" %}
-                                        {% endif %}
-
-                                        {% set renderedIndicatorMark = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('-') %}
-
-                                        <td{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
-                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ renderedIndicatorMark }}</a>
-                                        </td>
-                                    {% endif %}
-                                {% endfor %}
+                            <tr>
+                                <th class="column-1 placeholder">&nbsp;</th>
+                                <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
                             </tr>
                         {% endfor %}
+
                     {% endfor %}
                 {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                </thead>
+            </table>
 
-</div>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-progress"></i>
-        {% if isFiltered %}
-            <p>There are no assessments that match your filter selections.</p>
+            <div id="rubric-marksheet-container">
+                {# Marksheet class IS being used; do not delete it #}
+                <table id="rubric-marksheet" class="marksheet" data-mark-sheet>
+                    <thead>
+                        <tr class="rotate-headers" data-headers>
+                            {% for studentId, student in students %}
+                                <th>
+                                    <div>
+                                        <span>
+                                            <a href="{{ student.profileLink }}">
+                                                {{ student.lastname ~ ', ' ~ student.firstname}}
+                                            </a>
+                                        </span>
+                                    </div>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for assessmentId, assessment in assessments %}
+
+                            {% for capabilityId, capability in assessment.capabilities %}
+                                <tr class="capability">
+                                    {% for studentId, student in students %}
+
+                                        {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                        <td class="excluded"></td>
+                                        {% else %}
+                                            {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
+                                            {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
+                                            {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+
+                                            {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
+                                            {% if capabilityMark is null %}
+                                                {% set gradientClass = "" %}
+                                            {% endif %}
+
+                                            <td>
+                                                <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
+                                            </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+
+                                {% for indicatorId, indicator in capability.indicators %}
+                                    <tr class="indicator">
+                                        {% for studentId, student in students %}
+
+                                            {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                                <td class="excluded"></td>
+                                            {% else %}
+                                                {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
+                                                {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
+                                                {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
+                                                {% set summaryLink = student.assessments[assessmentId].summaryLink %}
+
+                                                {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
+                                                {% if normalisedIndicatorMark is null %}
+                                                    {% set gradientClass = "" %}
+                                                {% endif %}
+
+                                                {% set renderedIndicatorMark = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('-') %}
+
+                                                <td{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
+                                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ renderedIndicatorMark }}</a>
+                                                </td>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
         {% else %}
-            <p>There are no assessments that use a rubric in this folder.</p>
+            <div class="empty-state">
+                <i class="icon-progress"></i>
+                {% if isFiltered %}
+                    <p>There are no assessments that match your filter selections.</p>
+                {% else %}
+                    <p>There are no assessments that use a rubric in this folder.</p>
+                {% endif %}
+            </div>
         {% endif %}
     </div>
-{% endif %}
+</div>
