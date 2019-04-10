@@ -35,7 +35,7 @@ Usage:
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
         var $resetToDefaultsBtn  = $filterPanel.find('#defaults_reset');
-        var $cancelChangesBtn    = $filterPanel.find('#cancel_changes');
+        var $clearAllBtn    = $filterPanel.find('#clear-all');
 
         //  Error messages to display for different server errors
         var $alertOutOfMemory       = null;
@@ -70,7 +70,7 @@ Usage:
         });
 
         // Cancel changes since last selection submit
-        $cancelChangesBtn.on('click', function (){
+        $clearAllBtn.on('click', function (){
             $filterPanel.find('input[type=checkbox][data-value-original]').each(function(idx, elem){
                 var $checkbox = $(elem);
                 $checkbox.prop('checked', $checkbox.data('value-original'));
@@ -289,7 +289,7 @@ Usage:
          */
         function enableInputs() {
             $submitButton.attr('disabled', false);
-            $cancelChangesBtn.attr('disabled', false);
+            $clearAllBtn.attr('disabled', false);
             $resetToDefaultsBtn.attr('disabled', false);
             $optionCheckboxes.filter(':not([data-disabled])').attr('disabled', false);
         }
@@ -299,7 +299,7 @@ Usage:
          */
         function disableInputs() {
             $submitButton.attr('disabled', true);
-            $cancelChangesBtn.attr('disabled', true);
+            $clearAllBtn.attr('disabled', true);
             $resetToDefaultsBtn.attr('disabled', true);
             $optionCheckboxes.attr('disabled', true);
         }
@@ -509,7 +509,7 @@ Usage:
                         </div>
                     {% endif %}
                     <li class="filter-component btn">
-                        <a class="button" id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a>
+                        <a class="button" id="clear-all" title="Revert to your most recently applied filter">Clear all</a>
                     </li>
                     <li class="filter-component btn">
                         <input id="submit_button"
