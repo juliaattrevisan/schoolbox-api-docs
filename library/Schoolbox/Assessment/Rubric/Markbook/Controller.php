@@ -436,12 +436,12 @@ class Controller extends Base
      * @return array
      * @throws /Aura/Router/Exception/RouteNotFound
      */
-    private function generateHumanReadableMarks(array $students, array $assessments) : array
+    private function generateHumanReadableMarks(array $students, array $assessments): array
     {
         $decimalHydrator   = new Decimal();
         $booleanHydrator   = new Boolean();
         $markSchemeFactory = new MarkScheme\Factory();
-        $totalMarkScheme   = new MarkScheme\TotalMarkFractional(null);
+        $totalMarkScheme   = new MarkScheme\TotalMarkFractional();
 
         foreach($students as $studentId => $student) {
 
