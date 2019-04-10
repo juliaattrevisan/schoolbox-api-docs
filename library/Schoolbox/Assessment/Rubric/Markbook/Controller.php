@@ -100,7 +100,7 @@ class Controller extends Base
 
 
     /**
-     * Displays a list of rubric marks for students in the specified class
+     * Renders a filter panel and placeholder that will asynchronously load the rubric report
      *
      * @api   GET /learning/rubricMarkbook/{folderId}
      * @level 190
@@ -139,7 +139,7 @@ class Controller extends Base
 
 
     /**
-     * Displays a list of rubric marks for students in the specified class
+     * Displays a list of rubric marks for students and learners associated with the specified folder
      *
      * @api   GET /learning/rubricMarkbook/{folderId}
      * @level 190
@@ -522,7 +522,7 @@ class Controller extends Base
 
 
     /**
-     * Combine students who have marks with those who are in the class or group, but have no marks yet
+     * Combine users who have marks with students and learners who are in the class or group, but have no marks yet
      *
      * @param array        $studentMarks
      * @param Folder\Model $folder
@@ -561,7 +561,7 @@ class Controller extends Base
 
 
     /**
-     * Returns CAP exclusions, grouped by assessment id
+     * Returns the ids of users who have been excluded via CAP, grouped by assessment id
      *
      * @param array $assessmentIds
      * @return int[][]
