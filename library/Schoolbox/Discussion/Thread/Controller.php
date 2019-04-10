@@ -166,11 +166,12 @@ class Controller extends BaseController
      * @api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @level 190
      *
-     * @param Model $thread
+     * @param Model    $thread
+     * @param IContext $context
      *
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function createCommentInThread(Model $thread): void
+    public function createCommentInThread(Model $thread, IContext $context): void
     {
         /** @var \stdClass $data */
         $data = $this->request->content->get();
@@ -182,7 +183,9 @@ class Controller extends BaseController
 
         $this->commentMapper->save($comment);
 
-        $responseData = $comment->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
+        $responseData = $this->commentWrapperFactory
+            ->build($comment, $context)
+            ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
 
         // Clean-up content before returning the result
         $responseData['content'] = Scrub::html($responseData['content']);
