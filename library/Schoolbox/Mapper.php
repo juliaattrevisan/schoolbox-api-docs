@@ -15,6 +15,7 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
+use function array_map;
 use Aura\Di;
 use InvalidArgumentException;
 use PDO;
@@ -1767,6 +1768,20 @@ abstract class Mapper implements IMapper, Serializable
         return $this->getIdentifier()['column'];
     }
 
+
+    /**
+     * Retrieves this entity's identifier's hydrator.
+     *
+     * Returns NULL if this entity does not have an identifier
+     *
+     * @return null|IColumnType
+     */
+    public function getIdentifierHydrator(): ?IColumnType
+    {
+        return $this->getIdentifier()['hydrator'] ?? null;
+    }
+
+
     /**
      * Sets identifier for this mapper.
      *
@@ -2468,14 +2483,19 @@ abstract class Mapper implements IMapper, Serializable
      * @param array $options
      * @return array
      */
-    public function findIdsByColumnList(array $columnList, array $options = [])
+    public function findIdsByColumnList(array $columnList, array $options = []): array
     {
         try {
             $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifierColumn(), $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $ids        = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $idHydrator = $this->getIdentifierHydrator();
+        if ($idHydrator) {
+            $ids = array_map([$idHydrator, 'hydrate'], $ids);
+        }
+        return $ids;
     }
 
 
