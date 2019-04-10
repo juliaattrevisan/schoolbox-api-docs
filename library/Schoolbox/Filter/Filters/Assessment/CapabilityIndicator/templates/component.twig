@@ -1,0 +1,58 @@
+{#
+    Usage:
+        isUserConfigurable: bool                - If false, just hidden input. If true, render a checkbox to clobber hidden value
+        hasOptions:         bool                - Whether any concrete options are available
+        definition:         IFilterDefinition
+        roleSelections:     FilterSelection[]   - Default filter selections for current user's role, indexed by selection.key
+        userSelections:     FilterSelection[]   - A set of filter selections made by the current user, indexed by selection.key
+        capabilities:       Rubric\Capability[] - The set of capabililites we are to render.
+        showCapabilities:   bool
+        showIndicators:     bool
+
+    We only render an option if it:
+    * In the capability/indicator list, and
+    * In the roleSelections collection
+#}
+{% extends '@filters/_component.twig' %}
+
+{% block filterName %}
+    {% if showCapabilities and showIndicators %}
+        {{ locale.rubricGroup.properPlural }}/{{ locale.rubricCriterion.properPlural }}
+    {% elseif showCapabilities %}
+        {{ locale.rubricGroup.properPlural }}
+    {% else %}
+        {{ locale.rubricCriterion.properPlural }}
+    {% endif %}
+{% endblock %}
+
+{% block userOptions %}
+    {% for capability in capabilities %}
+        {% if showCapabilities %}
+            {% set key = 'c' ~ capability.id %}
+            {% set roleSelection = roleSelections[key] %}
+            {% include '@filters/_selectionCheckbox.twig' with {
+                roleSelection:      roleSelection,
+                userSelection:      userSelections[key],
+                label:              capability.name,
+                disabled:           isDisabled
+            } only %}
+        {% else %}
+            <span>{{ capability.name }}</span>
+        {% endif %}
+
+        {% if showIndicators %}
+            <div class="checklist">
+                {% for indicator in capability.indicators %}
+                    {% set key = 'i' ~ indicator.id %}
+                    {% set roleSelection = roleSelections[key] %}
+                    {% include '@filters/_selectionCheckbox.twig' with {
+                        roleSelection:      roleSelection,
+                        userSelection:      userSelections[key],
+                        label:              indicator.name,
+                        disabled:           isDisabled
+                    } only %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

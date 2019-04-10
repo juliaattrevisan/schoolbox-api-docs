@@ -149,6 +149,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper()
                 );
+            case CapabilityIndicator\Definition::class:
+                return new CapabilityIndicator\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getFolderMapper()
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
