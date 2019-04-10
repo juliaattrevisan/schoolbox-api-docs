@@ -6,6 +6,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use DomainException;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -73,12 +74,16 @@ class Group implements ISoftDeletable
      */
     private $parentType = self::PARENT_TYPE_CATEGORY;
 
+    /** @var GenericCollection|Criterion[] */
+    private $indicators;
+
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->curriculumNodes = new GenericCollection(NodeModel::class);
+        $this->indicators      = new GenericCollection(Criterion::class);
     }
 
     /**
@@ -145,6 +150,27 @@ class Group implements ISoftDeletable
     public function setParentType(string $parentType)
     {
         $this->parentType = $parentType;
+        return $this;
+    }
+
+
+    /**
+     * @return Criterion[]|GenericCollection
+     */
+    public function getIndicators(): GenericCollection
+    {
+        return $this->indicators;
+    }
+
+
+    /**
+     * @param Criterion[]|GenericCollection $indicators
+     * @return $this
+     * @throws DomainException
+     */
+    public function setIndicators(GenericCollection $indicators): self
+    {
+        $this->indicators->replaceWith($indicators);
         return $this;
     }
 }
