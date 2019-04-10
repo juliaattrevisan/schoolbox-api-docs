@@ -6,13 +6,13 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Discussion\Comment\ModelWrapper;
+namespace Schoolbox\Comms\News\Discussion\Comment\ModelDecorator;
 
 use Schoolbox\Discussion\Comment\ModelDecorator\BaseDecorator;
 use Schoolbox\Json\Api\AuraLink;
 
 /**
- * Wrapper for comment models: this one provides links specific to the comms
+ * Decorator for comment models: this one provides links specific to the comms
  * variant of the discussion thread comments module.
  */
 class Decorator extends BaseDecorator

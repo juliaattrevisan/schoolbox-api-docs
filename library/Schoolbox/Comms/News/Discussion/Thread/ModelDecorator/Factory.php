@@ -6,16 +6,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Comms\News\Discussion\Comment\ModelWrapper;
+namespace Schoolbox\Comms\News\Discussion\Thread\ModelDecorator;
 
-use Schoolbox\Discussion\Comment\Model;
-use Schoolbox\Discussion\Comment\ModelDecorator\BaseDecorator;
-use Schoolbox\Discussion\Comment\ModelDecorator\IFactory;
 use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Model;
+use Schoolbox\Discussion\Thread\ModelDecorator\BaseDecorator;
+use Schoolbox\Discussion\Thread\ModelDecorator\IFactory;
 
 /**
- * Factory for model wrappers for the comms variant of the discussion thread
- * comments module.
+ * Factory for model decorators for the comms variant of the discussion thread
+ * module.
  */
 class Factory implements IFactory
 {

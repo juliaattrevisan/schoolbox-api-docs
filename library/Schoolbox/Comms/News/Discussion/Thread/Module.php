@@ -41,24 +41,24 @@ class Module extends Thread\Module
 
 
     /**
-     * Builds a factory for building wrappers around thread objects.
+     * Builds a factory for building decorators around thread objects.
      *
      * @return Thread\ModelDecorator\IFactory
      */
     protected function buildModelDecoratorFactory(): Thread\ModelDecorator\IFactory
     {
-        return new ModelWrapper\Factory();
+        return new ModelDecorator\Factory();
     }
 
 
     /**
-     * Builds a factory for building wrappers around comment objects.
+     * Builds a factory for building decorators around comment objects.
      *
      * @return Comment\ModelDecorator\IFactory
      */
     protected function buildCommentModelDecoratorFactory(): Comment\ModelDecorator\IFactory
     {
-        return new News\Discussion\Comment\ModelWrapper\Factory();
+        return new News\Discussion\Comment\ModelDecorator\Factory();
     }
 
 
