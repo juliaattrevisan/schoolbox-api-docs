@@ -54,44 +54,44 @@ class Controller extends BaseController
 
 
     /**
-     * The model wrapper factory for threads, used to wrap a thread in a
+     * The model decorator factory for threads, used to wrap a thread in a
      * renderer that knows how to create links for its context.
      *
-     * @var ModelWrapper\IFactory
+     * @var ModelDecorator\IFactory
      */
-    private $wrapperFactory;
+    private $decoratorFactory;
 
 
     /**
-     * The model wrapper factory for comments, used to wrap comments in a
+     * The model decorator factory for comments, used to wrap comments in a
      * thread in a renderer that knows how to create links for its context.
      *
-     * @var Comment\ModelWrapper\IFactory
+     * @var Comment\ModelDecorator\IFactory
      */
-    private $commentWrapperFactory;
+    private $commentDecoratorFactory;
 
 
     /**
      * Constructor
      *
-     * @param Comment\Mapper                $commentMapper
-     * @param Mapper                        $threadMapper
-     * @param IContextLocator               $context
-     * @param ModelWrapper\IFactory         $wrapperFactory
-     * @param Comment\ModelWrapper\IFactory $commentWrapperFactory
+     * @param Comment\Mapper                  $commentMapper
+     * @param Mapper                          $threadMapper
+     * @param IContextLocator                 $context
+     * @param ModelDecorator\IFactory         $decoratorFactory
+     * @param Comment\ModelDecorator\IFactory $commentDecoratorFactory
      */
     public function __construct(
         Comment\Mapper $commentMapper,
         Mapper $threadMapper,
         IContextLocator $context,
-        ModelWrapper\IFactory $wrapperFactory,
-        Comment\ModelWrapper\IFactory $commentWrapperFactory
+        ModelDecorator\IFactory $decoratorFactory,
+        Comment\ModelDecorator\IFactory $commentDecoratorFactory
     ) {
-        $this->commentMapper         = $commentMapper;
-        $this->threadMapper          = $threadMapper;
-        $this->context               = $context;
-        $this->wrapperFactory        = $wrapperFactory;
-        $this->commentWrapperFactory = $commentWrapperFactory;
+        $this->commentMapper           = $commentMapper;
+        $this->threadMapper            = $threadMapper;
+        $this->context                 = $context;
+        $this->decoratorFactory        = $decoratorFactory;
+        $this->commentDecoratorFactory = $commentDecoratorFactory;
     }
 
 
@@ -183,7 +183,7 @@ class Controller extends BaseController
 
         $this->commentMapper->save($comment);
 
-        $responseData = $this->commentWrapperFactory
+        $responseData = $this->commentDecoratorFactory
             ->build($comment, $context)
             ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
 
@@ -283,7 +283,7 @@ class Controller extends BaseController
         return [
             'data'     => $comments
                 ->map(function (Comment\Model $comment) use ($context) {
-                    return $this->commentWrapperFactory->build($comment, $context);
+                    return $this->commentDecoratorFactory->build($comment, $context);
                 })
                 ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
@@ -307,7 +307,7 @@ class Controller extends BaseController
      */
     private function buildResponse(Model $thread, IContext $context, bool $loadChildren): void
     {
-        $responseData             = $this->wrapperFactory->build($thread, $context)->jsonSerialize(
+        $responseData             = $this->decoratorFactory->build($thread, $context)->jsonSerialize(
             $this->retrieveJsonDecorator(),
             $this->retrieveLinkDecorator()
         );

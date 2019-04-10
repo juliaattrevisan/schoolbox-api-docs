@@ -151,11 +151,11 @@ abstract class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'commentMapper'         => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'threadMapper'          => $this->getMapperFactory()->getLazy(Mapper::class),
-            'context'               => $this->buildContext(),
-            'wrapperFactory'        => $this->buildModelWrapperFactory(),
-            'commentWrapperFactory' => $this->buildCommentModelWrapperFactory(),
+            'commentMapper'           => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
+            'threadMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
+            'context'                 => $this->buildContext(),
+            'decoratorFactory'        => $this->buildModelDecoratorFactory(),
+            'commentDecoratorFactory' => $this->buildCommentModelDecoratorFactory(),
         ];
     }
 
@@ -185,25 +185,25 @@ abstract class Module extends BaseModule
 
 
     /**
-     * Builds a factory for building wrappers around thread models.
+     * Builds a factory for building decorators around thread models.
      *
      * Required so that the controller may render links dependent on the module
      * that uses the variant.
      *
-     * @return ModelWrapper\IFactory
+     * @return ModelDecorator\IFactory
      */
-    abstract protected function buildModelWrapperFactory(): ModelWrapper\IFactory;
+    abstract protected function buildModelDecoratorFactory(): ModelDecorator\IFactory;
 
 
     /**
-     * Builds a factory for building wrappers around thread comment models.
+     * Builds a factory for building decorators around thread comment models.
      *
      * Required so that the controller may render links dependent on the module
      * that uses the variant.
      *
-     * @return Comment\ModelWrapper\IFactory
+     * @return Comment\ModelDecorator\IFactory
      */
-    abstract protected function buildCommentModelWrapperFactory(): Comment\ModelWrapper\IFactory;
+    abstract protected function buildCommentModelDecoratorFactory(): Comment\ModelDecorator\IFactory;
 
 
     /**

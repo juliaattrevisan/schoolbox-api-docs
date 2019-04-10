@@ -10,8 +10,8 @@ namespace Schoolbox\Comms\News\Discussion\Thread\ModelWrapper;
 
 use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Model;
-use Schoolbox\Discussion\Thread\ModelWrapper\BaseWrapper;
-use Schoolbox\Discussion\Thread\ModelWrapper\IFactory;
+use Schoolbox\Discussion\Thread\ModelDecorator\BaseDecorator;
+use Schoolbox\Discussion\Thread\ModelDecorator\IFactory;
 
 /**
  * Factory for model wrappers for the comms variant of the discussion thread
@@ -22,10 +22,10 @@ class Factory implements IFactory
     /**
      * @param Model    $model
      * @param IContext $context
-     * @return BaseWrapper
+     * @return BaseDecorator
      */
-    public function build(Model $model, IContext $context): BaseWrapper
+    public function build(Model $model, IContext $context): BaseDecorator
     {
-        return new Wrapper($model, $context);
+        return new Decorator($model, $context);
     }
 }

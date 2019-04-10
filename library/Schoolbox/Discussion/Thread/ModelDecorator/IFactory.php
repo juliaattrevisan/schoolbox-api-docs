@@ -6,10 +6,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Comment\ModelWrapper;
+namespace Schoolbox\Discussion\Thread\ModelDecorator;
 
-use Schoolbox\Discussion\Comment\Model;
 use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Model;
 
 /**
  * Interface for the factory for building a wrapped model out of a model.
@@ -21,7 +21,7 @@ interface IFactory
      *
      * @param Model    $model
      * @param IContext $context
-     * @return BaseWrapper
+     * @return BaseDecorator
      */
-    public function build(Model $model, IContext $context): BaseWrapper;
+    public function build(Model $model, IContext $context): BaseDecorator;
 }

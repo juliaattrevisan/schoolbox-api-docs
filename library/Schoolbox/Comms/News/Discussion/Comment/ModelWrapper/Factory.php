@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Discussion\Comment\ModelWrapper;
 
 use Schoolbox\Discussion\Comment\Model;
-use Schoolbox\Discussion\Comment\ModelWrapper\BaseWrapper;
-use Schoolbox\Discussion\Comment\ModelWrapper\IFactory;
+use Schoolbox\Discussion\Comment\ModelDecorator\BaseDecorator;
+use Schoolbox\Discussion\Comment\ModelDecorator\IFactory;
 use Schoolbox\Discussion\Thread\Context\IContext;
 
 /**
@@ -22,10 +22,10 @@ class Factory implements IFactory
     /**
      * @param Model    $model
      * @param IContext $context
-     * @return BaseWrapper
+     * @return BaseDecorator
      */
-    public function build(Model $model, IContext $context): BaseWrapper
+    public function build(Model $model, IContext $context): BaseDecorator
     {
-        return new Wrapper($model, $context);
+        return new Decorator($model, $context);
     }
 }

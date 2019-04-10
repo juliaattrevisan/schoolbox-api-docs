@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Discussion\Thread\ModelWrapper;
+namespace Schoolbox\Discussion\Thread\ModelDecorator;
 
 use Alaress_Date_Format;
 use Alaress\Json;
@@ -14,12 +14,12 @@ use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread\Model;
 
 /**
- * Wrapper for thread models, so that they may have links output as part of
+ * Decorator for thread models, so that they may have links output as part of
  * their JSON representation.
  *
  * Intended to be extended: subclass this class and implement `getJsonApiLinks`.
  */
-abstract class BaseWrapper implements Json\Serializable, Json\Linkable
+abstract class BaseDecorator implements Json\Serializable, Json\Linkable
 {
     use Json\SerializeTrait;
 
