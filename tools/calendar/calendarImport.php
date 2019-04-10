@@ -19,16 +19,17 @@ $kernel = new CliTool\Kernel(
     new class extends CliTool\App
     {
 
-        private const OPT_LONG_HELP = 'help';         // print help
-//    --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
+        // --help: print help
+        private const OPT_LONG_HELP = 'help';
+        // --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
         private const OPT_LONG_FILE = 'file:';
-//    --owner:      The user ID of who the events should be owned by
+        // --owner:      The user ID of who the events should be owned by
         private const OPT_LONG_OWNER = 'owner:';
-//    --campus:     Comma-seperated list of campus IDs that the events should be shown to
+        // --campus:     Comma-separated list of campus IDs that the events should be shown to
         private const OPT_LONG_CAMPUS = 'campus:';
-//    --role:       Comma-seperated list of role IDs that the events should be shown to
+        // --role:       Comma-separated list of role IDs that the events should be shown to
         private const OPT_LONG_ROLE = 'role:';
-//    --source:     Optional source name, subsequent uploads will delete any events with the same source name
+        // --source:     Optional source name, subsequent uploads will delete any events with the same source name
         private const OPT_LONG_SOURCE = 'source:';
 
 
@@ -66,7 +67,7 @@ $kernel = new CliTool\Kernel(
         {
             $log = $this->getLogger();
 
-            if ($this->getOpt(self::OPT_LONG_HELP)  || !$this->parseAppOptions()) {
+            if ($this->getOpt(self::OPT_LONG_HELP) || !$this->parseAppOptions()) {
                 echo <<<HELP
 Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source='sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
@@ -79,18 +80,9 @@ HELP;
                 exit;
             }
 
-            //Optional options
-            if ($this->getOpt(self::OPT_LONG_SOURCE)) {
-                $source = $this->getOpt(self::OPT_LONG_SOURCE);
-                $log->warning('Events with source "' . $source . '" will be deleted' . "\n");
-            } else {
-                $source = null;
-            }
-
-            $bulkHandler = new Bulk_Calendar($this->file, $source, $this->ownerId, [], $this->roleList, $this->campusList);
+            $bulkHandler = new Bulk_Calendar($this->file, $this->source, $this->ownerId, [], $this->roleList, $this->campusList);
 
             try {
-
                 $result = $bulkHandler->addCalendar();
                 foreach ($result as $event) {
                     $log->notice("{$event['status']} event: {$event['name']}, {$event['error']}");
@@ -139,6 +131,17 @@ HELP;
                 $valid = false;
             } else {
                 $this->file = $this->getOpt(self::OPT_LONG_FILE);
+            }
+
+            /* source: optional flag
+             * The source column allows us to identify events with an arbitrary string ("source") so we can
+             * see where events came from (ie. what imported them). It only has utility when you specify a value
+             * It's optional, but if you supply it, it must have a value
+             * Currently, this flag is ignored, when a value is not provided.
+             */
+            if ($this->getOpt(self::OPT_LONG_SOURCE)) {
+                $this->source = $this->getOpt(self::OPT_LONG_SOURCE);
+                $this->getLogger()->warning("Events with source '{$this->source}' will be deleted.\n");
             }
 
             return $valid;
