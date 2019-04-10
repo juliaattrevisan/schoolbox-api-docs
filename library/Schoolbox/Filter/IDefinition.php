@@ -32,7 +32,7 @@ interface IDefinition
      *
      * @return string
      */
-    public static function getName();
+    public static function getName(): string;
 
 
     /**
@@ -45,13 +45,13 @@ interface IDefinition
      * @param string $page
      * @return bool
      */
-    public static function isMandatory($page);
+    public static function isMandatory(string $page): bool;
 
 
     /**
      * @return Model
      */
-    public function getFilter();
+    public function getFilter(): Model;
 
 
     /**
@@ -59,7 +59,7 @@ interface IDefinition
      *
      * @return string
      */
-    public static function getPanelComponentTemplate();
+    public static function getPanelComponentTemplate(): string;
 
 
     /**
@@ -75,7 +75,7 @@ interface IDefinition
      * @param null|string $roleTypeFilter
      * @return GenericCollection|Page\Option\Model[]
      */
-    public function normalisePageOptions(Page\Model $pageFilter, $roleTypeFilter = null);
+    public function normalisePageOptions(Page\Model $pageFilter, string $roleTypeFilter = null): GenericCollection;
 
 
     /**
@@ -99,7 +99,7 @@ interface IDefinition
      * @throws \InvalidArgumentException If key is recognised as invalid
      * @todo This should be a view-layer responsibility
      */
-    public function getLabel($key);
+    public function getLabel(string $key): string;
 
 
     /**
@@ -108,7 +108,7 @@ interface IDefinition
      * @param string $page
      * @return bool
      */
-    public static function getEnabledInitialState($page);
+    public static function getEnabledInitialState(string $page): bool;
 
     /**
      * Prior to admin-configuration, should this filter be user-configurable on the specified page?
@@ -116,5 +116,5 @@ interface IDefinition
      * @param string $page
      * @return bool
      */
-    public static function getUserConfigurableInitialState($page);
+    public static function getUserConfigurableInitialState(string $page): bool;
 }

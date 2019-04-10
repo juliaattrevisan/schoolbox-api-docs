@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 
 
@@ -73,7 +74,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         if (self::KEY_PROJECT === $key) {
             return 'Project';
@@ -94,7 +95,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // by default, all AssessmentTypes are available
         return true;
@@ -104,7 +105,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return $this->assessmentTypes->getAll();
     }
@@ -113,7 +114,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter): GenericCollection
     {
         $cleanPageOptions = parent::unsetInvalidOptions($pageFilter);
 
@@ -130,7 +131,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // No options checked
         return false;
@@ -140,7 +141,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/AssessmentType/templates';
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Page;
+use Schoolbox\GenericCollection;
 
 /**
  * The unit-spec that an an assessment-impl's unit-impl was imported from.
@@ -61,7 +62,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return array_merge(parent::getCustomKeys(), [
             self::KEY_IMPORTED_TO_CLASS,
@@ -86,7 +87,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function isMandatory($page)
+    public static function isMandatory(string $page): bool
     {
         // This filter must always be present on this page
         return $page === Page\Model::PAGE_COURSE_MARK_BOOK;
@@ -95,7 +96,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(Page\Model $pageFilter)
+    protected function unsetInvalidOptions(Page\Model $pageFilter): GenericCollection
     {
         $options = parent::unsetInvalidOptions($pageFilter);
 
@@ -113,7 +114,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         switch ($key) {
             case self::KEY_NONE:
@@ -130,7 +131,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/NullableContext/UnitImportSpec/templates';
     }

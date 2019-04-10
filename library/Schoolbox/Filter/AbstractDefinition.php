@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
 
 /**
@@ -58,7 +59,7 @@ abstract class AbstractDefinition implements IDefinition
      * @inheritdoc
      * @throws \DomainException If NAME constant not defined
      */
-    public static function getName()
+    public static function getName(): string
     {
         $name = static::NAME;
         if (!$name) {
@@ -71,7 +72,7 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @inheritdoc
      */
-    public static function isMandatory($page)
+    public static function isMandatory(string $page): bool
     {
         // Default to not being mandatory. The admin can disable this filter on any page where it appears.
         return false;
@@ -81,7 +82,7 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @inheritdoc
      */
-    public static function getEnabledInitialState($page)
+    public static function getEnabledInitialState(string $page): bool
     {
         return true;
     }
@@ -90,7 +91,7 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @inheritdoc
      */
-    public static function getUserConfigurableInitialState($page)
+    public static function getUserConfigurableInitialState(string $page): bool
     {
         return true;
     }
@@ -105,7 +106,7 @@ abstract class AbstractDefinition implements IDefinition
      * @param Page\Model $pageFilter
      * @return bool
      */
-    protected abstract function getInitialAvailability($customAbstractKey, Page\Model $pageFilter);
+    abstract protected function getInitialAvailability(string $customAbstractKey, Page\Model $pageFilter): bool;
 
 
     /**
@@ -117,7 +118,7 @@ abstract class AbstractDefinition implements IDefinition
      * @return GenericCollection|Page\Option\Model[]
      * @throws \Schoolbox\Mapper\Exception            If unable to generate a mapper's model
      */
-    protected function insertAbstractOptions(Page\Model $pageFilter)
+    protected function insertAbstractOptions(Page\Model $pageFilter): GenericCollection
     {
         $options = $pageFilter->getOptions();
 
@@ -146,7 +147,7 @@ abstract class AbstractDefinition implements IDefinition
      * @param Page\Model $pageFilter
      * @return GenericCollection|Page\Option\Model[]
      */
-    protected function insertDynamicOptions(Page\Model $pageFilter)
+    protected function insertDynamicOptions(Page\Model $pageFilter): GenericCollection
     {
         return $pageFilter->getOptions();
     }
@@ -166,7 +167,7 @@ abstract class AbstractDefinition implements IDefinition
      * @param Page\Model $pageFilter
      * @return GenericCollection|Page\Option\Model[]
      */
-    protected function unsetInvalidOptions(Page\Model $pageFilter)
+    protected function unsetInvalidOptions(Page\Model $pageFilter): GenericCollection
     {
         // Note: You must override this is you wish to remove some options for specific pages
         $validKeys = $this->getAbstractKeys();
@@ -194,7 +195,7 @@ abstract class AbstractDefinition implements IDefinition
      * @param null|string $roleTypeFilter
      * @return GenericCollection|Page\Option\Model[]
      */
-    protected function unsetInvalidDefaults(Page\Model $pageFilter, $roleTypeFilter = null)
+    protected function unsetInvalidDefaults(Page\Model $pageFilter, $roleTypeFilter = null): GenericCollection
     {
         $validRoleTypes = $roleTypeFilter ? [$roleTypeFilter] : Page\Model::getPageRoleTypes()[$pageFilter->getPage()];
         $validRoleTypes = array_combine($validRoleTypes, $validRoleTypes);
@@ -216,7 +217,7 @@ abstract class AbstractDefinition implements IDefinition
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception            If unable to generate a mapper's model
      */
-    public function normalisePageOptions(Page\Model $pageFilter, $roleTypeFilter = null)
+    public function normalisePageOptions(Page\Model $pageFilter, string $roleTypeFilter = null): GenericCollection
     {
         $this->insertAbstractOptions($pageFilter);
         $this->insertDynamicOptions($pageFilter);
@@ -280,7 +281,7 @@ abstract class AbstractDefinition implements IDefinition
      * @param string $roleType
      * @return bool
      */
-    abstract protected function getInitialSelectedState($key, $page, $roleType);
+    abstract protected function getInitialSelectedState(string $key, string $page, string $roleType): bool;
 
 
     /**
@@ -291,11 +292,15 @@ abstract class AbstractDefinition implements IDefinition
      *
      * @return string[]
      */
-    abstract protected function getCustomKeys();
+    abstract protected function getCustomKeys(): array;
 
 
     /**
-     * @inheritdoc
+     * Returns the keys that represent options that are system-config dependent, and where the set is
+     * known even when not in a specific-page or viewer/viewee context.
+     * eg:
+     *   list of configured terms,
+     *   list of configured work-types
      */
     public function getAbstractKeys()
     {
@@ -313,7 +318,7 @@ abstract class AbstractDefinition implements IDefinition
      * @param GenericCollection|Page\Option\Model[] $options
      * @return GenericCollection|Page\Option\Model[]
      */
-    protected function sortFilterOptions(GenericCollection $options)
+    protected function sortFilterOptions(GenericCollection $options): GenericCollection
     {
         return $options->sortByCallback(function (Page\Option\Model $left, Page\Option\Model $right) {
 
@@ -330,7 +335,7 @@ abstract class AbstractDefinition implements IDefinition
      *
      * @return string
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         // undefined on abstract. Concrete class must implement
         return '';
@@ -341,7 +346,7 @@ abstract class AbstractDefinition implements IDefinition
      * @inheritdoc
      * @throws \DomainException If this definition has not defined a template directory
      */
-    public static function getPanelComponentTemplate()
+    public static function getPanelComponentTemplate(): string
     {
         $templateDir = static::getTemplatesDir();
 
@@ -359,7 +364,7 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @return Model
      */
-    public function getFilter()
+    public function getFilter(): Model
     {
         return $this->filter;
     }
@@ -368,7 +373,7 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @return Page\Option\Mapper
      */
-    protected function getFilterOptionMapper()
+    protected function getFilterOptionMapper(): Page\Option\Mapper
     {
         return $this->filterOptionMapper;
     }
@@ -377,7 +382,7 @@ abstract class AbstractDefinition implements IDefinition
     /**
      * @return Page\Option\Defaults\Mapper
      */
-    public function getFilterDefaultMapper()
+    public function getFilterDefaultMapper(): Page\Option\Defaults\Mapper
     {
         return $this->filterDefaultMapper;
     }

@@ -10,6 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Schoolbox\GenericCollection;
 
 /**
  * Displays a list of projects.
@@ -38,7 +39,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter): GenericCollection
     {
         $cleanedPageOptions = parent::unsetInvalidOptions($pageFilter);
 
@@ -58,7 +59,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return array_merge(parent::getCustomKeys(), [
             self::KEY_ON_CLASS_FOLDER,
@@ -85,7 +86,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         switch ($key) {
             case self::KEY_NONE:
@@ -108,7 +109,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/NullableContext/Project/templates';
     }

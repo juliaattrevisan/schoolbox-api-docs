@@ -18,7 +18,7 @@ abstract class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // No options checked
         return false;
@@ -28,7 +28,7 @@ abstract class Definition extends AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // Initial config is both classes and groups are available for all pages
         return true;

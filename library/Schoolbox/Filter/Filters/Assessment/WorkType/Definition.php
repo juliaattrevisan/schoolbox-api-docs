@@ -55,7 +55,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_NONE,
@@ -83,7 +83,7 @@ class Definition extends Filter\AbstractDefinition
      * @param GenericCollection|Filter\Page\Option\Model[] $options
      * @return GenericCollection
      */
-    protected function sortFilterOptions(GenericCollection $options)
+    protected function sortFilterOptions(GenericCollection $options): GenericCollection
     {
         // Keys represent WorkType IDs
         return $options->sortByCallback(function (Filter\Page\Option\Model $left, Filter\Page\Option\Model $right) {
@@ -118,7 +118,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         if (self::KEY_NONE === $key) {
             return '(none)';
@@ -130,7 +130,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(Filter\Page\Model $pageFilter)
+    protected function insertDynamicOptions(Filter\Page\Model $pageFilter): GenericCollection
     {
         $options = $pageFilter->getOptions();
 
@@ -155,7 +155,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // No options checked
         return false;
@@ -165,7 +165,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // by default, all WorkTypes are available
         return true;
@@ -175,7 +175,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/WorkType/templates';
     }

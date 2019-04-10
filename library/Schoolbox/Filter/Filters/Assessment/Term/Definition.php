@@ -69,7 +69,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_ALL,
@@ -88,7 +88,7 @@ abstract class Definition extends Filter\AbstractDefinition
      * @param Filter\Page\Model $pageFilter
      * @return bool
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         $isAvailable = false;
         $page        = $pageFilter->getPage();
@@ -111,7 +111,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         if (Filter\Page\Model::PAGE_PENDING_ASSESSMENTS === $page) {
             return in_array($key, [self::KEY_FUTURE, self::KEY_CURRENT], true);
@@ -123,7 +123,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function insertDynamicOptions(Filter\Page\Model $pageFilter)
+    protected function insertDynamicOptions(Filter\Page\Model $pageFilter): GenericCollection
     {
         $options = $pageFilter->getOptions();
 
@@ -147,7 +147,7 @@ abstract class Definition extends Filter\AbstractDefinition
      * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $options
      * @return GenericCollection
      */
-    protected function sortFilterOptions(GenericCollection $options)
+    protected function sortFilterOptions(GenericCollection $options): GenericCollection
     {
         return $options->sortByCallback(function (Filter\Page\Option\Model $left, Filter\Page\Option\Model $right) {
             $leftKey  = $left->getKey();
@@ -198,7 +198,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         if (self::KEY_ALL === $key) {
             return 'All Terms';
