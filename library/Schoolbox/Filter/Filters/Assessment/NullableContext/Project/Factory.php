@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
 use function count;
-use function in_array;
 use InvalidArgumentException;
 use PDO;
 use Schoolbox\Collection;
@@ -159,7 +158,7 @@ class Factory extends NullableContext\Factory
         $options = $pageFilter->getOptions();
 
         // Is this filter being used on a page that renders involved folders?
-        if (in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
+        if ($this->isInvolvedFolderPage($pageFilter->getPage())) {
             [$directFolders, $indirectFolders] = $this->fetchRelatedFolders($options, $pageFilter, $viewee);
         } else {
             $directFolders   = $this->folderMapper->createCollection();
@@ -167,7 +166,7 @@ class Factory extends NullableContext\Factory
         }
 
         // Is component being used on a page that has a folder in the URL?
-        if (in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
+        if ($this->isSingleFolderPage($pageFilter->getPage())) {
             $folder                            = $this->findFolderModel($routeArgs);
             $directFolders[$folder->getId()]   = $folder;
             $indirectFolders[$folder->getId()] = $folder;

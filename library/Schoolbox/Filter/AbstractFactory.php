@@ -8,8 +8,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter;
 
+use function in_array;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+use Schoolbox\Resource\Folder;
+use TypeError;
 
 abstract class AbstractFactory implements IFactory
 {
@@ -86,5 +89,47 @@ abstract class AbstractFactory implements IFactory
     protected function getSelectionMapper(): Selection\Mapper
     {
         return $this->selectionMapper;
+    }
+
+
+    /**
+     * Returns whether the specified page displays a list of folders related to the viewee
+     *
+     * @param string $page
+     * @return bool
+     */
+    protected function isInvolvedFolderPage(string $page): bool
+    {
+        return in_array($page, Page\Model::getInvolvedFoldersPages(), true);
+    }
+
+
+    /**
+     * Returns whether the specified page relates to a single folder
+     *
+     * @param string $page
+     * @return bool
+     */
+    protected function isSingleFolderPage(string $page): bool
+    {
+        return in_array($page, Page\Model::getSingleFolderPages(), true);
+    }
+
+
+    /**
+     * Finds a returns the first folder model from an array of route args
+     *
+     * @param array $routeArgs
+     * @return Folder\Model
+     * @throws TypeError If no Folder\Model found in $routeArgs
+     */
+    protected function findFolderModel(array $routeArgs): Folder\Model
+    {
+        foreach ($routeArgs as $routeArg) {
+            if ($routeArg instanceof Folder\Model) {
+                return $routeArg;
+            }
+        }
+        return null;
     }
 }
