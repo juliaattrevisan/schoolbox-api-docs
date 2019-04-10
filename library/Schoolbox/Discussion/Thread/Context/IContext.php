@@ -18,6 +18,14 @@ use Schoolbox\Discussion\Thread\Model;
 interface IContext
 {
     /**
+     * Get an identifier for this object.
+     *
+     * @return mixed
+     */
+    public function getId();
+
+
+    /**
      * Which thread is associated with this object, if any?
      *
      * @return Model|null
