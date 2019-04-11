@@ -141,7 +141,7 @@ class Controller extends Base
     /**
      * Displays a list of rubric marks for students and learners associated with the specified folder
      *
-     * @api   GET /learning/rubricMarkbook/{folderId}
+     * @api   POST /learning/rubricMarkbook/{folderId}
      * @level 190
      * @param Folder\Model $folder Folder for this class
      * @throws Database\Exception
