@@ -121,7 +121,7 @@ class GDriveFetcher implements FetcherInterface
      */
     private function isPdfExportEnabled(): bool
     {
-        return $this->configLoader->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf']);
+        return $this->configLoader->get('googledrive_export_pdf') == '1' && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
     }
 
 
@@ -164,7 +164,7 @@ class GDriveFetcher implements FetcherInterface
             return null;
         } elseif ($this->isPdfExportEnabled()) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-            $url = $metadata['exportLinks']['application/pdf'];
+            $url = $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
         } else {
 
             /* Inspect metadata fields to find a download url
