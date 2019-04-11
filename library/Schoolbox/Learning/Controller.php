@@ -12,18 +12,23 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use function func_get_args;
+use External_Class;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\External\Subject;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Statistics;
 use Schoolbox\Learning\Classes\ClassList;
+use Schoolbox\Learning\Students\StudentLists;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
@@ -346,6 +351,43 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
     }
 
+    /**
+     * @param string $classCode
+     *
+     * @throws Mapper\Exception
+     */
+    public function getStudentListByClassCode(string $classCode)
+    {
+        $students = (new StudentLists(new External_Class(), new UserMapper(), $this->folderMapper, new Folder\Log\Mapper()))
+            ->setClassCode($classCode)
+            ->getStudentLists();
+
+        $this->getResponse()->status->set(200);
+        $this->getResponse()->content->set($this->buildJsonOutput($students));
+    }
+
+    /**
+     * @param string $classCode
+     *
+     * @throws Mapper\Exception
+     * @throws ServiceNotFound
+     */
+    public function getClassListPage(string $classCode)
+    {
+        $folder = $this->folderMapper->findByCode($classCode);
+
+        $subjectName = $folder->getName();
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learning/classLists.twig', [
+                'subjectName'   => $subjectName,
+                'classCode'     => $classCode,
+                'specialNeeds'  => $this->getDi()->get('sitePage')->getLocalisedTerm('specialNeeds', false, true),
+                'replyTo'       => $this->getUser()->getEmail(),
+                'mailEnabled'   => ConfigMapper::getInstance()->get('mail_enable'),
+            ])->setTab('classes')->setTitle($subjectName)
+        );
+    }
     /* Getters/Setters
      */
 }

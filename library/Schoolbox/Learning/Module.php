@@ -48,6 +48,8 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
+                '/class/lists/{classCode}'                => 'getStudentListByClassCode',
+                '/class/{classCode}'                      => 'getClassListPage',
             ],
             'POST' => [
                 '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
@@ -70,6 +72,17 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
+
+        $this->addRoutePermission($authorizer,
+            '(?:getStudentListByClassCode)',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            )
+        );
 
         // Either a SU or staff viewing their own assessments
         $this->addRoutePermission(
