@@ -44,7 +44,7 @@ class GDriveFetcher implements FetcherInterface
      *
      * @var array
      */
-    private $mimetypeMapping = [
+    private const MIMETYPE_MAPPING = [
         /* Powerpoint slides
          */
         'application/vnd.google-apps.presentation' => [
@@ -198,13 +198,14 @@ class GDriveFetcher implements FetcherInterface
 
     /**
      * Inspect metadata fields to find a download url
+     *
      * @param array $metadata
      * @return string
      */
     private function inspectExportLinks(array $metadata): string
     {
-        if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
-            $key = $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
+        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
+            $key = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
 
             return $metadata[self::CONTEXT_EXPORTLINKS][$key];
         }
@@ -231,8 +232,8 @@ class GDriveFetcher implements FetcherInterface
      */
     private function inspectFileExtension(array $metadata): string
     {
-        if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
-            return $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXTENSION];
+        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
+            return self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXTENSION];
         }
 
         foreach (self::FIELDS_EXTENSION as $field) {
