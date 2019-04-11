@@ -17,6 +17,7 @@ use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
 use function array_map;
 use Aura\Di;
+use function count;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
@@ -150,6 +151,10 @@ abstract class Mapper implements IMapper, Serializable
     protected $moduleNotifier;
 
     /**
+     * Indexed by model property name (not db column)
+     *
+     * @see MappingCollection::getOffsetByColumn() if you need to look
+     *
      * @var MappingCollection
      */
     protected $map;
@@ -1768,20 +1773,6 @@ abstract class Mapper implements IMapper, Serializable
         return $this->getIdentifier()['column'];
     }
 
-
-    /**
-     * Retrieves this entity's identifier's hydrator.
-     *
-     * Returns NULL if this entity does not have an identifier
-     *
-     * @return null|IColumnType
-     */
-    public function getIdentifierHydrator(): ?IColumnType
-    {
-        return $this->getIdentifier()['hydrator'] ?? null;
-    }
-
-
     /**
      * Sets identifier for this mapper.
      *
@@ -2187,7 +2178,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Build ORDER BY part
-        if (isset($options['order']) && \is_array($options['order']) && \count($options['order'])) {
+        if (isset($options['order']) && \is_array($options['order']) && count($options['order'])) {
             $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database);
         }
 
@@ -2245,7 +2236,7 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($order as $column => $order_option) {
                 // Is there a . in escaped_name? Assume it's a sort on a join
                 $parts = \explode('.', $column, 2);
-                if (\count($parts) === 1) {
+                if (count($parts) === 1) {
                     $prefix     = $quoted_table;
                     $columnName = $db->quoteIdentifier($column);
                 } else {
@@ -2492,9 +2483,7 @@ abstract class Mapper implements IMapper, Serializable
         }
         $ids        = $stmt->fetchAll(PDO::FETCH_COLUMN);
         $idHydrator = $this->getIdentifierHydrator();
-        if ($idHydrator) {
-            $ids = array_map([$idHydrator, 'hydrate'], $ids);
-        }
+        $ids        = array_map([$idHydrator, 'hydrate'], $ids);
         return $ids;
     }
 
@@ -2516,13 +2505,18 @@ abstract class Mapper implements IMapper, Serializable
      * @param array   $options
      * @return array
      */
-    public function findScalarByPredicates($column, Builder $pb, array $options = [])
+    public function findScalarByPredicates(string $column, Builder $pb, array $options = []): array
     {
         try {
-            return $this->selectColumnsByPredicates([ $column ], $pb, $options)->fetchAll(PDO::FETCH_COLUMN);
+            $scalars = $this->selectColumnsByPredicates([$column], $pb, $options)->fetchAll(PDO::FETCH_COLUMN);
         } catch (UnderflowException $e) {
             return [];
         }
+        if (count($scalars)) {
+            $hydrator = $this->getColumnHydrator($column);
+            $scalars  = array_map([$hydrator, 'hydrate'], $scalars);
+        }
+        return $scalars;
     }
 
 
@@ -2532,13 +2526,26 @@ abstract class Mapper implements IMapper, Serializable
      * @param array    $options
      * @return array
      */
-    public function findColumnsByPredicates($columnList, Builder $pb, array $options = [])
+    public function findColumnsByPredicates($columnList, Builder $pb, array $options = []): array
     {
         try {
-            return $this->selectColumnsByPredicates($columnList, $pb, $options)->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $this->selectColumnsByPredicates($columnList, $pb, $options)->fetchAll(PDO::FETCH_ASSOC);
         } catch (UnderflowException $e) {
             return [];
         }
+        if (count($rows)) {
+            /** @var IColumnType[] $hydrators */
+            $hydrators = [];
+            foreach ($columnList as $column) {
+                $hydrators[$column] = $this->getColumnHydrator($column);
+            }
+            foreach ($rows as $rowId => $row) {
+                foreach ($row as $column => $value) {
+                    $rows[$rowId][$column] = $hydrators[$column]->hydrate($value);
+                }
+            }
+        }
+        return $rows;
     }
 
 
@@ -3837,14 +3844,20 @@ abstract class Mapper implements IMapper, Serializable
      *                   'limit' or 'offset')
      * @return array
      */
-    public function findDistinct($column, $columnList = array(), $options = array())
+    public function findDistinct($column, $columnList = array(), $options = array()): array
     {
         try {
             $stmt = $this->selectScalarByColumnList("DISTINCT $column", $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $scalars = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if (count($scalars)) {
+            $hydrator = $this->getColumnHydrator($column);
+            $scalars = array_map([$hydrator, 'hydrator'], $scalars);
+        }
+        return $scalars;
+
     }
 
     /**
@@ -4015,5 +4028,32 @@ abstract class Mapper implements IMapper, Serializable
                 throw new \UnexpectedValueException($message ?? 'Joined model has changed');
             }
         }
+    }
+
+
+    /**
+     * Retrieves this entity's identifier's hydrator.
+     *
+     * Intentionally throws a TypeError if called on a entity that does not have an identifier
+     *
+     * @return IColumnType
+     */
+    private function getIdentifierHydrator(): IColumnType
+    {
+        return $this->getIdentifier()['hydrator'];
+    }
+
+
+    /**
+     * Returns a column's hydrator
+     *
+     * Intentionally throws a TypeError if column does not have a mapping
+     *
+     * @param string $column
+     * @return IColumnType|null
+     */
+    private function getColumnHydrator(string $column): IColumnType
+    {
+        return $this->map->getOffsetByColumn($column)['hydrator'];
     }
 }
