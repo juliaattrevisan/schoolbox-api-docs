@@ -13,9 +13,8 @@ use BadMethodCallException;
 use CallbackFilterIterator;
 
 /**
- * TODO - this probably shouldn't extent Collection anymore, as many Collection methods will
+ * TODO - this probably shouldn't extend Collection anymore, as many Collection methods will
  *        break this class's internals. (it relies on being indexed by property)
- *
  */
 class MappingCollection extends Collection
 {
