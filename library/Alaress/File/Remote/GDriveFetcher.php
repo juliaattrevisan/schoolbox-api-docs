@@ -68,6 +68,17 @@ class GDriveFetcher implements FetcherInterface
         curl_close($this->ch);
     }
 
+
+    /**
+     * The config option "Google Drive Always Convert To PDF" is on
+     *
+     * @return bool
+     */
+    private function isPdfExportEnabled(): bool
+    {
+        return $this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf']);
+    }
+
     /**
      * Retrieves the metadata for the given fileId
      *
@@ -105,8 +116,7 @@ class GDriveFetcher implements FetcherInterface
         if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
             // if this file has been flagged by Drive as "restricted", disallow any download
             return null;
-
-        } elseif ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
+        } elseif ($this->isPdfExportEnabled()) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
         } else {
@@ -160,27 +170,27 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata)
     {
-            if ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
-                // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-                $ext = '.pdf';
+        if ($this->isPdfExportEnabled()) {
+            // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
+            $ext = '.pdf';
+        } else {
+            if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
+                $ext = '.pptx';
+            } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
+                // Get DOCX format spreadsheet
+                $ext = '.docx';
+            } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
+                // Get XLSX format spreadsheet
+                $ext = '.xlsx';
+            } else if ($metadata['fullFileExtension']) {
+                // attempt to use the file extension proper
+                $ext = '.' . $metadata['fullFileExtension'];
             } else {
-                if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
-                    $ext = '.pptx';
-                } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
-                    // Get DOCX format spreadsheet
-                    $ext = '.docx';
-                } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
-                    // Get XLSX format spreadsheet
-                    $ext = '.xlsx';
-                } else if ($metadata['fullFileExtension']) {
-                    // attempt to use the file extension proper
-                    $ext = '.' . $metadata['fullFileExtension'];
-                } else {
-                    $ext = '.pdf';
-                }
+                $ext = '.pdf';
             }
+        }
 
-            return $metadata['title'].$ext;
+        return $metadata['title'].$ext;
     }
 
 
