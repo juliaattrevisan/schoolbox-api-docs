@@ -2482,7 +2482,7 @@ abstract class Mapper implements IMapper, Serializable
             return [];
         }
         $ids        = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        $idHydrator = $this->getIdentifierHydrator();
+        $idHydrator = $this->getColumnScalarHydrator($this->getIdentifierColumn());
         $ids        = array_map([$idHydrator, 'hydrate'], $ids);
         return $ids;
     }
@@ -4032,20 +4032,10 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Retrieves this entity's identifier's hydrator.
-     *
-     * Intentionally throws a TypeError if called on a entity that does not have an identifier
-     *
-     * @return IColumnType
-     */
-    private function getIdentifierHydrator(): IColumnType
-    {
-        return $this->getIdentifier()['hydrator'];
-    }
-
-
-    /**
      * Returns a column's scalar hydrator.
+     *
+     * 'Scalar' is treated as anything that is not a Model hydrator.
+     * ie, this will still return Colour, Collection, etc hydrators.
      *
      * Intentionally throws a TypeError if column does not have a mapping
      *
@@ -4055,7 +4045,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function getColumnScalarHydrator(string $column, int $depth = 0): IColumnType
     {
-        // If the column is a foreign key to another entity, we need to fetch that entities column hydrator,
+        // If the column is a foreign key to another entity, we need to fetch that entity's column hydrator
         // to ensure we are always returning a hydrator whose hydrate() method generates a scalar, never an object.
         // We know the data types are the same as that's a pre-requisite for adding the foreign key.
         // It quite possible for a FK to point to a column that is itself a FK.
