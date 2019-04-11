@@ -8,13 +8,24 @@
  */
 
 namespace Schoolbox;
+use function array_key_exists;
 use BadMethodCallException;
 use CallbackFilterIterator;
 
 /**
- * TODO - this probably shouldn't extent Collection anymore, as many Collection methods will break this class's internals
+ * TODO - this probably shouldn't extent Collection anymore, as many Collection methods will
+ *        break this class's internals. (it relies on being indexed by property)
+ *
  */
-class MappingCollection extends Collection {
+class MappingCollection extends Collection
+{
+
+    /**
+     * Reverse map of columns to properties for efficient by-column lookup
+     *
+     * @var string[]
+     */
+    private $columnToPropertyMap = [];
 
 	/**
 	 * Retrieves an iterator which filters out any element in the collection
@@ -55,16 +66,37 @@ class MappingCollection extends Collection {
 	 * property name.
 	 *
 	 * @param  string $column
-	 * @return array
+	 * @return null|array
 	 */
-	public function getOffsetByColumn($column) {
-		foreach ($this as $map) {
-			if ($map['column'] === $column) {
-				return $map;
-			}
-		}
-		return null;
-	}
+    public function getOffsetByColumn(string $column): ?array
+    {
+        if (!array_key_exists($column, $this->columnToPropertyMap)) {
+            return null;
+        }
+        return $this->getOffset($this->columnToPropertyMap[$column]);
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function offsetSet($offset, $value)
+    {
+        return $this->setOffset($offset, $value);
+    }
+
+
+    /**
+     * Stores the column and property in a map to avoid O(N) by column lookup
+     *
+     * @see getOffsetByColumn()
+     * @inheritDoc
+     */
+    public function setOffset($index, $value)
+    {
+        $this->columnToPropertyMap[$value['column']] = $index;
+        return parent::setOffset($index, $value);
+    }
 
 
     /**
