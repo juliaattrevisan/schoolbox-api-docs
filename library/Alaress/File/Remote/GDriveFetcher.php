@@ -171,17 +171,7 @@ class GDriveFetcher implements FetcherInterface
 
             /* Inspect metadata fields to find a download url
              */
-            if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
-                $key = $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
-
-                $url = $metadata[self::CONTEXT_EXPORTLINKS][$key];
-            } elseif (!empty($metadata['downloadUrl'])) {
-                $url = $metadata['downloadUrl'];
-            }
-
-            /* If you got here, the api no longer provides the fields we were originally looking at
-             */
-            trigger_error("Google api fields for exportLinks not found: check api docs", E_USER_WARNING);
+            $url = $this->inspectExportLinks($metadata);
         }
 
         if (!$url) {
@@ -209,6 +199,58 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
+     * Inspect metadata fields to find a download url
+     * @param array $metadata
+     * @return string
+     */
+    private function inspectExportLinks(array $metadata): string
+    {
+        if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
+            $key = $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
+
+            return $metadata[self::CONTEXT_EXPORTLINKS][$key];
+        }
+
+        foreach (self::FIELDS_EXPORTLINKS as $field) {
+            if (!empty($metadata[$field])) {
+                return $metadata[$field];
+            }
+        }
+
+        /* If you got here, the api no longer provides the fields we were originally looking at
+         */
+        trigger_error('Google api fields for exportLinks not found: check api docs', E_USER_WARNING);
+
+        return '';
+    }
+
+
+    /**
+     * Inspect metadata fields to find a file extension
+     *
+     * @param array $metadata
+     * @return string
+     */
+    private function inspectFileExtension(array $metadata): string
+    {
+        if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
+            return $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXTENSION];
+        }
+
+        foreach (self::FIELDS_EXTENSION as $field) {
+            if (!empty($metadata[$field])) {
+                return $metadata[$field];
+            }
+        }
+
+        /* If you got here, the api no longer provides the fields we were originally looking at
+         */
+        trigger_error('Google api fields for extension not found: check api docs', E_USER_WARNING);
+
+        return '';
+    }
+
+    /**
      * Derive the file name from the metadata
      *
      * @param array $metadata
@@ -216,8 +258,6 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata)
     {
-        $ext = '';
-
         if ($this->isPdfExportEnabled()) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $ext = 'pdf';
@@ -225,18 +265,7 @@ class GDriveFetcher implements FetcherInterface
 
             /* Inspect metadata fields to find a file extension
              */
-            if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
-                $ext = $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXTENSION];
-            } elseif ($metadata['fileExtension']) {
-                $ext = $metadata['fileExtension'];
-            } elseif ($metadata['fullFileExtension']) {
-                // attempt to use the file extension proper
-                $ext = $metadata['fullFileExtension'];
-            }
-
-            /* If you got here, the api no longer provides the fields we were originally looking at
-             */
-            trigger_error("Google api fields for extension not found: check api docs", E_USER_WARNING);
+            $ext = $this->inspectFileExtension($metadata);
         }
 
         return "{$metadata['title']}.{$ext}";
