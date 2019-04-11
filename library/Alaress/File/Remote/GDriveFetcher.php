@@ -72,19 +72,19 @@ class GDriveFetcher implements FetcherInterface
          */
         'application/vnd.google-apps.presentation' => [
             'exportLinks' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'ext' => '.pptx',
+            'ext' => 'pptx',
         ],
         /* Word doc
          */
         'application/vnd.google-apps.document' => [
             'exportLinks' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'ext' => '.docx',
+            'ext' => 'docx',
         ],
         /* Spreadsheets
          */
         'application/vnd.google-apps.spreadsheet' => [
             'exportLinks' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'ext' => '.xlsx'
+            'ext' => 'xlsx'
         ]
     ];
 
@@ -168,22 +168,20 @@ class GDriveFetcher implements FetcherInterface
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata['exportLinks']['application/pdf'];
         } else {
-            if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
-                // Get PPTX format slides
-                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
-            } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
-                // Get DOCX format spreadsheet
-                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-            } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
-                // Get XLSX format spreadsheet
-                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-            } else if (!empty($metadata['downloadUrl'])) {
-                // Fall back to the download URL
+
+            /* Inspect metadata fields to find a download url
+             */
+            if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
+                $key = $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
+
+                $url = $metadata[self::CONTEXT_EXPORTLINKS][$key];
+            } elseif (!empty($metadata['downloadUrl'])) {
                 $url = $metadata['downloadUrl'];
-            } else {
-                // Last ditched PDF attempt if the download URL not set
-                $url = $metadata['exportLinks']['application/pdf'];
             }
+
+            /* If you got here, the api no longer provides the fields we were originally looking at
+             */
+            trigger_error("Google api fields for exportLinks not found: check api docs", E_USER_WARNING);
         }
 
         if (!$url) {
@@ -218,27 +216,30 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata)
     {
+        $ext = '';
+
         if ($this->isPdfExportEnabled()) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-            $ext = '.pdf';
+            $ext = 'pdf';
         } else {
-            if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
-                $ext = '.pptx';
-            } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
-                // Get DOCX format spreadsheet
-                $ext = '.docx';
-            } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
-                // Get XLSX format spreadsheet
-                $ext = '.xlsx';
-            } else if ($metadata['fullFileExtension']) {
+
+            /* Inspect metadata fields to find a file extension
+             */
+            if (isset($this->mimetypeMapping[$metadata['mimeType']])) {
+                $ext = $this->mimetypeMapping[$metadata['mimeType']][self::CONTEXT_EXTENSION];
+            } elseif ($metadata['fileExtension']) {
+                $ext = $metadata['fileExtension'];
+            } elseif ($metadata['fullFileExtension']) {
                 // attempt to use the file extension proper
-                $ext = '.' . $metadata['fullFileExtension'];
-            } else {
-                $ext = '.pdf';
+                $ext = $metadata['fullFileExtension'];
             }
+
+            /* If you got here, the api no longer provides the fields we were originally looking at
+             */
+            trigger_error("Google api fields for extension not found: check api docs", E_USER_WARNING);
         }
 
-        return $metadata['title'].$ext;
+        return "{$metadata['title']}.{$ext}";
     }
 
 
