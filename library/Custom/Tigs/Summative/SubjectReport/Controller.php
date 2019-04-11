@@ -507,7 +507,7 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Builds NESA Score Graph report data.
+     * Builds NESA Grade Graph report data.
      *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
@@ -537,7 +537,7 @@ class Controller extends Web\Controller\Base
         $semester  = $attributes->getCurriculumSemester();
         if (($semester === 1 && $attributes->isMyp()) || (11 === $yearLevel && $semester === 2 && $attributes->isHsc())) {
             $configName   = Config::_TIGS_WORK_TYPE_NESA_SCORE;
-            $errorMsgLink = 'Set NESA Score Work Type';
+            $errorMsgLink = 'Set NESA Grade Work Type';
         } elseif ($semester === 2 && $attributes->isMyp()) {
             $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
             $errorMsgLink = 'Set MYP FAL Work Type';
@@ -547,7 +547,7 @@ class Controller extends Web\Controller\Base
         }
 
         try {
-            $workTypeId = $this->checkWorkType($configName, 'Cannot render NESA Score graph. Work type not set.', $errorMsgLink);
+            $workTypeId = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
         } catch (UnexpectedValueException $e) {
             return ['error' => $e->getMessage()];
         }
