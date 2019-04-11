@@ -16,29 +16,6 @@ use \Schoolbox\Config\Loader as ConfigLoader;
 class GDriveFetcher implements FetcherInterface
 {
 
-
-    /** @var resource */
-    protected $ch;
-
-    /** @var string */
-    protected $dir;
-
-    /** @var array */
-    protected $metaCache = array();
-
-    /** @var ConfigLoader */
-    protected $configLoader;
-
-    public function getConfigLoader() {
-        return $this->configLoader;
-    }
-
-    public function setConfigLoader($configLoader) {
-        $this->configLoader = $configLoader;
-        return $this;
-    }
-
-
     /**
      * Google API Endpoint
      */
@@ -89,6 +66,26 @@ class GDriveFetcher implements FetcherInterface
     ];
 
     /**
+     * @var ConfigLoader
+     */
+    private $configLoader;
+
+    /**
+     * @var false|resource
+     */
+    private $ch;
+
+    /**
+     * @var string
+     */
+    private $dir;
+
+    /**
+     * @var array
+     */
+    protected $metaCache = [];
+
+    /**
      * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
      * @param resource $curl       - a custom curl handle if a default won't suffice
      * @param string   $httpAuth   - an authorization header if not using an anonymous connection
@@ -104,7 +101,7 @@ class GDriveFetcher implements FetcherInterface
             ));
         }
 
-        $this->setConfigLoader(new ConfigLoader());
+        $this->configLoader = new ConfigLoader();
     }
 
 
@@ -124,8 +121,9 @@ class GDriveFetcher implements FetcherInterface
      */
     private function isPdfExportEnabled(): bool
     {
-        return $this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf']);
+        return $this->configLoader->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf']);
     }
+
 
     /**
      * Retrieves the metadata for the given fileId
@@ -134,11 +132,11 @@ class GDriveFetcher implements FetcherInterface
      * @param bool $refresh
      * @return array
      */
-    function fetchMetaData($fileId, $refresh = false)
+    public function fetchMetaData($fileId, $refresh = false): array
     {
         if (empty($this->metaCache[$fileId]) || $refresh) {
-            $ch = $this->cUrlPrepare(array(
-                CURLOPT_URL            => self::GOOGLE_API . "/files/$fileId",
+            $ch = $this->curlPrepare(array(
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}",
                 CURLOPT_RETURNTRANSFER => 1,
             ));
 
@@ -157,7 +155,7 @@ class GDriveFetcher implements FetcherInterface
      * @throws OutOfBoundsException
      * @return string
      */
-    function fetchToFile($fileId)
+    public function fetchToFile($fileId): string
     {
         $metadata = $this->fetchMetaData($fileId);
 
@@ -176,16 +174,16 @@ class GDriveFetcher implements FetcherInterface
 
         if (!$url) {
             // no valid URL was found
-            throw new OutOfBoundsException("No url found for download");
+            throw new OutOfBoundsException('No url found for download');
         }
 
         $destination = tempnam($this->dir, 'gdrive-');
 
         if (!($fp = fopen($destination, 'w'))) {
-            throw new OutOfBoundsException("Could not open target");
+            throw new OutOfBoundsException('Could not open target');
         }
 
-        $ch = $this->cUrlPrepare(array(
+        $ch = $this->curlPrepare(array(
             CURLOPT_URL  => $url,
             CURLOPT_FILE => $fp,
         ));
@@ -250,13 +248,14 @@ class GDriveFetcher implements FetcherInterface
         return '';
     }
 
+
     /**
      * Derive the file name from the metadata
      *
      * @param array $metadata
      * @return string
      */
-    public function deriveFileName(array $metadata)
+    public function deriveFileName(array $metadata): string
     {
         if ($this->isPdfExportEnabled()) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
@@ -276,7 +275,7 @@ class GDriveFetcher implements FetcherInterface
      * @param array $opts
      * @return resource
      */
-    protected function cUrlPrepare($opts)
+    protected function curlPrepare($opts)
     {
         $ch = curl_copy_handle($this->ch);
         curl_setopt_array($ch, $opts);
