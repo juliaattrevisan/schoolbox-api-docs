@@ -10,6 +10,7 @@
 
 namespace Alaress\File\Remote;
 
+use DomainException;
 use OutOfBoundsException;
 use \Schoolbox\Config\Loader as ConfigLoader;
 
@@ -135,9 +136,10 @@ class GDriveFetcher implements FetcherInterface
     /**
      * Retrieves the metadata for the given fileId
      *
-     * @param int $fileId
+     * @param int  $fileId
      * @param bool $refresh
      * @return array
+     * @throws DomainException
      */
     public function fetchMetaData($fileId, $refresh = false): array
     {
@@ -151,7 +153,27 @@ class GDriveFetcher implements FetcherInterface
             curl_close($ch);
         }
 
-        return $this->metaCache[$fileId];
+        /* On some mysterious occasions google drive will return you an error payload
+         * If any were encountered, detonate with it - this crashes everything anyway
+         */
+        $metadata = $this->metaCache[$fileId];
+
+        if (isset($metadata['error'])) {
+            $errors = [];
+
+            /** @var array $errorIndex */
+            $errorIndex = $metadata['error']['errors'];
+
+            foreach ($errorIndex as $currentError) {
+                $errors[] = $currentError['message'];
+            }
+
+            $errorMessage = implode('; ', $errors);
+
+            throw new DomainException($errorMessage);
+        }
+
+        return $metadata;
     }
 
 
@@ -159,8 +181,9 @@ class GDriveFetcher implements FetcherInterface
      * Attempts to retrieve remote source to local destination, returns the path of the saved file.
      *
      * @param int $fileId
-     * @throws OutOfBoundsException
      * @return string
+     * @throws DomainException
+     * @throws OutOfBoundsException
      */
     public function fetchToFile($fileId): string
     {
