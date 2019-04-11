@@ -1,6 +1,7 @@
 <?php
 /**
- * 
+ * Yank down Google Drive files to upload into schoolbox
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,30 +10,32 @@
 
 namespace Alaress\File\Remote;
 
-
 use OutOfBoundsException;
 use \Schoolbox\Config\Loader as ConfigLoader;
 
 class GDriveFetcher implements FetcherInterface
 {
-
     /**
      * Google API Endpoint
      */
     private const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
+
     /**
      * The mimetypeMapping key that stores file extensions
      */
     private const CONTEXT_EXTENSION = 'ext';
+
     /**
      * Metadata fields that might contain a file extension
      * Google API sometimes changes causing fields to no longer exist
      */
     private const FIELDS_EXTENSION = ['fileExtension', 'fullFileExtension'];
+
     /**
      * The mimetypeMapping key that stores download urls (exportLinks)
      */
     private const CONTEXT_EXPORTLINKS = 'exportLinks';
+
     /**
      * Metadata fields that might contain a download url
      * Google API sometimes changes causing fields to no longer exist
@@ -45,18 +48,21 @@ class GDriveFetcher implements FetcherInterface
      * @var array
      */
     private const MIMETYPE_MAPPING = [
+
         /* Powerpoint slides
          */
         'application/vnd.google-apps.presentation' => [
             'exportLinks' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
             'ext' => 'pptx',
         ],
+
         /* Word doc
          */
         'application/vnd.google-apps.document' => [
             'exportLinks' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'ext' => 'docx',
         ],
+
         /* Spreadsheets
          */
         'application/vnd.google-apps.spreadsheet' => [
@@ -83,14 +89,14 @@ class GDriveFetcher implements FetcherInterface
     /**
      * @var array
      */
-    protected $metaCache = [];
+    private $metaCache = [];
 
     /**
      * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
      * @param resource $curl       - a custom curl handle if a default won't suffice
      * @param string   $httpAuth   - an authorization header if not using an anonymous connection
      */
-    public function __construct($storageDir, $curl = null, $httpAuth = '')
+    public function __construct(string $storageDir, $curl = null, string $httpAuth = '')
     {
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
@@ -121,7 +127,7 @@ class GDriveFetcher implements FetcherInterface
      */
     private function isPdfExportEnabled(): bool
     {
-        return $this->configLoader->get('googledrive_export_pdf') == '1' && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
+        return $this->configLoader->get('googledrive_export_pdf') && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
     }
 
 
@@ -134,7 +140,7 @@ class GDriveFetcher implements FetcherInterface
      */
     public function fetchMetaData($fileId, $refresh = false): array
     {
-        if (empty($this->metaCache[$fileId]) || $refresh) {
+        if ($refresh || empty($this->metaCache[$fileId])) {
             $ch = $this->curlPrepare(array(
                 CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}",
                 CURLOPT_RETURNTRANSFER => 1,
@@ -276,10 +282,11 @@ class GDriveFetcher implements FetcherInterface
      * @param array $opts
      * @return resource
      */
-    protected function curlPrepare($opts)
+    private function curlPrepare(array $opts)
     {
         $ch = curl_copy_handle($this->ch);
         curl_setopt_array($ch, $opts);
+
         return $ch;
     }
 } 
