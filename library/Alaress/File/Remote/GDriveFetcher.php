@@ -16,8 +16,6 @@ use \Schoolbox\Config\Loader as ConfigLoader;
 class GDriveFetcher implements FetcherInterface
 {
 
-    const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
-
 
     /** @var resource */
     protected $ch;
@@ -39,6 +37,56 @@ class GDriveFetcher implements FetcherInterface
         $this->configLoader = $configLoader;
         return $this;
     }
+
+
+    /**
+     * Google API Endpoint
+     */
+    private const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
+    /**
+     * The mimetypeMapping key that stores file extensions
+     */
+    private const CONTEXT_EXTENSION = 'ext';
+    /**
+     * Metadata fields that might contain a file extension
+     * Google API sometimes changes causing fields to no longer exist
+     */
+    private const FIELDS_EXTENSION = ['fileExtension', 'fullFileExtension'];
+    /**
+     * The mimetypeMapping key that stores download urls (exportLinks)
+     */
+    private const CONTEXT_EXPORTLINKS = 'exportLinks';
+    /**
+     * Metadata fields that might contain a download url
+     * Google API sometimes changes causing fields to no longer exist
+     */
+    private const FIELDS_EXPORTLINKS = ['downloadUrl'];
+
+    /**
+     * Mimetypes and their corresponding exportLinks, ext values
+     *
+     * @var array
+     */
+    private $mimetypeMapping = [
+        /* Powerpoint slides
+         */
+        'application/vnd.google-apps.presentation' => [
+            'exportLinks' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'ext' => '.pptx',
+        ],
+        /* Word doc
+         */
+        'application/vnd.google-apps.document' => [
+            'exportLinks' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'ext' => '.docx',
+        ],
+        /* Spreadsheets
+         */
+        'application/vnd.google-apps.spreadsheet' => [
+            'exportLinks' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'ext' => '.xlsx'
+        ]
+    ];
 
     /**
      * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
