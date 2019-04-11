@@ -123,9 +123,10 @@ class GDriveFetcher implements FetcherInterface
     /**
      * The config option "Google Drive Always Convert To PDF" is on
      *
+     * @param array $metadata
      * @return bool
      */
-    private function isPdfExportEnabled(): bool
+    private function isPdfExportEnabled(array $metadata): bool
     {
         return $this->configLoader->get('googledrive_export_pdf') && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
     }
@@ -168,7 +169,7 @@ class GDriveFetcher implements FetcherInterface
         if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
             // if this file has been flagged by Drive as "restricted", disallow any download
             return null;
-        } elseif ($this->isPdfExportEnabled()) {
+        } elseif ($this->isPdfExportEnabled($metadata)) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
         } else {
@@ -264,7 +265,7 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata): string
     {
-        if ($this->isPdfExportEnabled()) {
+        if ($this->isPdfExportEnabled($metadata)) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $ext = 'pdf';
         } else {
