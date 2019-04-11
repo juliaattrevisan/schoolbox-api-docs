@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Schoolbox\Column;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
@@ -3854,10 +3855,9 @@ abstract class Mapper implements IMapper, Serializable
         $scalars = $stmt->fetchAll(PDO::FETCH_COLUMN);
         if (count($scalars)) {
             $hydrator = $this->getColumnScalarHydrator($column);
-            $scalars = array_map([$hydrator, 'hydrator'], $scalars);
+            $scalars  = array_map([$hydrator, 'hydrator'], $scalars);
         }
         return $scalars;
-
     }
 
     /**
@@ -4034,8 +4034,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Returns a column's scalar hydrator.
      *
-     * 'Scalar' is treated as anything that is not a Model hydrator.
-     * ie, this will still return Colour, Collection, etc hydrators.
+     * ie, Colour, Collection, Date etc will fall back to no hydration, and their raw value returned.
      *
      * Intentionally throws a TypeError if column does not have a mapping
      *
@@ -4045,8 +4044,8 @@ abstract class Mapper implements IMapper, Serializable
      */
     private function getColumnScalarHydrator(string $column, int $depth = 0): IColumnType
     {
-        // If the column is a foreign key to another entity, we need to fetch that entity's column hydrator
-        // to ensure we are always returning a hydrator whose hydrate() method generates a scalar, never an object.
+        // If the column is a foreign key to another entity, we need to fetch that other entity's column hydrator.
+        // This ensures we always returning a hydrator whose hydrate() method generates a scalar data type.
         // We know the data types are the same as that's a pre-requisite for adding the foreign key.
         // It quite possible for a FK to point to a column that is itself a FK.
         // This therefore needs to be recursive to follow these relationships.
@@ -4063,9 +4062,16 @@ abstract class Mapper implements IMapper, Serializable
         $hydrator = $this->map->getOffsetByColumn($column)['hydrator'];
 
         // Base Case 2:
-        //   The hydrator is a Scalar Hydrator.
-        if (!$hydrator instanceof ModelColumn) {
+        //   Column is a non-model object. Don't perform hydration.
+        if($this->column_factory->isScalar($hydrator)){
             return $hydrator;
+        }
+
+        // Base Case 3:
+        //   The hydrator is not scalar, but is also not for a Model
+        if (!$hydrator instanceof ModelColumn) {
+            // Don't hydrate at all. Raw value will be returned.
+            return new Column\Base();
         }
 
         // Recursive Case:
