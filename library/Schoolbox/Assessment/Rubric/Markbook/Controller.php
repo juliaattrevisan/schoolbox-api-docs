@@ -18,7 +18,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Column\Boolean;
 use Schoolbox\Column\Decimal;
-use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
@@ -29,7 +28,6 @@ use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\User;
 use Alaress\Database;
 use InvalidArgumentException;
 use PDOException;
@@ -215,25 +213,6 @@ class Controller extends Base
         return $this->assessmentIdFinder->findIdsByFilters($filters);
     }
 
-
-    /**
-     * Returns a collection of users comprised of:
-     * * folder's SIS enrolled students (regardless of schoolbox role type), and
-     * * folder's SB READ level group members
-     *
-     * @param Folder\Model $folder
-     * @return GenericCollection|User[]
-     * @throws Database\Predicate\InvalidColumnException
-     * @throws InvalidArgumentException
-     * @throws PDOException
-     * @throws Mapper\DefinitionException
-     * @throws Mapper\Exception
-     * @throws UnderflowException
-     */
-    public function retrieveAllUsersInFolder(Folder\Model $folder): GenericCollection
-    {
-        return $this->userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, true, true);
-    }
 
     /**
      * Fetch assessment data, and return it indexed by assessment ID
