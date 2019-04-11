@@ -2513,7 +2513,7 @@ abstract class Mapper implements IMapper, Serializable
             return [];
         }
         if (count($scalars)) {
-            $hydrator = $this->getColumnHydrator($column);
+            $hydrator = $this->getColumnScalarHydrator($column);
             $scalars  = array_map([$hydrator, 'hydrate'], $scalars);
         }
         return $scalars;
@@ -2537,7 +2537,7 @@ abstract class Mapper implements IMapper, Serializable
             /** @var IColumnType[] $hydrators */
             $hydrators = [];
             foreach ($columnList as $column) {
-                $hydrators[$column] = $this->getColumnHydrator($column);
+                $hydrators[$column] = $this->getColumnScalarHydrator($column);
             }
             foreach ($rows as $rowId => $row) {
                 foreach ($row as $column => $value) {
@@ -3853,7 +3853,7 @@ abstract class Mapper implements IMapper, Serializable
         }
         $scalars = $stmt->fetchAll(PDO::FETCH_COLUMN);
         if (count($scalars)) {
-            $hydrator = $this->getColumnHydrator($column);
+            $hydrator = $this->getColumnScalarHydrator($column);
             $scalars = array_map([$hydrator, 'hydrator'], $scalars);
         }
         return $scalars;
@@ -4045,15 +4045,31 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Returns a column's hydrator
+     * Returns a column's scalar hydrator.
      *
+     * If the column is a foreign key to another entity, this will return the hydrator for the corresponding column on the another entity.
+     * In this manner, we are always returning a hydrator whose hydrate() method generates a scalar, never an object.
+     *
+     * We know the data types are the same as that's a pre-requisite for adding the foreign key.
+
      * Intentionally throws a TypeError if column does not have a mapping
      *
      * @param string $column
      * @return IColumnType|null
      */
-    private function getColumnHydrator(string $column): IColumnType
+    private function getColumnScalarHydrator(string $column): IColumnType
     {
-        return $this->map->getOffsetByColumn($column)['hydrator'];
+        /** @var IColumnType $hydrator */
+        $hydrator = $this->map->getOffsetByColumn($column)['hydrator'];
+        if (!$hydrator instanceof ModelColumn) {
+            return $hydrator;
+        }
+        $joinDef = $this->map->getOffsetByColumn($column)['join_def'];
+        /** @var IMapper $otherMapper */
+        $otherMapper  = $joinDef['mapper'];
+        $otherMapper  = $otherMapper instanceof IMapper ? $otherMapper : $otherMapper::getInstance();
+        $otherColumn  = $joinDef['other_key'];
+        $otherMapping = $otherMapper->getMap()->getOffsetByColumn($otherColumn);
+        return $otherMapping['hydrator'];
     }
 }
