@@ -21,8 +21,7 @@ $settingsInfo = array (
         'x509cert' => preg_replace("/\r/m", "", Config::get('saml_idp_certificate')),
     ],
     'security' => [
-        'requestedAuthnContext'             => [useSAMLKerberos() ? OneLogin_Saml2_Constants::AC_WINDOWS : OneLogin_Saml2_Constants::AC_PASSWORD_PROTECTED],
-        'requestedAuthnContextComparison'   => Config::get('saml_auth_comparison'),
+        'requestedAuthnContext'             => false,
         'signatureAlgorithm'                => XMLSecurityKey::RSA_SHA256,
         'digestAlgorithm'                   => XMLSecurityDSig::SHA256,
         'lowercaseUrlencoding'              => true,
@@ -32,6 +31,18 @@ $settingsInfo = array (
 
     ],
 );
+
+// requestAuthnContext
+if (useSAMLKerberos() && (Config::get('saml_auth_context') !== 'unspecified')) {
+    $settingsInfo['security']['requestAuthnContext'] = OneLogin_Saml2_Constants::AC_WINDOWS;
+} else if (!useSAMLKerberos()) {
+    $settingsInfo['security']['requestAuthnContext'] = OneLogin_Saml2_Constants::AC_UNSPECIFIED;
+}
+
+if ($settingsInfo['security']['requestAuthnContext']) {
+    $settingsInfo['security']['requestedAuthnContextComparison'] = Config::get('saml_auth_comparison');
+}
+
 SAMLDebugLog(json_encode($settingsInfo));
 
 try {
