@@ -287,8 +287,8 @@ class Controller extends Web\Controller\Base
         try {
             $workTypeId = $this->checkWorkType(
                 $configName,
-                'Cannot render Academic Achievement Matrix components. Work type not set.',
-                'Set Academic Achievement Matrix Work Type'
+                'Cannot render Approaches to Learning components. Work type not set.',
+                'Set Approaches to Learning Work Type'
             );
         } catch (UnexpectedValueException $e) {
             return ['error' => $e->getMessage()];
