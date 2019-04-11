@@ -17,7 +17,6 @@ use Schoolbox\Filter\Filters\Assessment\WorkType;
 use UnderflowException;
 use UnexpectedValueException;
 
-
 /**
  * Helper for building the query clauses.
  *

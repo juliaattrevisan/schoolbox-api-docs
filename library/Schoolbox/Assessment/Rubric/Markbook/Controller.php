@@ -224,7 +224,7 @@ class Controller extends Base
     private function buildAssessmentData(array $assessmentIds): array
     {
         $assessments = [];
-        if(!count($assessmentIds)){
+        if (!count($assessmentIds)) {
             return $assessments;
         }
 
@@ -256,7 +256,7 @@ class Controller extends Base
         $lastObservedAssessmentId = null;
         $lastObservedCapabilityId = null;
 
-        foreach($stmt->getIterator($pb->getParams()) as $row) {
+        foreach ($stmt->getIterator($pb->getParams()) as $row) {
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
                 // Has the assessment we're looking at changed? Reset the capabilities
                 $capabilities = [];

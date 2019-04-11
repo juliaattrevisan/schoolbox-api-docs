@@ -303,7 +303,7 @@ class UserAccessMapper extends Mapper
      * union 2 sources: userAccess, and if synergy, external class
      *
      * @param FolderModel $folder      Folder codes must be hydrated if $includeSynergy == true
-     * @param string      $roleType    If provided, restrict to this role type
+     * @param null|string $roleType    If provided, restrict to this role type
      * @param int         $accessType
      * @param bool        $includeSynergy
      * @param bool        $exactAccess If true, only fetch users with exactly $accessType.
@@ -326,8 +326,7 @@ class UserAccessMapper extends Mapper
         int $accessType = UserAccess::ACCESS_READ,
         bool $includeSynergy = true,
         bool $exactAccess = false
-    ): GenericCollection
-    {
+    ): GenericCollection {
         if ($roleType && !in_array($roleType, Role::getRoleTypes(), true)) {
             throw new InvalidArgumentException("Unrecognised role type: $roleType");
         }
