@@ -153,7 +153,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Indexed by model property name (not db column)
      *
-     * @see MappingCollection::getOffsetByColumn() if you need to look
+     * @see MappingCollection::getOffsetByColumn() for O(1) fetch by column
      *
      * @var MappingCollection
      */
