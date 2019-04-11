@@ -358,6 +358,7 @@ class Controller extends Base
                 FROM submission_return sr
                 INNER JOIN submission_box sb on sr.box_id = sb.id
                 WHERE
+                      sr.deleted_at   IS NOT NULL AND
                       sr.published_at IS NOT NULL AND
                       sr.review_route = :review_route
                 GROUP BY sb.assessment_id, sr.owner
