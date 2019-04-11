@@ -25,7 +25,8 @@ SELECT
   FROM assessment a
 
   -- Due work joins
-  INNER JOIN submission_box sb ON a.id = sb.assessment_id
+  INNER JOIN submission_box         sb  ON a.id = sb.assessment_id
+  INNER JOIN rubric_level           rl  ON sb.id = rl.box_id
 
   -- Rubric indicator, descriptor joins
   -- Join through rubric_criterion_usage as I only care about indicators actually in use
@@ -36,11 +37,12 @@ SELECT
   INNER JOIN rubric_criterion       rc  ON  rcu.criterion_id    = rc.id AND
                                             rc.rubric_group_id  = rg.id
 
-  INNER JOIN rubric_descriptor      rd  ON  rd.criterion_id     = rc.id
+  INNER JOIN rubric_descriptor      rd  ON  rd.criterion_id     = rc.id AND
+                                            rd.level_id         = rl.id
 
   -- Only valid rubric marks
   WHERE
-    a.deleted_at IS NULL AND
+    a.deleted_at  IS NULL AND
     sb.use_rubric IS TRUE AND
     rg.deleted_at IS NULL AND
     rc.deleted_at IS NULL AND
