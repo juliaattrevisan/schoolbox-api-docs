@@ -3852,12 +3852,12 @@ abstract class Mapper implements IMapper, Serializable
         } catch (UnderflowException $e) {
             return [];
         }
-        $scalars = $stmt->fetchAll(PDO::FETCH_COLUMN);
-        if (count($scalars)) {
+        $distinct = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if (count($distinct)) {
             $hydrator = $this->getColumnScalarHydrator($column);
-            $scalars  = array_map([$hydrator, 'hydrator'], $scalars);
+            $distinct = array_map([$hydrator, 'hydrator'], $distinct);
         }
-        return $scalars;
+        return $distinct;
     }
 
     /**
@@ -4034,7 +4034,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Returns a column's scalar hydrator.
      *
-     * ie, Colour, Collection, Date etc will fall back to no hydration, and their raw value returned.
+     * ie, Colour, Collection, Date etc will fall back to no hydration, and their raw database value returned.
      *
      * Intentionally throws a TypeError if column does not have a mapping
      *
@@ -4062,7 +4062,7 @@ abstract class Mapper implements IMapper, Serializable
         $hydrator = $this->map->getOffsetByColumn($column)['hydrator'];
 
         // Base Case 2:
-        //   Column is a non-model object. Don't perform hydration.
+        //   Column is a scalar. Respect declared data type.
         if($this->column_factory->isScalar($hydrator)){
             return $hydrator;
         }
@@ -4070,7 +4070,7 @@ abstract class Mapper implements IMapper, Serializable
         // Base Case 3:
         //   The hydrator is not scalar, but is also not for a Model
         if (!$hydrator instanceof ModelColumn) {
-            // Don't hydrate at all. Raw value will be returned.
+            // Don't hydrate at all. Raw data type (null|string) will be returned.
             return new Column\Base();
         }
 
