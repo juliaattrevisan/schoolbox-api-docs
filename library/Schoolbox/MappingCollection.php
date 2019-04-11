@@ -8,8 +8,12 @@
  */
 
 namespace Schoolbox;
+use BadMethodCallException;
 use CallbackFilterIterator;
 
+/**
+ * TODO - this probably shouldn't extent Collection anymore, as many Collection methods will break this class's internals
+ */
 class MappingCollection extends Collection {
 
 	/**
@@ -62,4 +66,27 @@ class MappingCollection extends Collection {
 		return null;
 	}
 
+
+    /**
+     * Not supported. This collection must be keyed by model property
+     *
+     * @param $element
+     * @return $this
+     * @throws BadMethodCallException
+     */
+    public function add($element): self
+    {
+        throw new BadMethodCallException('This collection must be keyed');
+    }
+
+
+    /**
+     * @param $element
+     * @return Collection|void
+     * @throws BadMethodCallException
+     */
+    public function prepend($element)
+    {
+        throw new BadMethodCallException('This collection must be keyed');
+    }
 }
