@@ -9,22 +9,28 @@ Data:
     marks['rubric']      int[]            - Keyed by criterion name
 #}
 
+<style>
+    table.aas td.narrow {
+        width: 100px;
+    }
+</style>
+
 <p class="meta">Academic Achievement Summary</p>
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
     <div class="scrollable">
-        <table>
+        <table class="aas">
             <thead>
             <tr>
-                <td>Criterion</td>
+                <td class="narrow">Criterion</td>
                 <td>Mark</td>
             </tr>
             </thead>
             <tbody>
             {% for criterion, mark in marks.rubric %}
                 <tr>
-                    <td>{{ criterion | nl2br }}</td>
+                    <td class="narrow">{{ criterion | nl2br }}</td>
                     <td>{{ mark }}</td>
                 </tr>
             {% endfor %}

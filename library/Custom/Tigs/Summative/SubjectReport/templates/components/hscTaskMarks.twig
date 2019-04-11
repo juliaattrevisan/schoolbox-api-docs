@@ -10,12 +10,18 @@ Data:
     cohortAverage        string|null      - eg '25 %'
 #}
 
+<style>
+    table.hsc-task-marks th {
+        width: 150px;
+    }
+</style>
+
 <p class="meta">HSC Task Marks (%)</p>
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
     <div class="scrollable">
-        <table>
+        <table class="hsc-task-marks">
             <tbody>
                 <tr>
                     <th>Student Mark %</th>
