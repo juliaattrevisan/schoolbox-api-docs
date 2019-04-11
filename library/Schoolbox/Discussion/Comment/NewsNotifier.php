@@ -11,9 +11,9 @@ namespace Schoolbox\Discussion\Comment;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Discussion\Context;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -38,6 +38,8 @@ class NewsNotifier extends AbstractModuleNotifier
     private const PATTERN_COMMENTED_TITLE = ':user commented on your article, :title';
     private const PATTERN_ARTICLE_HREF = '/news/%d';
 
+    private const PATTERN_FOLLOWED_TITLE = ':user commented on the article :title';
+
     /** @var UserMapper */
     private $userMapper;
 
@@ -59,7 +61,7 @@ class NewsNotifier extends AbstractModuleNotifier
 
         return [
             'setMapper' => $mf->getLazy(CommentMapper::class),
-            'setUserMapper'        => $mf->getLazy(UserMapper::class),
+            'setUserMapper' => $mf->getLazy(UserMapper::class),
             'setThreadMapper' => $mf->getLazy(ThreadMapper::class),
             'setArticleMapper' => $mf->getLazy(ArticleMapper::class),
         ];
@@ -219,16 +221,6 @@ class NewsNotifier extends AbstractModuleNotifier
 
         /** @var Article $article */
         $article = $articles->first();
-        try {
-            $author = $this->userMapper->findById($article->getAuthor()->getId());
-        } catch (Exception $e) {
-            // Failed to find the user
-            return $envelope;
-        }
-
-        if ($author->getRole()->getType() !== $roleType) {
-            return $envelope;
-        }
 
         $bob = new Builder();
 
@@ -236,16 +228,17 @@ class NewsNotifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
+            ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
-                'user' => new UserParam($effector, Param::STACKING_REPLACE),
+                'user' => new UserParam($effector, Param::STACKING_APPEND),
                 'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
                     Param::STACKING_APPEND),
             ])
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_COMMENTED);
 
-        $envelope->targetToUser($author->getId(), $bob->build());
+        $envelope->targetToUser($article->getAuthor()->getId(), $bob->build());
         return $envelope;
     }
 
@@ -285,14 +278,62 @@ class NewsNotifier extends AbstractModuleNotifier
     /**
      * Notifies users who have made comments on the same article
      * @param string $roleType
-     * @param Model $comment
+     * @param Comment $comment
      * @param User $effector
      * @return Envelope
      */
     private function notifyFollowed(string $roleType, Comment $comment, User $effector): Envelope
     {
-        // TODO: implement!!
+
         $envelope = new Envelope();
+        $context = new Context($this->threadMapper, $this->articleMapper);
+
+        // get the item that the comment has created on
+        $thread = $comment->getThread();
+        /** @var GenericCollection $articles */
+        $articles = $context->findAssociations($thread);
+
+        if ($articles->count() === 0) {
+            return $envelope;
+        }
+
+        /** @var Article $article */
+        $article = $articles->first();
+        $commentAuthors = $this->mapper->findByColumn('discussion_thread_id', $thread->getId())->getPropertyValues('author');
+        $recipientIds = new Collection();
+        /** @var User $commentAuthor */
+        // send to users who have ever made comments and are not the author of the article
+        foreach ($commentAuthors as $commentAuthor) {
+            if (!$recipientIds->contains($commentAuthor->getId())
+                && ($commentAuthor->getId() !== $article->getAuthor()->getId())) {
+                $recipientIds->add($commentAuthor->getId());
+            }
+        }
+
+        if (empty($recipientIds)) {
+            return $envelope;
+        }
+
+        $bob = new Builder();
+
+        $bob->setTitle(self::PATTERN_FOLLOWED_TITLE)
+            ->setNamespace($this->getSlug())
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setSeverity(Logger::INFO)
+            ->setFilter(['roletype' => $roleType])
+            ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
+            ->setParams([
+                'user' => new UserParam($effector, Param::STACKING_APPEND),
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
+                    Param::STACKING_APPEND),
+            ])
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_FOLLOWED);
+
+        foreach ($recipientIds as $recipient) {
+            $envelope->targetToUser($recipient, $bob->build());
+        }
+
         return $envelope;
     }
 
