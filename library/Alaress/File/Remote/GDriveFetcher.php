@@ -247,6 +247,7 @@ class GDriveFetcher implements FetcherInterface
         }
 
         /* If you got here, the api no longer provides the fields we were originally looking at
+         * https://developers.google.com/drive/api/v2/reference/
          */
         trigger_error('Google api fields for exportLinks not found: check api docs', E_USER_WARNING);
 
@@ -273,6 +274,7 @@ class GDriveFetcher implements FetcherInterface
         }
 
         /* If you got here, the api no longer provides the fields we were originally looking at
+         * https://developers.google.com/drive/api/v2/reference/
          */
         trigger_error('Google api fields for extension not found: check api docs', E_USER_WARNING);
 
