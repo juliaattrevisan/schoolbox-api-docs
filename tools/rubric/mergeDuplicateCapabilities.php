@@ -25,11 +25,11 @@
 declare(strict_types=1);
 
 
-use Schoolbox\Learning\Course\DataModel\Implementation;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\Query\IQuery;
 use Psr\Log\LoggerInterface as Logger;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Course\DataModel\Implementation;
 
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 
@@ -456,7 +456,7 @@ $app = new class extends CliTool\App
                 $this->db->rollBack();
                 throw $e;
             }
-        }  else {
+        } else {
             $this->db->rollBack();
             $this->log->alert('Dry-run complete - no changes written to database');
         }
@@ -471,6 +471,7 @@ $app = new class extends CliTool\App
 
     /**
      * Run the repair process.
+     *
      * @throws \Alaress\Database\Exception
      */
     private function repair(): void
@@ -522,493 +523,18 @@ $app = new class extends CliTool\App
 
     /**
      * Attempt to repair this set of capabilities by removing any duplicates.
-     * Cascades to each capability's indicators.
      *
      * @param array $groupedCapabilities key: capability name, value: list of capability IDs
-     * @param int $folderId    Used to find duplicates of this capability in the same folder
+     * @param int   $folderId            Used to find duplicates of this capability in the same folder
      * @throws \Alaress\Database\Exception
      */
     private function repairCapabilities(array $groupedCapabilities, int $folderId): void
     {
-        // In here: get indicators for each capability. Group by name
-
-
         $seenCapabilities = [];
         foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
-
-//            $this->log->info(
-//                sprintf(
-//                    self::indent(1) . 'Checking capability #%d "%s"',
-//                    $capabilityId,
-//                    $capabilityName
-//                )
-//            );
-//
-//            // Skip if we've already looked at this capability (such as in the inner loop)
-//            // TODO this isn't correctly excluding caps we've already seen
-//            if (isset($seenCapabilities[$capabilityName]) && in_array($capabilityId, $seenCapabilities[$capabilityName], false)) {
-//                $this->log->debug(self::indent(2) . 'Already checked capability ' . $capabilityId . ': skipping');
-//                continue;
-//            }
-//            // Record having looked at this capability
-//            $seenCapabilities[$capabilityName][] = $capabilityId;
-
-
-            // Find duplicates of this capability
-            $capabilityNeedsDedupe = count($capabilityIds) > 1;
-//            $this->findCapabilityDupesQuery->execute(
-//                [
-//                    'capabilityName' => $capabilityName,
-//                    'capabilityId' => $capabilityId,
-//                    'folderId' => $folderId
-//                ]
-//            );
-//            if ($this->findCapabilityDupesQuery->rowCount() > 0) {
-//                $capabilityNeedsDedupe = true;
-//            }
-
-            if ($capabilityNeedsDedupe) {
-                $this->duplicateCapabilityCount++;
-                $this->log->debug(self::indent(1) . 'incrementing duplicateCapabilityCount line ' . __LINE__);
-
-                // Get the IDs of the duplicate capability/s
-                $duplicateCapabilityIds = $this->findCapabilityDupesQuery->fetchColumnArray('name', 'id');
-                $seenCapabilities[$capabilityName][] = array_keys($duplicateCapabilityIds);
-
-                $this->log->info(
-                    sprintf(
-                        self::indent(2) . 'capability #%d has duplicates - checking if it can be deduplicated',
-                        $capabilityId
-                    )
-                );
-
-                $capabilityIsInUse = false;
-                $capabilityHasIndicatorsInUse = false;
-                // Count usages of this capability
-                $this->countCapabilityUsagesQuery->execute(['capabilityId' => $capabilityId]);
-                if ($this->countCapabilityUsagesQuery->rowCount() > 0) {
-                    $capabilityIsInUse = true;
-                }
-
-                // Is this capability in use?
-                if ($capabilityIsInUse) {
-                    // Loop through the duplicates and see if we can safely delete them instead
-
-                    // An array of boolean results indexed by capability ID (either true or false)
-                    // Represents whether we were able to successfully dedupe or not
-                    $migratedStatuses = [];
-
-                    foreach($duplicateCapabilityIds as $duplicateCapabilityId => $duplicateCapabilityName) {
-                        // Skip if we've already looked at this capability (such as in the outer loop)
-                        // TODO not working
-                        if (in_array($duplicateCapabilityId, $seenCapabilities[$capabilityName], false)) {
-                            $this->log->debug(self::indent(2) . 'Already checked capability ' . $duplicateCapabilityId . ': skipping');
-                            continue;
-                        }
-                        // Record having looked at this capability
-                        $seenCapabilities[$capabilityName][] = $duplicateCapabilityId;
-
-                        $migratedStatuses[] = $this->attemptToSafelyDedupeCapability($capabilityId, $capabilityName, $duplicateCapabilityId);
-                    }
-
-                    $successfullyMigratedCaps = array_filter($migratedStatuses, function($element) {
-                        return $element === true;
-                    });
-
-                    if (\count($successfullyMigratedCaps) === \count($migratedStatuses)) {
-                        // Don't increment this unless everything was executed successfully
-                        $this->log->debug(self::indent(2) . 'incrementing repairedCapabilityCount line ' . __LINE__);
-                        $this->repairedCapabilityCount++;
-                    }
-                } else {
-                    // Capability is not in use
-
-                    // Does this capability have indicators in use?
-                    $this->countIndicatorUsagesForCapabilityQuery->execute(['capabilityId' => $capabilityId]);
-                    if ($this->countIndicatorUsagesForCapabilityQuery->rowCount() > 0) {
-                        $capabilityHasIndicatorsInUse = true;
-                    }
-
-                    if ($capabilityHasIndicatorsInUse) {
-                        $this->capabilityNotInUseButHasIndicatorsInUseCount++;
-                        $this->log->error('INVALID DATA: capability is not in use, but has indicators in use - skipping');
-                    } else {
-                        // Capability does not have indicators in use
-                        // Dedupe it
-                        // No point deduping its indicators here, because we're just gonna delete the capability anyway
-                        $this->log->warning(
-                            sprintf(
-                                self::indent(2) . 'capability #%d has duplicates and can safely be removed: deduplicating',
-                                $capabilityId
-                            )
-                        );
-                        $this->deduplicateCapability((int)$capabilityId);
-                        // Don't increment this unless everything was executed successfully
-                        $this->log->debug(self::indent(2) . 'incrementing repairedCapabilityCount line ' . __LINE__);
-                        $this->repairedCapabilityCount++;
-                    }
-                }
-            } else {
-                // Capability has no duplicates (that we know of, at this point in time)
-                $this->log->debug(
-                    sprintf(
-                        self::indent(2) . 'capability #%d has no duplicates: no action required',
-                        $capabilityId
-                    )
-                );
-
-                // Does this capability have indicators?
-                $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $capabilityId]);
-                if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
-                    // No indicators is an error state - a capability must have children
-                    $this->capabilityHasNoIndicators++;
-
-                    $this->log->error(
-                        self::indent(2) .
-                        sprintf('INVALID DATA - capability #%d contains no indicators, skipping', $capabilityId)
-                    );
-                } else {
-                    // Capability has indicators
-                    // Loop through and dedupe them as required
-                    $indicatorsForCapability = $this->findCapabilityIndicatorsQuery->fetchColumnArray('id', 'name');
-                    $this->repairIndicators($indicatorsForCapability, $capabilityId);
-                }
-            }
-
+            //
         }
     }
-
-    /**
-     * Loop through a capability's duplicates and test if we can safely remove them
-     *
-     * @param $capabilityId
-     * @param $capabilityName
-     * @param $duplicateCapabilityId
-     * @return bool
-     * @throws \Alaress\Database\Exception
-     */
-    private function attemptToSafelyDedupeCapability($capabilityId, $capabilityName, $duplicateCapabilityId) : bool
-    {
-        // TODO somehow this is returning true even when none of the logs in here are, uh, getting logged
-        $duplicateCapabilityIsInUse = false;
-        $duplicateCapabilityHasIndicatorsInUse = false;
-        $this->countCapabilityUsagesQuery->execute(['capabilityId' => $duplicateCapabilityId]);
-        if ($this->countCapabilityUsagesQuery->rowCount() > 0) {
-            $duplicateCapabilityIsInUse = true;
-        }
-        $this->countIndicatorUsagesForCapabilityQuery->execute(['capabilityId' => $duplicateCapabilityId]);
-        if ($this->countIndicatorUsagesForCapabilityQuery->rowCount() > 0) {
-            $duplicateCapabilityHasIndicatorsInUse = true;
-        }
-
-        // Is capability's duplicate in use?
-        if ($duplicateCapabilityIsInUse) {
-            // Don't dedupe
-            $this->bothCapabilityDupesInUseCount++;
-            $this->log->notice(
-                sprintf(
-                    self::indent(2) . 'capability #%d has duplicates, but both copies are in use: skipping deduplication',
-                    $capabilityId
-                )
-            );
-        } else {
-            // Capability's duplicate is not in use.
-
-            // Does capability's duplicate have indicators in use?
-            if ($duplicateCapabilityHasIndicatorsInUse) {
-                // Capability's duplicate has indicators in use
-                $this->capabilityNotInUseButHasIndicatorsInUseCount++;
-                $this->log->error('INVALID DATA: duplicate is in not in use, but has indicators in use - skipping');
-            } else {
-                // Capability's duplicate does not have indicators in use
-                // Dedupe it
-                // No point deduping its indicators here, because we're just gonna delete the capability anyway
-                $this->log->warning(
-                    sprintf(
-                        self::indent(2) . 'capability #%d has duplicates but cannot be safely be removed: deleting its duplicate #%d instead',
-                        $capabilityId,
-                        $duplicateCapabilityId
-                    )
-                );
-                $this->deduplicateCapability((int)$duplicateCapabilityId);
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Attempt to repair this set of indicators by removing any duplicates.
-     *
-     * @param $indicators
-     * @param $capabilityId
-     * @throws \Alaress\Database\Exception
-     */
-    private function repairIndicators($indicators, $capabilityId) : void
-    {
-        $seenIndicators = [];
-        foreach($indicators as $indicatorName => $indicatorId) {
-            // This only needs to be debug log level, as the capability already provides enough context
-            $this->log->debug(
-                sprintf(
-                    self::indent(2) . 'Checking indicator #%d "%s"',
-                    $indicatorId,
-                    $indicatorName
-                )
-            );
-
-            // Skip if we've already looked at this indicator (such as in the inner loop)
-            if (isset($seenIndicators[$indicatorName]) && in_array($indicatorId, $seenIndicators[$indicatorName], false)) {
-                $this->log->debug(self::indent(3) . 'Already checked indicator ' . $indicatorId . ': skipping');
-                continue;
-            }
-            // Record having looked at this indicator
-            $seenIndicators[$indicatorName][] = $indicatorId;
-
-
-            // Find duplicates of this indicator
-            $indicatorNeedsDedupe = false;
-            $this->findIndicatorDupesQuery->execute(
-                [
-                    'indicatorName' => $indicatorName,
-                    'indicatorId' => $indicatorId,
-                    'parentCapabilityId' => $capabilityId
-                ]
-            );
-            if ($this->findIndicatorDupesQuery->rowCount() > 0) {
-                $indicatorNeedsDedupe = true;
-            }
-
-            // Does this indicator have duplicates?
-            if ($indicatorNeedsDedupe) {
-                $this->duplicateIndicatorCount++;
-                $this->log->debug(self::indent(3) . 'incrementing duplicateIndicatorCount line ' . __LINE__);
-
-                $this->log->info(
-                    sprintf(
-                        self::indent(3) . 'indicator #%d has duplicates - checking if it can be deduplicated',
-                        $indicatorId
-                    )
-                );
-
-                $indicatorIsInUse = false;
-                $indicatorHasDescriptors = false;
-
-                $this->countDescriptorsForIndicatorQuery->execute(['indicatorId' => $indicatorId]);
-                if ($this->countDescriptorsForIndicatorQuery->rowCount() > 0) {
-                    $indicatorHasDescriptors = true;
-                }
-                $this->countIndicatorUsagesQuery->execute(['indicatorId' => $indicatorId]);
-                if ($this->countIndicatorUsagesQuery->rowCount() > 0) {
-                    $indicatorIsInUse = true;
-                }
-
-                // Is this indicator in use?
-                if ($indicatorIsInUse) {
-
-                    // Does this indicator have descriptors?
-                    if ($indicatorHasDescriptors) {
-                        // This indicator has descriptors
-
-                        // Let's loop through the duplicate indicator/s and see if we can safely delete them instead
-                        // Get the IDs of the duplicate indicator/s, filtering out the indicator we're currently looking at
-                        $duplicateIndicatorIds = $this->findIndicatorDupesQuery->fetchColumnArray('name', 'id');
-
-                        // An array of boolean results indexed by capability ID (either true or false)
-                        // Represents whether we were able to successfully dedupe or not
-                        $migratedStatuses = [];
-
-                        foreach ($duplicateIndicatorIds as $duplicateIndicatorId => $duplicateIndicatorName) {
-                            // Skip if we've already looked at this indicator (such as in the outer loop)
-                            if (in_array($duplicateIndicatorId, $seenIndicators[$indicatorName], false)) {
-                                $this->log->debug(self::indent(3) . 'Already checked indicator ' . $duplicateIndicatorId . ': skipping');
-                                continue;
-                            }
-                            // Record having looked at this capability
-                            $seenIndicators[$indicatorName][] = $duplicateIndicatorId;
-
-                            $migratedStatuses[] = $this->attemptToSafelyDedupeIndicator(
-                                $indicatorId,
-                                $indicatorName,
-                                $duplicateIndicatorId,
-                                $capabilityId
-                            );
-                        }
-
-                        $successfullyMigratedInds = array_filter($migratedStatuses, function($element) {
-                            return $element === true;
-                        });
-
-                        if (\count($successfullyMigratedInds) === \count($migratedStatuses)) {
-                            // Don't increment this unless everything was executed successfully
-                            $this->log->debug(self::indent(3) . 'incrementing repairedIndicatorCount line ' . __LINE__);
-                            $this->repairedIndicatorCount++;
-                        }
-                    } else {
-                        // Indicator does not have descriptors - this is an error state since an indicator in use must have descriptors
-                        $this->indicatorInUseWithNoDescriptorsCount++;
-                        $this->log->debug(self::indent(3) . 'incrementing indicatorInUseWithNoDescriptorsCount line ' . __LINE__);
-
-                        $this->log->error(
-                            sprintf(
-                                self::indent(3) . 'INVALID DATA: indicator #%d is in use, but has no descriptors - skipping',
-                                $indicatorId
-                            )
-                        );
-                    }
-                } else {
-                    // This indicator is not in use, and can safely be deleted
-                    // Dedupe it
-                    $this->log->warning(
-                        sprintf(
-                            self::indent(3) . 'indicator #%d has duplicates and can safely be removed: deduplicating',
-                            $indicatorId
-                        )
-                    );
-                    $this->deduplicateIndicator((int)$indicatorId, (int)$capabilityId);
-
-                    // Don't increment this unless everything was executed successfully
-                    $this->log->debug(self::indent(3) . 'incrementing repairedIndicatorCount line ' . __LINE__);
-                    $this->repairedIndicatorCount++;
-                }
-            } else {
-                // Indicator does not have duplicates. Do nothing
-                $this->log->debug(
-                    sprintf(
-                        self::indent(3) . 'indicator #%d has no duplicates: no action required',
-                        $indicatorId
-                    )
-                );
-            }
-
-            $seenIndicators[$indicatorName][] = $indicatorId;
-        }
-    }
-
-
-    /**
-     * @param $indicatorId
-     * @param $indicatorName
-     * @param $duplicateIndicatorId
-     * @param $capabilityId
-     * @throws \Alaress\Database\Exception
-     */
-    private function attemptToSafelyDedupeIndicator($indicatorId, $indicatorName, $duplicateIndicatorId, $capabilityId) : bool
-    {
-        $duplicateIndicatorIsInUse = false;
-        $duplicateIndicatorHasDescriptors = false;
-        $this->countIndicatorUsagesQuery->execute(['indicatorId' => $duplicateIndicatorId]);
-        if ($this->countIndicatorUsagesQuery->rowCount() > 0) {
-            $duplicateIndicatorIsInUse = true;
-        }
-        $this->countDescriptorsForIndicatorQuery->execute(['indicatorId' => $duplicateIndicatorId]);
-        if ($this->countDescriptorsForIndicatorQuery->rowCount() > 0) {
-            $duplicateIndicatorHasDescriptors = true;
-        }
-
-        // Is the indicator's duplicate in use?
-        if ($duplicateIndicatorIsInUse) {
-            // Indicator's duplicate is in use
-
-            // Does indicator's duplicate have descriptors?
-            if ($duplicateIndicatorHasDescriptors) {
-                // Indicator's duplicate has descriptors
-                // This causes a conflict which we cannot resolve ourselves
-                // Don't dedupe
-                $this->indicatorWithDescriptorConflictCount++;
-                $this->log->debug(self::indent(3) . 'incrementing indicatorWithDescriptorConflictCount line ' . __LINE__);
-
-                $this->log->notice(
-                    sprintf(self::indent(3) . 'indicator #%d has duplicates, but both copies have descriptors: skipping deduplication', $indicatorId, $indicatorName)
-                );
-            } else {
-                // Indicator's duplicate has no descriptors
-                // This is an error state since an indicator in use must have descriptors
-                $this->indicatorInUseWithNoDescriptorsCount++;
-                $this->log->debug(self::indent(3) . 'incrementing indicatorInUseWithNoDescriptorsCount line ' . __LINE__);
-
-                $this->log->error(self::indent(3) . 'INVALID DATA: duplicate indicator #%d is in use, but has no descriptors - skipping');
-            }
-        } else {
-            // Indicator's duplicate is not in use
-            // Dedupe it
-            $this->log->warning(
-                sprintf(
-                    self::indent(3) . 'indicator #%d has duplicates but cannot safely be removed: deleting its duplicate #%d instead',
-                    $indicatorId,
-                    $duplicateIndicatorId
-                )
-            );
-            $this->deduplicateIndicator($duplicateIndicatorId, $capabilityId);
-            return true;
-        }
-        return false;
-    }
-
-
-
-    /**
-     * Remove a capability that has been determined to be a duplicate
-     *
-     * @param int    $duplicateCapabilityId
-     * @throws \Alaress\Database\Exception    if the query did not execute successfully
-     */
-    private function deduplicateCapability(int $duplicateCapabilityId): void
-    {
-        $this->deleteCapabilityQuery
-            ->execute([
-                'now' => $this->now,
-                'capabilityId' => $duplicateCapabilityId
-            ]);
-
-        $this->log->notice(
-            self::indent(2) . sprintf('Deleting orphaned indicators from capability #%d', $duplicateCapabilityId)
-        );
-
-        // Delete the orphaned indicators
-        $this->deleteIndicatorsForCapabilityQuery
-            ->execute([
-                'now' => $this->now,
-                'capabilityId' => $duplicateCapabilityId
-            ]);
-    }
-
-
-    /**
-     * Remove an indicator that has been determined to be a duplicate
-     *
-     * @param int    $duplicateIndicatorId
-     * @param int    $capabilityId
-     * @throws \Alaress\Database\Exception    if the query did not execute successfully
-     */
-    private function deduplicateIndicator(int $duplicateIndicatorId, int $capabilityId): void
-    {
-        $this->deleteIndicatorQuery
-            ->execute([
-                'now' => $this->now,
-                'indicatorId' => $duplicateIndicatorId
-            ]);
-
-        // Delete parent capability if this was the last indicator
-        // This should never actually happen because if we detect a duplicate indicator,
-        // it must mean there is more than 1 indicator in the cap, but better safe than sorry...
-        $this->findCapabilityIndicatorsQuery
-            ->execute([
-                'capabilityId' => $capabilityId
-            ]);
-        if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
-            $this->log->notice(
-                sprintf(self::indent(3) . 'No indicators left in capability #%d: deleting capability', $capabilityId)
-            );
-            $this->deleteCapabilityQuery->execute([
-               'now' => $this->now,
-               'capabilityId' => $capabilityId
-            ]);
-        }
-    }
-
 
     /**
      * Helper method for indenting log output for legibility.
@@ -1020,32 +546,10 @@ $app = new class extends CliTool\App
     {
         return str_repeat(self::INDENT, $depth);
     }
-
-
-    /**
-     * Log a significant event.
-     *
-     * @param string $message
-     */
-    private function logSignificantEvent(string $message): void
-    {
-        $this->significantEvents[] = $message;
-    }
-
-
-    /**
-     * Output significant events.
-     */
-    private function outputSignificantEvents(): void
-    {
-        foreach ($this->significantEvents as $event) {
-            $this->log->warning($event);
-        }
-    }
 };
 
 $options = [
-    CliTool\Kernel::OPTION_ERRORS => E_ALL
+    CliTool\Kernel::OPTION_ERRORS => E_ALL,
 ];
 
 try {
