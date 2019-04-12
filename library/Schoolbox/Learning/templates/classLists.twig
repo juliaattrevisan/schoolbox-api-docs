@@ -1,5 +1,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ subjectName, '/homepage/' ~ homepageId ],
+    ['Class List']
+) }}
+
 <div class="row" id="email-class-lists">
     <div class="small-12 island">
         <h1>${ subject }</h1>

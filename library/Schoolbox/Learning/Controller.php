@@ -380,6 +380,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
+                'homepageId'    => $folder->getId(),
                 'subjectName'   => $subjectName,
                 'classCode'     => $classCode,
                 'specialNeeds'  => $this->getDi()->get('sitePage')->getLocalisedTerm('specialNeeds', false, true),
