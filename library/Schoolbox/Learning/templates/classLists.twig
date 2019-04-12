@@ -65,7 +65,7 @@
                 </template>
             </ul>
             <span class="right">
-                <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent style="margin-bottom: 0">
+                <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
                     <input type="hidden" name="replyto" :value="replyTo"/>
                     <input type="hidden" name="bcc" v-model="emailLists.join(emailDelimiter)" />
                     <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
