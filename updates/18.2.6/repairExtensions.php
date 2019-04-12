@@ -36,16 +36,18 @@ $app = new class extends App
     {
         /* Get all the storage records with `pdf` as their extensions
          * These are the files that might have been affected by SA-8297
-         */
-        $query = "
-            SELECT storage_id, filename, ext
-            FROM `storage`
-            WHERE `ext` = 'pdf'
-        ";
-
-        /* For each of the files we found, find the file extension in the `filename` column
+         *
+         * For each of the files we found, find the file extension in the `filename` column
          * This is what the file originally was
          */
+        $query = "
+            SELECT 
+                storage_id, filename, ext,
+                SUBSTRING_INDEX(filename, '.', -1) AS original_extension
+            FROM `storage`
+            WHERE `ext` = 'pdf'
+            AND filename LIKE '%.%'
+        ";
 
         /* Check that this extension is one of the allowedFiles extensions
          * If it wasn't in that table, it might not be a file extension at all
