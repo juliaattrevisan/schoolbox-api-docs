@@ -34,7 +34,24 @@ $app = new class extends App
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
-        echo "\ntest\n";
+        /* Get all the storage records with `pdf` as their extensions
+         * These are the files that might have been affected by SA-8297
+         */
+
+        /* For each of the files we found, find the file extension in the `filename` column
+         * This is what the file originally was
+         */
+
+        /* Check that this extension is one of the allowedFiles extensions
+         * If it wasn't in that table, it might not be a file extension at all
+         *
+         * This is one way to differentiate broken SA-8297 files from pdfs that originally
+         * had a full stop in their file names
+         */
+
+        /* If it was a valid allowedFiles extension in the `filename` column, and it has
+         * a `pdf` extension, then assume it needs correction
+         */
     }
 };
 
