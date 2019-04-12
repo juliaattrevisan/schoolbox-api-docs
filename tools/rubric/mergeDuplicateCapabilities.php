@@ -362,7 +362,8 @@ $app = new class extends CliTool\App
             = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_MARK_QUERY);
 
         // Do everything in a transaction
-        $this->db->beginTransaction();
+        // (will be in individual methods, as we have no nesting)
+//        $this->db->beginTransaction();
         $this->repair();
 
 //        // Report on what we were able to automatically repair
@@ -448,16 +449,16 @@ $app = new class extends CliTool\App
         // Either commit or roll back changes, depending on whether we ran in perform mode or not
         if ($this->perform()) {
             try {
-                $this->db->commit();
+//                $this->db->commit();
                 $this->log->alert('Changes written to database');
             } catch (\Throwable $e) {
                 // In case something goes wrong when executing a query
                 $this->log->alert('An error occurred while trying to write changes to the database: rolling back changes');
-                $this->db->rollBack();
+//                $this->db->rollBack();
                 throw $e;
             }
         } else {
-            $this->db->rollBack();
+//            $this->db->rollBack();
             $this->log->alert('Dry-run complete - no changes written to database');
         }
 
@@ -592,6 +593,7 @@ $app = new class extends CliTool\App
             }
 
             // Probably this won't work without nested transactions
+            // TODO this should be around the capability itself, not a part
             if ($conflict) {
                 $this->db->rollBack();
             } elseif (!$this->perform()) {
