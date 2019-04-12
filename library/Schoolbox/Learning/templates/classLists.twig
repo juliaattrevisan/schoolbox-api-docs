@@ -56,21 +56,21 @@
 
     <div class="checklist small-12 island" v-if="! showSkeletonLoader && mailEnabled">
         <div class="content clearfix" style="background-color: #FFF;">
-            <ul class="inline-list no-margin right email-select-group">
+            <ul class="inline-list no-margin left">
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
                         <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" />
                         <label :for="group.label">${ group.label.capitalise() }</label>
                     </li>
                 </template>
-                <li>
-                    <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent>
-                        <input type="hidden" name="replyto" :value="replyTo"/>
-                        <input type="hidden" name="bcc" v-model="emailLists.join(emailDelimiter)" />
-                        <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
-                    </form>
-                </li>
             </ul>
+            <span class="right">
+                <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent style="margin-bottom: 0">
+                    <input type="hidden" name="replyto" :value="replyTo"/>
+                    <input type="hidden" name="bcc" v-model="emailLists.join(emailDelimiter)" />
+                    <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
+                </form>
+            </span>
         </div>
     </div>
 </div>
