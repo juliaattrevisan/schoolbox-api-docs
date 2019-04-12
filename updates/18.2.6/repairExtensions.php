@@ -39,22 +39,22 @@ $app = new class extends App
          *
          * For each of the files we found, find the file extension in the `filename` column
          * This is what the file originally was
+         *
+         * Check that this extension is one of the allowedFiles extensions
+         * If it wasn't in that table, it might not be a file extension at all
+         *
+         * This is one way to differentiate broken SA-8297 files from pdfs that originally
+         * had a full stop in their file names
          */
         $query = "
             SELECT 
                 storage_id, filename, ext,
                 SUBSTRING_INDEX(filename, '.', -1) AS original_extension
             FROM `storage`
+            INNER JOIN allowedFileExtension afe ON SUBSTRING_INDEX(filename, '.', -1) = afe.extension
             WHERE `ext` = 'pdf'
             AND filename LIKE '%.%'
         ";
-
-        /* Check that this extension is one of the allowedFiles extensions
-         * If it wasn't in that table, it might not be a file extension at all
-         *
-         * This is one way to differentiate broken SA-8297 files from pdfs that originally
-         * had a full stop in their file names
-         */
 
         /* If it was a valid allowedFiles extension in the `filename` column, and it has
          * a `pdf` extension, then assume it needs correction
