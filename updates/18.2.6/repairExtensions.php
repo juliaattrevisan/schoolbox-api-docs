@@ -9,6 +9,7 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -24,6 +25,21 @@ $kernel = new Schoolbox\Application\Daemon\Kernel("'Repair Google Drive PDF Assi
 
 $app = new class extends App
 {
+
+    /**
+     * Update Query for fixing the busted records
+     */
+    private const UPDATE_QUERY = '
+        UPDATE `storage` SET filename = :filename, ext = :ext
+        WHERE storage_id = :storageId
+    ';
+
+
+    /**
+     * @var IConnector
+     */
+    private $database;
+
     /**
      * Re-assign originally intended file extension
      *
@@ -34,6 +50,10 @@ $app = new class extends App
      */
     public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
     {
+        $this->database = $di->get('databaseInternal');
+
+        $updateStorage = $this->database->prepareQuery(self::UPDATE_QUERY);
+
         /* Get all the storage records with `pdf` as their extensions
          * These are the files that might have been affected by SA-8297
          *
@@ -59,6 +79,15 @@ $app = new class extends App
         /* If it was a valid allowedFiles extension in the `filename` column, and it has
          * a `pdf` extension, then assume it needs correction
          */
+        $statement = $this->database->executeQuery($query);
+
+        foreach ($statement->getIterator() as $row) {
+            $updateStorage->execute([
+                'filename' => substr($row['filename'], 0, \strrpos($row['filename'], '.')),
+                'ext' => $row['original_extension'],
+                'storageId' => $row['storage_id']
+            ]);
+        }
     }
 };
 
