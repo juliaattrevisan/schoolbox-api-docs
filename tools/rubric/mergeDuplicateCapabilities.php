@@ -530,9 +530,19 @@ $app = new class extends CliTool\App
      */
     private function repairCapabilities(array $groupedCapabilities, int $folderId): void
     {
-        $seenCapabilities = [];
         foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
-            //
+            $capabilityCount = count($capabilityIds);
+            if ($capabilityCount === 1) {
+                $this->log->debug(
+                    self::indent(2) . sprintf('capability "%s" has no duplicates: skipping', $capabilityName)
+                );
+                continue;
+            }
+
+            // We have duplicates. Undupe them
+            $this->log->notice(
+                self::indent(2) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
+            );
         }
     }
 
