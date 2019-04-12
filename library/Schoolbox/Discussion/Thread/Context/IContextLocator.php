@@ -20,15 +20,6 @@ use Schoolbox\Discussion\Thread\Model as ThreadModel;
  */
 interface IContextLocator
 {
-//    /**
-//     * Is this the correct context for objects of this type?
-//     *
-//     * @param string $contextType
-//     * @return bool
-//     */
-//    public function isContextFor(string $contextType): bool;
-
-
     /**
      * Find an item by its ID, which this context knows how to associate with a
      * thread.
@@ -37,17 +28,6 @@ interface IContextLocator
      * @return IContext
      */
     public function findById($id): IContext;
-
-
-//    /**
-//     * Does this strategy know of any associations between this thread? If so,
-//     * return them.
-//     *
-//     * @param ThreadModel $thread
-//     * @return iterable|IAssociable[] A collection of objects that are
-//     *                                associated with this thread.
-//     */
-//    public function findAssociations(ThreadModel $thread): iterable;
 
 
     /**
