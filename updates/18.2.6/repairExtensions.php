@@ -9,21 +9,18 @@
  */
 declare(strict_types=1);
 
-use Alaress\Database\Connector\IConnector;
-use Aura\Di;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon\App;
+use Schoolbox\Application\CliTool;
 
-$opts = require __DIR__ . '/../../conf/core/require-cli.php';
-spl_autoload_call('\\Schoolbox\\Application\\Daemon');
+// TODO - START - Delete this once SA-8248 is merged. It will be handled by a single core require.php
+require_once __DIR__ . '/../../www/conf/conf.php';
+require_once __DIR__ . '/../../www/include/stdfuncs.php';
+require_once __DIR__ . '/../../library/constants.php';
+set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
+require_once __DIR__ . '/../../library/Autoloader.php';
+Autoloader::initialise();
+// TODO - END
 
-$kernel = new Schoolbox\Application\Daemon\Kernel("'Repair Google Drive PDF Assignations'", [
-    'verbose' => $opts['v'] ?? null,
-    'errors'  => E_ALL,
-]);
-
-$app = new class extends App
+$app = new class extends CliTool\App
 {
 
     /**
@@ -34,25 +31,21 @@ $app = new class extends App
         WHERE storage_id = :storageId
     ';
 
-
-    /**
-     * @var IConnector
-     */
-    private $database;
-
     /**
      * Re-assign originally intended file extension
      *
-     * @param Di\Container    $di
-     * @param LoopInterface   $loop
-     * @param LoggerInterface $log
-     * @param array           $opts
      */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts): void
+    public function run(): void
     {
-        $this->database = $di->get('databaseInternal');
+        $database = $this->getDi()->get('databaseInternal');
 
-        $updateStorage = $this->database->prepareQuery(self::UPDATE_QUERY);
+        $updateStorage = $database->prepareQuery(self::UPDATE_QUERY);
+
+        if ($this->perform()) {
+            $this->getLogger()->notice('Running in Perform mode');
+        } else {
+            $this->getLogger()->notice('Running in Planning mode');
+        }
 
         /* Get all the storage records with `pdf` as their extensions
          * These are the files that might have been affected by SA-8297
@@ -79,7 +72,9 @@ $app = new class extends App
         /* If it was a valid allowedFiles extension in the `filename` column, and it has
          * a `pdf` extension, then assume it needs correction
          */
-        $statement = $this->database->executeQuery($query);
+        $statement = $database->executeQuery($query);
+
+        $database->beginTransaction();
 
         foreach ($statement->getIterator() as $row) {
             $updateStorage->execute([
@@ -88,12 +83,16 @@ $app = new class extends App
                 'storageId' => $row['storage_id']
             ]);
         }
+
+        if ($this->perform()) {
+            $database->commit();
+        } else {
+            $database->rollBack();
+        }
     }
 };
 
-try {
-    $kernel->run($app);
-} catch (Throwable $e) {
-    /** @noinspection PhpUnhandledExceptionInspection */
-    throw $e;
-}
+$options = [CliTool\Kernel::OPTION_LEVEL_MIN => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
