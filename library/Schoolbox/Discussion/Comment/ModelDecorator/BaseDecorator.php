@@ -11,7 +11,7 @@ namespace Schoolbox\Discussion\Comment\ModelDecorator;
 use Alaress_Date_Format;
 use Alaress\Json;
 use Schoolbox\Discussion\Comment\Model;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\User;
 
 /**
@@ -32,7 +32,7 @@ abstract class BaseDecorator implements Json\Serializable, Json\Linkable
 
 
     /**
-     * @var IContext
+     * @var IThreadLocation
      */
     protected $context;
 
@@ -41,9 +41,9 @@ abstract class BaseDecorator implements Json\Serializable, Json\Linkable
      * Constructor
      *
      * @param Model    $model
-     * @param IContext $context
+     * @param IThreadLocation $context
      */
-    public function __construct(Model $model, IContext $context)
+    public function __construct(Model $model, IThreadLocation $context)
     {
         $this->model   = $model;
         $this->context = $context;

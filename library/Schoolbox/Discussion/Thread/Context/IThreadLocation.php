@@ -15,7 +15,7 @@ use Schoolbox\Discussion\Thread\Model;
  *
  * Any model which is associated with a thread must implement this interface.
  */
-interface IContext
+interface IThreadLocation
 {
     /**
      * Get an identifier for this object.

@@ -11,7 +11,7 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\Discussion\Thread\Context\IContextLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
@@ -98,13 +98,13 @@ class Controller extends BaseController
     /**
      * Get a thread, including its most recent comments.
      *
-     * @api   GET /discussion/{contextType}/{contextId}/threads/{id}
+     * @param Model    $thread
+     * @param IThreadLocation $context
+     *@api   GET /discussion/{contextType}/{contextId}/threads/{id}
      * @level 190
      *
-     * @param Model    $thread
-     * @param IContext $context
      */
-    public function getThread(Model $thread, IContext $context): void
+    public function getThread(Model $thread, IThreadLocation $context): void
     {
         $this->buildResponse($thread, $context, true);
     }
@@ -113,13 +113,13 @@ class Controller extends BaseController
     /**
      * Create a new thread, and associates it with `$context`.
      *
-     * @api   POST /discussion/{contextType}/{contextId}/threads/
+     * @param IThreadLocation $context The item with which to associate the thread
+     * @throws \Schoolbox\Mapper\Exception
+     *@api   POST /discussion/{contextType}/{contextId}/threads/
      * @level 190
      *
-     * @param IContext $context The item with which to associate the thread
-     * @throws \Schoolbox\Mapper\Exception
      */
-    public function createThread(IContext $context): void
+    public function createThread(IThreadLocation $context): void
     {
         /** @var \stdClass $data */
         $data   = $this->request->content->get();
@@ -134,13 +134,13 @@ class Controller extends BaseController
     /**
      * Get a list of comments in the given thread.
      *
-     * @api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @param Model    $thread
+     * @param IThreadLocation $context
+     *@api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @level 190
      *
-     * @param Model    $thread
-     * @param IContext $context
      */
-    public function getCommentsByThread(Model $thread, IContext $context): void
+    public function getCommentsByThread(Model $thread, IThreadLocation $context): void
     {
         $responseData = $this->retrieveCommentList($thread, $context, $this->request->query->get('cursor'));
 
@@ -163,15 +163,15 @@ class Controller extends BaseController
     /**
      * Comment to a thread.
      *
-     * @api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
-     * @level 190
-     *
      * @param Model    $thread
-     * @param IContext $context
+     * @param IThreadLocation $context
      *
      * @throws \Schoolbox\Mapper\Exception
+     *@api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @level 190
+     *
      */
-    public function createCommentInThread(Model $thread, IContext $context): void
+    public function createCommentInThread(Model $thread, IThreadLocation $context): void
     {
         /** @var \stdClass $data */
         $data = $this->request->content->get();
@@ -272,11 +272,11 @@ class Controller extends BaseController
      * Retrieve a list of comments as an array for later output.
      *
      * @param Model       $thread
-     * @param IContext    $context
+     * @param IThreadLocation $context
      * @param string|null $encodedCursor
      * @return array
      */
-    private function retrieveCommentList(Model $thread, IContext $context, ?string $encodedCursor): array
+    private function retrieveCommentList(Model $thread, IThreadLocation $context, ?string $encodedCursor): array
     {
         $cursor   = new Comment\Cursor($this->commentMapper, $thread, Comment\Cursor::ORDER_DESC);
         $comments = $cursor->retrieveResults($encodedCursor);
@@ -302,10 +302,10 @@ class Controller extends BaseController
      * `$this->response->content`.
      *
      * @param Model    $thread
-     * @param IContext $context
+     * @param IThreadLocation $context
      * @param bool     $loadChildren
      */
-    private function buildResponse(Model $thread, IContext $context, bool $loadChildren): void
+    private function buildResponse(Model $thread, IThreadLocation $context, bool $loadChildren): void
     {
         $responseData             = $this->decoratorFactory->build($thread, $context)->jsonSerialize(
             $this->retrieveJsonDecorator(),

@@ -11,7 +11,7 @@ namespace Schoolbox\Comms\News\Discussion\Comment\ModelDecorator;
 use Schoolbox\Discussion\Comment\Model;
 use Schoolbox\Discussion\Comment\ModelDecorator\BaseDecorator;
 use Schoolbox\Discussion\Comment\ModelDecorator\IFactory;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 
 /**
  * Factory for model decorators for the comms variant of the discussion thread
@@ -21,10 +21,10 @@ class Factory implements IFactory
 {
     /**
      * @param Model    $model
-     * @param IContext $context
+     * @param IThreadLocation $context
      * @return BaseDecorator
      */
-    public function build(Model $model, IContext $context): BaseDecorator
+    public function build(Model $model, IThreadLocation $context): BaseDecorator
     {
         return new Decorator($model, $context);
     }

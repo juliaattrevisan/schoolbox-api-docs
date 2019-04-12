@@ -25,7 +25,7 @@ use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IContext
+class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
     // The discrete, atomic states this article may be in.
     private const STATE_DRAFT                = 1;

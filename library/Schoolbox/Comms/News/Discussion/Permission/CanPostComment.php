@@ -11,7 +11,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread\Authorizer\IHasPermission;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\User;
 
 /**
@@ -41,11 +41,11 @@ class CanPostComment implements IHasPermission
 
 
     /**
-     * @param IContext  $object
+     * @param IThreadLocation  $object
      * @param User|null $user
      * @return bool
      */
-    public function hasPermission(IContext $object, ?User $user): bool
+    public function hasPermission(IThreadLocation $object, ?User $user): bool
     {
         if (!$object instanceof News\Model) {
             return false;

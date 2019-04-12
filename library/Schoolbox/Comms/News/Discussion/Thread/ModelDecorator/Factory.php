@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Discussion\Thread\ModelDecorator;
 
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\Discussion\Thread\Model;
 use Schoolbox\Discussion\Thread\ModelDecorator\BaseDecorator;
 use Schoolbox\Discussion\Thread\ModelDecorator\IFactory;
@@ -21,10 +21,10 @@ class Factory implements IFactory
 {
     /**
      * @param Model    $model
-     * @param IContext $context
+     * @param IThreadLocation $context
      * @return BaseDecorator
      */
-    public function build(Model $model, IContext $context): BaseDecorator
+    public function build(Model $model, IThreadLocation $context): BaseDecorator
     {
         return new Decorator($model, $context);
     }

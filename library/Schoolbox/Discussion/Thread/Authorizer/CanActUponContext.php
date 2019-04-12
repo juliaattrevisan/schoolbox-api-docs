@@ -45,8 +45,8 @@ class CanActUponContext implements IAuthorizationRule
     {
         // Extract context
         $context = $params['context'] ?? null;
-        if (!$context instanceof Thread\Context\IContext) {
-            throw new \InvalidArgumentException('"context" param is not an instance of ' . Thread\Context\IContext::class);
+        if (!$context instanceof Thread\Context\IThreadLocation) {
+            throw new \InvalidArgumentException('"context" param is not an instance of ' . Thread\Context\IThreadLocation::class);
         }
 
         // Search for the thread in all the strategies.

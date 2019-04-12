@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Thread\Authorizer;
 
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\User;
 
 /**
@@ -22,9 +22,9 @@ interface IHasPermission
      * Does the given user have permission to perform the action, based on the
      * object that is associated with the thread?
      *
-     * @param IContext  $object The object that is related to the thread
+     * @param IThreadLocation  $object The object that is related to the thread
      * @param User|null $user
      * @return bool
      */
-    public function hasPermission(IContext $object, ?User $user): bool;
+    public function hasPermission(IThreadLocation $object, ?User $user): bool;
 }

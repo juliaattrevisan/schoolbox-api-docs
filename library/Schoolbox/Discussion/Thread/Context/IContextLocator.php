@@ -25,26 +25,26 @@ interface IContextLocator
      * thread.
      *
      * @param $id
-     * @return IContext
+     * @return IThreadLocation
      */
-    public function findById($id): IContext;
+    public function findById($id): IThreadLocation;
 
 
     /**
      * Associates the given object with the thread.
      *
      * @param ThreadModel $thread
-     * @param IContext    $object
+     * @param IThreadLocation    $object
      */
-    public function associate(ThreadModel $thread, IContext $object): void;
+    public function associate(ThreadModel $thread, IThreadLocation $object): void;
 
 
     /**
      * Is this thread the correct association for this context?
      *
      * @param ThreadModel $thread
-     * @param IContext    $context
+     * @param IThreadLocation    $context
      * @return bool
      */
-    public function isContextForThread(ThreadModel $thread, IContext $context): bool;
+    public function isContextForThread(ThreadModel $thread, IThreadLocation $context): bool;
 }
