@@ -41,11 +41,9 @@ $app = new class extends CliTool\App
 
         $updateStorage = $database->prepareQuery(self::UPDATE_QUERY);
 
-        if ($this->perform()) {
-            $this->getLogger()->warning('Running in Perform mode');
-        } else {
-            $this->getLogger()->notice('Running in Planning mode');
-        }
+        /* Always run this file, because it's in the updates folder
+         */
+        $this->getLogger()->warning('Running in Perform mode');
 
         /* Get all the storage records with `pdf` as their extensions
          * These are the files that might have been affected by SA-8297
@@ -94,15 +92,11 @@ $app = new class extends CliTool\App
             $count++;
         }
 
+        $database->commit();
+
         /* "Helpful" count
          */
         $this->getLogger()->notice(sprintf('Updated %d records.', $count));
-
-        if ($this->perform()) {
-            $database->commit();
-        } else {
-            $database->rollBack();
-        }
     }
 };
 
