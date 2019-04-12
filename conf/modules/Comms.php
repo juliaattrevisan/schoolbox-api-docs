@@ -31,5 +31,9 @@ class Comms extends ModuleLoader
         $this->loadModule($kernel, News\Feed\Module::class, "/news/feed");
         $this->loadModule($kernel, News\Statistics\Module::class, "/news/statistics");
         $this->loadModule($kernel, News\Module::class, "/news");
+
+        // Discussion threads and comments for comms articles
+        $this->loadModule($kernel, News\Discussion\Thread\Module::class, "/discussion/comms/{contextId}/threads");
+        $this->loadModule($kernel, News\Discussion\Comment\Module::class, "/discussion/comms/{contextId}/comments");
     }
 }

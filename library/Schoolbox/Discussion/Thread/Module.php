@@ -9,61 +9,32 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Thread;
 
 use Alaress\Authorizer as Auth;
+use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Comms\News;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Comment;
-use Schoolbox\Discussion\Thread\Authorizer\CanActUponThread;
+use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 
 /**
  * Module for discussion thread requests.
+ *
+ * This is an abstract class, so a concrete implementation must be created for
+ * each place that uses discussion threads.
  */
-class Module extends BaseModule
+abstract class Module extends BaseModule
 {
-    /**
-     * @var string
-     */
-    protected $basename = 'discussionThreads';
-
-
     /**
      * @inheritdoc
      */
     protected function registerRoutes(): void
     {
-        /** @var Auth\Authorizer $authorizer */
-        /** @var News\Mapper     $newsMapper */
-        /** @var Mapper          $threadMapper */
-        $authorizer     = $this->getInjector()->get('authorizer');
-        $newsMapper     = $this->getMapperFactory()->get(News\Mapper::class);
-        $threadMapper   = $this->getMapperFactory()->get(Mapper::class);
-        $commsContext   = new News\Discussion\Context($threadMapper, $newsMapper);
-        $getAuthorizer  = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $commsContext)
-                );
-            })
-        );
-        $postAuthorizer = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanPostComment($authorizer, $commsContext)
-                );
-            })
-        );
-        $moderateAuthorizer = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $commsContext)
-                );
-            })
-        );
+        $getAuthorizer      = $this->buildGetCommentsAuthorizationRule();
+        $postAuthorizer     = $this->buildPostCommentsAuthorizationRule();
+        $moderateAuthorizer = $this->buildModerateThreadAuthorizationRule();
 
 
         // Routes
@@ -85,7 +56,7 @@ class Module extends BaseModule
             'POST',
             '',
             'createThread',
-            new Auth\Rule\IsLoggedIn()
+            $this->buildCreateThreadAuthorizationRule()
         );
         $this->register(
             'POST',
@@ -112,6 +83,50 @@ class Module extends BaseModule
 
 
     /**
+     * All discussion thread routes have a preloader for fetching the context.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher): void
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) {
+                return [
+                    'context' => $this->buildContext()->findById($params['contextId']),
+                ];
+            }
+        );
+    }
+
+
+    /**
+     * All discussion thread routes must ensure the context found in the
+     * preloader is the same as the context of the requested object.
+     *
+     * @param Authorizer $authorizer
+     */
+    public function initRoutePermissions(Authorizer $authorizer): void
+    {
+        // All routes except for create
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Auth\Rule\Callback(function (array $params) {
+                // Only if the thread exists
+                $thread = $params['thread'] ?? null;
+                if (!$thread) {
+                    return;
+                }
+                if (!$this->buildContext()->isContextForThread($thread, $params['context'])) {
+                    throw new NotFound();
+                }
+            })
+        );
+    }
+
+    /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector): void
@@ -136,8 +151,11 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'commentMapper' => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
-            'threadMapper'  => $this->getMapperFactory()->getLazy(Mapper::class),
+            'commentMapper'           => $this->getMapperFactory()->getLazy(Comment\Mapper::class),
+            'threadMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
+            'context'                 => $this->buildContext(),
+            'decoratorFactory'        => $this->buildModelDecoratorFactory(),
+            'commentDecoratorFactory' => $this->buildCommentModelDecoratorFactory(),
         ];
     }
 
@@ -155,4 +173,72 @@ class Module extends BaseModule
             'thread' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
         ];
     }
+
+
+    /**
+     * Builds a context object for retrieving and persisting objects that are
+     * related to a discussion thread.
+     *
+     * @return IThreadLocator
+     */
+    abstract protected function buildContext(): IThreadLocator;
+
+
+    /**
+     * Builds a factory for building decorators around thread models.
+     *
+     * Required so that the controller may render links dependent on the module
+     * that uses the variant.
+     *
+     * @return ModelDecorator\IFactory
+     */
+    abstract protected function buildModelDecoratorFactory(): ModelDecorator\IFactory;
+
+
+    /**
+     * Builds a factory for building decorators around thread comment models.
+     *
+     * Required so that the controller may render links dependent on the module
+     * that uses the variant.
+     *
+     * @return Comment\ModelDecorator\IFactory
+     */
+    abstract protected function buildCommentModelDecoratorFactory(): Comment\ModelDecorator\IFactory;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to read
+     * comments in this thread.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to post
+     * comments in this thread.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildPostCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to create
+     * a thread.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildCreateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to
+     * moderate this thread, including deleting comments that another user
+     * has made.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildModerateThreadAuthorizationRule(): Auth\Rule\IAuthorizationRule;
 }

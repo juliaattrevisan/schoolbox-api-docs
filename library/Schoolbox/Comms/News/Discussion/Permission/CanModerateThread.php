@@ -10,7 +10,8 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Context\IContext;
+use Schoolbox\Discussion\Thread\Authorizer\IHasPermission;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\User;
 
 /**
@@ -26,7 +27,7 @@ use Schoolbox\User;
  * * they approved the article
  * * they have modify rights on the article
  */
-class CanModerateThread extends BaseStrategy
+class CanModerateThread implements IHasPermission
 {
     /**
      * @var Authorizer
@@ -38,21 +39,19 @@ class CanModerateThread extends BaseStrategy
      * Constructor
      *
      * @param Authorizer $authorizer
-     * @param IContext   $context
      */
-    public function __construct(Authorizer $authorizer, IContext $context)
+    public function __construct(Authorizer $authorizer)
     {
-        parent::__construct($context);
         $this->authorizer = $authorizer;
     }
 
 
     /**
-     * @param mixed     $object The object that is related to the thread
+     * @param IThreadLocation  $object
      * @param User|null $user
      * @return bool
      */
-    public function hasPermission($object, ?User $user): bool
+    public function hasPermission(IThreadLocation $object, ?User $user): bool
     {
         if (!$object instanceof News\Model) {
             return false;

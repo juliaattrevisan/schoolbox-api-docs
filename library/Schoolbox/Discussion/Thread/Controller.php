@@ -11,6 +11,8 @@ namespace Schoolbox\Discussion\Thread;
 use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Discussion\Thread\Context\IThreadLocation;
+use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
 
@@ -44,65 +46,103 @@ class Controller extends BaseController
 
 
     /**
+     * The context object, used for associating a thread to a context.
+     *
+     * @var IThreadLocator
+     */
+    private $context;
+
+
+    /**
+     * The model decorator factory for threads, used to wrap a thread in a
+     * renderer that knows how to create links for its context.
+     *
+     * @var ModelDecorator\IFactory
+     */
+    private $decoratorFactory;
+
+
+    /**
+     * The model decorator factory for comments, used to wrap comments in a
+     * thread in a renderer that knows how to create links for its context.
+     *
+     * @var Comment\ModelDecorator\IFactory
+     */
+    private $commentDecoratorFactory;
+
+
+    /**
      * Constructor
      *
-     * @param Comment\Mapper $commentMapper
-     * @param Mapper         $threadMapper
+     * @param Comment\Mapper                  $commentMapper
+     * @param Mapper                          $threadMapper
+     * @param IThreadLocator                 $context
+     * @param ModelDecorator\IFactory         $decoratorFactory
+     * @param Comment\ModelDecorator\IFactory $commentDecoratorFactory
      */
-    public function __construct(Comment\Mapper $commentMapper, Mapper $threadMapper)
-    {
-        $this->commentMapper = $commentMapper;
-        $this->threadMapper  = $threadMapper;
+    public function __construct(
+        Comment\Mapper $commentMapper,
+        Mapper $threadMapper,
+        IThreadLocator $context,
+        ModelDecorator\IFactory $decoratorFactory,
+        Comment\ModelDecorator\IFactory $commentDecoratorFactory
+    ) {
+        $this->commentMapper           = $commentMapper;
+        $this->threadMapper            = $threadMapper;
+        $this->context                 = $context;
+        $this->decoratorFactory        = $decoratorFactory;
+        $this->commentDecoratorFactory = $commentDecoratorFactory;
     }
 
 
     /**
      * Get a thread, including its most recent comments.
      *
-     * @api   GET /threads/{id}
+     * @param Model    $thread
+     * @param IThreadLocation $context
+     *@api   GET /discussion/{contextType}/{contextId}/threads/{id}
      * @level 190
      *
-     * @param Model $thread
      */
-    public function getThread(Model $thread): void
+    public function getThread(Model $thread, IThreadLocation $context): void
     {
-        $this->buildResponse($thread, true);
+        $this->buildResponse($thread, $context, true);
     }
 
 
     /**
-     * Create a new thread.
+     * Create a new thread, and associates it with `$context`.
      *
-     * This thread is created in an orphaned state: it is not associated with
-     * any particular context. It's the responsibility of the client to
-     * associate it with something.
-     *
+     * @param IThreadLocation $context The item with which to associate the thread
      * @throws \Schoolbox\Mapper\Exception
-     * @api   GET /threads/{id}/comments
+     *@api   POST /discussion/{contextType}/{contextId}/threads/
      * @level 190
+     *
      */
-    public function createThread(): void
+    public function createThread(IThreadLocation $context): void
     {
         /** @var \stdClass $data */
         $data   = $this->request->content->get();
         $thread = $this->threadMapper->createModel()
             ->setOpen($data->open);
         $this->threadMapper->save($thread);
-        $this->buildResponse($thread, false);
+        $this->context->associate($thread, $context);
+        $this->buildResponse($thread, $context, false);
     }
 
 
     /**
      * Get a list of comments in the given thread.
      *
-     * @api   GET /threads/{id}/comments
+     * @param Model    $thread
+     * @param IThreadLocation $context
+     *@api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
      * @level 190
      *
-     * @param Model $thread
      */
-    public function getCommentsByThread(Model $thread): void
+    public function getCommentsByThread(Model $thread, IThreadLocation $context): void
     {
-        $responseData = $this->retrieveCommentList($thread, $this->request->query->get('cursor'));
+        $responseData = $this->retrieveCommentList($thread, $context, $this->request->query->get('cursor'));
 
         // Clean-up every content before returning the result
         foreach ($responseData['data'] as $key => $data) {
@@ -123,14 +163,15 @@ class Controller extends BaseController
     /**
      * Comment to a thread.
      *
-     * @api   POST /threads/{id}/comments
-     * @level 190
-     *
-     * @param Model $thread
+     * @param Model    $thread
+     * @param IThreadLocation $context
      *
      * @throws \Schoolbox\Mapper\Exception
+     *@api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
+     * @level 190
+     *
      */
-    public function createCommentInThread(Model $thread): void
+    public function createCommentInThread(Model $thread, IThreadLocation $context): void
     {
         /** @var \stdClass $data */
         $data = $this->request->content->get();
@@ -142,7 +183,9 @@ class Controller extends BaseController
 
         $this->commentMapper->save($comment);
 
-        $responseData = $comment->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
+        $responseData = $this->commentDecoratorFactory
+            ->build($comment, $context)
+            ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator());
 
         // Clean-up content before returning the result
         $responseData['content'] = Scrub::html($responseData['content']);
@@ -155,7 +198,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/open
+     * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/open
      * @param Model $thread
      *
      * @throws \Aura\Web\Exception\InvalidStatusCode
@@ -167,7 +210,7 @@ class Controller extends BaseController
     }
 
     /**
-     * @api   PUT /threads/{id}/close
+     * @api   PUT /discussion/{contextType}/{contextId}/threads/{id}/close
      * @param Model $thread
      *
      * @throws \Aura\Web\Exception\InvalidStatusCode
@@ -229,15 +272,20 @@ class Controller extends BaseController
      * Retrieve a list of comments as an array for later output.
      *
      * @param Model       $thread
+     * @param IThreadLocation $context
      * @param string|null $encodedCursor
      * @return array
      */
-    private function retrieveCommentList(Model $thread, ?string $encodedCursor): array
+    private function retrieveCommentList(Model $thread, IThreadLocation $context, ?string $encodedCursor): array
     {
         $cursor   = new Comment\Cursor($this->commentMapper, $thread, Comment\Cursor::ORDER_DESC);
         $comments = $cursor->retrieveResults($encodedCursor);
         return [
-            'data'     => $comments->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
+            'data'     => $comments
+                ->map(function (Comment\Model $comment) use ($context) {
+                    return $this->commentDecoratorFactory->build($comment, $context);
+                })
+                ->jsonSerialize($this->retrieveJsonDecorator(), $this->retrieveLinkDecorator()),
             'metadata' => [
                 'count'  => $cursor->retrieveResultCount(),
                 'cursor' => [
@@ -253,17 +301,18 @@ class Controller extends BaseController
      * Builds a response for this thread, putting it into
      * `$this->response->content`.
      *
-     * @param Model $thread
-     * @param bool  $loadChildren
+     * @param Model    $thread
+     * @param IThreadLocation $context
+     * @param bool     $loadChildren
      */
-    private function buildResponse(Model $thread, bool $loadChildren): void
+    private function buildResponse(Model $thread, IThreadLocation $context, bool $loadChildren): void
     {
-        $responseData             = $thread->jsonSerialize(
+        $responseData             = $this->decoratorFactory->build($thread, $context)->jsonSerialize(
             $this->retrieveJsonDecorator(),
             $this->retrieveLinkDecorator()
         );
         $responseData['children'] = $loadChildren
-            ? $this->retrieveCommentList($thread, null)
+            ? $this->retrieveCommentList($thread, $context, null)
             : [];
         $this->response->content->set(
             $this->isJsonRequest()

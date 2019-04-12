@@ -9,13 +9,13 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\Discussion;
 
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 
 /**
  * Discussion threads context for comms articles.
  */
-class Context implements IContext
+class ThreadLocator implements IThreadLocator
 {
     public const TYPE = 'comms';
 
@@ -61,11 +61,11 @@ class Context implements IContext
      * @inheritDoc
      *
      * @param int $id
-     * @return mixed|News\Model
+     * @return News\Model
      * @throws \Schoolbox\Mapper\Exception         if fetch failed
      * @throws \Schoolbox\Mapper\Exception\Deleted if object was deleted
      */
-    public function findById($id)
+    public function findById($id): Thread\Context\IThreadLocation
     {
         return $this->mapper->findById($id);
     }
@@ -87,13 +87,13 @@ class Context implements IContext
      * @inheritDoc
      *
      * @param Thread\Model $thread
-     * @param mixed        $object
+     * @param News\Model   $object
      * @throws \TypeError                  if $object isn't a News\Model
      * @throws \Schoolbox\Mapper\Exception if save failed
      * @throws \UnexpectedValueException   if either $thread or $object is
      *                                     associated with something else
      */
-    public function associate(Thread\Model $thread, $object): void
+    public function associate(Thread\Model $thread, Thread\Context\IThreadLocation $object): void
     {
         if (!$object instanceof News\Model) {
             throw new \TypeError('$object must be a ' . News\Model::class);
@@ -111,5 +111,19 @@ class Context implements IContext
 
         $object->setDiscussionThread($thread);
         $this->mapper->save($object);
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param Thread\Model                                  $thread
+     * @param \Schoolbox\Discussion\Thread\Context\IThreadLocation $context
+     * @return bool
+     */
+    public function isContextForThread(Thread\Model $thread, Thread\Context\IThreadLocation $context): bool
+    {
+        $contextThread = $context->getDiscussionThread();
+        return $contextThread && $thread->getId() === $contextThread->getId();
     }
 }

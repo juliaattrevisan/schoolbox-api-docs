@@ -14,7 +14,7 @@ info:
 
 paths:
 
-  /comments/{id}:
+  /discussion/{contextType}/{contextId}/comments/{id}:
     delete:
       operationId: deleteComment
       summary: Deletes a comment
@@ -25,10 +25,12 @@ paths:
           $ref: '#/components/responses/problem'
 
     parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
       - $ref: '#/components/parameters/id'
       - $ref: '#/components/parameters/token'
 
-  /comments/{id}/comments:
+  /discussion/{contextType}/{contextId}/comments/{id}/comments:
     get:
       operationId: getCommentsByParent
       summary: Returns child comments for a parent comment
@@ -39,13 +41,15 @@ paths:
           $ref: '#/components/responses/problem'
 
     parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
       - $ref: '#/components/parameters/id'
       - $ref: '#/components/parameters/cursor'
       - $ref: '#/components/parameters/limit'
       - $ref: '#/components/parameters/token'
       - $ref: '#/components/parameters/depth'
 
-  /threads/{id}:
+  /discussion/{contextType}/{contextId}/threads/{id}:
     get:
       operationId: getThread
       summary: Returns a thread
@@ -55,7 +59,12 @@ paths:
         default:
           $ref: '#/components/responses/problem'
 
-  /threads:
+    parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
+      - $ref: '#/components/parameters/id'
+
+  /discussion/{contextType}/{contextId}/threads:
     post:
       operationId: createThread
       summary: Creates a thread
@@ -74,7 +83,11 @@ paths:
             schema:
               $ref: '#/components/schemas/thread'
 
-  /threads/{id}/comments:
+    parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
+
+  /discussion/{contextType}/{contextId}/threads/{id}/comments:
     get:
       operationId: getCommentsByThread
       summary: Returns comments for a thread
@@ -103,13 +116,15 @@ paths:
               $ref: '#/components/schemas/comment'
 
     parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
       - $ref: '#/components/parameters/id'
       - $ref: '#/components/parameters/cursor'
       - $ref: '#/components/parameters/limit'
       - $ref: '#/components/parameters/token'
       - $ref: '#/components/parameters/depth'
 
-  /threads/{id}/open:
+  /discussion/{contextType}/{contextId}/threads/{id}/open:
     put:
       operationId: openThread
       summary: Open commenting thread
@@ -124,9 +139,11 @@ paths:
             schema:
               $ref: '#/components/schemas/thread'
     parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
       - $ref: '#/components/parameters/id'
 
-  /threads/{id}/close:
+  /discussion/{contextType}/{contextId}/threads/{id}/close:
     put:
       operationId: closeThread
       summary: Close commenting thread
@@ -141,6 +158,8 @@ paths:
             schema:
               $ref: '#/components/schemas/thread'
     parameters:
+      - $ref: '#/components/parameters/contextType'
+      - $ref: '#/components/parameters/contextId'
       - $ref: '#/components/parameters/id'
 
 components:
@@ -453,6 +472,34 @@ components:
         type: integer
         format: int32
         minimum: 1
+
+    contextType:
+      name:        contextType
+      in:          path
+      description: |
+        The type of item that a thread is associated with.
+        Used in conjunction with contextId to find the item with which a thread
+        is associated, and then to determine whether the authenticated user has
+        permission to perform the requested action.
+
+        Currently, only comms is supported, but it is intended that other
+        contexts will be introduced.
+      required:    true
+      schema:
+        type: string
+        enum: [comms]
+
+    contextId:
+      name:        contextId
+      in:          path
+      description: |
+        The unique ID of the item that a thread is associated with.
+        Used in conjunction with contextType to find the item with which a
+        thread is associated, and then to determine whether the authenticated
+        user has permission to perform the requested action.
+      required:    true
+      schema:
+        $ref: '#/components/schemas/id'
 
     limit:
       name:        sort

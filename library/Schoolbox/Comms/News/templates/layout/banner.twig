@@ -167,6 +167,7 @@
         el: '#threads-section',
         delimiters: ['${', '}'],
         data: {
+            articleId: Number({{ article.id }}),
             threadId: Number({{ article.discussionThread.id }}),
             threadCheckboxVisible: Boolean({{ modifyRoute or isAuthor }}),
             threadCheckboxEnabled: Boolean({{ article.discussionThread.open }}),
@@ -198,7 +199,7 @@
             commentHasBeenAddedText: 'Comment has been added',
             errorAddingCommentText: 'Unable to post comment',
             postCommentButtonIsEnabled: true,
-            createThreadEndpoint: "{{ routeLookup('discussionThreads.createThread') }}",
+            createThreadEndpoint: "{{ routeLookup('commsDiscussionThreads.createThread', {contextId: article.id}) }}",
             associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {articleId: article.id}) }}",
         },
         // define methods under the `methods` object
@@ -212,7 +213,8 @@
                 if (self.threadId) {
                     // I already have a thread ID: switch it on/off
                     changeThreadStatusAction = new Promise(function(resolve, reject) {
-                        var changeThreadStatusEndpoint = '/threads/' + String(self.threadId) + '/';
+                        // TODO don't construct this endpoint manually
+                        var changeThreadStatusEndpoint = '/discussion/comms/' + String(self.articleId) + '/threads/' + String(self.threadId) + '/';
 
                         if (self.threadEnabled) {
                             changeThreadStatusEndpoint += 'open';
@@ -235,20 +237,8 @@
                         axios
                             .post(self.createThreadEndpoint, { open: self.threadEnabled }, { headers: postHeaders })
                             .then(function (response) {
-                                var threadId = response.data.id,
-                                    params   = new URLSearchParams();
-                                params.append('discussionThreadId', threadId);
-                                axios
-                                    .post(self.associateThreadEndpoint, params, { headers: postHeaders })
-                                    .then(function () {
-                                        // We successfully created and associated a thread.
-                                        // Now we can enable/disable it.
-                                        self.threadId = threadId;
-                                        resolve();
-                                    })
-                                    .catch(function (error) {
-                                        reject(error);
-                                    })
+                                self.threadId = response.data.id;
+                                resolve();
                             })
                             .catch(function () {
                                 reject(error);
@@ -286,7 +276,8 @@
 
                 $toast.toastActivate({text: self.loadingCommentsText});
 
-                axios.get('/threads/' + String(self.threadId) + '/comments/', {
+                // TODO don't construct this endpoint manually
+                axios.get('/discussion/comms/' + String(self.articleId) + '/threads/' + String(self.threadId) + '/comments/', {
                     params: {
                         cursor: self.cursorNext
                     }
@@ -340,7 +331,8 @@
 
                     $toast.toastActivate({text: self.deletingCommentText});
 
-                    axios.delete('/comments/'+ self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
+                    // TODO don't construct this endpoint manually
+                    axios.delete('/discussion/comms/' + String(self.articleId) + '/comments/' + self.commentIdToDelete, {}, { headers: postHeaders }).then(function () {
                         self.comments.splice(self.commentIndexToDelete, 1);
 
                         // On successful delete, reduce the total comments count in the UI without hitting the backend
@@ -377,7 +369,8 @@
 
                     self.postCommentButtonIsEnabled = false;
 
-                    axios.post('/threads/' + self.threadId + '/comments', {
+                    // TODO don't construct this endpoint manually
+                    axios.post('/discussion/comms/' + String(self.articleId) + '/threads/' + self.threadId + '/comments', {
                         content: self.comment
                     }).then(function (response) {
 

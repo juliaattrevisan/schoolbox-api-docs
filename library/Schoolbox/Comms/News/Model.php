@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
+use Alaress_Date_Format;
 use DomainException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
@@ -23,9 +24,8 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
-use Alaress_Date_Format;
 
-class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable
+class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
     // The discrete, atomic states this article may be in.
     private const STATE_DRAFT                = 1;

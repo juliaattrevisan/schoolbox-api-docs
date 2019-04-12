@@ -10,7 +10,6 @@ namespace Schoolbox\Discussion\Thread;
 
 use Alaress\Json;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -19,7 +18,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 /**
  * Model for discussion threads.
  */
-class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
+class Model implements ISoftDeletable, Json\Serializable
 {
     use Id;
     use CreatedAtDate;
@@ -66,23 +65,5 @@ class Model implements ISoftDeletable, Json\Serializable, Json\Linkable
             'updatedAt',
         ];
         return $map;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getJsonApiLinks(): array
-    {
-        return [
-            'getComments' => new AuraLink(
-                'discussionThreads.getCommentsByThread',
-                ['id' => $this->id, 'thread' => $this,]
-            ),
-            'createComment' => new AuraLink(
-                'discussionThreads.createCommentInThread',
-                ['id' => $this->id, 'thread' => $this,]
-            ),
-        ];
     }
 }

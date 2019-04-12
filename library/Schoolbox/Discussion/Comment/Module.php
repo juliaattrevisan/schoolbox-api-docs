@@ -9,56 +9,31 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Comment;
 
 use Alaress\Authorizer as Auth;
+use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Comment\Authorizer\IsCommentAuthor;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Module for discussion comment requests.
+ *
+ * This is an abstract class, so a concrete implementation must be created for
+ * each place that uses discussion comments.
  */
-class Module extends BaseModule
+abstract class Module extends BaseModule
 {
-    /**
-     * @var string
-     */
-    protected $basename = 'discussionComments';
-
-
     /**
      * @inheritdoc
      */
     protected function registerRoutes(): void
     {
-        /** @var Auth\Authorizer $authorizer */
-        /** @var News\Mapper     $newsMapper */
-        /** @var Thread\Mapper   $threadMapper */
-        $authorizer       = $this->getInjector()->get('authorizer');
-        $newsMapper       = $this->getMapperFactory()->get(News\Mapper::class);
-        $threadMapper     = $this->getMapperFactory()->get(Thread\Mapper::class);
-        $commsContext     = new News\Discussion\Context($threadMapper, $newsMapper);
-        $deleteAuthorizer = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanModerateThread($authorizer, $commsContext)
-                );
-            })
-        );
-        $getAuthorizer    = new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () use ($authorizer, $commsContext) {
-                return new Thread\Authorizer\CanActUponThread(
-                    new News\Discussion\Permission\CanGetComments($authorizer, $commsContext)
-                );
-            })
-        );
+        $deleteAuthorizer = $this->buildDeleteCommentsAuthorizationRule();
+        $getAuthorizer    = $this->buildGetCommentsAuthorizationRule();
 
         // Routes
         $this->register(
@@ -74,6 +49,51 @@ class Module extends BaseModule
             'getCommentsByParent',
             $getAuthorizer,
             [$this, 'preloadComment']
+        );
+    }
+
+
+    /**
+     * All discussion thread routes have a preloader for fetching the context.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher): void
+    {
+        $this->addRoutePreload(
+            $matcher,
+            '.*',
+            function ($params) {
+                return [
+                    'context' => $this->buildContext()->findById($params['contextId']),
+                ];
+            }
+        );
+    }
+
+
+    /**
+     * All discussion thread routes must ensure the context found in the
+     * preloader is the same as the context of the requested object.
+     *
+     * @param Authorizer $authorizer
+     */
+    public function initRoutePermissions(Authorizer $authorizer): void
+    {
+        // Currently this route applies to all endpoints.
+        // Eventually it will need to apply only to ones that contain a comment.
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Auth\Rule\Callback(function (array $params) {
+                $comment = $params['comment'];
+                if ($comment instanceof Model
+                    && $this->buildContext()->isContextForThread($comment->getThread(), $params['context'])
+                ) {
+                    return;
+                }
+                throw new NotFound();
+            })
         );
     }
 
@@ -141,4 +161,32 @@ class Module extends BaseModule
             return ['comment' => $e->getDeletedObject(),];
         }
     }
+
+
+    /**
+     * Builds a context object for retrieving and persisting objects that are
+     * related to a discussion thread.
+     *
+     * @return Thread\Context\IThreadLocator
+     */
+    abstract protected function buildContext(): Thread\Context\IThreadLocator;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to read
+     * comments.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
+
+    /**
+     * Builds an authorization rule for whether a user has permission to delete
+     * comments.
+     *
+     * @return Auth\Rule\IAuthorizationRule
+     */
+    abstract protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
+
 }
