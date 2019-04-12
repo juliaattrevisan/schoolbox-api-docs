@@ -46,6 +46,7 @@ $app = new class extends CliTool\App
 {
     // This tools CLI options
     private const OPT_SHORT_FOLDER = 'f:';
+    private const OPT_LONG_MAILTO = 'mailto:';
 
 
     // An indentation constant.
@@ -266,13 +267,6 @@ $app = new class extends CliTool\App
     private $now;
 
     /**
-     * Is this actually performing an update?
-     *
-     * @var bool
-     */
-    private $perform = false;
-
-    /**
      * The fully-qualified domain name for this instance.
      *
      * @var
@@ -299,11 +293,21 @@ $app = new class extends CliTool\App
     private $significantEvents = [];
 
 
-
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     */
     public function getShortOpts(): array
     {
         return [self::OPT_SHORT_FOLDER];
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getLongOpts(): array
+    {
+        return [self::OPT_LONG_MAILTO];
     }
 
 
@@ -323,7 +327,6 @@ $app = new class extends CliTool\App
         $this->log     = $this->getLogger();
         $this->db      = $this->getDi()->get('databaseInternal');
         $this->now     = Alaress_Date_Format::now();
-        $this->perform = $this->perform();
         $this->fqdn    = trim($this->getConfig()->get('site_hostname') . '.' . $this->getConfig()->get('site_domain'), ';.');
         $folderIds     = $this->getOpt(self::OPT_SHORT_FOLDER);
         $this->folders = empty($folderIds)
@@ -331,7 +334,7 @@ $app = new class extends CliTool\App
             : array_map('intval', explode(',', $folderIds));
 
         // log perform / dry run
-        if ($this->perform) {
+        if ($this->perform()) {
             $this->log->info('Running in perform mode (-p): changes will be written to database');
         } else {
             $this->log->info('Running in dry-run mode: use -p to write changes to database');
@@ -362,88 +365,88 @@ $app = new class extends CliTool\App
         $this->db->beginTransaction();
         $this->repair();
 
-        // Report on what we were able to automatically repair
-        if ($this->duplicateCapabilityCount > 0) {
-            $this->log->critical(
-                sprintf('%d capabilities had duplicates.',
-                    $this->duplicateCapabilityCount
-                )
-            );
-            $this->log->critical(
-                sprintf('%d capabilities were automatically deduplicated.',
-                    $this->repairedCapabilityCount
-                )
-            );
-        }
-
-        if ($this->repairedCapabilityCount < $this->duplicateCapabilityCount) {
-            $this->log->critical(
-                sprintf('%d capabilities were not able to be automatically deduplicated:',
-                    $this->duplicateCapabilityCount - $this->repairedCapabilityCount
-                )
-            );
-            $this->log->critical(
-                sprintf(self::indent(1) . '- %d capabilities could not be deduped because both copies were in use',
-                    $this->bothCapabilityDupesInUseCount
-                )
-            );
-
-            $cumulativeInvalidCapabilityCount = $this->capabilityNotInUseButHasIndicatorsInUseCount + $this->capabilityHasNoIndicators;
-
-            if ($cumulativeInvalidCapabilityCount > 0) {
-                $this->log->critical(
-                    sprintf(self::indent(1) . '- %d capabilities could not be deduped because they had invalid data:',
-                        $cumulativeInvalidCapabilityCount
-                    )
-                );
-                $this->log->critical(
-                    sprintf(self::indent(2) . '- %d capabilities were not in use, but had indicators in use',
-                        $this->capabilityNotInUseButHasIndicatorsInUseCount
-                    )
-                );
-                $this->log->critical(
-                    sprintf(self::indent(2) . '- %d capabilities had no indicators',
-                        $this->capabilityHasNoIndicators
-                    )
-                );
-            }
-        }
-
-        if ($this->duplicateIndicatorCount > 0) {
-            $this->log->critical(
-                sprintf('%d indicators had duplicates.',
-                    $this->duplicateIndicatorCount
-                )
-            );
-            $this->log->critical(
-                sprintf('%d indicators were automatically deduplicated.',
-                    $this->repairedIndicatorCount
-                )
-            );
-        }
-        if ($this->repairedIndicatorCount < $this->duplicateIndicatorCount) {
-            $this->log->critical(
-                sprintf('%d indicators were not able to be automatically deduplicated:',
-                    $this->duplicateIndicatorCount - $this->repairedIndicatorCount
-                )
-            );
-            $this->log->critical(
-                sprintf(self::indent(1) . '- %d indicators could not be deduped because both copies had descriptors',
-                    $this->indicatorWithDescriptorConflictCount
-                )
-            );
-
-            if ($this->indicatorInUseWithNoDescriptorsCount) {
-                $this->log->critical(
-                    sprintf(self::indent(1) . '- %d indicators could not be deduped because they had usages but no descriptors',
-                        $this->indicatorInUseWithNoDescriptorsCount
-                    )
-                );
-            }
-        }
+//        // Report on what we were able to automatically repair
+//        if ($this->duplicateCapabilityCount > 0) {
+//            $this->log->critical(
+//                sprintf('%d capabilities had duplicates.',
+//                    $this->duplicateCapabilityCount
+//                )
+//            );
+//            $this->log->critical(
+//                sprintf('%d capabilities were automatically deduplicated.',
+//                    $this->repairedCapabilityCount
+//                )
+//            );
+//        }
+//
+//        if ($this->repairedCapabilityCount < $this->duplicateCapabilityCount) {
+//            $this->log->critical(
+//                sprintf('%d capabilities were not able to be automatically deduplicated:',
+//                    $this->duplicateCapabilityCount - $this->repairedCapabilityCount
+//                )
+//            );
+//            $this->log->critical(
+//                sprintf(self::indent(1) . '- %d capabilities could not be deduped because both copies were in use',
+//                    $this->bothCapabilityDupesInUseCount
+//                )
+//            );
+//
+//            $cumulativeInvalidCapabilityCount = $this->capabilityNotInUseButHasIndicatorsInUseCount + $this->capabilityHasNoIndicators;
+//
+//            if ($cumulativeInvalidCapabilityCount > 0) {
+//                $this->log->critical(
+//                    sprintf(self::indent(1) . '- %d capabilities could not be deduped because they had invalid data:',
+//                        $cumulativeInvalidCapabilityCount
+//                    )
+//                );
+//                $this->log->critical(
+//                    sprintf(self::indent(2) . '- %d capabilities were not in use, but had indicators in use',
+//                        $this->capabilityNotInUseButHasIndicatorsInUseCount
+//                    )
+//                );
+//                $this->log->critical(
+//                    sprintf(self::indent(2) . '- %d capabilities had no indicators',
+//                        $this->capabilityHasNoIndicators
+//                    )
+//                );
+//            }
+//        }
+//
+//        if ($this->duplicateIndicatorCount > 0) {
+//            $this->log->critical(
+//                sprintf('%d indicators had duplicates.',
+//                    $this->duplicateIndicatorCount
+//                )
+//            );
+//            $this->log->critical(
+//                sprintf('%d indicators were automatically deduplicated.',
+//                    $this->repairedIndicatorCount
+//                )
+//            );
+//        }
+//        if ($this->repairedIndicatorCount < $this->duplicateIndicatorCount) {
+//            $this->log->critical(
+//                sprintf('%d indicators were not able to be automatically deduplicated:',
+//                    $this->duplicateIndicatorCount - $this->repairedIndicatorCount
+//                )
+//            );
+//            $this->log->critical(
+//                sprintf(self::indent(1) . '- %d indicators could not be deduped because both copies had descriptors',
+//                    $this->indicatorWithDescriptorConflictCount
+//                )
+//            );
+//
+//            if ($this->indicatorInUseWithNoDescriptorsCount) {
+//                $this->log->critical(
+//                    sprintf(self::indent(1) . '- %d indicators could not be deduped because they had usages but no descriptors',
+//                        $this->indicatorInUseWithNoDescriptorsCount
+//                    )
+//                );
+//            }
+//        }
 
         // Either commit or roll back changes, depending on whether we ran in perform mode or not
-        if ($this->perform) {
+        if ($this->perform()) {
             try {
                 $this->db->commit();
                 $this->log->alert('Changes written to database');
