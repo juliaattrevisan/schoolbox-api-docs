@@ -167,9 +167,9 @@ abstract class Module extends BaseModule
      * Builds a context object for retrieving and persisting objects that are
      * related to a discussion thread.
      *
-     * @return Thread\Context\IContextLocator
+     * @return Thread\Context\IThreadLocator
      */
-    abstract protected function buildContext(): Thread\Context\IContextLocator;
+    abstract protected function buildContext(): Thread\Context\IThreadLocator;
 
 
     /**

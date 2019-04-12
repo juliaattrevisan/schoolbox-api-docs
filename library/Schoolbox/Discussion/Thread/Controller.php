@@ -12,7 +12,7 @@ use Alaress\Json\Decorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread\Context\IThreadLocation;
-use Schoolbox\Discussion\Thread\Context\IContextLocator;
+use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
 
@@ -48,7 +48,7 @@ class Controller extends BaseController
     /**
      * The context object, used for associating a thread to a context.
      *
-     * @var IContextLocator
+     * @var IThreadLocator
      */
     private $context;
 
@@ -76,14 +76,14 @@ class Controller extends BaseController
      *
      * @param Comment\Mapper                  $commentMapper
      * @param Mapper                          $threadMapper
-     * @param IContextLocator                 $context
+     * @param IThreadLocator                 $context
      * @param ModelDecorator\IFactory         $decoratorFactory
      * @param Comment\ModelDecorator\IFactory $commentDecoratorFactory
      */
     public function __construct(
         Comment\Mapper $commentMapper,
         Mapper $threadMapper,
-        IContextLocator $context,
+        IThreadLocator $context,
         ModelDecorator\IFactory $decoratorFactory,
         Comment\ModelDecorator\IFactory $commentDecoratorFactory
     ) {

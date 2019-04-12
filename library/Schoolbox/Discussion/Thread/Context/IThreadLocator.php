@@ -18,7 +18,7 @@ use Schoolbox\Discussion\Thread\Model as ThreadModel;
  * * associating a thread with a context
  * * determining if a thread is associated with a given context
  */
-interface IContextLocator
+interface IThreadLocator
 {
     /**
      * Find an item by its ID, which this context knows how to associate with a

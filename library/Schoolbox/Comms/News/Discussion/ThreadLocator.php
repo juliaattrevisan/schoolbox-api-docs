@@ -10,12 +10,12 @@ namespace Schoolbox\Comms\News\Discussion;
 
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Discussion\Thread\Context\IContextLocator;
+use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 
 /**
  * Discussion threads context for comms articles.
  */
-class ContextLocator implements IContextLocator
+class ThreadLocator implements IThreadLocator
 {
     public const TYPE = 'comms';
 

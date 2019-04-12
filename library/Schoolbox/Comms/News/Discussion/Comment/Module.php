@@ -28,15 +28,15 @@ class Module extends Comment\Module
      * Builds a context object for retrieving and persisting objects that are
      * related to a discussion thread.
      *
-     * @return Thread\Context\IContextLocator
+     * @return Thread\Context\IThreadLocator
      */
-    protected function buildContext(): Thread\Context\IContextLocator
+    protected function buildContext(): Thread\Context\IThreadLocator
     {
         /** @var News\Mapper   $newsMapper */
         /** @var Thread\Mapper $threadMapper */
         $newsMapper   = $this->getMapperFactory()->get(News\Mapper::class);
         $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
-        return new News\Discussion\ContextLocator($threadMapper, $newsMapper);
+        return new News\Discussion\ThreadLocator($threadMapper, $newsMapper);
     }
 
 

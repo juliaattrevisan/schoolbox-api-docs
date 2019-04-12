@@ -17,7 +17,7 @@ use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\Comms\News\Audience\UserResolver;
-use Schoolbox\Comms\News\Discussion\ContextLocator;
+use Schoolbox\Comms\News\Discussion\ThreadLocator;
 use Schoolbox\Comms\News\Discussion\Permission\CanModerateThread;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -141,7 +141,7 @@ class Module extends BaseModule
             $authorizer = $this->getInjector()->get('authorizer');
             $rule       = new CanModerateThread(
                 $authorizer,
-                new ContextLocator(
+                new ThreadLocator(
                     $this->getMapperFactory()->get(Thread\Mapper::class),
                     $this->getMapperFactory()->get(Mapper::class)
                 )
