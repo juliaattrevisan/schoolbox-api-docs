@@ -48,6 +48,8 @@ $app = new class extends CliTool\App
     private const OPT_SHORT_FOLDER = 'f:';
 
 
+    // An indentation constant.
+    // TODO make this part of the CliTool class
     private const INDENT = '  ';
 
 
@@ -129,33 +131,6 @@ $app = new class extends CliTool\App
     ';
 
 
-    private const FIND_INDICATORS_FOR_CAPABILITY_QUERY = '
-        SELECT id, name
-        FROM   rubric_criterion
-        WHERE  rubric_group_id = :capabilityId
-        AND    deleted_at IS NULL
-    ';
-
-
-    /**************************** Descriptor queries ***************************/
-
-    private const COUNT_DESCRIPTORS_FOR_LEVEL_QUERY = '
-        SELECT COUNT(*)
-        FROM   rubric_descriptor
-        WHERE  criterion_id = :indicatorId
-        AND    level_id     = :levelId
-        AND    deleted_at   IS NULL
-    ';
-
-    private const MOVE_DESCRIPTOR_QUERY = '
-        UPDATE rubric_descriptor
-        SET    criterion_id = :originalIndicatorId
-        WHERE  criterion_id = :duplicateIndicatorId
-        AND    level_id     = :levelId
-        AND    deleted_at   IS NULL
-    ';
-
-
     /**************************** Prepared folder queries ***************************/
 
     /**
@@ -173,30 +148,59 @@ $app = new class extends CliTool\App
      *
      * @var IQuery
      */
-    private $findCapabilityQuery;
+    private $findCapabilitiesQuery;
+
+
+    /**************************** Prepared indicator migration queries ***************************/
 
     /**
      * Query for finding all rubric indicators in a capability.
      *
      * @var IQuery
      */
-    private $findIndicatorsForCapabilityQuery;
-
-
-    /**************************** Prepared descriptor queries ***************************/
+    private $findCapabilityIndicatorsQuery;
 
     /**
-     * Retrieve a particular indicator by ID
+     * Query for migrating an indicator from a duplicate to the original capability.
      *
      * @var IQuery
      */
-    private $countDescriptorsForLevelQuery;
+    private $migrateCapabilityIndicatorQuery;
+
+
+    /**************************** Prepared usage migration queries ***************************/
 
     /**
-     * Find all indicators with the same name as but a different ID to the specified indicator
+     * Query for finding all usages of a capability.
+     *
      * @var IQuery
      */
-    private $moveDescriptorQuery;
+    private $findCapabilityUsagesQuery;
+
+    /**
+     * Query for migrating a usage from a duplicate to the original capability.
+     *
+     * @var IQuery
+     */
+    private $migrateCapabilityUsageQuery;
+
+
+    /**************************** Prepared mark migration queries ***************************/
+
+    /**
+     * Query for finding all marks given for a capability.
+     *
+     * @var IQuery
+     */
+    private $findCapabilityMarksQuery;
+
+    /**
+     * Query for migrating a usage from a duplicate to the original capability.
+     *
+     * @var IQuery
+     */
+    private $migrateCapabilityMarkQuery;
+
 
     /**************************** Repair state ***************************/
 
@@ -336,15 +340,23 @@ $app = new class extends CliTool\App
         $this->findFoldersQuery
             = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
 
-        $this->findCapabilityQuery
+        $this->findCapabilitiesQuery
             = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY);
-        $this->findIndicatorsForCapabilityQuery
-            = $this->db->prepareQuery(self::FIND_INDICATORS_FOR_CAPABILITY_QUERY);
 
-        $this->countDescriptorsForLevelQuery
-            = $this->db->prepareQuery(self::COUNT_DESCRIPTORS_FOR_LEVEL_QUERY);
-        $this->moveDescriptorQuery
-            = $this->db->prepareQuery(self::MOVE_DESCRIPTOR_QUERY);
+        $this->findCapabilityIndicatorsQuery
+            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY);
+        $this->migrateCapabilityIndicatorQuery
+            = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_INDICATOR_QUERY);
+
+        $this->findCapabilityUsagesQuery
+            = $this->db->prepareQuery(self::FIND_CAPABILITY_USAGES_QUERY);
+        $this->migrateCapabilityUsageQuery
+            = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_USAGE_QUERY);
+
+        $this->findCapabilityMarksQuery
+            = $this->db->prepareQuery(self::FIND_CAPABILITY_MARKS_QUERY);
+        $this->migrateCapabilityMarkQuery
+            = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_MARK_QUERY);
 
         // Do everything in a transaction
         $this->db->beginTransaction();
@@ -489,14 +501,14 @@ $app = new class extends CliTool\App
             );
 
             // Don't go further if there's no capabilities in the class
-            $this->findCapabilityQuery->execute(['folderId' => $classFolderId]);
-            if ($this->findCapabilityQuery->rowCount() === 0) {
+            $this->findCapabilitiesQuery->execute(['folderId' => $classFolderId]);
+            if ($this->findCapabilitiesQuery->rowCount() === 0) {
                 $this->log->debug(self::indent(1) . 'class contains no capabilities: no action required');
                 continue;
             }
 
             $groupedCapabilities = [];
-            foreach ($this->findCapabilityQuery->fetchColumnArray('name', 'id') as $id => $name) {
+            foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $id => $name) {
                 $groupedCapabilities[$name][] = $id;
             }
 
@@ -643,8 +655,8 @@ $app = new class extends CliTool\App
                 );
 
                 // Does this capability have indicators?
-                $this->findIndicatorsForCapabilityQuery->execute(['capabilityId' => $capabilityId]);
-                if ($this->findIndicatorsForCapabilityQuery->rowCount() === 0) {
+                $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $capabilityId]);
+                if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
                     // No indicators is an error state - a capability must have children
                     $this->capabilityHasNoIndicators++;
 
@@ -655,7 +667,7 @@ $app = new class extends CliTool\App
                 } else {
                     // Capability has indicators
                     // Loop through and dedupe them as required
-                    $indicatorsForCapability = $this->findIndicatorsForCapabilityQuery->fetchColumnArray('id', 'name');
+                    $indicatorsForCapability = $this->findCapabilityIndicatorsQuery->fetchColumnArray('id', 'name');
                     $this->repairIndicators($indicatorsForCapability, $capabilityId);
                 }
             }
@@ -979,11 +991,11 @@ $app = new class extends CliTool\App
         // Delete parent capability if this was the last indicator
         // This should never actually happen because if we detect a duplicate indicator,
         // it must mean there is more than 1 indicator in the cap, but better safe than sorry...
-        $this->findIndicatorsForCapabilityQuery
+        $this->findCapabilityIndicatorsQuery
             ->execute([
                 'capabilityId' => $capabilityId
             ]);
-        if ($this->findIndicatorsForCapabilityQuery->rowCount() === 0) {
+        if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
             $this->log->notice(
                 sprintf(self::indent(3) . 'No indicators left in capability #%d: deleting capability', $capabilityId)
             );
