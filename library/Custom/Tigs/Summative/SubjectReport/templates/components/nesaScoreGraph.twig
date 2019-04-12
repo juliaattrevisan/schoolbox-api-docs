@@ -17,10 +17,8 @@ Data:
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
 
-
-    {# TODO style this properly, of course #}
     <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>
-        <h3 style="{% if gradientClass %}color: white; {% endif %}text-align: center; margin-bottom: 0;">{{ studentMark|default('-') }}</h3>
+        <h3 class="grade-heading {% if gradientClass %}has-gradient{% endif %}">{{ studentMark|default('-') }}</h3>
     </div>
 
 
@@ -101,6 +99,5 @@ Data:
             });
         </script>
     {% endautoescape %}
-    {# TODO style this properly #}
-    <div id="nesa-graph" style="margin-bottom: 30px;"></div>
+    <div id="nesa-graph" class="grade-graph" style="margin-bottom: 30px;"></div>
 {% endif %}
