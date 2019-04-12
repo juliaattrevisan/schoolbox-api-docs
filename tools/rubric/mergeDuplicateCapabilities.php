@@ -543,8 +543,65 @@ $app = new class extends CliTool\App
             $this->log->notice(
                 self::indent(2) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
             );
+            $this->repairCapabilityIndicators($capabilityIds);
         }
     }
+
+
+    private function repairCapabilityIndicators(array $capabilityIds): void
+    {
+        // Roll each capability after the last into the first.
+        $originalCapabilityId = array_shift($capabilityIds);
+
+        foreach ($capabilityIds as $duplicateCapabilityId) {
+            // Which indicators are within the original capability?
+            // (Need to load after each loop, because the loop puts indicators in the original)
+            $this->log->notice(
+                self::indent(3) . sprintf('merging duplicate #%d into original #%d', $duplicateCapabilityId, $originalCapabilityId)
+            );
+
+            $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $originalCapabilityId]);
+            $originalIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
+
+            // And which are in the duplicate?
+            $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $duplicateCapabilityId]);
+            $duplicateIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
+
+            // Is there any overlap between the capabilities in the original and the duplicate?
+            $this->db->beginTransaction();
+            $conflict = false;
+            foreach ($duplicateIndicators as $duplicateIndicatorId => $duplicateIndicatorName) {
+                $this->log->notice(
+                    self::indent(4) . sprintf('moving indicator %s into original', $duplicateIndicatorName)
+                );
+
+                if (in_array($duplicateIndicatorId, $originalIndicators, true)) {
+                    // raise an exception
+                    $this->log->warning(
+                        self::indent(4) . 'indicator already exists in original: rolling back'
+                    );
+                    $conflict = true;
+                    break;
+                }
+
+                $this->migrateCapabilityIndicatorQuery->execute([
+                    'originalCapabilityId'  => $originalCapabilityId,
+                    'duplicateCapabilityId' => $duplicateCapabilityId,
+                    'id'                    => $duplicateIndicatorId,
+                ]);
+            }
+
+            // Probably this won't work without nested transactions
+            if ($conflict) {
+                $this->db->rollBack();
+            } elseif (!$this->perform()) {
+                $this->db->rollBack();
+            } else {
+                $this->db->commit();
+            }
+        }
+    }
+
 
     /**
      * Helper method for indenting log output for legibility.
