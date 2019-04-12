@@ -88,12 +88,17 @@ class MappingCollection extends Collection
     /**
      * Stores the column and property in a map to avoid O(N) by column lookup
      *
+     * Note that 'joinsVia' mappings do not have a local column
+     *
+     * @see Mapper::joinsVia()
      * @see getOffsetByColumn()
      * @inheritDoc
      */
     public function setOffset($index, $value)
     {
-        $this->columnToPropertyMap[$value['column']] = $index;
+        if (array_key_exists('column', $value)) {
+            $this->columnToPropertyMap[$value['column']] = $index;
+        }
         return parent::setOffset($index, $value);
     }
 
