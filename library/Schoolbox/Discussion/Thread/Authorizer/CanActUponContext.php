@@ -22,7 +22,7 @@ use Schoolbox\User;
 class CanActUponContext implements IAuthorizationRule
 {
     /**
-     * @var IStrategy[]
+     * @var IHasPermission[]
      */
     private $strategies;
 
@@ -30,9 +30,9 @@ class CanActUponContext implements IAuthorizationRule
     /**
      * Constructor
      *
-     * @param IStrategy ...$strategies
+     * @param IHasPermission ...$strategies
      */
-    public function __construct(IStrategy... $strategies)
+    public function __construct(IHasPermission... $strategies)
     {
         $this->strategies = $strategies;
     }

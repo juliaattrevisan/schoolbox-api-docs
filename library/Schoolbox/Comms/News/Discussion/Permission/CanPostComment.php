@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
+use Schoolbox\Discussion\Thread\Authorizer\IHasPermission;
 use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\User;
 
@@ -21,7 +21,7 @@ use Schoolbox\User;
  * If a user can view a comms article, they can post comments, unless comments
  * are closed.
  */
-class CanPostComment implements IStrategy
+class CanPostComment implements IHasPermission
 {
     /**
      * @var Authorizer

@@ -10,7 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Permission;
 
 use Alaress\Authorizer\Authorizer;
 use Schoolbox\Comms\News;
-use Schoolbox\Discussion\Thread\Authorizer\IStrategy;
+use Schoolbox\Discussion\Thread\Authorizer\IHasPermission;
 use Schoolbox\Discussion\Thread\Context\IContext;
 use Schoolbox\User;
 
@@ -27,7 +27,7 @@ use Schoolbox\User;
  * * they approved the article
  * * they have modify rights on the article
  */
-class CanModerateThread implements IStrategy
+class CanModerateThread implements IHasPermission
 {
     /**
      * @var Authorizer

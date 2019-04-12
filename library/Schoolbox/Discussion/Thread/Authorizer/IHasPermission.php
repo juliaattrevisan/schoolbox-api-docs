@@ -16,7 +16,7 @@ use Schoolbox\User;
  * * is associated with a particular type of item
  * * if associated, whether the current user has permission to act upon it
  */
-interface IStrategy
+interface IHasPermission
 {
     /**
      * Does the given user have permission to perform the action, based on the
