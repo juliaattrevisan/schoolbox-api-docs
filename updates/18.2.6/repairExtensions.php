@@ -42,7 +42,7 @@ $app = new class extends CliTool\App
         $updateStorage = $database->prepareQuery(self::UPDATE_QUERY);
 
         if ($this->perform()) {
-            $this->getLogger()->notice('Running in Perform mode');
+            $this->getLogger()->warning('Running in Perform mode');
         } else {
             $this->getLogger()->notice('Running in Planning mode');
         }
@@ -76,13 +76,27 @@ $app = new class extends CliTool\App
 
         $database->beginTransaction();
 
+        $count = 0;
+
         foreach ($statement->getIterator() as $row) {
+            $newFilename = substr($row['filename'], 0, \strrpos($row['filename'], '.'));
+
             $updateStorage->execute([
                 'filename' => substr($row['filename'], 0, \strrpos($row['filename'], '.')),
                 'ext' => $row['original_extension'],
                 'storageId' => $row['storage_id']
             ]);
+
+            $this->getLogger()->notice(sprintf('storageId %d: rename (%s, %s) to (%s, %s)',
+                $row['storage_id'], $row['filename'], $row['ext'], $newFilename, $row['original_extension']
+            ));
+
+            $count++;
         }
+
+        /* "Helpful" count
+         */
+        $this->getLogger()->notice(sprintf('Updated %d records.', $count));
 
         if ($this->perform()) {
             $database->commit();
