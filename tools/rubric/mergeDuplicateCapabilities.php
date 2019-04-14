@@ -579,27 +579,27 @@ $app = new class extends CliTool\App
     /**
      * Repair indicators for the capability IDs provided.
      *
-     * All indicators from `$duplicateCapabilityId` are migrated into
-     * `$originalCapabilityId`. Indicators which already exist in the original
+     * All indicators from `$destinationCapabilityId` are migrated into
+     * `$sourceCapabilityId`. Indicators which already exist in the original
      * are still migrated: there will be another step which merges the
      * duplicate indicators themselves.
      *
-     * @param int $originalCapabilityId
-     * @param int $duplicateCapabilityId
+     * @param int $destinationCapabilityId
+     * @param int $sourceCapabilityId
      */
-    private function repairCapabilityIndicators(int $originalCapabilityId, int $duplicateCapabilityId): void
+    private function repairCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
         // Which indicators are within the original capability?
         // (Need to load after each loop, because the loop puts indicators in the original)
         $this->log->notice(
-            self::indent(3) . sprintf('merging duplicate #%d into original #%d', $duplicateCapabilityId, $originalCapabilityId)
+            self::indent(3) . sprintf('merging duplicate #%d into original #%d', $sourceCapabilityId, $destinationCapabilityId)
         );
 
-        $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $originalCapabilityId]);
+        $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
         $originalIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
 
         // And which are in the duplicate?
-        $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $duplicateCapabilityId]);
+        $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $sourceCapabilityId]);
         $duplicateIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
 
         // Is there any overlap between the capabilities in the original and the duplicate?
@@ -620,8 +620,8 @@ $app = new class extends CliTool\App
             }
 
             $this->migrateCapabilityIndicatorQuery->execute([
-                'originalCapabilityId'  => $originalCapabilityId,
-                'duplicateCapabilityId' => $duplicateCapabilityId,
+                'originalCapabilityId'  => $destinationCapabilityId,
+                'duplicateCapabilityId' => $sourceCapabilityId,
                 'id'                    => $duplicateIndicatorId,
             ]);
         }
