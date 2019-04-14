@@ -536,21 +536,21 @@ $app = new class extends CliTool\App
             $capabilityCount = count($capabilityIds);
             if ($capabilityCount <= 1) {
                 $this->log->debug(
-                    self::indent(2) . sprintf('capability "%s" has no duplicates: skipping', $capabilityName)
+                    self::indent(1) . sprintf('capability "%s" has no duplicates: skipping', $capabilityName)
                 );
                 continue;
             }
 
             // We have duplicates. Undupe them
             $this->log->notice(
-                self::indent(2) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
+                self::indent(1) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
             );
 
 
             // Build pairs to merge into one another.
             // Merge backwards from the last duplicate into the previous one,
             // ending up at the last.
-            array_reverse($capabilityIds);
+            $capabilityIds = array_reverse($capabilityIds);
             while (count($capabilityIds) >= 2) {
                 $sourceCapabilityId = array_shift($capabilityIds);
                 foreach ($capabilityIds as $destinationCapabilityId) {
@@ -592,7 +592,7 @@ $app = new class extends CliTool\App
         // Which indicators are within the original capability?
         // (Need to load after each loop, because the loop puts indicators in the original)
         $this->log->notice(
-            self::indent(3) . sprintf('merging duplicate #%d into original #%d', $sourceCapabilityId, $destinationCapabilityId)
+            self::indent(2) . sprintf('merging duplicate #%d into original #%d', $sourceCapabilityId, $destinationCapabilityId)
         );
 
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
@@ -604,19 +604,16 @@ $app = new class extends CliTool\App
 
         // Is there any overlap between the capabilities in the original and the duplicate?
         $this->db->beginTransaction();
-        $conflict = false;
         foreach ($duplicateIndicators as $duplicateIndicatorId => $duplicateIndicatorName) {
             $this->log->notice(
-                self::indent(4) . sprintf('moving indicator %s into original', $duplicateIndicatorName)
+                self::indent(3) . sprintf('moving indicator %s into original', $duplicateIndicatorName)
             );
 
             if (in_array($duplicateIndicatorId, $originalIndicators, true)) {
                 // raise an exception
                 $this->log->warning(
-                    self::indent(4) . 'indicator already exists in original: rolling back'
+                    self::indent(3) . 'indicator already exists in original: will need to deduplicate'
                 );
-                $conflict = true;
-                break;
             }
 
             $this->migrateCapabilityIndicatorQuery->execute([
@@ -626,15 +623,10 @@ $app = new class extends CliTool\App
             ]);
         }
 
-        // Is there a case where this could fail?
-        // Probably this won't work without nested transactions
-        // TODO this should be around the capability itself, not a part
-        if ($conflict) {
-            $this->db->rollBack();
-        } elseif (!$this->perform()) {
-            $this->db->rollBack();
-        } else {
+        if ($this->perform()) {
             $this->db->commit();
+        } else {
+            $this->db->rollBack();
         }
     }
 
