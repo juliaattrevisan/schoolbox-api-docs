@@ -97,7 +97,10 @@ $app = new class extends CliTool\App
     /**************************** Usage migration queries ***************************/
 
     private const FIND_CAPABILITY_USAGES_QUERY = '
-        SELECT rgu.submission_box_id
+        SELECT
+            rgu.submission_box_id AS box_id,
+            a.id,
+            a.title
         FROM rubric_group_usage rgu
         INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment     a  ON sb.assessment_id = a.id
@@ -116,7 +119,10 @@ $app = new class extends CliTool\App
     /**************************** Mark migration queries ***************************/
 
     private const FIND_CAPABILITY_MARKS_QUERY = '
-        SELECT rgu.submission_box_id
+        SELECT
+            rgu.submission_box_id AS box_id,
+            a.id,
+            a.title
         FROM rubric_group_mark rm
         INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
         INNER JOIN submission_box     sb  ON rgu.submission_box_id = sb.id
@@ -630,10 +636,55 @@ $app = new class extends CliTool\App
     }
 
 
-
+    /**
+     * Repair usages for the capability IDs provided.
+     *
+     * Each due work which uses `$destinationCapabilityId` has its usage
+     * migrated to `$sourceCapabilityId`.
+     *
+     * However, if the due work uses both source and destination capabilities,
+     * that is an error: it will be reported, and migration of that capability
+     * will be rolled back.
+     *
+     * @param int $destinationCapabilityId
+     * @param int $sourceCapabilityId
+     */
     private function repairCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
-        //
+        // Which indicators are within the original capability?
+        $this->findCapabilityUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
+        $originalDueWorkIds = $this->findCapabilityUsagesQuery->fetchColumnArray('id');
+
+        // And which are in the duplicate?
+        $this->findCapabilityUsagesQuery->execute(['capabilityId' => $sourceCapabilityId]);
+        $duplicateDueWorks = $this->findCapabilityUsagesQuery->fetchAll();
+
+        foreach ($duplicateDueWorks as $duplicateDueWork) {
+            $this->log->notice(
+                self::indent(3)
+                . sprintf(
+                    'moving usages of capability in due work #%d (%s) into original',
+                    $duplicateDueWork['id'],
+                    $duplicateDueWork['title']
+                )
+            );
+
+            // Is this capability in use on both the source and destination?
+            // If so that's an error.
+            if (in_array($duplicateDueWork['id'], $originalDueWorkIds, true)) {
+                $this->log->warning(
+                    self::indent(4) . 'capability is already used in due work: aborting'
+                );
+                throw new UnexpectedValueException('capability is already used in due work: aborting');
+                // TODO need to know that this due work is the one which failed
+            }
+
+            $this->migrateCapabilityUsageQuery->execute([
+                'originalCapabilityId'  => $destinationCapabilityId,
+                'duplicateCapabilityId' => $sourceCapabilityId,
+                'boxId'                 => $duplicateDueWork['box_id'],
+            ]);
+        }
     }
 
 
