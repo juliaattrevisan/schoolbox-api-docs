@@ -550,6 +550,14 @@ $app = new class extends CliTool\App
     }
 
 
+    /**
+     * Repair indicators for each of the capability IDs provided.
+     *
+     * The first capability in `$capabilityIds` is considered the original: all
+     * indicators in the other capabilities are moved to the original.
+     *
+     * @param array $capabilityIds
+     */
     private function repairCapabilityIndicators(array $capabilityIds): void
     {
         // Roll each capability after the last into the first.
