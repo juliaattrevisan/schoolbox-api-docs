@@ -597,7 +597,7 @@ $app = new class extends CliTool\App
      *
      * All indicators from `$destinationCapabilityId` are migrated into
      * `$sourceCapabilityId`. Indicators which already exist in the original
-     * are still migrated: there will be another step which merges the
+     * are still migrated: there will be another script which merges the
      * duplicate indicators themselves.
      *
      * @param int $destinationCapabilityId
@@ -606,7 +606,6 @@ $app = new class extends CliTool\App
     private function repairCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
         // Which indicators are within the original capability?
-        // (Need to load after each loop, because the loop puts indicators in the original)
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
         $originalIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
 
@@ -614,16 +613,14 @@ $app = new class extends CliTool\App
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $sourceCapabilityId]);
         $duplicateIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
 
-        // Is there any overlap between the capabilities in the original and the duplicate?
         foreach ($duplicateIndicators as $duplicateIndicatorId => $duplicateIndicatorName) {
             $this->log->notice(
-                self::indent(3) . sprintf('moving indicator %s into original', $duplicateIndicatorName)
+                self::indent(3) . sprintf('moving indicator "%s" into original', $duplicateIndicatorName)
             );
 
             if (in_array($duplicateIndicatorId, $originalIndicators, true)) {
-                // raise an exception
                 $this->log->warning(
-                    self::indent(3) . 'indicator already exists in original: will need to deduplicate'
+                    self::indent(4) . 'indicator already exists in original: will need to deduplicate'
                 );
             }
 
