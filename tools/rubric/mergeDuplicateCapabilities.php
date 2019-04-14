@@ -558,7 +558,17 @@ $app = new class extends CliTool\App
                     $this->db->beginTransaction();
                     try {
                         // do stuff
+                        $this->log->notice(
+                            self::indent(2)
+                            . sprintf(
+                                'merging duplicate #%d into original #%d',
+                                $sourceCapabilityId,
+                                $destinationCapabilityId
+                            )
+                        );
                         $this->repairCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
+                        $this->repairCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
+                        $this->repairCapabilityMarks($destinationCapabilityId, $sourceCapabilityId);
                     } catch (\Exception $e) {
                         $conflict = true;
                     }
@@ -591,10 +601,6 @@ $app = new class extends CliTool\App
     {
         // Which indicators are within the original capability?
         // (Need to load after each loop, because the loop puts indicators in the original)
-        $this->log->notice(
-            self::indent(2) . sprintf('merging duplicate #%d into original #%d', $sourceCapabilityId, $destinationCapabilityId)
-        );
-
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
         $originalIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
 
@@ -628,6 +634,19 @@ $app = new class extends CliTool\App
         } else {
             $this->db->rollBack();
         }
+    }
+
+
+
+    private function repairCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
+    {
+        //
+    }
+
+
+    private function repairCapabilityMarks(int $destinationCapabilityId, int $sourceCapabilityId): void
+    {
+        //
     }
 
 
