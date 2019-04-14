@@ -12,7 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Application\CliTool;
 
-require_once __DIR__ . '/../conf/core/require-cli.php';
+require_once __DIR__ . '/../conf/core/require.php';
 
 $app = new class extends CliTool\App {
     public function run() : void
@@ -127,7 +127,7 @@ $app = new class extends CliTool\App {
 
         echo json_encode($result);
     }
-}
+};
 
 $kernel = new CliTool\Kernel($app, false);
 $kernel->runapp();
