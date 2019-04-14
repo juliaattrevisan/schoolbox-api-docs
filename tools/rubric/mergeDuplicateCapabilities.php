@@ -550,8 +550,9 @@ $app = new class extends CliTool\App
             // Build pairs to merge into one another.
             // Merge backwards from the last duplicate into the previous one,
             // ending up at the last.
+            array_reverse($capabilityIds);
             while (count($capabilityIds) >= 2) {
-                $sourceCapabilityId = array_pop($capabilityIds);
+                $sourceCapabilityId = array_shift($capabilityIds);
                 foreach ($capabilityIds as $destinationCapabilityId) {
                     $conflict = false;
                     $this->db->beginTransaction();
