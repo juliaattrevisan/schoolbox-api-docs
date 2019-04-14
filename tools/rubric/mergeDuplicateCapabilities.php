@@ -609,7 +609,6 @@ $app = new class extends CliTool\App
         $duplicateIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
 
         // Is there any overlap between the capabilities in the original and the duplicate?
-        $this->db->beginTransaction();
         foreach ($duplicateIndicators as $duplicateIndicatorId => $duplicateIndicatorName) {
             $this->log->notice(
                 self::indent(3) . sprintf('moving indicator %s into original', $duplicateIndicatorName)
@@ -627,12 +626,6 @@ $app = new class extends CliTool\App
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'id'                    => $duplicateIndicatorId,
             ]);
-        }
-
-        if ($this->perform()) {
-            $this->db->commit();
-        } else {
-            $this->db->rollBack();
         }
     }
 
