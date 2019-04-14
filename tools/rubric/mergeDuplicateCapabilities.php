@@ -584,7 +584,6 @@ $app = new class extends CliTool\App
                         );
                         $this->repairCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
                         $this->repairCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
-                        $this->repairCapabilityMarks($destinationCapabilityId, $sourceCapabilityId);
                     } catch (\Exception $e) {
                         $conflict = true;
                     }
@@ -644,14 +643,17 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Repair usages for the capability IDs provided.
+     * Repair usages and marks for the capability IDs provided.
      *
-     * Each due work which uses `$destinationCapabilityId` has its usage
-     * migrated to `$sourceCapabilityId`.
+     * Each due work which uses `$destinationCapabilityId` has its usages and
+     * marks migrated to `$sourceCapabilityId`.
      *
      * However, if the due work uses both source and destination capabilities,
      * that is an error: it will be reported, and migration of that capability
      * will be rolled back.
+     *
+     * (Marks for source and destination capabilities don't need to be checked
+     *  separately, because the mark can't exist without a usage.)
      *
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
@@ -671,7 +673,7 @@ $app = new class extends CliTool\App
             $this->log->notice(
                 self::indent(3)
                 . sprintf(
-                    'moving usages of capability in due work #%d (%s) into original',
+                    'moving usages and marks of capability in due work #%d (%s) into original',
                     $duplicateDueWork['id'],
                     $duplicateDueWork['title']
                 )
@@ -681,12 +683,19 @@ $app = new class extends CliTool\App
             // If so that's an error.
             if (in_array($duplicateDueWork['id'], $originalDueWorkIds, true)) {
                 $this->log->warning(
-                    self::indent(4) . 'capability is already used in due work: aborting'
+                    self::indent(4) . 'capability is used by both source and destination due work: aborting'
                 );
                 $failedDueWorks[] = $duplicateDueWork['id'];
+                continue;
             }
 
             $this->migrateCapabilityUsageQuery->execute([
+                'originalCapabilityId'  => $destinationCapabilityId,
+                'duplicateCapabilityId' => $sourceCapabilityId,
+                'boxId'                 => $duplicateDueWork['box_id'],
+            ]);
+
+            $this->migrateCapabilityMarkQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'boxId'                 => $duplicateDueWork['box_id'],
@@ -698,12 +707,6 @@ $app = new class extends CliTool\App
             $this->failedDueWorks = array_merge($this->failedDueWorks, $failedDueWorks);
             throw new UnexpectedValueException('One or more due works failed to migrate');
         }
-    }
-
-
-    private function repairCapabilityMarks(int $destinationCapabilityId, int $sourceCapabilityId): void
-    {
-        //
     }
 
 
