@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\Discussion;
 use Schoolbox\Comms\News;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Discussion\Thread\Context\IThreadLocator;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Discussion threads context for comms articles.
@@ -125,5 +126,24 @@ class ThreadLocator implements IThreadLocator
     {
         $contextThread = $context->getDiscussionThread();
         return $contextThread && $thread->getId() === $contextThread->getId();
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @param Thread\Model $thread
+     * @param Thread\Context\IThreadLocation $context
+     */
+    public function deleteThread(Thread\Model $thread, Thread\Context\IThreadLocation $context): void
+    {
+        try {
+            $this->threadMapper->delete($thread);
+            $commentMapper = $this->threadMapper->getJoinMapper('comments');
+            $commentMapper->hasModuleNotifier($context->getCommentNotifier());
+            $commentMapper->deleteByColumn('discussion_thread_id', $thread->getId());
+        } catch (Exception $e) {
+            // noop
+        }
     }
 }

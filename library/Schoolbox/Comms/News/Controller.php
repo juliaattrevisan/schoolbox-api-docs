@@ -775,6 +775,9 @@ class Controller extends Base
 
             $this->newsMapper->delete($article);
 
+            $context = new ThreadLocator($this->threadMapper, $this->newsMapper);
+            $context->deleteThread($article->getDiscussionThread(), $article);
+
             /* Redirect to returnUrl if provided, otherwise to news feed.
              */
 

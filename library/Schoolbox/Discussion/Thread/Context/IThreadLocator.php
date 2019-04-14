@@ -47,4 +47,13 @@ interface IThreadLocator
      * @return bool
      */
     public function isContextForThread(ThreadModel $thread, IThreadLocation $context): bool;
+
+
+    /**
+     * Delete thread and its comments
+     *
+     * @param ThreadModel $thread
+     * @param IThreadLocation $context
+     */
+    public function deleteThread(ThreadModel $thread, IThreadLocation $context): void;
 }
