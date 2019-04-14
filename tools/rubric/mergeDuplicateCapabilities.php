@@ -377,9 +377,6 @@ $app = new class extends CliTool\App
         $this->migrateCapabilityMarkQuery
             = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_MARK_QUERY);
 
-        // Do everything in a transaction
-        // (will be in individual methods, as we have no nesting)
-//        $this->db->beginTransaction();
         $this->repair();
 
 //        // Report on what we were able to automatically repair
@@ -462,27 +459,28 @@ $app = new class extends CliTool\App
 //            }
 //        }
 
-        // Either commit or roll back changes, depending on whether we ran in perform mode or not
+
         if ($this->perform()) {
             $this->log->alert('Changes written to database');
-//            try {
-////                $this->db->commit();
-//                $this->log->alert('Changes written to database');
-//            } catch (\Throwable $e) {
-//                // In case something goes wrong when executing a query
-//                $this->log->alert('An error occurred while trying to write changes to the database: rolling back changes');
-////                $this->db->rollBack();
-//                throw $e;
-//            }
         } else {
-//            $this->db->rollBack();
             $this->log->alert('Dry-run complete - no changes written to database');
         }
 
-        // Throw an exception if the migration was incomplete, so that it gets logged in our dashboard for manual intervention
-        if ($this->repairedIndicatorCount < $this->duplicateIndicatorCount || $this->repairedCapabilityCount < $this->duplicateCapabilityCount) {
+
+        // Report on which due works must be repaired manually, if any.
+        if (!empty($this->failedDueWorks)) {
+            $this->log->warning(sprintf('%d due works must be deduplicated manually:', count($this->failedDueWorks)));
+            foreach ($this->failedDueWorks as $failedDueWorkId) {
+                $this->log->warning(
+                    self::indent(1)
+                    . sprintf(
+                        'https://%s/learning/assessments/%d/modify',
+                        $this->fqdn,
+                        $failedDueWorkId
+                    )
+                );
+            }
             throw new RuntimeException('Migration incomplete, could not migrate non-destructively.');
-            // TODO instead of throwing exception here, email Support with a list of assessments that didn't work properly
         }
     }
 
