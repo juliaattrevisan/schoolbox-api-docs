@@ -300,6 +300,16 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Due works which failed to migrate for whatever reason.
+     *
+     * These must be fixed manually for each instance.
+     *
+     * @var array|int[]
+     */
+    private $failedDueWorks = [];
+
+
+    /**
      * @inheritdoc
      */
     public function getShortOpts(): array
@@ -648,14 +658,15 @@ $app = new class extends CliTool\App
      */
     private function repairCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
-        // Which indicators are within the original capability?
+        // Which due works use the original capability?
         $this->findCapabilityUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
         $originalDueWorkIds = $this->findCapabilityUsagesQuery->fetchColumnArray('id');
 
-        // And which are in the duplicate?
+        // And which use the duplicate?
         $this->findCapabilityUsagesQuery->execute(['capabilityId' => $sourceCapabilityId]);
         $duplicateDueWorks = $this->findCapabilityUsagesQuery->fetchAll();
 
+        $failedDueWorks = [];
         foreach ($duplicateDueWorks as $duplicateDueWork) {
             $this->log->notice(
                 self::indent(3)
@@ -666,14 +677,13 @@ $app = new class extends CliTool\App
                 )
             );
 
-            // Is this capability in use on both the source and destination?
+            // Do any due works use both the source and destination capability?
             // If so that's an error.
             if (in_array($duplicateDueWork['id'], $originalDueWorkIds, true)) {
                 $this->log->warning(
                     self::indent(4) . 'capability is already used in due work: aborting'
                 );
-                throw new UnexpectedValueException('capability is already used in due work: aborting');
-                // TODO need to know that this due work is the one which failed
+                $failedDueWorks[] = $duplicateDueWork['id'];
             }
 
             $this->migrateCapabilityUsageQuery->execute([
@@ -681,6 +691,12 @@ $app = new class extends CliTool\App
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'boxId'                 => $duplicateDueWork['box_id'],
             ]);
+        }
+
+        // Did any fail? Log and report later
+        if (!empty($failedDueWorks)) {
+            $this->failedDueWorks = array_merge($this->failedDueWorks, $failedDueWorks);
+            throw new UnexpectedValueException('One or more due works failed to migrate');
         }
     }
 
