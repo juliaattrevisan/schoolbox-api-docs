@@ -448,15 +448,16 @@ $app = new class extends CliTool\App
 
         // Either commit or roll back changes, depending on whether we ran in perform mode or not
         if ($this->perform()) {
-            try {
-//                $this->db->commit();
-                $this->log->alert('Changes written to database');
-            } catch (\Throwable $e) {
-                // In case something goes wrong when executing a query
-                $this->log->alert('An error occurred while trying to write changes to the database: rolling back changes');
-//                $this->db->rollBack();
-                throw $e;
-            }
+            $this->log->alert('Changes written to database');
+//            try {
+////                $this->db->commit();
+//                $this->log->alert('Changes written to database');
+//            } catch (\Throwable $e) {
+//                // In case something goes wrong when executing a query
+//                $this->log->alert('An error occurred while trying to write changes to the database: rolling back changes');
+////                $this->db->rollBack();
+//                throw $e;
+//            }
         } else {
 //            $this->db->rollBack();
             $this->log->alert('Dry-run complete - no changes written to database');
