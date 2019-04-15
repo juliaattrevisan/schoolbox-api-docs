@@ -38,7 +38,7 @@ class Indicator extends Base
     /**************************** Folder queries ***************************/
 
     private const FIND_FOLDERS_QUERY = '
-       SELECT DISTINCT
+       SELECT
            id, name
        FROM folder
        WHERE deleted_at IS NULL
@@ -236,29 +236,29 @@ class Indicator extends Base
     {
         $this->findFoldersQuery->execute();
         if ($this->findFoldersQuery->rowCount() === 0) {
-            $this->log->critical('No classes found - nothing to merge');
+            $this->log->critical('No folders found - nothing to merge');
         }
-        foreach ($this->findFoldersQuery->fetchAll() as $class) {
-            $classFolderId = (int)$class['id'];
+        foreach ($this->findFoldersQuery->fetchAll() as $folder) {
+            $folderId = (int)$folder['id'];
 
             // Is there a folder restriction?
             // If so and this folder's outside of it: just skip
-            if (!empty($this->folders) && !in_array($classFolderId, $this->folders, true)) {
+            if (!empty($this->folders) && !in_array($folderId, $this->folders, true)) {
                 continue;
             }
 
             $this->log->info(
                 sprintf(
-                    'Checking class folder #%d (%s)',
-                    $classFolderId,
-                    $class['name']
+                    'Checking folder #%d (%s)',
+                    $folderId,
+                    $folder['name']
                 )
             );
 
-            // Don't go further if there's no capabilities in the class
-            $this->findCapabilitiesQuery->execute(['folderId' => $classFolderId]);
+            // Don't go further if there's no capabilities in the folder
+            $this->findCapabilitiesQuery->execute(['folderId' => $folderId]);
             if ($this->findCapabilitiesQuery->rowCount() === 0) {
-                $this->log->debug(self::indent(1) . 'class contains no capabilities: no action required');
+                $this->log->debug(self::indent(1) . 'folder contains no capabilities: no action required');
                 continue;
             }
 
