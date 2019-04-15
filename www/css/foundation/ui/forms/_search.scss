@@ -93,15 +93,27 @@
             padding-left: $tabbar-icon-width * 3;
         }
     }
-    // When notifications are disabled
-    .disableNotifications .global-search {
-        right: $tabbar-icon-width;
-    }
-    .disableNotifications .inner-wrap:not(.left-open) .global-search,
     .inner-wrap.left-open.right-open .global-search {
         &:hover,
         &.focus {
             padding-left: $tabbar-icon-width * 2;
+        }
+    }
+    // When notifications are disabled
+    .disableNotifications .inner-wrap:not(.left-open) .global-search {
+        right: $tabbar-icon-width;
+
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width * 2;
+        }
+    }
+    .disableNotifications .inner-wrap.left-open .global-search {
+        right: $tabbar-icon-width;
+
+        &:hover,
+        &.focus {
+            padding-left: $tabbar-icon-width;
         }
     }
 }
