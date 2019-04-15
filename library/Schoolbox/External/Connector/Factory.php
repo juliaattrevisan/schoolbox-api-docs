@@ -41,6 +41,20 @@ class Factory
             return new $classOffline($config, null);
         }
 
+        /* If $type == EXTERNAL_SYNC then we're spawning UPS-related provider classes
+         */
+
+        /* If config->get('external_ups_provider') is null, use the same value as External Db
+         * Otherwise, use its value which is one of a set of hardcoded options
+         *
+         * Its default is the current External Db value
+         */
+
+        /* Look for a class corresponding config->get('external_ups_provider')
+         * That would be something like that implements ISync
+         * This divorces external_ups_provider from external_db setting
+         */
+
         $prefixBase = "\\Schoolbox\\External\\Connector\\" . ucwords($config->get('external_type'));
         $schoolCode = ucwords($config->get('site_location'));
 
