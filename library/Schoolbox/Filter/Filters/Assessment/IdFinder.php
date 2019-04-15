@@ -98,11 +98,11 @@ class IdFinder extends Filter\AbstractIdFinder
 //        $markPerCap     = $completeFilters[MarkPerCap\Definition::class];
         $markPerCap     = null;
 
-        $dueWorkAlias                               = 'dw';
-        [$aTypeJoin, $aTypeWhere]                   = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap, $dueWorkAlias);
-        [$capIndJoin, $capIndWhere, $capIndParams]  = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
-        [$markPerCapWhere, $markPerCapParams]       = $this->getClauseMarkPerCap($markPerCap, $aTypes, $dueWorkAlias);
-        list($temporalWhere, $temporalParams, $participantPlanJoin) = $this->getClauseTemporalState($temporalStates);
+        $dueWorkAlias                                             = 'dw';
+        [$aTypeJoin, $aTypeWhere]                                 = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap, $dueWorkAlias);
+        [$rubricUsageJoin, $rubricUsageWhere, $rubricUsageParams] = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
+        [$markPerCapWhere, $markPerCapParams]                     = $this->getClauseMarkPerCap($markPerCap, $aTypes, $dueWorkAlias);
+        [$temporalWhere, $temporalParams, $participantPlanJoin]   = $this->getClauseTemporalState($temporalStates);
         list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
         list($weightingWhere, $weightingParams)     = $this->getClauseWeighting($weightings);
@@ -114,7 +114,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $nonContextJoins = [
             $participantPlanJoin,
             $aTypeJoin,
-            $capIndJoin,
+            $rubricUsageJoin,
             $termDJoin,
             $termCJoin,
         ];
@@ -123,7 +123,7 @@ class IdFinder extends Filter\AbstractIdFinder
         // Build the non-context WHERE clauses.
         $nonContextWhereClauses = [
             $aTypeWhere,
-            $capIndWhere,
+            $rubricUsageWhere,
             $markPerCapWhere,
             $temporalWhere,
             $termDWhere,
@@ -143,7 +143,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $unitSpecParams,
             $uImpSpcParams,
             $temporalParams,
-            $capIndParams,
+            $rubricUsageParams,
             $markPerCapParams,
             $termDParams,
             $termCParams,
