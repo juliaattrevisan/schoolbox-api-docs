@@ -310,12 +310,11 @@ $app = new class extends CliTool\App
 
         // Report on which due works must be merged manually, if any.
         if (!empty($this->failedDueWorks)) {
-            $this->log->warning(
-                sprintf(
-                    '%d due work(s) must be fixed manually before merge can complete:',
-                    count($this->failedDueWorks)
-                )
+            $subject = sprintf(
+                '%d due work(s) must be fixed manually before merge can complete',
+                count($this->failedDueWorks)
             );
+            $this->log->warning($subject);
             $failedDueWorkUrls = [];
             foreach ($this->failedDueWorks as $failedDueWorkId) {
                 $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
@@ -336,7 +335,7 @@ $app = new class extends CliTool\App
                 $mailer->setContext([
                     'output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),
                 ]);
-                $mailer->setSubject('Manual deduplicate required');
+                $mailer->setSubject($subject);
                 $mailer->send($mailto);
             }
 
