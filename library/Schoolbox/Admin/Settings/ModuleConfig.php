@@ -48,20 +48,20 @@ class ModuleConfig
         foreach ($configs as $config) {
             if ($config->getEditable()) {
                 $isEditable = true;
-                switch ($config->getFieldId()) {
-                    case ConfigMapper::FIELD_COLOUR:
-                        $hasColourPicker = true;
-                        break;
-                    case ConfigMapper::FIELD_TIME_PICKER:
-                        $hasTimePicker = true;
-                        break;
-                    case ConfigMapper::FIELD_HTML:
-                        $hasHtmlEditor = true;
-                        break;
-                    case ConfigMapper::FIELD_RESOURCE:
-                        $hasResourcePicker = true;
-                        break;
-                }
+            }
+            switch ($config->getFieldId()) {
+                case ConfigMapper::FIELD_COLOUR:
+                    $hasColourPicker = true;
+                    break;
+                case ConfigMapper::FIELD_TIME_PICKER:
+                    $hasTimePicker = true;
+                    break;
+                case ConfigMapper::FIELD_HTML:
+                    $hasHtmlEditor = true;
+                    break;
+                case ConfigMapper::FIELD_RESOURCE:
+                    $hasResourcePicker = true;
+                    break;
             }
             $settings[] = $this->fieldStrategyFactory->makeRenderer($config->getFieldId())->getTemplateAndData($config);
         }
