@@ -289,15 +289,6 @@ $app = new class extends CliTool\App
      */
     private $folders;
 
-    /**
-     * Significant events: read these, if nothing else.
-     *
-     * Indexed by assessment ID.
-     *
-     * @var array|string[][]
-     */
-    private $significantEvents = [];
-
 
     /**
      * Due works which failed to migrate for whatever reason.
