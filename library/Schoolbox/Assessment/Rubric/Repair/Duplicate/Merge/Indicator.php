@@ -27,20 +27,32 @@ use UnexpectedValueException;
  * * for any duplicate indicators:
  * ** moves usages within the duplicate into the original
  * ** moves descriptors within the duplicate into the original
- * ** moves marks given to the duplicate into the original
+ * *** moving descriptors will also move marks given to those descriptors,
+ *     so they don't need to be moved separately.
  *
  * This script will raise an error (and not continue to merge the capability)
  * if both the original and duplicate are in use on the same assessment.
  */
 class Indicator extends Base
 {
+    /**************************** Folder queries ***************************/
+
+    private const FIND_FOLDERS_QUERY = '
+       SELECT DISTINCT
+           id, name
+       FROM folder
+       WHERE deleted_at IS NULL
+    ';
+
+
     /**************************** Capability queries ***************************/
 
     private const FIND_CAPABILITIES_QUERY = "
         SELECT id, name
         FROM   rubric_group
         WHERE  parent_type = 'category'
-        AND    deleted_at IS NULL
+        AND    parent_id   = :folderId
+        AND    deleted_at  IS NULL
         ORDER BY name, id
     ";
 
@@ -51,7 +63,7 @@ class Indicator extends Base
         SELECT id, name
         FROM   rubric_criterion
         WHERE  rubric_group_id = :capabilityId
-        AND    deleted_at IS NULL
+        AND    deleted_at      IS NULL
         ORDER BY name, id
     ';
 
@@ -83,14 +95,6 @@ class Indicator extends Base
         SET   rd.criterion_id = :originalCapabilityId
         WHERE rd.criterion_id = :duplicateCapabilityId
         AND   rl.box_id       = :boxId
-    ';
-
-    private const MERGE_INDICATOR_MARK_QUERY = '
-        UPDATE rubric_descriptor_mark rdm
-        INNER JOIN rubric_group_usage rgu ON rdm.rubric_group_id = rgu.rubric_group_id
-        SET rdm.rubric_group_id = :originalCapabilityId
-        WHERE rdm.rubric_group_id = :duplicateCapabilityId
-        AND rgu.submission_box_id = :boxId
     ';
 
 
@@ -139,7 +143,7 @@ class Indicator extends Base
      *
      * @var IQuery
      */
-    private $findCapabilityUsagesQuery;
+    private $findIndicatorUsagesQuery;
 
 
     /**
@@ -147,7 +151,7 @@ class Indicator extends Base
      *
      * @var IQuery
      */
-    private $mergeCapabilityUsageQuery;
+    private $mergeIndicatorUsageQuery;
 
 
     /**
@@ -155,7 +159,7 @@ class Indicator extends Base
      *
      * @var IQuery
      */
-    private $mergeCapabilityMarkQuery;
+    private $mergeIndicatorDescriptorQuery;
 
 
     /**
@@ -181,15 +185,13 @@ class Indicator extends Base
 
         $this->findCapabilityIndicatorsQuery
             = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY);
-        $this->mergeCapabilityIndicatorQuery
-            = $this->db->prepareQuery(self::MERGE_CAPABILITY_INDICATOR_QUERY);
 
-        $this->findCapabilityUsagesQuery
+        $this->findIndicatorUsagesQuery
             = $this->db->prepareQuery(self::FIND_INDICATOR_USAGES_QUERY);
-        $this->mergeCapabilityUsageQuery
+        $this->mergeIndicatorUsageQuery
             = $this->db->prepareQuery(self::MERGE_INDICATOR_USAGE_QUERY);
-        $this->mergeCapabilityMarkQuery
-            = $this->db->prepareQuery(self::MERGE_INDICATOR_MARK_QUERY);
+        $this->mergeIndicatorDescriptorQuery
+            = $this->db->prepareQuery(self::MERGE_INDICATOR_DESCRIPTOR_QUERY);
     }
 
 
@@ -391,12 +393,12 @@ class Indicator extends Base
     private function mergeCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
         // Which due works use the original capability?
-        $this->findCapabilityUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
-        $originalDueWorkIds = $this->findCapabilityUsagesQuery->fetchColumnArray('id');
+        $this->findIndicatorUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
+        $originalDueWorkIds = $this->findIndicatorUsagesQuery->fetchColumnArray('id');
 
         // And which use the duplicate?
-        $this->findCapabilityUsagesQuery->execute(['capabilityId' => $sourceCapabilityId]);
-        $duplicateDueWorks = $this->findCapabilityUsagesQuery->fetchAll();
+        $this->findIndicatorUsagesQuery->execute(['capabilityId' => $sourceCapabilityId]);
+        $duplicateDueWorks = $this->findIndicatorUsagesQuery->fetchAll();
 
         $failedDueWorks = [];
         foreach ($duplicateDueWorks as $duplicateDueWork) {
@@ -419,13 +421,13 @@ class Indicator extends Base
                 continue;
             }
 
-            $this->mergeCapabilityUsageQuery->execute([
+            $this->mergeIndicatorUsageQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'boxId'                 => $duplicateDueWork['box_id'],
             ]);
 
-            $this->mergeCapabilityMarkQuery->execute([
+            $this->mergeIndicatorDescriptorQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'boxId'                 => $duplicateDueWork['box_id'],
