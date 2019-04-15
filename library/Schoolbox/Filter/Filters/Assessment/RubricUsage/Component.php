@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment\CapabilityIndicator;
+namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use function array_merge;
 use InvalidArgumentException;

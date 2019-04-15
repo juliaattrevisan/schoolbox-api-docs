@@ -149,8 +149,8 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper()
                 );
-            case CapabilityIndicator\Definition::class:
-                return new CapabilityIndicator\Factory(
+            case RubricUsage\Definition::class:
+                return new RubricUsage\Factory(
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper(),

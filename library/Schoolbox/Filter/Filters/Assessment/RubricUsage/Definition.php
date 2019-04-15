@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment\CapabilityIndicator;
+namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use Schoolbox\Filter;
@@ -113,6 +113,6 @@ class Definition extends Filter\AbstractDefinition
      */
     protected static function getTemplatesDir(): string
     {
-        return '@filterDefinitions/Assessment/CapabilityIndicator/templates';
+        return '@filterDefinitions/Assessment/RubricUsage/templates';
     }
 }

@@ -99,7 +99,7 @@ class TestableIdFinder extends IdFinder
             WeightingType\Definition::class,
             WorkType\Definition::class,
             YearDue\Definition::class,
-            CapabilityIndicator\Definition::class,
+            RubricUsage\Definition::class,
         ];
         $this->setRegistry(array_combine($filterClasses, $filterClasses));
     }

@@ -87,7 +87,7 @@ class LogicTests extends TestCase
 
         $message =
             AssessmentFilters\AssessmentType\Definition::class      . ':  '. $this->toStr($a).
-            AssessmentFilters\CapabilityIndicator\Definition::class . ':  '. $this->toStr($capInd).
+            AssessmentFilters\RubricUsage\Definition::class . ':  '. $this->toStr($capInd).
             $this->toStr($completeFilters)."\n";
 
         $this->assertEquals($expected, $actual, $message);
@@ -223,8 +223,8 @@ class LogicTests extends TestCase
     private function buildIndicatorCapabilityFilterArray(?array $a, ?array $capInd): array
     {
         return [
-            AssessmentFilters\AssessmentType\Definition::class      => null === $a       ? null : new Collection($a),
-            AssessmentFilters\CapabilityIndicator\Definition::class => null === $capInd  ? null : new Collection($capInd),
+            AssessmentFilters\AssessmentType\Definition::class => null === $a       ? null : new Collection($a),
+            AssessmentFilters\RubricUsage\Definition::class    => null === $capInd  ? null : new Collection($capInd),
         ];
     }
 
@@ -771,8 +771,8 @@ class LogicTests extends TestCase
         $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
 
         // CapabilityIndicator keys
-        $noneKey    = AssessmentFilters\CapabilityIndicator\Definition::KEY_NONE;
-        $codec      = new AssessmentFilters\CapabilityIndicator\Codec();
+        $noneKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
+        $codec      = new AssessmentFilters\RubricUsage\Codec();
         $exampleKey = $codec->encodeCapability((new Group())->setId(1));
 
         // Various filter sets possible

@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment\CapabilityIndicator;
+namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use ReflectionException;
@@ -23,22 +23,15 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use UnexpectedValueException;
 
 /**
- * A factory for building 'CapabilityIndicatorUsage' filter objects
+ * A factory for building 'RubricUsage' filter objects
  *
- * The admin page has the following options:
- * □ Show folder's capabilities
- * □ Show folder's indicators
- * If enabled, either or both (but not neither) must be checked.
+ * The admin page has the following logical options:
+ * □ (no rubric) - Assessment does not use rubric
+ * □ List folder's capabilities
+ * □ List folder's indicators
  *
- * These options will then cause the component to list the folder's capabilities and/or indicators.
- * Javascript will run to ensure that:
- *  * if a capability is selected, then all its indicators are selected.
- *  * if an indicator is selected, then its capability is selected
- *
- * When the page viewer selects a capability/indicator, the filtered assessment list will only contain assessments
- * that use that capability/indicator.
+ * When the page viewer selects a capability/indicator, the filtered assessment list will only contain assessments that use that capability/indicator.
  * The report will also only render that capability/indicator
- *
  */
 class Factory extends AbstractFactory
 {

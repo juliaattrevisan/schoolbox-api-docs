@@ -5,18 +5,18 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment\CapabilityIndicator\Test;
+namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
-use Schoolbox\Filter\Filters\Assessment\CapabilityIndicator\Codec;
+use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 
 
 /**
- * @covers \Schoolbox\Filter\Filters\Assessment\CapabilityIndicator\Codec
+ * @covers \Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec
  * @codeCoverageIgnore
  */
 class CodecTest extends TestCase

@@ -94,13 +94,13 @@ class IdFinder extends Filter\AbstractIdFinder
         $weightings     = $completeFilters[WeightingType\Definition::class];
         $workTypeIds    = $completeFilters[WorkType\Definition::class];
         $yearsDue       = $completeFilters[YearDue\Definition::class];
-        $capsAndInds    = $completeFilters[CapabilityIndicator\Definition::class];
+        $rubricUsages   = $completeFilters[RubricUsage\Definition::class];
 //        $markPerCap     = $completeFilters[MarkPerCap\Definition::class];
         $markPerCap     = null;
 
         $dueWorkAlias                               = 'dw';
-        [$aTypeJoin, $aTypeWhere]                   = $this->getClauseAType($aTypes, $capsAndInds, $markPerCap, $dueWorkAlias);
-        [$capIndJoin, $capIndWhere, $capIndParams]  = $this->getClauseCapabilityIndicator($capsAndInds, $aTypes, $dueWorkAlias);
+        [$aTypeJoin, $aTypeWhere]                   = $this->getClauseAType($aTypes, $rubricUsages, $markPerCap, $dueWorkAlias);
+        [$capIndJoin, $capIndWhere, $capIndParams]  = $this->getClauseRubricUsage($rubricUsages, $aTypes, $dueWorkAlias);
         [$markPerCapWhere, $markPerCapParams]       = $this->getClauseMarkPerCap($markPerCap, $aTypes, $dueWorkAlias);
         list($temporalWhere, $temporalParams, $participantPlanJoin) = $this->getClauseTemporalState($temporalStates);
         list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
@@ -465,7 +465,7 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on filters:
      * * AssessmentType
-     * * CapabilityIndicator
+     * * RubricUsage
      * * MarkPerCap
      *
      * There is a coupling between the implementation of these filters.
@@ -476,15 +476,16 @@ class IdFinder extends Filter\AbstractIdFinder
      * @precondition Filter combinations that logically can never return rows are not passed to this method. They are already handled.
      * @precondition Filter sets that logically cause no filtering to occur have been set to NULL
      * @param null|Collection|int[] $aTypes
-     * @param Collection|null       $capsAndInds
+     * @param Collection|null       $rubricUsages
      * @param Collection|null       $markPerCap
+     * @param string                $dueWorkAlias
      * @return mixed[]
      * @throws InvalidColumnException
      */
-    private function getClauseAType(?Collection $aTypes, ?Collection $capsAndInds, ?Collection $markPerCap, string $dueWorkAlias): array
+    private function getClauseAType(?Collection $aTypes, ?Collection $rubricUsages, ?Collection $markPerCap, string $dueWorkAlias): array
     {
         // Are we not filtering by assessment type, have no cap/Ind usage, and no markPerCap considerations?
-        if (null === $aTypes && null === $capsAndInds && null === $markPerCap) {
+        if (null === $aTypes && null === $rubricUsages && null === $markPerCap) {
             // We don't need to JOIN to any assessment type table.
             return ['', 'TRUE'];
         }
@@ -493,12 +494,12 @@ class IdFinder extends Filter\AbstractIdFinder
         $joinClause = '';
 
         // Do we need to JOIN to `submission_box`?
-        $joinToSubBox = ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) || $capsAndInds || $markPerCap;
+        $joinToSubBox = ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) || $rubricUsages || $markPerCap;
 
         // Are we only joining to a single assessment type table?
         $oneJoinOnly =
-            ($aTypes && $aTypes->count() === 1 && !$capsAndInds && !$markPerCap) ||                              // Just 1 of [project/quiz/assess/subBox]
-            (!$aTypes && ($capsAndInds || $markPerCap)) ||                                                       // Just subBox per cap/ind usage || markPerCap
+            ($aTypes && $aTypes->count() === 1 && !$rubricUsages && !$markPerCap) ||                              // Just 1 of [project/quiz/assess/subBox]
+            (!$aTypes && ($rubricUsages || $markPerCap)) ||                                                       // Just subBox per cap/ind usage || markPerCap
             ($aTypes && $aTypes->count() === 1 && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));  // Just [subBox], others don't matter here
 
 
@@ -559,7 +560,7 @@ class IdFinder extends Filter\AbstractIdFinder
      *
      * If the filters include the 'none' option, also fetch assessments that don't use any Capabilities/Indicators at all.
      *
-     * @param Collection|null $capsAndInds
+     * @param Collection|null $rubricUsages
      * @param Collection|null $aTypes
      * @param string          $dueWorkAlias
      * @return array
@@ -569,31 +570,31 @@ class IdFinder extends Filter\AbstractIdFinder
      * We don't to join to `submission_box` here:
      * @see getClauseAType
      */
-    private function getClauseCapabilityIndicator(?Collection $capsAndInds, ?Collection $aTypes, string $dueWorkAlias): array
+    private function getClauseRubricUsage(?Collection $rubricUsages, ?Collection $aTypes, string $dueWorkAlias): array
     {
         // Do we not wish to apply this filter?
-        if(null === $capsAndInds){
+        if(null === $rubricUsages){
             // Always return the row, no params
             return ['TRUE', []];
         }
 
         // How should we join to usage tables?
         $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
-        $includeNoUsage       = $capsAndInds->keyExists(CapabilityIndicator\Definition::KEY_NONE);
+        $includeNoUsage       = $rubricUsages->keyExists(RubricUsage\Definition::KEY_NONE);
         $joinType             = $otherAssessmentTypes || $includeNoUsage ? 'LEFT' : 'INNER';
 
         $pb    = $this->getMapper()->getPredicateBuilder();
-        $codex = new CapabilityIndicator\Codec();
+        $codex = new RubricUsage\Codec();
 
         $capabilityIds = [];
 
-        foreach($capsAndInds as $capAndInd){
-            if($capAndInd === CapabilityIndicator\Definition::KEY_NONE){
+        foreach($rubricUsages as $rubricUsage){
+            if($rubricUsage === RubricUsage\Definition::KEY_NONE){
                 $pb->isNull('rgu.rubric_group_id');
             } else {
                 // This assumes that if an assessment is using an indicator, it is using the indicator's capability.
                 // Hence we can just JOIN to capability usage
-                [$capId] = $codex->decode($capAndInd);
+                [$capId] = $codex->decode($rubricUsage);
                 $capabilityIds[] = $capId;
             }
         }
@@ -1142,7 +1143,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
 
-        $capabilitiesAndIndicators = $completeFilters[CapabilityIndicator\Definition::class];
+        $capabilitiesAndIndicators = $completeFilters[RubricUsage\Definition::class];
         if($capabilitiesAndIndicators instanceOf Collection){
             // The full set of capability/indicator keys includes a 'none' key, so the full set is essentially [no usages, specific usages ...].
             // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
@@ -1154,7 +1155,7 @@ class IdFinder extends Filter\AbstractIdFinder
             if (
                 $assessmentTypes instanceOf Collection &&
                 !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
-                !$capabilitiesAndIndicators->keyExists(CapabilityIndicator\Definition::KEY_NONE))
+                !$capabilitiesAndIndicators->keyExists(RubricUsage\Definition::KEY_NONE))
             {
                 // No assessments can logically match request.
                 return true;
