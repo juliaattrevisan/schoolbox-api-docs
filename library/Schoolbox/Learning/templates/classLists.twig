@@ -132,11 +132,7 @@
             isAllSelected: false,
             selectedStudentIds: [],
             studentsCheckboxElements: undefined,
-            groups: [
-                {label: 'students', isChecked: true},
-                {label: 'parents', isChecked: false},
-                {label: 'housemasters', isChecked: false},
-            ],
+            groups: {{ emailGroups | raw }},
             groupsCheckboxElements: [],
             selectedGroups: [],
             enableSendEmailButton: false,

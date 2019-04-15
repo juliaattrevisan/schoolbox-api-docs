@@ -389,8 +389,36 @@ class Controller extends Base
                 'pastoralEnabled'   => ConfigMapper::getInstance()->get('pastoral_enabled'),
                 'today'             => Alaress_Date_Format::now()->getURLDate(),
                 'mailHandle'        => $this->getSession()->get('mailhandle'),
+                'emailGroups'       => $this->getClassListsEmailGroups(),
             ])->setTab('classes')->setTitle($subjectName)
         );
+    }
+
+    /**
+     * @return false|string
+     */
+    private function getClassListsEmailGroups(): string
+    {
+        $result[] = [
+            'label' => 'students',
+            'isChecked' => true,
+        ];
+
+        if (ConfigMapper::getInstance()->get('email_all_parents')) {
+            $result[] = [
+                'label' => 'parents',
+                'isChecked' => false,
+            ];
+        }
+
+        if (ConfigMapper::getInstance()->get('email_housemasters')) {
+            $result[] = [
+                'label' => 'housemasters',
+                'isChecked' => false,
+            ];
+        }
+
+        return json_encode($result);
     }
     /* Getters/Setters
      */
