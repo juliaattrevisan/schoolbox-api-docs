@@ -120,13 +120,6 @@ class Indicator extends Base
      */
     private $findCapabilityIndicatorsQuery;
 
-    /**
-     * Query for finding all rubric indicators in a capability.
-     *
-     * @var IQuery
-     */
-    private $countCapabilityIndicatorsQuery;
-
 
     /**************************** Prepared usage queries ***************************/
 
