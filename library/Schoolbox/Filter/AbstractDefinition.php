@@ -285,7 +285,7 @@ abstract class AbstractDefinition implements IDefinition
 
 
     /**
-     * Return the ordered, hard-codes list of custom keys for this filter.
+     * Return the ordered, hard-coded list of custom keys for this filter.
      *
      * These may represent abstract concepts, eg 'all', 'past', '1' => Project, '2' => Quiz
      * They do not include those abstract keys that relate to concrete items, eg '1' => Term(2017)
