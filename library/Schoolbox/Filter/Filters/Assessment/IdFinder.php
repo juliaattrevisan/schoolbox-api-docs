@@ -1143,11 +1143,11 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
 
-        $capabilitiesAndIndicators = $completeFilters[RubricUsage\Definition::class];
-        if($capabilitiesAndIndicators instanceOf Collection){
+        $rubricUsage = $completeFilters[RubricUsage\Definition::class];
+        if($rubricUsage instanceOf Collection){
             // The full set of capability/indicator keys includes a 'none' key, so the full set is essentially [no usages, specific usages ...].
             // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
-            if(!$capabilitiesAndIndicators->count()){
+            if(!$rubricUsage->count()){
                 return true;
             }
             // It is valid to request assessment that use no capabilities or indicators.
@@ -1155,7 +1155,7 @@ class IdFinder extends Filter\AbstractIdFinder
             if (
                 $assessmentTypes instanceOf Collection &&
                 !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
-                !$capabilitiesAndIndicators->keyExists(RubricUsage\Definition::KEY_NONE))
+                !$rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE))
             {
                 // No assessments can logically match request.
                 return true;
