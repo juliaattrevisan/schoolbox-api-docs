@@ -380,12 +380,15 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
-                'homepageId'    => $folder->getId(),
-                'subjectName'   => $subjectName,
-                'classCode'     => $classCode,
-                'specialNeeds'  => $this->getDi()->get('sitePage')->getLocalisedTerm('specialNeeds', false, true),
-                'replyTo'       => $this->getUser()->getEmail(),
-                'mailEnabled'   => ConfigMapper::getInstance()->get('mail_enable'),
+                'homepageId'        => $folder->getId(),
+                'subjectName'       => $subjectName,
+                'classCode'         => $classCode,
+                'specialNeeds'      => $this->getDi()->get('sitePage')->getLocalisedTerm('specialNeeds', false, true),
+                'replyTo'           => $this->getUser()->getEmail(),
+                'mailEnabled'       => ConfigMapper::getInstance()->get('mail_enable'),
+                'pastoralEnabled'   => ConfigMapper::getInstance()->get('pastoral_enabled'),
+                'today'             => Alaress_Date_Format::now()->getURLDate(),
+                'mailHandle'        => $this->getSession()->get('mailhandle'),
             ])->setTab('classes')->setTitle($subjectName)
         );
     }

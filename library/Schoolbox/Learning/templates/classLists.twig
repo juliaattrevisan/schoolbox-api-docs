@@ -1,6 +1,4 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
-
-{% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ subjectName, '/homepage/' ~ homepageId ],
     ['Class List']
@@ -50,10 +48,34 @@
                         <template v-else>
                             ${ student.lastname + ', ' + student.firstname }
                         </template>
+                        <span class="meta">(${ student.synergy_id })</span>
+                        <span class="show-for-print"><br>${ student.email }</span>
+                        <p class="meta">
+                            <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight" title="English as a second language"></span>
+                            <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" :title="specialNeeds"></span>
+                            <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + student.StudentMedicalAlert"></span>
+                        </p>
+
+                        <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
+                            <li><a :href="'/learning/due/' + student.id" class="icon-due-work">${ linkTitle.dueWork.capitalise() }</a></li>
+                            <li><a :href="'/learning/grades/' + student.id" class="icon-approve">${ linkTitle.grades.capitalise() }</a></li>
+                            <li v-if="student.ePortfolioIsEnabled"><a :href="'/eportfolio/' + student.id + '/profile'" class="icon-eportfolio">${ linkTitle.ePortfolio }</a></li>
+                            <li v-if="pastoralIsEnabled"><a :href="'/pastoral/student/' + student.id" class="icon-pastoral">${ linkTitle.pastoralCare.capitalise() }</a></li>
+                            <li><a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar.capitalise() }</a></li>
+                            <li><a :href="/timetable/+ student.synergy_id" class="icon-timetable">${ linkTitle.timetable.capitalise() }</a></li>
+                            <li v-if="student.email"><a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email.capitalise() }</a></li>
+                        </ul>
                     </td>
                     <td class="show-for-large-up">${ student.yearlevel }</td>
                     <td class="show-for-medium-up">${ student.house }</td>
                     <td class="show-for-medium-up">${ student.lastAccessTime }</td>
+                    <td class="no-pad">
+                        <div class="actions-small-1" v-if="student.id">
+                            <nav>
+                                <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
+                            </nav>
+                        </div>
+                    </td>
                 </tr>
             </template>
             </tbody>
@@ -79,10 +101,18 @@
             </span>
         </div>
     </div>
+
+    <template v-if="actionsPlaceholder">
+        {#  Just a place holder. Cause currently when we remove this line, the actions doesn't work.
+            Seems like when the page has loaded, foundation JS looks for this element right-away.
+         #}
+        <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
+    </template>
 </div>
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script type="text/javascript">
+    Vue.config.devtools = true;
 
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
@@ -95,6 +125,8 @@
             subjectName: '{{ subjectName }}',
             classCode: '{{ classCode }}',
             replyToEmail: '{{ replyTo }}',
+            mailEnabled: Boolean({{ mailEnabled }}),
+            specialNeeds: '{{ specialNeeds }}',
             studentLists: [],
             showSkeletonLoader: true,
             isAllSelected: false,
@@ -108,13 +140,25 @@
             groupsCheckboxElements: [],
             selectedGroups: [],
             enableSendEmailButton: false,
-            sendEmailButtonText: 'Email Selected Groups',
+            sendEmailButtonText: 'Email Selected',
             emailLists: [],
             emailDelimiter: String.fromCharCode(30),
             classListsEndpointPrefix: '/subject/classList/ajax/',
             getStudentListsEndpointPrefix: '/learning/class/lists/',
             formIsReady: false,
-            mailEnabled: Boolean({{ mailEnabled }}),
+            linkTitle: {
+                'dueWork':      '{{ locale.dueWork }}',
+                'grades':       '{{ locale.grades.plural }}',
+                'pastoralCare': '{{ locale.pastoralCare.proper }}',
+                'calendar':     '{{ locale.calendar }}',
+                'ePortfolio':   'ePortfolio',
+                'timetable':    'Timetable',
+                'email':        'Email',
+            },
+            calendarPath: '{{ '/calendar/full/' ~ today }}',
+            pastoralIsEnabled: Boolean({{ pastoralEnabled }}),
+            mailHandle: '{{ mailHandle }}',
+            actionsPlaceholder: true,
         },
         mounted: function() {
             new Promise(resolve => {
@@ -142,10 +186,11 @@
 
                 self.studentsCheckboxElements = document.getElementsByName('students[]');
                 self.groupsCheckboxElements = document.getElementsByName('groups[]');
+                self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
 
-                // On initial load, set group checkboxes to checked if the isChecked value from the array above is true
+                // On initial load, set group checkboxes to checked if the isChecked value from the array groups is true
                 for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
-                    if (self.groupsCheckboxElements[i].checked) {
+                    if (self.groups[i].isChecked) {
                         self.groupsCheckboxElements[i].checked = true;
                         self.selectedGroups.push(self.groupsCheckboxElements[i].value);
                     }

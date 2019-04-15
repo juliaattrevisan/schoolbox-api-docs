@@ -80,9 +80,10 @@ class StudentLists
             $user = $this->userMapper->findByExternalId($student['synergy_id']);
             $lastVisit = $this->logMapper->lastVisit($folder, $user)->first();
 
-            $students[$key]['id']               = $user->getId();
-            $students[$key]['email']            = $user->getEmail();
-            $students[$key]['lastAccessTime']   = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
+            $students[$key]['id']                   = $user->getId();
+            $students[$key]['email']                = $user->getEmail();
+            $students[$key]['ePortfolioIsEnabled']  = $user->getEportfolioEnable();
+            $students[$key]['lastAccessTime']       = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
         }
 
         return $students;
