@@ -56,7 +56,7 @@ class Indicator extends Base
     private const DELETE_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET    deleted_at = :now
-        WHERE  id         = :capabilityId
+        WHERE  id         = :indicatorId
     ';
 
 
