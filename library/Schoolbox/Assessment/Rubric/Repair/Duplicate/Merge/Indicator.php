@@ -262,60 +262,69 @@ class Indicator extends Base
                 continue;
             }
 
-//            $groupedCapabilities = [];
-            foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $id => $name) {
-                $this->log->info(sprintf('Checking capability #%d (%s)', $id, $name));
-            }
+            foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $capId => $capName) {
+                $this->log->info(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $capName));
+                $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $capId]);
+                if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
+                    $this->log->debug(self::indent(2) . 'capability contains no indicators: no action required');
+                    continue;
+                }
 
-//            $this->mergeCapabilities($groupedCapabilities);
+                $groupedIndicators = [];
+                foreach ($this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id') as $indId => $indName) {
+                    $groupedIndicators[$indName][] = $indId;
+                }
+
+                $this->mergeIndicators($groupedIndicators);
+            }
         }
     }
 
 
     /**
-     * Attempt to merge this set of capabilities by removing any duplicates.
+     * Attempt to merge this set of indicators by removing any duplicates.
      *
-     * @param array $groupedCapabilities key: capability name, value: list of capability IDs
+     * @param array $groupedIndicators key: indicator name, value: list of indicator IDs
      * @throws Exception
      */
-    private function mergeCapabilities(array $groupedCapabilities): void
+    private function mergeIndicators(array $groupedIndicators): void
     {
-        foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
-            $capabilityCount = count($capabilityIds);
-            if ($capabilityCount <= 1) {
+        foreach ($groupedIndicators as $indicatorName => $indicatorIds) {
+            $indicatorCount = count($indicatorIds);
+            if ($indicatorCount <= 1) {
                 $this->log->debug(
-                    self::indent(1) . sprintf('capability "%s" has no duplicates: skipping', $capabilityName)
+                    self::indent(2) . sprintf('indicator "%s" has no duplicates: skipping', $indicatorName)
                 );
                 continue;
             }
 
             // We have duplicates. Undupe them
             $this->log->notice(
-                self::indent(1) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
+                self::indent(2) . sprintf('indicator "%s" has %d duplicate(s)', $indicatorName, $indicatorCount - 1)
             );
 
 
             // Build pairs to merge into one another.
             // Merge backwards from the last duplicate into the previous one,
             // ending up at the last.
-            $capabilityIds = array_reverse($capabilityIds);
-            while (count($capabilityIds) >= 2) {
-                $sourceCapabilityId = array_shift($capabilityIds);
-                foreach ($capabilityIds as $destinationCapabilityId) {
+            $indicatorIds = array_reverse($indicatorIds);
+            while (count($indicatorIds) >= 2) {
+                $sourceIndicatorId = array_shift($indicatorIds);
+                foreach ($indicatorIds as $destinationIndicatorId) {
                     $conflict = false;
                     $this->db->beginTransaction();
                     try {
                         // do stuff
                         $this->log->notice(
-                            self::indent(2)
+                            self::indent(3)
                             . sprintf(
                                 'merging duplicate #%d into original #%d',
-                                $sourceCapabilityId,
-                                $destinationCapabilityId
+                                $sourceIndicatorId,
+                                $destinationIndicatorId
                             )
                         );
-                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
-                        $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
+//                        $this->mergeCapabilityIndicators($destinationIndicatorId, $sourceIndicatorId);
+//                        $this->mergeCapabilityUsages($destinationIndicatorId, $sourceIndicatorId);
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
                     }
