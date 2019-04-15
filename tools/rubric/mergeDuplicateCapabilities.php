@@ -117,20 +117,6 @@ $app = new class extends CliTool\App
         AND submission_box_id = :boxId
     ';
 
-
-    /**************************** Mark merging queries ***************************/
-
-    private const FIND_CAPABILITY_MARKS_QUERY = '
-        SELECT
-            rgu.submission_box_id AS box_id,
-            a.id,
-            a.title
-        FROM rubric_group_mark rm
-        INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
-        INNER JOIN submission_box     sb  ON rgu.submission_box_id = sb.id
-        INNER JOIN assessment         a   ON sb.assessment_id = a.id
-    ';
-
     private const MERGE_CAPABILITY_MARK_QUERY = '
         UPDATE rubric_group_mark rm
         INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
@@ -192,16 +178,6 @@ $app = new class extends CliTool\App
      * @var IQuery
      */
     private $mergeCapabilityUsageQuery;
-
-
-    /**************************** Prepared mark merging queries ***************************/
-
-    /**
-     * Query for finding all marks given for a capability.
-     *
-     * @var IQuery
-     */
-    private $findCapabilityMarksQuery;
 
     /**
      * Query for merging a usage from a duplicate to the original capability.
@@ -319,9 +295,6 @@ $app = new class extends CliTool\App
             = $this->db->prepareQuery(self::FIND_CAPABILITY_USAGES_QUERY);
         $this->mergeCapabilityUsageQuery
             = $this->db->prepareQuery(self::MERGE_CAPABILITY_USAGE_QUERY);
-
-        $this->findCapabilityMarksQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_MARKS_QUERY);
         $this->mergeCapabilityMarkQuery
             = $this->db->prepareQuery(self::MERGE_CAPABILITY_MARK_QUERY);
 
