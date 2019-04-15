@@ -65,6 +65,12 @@
     }
 }
 
+// When notifications are disabled
+.disableNotifications .global-search {
+    right: 0;
+    padding-left: $tabbar-icon-width;
+}
+
 @media #{$allow-sidebar-stash} {
     .inner-wrap:not(.left-open) .global-search {
         &:hover,
