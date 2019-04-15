@@ -1,0 +1,1 @@
+INSERT INTO `config` (`name`, `value`, `title`, `description`, `field_id`, `options`, `type_id`, `editable`, `hidden`, `required`, `module`) VALUES ('external_ups_provider', '', 'External UPS Provider', 'How UPS sources its data', '4', 'default:batchxml', '7', 'true', 'false', 'false', 'settings');
