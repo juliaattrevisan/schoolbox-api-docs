@@ -151,7 +151,7 @@ class BaseComponent implements IComponent
     {
         // IMPORTANT:
         // This base implementation represents the case when there is a 1:1 between option.key and selection.key
-        // This is the case for, eg, WorkType, AssessmentType, etc.
+        // This is the case for, eg, WorkType, AssessmentType, MarkPerCap etc.
         // It is NOT the case when a single option.key represents more than 1 selection.key, eg terms 'ALL' can match 2015, 2016 etc
         // In the latter case, you MUST override this method (see TermFilter for an example)
 

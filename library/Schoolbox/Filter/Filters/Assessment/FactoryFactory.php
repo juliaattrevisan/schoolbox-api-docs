@@ -173,6 +173,13 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getFolderMapper(),
                     $this->rosettaStone
                 );
+            case MarkPerCap\Definition::class:
+                return new MarkPerCap\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->rosettaStone
+                );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);
     }
