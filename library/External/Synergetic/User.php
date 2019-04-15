@@ -544,7 +544,7 @@ class External_Synergetic_User implements External_UserInterface
         // Now can build the query string
 
         $query = "
-            SELECT      vStudentContactAllAddress.StudentID,
+            SELECT DISTINCT vStudentContactAllAddress.StudentID,
                         StudentPreferred,
                         StudentSurname,
                         StudentYearLevel,
