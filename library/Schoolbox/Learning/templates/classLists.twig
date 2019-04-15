@@ -210,6 +210,8 @@
                 self.sendEmailButtonText = 'Please wait...';
 
                 // Prepare endpoints to requests. Loop through the selected groups.
+                // We need to do this for now as our endpoints to fetch email addresses are designed this way.
+                // TODO: Re-architect fetching of email address to prevent doing this
                 for (var i = 0; i < self.selectedGroups.length; i++) {
                     var groupname = self.selectedGroups[i];
 
