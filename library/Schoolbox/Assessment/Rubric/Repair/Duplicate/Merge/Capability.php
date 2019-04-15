@@ -8,14 +8,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Repair\Duplicate\Merge;
 
-use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
-use Alaress_Date_Format;
-use Psr\Log\LoggerInterface as Logger;
 use RuntimeException;
 use Schoolbox\Assessment\Rubric\Repair\Base;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmail;
 use Scrub;
 use UnexpectedValueException;
 
@@ -39,16 +35,6 @@ use UnexpectedValueException;
  */
 class Capability extends Base
 {
-    // This tools CLI options
-    private const OPT_SHORT_FOLDER = 'f:';
-    private const OPT_LONG_MAILTO = 'mailto:';
-
-
-    // An indentation constant.
-    // TODO make this part of the CliTool class
-    private const INDENT = '  ';
-
-
     /**************************** Folder queries ***************************/
 
     private const FIND_FOLDERS_QUERY = '
@@ -148,6 +134,7 @@ class Capability extends Base
      */
     private $findCapabilityIndicatorsQuery;
 
+
     /**
      * Query for merging an indicator from a duplicate to the original capability.
      *
@@ -165,6 +152,7 @@ class Capability extends Base
      */
     private $findCapabilityUsagesQuery;
 
+
     /**
      * Query for merging a usage from a duplicate to the original capability.
      *
@@ -172,45 +160,13 @@ class Capability extends Base
      */
     private $mergeCapabilityUsageQuery;
 
+
     /**
      * Query for merging a usage from a duplicate to the original capability.
      *
      * @var IQuery
      */
     private $mergeCapabilityMarkQuery;
-
-
-    /**
-     * @var Logger
-     */
-    private $log;
-
-    /**
-     * @var IConnector
-     */
-    private $db;
-
-    /**
-     * @var Alaress_Date_Format
-     */
-    private $now;
-
-    /**
-     * The fully-qualified domain name for this instance.
-     *
-     * @var
-     */
-    private $fqdn;
-
-    /**
-     * The folders to merge duplicate capabilities for, if passed via the
-     * `self::OPT_SHORT_FOLDER` option.
-     *
-     * If empty, merge for all folders.
-     *
-     * @var array
-     */
-    private $folders;
 
 
     /**
@@ -224,55 +180,10 @@ class Capability extends Base
 
 
     /**
-     * @inheritdoc
+     * Setup all queries this script requires.
      */
-    public function getShortOpts(): array
+    protected function setupQueries(): void
     {
-        return [self::OPT_SHORT_FOLDER];
-    }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function getLongOpts(): array
-    {
-        return [self::OPT_LONG_MAILTO];
-    }
-
-
-    /**
-     * Set up and run the merge process.
-     *
-     * Install all instance vars, and wraps the merge process in a transaction
-     * for commit (if `--perform` is on) or rollback (if it's off, or an error
-     * is raised).
-     *
-     * @inheritdoc
-     * @throws RuntimeException
-     */
-    public function run(): void
-    {
-        // Install logger and DB
-        $this->log     = $this->getLogger();
-        $this->db      = $this->getDi()->get('databaseInternal');
-        $this->now     = Alaress_Date_Format::now();
-        $this->fqdn    = trim(
-            $this->getConfig()->get('site_hostname') . '.' . $this->getConfig()->get('site_domain'),
-            ';.'
-        );
-        $folderIds     = $this->getOpt(self::OPT_SHORT_FOLDER);
-        $this->folders = empty($folderIds)
-            ? []
-            : array_map('intval', explode(',', $folderIds));
-
-        // log perform / dry run
-        if ($this->perform()) {
-            $this->log->info('Running in perform mode (-p): changes will be written to database');
-        } else {
-            $this->log->info('Running in dry-run mode: use -p to write changes to database');
-        }
-
         $this->findFoldersQuery
             = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
 
@@ -290,17 +201,14 @@ class Capability extends Base
             = $this->db->prepareQuery(self::MERGE_CAPABILITY_USAGE_QUERY);
         $this->mergeCapabilityMarkQuery
             = $this->db->prepareQuery(self::MERGE_CAPABILITY_MARK_QUERY);
-
-        $this->merge();
-
-
-        if ($this->perform()) {
-            $this->log->alert('Changes written to database');
-        } else {
-            $this->log->alert('Dry-run complete - no changes written to database');
-        }
+    }
 
 
+    /**
+     * @inheritDoc
+     */
+    protected function summarizeResult(): void
+    {
         // Report on which due works must be merged manually, if any.
         if (!empty($this->failedDueWorks)) {
             $subject = sprintf(
@@ -318,19 +226,10 @@ class Capability extends Base
                 $this->log->warning(self::indent(1) . $failedDueWorkUrl);
             }
 
-            $mailto = $this->getOpt(self::OPT_LONG_MAILTO);
-            if ($mailto) {
-                $this->log->notice(sprintf('Mailing report to "%s"', $mailto));
-
-                $mailer = new TwigEmail('output.twig');
-                $mailer->setCoreContext((new CoreContext($this->getConfig()))->getContext());
-                $mailer->setFrom($this->getConfig()->get('mail_from_address'));
-                $mailer->setContext([
-                    'output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),
-                ]);
-                $mailer->setSubject($subject);
-                $mailer->send($mailto);
-            }
+            $this->sendMail(
+                $subject,
+                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),]
+            );
 
             throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
         }
@@ -338,11 +237,11 @@ class Capability extends Base
 
 
     /**
-     * Run the merge process.
+     * Run this script's repair process.
      *
-     * @throws \Alaress\Database\Exception
+     * @throws Exception
      */
-    private function merge(): void
+    protected function repair(): void
     {
         $this->findFoldersQuery->execute();
         if ($this->findFoldersQuery->rowCount() === 0) {
@@ -386,7 +285,7 @@ class Capability extends Base
      * Attempt to merge this set of capabilities by removing any duplicates.
      *
      * @param array $groupedCapabilities key: capability name, value: list of capability IDs
-     * @throws \Alaress\Database\Exception
+     * @throws Exception
      */
     private function mergeCapabilities(array $groupedCapabilities): void
     {
@@ -550,17 +449,5 @@ class Capability extends Base
             $this->failedDueWorks += $failedDueWorks;
             throw new UnexpectedValueException('One or more due works failed to merge');
         }
-    }
-
-
-    /**
-     * Helper method for indenting log output for legibility.
-     *
-     * @param int $depth The depth to indent by
-     * @return string
-     */
-    private static function indent(int $depth): string
-    {
-        return str_repeat(self::INDENT, $depth);
     }
 }
