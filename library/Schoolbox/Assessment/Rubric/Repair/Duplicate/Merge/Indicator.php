@@ -344,8 +344,8 @@ class Indicator extends Base
     /**
      * Merge usages and marks for the indicator IDs provided.
      *
-     * Each due work which uses `$destinationIndicatorId` has its usages and
-     * marks merged to `$sourceIndicatorId`.
+     * Each due work which uses `$sourceIndicatorId` has its usages and marks
+     * merged to `$destinationIndicatorId`.
      *
      * However, if the due work uses both source and destination indicators,
      * that is an error: it will be reported, and merging of that indicator
@@ -356,6 +356,7 @@ class Indicator extends Base
      *
      * @param int $destinationIndicatorId
      * @param int $sourceIndicatorId
+     * @throws UnexpectedValueException if due work uses both indicators
      */
     private function mergeIndicatorUsages(int $destinationIndicatorId, int $sourceIndicatorId): void
     {

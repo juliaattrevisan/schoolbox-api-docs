@@ -345,10 +345,11 @@ class Capability extends Base
     /**
      * Merge indicators for the capability IDs provided.
      *
-     * All indicators from `$destinationCapabilityId` are merged into
-     * `$sourceCapabilityId`. Indicators which already exist in the original
-     * are still merged: there will be another script which merges the
-     * duplicate indicators themselves.
+     * All indicators from `$sourceCapabilityId` are merged into
+     * `$destinationCapabilityId`.
+     *
+     * Indicators which already exist in the original are still merged: there
+     * will be another script which merges the duplicate indicators themselves.
      *
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
@@ -386,8 +387,8 @@ class Capability extends Base
     /**
      * Merge usages and marks for the capability IDs provided.
      *
-     * Each due work which uses `$destinationCapabilityId` has its usages and
-     * marks merged to `$sourceCapabilityId`.
+     * Each due work which uses `$sourceCapabilityId` has its usages and marks
+     * merged to `$destinationCapabilityId`.
      *
      * However, if the due work uses both source and destination capabilities,
      * that is an error: it will be reported, and merging of that capability
@@ -398,6 +399,7 @@ class Capability extends Base
      *
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
+     * @throws UnexpectedValueException if due work uses both capabilities
      */
     private function mergeCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
