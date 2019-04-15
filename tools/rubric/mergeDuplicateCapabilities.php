@@ -15,7 +15,7 @@
  * ** moves usages of the duplicate into the original
  * ** moves any marks given to the duplicate into the original
  *
- * This script will raise an error (and not continue to migrate the capability)
+ * This script will raise an error (and not continue to merge the capability)
  * if both the original and duplicate are in use on the same assessment.
  *
  * @copyright Copyright 2019, Alaress Pty Ltd
@@ -78,7 +78,7 @@ $app = new class extends CliTool\App
     ";
 
 
-    /**************************** Indicator migration queries ***************************/
+    /**************************** Indicator merging queries ***************************/
 
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
         SELECT id, name
@@ -88,7 +88,7 @@ $app = new class extends CliTool\App
         ORDER BY name, id
     ';
 
-    private const MIGRATE_CAPABILITY_INDICATOR_QUERY = '
+    private const MERGE_CAPABILITY_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET rubric_group_id = :originalCapabilityId
         WHERE rubric_group_id = :duplicateCapabilityId
@@ -96,7 +96,7 @@ $app = new class extends CliTool\App
     ';
 
 
-    /**************************** Usage migration queries ***************************/
+    /**************************** Usage merging queries ***************************/
 
     private const FIND_CAPABILITY_USAGES_QUERY = '
         SELECT
@@ -110,7 +110,7 @@ $app = new class extends CliTool\App
         AND   a.deleted_at IS NULL
     ';
 
-    private const MIGRATE_CAPABILITY_USAGE_QUERY = '
+    private const MERGE_CAPABILITY_USAGE_QUERY = '
         UPDATE rubric_group_usage
         SET rubric_group_id = :originalCapabilityId
         WHERE rubric_group_id = :duplicateCapabilityId
@@ -118,7 +118,7 @@ $app = new class extends CliTool\App
     ';
 
 
-    /**************************** Mark migration queries ***************************/
+    /**************************** Mark merging queries ***************************/
 
     private const FIND_CAPABILITY_MARKS_QUERY = '
         SELECT
@@ -131,7 +131,7 @@ $app = new class extends CliTool\App
         INNER JOIN assessment         a   ON sb.assessment_id = a.id
     ';
 
-    private const MIGRATE_CAPABILITY_MARK_QUERY = '
+    private const MERGE_CAPABILITY_MARK_QUERY = '
         UPDATE rubric_group_mark rm
         INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
         SET rm.rubric_group_id = :originalCapabilityId
@@ -160,7 +160,7 @@ $app = new class extends CliTool\App
     private $findCapabilitiesQuery;
 
 
-    /**************************** Prepared indicator migration queries ***************************/
+    /**************************** Prepared indicator merging queries ***************************/
 
     /**
      * Query for finding all rubric indicators in a capability.
@@ -170,14 +170,14 @@ $app = new class extends CliTool\App
     private $findCapabilityIndicatorsQuery;
 
     /**
-     * Query for migrating an indicator from a duplicate to the original capability.
+     * Query for merging an indicator from a duplicate to the original capability.
      *
      * @var IQuery
      */
-    private $migrateCapabilityIndicatorQuery;
+    private $mergeCapabilityIndicatorQuery;
 
 
-    /**************************** Prepared usage migration queries ***************************/
+    /**************************** Prepared usage merging queries ***************************/
 
     /**
      * Query for finding all usages of a capability.
@@ -187,14 +187,14 @@ $app = new class extends CliTool\App
     private $findCapabilityUsagesQuery;
 
     /**
-     * Query for migrating a usage from a duplicate to the original capability.
+     * Query for merging a usage from a duplicate to the original capability.
      *
      * @var IQuery
      */
-    private $migrateCapabilityUsageQuery;
+    private $mergeCapabilityUsageQuery;
 
 
-    /**************************** Prepared mark migration queries ***************************/
+    /**************************** Prepared mark merging queries ***************************/
 
     /**
      * Query for finding all marks given for a capability.
@@ -204,11 +204,11 @@ $app = new class extends CliTool\App
     private $findCapabilityMarksQuery;
 
     /**
-     * Query for migrating a usage from a duplicate to the original capability.
+     * Query for merging a usage from a duplicate to the original capability.
      *
      * @var IQuery
      */
-    private $migrateCapabilityMarkQuery;
+    private $mergeCapabilityMarkQuery;
 
 
     /**
@@ -245,7 +245,7 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Due works which failed to migrate for whatever reason.
+     * Due works which failed to merge for whatever reason.
      *
      * These must be fixed manually for each instance.
      *
@@ -312,18 +312,18 @@ $app = new class extends CliTool\App
 
         $this->findCapabilityIndicatorsQuery
             = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY);
-        $this->migrateCapabilityIndicatorQuery
-            = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_INDICATOR_QUERY);
+        $this->mergeCapabilityIndicatorQuery
+            = $this->db->prepareQuery(self::MERGE_CAPABILITY_INDICATOR_QUERY);
 
         $this->findCapabilityUsagesQuery
             = $this->db->prepareQuery(self::FIND_CAPABILITY_USAGES_QUERY);
-        $this->migrateCapabilityUsageQuery
-            = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_USAGE_QUERY);
+        $this->mergeCapabilityUsageQuery
+            = $this->db->prepareQuery(self::MERGE_CAPABILITY_USAGE_QUERY);
 
         $this->findCapabilityMarksQuery
             = $this->db->prepareQuery(self::FIND_CAPABILITY_MARKS_QUERY);
-        $this->migrateCapabilityMarkQuery
-            = $this->db->prepareQuery(self::MIGRATE_CAPABILITY_MARK_QUERY);
+        $this->mergeCapabilityMarkQuery
+            = $this->db->prepareQuery(self::MERGE_CAPABILITY_MARK_QUERY);
 
         $this->repair();
 
@@ -360,7 +360,7 @@ $app = new class extends CliTool\App
                 $mailer->send($mailto);
             }
 
-            throw new RuntimeException('Migration incomplete, could not migrate non-destructively.');
+            throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
         }
     }
 
@@ -381,7 +381,7 @@ $app = new class extends CliTool\App
         /** @var Implementation\Model[] $classes */
         $this->findFoldersQuery->execute();
         if ($this->findFoldersQuery->rowCount() === 0) {
-            $this->log->critical('No classes found - nothing to migrate');
+            $this->log->critical('No classes found - nothing to merge');
         }
         foreach ($this->findFoldersQuery->fetchAll() as $class) {
             $classFolderId = (int)$class['id'];
@@ -482,9 +482,9 @@ $app = new class extends CliTool\App
     /**
      * Repair indicators for the capability IDs provided.
      *
-     * All indicators from `$destinationCapabilityId` are migrated into
+     * All indicators from `$destinationCapabilityId` are merged into
      * `$sourceCapabilityId`. Indicators which already exist in the original
-     * are still migrated: there will be another script which merges the
+     * are still merged: there will be another script which merges the
      * duplicate indicators themselves.
      *
      * @param int $destinationCapabilityId
@@ -511,7 +511,7 @@ $app = new class extends CliTool\App
                 );
             }
 
-            $this->migrateCapabilityIndicatorQuery->execute([
+            $this->mergeCapabilityIndicatorQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'indicatorId'           => $duplicateIndicatorId,
@@ -524,10 +524,10 @@ $app = new class extends CliTool\App
      * Repair usages and marks for the capability IDs provided.
      *
      * Each due work which uses `$destinationCapabilityId` has its usages and
-     * marks migrated to `$sourceCapabilityId`.
+     * marks merged to `$sourceCapabilityId`.
      *
      * However, if the due work uses both source and destination capabilities,
-     * that is an error: it will be reported, and migration of that capability
+     * that is an error: it will be reported, and merging of that capability
      * will be rolled back.
      *
      * (Marks for source and destination capabilities don't need to be checked
@@ -567,13 +567,13 @@ $app = new class extends CliTool\App
                 continue;
             }
 
-            $this->migrateCapabilityUsageQuery->execute([
+            $this->mergeCapabilityUsageQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'boxId'                 => $duplicateDueWork['box_id'],
             ]);
 
-            $this->migrateCapabilityMarkQuery->execute([
+            $this->mergeCapabilityMarkQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
                 'boxId'                 => $duplicateDueWork['box_id'],
@@ -584,7 +584,7 @@ $app = new class extends CliTool\App
         if (!empty($failedDueWorks)) {
             /** @noinspection AdditionOperationOnArraysInspection */
             $this->failedDueWorks += $failedDueWorks;
-            throw new UnexpectedValueException('One or more due works failed to migrate');
+            throw new UnexpectedValueException('One or more due works failed to merge');
         }
     }
 
