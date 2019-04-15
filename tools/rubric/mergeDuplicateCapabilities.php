@@ -337,7 +337,12 @@ $app = new class extends CliTool\App
 
         // Report on which due works must be merged manually, if any.
         if (!empty($this->failedDueWorks)) {
-            $this->log->warning(sprintf('%d due work(s) must be deduplicated manually:', count($this->failedDueWorks)));
+            $this->log->warning(
+                sprintf(
+                    '%d due work(s) must be fixed manually before merge can complete:',
+                    count($this->failedDueWorks)
+                )
+            );
             $failedDueWorkUrls = [];
             foreach ($this->failedDueWorks as $failedDueWorkId) {
                 $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
@@ -350,6 +355,8 @@ $app = new class extends CliTool\App
 
             $mailto = $this->getOpt(self::OPT_LONG_MAILTO);
             if ($mailto) {
+                $this->log->notice(sprintf('Mailing report to "%s"', $mailto));
+
                 $mailer = new TwigEmail('output.twig');
                 $mailer->setCoreContext((new CoreContext($this->getConfig()))->getContext());
                 $mailer->setFrom($this->getConfig()->get('mail_from_address'));
