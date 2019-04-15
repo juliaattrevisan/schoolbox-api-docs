@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * Merge duplicate rubric capabilities.
+ * Merge duplicate rubric indicators.
  *
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
