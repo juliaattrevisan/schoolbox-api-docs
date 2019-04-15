@@ -13,8 +13,7 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
 use Psr\Log\LoggerInterface as Logger;
 use RuntimeException;
-use Schoolbox\Application\CliTool;
-use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Assessment\Rubric\Repair\Base;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 use Scrub;
@@ -38,7 +37,7 @@ use UnexpectedValueException;
  * This script will raise an error (and not continue to merge the capability)
  * if both the original and duplicate are in use on the same assessment.
  */
-class Capability extends CliTool\App
+class Capability extends Base
 {
     // This tools CLI options
     private const OPT_SHORT_FOLDER = 'f:';
@@ -345,9 +344,6 @@ class Capability extends CliTool\App
      */
     private function merge(): void
     {
-        // Find each class
-        // Retrieve its capabilities+indicators
-        /** @var Implementation\Model[] $classes */
         $this->findFoldersQuery->execute();
         if ($this->findFoldersQuery->rowCount() === 0) {
             $this->log->critical('No classes found - nothing to merge');
