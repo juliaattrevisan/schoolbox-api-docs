@@ -469,7 +469,7 @@ $app = new class extends CliTool\App
 
         // Report on which due works must be repaired manually, if any.
         if (!empty($this->failedDueWorks)) {
-            $this->log->warning(sprintf('%d due works must be deduplicated manually:', count($this->failedDueWorks)));
+            $this->log->warning(sprintf('%d due work(s) must be deduplicated manually:', count($this->failedDueWorks)));
             foreach ($this->failedDueWorks as $failedDueWorkId) {
                 $this->log->warning(
                     self::indent(1)
@@ -683,7 +683,7 @@ $app = new class extends CliTool\App
                 $this->log->warning(
                     self::indent(4) . 'capability is used by both source and destination due work: aborting'
                 );
-                $failedDueWorks[] = $duplicateDueWork['id'];
+                $failedDueWorks[$duplicateDueWork['id']] = $duplicateDueWork['id'];
                 continue;
             }
 
@@ -702,7 +702,8 @@ $app = new class extends CliTool\App
 
         // Did any fail? Log and report later
         if (!empty($failedDueWorks)) {
-            $this->failedDueWorks = array_merge($this->failedDueWorks, $failedDueWorks);
+            /** @noinspection AdditionOperationOnArraysInspection */
+            $this->failedDueWorks += $failedDueWorks;
             throw new UnexpectedValueException('One or more due works failed to migrate');
         }
     }
