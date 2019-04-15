@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress\Web\Router\PathMatcher;
@@ -97,8 +98,10 @@ class Module extends BaseModule
             $matcher,
             '(?:getPendingAssessmentsForUser|postPendingAssessmentsForUser)',
             function () {
+                /** @var RosettaStone $rosettaStone */
+                $rosettaStone = $this->getInjector()->get('l10n');
                 return [
-                    'filterFactoryFactory' => new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory()),
+                    'filterFactoryFactory' => new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory(), $rosettaStone),
                 ];
             }
         );

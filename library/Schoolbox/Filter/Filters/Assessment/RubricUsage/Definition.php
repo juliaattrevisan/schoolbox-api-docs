@@ -9,7 +9,10 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Model;
+use Schoolbox\Filter\Page;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use function sprintf;
 
 /**
@@ -19,11 +22,32 @@ class Definition extends Filter\AbstractDefinition
 {
 
     // The name to expose in the UI
-    protected const NAME = 'Capability/Indicator usage';
+    protected const NAME = 'Rubric Usage';
 
     public const KEY_NONE         = 'none';            // filter to assessments that don't use capabilities or indicators (non DW + DW that don't use rubric)
     public const KEY_CAPABILITIES = 'capabilities';    // filter to assessments that use some capability
     public const KEY_INDICATORS   = 'indicators';      // filter to assessments that use some indicator
+
+    /** @var RosettaStone */
+    private $rosettaStone;
+
+
+    /**
+     * @param Model                       $filter
+     * @param Page\Option\Mapper          $filterOptionMapper
+     * @param Page\Option\Defaults\Mapper $filterDefaultMapper
+     * @param RosettaStone                $rosettaStone
+     */
+    public function __construct(
+        Model $filter,
+        Page\Option\Mapper $filterOptionMapper,
+        Page\Option\Defaults\Mapper $filterDefaultMapper,
+        RosettaStone $rosettaStone
+    ) {
+        parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
+        $this->rosettaStone = $rosettaStone;
+    }
+
 
     /**
      * @inheritdoc
@@ -76,13 +100,13 @@ class Definition extends Filter\AbstractDefinition
     public function getLabel(string $key): string
     {
         if (self::KEY_NONE === $key) {
-            return '(none) - Does not use any Capabilities or Indicators';
+            return '(none) - Does not Rubric';
         }
         if (self::KEY_CAPABILITIES === $key) {
-            return 'Folder Capabilities';
+            return "Folder {$this->rosettaStone->translate('rubricGroup', true, true)}";
         }
         if (self::KEY_INDICATORS === $key) {
-            return 'Folder Indicators';
+            return "Folder {$this->rosettaStone->translate('rubricCriterion', true, true)}";
         }
         throw new InvalidArgumentException(sprintf("Unknown '%s' key: '%s'", self::NAME, $key));
     }

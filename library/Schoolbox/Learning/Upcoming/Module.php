@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Aura\Di\ContainerInterface;
@@ -125,8 +126,13 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'participantDataSource' => $injector->lazyGet('participantDataSource'),
             'defaultGradeGroup'     => $this->getInjector()->lazyGet('defaultGradeGroup'),
-            'filterFactoryFactory'  => $injector->lazy(function () {
-                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+                /** @var RosettaStone $rosettaStone */
+                $rosettaStone = $injector->get('l10n');
+                return new Filter\Filters\Assessment\FactoryFactory(
+                    $this->getMapperFactory(),
+                    $rosettaStone
+                );
             }),
             'assessmentIdFinder'    => $injector->lazy(function () {
                 /** @var Filter\Mapper $filterMapper */

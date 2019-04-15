@@ -12,6 +12,7 @@ use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -131,8 +132,13 @@ class Module extends BaseModule
             'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
             'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
             'access'                     => $this->getMapperFactory()->getLazy(Access::class),
-            'filterFactoryFactory'       => $injector->lazy(function(){
-                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+                /** @var RosettaStone $rosettaStone */
+                $rosettaStone = $injector->get('l10n');
+                return new Filter\Filters\Assessment\FactoryFactory(
+                    $this->getMapperFactory(),
+                    $rosettaStone
+                );
             }),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
             'assessmentIdFinder'         => $injector->lazy(function(){

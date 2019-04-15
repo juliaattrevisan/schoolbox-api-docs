@@ -14,6 +14,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Filter\Filters;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\L10n\RosettaStone;
 
 
 class Module extends AlaressModule
@@ -47,7 +48,12 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_RUBRIC_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
-                    return ['factoryFactory' => new Filters\Assessment\FactoryFactory($this->getMapperFactory())];
+                    /** @var RosettaStone $rosettaStone */
+                    $rosettaStone = $this->getInjector()->get('l10n');
+                    return ['factoryFactory' => new Filters\Assessment\FactoryFactory(
+                        $this->getMapperFactory(),
+                        $rosettaStone
+                    )];
                 // Other entity types can have their factory factories registered here
             }
             return [];

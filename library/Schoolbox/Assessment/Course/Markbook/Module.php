@@ -15,6 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -108,8 +109,13 @@ class Module extends \Alaress\Module\Module
             'controller:' . $this->getBasename(),
             $injector->lazyNew(Controller::class, [
                 'defaultGradeGroup'     => $this->getInjector()->get('defaultGradeGroup'),
-                'filterFactoryFactory'  => $injector->lazy(function () {
-                    return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+                'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+                    /** @var RosettaStone $rosettaStone */
+                    $rosettaStone = $injector->get('l10n');
+                    return new Filter\Filters\Assessment\FactoryFactory(
+                        $this->getMapperFactory(),
+                        $rosettaStone
+                    );
                 }),
                 'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
                 'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),

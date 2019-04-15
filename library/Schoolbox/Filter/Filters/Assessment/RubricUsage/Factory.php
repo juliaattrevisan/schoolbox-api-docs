@@ -16,6 +16,7 @@ use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
@@ -39,21 +40,27 @@ class Factory extends AbstractFactory
     /** @var Folder\Mapper */
     private $folderMapper;
 
+    /** @var RosettaStone */
+    private $rosettaStone;
+
 
     /**
      * @param Page\Option\Mapper          $optionMapper
      * @param Page\Option\Defaults\Mapper $defaultMapper
      * @param Selection\Mapper            $selectionMapper
      * @param Folder\Mapper               $folderMapper
+     * @param RosettaStone                $rosettaStone
      */
     public function __construct(
         Page\Option\Mapper $optionMapper,
         Page\Option\Defaults\Mapper $defaultMapper,
         Selection\Mapper $selectionMapper,
-        Folder\Mapper $folderMapper
+        Folder\Mapper $folderMapper,
+        RosettaStone $rosettaStone
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper);
         $this->folderMapper = $folderMapper;
+        $this->rosettaStone = $rosettaStone;
     }
 
 
@@ -67,7 +74,8 @@ class Factory extends AbstractFactory
         return new Definition(
             $filter,
             $this->getOptionMapper(),
-            $this->getDefaultsMapper()
+            $this->getDefaultsMapper(),
+            $this->rosettaStone
         );
     }
 

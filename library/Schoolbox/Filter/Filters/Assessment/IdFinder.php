@@ -498,12 +498,12 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Are we only joining to a single assessment type table?
         $oneJoinOnly =
-            ($aTypes && $aTypes->count() === 1 && !$rubricUsages && !$markPerCap) ||                              // Just 1 of [project/quiz/assess/subBox]
-            (!$aTypes && ($rubricUsages || $markPerCap)) ||                                                       // Just subBox per cap/ind usage || markPerCap
+            ($aTypes && $aTypes->count() === 1 && !$rubricUsages && !$markPerCap) ||                             // Just 1 of [project/quiz/assess/subBox]
+            (!$aTypes && ($rubricUsages || $markPerCap)) ||                                                      // Just subBox due to rubricUsage || markPerCap
             ($aTypes && $aTypes->count() === 1 && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));  // Just [subBox], others don't matter here
 
 
-        // If we are only fetching 1 of the assessment types, we can INNER JOIN, other wise we must LEFT JOIN and add WHERE clause
+        // If we are only fetching 1 of the assessment types, we can INNER JOIN, otherwise we must LEFT JOIN and add WHERE clause
         if ($oneJoinOnly) {
             $joinType = 'INNER';
             $builder  = null;
@@ -633,7 +633,7 @@ class IdFinder extends Filter\AbstractIdFinder
             return ['TRUE', []];
         }
 
-        // TODO implement MarkPerCap filter (no rubric || markPerCap ON)
+        // TODO implement MarkPerCap filter (no rubric || markPerCap ON/OFF)
 //        $pb                   = $this->getMapper()->getPredicateBuilder();
 //        $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
 //
