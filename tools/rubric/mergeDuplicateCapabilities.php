@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 /**
- * Repair script for merging duplicate rubric capabilities.
+ * Script for merging duplicate rubric capabilities.
  *
  * In the past it may have been possible to create more than one capability
  * with the same name in a folder, and more than one indicator with the same
@@ -234,10 +234,10 @@ $app = new class extends CliTool\App
     private $fqdn;
 
     /**
-     * The folders to repair, if passed via the `self::OPT_SHORT_FOLDER`
-     * option.
+     * The folders to merge duplicate capabilities for, if passed via the
+     * `self::OPT_SHORT_FOLDER` option.
      *
-     * If empty, repair all folders.
+     * If empty, merge for all folders.
      *
      * @var array
      */
@@ -273,9 +273,9 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Set up and run the repair process.
+     * Set up and run the merge process.
      *
-     * Install all instance vars, and wraps the repair process in a transaction
+     * Install all instance vars, and wraps the merge process in a transaction
      * for commit (if `--perform` is on) or rollback (if it's off, or an error
      * is raised).
      *
@@ -325,7 +325,7 @@ $app = new class extends CliTool\App
         $this->mergeCapabilityMarkQuery
             = $this->db->prepareQuery(self::MERGE_CAPABILITY_MARK_QUERY);
 
-        $this->repair();
+        $this->merge();
 
 
         if ($this->perform()) {
@@ -335,7 +335,7 @@ $app = new class extends CliTool\App
         }
 
 
-        // Report on which due works must be repaired manually, if any.
+        // Report on which due works must be merged manually, if any.
         if (!empty($this->failedDueWorks)) {
             $this->log->warning(sprintf('%d due work(s) must be deduplicated manually:', count($this->failedDueWorks)));
             $failedDueWorkUrls = [];
@@ -366,16 +366,12 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Run the repair process.
+     * Run the merge process.
      *
      * @throws \Alaress\Database\Exception
      */
-    private function repair(): void
+    private function merge(): void
     {
-        // Actions:
-        // repairDuplicate
-
-
         // Find each class
         // Retrieve its capabilities+indicators
         /** @var Implementation\Model[] $classes */
@@ -412,19 +408,18 @@ $app = new class extends CliTool\App
                 $groupedCapabilities[$name][] = $id;
             }
 
-            $this->repairCapabilities($groupedCapabilities, $classFolderId);
+            $this->mergeCapabilities($groupedCapabilities);
         }
     }
 
 
     /**
-     * Attempt to repair this set of capabilities by removing any duplicates.
+     * Attempt to merge this set of capabilities by removing any duplicates.
      *
      * @param array $groupedCapabilities key: capability name, value: list of capability IDs
-     * @param int   $folderId            Used to find duplicates of this capability in the same folder
      * @throws \Alaress\Database\Exception
      */
-    private function repairCapabilities(array $groupedCapabilities, int $folderId): void
+    private function mergeCapabilities(array $groupedCapabilities): void
     {
         foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
             $capabilityCount = count($capabilityIds);
@@ -460,8 +455,8 @@ $app = new class extends CliTool\App
                                 $destinationCapabilityId
                             )
                         );
-                        $this->repairCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
-                        $this->repairCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
+                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
+                        $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
                     }
@@ -480,7 +475,7 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Repair indicators for the capability IDs provided.
+     * Merge indicators for the capability IDs provided.
      *
      * All indicators from `$destinationCapabilityId` are merged into
      * `$sourceCapabilityId`. Indicators which already exist in the original
@@ -490,7 +485,7 @@ $app = new class extends CliTool\App
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
      */
-    private function repairCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId): void
+    private function mergeCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
         // Which indicators are within the original capability?
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
@@ -521,7 +516,7 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Repair usages and marks for the capability IDs provided.
+     * Merge usages and marks for the capability IDs provided.
      *
      * Each due work which uses `$destinationCapabilityId` has its usages and
      * marks merged to `$sourceCapabilityId`.
@@ -536,7 +531,7 @@ $app = new class extends CliTool\App
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
      */
-    private function repairCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
+    private function mergeCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
     {
         // Which due works use the original capability?
         $this->findCapabilityUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
