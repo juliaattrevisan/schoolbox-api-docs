@@ -8,6 +8,12 @@
 
 use Schoolbox\Resource\Folder\Log\Model as Log;
 use \Schoolbox\Breadcrumbs;
+
+$code = urldecode(implode('/', $this->arg));
+header('Location: /learning/class/' . $code);
+die();
+
+
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $groupHandler = new Group;
