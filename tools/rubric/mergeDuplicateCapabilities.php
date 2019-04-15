@@ -288,7 +288,10 @@ $app = new class extends CliTool\App
         $this->log     = $this->getLogger();
         $this->db      = $this->getDi()->get('databaseInternal');
         $this->now     = Alaress_Date_Format::now();
-        $this->fqdn    = trim($this->getConfig()->get('site_hostname') . '.' . $this->getConfig()->get('site_domain'), ';.');
+        $this->fqdn    = trim(
+            $this->getConfig()->get('site_hostname') . '.' . $this->getConfig()->get('site_domain'),
+            ';.'
+        );
         $folderIds     = $this->getOpt(self::OPT_SHORT_FOLDER);
         $this->folders = empty($folderIds)
             ? []
@@ -350,7 +353,9 @@ $app = new class extends CliTool\App
                 $mailer = new TwigEmail('output.twig');
                 $mailer->setCoreContext((new CoreContext($this->getConfig()))->getContext());
                 $mailer->setFrom($this->getConfig()->get('mail_from_address'));
-                $mailer->setContext(['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls))]);
+                $mailer->setContext([
+                    'output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),
+                ]);
                 $mailer->setSubject('Manual deduplicate required');
                 $mailer->send($mailto);
             }
