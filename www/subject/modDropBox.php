@@ -4,6 +4,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource;
 
 require_once '../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $dropbox = Schoolbox\Dropbox\Mapper::getInstance();
 $page    = new SitePage();
