@@ -582,7 +582,7 @@ $app = new class extends CliTool\App
                         );
                         $this->repairCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
                         $this->repairCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
-                    } catch (\Exception $e) {
+                    } catch (UnexpectedValueException $e) {
                         $conflict = true;
                     }
 
