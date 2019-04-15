@@ -10,10 +10,14 @@ namespace Schoolbox\Filter\Filters\Assessment;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress_Date_Format;
 use function array_intersect;
+use function array_merge;
+use function array_unique;
+use function implode;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\Filter\Filters\Assessment\WorkType;
+use Schoolbox\Filter\Filters\Assessment\AssessmentType;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -90,8 +94,14 @@ class IdFinder extends Filter\AbstractIdFinder
         $weightings     = $completeFilters[WeightingType\Definition::class];
         $workTypeIds    = $completeFilters[WorkType\Definition::class];
         $yearsDue       = $completeFilters[YearDue\Definition::class];
+        $capsAndInds    = $completeFilters[CapabilityIndicator\Definition::class];
+//        $markPerCap     = $completeFilters[MarkPerCap\Definition::class];
+        $markPerCap     = null;
 
-        list($aTypeJoin, $aTypeWhere)               = $this->getClauseAType($aTypes);
+        $dueWorkAlias                               = 'dw';
+        [$aTypeJoin, $aTypeWhere]                   = $this->getClauseAType($aTypes, $capsAndInds, $markPerCap, $dueWorkAlias);
+        [$capIndJoin, $capIndWhere, $capIndParams]  = $this->getClauseCapabilityIndicator($capsAndInds, $aTypes, $dueWorkAlias);
+        [$markPerCapWhere, $markPerCapParams]       = $this->getClauseMarkPerCap($markPerCap, $aTypes, $dueWorkAlias);
         list($temporalWhere, $temporalParams, $participantPlanJoin) = $this->getClauseTemporalState($temporalStates);
         list($termDJoin, $termDWhere, $termDParams) = $this->getClauseTerm($termsDue, self::DATE_COL_DUE);
         list($termCJoin, $termCWhere, $termCParams) = $this->getClauseTerm($termsClose, self::DATE_COL_CLS);
@@ -99,6 +109,31 @@ class IdFinder extends Filter\AbstractIdFinder
         list($workTypeWhere,  $workTypeParams)      = $this->getClauseWorkType($workTypeIds);
         list($yearDueWhere, $yearDueParams)         = $this->getClauseYear($yearsDue, self::DATE_COL_DUE);
         list($deletedWhere)                         = $this->getClauseDeleted($deleted);
+
+        // Build the non-context JOINs
+        $nonContextJoins = [
+            $participantPlanJoin,
+            $aTypeJoin,
+            $capIndJoin,
+            $termDJoin,
+            $termCJoin,
+        ];
+        $nonContextJoin = implode("\n", $nonContextJoins);
+
+        // Build the non-context WHERE clauses.
+        $nonContextWhereClauses = [
+            $aTypeWhere,
+            $capIndWhere,
+            $markPerCapWhere,
+            $temporalWhere,
+            $termDWhere,
+            $termCWhere,
+            $weightingWhere,
+            $workTypeWhere,
+            $yearDueWhere,
+            $deletedWhere,
+        ];
+        $nonContextWhereClause = implode(' AND ', $nonContextWhereClauses);
 
         // Merge all the params
         $params = array_merge(
@@ -108,6 +143,8 @@ class IdFinder extends Filter\AbstractIdFinder
             $unitSpecParams,
             $uImpSpcParams,
             $temporalParams,
+            $capIndParams,
+            $markPerCapParams,
             $termDParams,
             $termCParams,
             $weightingParams,
@@ -119,9 +156,8 @@ class IdFinder extends Filter\AbstractIdFinder
         if ($this->subQueryBase($unitImpSpcIds, $teacherFolderIds, $studentFolderIds, $projectIds, $unitImplIds, $unitSpecIds)) {
             $subQueries[] = "
                 SELECT a.id, 0 AS 'case' FROM `assessment` a
-                {$participantPlanJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                WHERE {$deletedWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere}
-                AND {$workTypeWhere} AND {$yearDueWhere}
+                {$nonContextJoin}
+                WHERE {$nonContextWhereClause}
                 ";
         } else {
             if ($this->subQueryFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -129,9 +165,9 @@ class IdFinder extends Filter\AbstractIdFinder
                 $subQueries[] = "
                     SELECT a.id, 1 AS 'case' FROM `assessment` a
                     JOIN assessment_folder af ON af.assessment_id = a.id
-                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere}
-                    AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
+                    {$folderJoin}
+                    {$nonContextJoin}
+                    WHERE {$folderWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryProjectFolder($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -141,9 +177,9 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project_assessment ap ON ap.assessment_id  = a.id
                     JOIN project p             ON ap.project_id     = p.id
                     JOIN assessment_folder paf ON paf.assessment_id = p.assessment_id
-                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$aTypeWhere} AND {$temporalWhere}
-                    AND {$termDWhere} AND {$termCWhere} AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
+                    {$folderJoin}
+                    {$nonContextJoin}
+                    WHERE {$folderWhere} AND {$projectWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -155,11 +191,10 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 3 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id = a.id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
-                    {$participantPlanJoin} {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
-                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
-                    
+                    {$uImpSpcJoin}
+                    {$folderJoin}
+                    {$nonContextJoin}
+                    WHERE {$uImpSpcWhere} AND {$folderWhere} AND {$unitImplWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryProjectUnitImpl($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -173,10 +208,10 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p                                 ON ap.project_id                     = p.id 
                     JOIN assessment_course_unit_implementation aui ON aui.assessment_id                 = p.assessment_id
                     JOIN course_unit_implementation ui             ON aui.course_unit_implementation_id = ui.id
-                    {$participantPlanJoin} {$uImpSpcJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
-                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
+                    {$uImpSpcJoin}
+                    {$folderJoin}
+                    {$nonContextJoin}
+                    WHERE {$uImpSpcWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitImplWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -185,10 +220,9 @@ class IdFinder extends Filter\AbstractIdFinder
                     SELECT a.id, 5 AS 'case' FROM `assessment` a
                     JOIN assessment_course_unit_specification aus ON aus.assessment_id = a.id
                     JOIN course_unit_specification us ON aus.course_unit_specification_id = us.id
-                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
-                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
+                    {$folderJoin}
+                    {$nonContextJoin}
+                    WHERE {$folderWhere} AND {$unitSpecWhere} AND {$nonContextWhereClause}
                     ";
             }
             if ($this->subQueryProjectUnitSpec($unitImpSpcIds, $projectIds, $unitImplIds, $unitSpecIds)) {
@@ -199,10 +233,9 @@ class IdFinder extends Filter\AbstractIdFinder
                     JOIN project p                                 ON ap.project_id     = p.id
                     JOIN assessment_course_unit_specification aus  ON aus.assessment_id = p.assessment_id
                     JOIN course_unit_specification us              ON aus.course_unit_specification_id = us.id
-                    {$participantPlanJoin} {$folderJoin} {$aTypeJoin} {$termDJoin} {$termCJoin}
-                    WHERE {$deletedWhere} AND {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere}
-                    AND {$aTypeWhere} AND {$temporalWhere} AND {$termDWhere} AND {$termCWhere}
-                    AND {$weightingWhere} AND {$workTypeWhere} AND {$yearDueWhere}
+                    {$folderJoin}
+                    {$nonContextJoin}
+                    WHERE {$folderWhere} AND {$projectWhere} AND {$unitSpecWhere} AND {$nonContextWhereClause}
                     ";
             }
         }
@@ -430,55 +463,184 @@ class IdFinder extends Filter\AbstractIdFinder
 
 
     /**
-     * Get query fragments dependent on 'AssessmentType' filter
+     * Get query fragments dependent on filters:
+     * * AssessmentType
+     * * CapabilityIndicator
+     * * MarkPerCap
      *
+     * There is a coupling between the implementation of these filters.
+     * If any combination implies that we need to inspect the submission_box table, or JOIN via it, then the join from
+     * `assessment` to `submission_box` is generated here. Hence the other two getClause*() methods can assume the `submission_box`
+     * JOIN is already handled elsewhere.
+     *
+     * @precondition Filter combinations that logically can never return rows are not passed to this method. They are already handled.
+     * @precondition Filter sets that logically cause no filtering to occur have been set to NULL
      * @param null|Collection|int[] $aTypes
+     * @param Collection|null       $capsAndInds
+     * @param Collection|null       $markPerCap
      * @return mixed[]
      * @throws InvalidColumnException
      */
-    private function getClauseAType(Collection $aTypes = null)
+    private function getClauseAType(?Collection $aTypes, ?Collection $capsAndInds, ?Collection $markPerCap, string $dueWorkAlias): array
     {
-        // Not filtering by assessment type?
-        if (null === $aTypes) {
+        // Are we not filtering by assessment type, have no cap/Ind usage, and no markPerCap considerations?
+        if (null === $aTypes && null === $capsAndInds && null === $markPerCap) {
+            // We don't need to JOIN to any assessment type table.
             return ['', 'TRUE'];
         }
 
+        // We do need to JOIN to assessment type table/s. Start building JOIN and WHERE clause.
         $joinClause = '';
-        $builder    = $this->getMapper()->getPredicateBuilder();
+
+        // Do we need to JOIN to `submission_box`?
+        $joinToSubBox = ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) || $capsAndInds || $markPerCap;
+
+        // Are we only joining to a single assessment type table?
+        $oneJoinOnly =
+            ($aTypes && $aTypes->count() === 1 && !$capsAndInds && !$markPerCap) ||                              // Just 1 of [project/quiz/assess/subBox]
+            (!$aTypes && ($capsAndInds || $markPerCap)) ||                                                       // Just subBox per cap/ind usage || markPerCap
+            ($aTypes && $aTypes->count() === 1 && $aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));  // Just [subBox], others don't matter here
+
+
+        // If we are only fetching 1 of the assessment types, we can INNER JOIN, other wise we must LEFT JOIN and add WHERE clause
+        if ($oneJoinOnly) {
+            $joinType = 'INNER';
+            $builder  = null;
+        } else {
+            $joinType = 'LEFT';
+            $builder  = $this->getMapper()->getPredicateBuilder();
+        }
 
         // Task
         if ($aTypes->keyExists(AssessmentType\Definition::KEY_TASK)) {
-            $joinClause .= '
-                LEFT JOIN task tk           ON tk.assessment_id = a.id
-            ';
-            $builder->notNull('tk.id');
+            $joinClause .= "
+                $joinType JOIN task tk           ON tk.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('tk.id');
+            }
         }
 
         // Quiz
         if ($aTypes->keyExists(AssessmentType\Definition::KEY_QUIZ)) {
-            $joinClause .= '
-                LEFT JOIN assess qz         ON qz.assessment_id = a.id
-            ';
-            $builder->notNull('qz.assess_id');
+            $joinClause .= "
+                $joinType JOIN assess qz         ON qz.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('qz.assess_id');
+            }
         }
 
         // DueWork
-        if ($aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) {
-            $joinClause .= '
-                LEFT JOIN submission_box dw ON dw.assessment_id = a.id
-            ';
-            $builder->notNull('dw.id');
+        if ($joinToSubBox) {
+            $joinClause .= "
+                $joinType JOIN submission_box $dueWorkAlias ON $dueWorkAlias.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull("$dueWorkAlias.id");
+            }
         }
 
         // Project
         if ($aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
-            $joinClause .= '
-                LEFT JOIN project pr ON pr.assessment_id = a.id
-            ';
-            $builder->notNull('pr.id');
+            $joinClause .= "
+                $joinType JOIN project pr ON pr.assessment_id = a.id
+            ";
+            if ($builder) {
+                $builder->notNull('pr.id');
+            }
         }
-        return [$joinClause, '(' . implode(' OR ', $builder->getWhere()) . ')'];
+        return [$joinClause, $builder ? '(' . implode(' OR ', $builder->getWhere()) . ')' : 'TRUE'];
+    }
 
+
+    /**
+     * Modify query so we only return assessments that use any of the specified Capabilities or Indicators
+     *
+     * If the filters include the 'none' option, also fetch assessments that don't use any Capabilities/Indicators at all.
+     *
+     * @param Collection|null $capsAndInds
+     * @param Collection|null $aTypes
+     * @param string          $dueWorkAlias
+     * @return array
+     * @throws InvalidColumnException
+     * @throws UnexpectedValueException
+     *
+     * We don't to join to `submission_box` here:
+     * @see getClauseAType
+     */
+    private function getClauseCapabilityIndicator(?Collection $capsAndInds, ?Collection $aTypes, string $dueWorkAlias): array
+    {
+        // Do we not wish to apply this filter?
+        if(null === $capsAndInds){
+            // Always return the row, no params
+            return ['TRUE', []];
+        }
+
+        // How should we join to usage tables?
+        $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
+        $includeNoUsage       = $capsAndInds->keyExists(CapabilityIndicator\Definition::KEY_NONE);
+        $joinType             = $otherAssessmentTypes || $includeNoUsage ? 'LEFT' : 'INNER';
+
+        $pb    = $this->getMapper()->getPredicateBuilder();
+        $codex = new CapabilityIndicator\Codec();
+
+        $capabilityIds = [];
+
+        foreach($capsAndInds as $capAndInd){
+            if($capAndInd === CapabilityIndicator\Definition::KEY_NONE){
+                $pb->isNull('rgu.rubric_group_id');
+            } else {
+                // This assumes that if an assessment is using an indicator, it is using the indicator's capability.
+                // Hence we can just JOIN to capability usage
+                [$capId] = $codex->decode($capAndInd);
+                $capabilityIds[] = $capId;
+            }
+        }
+
+        foreach(array_unique($capabilityIds) as $uniqueCapId){
+            $pb->equals('rgu.rubric_group_id', $uniqueCapId);
+        }
+
+        return [
+            "$joinType JOIN rubric_group_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id",
+            '(' . implode(' OR ', $pb->getWhere()) . ')',
+            $pb->getParams()
+        ];
+    }
+
+
+    /**
+     * Modify query so we only return assessments that use any of the specified Capabilities or Indicators
+     *
+     * If the filters include the 'none' option, also fetch assessments that don't use any Capabilities/Indicators at all.
+
+     * @param Collection|null $markPerCap
+     * @param Collection|null $aTypes
+     * @param string          $dueWorkAlias
+     * @return array
+     * @throws InvalidColumnException
+     *
+     * We don't to join to `submission_box` here:
+     * @see getClauseAType
+     */
+    private function getClauseMarkPerCap(?Collection $markPerCap, ?Collection $aTypes, string $dueWorkAlias): array
+    {
+        // Do we not wish to apply this filter?
+        if (null === $markPerCap) {
+            // Always return the row, no params
+            return ['TRUE', []];
+        }
+
+        // TODO implement MarkPerCap filter (no rubric || markPerCap ON)
+//        $pb                   = $this->getMapper()->getPredicateBuilder();
+//        $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
+//
+//        if ($otherAssessmentTypes || $markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)) {
+//            $pb->isNull("$dueWorkAlias.id");
+//        }
+
+        return ["($dueWorkAlias.id IS NULL OR $dueWorkAlias.rubric_group_marks IS TRUE)", []];
     }
 
 
@@ -939,7 +1101,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @param int[][]|null[] $completeFilters
      * @return bool
      */
-    protected function doNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    protected function doNonContextFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         // Did call explicitly request assessments that do not have an assessment type?
         $assessmentTypes = $completeFilters[AssessmentType\Definition::class];
@@ -979,8 +1141,27 @@ class IdFinder extends Filter\AbstractIdFinder
             return true;
         }
 
+
+        $capabilitiesAndIndicators = $completeFilters[CapabilityIndicator\Definition::class];
+        if($capabilitiesAndIndicators instanceOf Collection){
+            // The full set of capability/indicator keys includes a 'none' key, so the full set is essentially [no usages, specific usages ...].
+            // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
+            if(!$capabilitiesAndIndicators->count()){
+                return true;
+            }
+            // It is valid to request assessment that use no capabilities or indicators.
+            // Is request for assessments that are non-DueWork, but also use Capabilities or Indicators?
+            if (
+                $assessmentTypes instanceOf Collection &&
+                !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
+                !$capabilitiesAndIndicators->keyExists(CapabilityIndicator\Definition::KEY_NONE))
+            {
+                // No assessments can logically match request.
+                return true;
+            }
+        }
+
         // Unable to conclude that result set is guaranteed to be empty
         return false;
     }
-
 }

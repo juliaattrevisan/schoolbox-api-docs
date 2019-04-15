@@ -7,16 +7,29 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\CapabilityIndicator;
 
-use function in_array;
 use InvalidArgumentException;
-use function is_numeric;
 use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
-use function substr;
+use UnexpectedValueException;
 
 class KeyConverter extends AbstractKeyConverter
 {
+    /** @var Codec */
+    private $codec;
+
+
+    /**
+     * @param Filter\Model $filter
+     * @param Codec        $codec
+     */
+    public function __construct(Filter\Model $filter, Codec $codec)
+    {
+        parent::__construct($filter);
+        $this->codec = $codec;
+    }
+
 
     /**
      * @inheritdoc
@@ -44,13 +57,13 @@ class KeyConverter extends AbstractKeyConverter
      */
     protected function assertValidKey(string $key, User $user, string $page): void
     {
-        $prefix = $key[0];
-        if (!in_array($prefix, ['c', 'i'], true)) {
-            throw new InvalidArgumentException("Key prefix is invalid: '$key'");
+        if ($key === Definition::KEY_NONE) {
+            return;
         }
-        $id = substr($key, 1);
-        if (!is_numeric($id)) {
-            throw new InvalidArgumentException("Key identifier invalid: '$key'");
+        try {
+            $this->codec->decode($key);
+        } catch (UnexpectedValueException $e) {
+            throw new InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
         }
     }
 }

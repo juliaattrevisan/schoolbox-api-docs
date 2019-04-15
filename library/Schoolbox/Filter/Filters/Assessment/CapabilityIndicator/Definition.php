@@ -9,6 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\CapabilityIndicator;
 
 use InvalidArgumentException;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 use function sprintf;
 
 /**
@@ -20,8 +21,9 @@ class Definition extends Filter\AbstractDefinition
     // The name to expose in the UI
     protected const NAME = 'Capability/Indicator usage';
 
-    public const KEY_CAPABILITIES = 'capabilities';
-    public const KEY_INDICATORS   = 'indicators';
+    public const KEY_NONE         = 'none';            // filter to assessments that don't use capabilities or indicators (non DW + DW that don't use rubric)
+    public const KEY_CAPABILITIES = 'capabilities';    // filter to assessments that use some capability
+    public const KEY_INDICATORS   = 'indicators';      // filter to assessments that use some indicator
 
     /**
      * @inheritdoc
@@ -29,6 +31,7 @@ class Definition extends Filter\AbstractDefinition
     protected function getCustomKeys(): array
     {
         return [
+            self::KEY_NONE,
             self::KEY_CAPABILITIES,
             self::KEY_INDICATORS,
         ];
@@ -41,8 +44,29 @@ class Definition extends Filter\AbstractDefinition
     public static function getPages(): array
     {
         return [
+//            Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,   // TODO remove when finished testing
             Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK,
         ];
+    }
+
+
+    /**
+     * @param Filter\Page\Model $pageFilter
+     * @return GenericCollection
+     */
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter): GenericCollection
+    {
+        $options = parent::unsetInvalidOptions($pageFilter);
+
+        // Rubric markbook is only concerned with assessments that use Capabilities or Indicators
+        if ($pageFilter->getPage() === Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK) {
+            foreach ($options as $idx => $option) {
+                if ($option->getKey() === self::KEY_NONE) {
+                    $options->offsetUnset($idx);
+                }
+            }
+        }
+        return $options;
     }
 
 
@@ -51,6 +75,9 @@ class Definition extends Filter\AbstractDefinition
      */
     public function getLabel(string $key): string
     {
+        if (self::KEY_NONE === $key) {
+            return '(none) - Does not use any Capabilities or Indicators';
+        }
         if (self::KEY_CAPABILITIES === $key) {
             return 'Folder Capabilities';
         }

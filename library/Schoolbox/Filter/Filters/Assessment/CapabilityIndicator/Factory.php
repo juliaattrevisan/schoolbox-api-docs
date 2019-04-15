@@ -111,9 +111,17 @@ class Factory extends AbstractFactory
             $folders[$folder->getId()] = $folder;
         }
 
+        if ($viewee && $this->isInvolvedFolderPage($pageFilter->getPage())) {
+            foreach ($this->folderMapper->findForUser($viewee) as $involvedFolder) {
+                $folders[$involvedFolder->getId()] = $involvedFolder;
+            }
+        }
+
         $options          = $pageFilter->getOptions();
-        $showCapabilities = $options[Definition::KEY_CAPABILITIES]->getAvailable();
-        $showIndicators   = $options[Definition::KEY_INDICATORS]->getAvailable();
+
+        // Need to check the option is relevant to the current page, before checking whether admin has configured it to be available.
+        $showCapabilities = $options->keyExists(Definition::KEY_CAPABILITIES) && $options[Definition::KEY_CAPABILITIES]->getAvailable();
+        $showIndicators   = $options->keyExists(Definition::KEY_INDICATORS) && $options[Definition::KEY_INDICATORS]->getAvailable();
 
         // If fetching both, just get indicators as they will have the capabilities attached
         // If fetching just capabilities, just get them
@@ -140,6 +148,7 @@ class Factory extends AbstractFactory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
+            new Codec,
             $capabilities,
             $showCapabilities,
             $showIndicators
@@ -154,6 +163,6 @@ class Factory extends AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter);
+        return new KeyConverter($filter, new Codec);
     }
 }
