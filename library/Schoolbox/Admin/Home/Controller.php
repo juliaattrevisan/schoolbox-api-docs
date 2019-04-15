@@ -51,7 +51,7 @@ class Controller extends Base
 
         if (is_readable('/proc/meminfo')) {
             foreach (file('/proc/meminfo') as $ri) {
-                $m[strtok($ri, ':')] = str_replace(' kB', '', strtok('')) * 1024;
+                $m[strtok($ri, ':')] = str_replace(' kB', '', \trim(strtok(''))) * 1024;
             }
 
             $memory_total = $m['MemTotal'];
