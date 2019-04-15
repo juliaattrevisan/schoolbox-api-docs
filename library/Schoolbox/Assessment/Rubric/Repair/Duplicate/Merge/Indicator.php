@@ -262,12 +262,12 @@ class Indicator extends Base
                 continue;
             }
 
-            $groupedCapabilities = [];
+//            $groupedCapabilities = [];
             foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $id => $name) {
-                $groupedCapabilities[$name][] = $id;
+                $this->log->info(sprintf('Checking capability #%d (%s)', $id, $name));
             }
 
-            $this->mergeCapabilities($groupedCapabilities);
+//            $this->mergeCapabilities($groupedCapabilities);
         }
     }
 
