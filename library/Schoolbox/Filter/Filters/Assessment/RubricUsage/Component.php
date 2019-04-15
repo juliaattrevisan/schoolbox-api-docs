@@ -99,12 +99,11 @@ class Component extends Filter\BaseComponent
         $data = [];
 
         foreach ($this->capabilities as $capability) {
-            $data[$capability->getId()] = [];
+            $data[$capability->getId()] = ['name' => $capability->getName()];
             if ($this->showCapabilities) {
                 $key                  = $this->codec->encodeCapability($capability);
                 $roleSelections[$key] = $this->createSelection($key, $selectCapabilities);
                 $data[$capability->getId()]['key'] = $key;
-                $data[$capability->getId()]['name'] = $capability->getName();
             }
             if ($this->showIndicators) {
                 $indicators = [];
