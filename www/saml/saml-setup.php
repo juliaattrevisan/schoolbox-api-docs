@@ -32,14 +32,9 @@ $settingsInfo = array (
     ],
 );
 
-// requestAuthnContext
-if (useSAMLKerberos() && (Config::get('saml_auth_context') !== 'unspecified')) {
-    $settingsInfo['security']['requestAuthnContext'] = OneLogin_Saml2_Constants::AC_WINDOWS;
-} else if (!useSAMLKerberos()) {
-    $settingsInfo['security']['requestAuthnContext'] = OneLogin_Saml2_Constants::AC_UNSPECIFIED;
-}
-
-if ($settingsInfo['security']['requestAuthnContext']) {
+// requestedAuthnContext
+if (Config::get('saml_auth_context') !== 'unspecified') {
+    $settingsInfo['security']['requestedAuthnContext'] = useSAMLKerberos() ? OneLogin_Saml2_Constants::AC_WINDOWS : OneLogin_Saml2_Constants::AC_PASSWORD_PROTECTED;
     $settingsInfo['security']['requestedAuthnContextComparison'] = Config::get('saml_auth_comparison');
 }
 
