@@ -1,5 +1,9 @@
 {% if not editable %}
-    <p>{{ name }}</p>
+    {% if attachzone.attachments[0].isImage %}
+        <p><img src="{{ attachzone.attachments[0].preview }}"></p>
+    {% else %}
+        <p>{{ attachzone.attachments[0].name }}</p>
+    {% endif %}
 {% else %}
 <input type="hidden" name="{{ name }}" value="" />
 {% include 'sub/attachzone.twig' with {attachzone: attachzone} only %}
