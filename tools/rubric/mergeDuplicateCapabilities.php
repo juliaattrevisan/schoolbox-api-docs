@@ -89,7 +89,7 @@ $app = new class extends CliTool\App
     private const MIGRATE_CAPABILITY_INDICATOR_QUERY = '
         UPDATE rubric_criterion
         SET rubric_group_id = :originalCapabilityId
-        WHERE rubric_group_id = :duplicateCapabilityid
+        WHERE rubric_group_id = :duplicateCapabilityId
         AND id = :indicatorId
     ';
 
@@ -111,7 +111,7 @@ $app = new class extends CliTool\App
     private const MIGRATE_CAPABILITY_USAGE_QUERY = '
         UPDATE rubric_group_usage
         SET rubric_group_id = :originalCapabilityId
-        WHERE rubric_group_id = :duplicateCapabilityid
+        WHERE rubric_group_id = :duplicateCapabilityId
         AND submission_box_id = :boxId
     ';
 
@@ -133,7 +133,7 @@ $app = new class extends CliTool\App
         UPDATE rubric_group_mark rm
         INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
         SET rm.rubric_group_id = :originalCapabilityId
-        WHERE rm.rubric_group_id = :duplicateCapabilityid
+        WHERE rm.rubric_group_id = :duplicateCapabilityId
         AND rgu.submission_box_id = :boxId
     ';
 
@@ -634,7 +634,7 @@ $app = new class extends CliTool\App
             $this->migrateCapabilityIndicatorQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
                 'duplicateCapabilityId' => $sourceCapabilityId,
-                'id'                    => $duplicateIndicatorId,
+                'indicatorId'           => $duplicateIndicatorId,
             ]);
         }
     }
