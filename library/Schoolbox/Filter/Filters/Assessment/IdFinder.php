@@ -732,7 +732,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getClauseTerm(Collection $termIds = null, $dateColumn)
+    private function getClauseTerm(?Collection $termIds, $dateColumn)
     {
         // Is this filter being applied ?
         if (null === $termIds) {
