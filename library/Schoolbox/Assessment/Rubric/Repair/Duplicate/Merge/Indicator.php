@@ -84,16 +84,16 @@ class Indicator extends Base
 
     private const MERGE_INDICATOR_USAGE_QUERY = '
         UPDATE rubric_criterion_usage
-        SET   criterion_id      = :originalCapabilityId
-        WHERE criterion_id      = :duplicateCapabilityId
+        SET   criterion_id      = :originalIndicatorId
+        WHERE criterion_id      = :duplicateIndicatorId
         AND   submission_box_id = :boxId
     ';
 
     private const MERGE_INDICATOR_DESCRIPTOR_QUERY = '
         UPDATE     rubric_descriptor rd
         INNER JOIN rubric_level      rl ON rd.level_id = rl.id
-        SET   rd.criterion_id = :originalCapabilityId
-        WHERE rd.criterion_id = :duplicateCapabilityId
+        SET   rd.criterion_id = :originalIndicatorId
+        WHERE rd.criterion_id = :duplicateIndicatorId
         AND   rl.box_id       = :boxId
     ';
 
@@ -323,8 +323,7 @@ class Indicator extends Base
                                 $destinationIndicatorId
                             )
                         );
-//                        $this->mergeCapabilityIndicators($destinationIndicatorId, $sourceIndicatorId);
-//                        $this->mergeCapabilityUsages($destinationIndicatorId, $sourceIndicatorId);
+                        $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId);
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
                     }
@@ -343,103 +342,62 @@ class Indicator extends Base
 
 
     /**
-     * Merge indicators for the capability IDs provided.
+     * Merge usages and marks for the indicator IDs provided.
      *
-     * All indicators from `$destinationCapabilityId` are merged into
-     * `$sourceCapabilityId`. Indicators which already exist in the original
-     * are still merged: there will be another script which merges the
-     * duplicate indicators themselves.
+     * Each due work which uses `$destinationIndicatorId` has its usages and
+     * marks merged to `$sourceIndicatorId`.
      *
-     * @param int $destinationCapabilityId
-     * @param int $sourceCapabilityId
-     */
-    private function mergeCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId): void
-    {
-        // Which indicators are within the original capability?
-        $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
-        $originalIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
-
-        // And which are in the duplicate?
-        $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $sourceCapabilityId]);
-        $duplicateIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
-
-        foreach ($duplicateIndicators as $duplicateIndicatorId => $duplicateIndicatorName) {
-            $this->log->notice(
-                self::indent(3) . sprintf('moving indicator "%s" into original', $duplicateIndicatorName)
-            );
-
-            if (in_array($duplicateIndicatorId, $originalIndicators, true)) {
-                $this->log->warning(
-                    self::indent(4) . 'indicator already exists in original: will need to deduplicate'
-                );
-            }
-
-            $this->mergeCapabilityIndicatorQuery->execute([
-                'originalCapabilityId'  => $destinationCapabilityId,
-                'duplicateCapabilityId' => $sourceCapabilityId,
-                'indicatorId'           => $duplicateIndicatorId,
-            ]);
-        }
-    }
-
-
-    /**
-     * Merge usages and marks for the capability IDs provided.
-     *
-     * Each due work which uses `$destinationCapabilityId` has its usages and
-     * marks merged to `$sourceCapabilityId`.
-     *
-     * However, if the due work uses both source and destination capabilities,
-     * that is an error: it will be reported, and merging of that capability
+     * However, if the due work uses both source and destination indicators,
+     * that is an error: it will be reported, and merging of that indicator
      * will be rolled back.
      *
-     * (Marks for source and destination capabilities don't need to be checked
+     * (Marks for source and destination indicators don't need to be checked
      *  separately, because the mark can't exist without a usage.)
      *
-     * @param int $destinationCapabilityId
-     * @param int $sourceCapabilityId
+     * @param int $destinationIndicatorId
+     * @param int $sourceIndicatorId
      */
-    private function mergeCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
+    private function mergeIndicatorUsages(int $destinationIndicatorId, int $sourceIndicatorId): void
     {
-        // Which due works use the original capability?
-        $this->findIndicatorUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
+        // Which due works use the original indicator?
+        $this->findIndicatorUsagesQuery->execute(['indicatorId' => $destinationIndicatorId]);
         $originalDueWorkIds = $this->findIndicatorUsagesQuery->fetchColumnArray('id');
 
         // And which use the duplicate?
-        $this->findIndicatorUsagesQuery->execute(['capabilityId' => $sourceCapabilityId]);
+        $this->findIndicatorUsagesQuery->execute(['indicatorId' => $sourceIndicatorId]);
         $duplicateDueWorks = $this->findIndicatorUsagesQuery->fetchAll();
 
         $failedDueWorks = [];
         foreach ($duplicateDueWorks as $duplicateDueWork) {
             $this->log->notice(
-                self::indent(3)
+                self::indent(4)
                 . sprintf(
-                    'moving usages and marks of capability in due work #%d (%s) into original',
+                    'moving usages and marks of indicator in due work #%d (%s) into original',
                     $duplicateDueWork['id'],
                     $duplicateDueWork['title']
                 )
             );
 
-            // Do any due works use both the source and destination capability?
+            // Do any due works use both the source and destination indicator?
             // If so that's an error.
             if (in_array($duplicateDueWork['id'], $originalDueWorkIds, true)) {
                 $this->log->warning(
-                    self::indent(4) . 'capability is used by both source and destination due work: aborting'
+                    self::indent(5) . 'indicator is used by both source and destination due work: aborting'
                 );
                 $failedDueWorks[$duplicateDueWork['id']] = $duplicateDueWork['id'];
                 continue;
             }
 
             $this->mergeIndicatorUsageQuery->execute([
-                'originalCapabilityId'  => $destinationCapabilityId,
-                'duplicateCapabilityId' => $sourceCapabilityId,
-                'boxId'                 => $duplicateDueWork['box_id'],
+                'originalIndicatorId'  => $destinationIndicatorId,
+                'duplicateIndicatorId' => $sourceIndicatorId,
+                'boxId'                => $duplicateDueWork['box_id'],
             ]);
 
             $this->mergeIndicatorDescriptorQuery->execute([
-                'originalCapabilityId'  => $destinationCapabilityId,
-                'duplicateCapabilityId' => $sourceCapabilityId,
-                'boxId'                 => $duplicateDueWork['box_id'],
+                'originalIndicatorId'  => $destinationIndicatorId,
+                'duplicateIndicatorId' => $sourceIndicatorId,
+                'boxId'                => $duplicateDueWork['box_id'],
             ]);
         }
 
