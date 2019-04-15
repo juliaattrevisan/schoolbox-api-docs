@@ -30,6 +30,8 @@ use Alaress\Database\Statement\Query\IQuery;
 use Psr\Log\LoggerInterface as Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Course\DataModel\Implementation;
+use Schoolbox\Mail\CoreContext;
+use Schoolbox\Mail\TwigEmail;
 
 $opts = require __DIR__ . '/../../conf/core/require-cli.php';
 
@@ -461,16 +463,26 @@ $app = new class extends CliTool\App
         // Report on which due works must be repaired manually, if any.
         if (!empty($this->failedDueWorks)) {
             $this->log->warning(sprintf('%d due work(s) must be deduplicated manually:', count($this->failedDueWorks)));
+            $failedDueWorkUrls = [];
             foreach ($this->failedDueWorks as $failedDueWorkId) {
-                $this->log->warning(
-                    self::indent(1)
-                    . sprintf(
-                        'https://%s/learning/assessments/%d/modify',
-                        $this->fqdn,
-                        $failedDueWorkId
-                    )
+                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
+                    'https://%s/learning/assessments/%d/modify',
+                    $this->fqdn,
+                    $failedDueWorkId
                 );
+                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
             }
+
+            $mailto = $this->getOpt(self::OPT_LONG_MAILTO);
+            if ($mailto) {
+                $mailer = new TwigEmail('output.twig');
+                $mailer->setCoreContext((new CoreContext($this->getConfig()))->getContext());
+                $mailer->setFrom($this->getConfig()->get('mail_from_address'));
+                $mailer->setContext(['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls))]);
+                $mailer->setSubject('Manual deduplicate required');
+                $mailer->send($mailto);
+            }
+
             throw new RuntimeException('Migration incomplete, could not migrate non-destructively.');
         }
     }
