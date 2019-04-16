@@ -109,36 +109,36 @@ class Indicator extends Base
     }
 
 
-    /**
-     * @inheritDoc
-     */
-    protected function summarizeResult(): void
-    {
-        // Report on which due works must be merged manually, if any.
-        if (!empty($this->failedDueWorks)) {
-            $subject = sprintf(
-                '%d due work(s) must be fixed manually before merge can complete',
-                count($this->failedDueWorks)
-            );
-            $this->log->warning($subject);
-            $failedDueWorkUrls = [];
-            foreach ($this->failedDueWorks as $failedDueWorkId) {
-                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
-                    'https://%s/learning/assessments/%d/modify',
-                    $this->fqdn,
-                    $failedDueWorkId
-                );
-                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
-            }
-
-            $this->sendMail(
-                $subject,
-                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),]
-            );
-
-            throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
-        }
-    }
+//    /**
+//     * @inheritDoc
+//     */
+//    protected function summarizeResult(): void
+//    {
+//        // Report on which due works must be merged manually, if any.
+//        if (!empty($this->failedDueWorks)) {
+//            $subject = sprintf(
+//                '%d due work(s) must be fixed manually before merge can complete',
+//                count($this->failedDueWorks)
+//            );
+//            $this->log->warning($subject);
+//            $failedDueWorkUrls = [];
+//            foreach ($this->failedDueWorks as $failedDueWorkId) {
+//                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
+//                    'https://%s/learning/assessments/%d/modify',
+//                    $this->fqdn,
+//                    $failedDueWorkId
+//                );
+//                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
+//            }
+//
+//            $this->sendMail(
+//                $subject,
+//                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),]
+//            );
+//
+//            throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
+//        }
+//    }
 
 
     /**
