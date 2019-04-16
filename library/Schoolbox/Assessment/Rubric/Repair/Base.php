@@ -354,43 +354,70 @@ abstract class Base extends CliTool\App
         $failedCapabilityCount = count($this->failedCapabilities);
         $failedIndicatorCount  = count($this->failedIndicators);
         $failedDueWorkCount    = count($this->failedDueWorks);
+        $folderBaseUrl         = 'https://%s/homepage/%d';
+        $dueWorkBaseUrl        = 'https://%s/learning/assessments/%d/modify';
+        $failures              = [];
+
         if (($failedCapabilityCount + $failedIndicatorCount + $failedDueWorkCount) > 0) {
             $this->log->warning('Manual intervention is required to repair:');
+
             if ($failedCapabilityCount > 0) {
-                $this->log->notice(self::indent(1) . sprintf('%d capabilities:', $failedCapabilityCount));
-                foreach ($this->failedCapabilities as $failedCapability) {
-                    //
+                $this->log->warning(self::indent(1) . sprintf('%d capabilities:', $failedCapabilityCount));
+                foreach ($this->failedCapabilities as $id => $data) {
+                    $failures[] = $failureMsg = sprintf(
+                        $folderBaseUrl . ' capability #%d (%s)',
+                        $this->fqdn,
+                        $data['folderId'],
+                        $id,
+                        $data['name']
+                    );
+                    $this->log->warning(self::indent(2) . $failureMsg);
                 }
             }
+
             if ($failedIndicatorCount > 0) {
                 $this->log->notice(self::indent(1) . sprintf('%d indicators:', $failedIndicatorCount));
+                foreach ($this->failedCapabilities as $id => $data) {
+                    $failures[] = $failureMsg = sprintf(
+                        $folderBaseUrl . ' indicator #%d (%s)',
+                        $this->fqdn,
+                        $data['folderId'],
+                        $id,
+                        $data['name']
+                    );
+                    $this->log->warning(self::indent(2) . $failureMsg);
+                }
             }
+
             if ($failedDueWorkCount > 0) {
                 $this->log->notice(self::indent(1) . sprintf('%d due works:', $failedDueWorkCount));
+                foreach ($this->failedCapabilities as $id => $data) {
+                    $failures[] = $failureMsg = sprintf(
+                        $folderBaseUrl . ' due work ' . $dueWorkBaseUrl . ' (%s)',
+                        $this->fqdn,
+                        $data['folderId'],
+                        $this->fqdn,
+                        $id,
+                        $data['name']
+                    );
+                    $this->log->warning(self::indent(2) . $failureMsg);
+                }
             }
 
-            foreach ($failures as $folderId => $failure) {
-
-            }
-
-            $subject = sprintf(
-                '%d due work(s) must be fixed manually before merge can complete',
-                count($this->failedDueWorks)
-            );
-            $this->log->warning($subject);
-            $failedDueWorkUrls = [];
-            foreach ($this->failedDueWorks as $failedDueWorkId) {
-                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
-                    'https://%s/learning/assessments/%d/modify',
-                    $this->fqdn,
-                    $failedDueWorkId
-                );
-                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
-            }
+            $subject = 'Some data must be fixed manually before merge can complete';
+//            $failedDueWorkUrls = [];
+//            foreach ($this->failedDueWorks as $failedDueWorkId) {
+//                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
+//                    'https://%s/learning/assessments/%d/modify',
+//                    $this->fqdn,
+//                    $failedDueWorkId
+//                );
+//                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
+//            }
 
             $this->sendMail(
                 $subject,
-                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),]
+                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failures)),]
             );
             throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
         }
