@@ -213,6 +213,11 @@ class Indicator extends Base
             $indicatorIds = array_reverse($indicatorIds);
             while (count($indicatorIds) >= 2) {
                 $sourceIndicatorId = array_shift($indicatorIds);
+                $result            = [
+                    'id'       => $sourceIndicatorId,
+                    'name'     => $indicatorName,
+                    'folderId' => $folderId,
+                ];
                 foreach ($indicatorIds as $destinationIndicatorId) {
                     $conflict = false;
                     $this->db->beginTransaction();
@@ -227,8 +232,10 @@ class Indicator extends Base
                             )
                         );
                         $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId, $folderId);
+                        $this->fixedIndicators[$sourceIndicatorId] = $result;
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
+                        $this->failedIndicators[$sourceIndicatorId] = $result;
                     }
 
                     if ($conflict) {

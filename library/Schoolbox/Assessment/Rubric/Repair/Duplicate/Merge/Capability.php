@@ -220,6 +220,11 @@ class Capability extends Base
             $capabilityIds = array_reverse($capabilityIds);
             while (count($capabilityIds) >= 2) {
                 $sourceCapabilityId = array_shift($capabilityIds);
+                $result             = [
+                    'id'       => $sourceCapabilityId,
+                    'name'     => $capabilityName,
+                    'folderId' => $folderId,
+                ];
                 foreach ($capabilityIds as $destinationCapabilityId) {
                     $conflict = false;
                     $this->db->beginTransaction();
@@ -235,8 +240,10 @@ class Capability extends Base
                         );
                         $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId, $folderId);
                         $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId, $folderId);
+                        $this->fixedCapabilities[$sourceCapabilityId] = $result;
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
+                        $this->failedCapabilities[$sourceCapabilityId] = $result;
                     }
 
                     if ($conflict) {
