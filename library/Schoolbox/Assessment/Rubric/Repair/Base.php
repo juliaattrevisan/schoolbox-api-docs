@@ -32,6 +32,27 @@ abstract class Base extends CliTool\App
     private const INDENT = '  ';
 
 
+    // Query for finding folders to repair.
+    // TODO consider skipping course/unit specs: another script repairs those
+    protected const FIND_FOLDERS_QUERY = '
+       SELECT
+           id, name
+       FROM folder
+       WHERE deleted_at IS NULL
+    ';
+
+
+    // Query for finding capabilities to repair within a folder.
+    protected const FIND_CAPABILITIES_QUERY = "
+        SELECT id, name
+        FROM   rubric_group
+        WHERE  parent_type = 'category'
+        AND    parent_id   = :folderId
+        AND    deleted_at  IS NULL
+        ORDER BY name, id
+    ";
+
+
     /**
      * @var Logger
      */

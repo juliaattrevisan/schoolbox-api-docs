@@ -35,28 +35,6 @@ use UnexpectedValueException;
  */
 class Capability extends Base
 {
-    /**************************** Folder queries ***************************/
-
-    private const FIND_FOLDERS_QUERY = '
-       SELECT
-           id, name
-       FROM folder
-       WHERE deleted_at IS NULL
-    ';
-
-
-    /**************************** Capability queries ***************************/
-
-    private const FIND_CAPABILITIES_QUERY = "
-        SELECT id, name
-        FROM   rubric_group
-        WHERE  parent_type = 'category'
-        AND    parent_id   = :folderId
-        AND    deleted_at IS NULL
-        ORDER BY name, id
-    ";
-
-
     /**************************** Indicator merging queries ***************************/
 
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
