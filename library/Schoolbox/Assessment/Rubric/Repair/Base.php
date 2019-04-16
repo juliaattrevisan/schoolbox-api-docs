@@ -253,6 +253,10 @@ abstract class Base extends CliTool\App
             $this->log->info('Running in dry-run mode: use -p to write changes to database');
         }
 
+        if (!empty($this->folders)) {
+            $this->log->info('Restricting to folders: ' . implode(',', $this->folders));
+        }
+
         $this->log->notice('-----');
         $this->repair();
         $this->log->notice('-----');
