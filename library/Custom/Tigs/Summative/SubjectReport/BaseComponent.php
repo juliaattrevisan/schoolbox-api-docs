@@ -128,7 +128,7 @@ class BaseComponent
      * @param int $semesterFrom
      * @param int|null $semesterTo
      */
-    public function setSemesters(int $semesterFrom, int $semesterTo = null): void
+    public function setSemesters(int $semesterFrom, ?int $semesterTo = null): void
     {
         $this->semesterFrom = $semesterFrom;
         if ($semesterTo) {
