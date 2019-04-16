@@ -236,7 +236,7 @@ class Capability extends Base
                                 $destinationCapabilityId
                             )
                         );
-                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId, $folderId);
+                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
                         $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId, $folderId);
                         $this->fixedCapabilities[$sourceCapabilityId] = $result;
                     } catch (UnexpectedValueException $e) {
@@ -268,12 +268,10 @@ class Capability extends Base
      *
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
-     * @param int $folderId
      */
     private function mergeCapabilityIndicators(
         int $destinationCapabilityId,
-        int $sourceCapabilityId,
-        int $folderId
+        int $sourceCapabilityId
     ): void {
         // Which indicators are within the original capability?
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
