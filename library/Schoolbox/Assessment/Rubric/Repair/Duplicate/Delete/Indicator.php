@@ -157,7 +157,7 @@ class Indicator extends Base
                     $groupedIndicators[$indName][] = $indId;
                 }
 
-                $this->deleteIndicators($groupedIndicators);
+                $this->deleteIndicators($groupedIndicators, $folderId);
             }
         }
     }
@@ -167,9 +167,9 @@ class Indicator extends Base
      * Attempt to delete any indicators.
      *
      * @param array $groupedIndicators key: indicator name, value: list of indicator IDs
-     * @throws Exception
+     * @param int   $folderId
      */
-    private function deleteIndicators(array $groupedIndicators): void
+    private function deleteIndicators(array $groupedIndicators, int $folderId): void
     {
         foreach ($groupedIndicators as $indicatorName => $indicatorIds) {
             $indicatorCount = count($indicatorIds);
@@ -197,8 +197,13 @@ class Indicator extends Base
                     );
                     $this->deleteIndicatorQuery->execute([
                         'indicatorId' => $indicatorId,
-                        'now'          => $this->now->getDatabase(),
+                        'now'         => $this->now->getDatabase(),
                     ]);
+                    $this->fixedIndicators[$indicatorId] = [
+                        'id'       => $indicatorId,
+                        'name'     => $indicatorName,
+                        'folderId' => $folderId,
+                    ];
                 } else {
                     $this->log->warning(
                         self::indent(2) . sprintf('refusing to delete indicator #%d, as it is in use', $indicatorId)

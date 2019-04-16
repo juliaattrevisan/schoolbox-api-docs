@@ -149,7 +149,7 @@ class Capability extends Base
                 $groupedCapabilities[$name][] = $id;
             }
 
-            $this->deleteCapabilities($groupedCapabilities);
+            $this->deleteCapabilities($groupedCapabilities, $folderId);
         }
     }
 
@@ -158,9 +158,9 @@ class Capability extends Base
      * Attempt to delete any capabilities.
      *
      * @param array $groupedCapabilities key: capability name, value: list of capability IDs
-     * @throws Exception
+     * @param int   $folderId
      */
-    private function deleteCapabilities(array $groupedCapabilities): void
+    private function deleteCapabilities(array $groupedCapabilities, int $folderId): void
     {
         foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
             $capabilityCount = count($capabilityIds);
@@ -192,6 +192,11 @@ class Capability extends Base
                         'capabilityId' => $capabilityId,
                         'now'          => $this->now->getDatabase(),
                     ]);
+                    $this->fixedCapabilities[$capabilityId] = [
+                        'id'       => $capabilityId,
+                        'name'     => $capabilityName,
+                        'folderId' => $folderId,
+                    ];
                 } else {
                     $this->log->warning(
                         self::indent(2) . sprintf('refusing to delete capability #%d, as it is in use', $capabilityId)
