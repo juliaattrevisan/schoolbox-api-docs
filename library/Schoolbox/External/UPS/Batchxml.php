@@ -14,15 +14,16 @@ namespace Schoolbox\External\UPS;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
-
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 class Batchxml implements ISync
 {
 
     /**
-     * @var Loader
+     * @var Batchxml
      */
-    private $config;
+    private $api;
 
 
     /**
@@ -30,8 +31,14 @@ class Batchxml implements ISync
      */
     public function __construct()
     {
-        $this->config = new Loader();
+        $config = new Loader();
+
+        $host = $config->get('external_ups_provider_batchxml_host');
+        $key = $config->get('external_ups_provider_batchxml_key');
+
+        $this->api = new Batchxml\Api($host, $key);
     }
+
 
     /**
      * Gets a collection of normalized student objects.
@@ -40,19 +47,18 @@ class Batchxml implements ISync
      * efficiency reasons.
      *
      * @return User\Student[]
+     * @throws \RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function findAllStudents(): array
     {
-        $host = $this->config->get('external_ups_provider_batchxml_host');
-        $key = $this->config->get('external_ups_provider_batchxml_key');
 
         /* Faster, for now
          */
-//        $ba = new Batchxml\Api($host, $key);
-//        $result = $ba->retrieveDocument();
+//        $result = $this->api->retrieveDocument();
 
         $result = file_get_contents('../library/Schoolbox/External/UPS/Batchxml/temp.xml');
-
 
 
 
