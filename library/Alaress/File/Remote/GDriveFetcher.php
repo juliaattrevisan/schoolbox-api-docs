@@ -290,15 +290,18 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata): string
     {
-        if ($this->isPdfExportEnabled($metadata)) {
-            // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-            $ext = 'pdf';
-        } else {
-
-            /* Inspect metadata fields to find a file extension
-             */
-            $ext = $this->inspectFileExtension($metadata);
+        /* if there is a PDF-export option for this file (and the config is set to do pdf export),
+         * always give that preference
+         *
+         * There seems to be different behaviour for pdf-able files and other ones
+         */
+        if ($this->isPdfExportEnabled($metadata) && isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
+            return "{$metadata['title']}.pdf";
         }
+
+        /* Inspect metadata fields to find a file extension
+         */
+        $ext = $this->inspectFileExtension($metadata);
 
         return "{$metadata['title']}.{$ext}";
     }
