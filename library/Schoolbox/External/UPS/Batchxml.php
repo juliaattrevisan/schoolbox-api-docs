@@ -11,12 +11,27 @@
 
 namespace Schoolbox\External\UPS;
 
+use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
 
 
 class Batchxml implements ISync
 {
+
+    /**
+     * @var Loader
+     */
+    private $config;
+
+
+    /**
+     * Batchxml constructor.
+     */
+    public function __construct()
+    {
+        $this->config = new Loader();
+    }
 
     /**
      * Gets a collection of normalized student objects.
@@ -26,9 +41,23 @@ class Batchxml implements ISync
      *
      * @return User\Student[]
      */
-    public function findAllStudents()
+    public function findAllStudents(): array
     {
-        // TODO: Implement findAllStudents() method.
+        $host = $this->config->get('external_ups_provider_batchxml_host');
+        $key = $this->config->get('external_ups_provider_batchxml_key');
+
+        /* Faster, for now
+         */
+//        $ba = new Batchxml\Api($host, $key);
+//        $result = $ba->retrieveDocument();
+
+        $result = file_get_contents('../library/Schoolbox/External/UPS/Batchxml/temp.xml');
+
+
+
+
+
+        return [];
     }
 
 
