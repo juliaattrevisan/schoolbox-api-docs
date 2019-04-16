@@ -252,6 +252,7 @@ abstract class Base extends CliTool\App
         }
 
         $this->repair();
+        $this->summarizeResult();
 
         if ($this->perform()) {
             $this->log->alert('Changes written to database');
@@ -259,7 +260,6 @@ abstract class Base extends CliTool\App
             $this->log->alert('Dry-run complete - no changes written to database');
         }
 
-        $this->summarizeResult();
     }
 
 
