@@ -11,6 +11,7 @@
 
 namespace Schoolbox\External\UPS;
 
+use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
@@ -55,7 +56,7 @@ class Batchxml implements ISync
 
         $students = $nodes->xpath('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-        $collection = new \Schoolbox\Collection();
+        $collection = new Collection();
 
         foreach ($students as $currentResult) {
             $student = new User\Student();
