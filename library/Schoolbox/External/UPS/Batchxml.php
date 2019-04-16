@@ -14,7 +14,6 @@ namespace Schoolbox\External\UPS;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
-use Schoolbox\External\UPS\Batchxml\StudentIterator;
 
 class Batchxml implements ISync
 {
@@ -56,7 +55,39 @@ class Batchxml implements ISync
 
         $students = $nodes->xpath('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-        return new StudentIterator(new \ArrayIterator($students));
+        $collection = new \Schoolbox\Collection();
+
+        foreach ($students as $currentResult) {
+            $student = new User\Student();
+
+            $student
+                ->setId((string)$currentResult->SchoolCode)
+                ->setTitle((string)$currentResult->Title)
+                ->setGivenName((string)$currentResult->Forename)
+                ->setPreferredName((string)$currentResult->Preferredname)
+                ->setLastname((string)$currentResult->Surname)
+                ->setGender((string)$currentResult->Gender);
+
+            $student
+                ->getYear()
+                    ->setDescription((string)$currentResult->Form)
+                    ->setLevel((string)$currentResult->NCYear);
+
+            $student
+                ->getHouse()
+                    ->setCode((string)$currentResult->AcademicHouse);
+
+            $student
+                ->getAccount()
+                    ->setLogin((string)$currentResult->UserName);
+
+            $student
+                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+            $collection->add($student);
+        }
+
+        return $collection;
     }
 
 
