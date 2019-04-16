@@ -21,6 +21,23 @@ Data:
     ibGraphData          array          - Data to render the MYP/DP Graph component
     nesaGraphData        array          - Data to render the NESA Score Graph component
 #}
+<style>
+    .linked-unit-heading {
+        color: inherit;
+    }
+
+    .grade-graph {
+        margin-bottom: 30px;
+    }
+
+    .grade-heading {
+        text-align: center;
+        margin-bottom: 0;
+    }
+    .has-gradient {
+        color: white;
+    }
+</style>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="row">
     <div class="island small-12">
@@ -126,7 +143,7 @@ Data:
                 {# Do we have a link to an AAS assessment for this unit? #}
                 {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
                 {% if unitRoute %}
-                    <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link" style="color: inherit;"></span>{{ unitSpec.title }}</a></h2>
+                    <h2 class="subheader"><a href="{{ unitRoute }}"><span class="icon-link linked-unit-heading"></span>{{ unitSpec.title }}</a></h2>
                 {% else %}
                     <h2 class="subheader">{{ unitSpec.title }}</h2>
                 {% endif %}
