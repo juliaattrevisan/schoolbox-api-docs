@@ -267,7 +267,6 @@ abstract class Base extends CliTool\App
      * @param string $subject
      * @param array  $context
      * @return void
-     * @throws Swift_SwiftException if the mail couldn't be sent
      */
     protected function sendMail(string $subject, array $context): void
     {
@@ -278,7 +277,11 @@ abstract class Base extends CliTool\App
             $mailer->setFrom($this->getConfig()->get('mail_from_address'));
             $mailer->setSubject($subject);
             $mailer->setContext($context);
-            $mailer->send($this->getOpt(self::OPT_LONG_MAILTO));
+            try {
+                $mailer->send($mailto);
+            } catch (Swift_SwiftException $e) {
+                $this->log->error(sprintf('Could not send mail to "%s"', $mailto));
+            }
         }
     }
 
