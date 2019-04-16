@@ -128,14 +128,6 @@ class Indicator extends Base
     private $findCapabilityIndicatorsQuery;
 
 
-    /**
-     * Query for merging an indicator from a duplicate to the original capability.
-     *
-     * @var IQuery
-     */
-    private $mergeCapabilityIndicatorQuery;
-
-
     /**************************** Prepared usage merging queries ***************************/
 
     /**
