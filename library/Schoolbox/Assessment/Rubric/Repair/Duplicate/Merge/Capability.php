@@ -174,7 +174,7 @@ class Capability extends Base
                 continue;
             }
 
-            $this->log->info(
+            $this->log->notice(
                 sprintf(
                     'Checking folder #%d (%s)',
                     $folderId,

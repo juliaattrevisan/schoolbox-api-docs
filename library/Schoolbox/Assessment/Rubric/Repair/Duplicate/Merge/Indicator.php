@@ -157,7 +157,7 @@ class Indicator extends Base
                 continue;
             }
 
-            $this->log->info(
+            $this->log->notice(
                 sprintf(
                     'Checking folder #%d (%s)',
                     $folderId,
@@ -173,7 +173,7 @@ class Indicator extends Base
             }
 
             foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $capId => $capName) {
-                $this->log->info(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $capName));
+                $this->log->notice(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $capName));
                 $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $capId]);
                 if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
                     $this->log->debug(self::indent(2) . 'capability contains no indicators: no action required');
