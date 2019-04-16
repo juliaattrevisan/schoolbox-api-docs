@@ -13,9 +13,11 @@ use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Psr\Log\LoggerInterface as Logger;
+use RuntimeException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
+use Scrub;
 use Swift_SwiftException;
 
 /**
@@ -313,5 +315,84 @@ abstract class Base extends CliTool\App
     /**
      * Output a summary of the results of this script.
      */
-    protected abstract function summarizeResult(): void;
+    protected function summarizeResult(): void
+    {
+        // A cap/ind/work might have been reported as both fixed and failed,
+        // if one part of the fix worked but another didn't.
+        $fixedCapabilities = array_diff_key($this->fixedCapabilities, $this->failedCapabilities);
+        $fixedIndicators   = array_diff_key($this->fixedIndicators, $this->failedIndicators);
+        $fixedDueWorks     = array_diff_key($this->fixedDueWorks, $this->failedDueWorks);
+        $this->log->notice('This script repaired:');
+        $this->log->notice(self::indent(1) . sprintf('%d capabilities', count($fixedCapabilities)));
+        $this->log->notice(self::indent(1) . sprintf('%d indicators', count($fixedIndicators)));
+        $this->log->notice(self::indent(1) . sprintf('%d due works', count($fixedDueWorks)));
+
+
+        // Collate a list of failures
+        $failures = [];
+        foreach ($this->failedCapabilities as $id => $data) {
+            $failures[$data['folderId']]['capability:' . $id] = [
+                'name' => $data['name'],
+                'type' => 'capability',
+            ];
+        }
+        foreach ($this->failedIndicators as $id => $data) {
+            $failures[$data['folderId']]['indicator:' . $id] = [
+                'name' => $data['name'],
+                'type' => 'indicator',
+            ];
+        }
+        foreach ($this->failedDueWorks as $id => $data) {
+            $failures[$data['folderId']]['duework:' . $id] = [
+                'name' => $data['name'],
+                'type' => 'duework',
+            ];
+        }
+
+
+        // Report on what failed
+        $failedCapabilityCount = count($this->failedCapabilities);
+        $failedIndicatorCount  = count($this->failedIndicators);
+        $failedDueWorkCount    = count($this->failedDueWorks);
+        if (($failedCapabilityCount + $failedIndicatorCount + $failedDueWorkCount) > 0) {
+            $this->log->warning('Manual intervention is required to repair:');
+            if ($failedCapabilityCount > 0) {
+                $this->log->notice(self::indent(1) . sprintf('%d capabilities:', $failedCapabilityCount));
+                foreach ($this->failedCapabilities as $failedCapability) {
+                    //
+                }
+            }
+            if ($failedIndicatorCount > 0) {
+                $this->log->notice(self::indent(1) . sprintf('%d indicators:', $failedIndicatorCount));
+            }
+            if ($failedDueWorkCount > 0) {
+                $this->log->notice(self::indent(1) . sprintf('%d due works:', $failedDueWorkCount));
+            }
+
+            foreach ($failures as $folderId => $failure) {
+
+            }
+
+            $subject = sprintf(
+                '%d due work(s) must be fixed manually before merge can complete',
+                count($this->failedDueWorks)
+            );
+            $this->log->warning($subject);
+            $failedDueWorkUrls = [];
+            foreach ($this->failedDueWorks as $failedDueWorkId) {
+                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
+                    'https://%s/learning/assessments/%d/modify',
+                    $this->fqdn,
+                    $failedDueWorkId
+                );
+                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
+            }
+
+            $this->sendMail(
+                $subject,
+                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failedDueWorkUrls)),]
+            );
+            throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
+        }
+    }
 }
