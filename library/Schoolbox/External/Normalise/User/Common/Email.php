@@ -31,10 +31,12 @@ class Email {
      * Set address
      *
      * @param string $address
+     * @return $this
      */
     public function setAddress($address)
     {
         $this->address = $address;
+        return $this;
     }
 
     /**
