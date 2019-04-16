@@ -130,16 +130,6 @@ class Capability extends Base
 
 
     /**
-     * Due works which failed to merge for whatever reason.
-     *
-     * These must be fixed manually for each instance.
-     *
-     * @var array|int[]
-     */
-    private $failedDueWorks = [];
-
-
-    /**
      * Setup all queries this script requires.
      */
     protected function setupQueries(): void

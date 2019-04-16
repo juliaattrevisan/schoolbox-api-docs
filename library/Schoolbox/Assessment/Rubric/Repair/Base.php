@@ -70,6 +70,66 @@ abstract class Base extends CliTool\App
 
 
     /**
+     * Which capabilities have been fixed by this script?
+     *
+     * @var array|array[] key:   capability ID
+     *                    value: array with keys "name", "folderId"
+     */
+    protected $fixedCapabilities = [];
+
+
+    /**
+     * Which capabilities were not able to be fixed?
+     *
+     * These must be fixed manually for each instance.
+     *
+     * @var array|array[] key:   capability ID
+     *                    value: array with keys "name", "folderId"
+     */
+    protected $failedCapabilities = [];
+
+
+    /**
+     * Which indicators have been fixed by this script?
+     *
+     * @var array|array[] key:   indicator ID
+     *                    value: array with keys "name", "folderId"
+     */
+    protected $fixedIndicators = [];
+
+
+    /**
+     * Which indicators have been fixed by this script?
+     *
+     * These must be fixed manually for each instance.
+     *
+     * @var array|array[] key:   indicator ID
+     *                    value: array with keys "name", "folderId"
+     */
+    protected $failedIndicators = [];
+
+
+    /**
+     * Which due works have been fixed by this script?
+     *
+     * @var array|array[] key:   assessment ID
+     *                    value: array with keys "name", "folderId"
+     */
+    protected $fixedDueWorks = [];
+
+
+    /**
+     * Which due works could not be fixed by this script?
+     *
+     * These must be fixed manually for each instance.
+     *
+     * @var array|array[] key:   assessment ID
+     *                    value: array with keys "name", "folderId"
+     */
+    protected $failedDueWorks = [];
+
+
+    /**
      * @inheritdoc
      */
     public function getShortOpts(): array
