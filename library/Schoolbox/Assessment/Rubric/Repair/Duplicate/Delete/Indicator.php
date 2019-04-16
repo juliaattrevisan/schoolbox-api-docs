@@ -15,17 +15,17 @@ use Schoolbox\Assessment\Rubric\Repair\Base;
 /**
  * Script for deleting empty duplicate rubric indicators.
  *
- * In the past it may have been possible to create more than one capability
- * with the same name in a folder.
+ * In the past it may have been possible to create more than one indicator with
+ * the same name in a capability.
  * This is now validated against, but broken data still exists for some schools.
  *
  * This script:
  * * finds all capabilities within a folder
- * * for any duplicate capabilities:
- * ** if it's neither in use on any due works, nor containing any indicators:
+ * * for any duplicate indicators:
+ * ** if it's not in use on any due works:
  * *** deletes the capability
  *
- * This script will raise an error (and not continue to merge the capability)
+ * This script will raise an error (and not continue to merge the indicator)
  * if both the original and duplicate are in use on the same assessment.
  */
 class Indicator extends Base

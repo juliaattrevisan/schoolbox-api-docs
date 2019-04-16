@@ -23,12 +23,12 @@ use UnexpectedValueException;
  * This script:
  * * finds all indicators within a capability
  * * for any duplicate indicators:
- * ** moves usages within the duplicate into the original
- * ** moves descriptors within the duplicate into the original
+ * ** moves usages of the duplicate to the original
+ * ** moves descriptors of the duplicate to the original
  * *** moving descriptors will also move marks given to those descriptors,
  *     so they don't need to be moved separately.
  *
- * This script will raise an error (and not continue to merge the capability)
+ * This script will raise an error (and not continue to merge the indicator)
  * if both the original and duplicate are in use on the same assessment.
  */
 class Indicator extends Base
