@@ -209,7 +209,7 @@ class Indicator extends Base
                     $groupedIndicators[$indName][] = $indId;
                 }
 
-                $this->mergeIndicators($groupedIndicators);
+                $this->mergeIndicators($groupedIndicators, $folderId);
             }
         }
     }
@@ -219,9 +219,10 @@ class Indicator extends Base
      * Attempt to merge this set of indicators by removing any duplicates.
      *
      * @param array $groupedIndicators key: indicator name, value: list of indicator IDs
+     * @param int   $folderId
      * @throws Exception
      */
-    private function mergeIndicators(array $groupedIndicators): void
+    private function mergeIndicators(array $groupedIndicators, int $folderId): void
     {
         foreach ($groupedIndicators as $indicatorName => $indicatorIds) {
             $indicatorCount = count($indicatorIds);
@@ -257,7 +258,7 @@ class Indicator extends Base
                                 $destinationIndicatorId
                             )
                         );
-                        $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId);
+                        $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId, $folderId);
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
                     }
@@ -290,9 +291,10 @@ class Indicator extends Base
      *
      * @param int $destinationIndicatorId
      * @param int $sourceIndicatorId
+     * @param int $folderId
      * @throws UnexpectedValueException if due work uses both indicators
      */
-    private function mergeIndicatorUsages(int $destinationIndicatorId, int $sourceIndicatorId): void
+    private function mergeIndicatorUsages(int $destinationIndicatorId, int $sourceIndicatorId, int $folderId): void
     {
         // Which due works use the original indicator?
         $this->findIndicatorUsagesQuery->execute(['indicatorId' => $destinationIndicatorId]);
@@ -315,16 +317,20 @@ class Indicator extends Base
 
             // Do any due works use both the source and destination indicator?
             // If so that's an error.
+            $result = [
+                'id'       => $duplicateDueWork['id'],
+                'name'     => $duplicateDueWork['title'],
+                'folderId' => $folderId,
+            ];
             if (in_array($duplicateDueWork['id'], $originalDueWorkIds, true)) {
                 $this->log->warning(
                     self::indent(5) . 'indicator is used by both source and destination due work: aborting'
                 );
-                $failedDueWorks[$duplicateDueWork['id']] = [
-                    'id'   => $duplicateDueWork['id'],
-                    'name' => $duplicateDueWork['title'],
-                ];
+                $failedDueWorks[$duplicateDueWork['id']] = $result;
                 continue;
             }
+
+            $this->fixedDueWorks[$duplicateDueWork['id']] = $result;
 
             $this->mergeIndicatorUsageQuery->execute([
                 'originalIndicatorId'  => $destinationIndicatorId,

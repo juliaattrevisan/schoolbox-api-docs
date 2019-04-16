@@ -218,7 +218,7 @@ class Capability extends Base
                 $groupedCapabilities[$name][] = $id;
             }
 
-            $this->mergeCapabilities($groupedCapabilities);
+            $this->mergeCapabilities($groupedCapabilities, $folderId);
         }
     }
 
@@ -227,9 +227,9 @@ class Capability extends Base
      * Attempt to merge this set of capabilities by removing any duplicates.
      *
      * @param array $groupedCapabilities key: capability name, value: list of capability IDs
-     * @throws Exception
+     * @param int   $folderId
      */
-    private function mergeCapabilities(array $groupedCapabilities): void
+    private function mergeCapabilities(array $groupedCapabilities, int $folderId): void
     {
         foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
             $capabilityCount = count($capabilityIds);
@@ -265,8 +265,8 @@ class Capability extends Base
                                 $destinationCapabilityId
                             )
                         );
-                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
-                        $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId);
+                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId, $folderId);
+                        $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId, $folderId);
                     } catch (UnexpectedValueException $e) {
                         $conflict = true;
                     }
@@ -295,8 +295,9 @@ class Capability extends Base
      *
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
+     * @param int $folderId
      */
-    private function mergeCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId): void
+    private function mergeCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId, int $folderId): void
     {
         // Which indicators are within the original capability?
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
@@ -341,9 +342,10 @@ class Capability extends Base
      *
      * @param int $destinationCapabilityId
      * @param int $sourceCapabilityId
+     * @param int $folderId
      * @throws UnexpectedValueException if due work uses both capabilities
      */
-    private function mergeCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId): void
+    private function mergeCapabilityUsages(int $destinationCapabilityId, int $sourceCapabilityId, int $folderId): void
     {
         // Which due works use the original capability?
         $this->findCapabilityUsagesQuery->execute(['capabilityId' => $destinationCapabilityId]);
@@ -366,16 +368,20 @@ class Capability extends Base
 
             // Do any due works use both the source and destination capability?
             // If so that's an error.
+            $result = [
+                'id'       => $duplicateDueWork['id'],
+                'name'     => $duplicateDueWork['title'],
+                'folderId' => $folderId,
+            ];
             if (in_array($duplicateDueWork['id'], $originalDueWorkIds, true)) {
                 $this->log->warning(
                     self::indent(4) . 'capability is used by both source and destination due work: aborting'
                 );
-                $failedDueWorks[$duplicateDueWork['id']] = [
-                    'id'   => $duplicateDueWork['id'],
-                    'name' => $duplicateDueWork['title'],
-                ];
+                $failedDueWorks[$duplicateDueWork['id']] = $result;
                 continue;
             }
+
+            $this->fixedDueWorks[$duplicateDueWork['id']] = $result;
 
             $this->mergeCapabilityUsageQuery->execute([
                 'originalCapabilityId'  => $destinationCapabilityId,
