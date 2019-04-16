@@ -245,6 +245,8 @@ abstract class Base extends CliTool\App
         $this->setupCommonQueries();
         $this->setupQueries();
 
+        $this->outputIntro();
+
         if ($this->perform()) {
             $this->log->info('Running in perform mode (-p): changes will be written to database');
         } else {
@@ -252,7 +254,7 @@ abstract class Base extends CliTool\App
         }
 
         $this->repair();
-        $this->summarizeResult();
+        $this->outputSummary();
 
         if ($this->perform()) {
             $this->log->alert('Changes written to database');
@@ -313,9 +315,15 @@ abstract class Base extends CliTool\App
 
 
     /**
-     * Output a summary of the results of this script.
+     * Output a summary of what this script will do.
      */
-    protected function summarizeResult(): void
+    protected abstract function outputIntro(): void;
+
+
+    /**
+     * Output a summary of what this script did.
+     */
+    protected function outputSummary(): void
     {
         // A cap/ind/work might have been reported as both fixed and failed,
         // if one part of the fix worked but another didn't.

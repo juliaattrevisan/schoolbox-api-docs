@@ -145,6 +145,16 @@ class Capability extends Base
 
 
     /**
+     * @inheritDoc
+     */
+    protected function outputIntro(): void
+    {
+        $this->log->notice('Merging duplicate capabilities');
+        $this->log->notice('This script will not merge duplicates which are both used by the same due work');
+    }
+
+
+    /**
      * Run this script's repair process.
      *
      * @throws Exception

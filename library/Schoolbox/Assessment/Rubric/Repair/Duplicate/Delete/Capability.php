@@ -108,6 +108,15 @@ class Capability extends Base
 
 
     /**
+     * @inheritDoc
+     */
+    protected function outputIntro(): void
+    {
+        $this->log->notice('Deleting empty duplicate capabilities that are not in use');
+    }
+
+
+    /**
      * Run this script's repair process.
      *
      * @throws Exception
