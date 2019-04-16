@@ -10,9 +10,7 @@ namespace Schoolbox\Assessment\Rubric\Repair\Duplicate\Delete;
 
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
-use RuntimeException;
 use Schoolbox\Assessment\Rubric\Repair\Base;
-use Scrub;
 
 /**
  * Script for deleting empty duplicate rubric capabilities.

@@ -10,9 +10,7 @@ namespace Schoolbox\Assessment\Rubric\Repair\Duplicate\Merge;
 
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
-use RuntimeException;
 use Schoolbox\Assessment\Rubric\Repair\Base;
-use Scrub;
 use UnexpectedValueException;
 
 /**
@@ -234,7 +232,7 @@ class Indicator extends Base
                         $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId, $folderId);
                         $this->fixedIndicators[$sourceIndicatorId] = $result;
                     } catch (UnexpectedValueException $e) {
-                        $conflict = true;
+                        $conflict                                   = true;
                         $this->failedIndicators[$sourceIndicatorId] = $result;
                     }
 

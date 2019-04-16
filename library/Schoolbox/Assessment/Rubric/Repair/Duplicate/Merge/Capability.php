@@ -10,9 +10,7 @@ namespace Schoolbox\Assessment\Rubric\Repair\Duplicate\Merge;
 
 use Alaress\Database\Exception;
 use Alaress\Database\Statement\Query\IQuery;
-use RuntimeException;
 use Schoolbox\Assessment\Rubric\Repair\Base;
-use Scrub;
 use UnexpectedValueException;
 
 /**
@@ -242,7 +240,7 @@ class Capability extends Base
                         $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId, $folderId);
                         $this->fixedCapabilities[$sourceCapabilityId] = $result;
                     } catch (UnexpectedValueException $e) {
-                        $conflict = true;
+                        $conflict                                      = true;
                         $this->failedCapabilities[$sourceCapabilityId] = $result;
                     }
 
@@ -272,8 +270,11 @@ class Capability extends Base
      * @param int $sourceCapabilityId
      * @param int $folderId
      */
-    private function mergeCapabilityIndicators(int $destinationCapabilityId, int $sourceCapabilityId, int $folderId): void
-    {
+    private function mergeCapabilityIndicators(
+        int $destinationCapabilityId,
+        int $sourceCapabilityId,
+        int $folderId
+    ): void {
         // Which indicators are within the original capability?
         $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $destinationCapabilityId]);
         $originalIndicators = $this->findCapabilityIndicatorsQuery->fetchColumnArray('name', 'id');
