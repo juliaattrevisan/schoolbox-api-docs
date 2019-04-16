@@ -253,8 +253,11 @@ abstract class Base extends CliTool\App
             $this->log->info('Running in dry-run mode: use -p to write changes to database');
         }
 
+        $this->log->notice('-----');
         $this->repair();
+        $this->log->notice('-----');
         $this->outputSummary();
+        $this->log->notice('-----');
 
         if ($this->perform()) {
             $this->log->alert('Changes written to database');
