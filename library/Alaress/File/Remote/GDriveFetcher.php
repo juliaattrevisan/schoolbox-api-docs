@@ -53,22 +53,22 @@ class GDriveFetcher implements FetcherInterface
         /* Powerpoint slides
          */
         'application/vnd.google-apps.presentation' => [
-            'exportLinks' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'ext' => 'pptx',
+            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            self::CONTEXT_EXTENSION => 'pptx',
         ],
 
         /* Word doc
          */
         'application/vnd.google-apps.document' => [
-            'exportLinks' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'ext' => 'docx',
+            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            self::CONTEXT_EXTENSION => 'docx',
         ],
 
         /* Spreadsheets
          */
         'application/vnd.google-apps.spreadsheet' => [
-            'exportLinks' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'ext' => 'xlsx'
+            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            self::CONTEXT_EXTENSION => 'xlsx'
         ]
     ];
 
