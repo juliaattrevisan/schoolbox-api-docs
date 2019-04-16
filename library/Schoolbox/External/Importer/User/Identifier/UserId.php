@@ -8,8 +8,8 @@
 namespace Schoolbox\External\Importer\User\Identifier;
 
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
+use function trim;
 
 /**
  * Identifies a user based on the Schoolbox user ID in the row.
@@ -38,7 +38,7 @@ class UserId implements IdentifierInterface
      */
     public function accept($row)
     {
-        return strlen($row['Schoolbox User ID']) > 0;
+        return trim($row['Schoolbox User ID'] ?? '') !== '';
     }
 
     /**
