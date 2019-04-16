@@ -14,8 +14,7 @@ namespace Schoolbox\External\UPS;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Schoolbox\External\UPS\Batchxml\StudentIterator;
 
 class Batchxml implements ISync
 {
@@ -41,29 +40,23 @@ class Batchxml implements ISync
 
 
     /**
-     * Gets a collection of normalized student objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return User\Student[]
-     * @throws \RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
+     * {@inheritDoc}
      */
-    public function findAllStudents(): array
+    public function findAllStudents()
     {
 
         /* Faster, for now
          */
-//        $result = $this->api->retrieveDocument();
+//        $xml = $this->api->retrieveDocument();
 
-        $result = file_get_contents('../library/Schoolbox/External/UPS/Batchxml/temp.xml');
+        $source = __DIR__ .'/../../../../www/temp.xml';
+        $xml = file_get_contents($source);
 
+        $nodes = new \SimpleXMLElement($xml);
 
+        $students = $nodes->xpath('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-
-        return [];
+        return new StudentIterator(new \ArrayIterator($students));
     }
 
 
