@@ -376,8 +376,8 @@ abstract class Base extends CliTool\App
             }
 
             if ($failedIndicatorCount > 0) {
-                $this->log->notice(self::indent(1) . sprintf('%d indicators:', $failedIndicatorCount));
-                foreach ($this->failedCapabilities as $id => $data) {
+                $this->log->warning(self::indent(1) . sprintf('%d indicators:', $failedIndicatorCount));
+                foreach ($this->failedIndicators as $id => $data) {
                     $failures[] = $failureMsg = sprintf(
                         $folderBaseUrl . ' indicator #%d (%s)',
                         $this->fqdn,
@@ -390,8 +390,8 @@ abstract class Base extends CliTool\App
             }
 
             if ($failedDueWorkCount > 0) {
-                $this->log->notice(self::indent(1) . sprintf('%d due works:', $failedDueWorkCount));
-                foreach ($this->failedCapabilities as $id => $data) {
+                $this->log->warning(self::indent(1) . sprintf('%d due works:', $failedDueWorkCount));
+                foreach ($this->failedDueWorks as $id => $data) {
                     $failures[] = $failureMsg = sprintf(
                         $folderBaseUrl . ' due work ' . $dueWorkBaseUrl . ' (%s)',
                         $this->fqdn,
@@ -405,16 +405,6 @@ abstract class Base extends CliTool\App
             }
 
             $subject = 'Some data must be fixed manually before merge can complete';
-//            $failedDueWorkUrls = [];
-//            foreach ($this->failedDueWorks as $failedDueWorkId) {
-//                $failedDueWorkUrls[] = $failedDueWorkUrl = sprintf(
-//                    'https://%s/learning/assessments/%d/modify',
-//                    $this->fqdn,
-//                    $failedDueWorkId
-//                );
-//                $this->log->warning(self::indent(1) . $failedDueWorkUrl);
-//            }
-
             $this->sendMail(
                 $subject,
                 ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failures)),]
