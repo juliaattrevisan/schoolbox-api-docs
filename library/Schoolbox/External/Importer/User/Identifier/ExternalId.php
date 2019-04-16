@@ -11,6 +11,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
+use function trim;
 
 /**
  * Identifies a user based on the external ID and role type in the row.
@@ -46,7 +47,7 @@ class ExternalId implements IdentifierInterface
      */
     public function accept($row)
     {
-        return strlen($row['External ID']) && strlen($row['Role']);
+        return trim($row['External ID'] ?? '') !== '' && trim($row['Role'] ?? '') !== '';
     }
 
     /**

@@ -15,6 +15,7 @@ namespace Schoolbox\External\Importer\UserProfile\Hydrator;
 use Schoolbox\External\UserProfile as UserProfileModel;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use function trim;
 
 /**
  * Sets a field in the user based on the value of a key in the imported row,
@@ -61,7 +62,7 @@ class Date implements HydratorInterface
         /* If $this->fieldname has no length
          * Assume null data
          */
-        if (!strlen(trim($row[$this->fieldname]))) {
+        if (trim($row[$this->fieldname] ?? '') === '') {
             return call_user_func([$user, $this->setMethod], new Alaress_Date_NullDate());
         }
 
