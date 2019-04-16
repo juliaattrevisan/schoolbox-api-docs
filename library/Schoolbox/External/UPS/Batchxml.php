@@ -44,12 +44,12 @@ class Batchxml implements ISync
     public function findAllStudents()
     {
 
+        $xml = $this->api->retrieveDocument();
+
         /* Faster, for now
          */
-//        $xml = $this->api->retrieveDocument();
-
-        $source = __DIR__ .'/../../../../www/temp.xml';
-        $xml = file_get_contents($source);
+//        $source = __DIR__ .'/../../../../www/temp.xml';
+//        $xml = file_get_contents($source);
 
         $nodes = new \SimpleXMLElement($xml);
 
