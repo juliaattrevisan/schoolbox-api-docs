@@ -157,7 +157,13 @@ class Indicator extends Base
                     $groupedIndicators[$indName][] = $indId;
                 }
 
+                $this->db->beginTransaction();
                 $this->deleteIndicators($groupedIndicators, $folderId);
+                if ($this->perform()) {
+                    $this->db->commit();
+                } else {
+                    $this->db->rollBack();
+                }
             }
         }
     }
