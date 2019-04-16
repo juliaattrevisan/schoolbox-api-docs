@@ -34,12 +34,19 @@ abstract class Base extends CliTool\App
 
 
     // Query for finding folders to repair.
-    // TODO consider skipping course/unit specs: another script repairs those
+    // Don't repair course spec or unit spec folders: there's already a script
+    // for those (tools/rubric/repairSpecAssessments.php)
     protected const FIND_FOLDERS_QUERY = '
-       SELECT
-           id, name
-       FROM folder
-       WHERE deleted_at IS NULL
+        SELECT DISTINCT
+            f.id,
+            f.name
+        FROM      folder                    f
+        LEFT JOIN course_specification      cs  ON f.id = cs.folder_id
+        LEFT JOIN course_unit_specification cus ON f.id = cus.course_specification_id
+        WHERE f.deleted_at IS NULL
+        AND   (cs.id  IS NULL OR cs.deleted_at  IS NOT NULL)
+        AND   (cus.id IS NULL OR cus.deleted_at IS NOT NULL)
+        ORDER BY f.id
     ';
 
 
