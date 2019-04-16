@@ -12,7 +12,7 @@ Data:
 {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
 {% set normalisedMark = studentMarks[studentMark] / (studentMarks | length) * 100 %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(normalisedMark) ~ '-bg' %}
-
+{% set graphId = 'nesa-graph' ~ semester %}
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
@@ -61,7 +61,7 @@ Data:
                     data.push(column);
                 }
 
-                $("#nesa-graph").highcharts({
+                $("#{{ graphId }}").highcharts({
                     legend: {
                         enabled: false
                     },
@@ -99,5 +99,5 @@ Data:
             });
         </script>
     {% endautoescape %}
-    <div id="nesa-graph" class="grade-graph"></div>
+    <div id="{{ graphId }}" class="grade-graph"></div>
 {% endif %}

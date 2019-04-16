@@ -106,9 +106,9 @@ Data:
 <div class="row">
     <div class="column small-12 medium-6">
         {% if ibGraphData %}
-            {% if ibGraphData.showComponent %}
-                {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibGraphData only %}
-            {% endif %}
+            {% for ibData in ibGraphData %}
+                {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData only %}
+            {% endfor %}
         {% elseif hscRankData %}
             {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData only %}
         {% else %}
@@ -117,9 +117,22 @@ Data:
     </div>
 
     <div class="column small-12 medium-6">
-        {% if nesaGraphData and nesaGraphData.showComponent %}
-            <h2 class="subheader">NESA Grade</h2>
-            {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData only %}
+        {% if nesaGraphData.0 %}
+            <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.0.semester }})</h2>
+            {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0 only %}
+        {% else %}
+            <p></p>
+        {% endif %}
+    </div>
+
+    <div class="column small-12 medium-6">
+            <p><!-- New Curriculum Year Report--></p>
+    </div>
+
+    <div class="column small-12 medium-6">
+        {% if nesaGraphData.1 %}
+            <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.1.semester }})</h2>
+            {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1 only %}
         {% else %}
             <p></p>
         {% endif %}
