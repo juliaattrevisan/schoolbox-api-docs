@@ -83,26 +83,6 @@ class Capability extends Base
     ';
 
 
-    /**************************** Prepared folder queries ***************************/
-
-    /**
-     * Query for finding folders which have had a unit imported into them.
-     *
-     * @var IQuery
-     */
-    private $findFoldersQuery;
-
-
-    /**************************** Prepared capability queries ***************************/
-
-    /**
-     * Query for finding rubric capabilities in a folder.
-     *
-     * @var IQuery
-     */
-    private $findCapabilitiesQuery;
-
-
     /**************************** Prepared indicator merging queries ***************************/
 
     /**
@@ -152,12 +132,6 @@ class Capability extends Base
      */
     protected function setupQueries(): void
     {
-        $this->findFoldersQuery
-            = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
-
-        $this->findCapabilitiesQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY);
-
         $this->findCapabilityIndicatorsQuery
             = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY);
         $this->mergeCapabilityIndicatorQuery

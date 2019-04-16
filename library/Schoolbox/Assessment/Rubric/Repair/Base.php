@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Repair;
 
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Psr\Log\LoggerInterface as Logger;
@@ -51,6 +52,22 @@ abstract class Base extends CliTool\App
         AND    deleted_at  IS NULL
         ORDER BY name, id
     ";
+
+
+    /**
+     * Query for finding folders which may contain a capability.
+     *
+     * @var IQuery
+     */
+    protected $findFoldersQuery;
+
+
+    /**
+     * Query for finding rubric capabilities in a folder.
+     *
+     * @var IQuery
+     */
+    protected $findCapabilitiesQuery;
 
 
     /**
@@ -191,6 +208,18 @@ abstract class Base extends CliTool\App
 
 
     /**
+     * Prepare queries that all scripts need.
+     */
+    private function setupCommonQueries(): void
+    {
+        $this->findFoldersQuery
+            = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
+        $this->findCapabilitiesQuery
+            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY);
+    }
+
+
+    /**
      * Set up and run the merge process.
      *
      * Install all instance vars, and wraps the merge process in a transaction
@@ -204,6 +233,7 @@ abstract class Base extends CliTool\App
     public function run(): void
     {
         $this->setupDependencies();
+        $this->setupCommonQueries();
         $this->setupQueries();
 
         if ($this->perform()) {

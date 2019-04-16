@@ -64,24 +64,7 @@ class Capability extends Base
     ';
 
 
-    /**************************** Prepared folder queries ***************************/
-
-    /**
-     * Query for finding folders which have had a unit imported into them.
-     *
-     * @var IQuery
-     */
-    private $findFoldersQuery;
-
-
     /**************************** Prepared capability queries ***************************/
-
-    /**
-     * Query for finding rubric capabilities in a folder.
-     *
-     * @var IQuery
-     */
-    private $findCapabilitiesQuery;
 
     /**
      * Query for deleting rubric capabilities.
@@ -116,11 +99,6 @@ class Capability extends Base
      */
     protected function setupQueries(): void
     {
-        $this->findFoldersQuery
-            = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
-
-        $this->findCapabilitiesQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY);
         $this->deleteCapabilityQuery
             = $this->db->prepareQuery(self::DELETE_CAPABILITY_QUERY);
 
