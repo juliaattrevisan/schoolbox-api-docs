@@ -264,17 +264,17 @@ abstract class Base extends CliTool\App
 
 
     /**
-     * Build a mail sender.
+     * Build and send an email.
      *
+     * @param string $template
      * @param string $subject
      * @param array  $context
-     * @return void
      */
-    protected function sendMail(string $subject, array $context): void
+    protected function sendMail(string $template, string $subject, array $context): void
     {
         $mailto = $this->getOpt(self::OPT_LONG_MAILTO);
         if ($mailto) {
-            $mailer = new TwigEmail('output.twig');
+            $mailer = new TwigEmail($template);
             $mailer->setCoreContext((new CoreContext($this->getConfig()))->getContext());
             $mailer->setFrom($this->getConfig()->get('mail_from_address'));
             $mailer->setSubject($subject);
@@ -354,8 +354,8 @@ abstract class Base extends CliTool\App
         $failedCapabilityCount = count($this->failedCapabilities);
         $failedIndicatorCount  = count($this->failedIndicators);
         $failedDueWorkCount    = count($this->failedDueWorks);
-        $folderBaseUrl         = 'https://%s/homepage/%d';
-        $dueWorkBaseUrl        = 'https://%s/learning/assessments/%d/modify';
+        $folderBaseUrl         = 'homepage/%d';
+        $dueWorkBaseUrl        = 'learning/assessments/%d/modify';
         $failures              = [];
 
         if (($failedCapabilityCount + $failedIndicatorCount + $failedDueWorkCount) > 0) {
@@ -364,10 +364,13 @@ abstract class Base extends CliTool\App
             if ($failedCapabilityCount > 0) {
                 $this->log->warning(self::indent(1) . sprintf('%d capabilities:', $failedCapabilityCount));
                 foreach ($this->failedCapabilities as $id => $data) {
-                    $failures[] = $failureMsg = sprintf(
-                        $folderBaseUrl . ' capability #%d (%s)',
-                        $this->fqdn,
-                        $data['folderId'],
+                    $failures[] = [
+                        'url'   => sprintf($folderBaseUrl, $data['folderId']),
+                        'title' => sprintf('capability #%d (%s)', $id, $data['name']),
+                    ];
+                    $failureMsg = sprintf(
+                        '%s capability #%d (%s)',
+                        'https://' . $this->fqdn . sprintf($folderBaseUrl, $data['folderId']),
                         $id,
                         $data['name']
                     );
@@ -378,10 +381,13 @@ abstract class Base extends CliTool\App
             if ($failedIndicatorCount > 0) {
                 $this->log->warning(self::indent(1) . sprintf('%d indicators:', $failedIndicatorCount));
                 foreach ($this->failedIndicators as $id => $data) {
-                    $failures[] = $failureMsg = sprintf(
-                        $folderBaseUrl . ' indicator #%d (%s)',
-                        $this->fqdn,
-                        $data['folderId'],
+                    $failures[] = [
+                        'url'   => sprintf($folderBaseUrl, $data['folderId']),
+                        'title' => sprintf('indicator #%d (%s)', $id, $data['name']),
+                    ];
+                    $failureMsg = sprintf(
+                        '%s indicator #%d (%s)',
+                        'https://' . $this->fqdn . sprintf($folderBaseUrl, $data['folderId']),
                         $id,
                         $data['name']
                     );
@@ -392,22 +398,29 @@ abstract class Base extends CliTool\App
             if ($failedDueWorkCount > 0) {
                 $this->log->warning(self::indent(1) . sprintf('%d due works:', $failedDueWorkCount));
                 foreach ($this->failedDueWorks as $id => $data) {
-                    $failures[] = $failureMsg = sprintf(
-                        $folderBaseUrl . ' due work ' . $dueWorkBaseUrl . ' (%s)',
-                        $this->fqdn,
-                        $data['folderId'],
-                        $this->fqdn,
-                        $id,
+                    $failures[] = [
+                        'url'   => sprintf($dueWorkBaseUrl, $id),
+                        'title' => sprintf('due work #%d (%s)', $id, $data['name']),
+                    ];
+                    $failureMsg = sprintf(
+                        '%s due work %s (%s)',
+                        'https://' . $this->fqdn . sprintf($folderBaseUrl, $data['folderId']),
+                        'https://' . $this->fqdn . sprintf($dueWorkBaseUrl, $id),
                         $data['name']
                     );
                     $this->log->warning(self::indent(2) . $failureMsg);
                 }
             }
 
-            $subject = 'Some data must be fixed manually before merge can complete';
+            $subject = sprintf(
+                '%s (%s) has data which requires manual intervention',
+                $this->getConfig()->get('title'),
+                $this->getConfig()->get('site_location')
+            );
             $this->sendMail(
+                'scriptOutput.twig',
                 $subject,
-                ['output' => implode('<br />', array_map([Scrub::class, 'text',], $failures)),]
+                ['output' => $failures,]
             );
             throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
         }

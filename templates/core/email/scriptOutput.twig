@@ -1,0 +1,13 @@
+{% extends 'schoolmail.twig' %}
+
+{##
+ # An email template intended for reporting the output of a script.
+ #}
+
+{% block content %}
+    <ul>
+        {% for item in output %}
+        <li><a href="https://{{ config.fqdn }}/{{ item.url }}">{{ item.title }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
