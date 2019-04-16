@@ -370,7 +370,10 @@ class Capability extends Base
                 $this->log->warning(
                     self::indent(4) . 'capability is used by both source and destination due work: aborting'
                 );
-                $failedDueWorks[$duplicateDueWork['id']] = $duplicateDueWork['id'];
+                $failedDueWorks[$duplicateDueWork['id']] = [
+                    'id'   => $duplicateDueWork['id'],
+                    'name' => $duplicateDueWork['title'],
+                ];
                 continue;
             }
 

@@ -319,7 +319,10 @@ class Indicator extends Base
                 $this->log->warning(
                     self::indent(5) . 'indicator is used by both source and destination due work: aborting'
                 );
-                $failedDueWorks[$duplicateDueWork['id']] = $duplicateDueWork['id'];
+                $failedDueWorks[$duplicateDueWork['id']] = [
+                    'id'   => $duplicateDueWork['id'],
+                    'name' => $duplicateDueWork['title'],
+                ];
                 continue;
             }
 
