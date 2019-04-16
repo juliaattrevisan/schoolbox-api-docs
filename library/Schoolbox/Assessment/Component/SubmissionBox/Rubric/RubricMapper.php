@@ -1357,10 +1357,7 @@ class RubricMapper
             // Normalize line values
             return array_map(
                 [$this, 'normalizeEncoding'],
-                array_map(
-                    [$this, 'normalizeSpace'],
-                    \array_slice($line, 0, $limit)
-                )
+                \array_slice($line, 0, $limit)
             );
         }
 
