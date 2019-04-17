@@ -12,6 +12,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\Query\IQuery;
 use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
+use OutOfRangeException;
 use Psr\Log\LoggerInterface as Logger;
 use RuntimeException;
 use Schoolbox\Application\CliTool;
@@ -93,6 +94,28 @@ abstract class Base extends CliTool\App
      * @var IConnector
      */
     protected $db;
+
+
+    /**
+     * What number savepoint are we up to?
+     *
+     * Static because the savepoints must be maintained per DB connection, of
+     * which there's only one per script execution.
+     *
+     * @var int
+     */
+    private static $savepointNumber = 0;
+
+
+    /**
+     * What are the current savepoints in this connection?
+     *
+     * Static because the savepoints must be maintained per DB connection, of
+     * which there's only one per script execution.
+     *
+     * @var array|string[]
+     */
+    private static $savepointStack = [];
 
 
     /**
@@ -349,6 +372,87 @@ abstract class Base extends CliTool\App
      * Output a summary of what this script will do.
      */
     abstract protected function outputIntro(): void;
+
+
+    /**
+     * Generate a savepoint name, and add it to the stack.
+     *
+     * @return string
+     */
+    private function generateSavepointName(): string
+    {
+        self::$savepointStack[] = $savepoint = 'savepoint' . self::$savepointNumber++;
+        return $savepoint;
+    }
+
+
+    /**
+     * Retrieve the most recent savepoint added to the stack.
+     *
+     * @return string
+     * @throws OutOfRangeException if there's no savepoints in the stack
+     */
+    private function retrieveLastSavepointName(): string
+    {
+        if (empty(self::$savepointStack)) {
+            throw new OutOfRangeException('No savepoints');
+        }
+        return array_pop(self::$savepointStack);
+    }
+
+
+    /**
+     * Create a savepoint, and adds it to the stack.
+     *
+     * Required because nested transactions don't exist in MySQL.
+     *
+     * @todo replace with nested transaction emulation, if/when SA-6405 is in
+     *
+     * @return bool
+     */
+    protected function createSavepoint(): bool
+    {
+        return $this->db->prepareQuery('SAVEPOINT :name')
+                        ->execute(['name' => $this->generateSavepointName()]);
+    }
+
+
+    /**
+     * Commit all changes since the last savepoint.
+     *
+     * This removes the last savepoint from the stack that `createSavepoint`
+     * added.
+     *
+     * Required because nested transactions don't exist in MySQL.
+     *
+     * @return bool
+     * @throws OutOfRangeException if there's no savepoints in the stack
+     *
+     */
+    protected function commitSavepoint(): bool
+    {
+        return $this->db->prepareQuery('RELEASE SAVEPOINT :name')
+                        ->execute(['name' => $this->retrieveLastSavepointName()]);
+    }
+
+
+    /**
+     * Rollback all changes since the last savepoint was created.
+     *
+     * This removes the last savepoint from the stack that `createSavepoint`
+     * added.
+     *
+     * Required because nested transactions don't exist in MySQL.
+     *
+     * @return bool
+     * @throws OutOfRangeException if there's no savepoints in the stack
+     */
+    protected function rollbackSavepoint(): bool
+    {
+        $savepoint = array_pop(self::$savepointStack);
+        return $this->db->prepareQuery('ROLLBACK TO SAVEPOINT :name')
+                        ->execute(['name' => $this->retrieveLastSavepointName()]);
+    }
 
 
     /**
