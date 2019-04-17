@@ -394,7 +394,6 @@ abstract class Base extends CliTool\App
         $failedDueWorkCount    = count($this->failedDueWorks);
         $folderBaseUrl         = 'homepage/%d';
         $dueWorkBaseUrl        = 'learning/assessments/%d/modify';
-        $failures              = [];
 
 
         // Output which due works were fixed
