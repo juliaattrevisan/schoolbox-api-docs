@@ -178,7 +178,7 @@ class Capability extends Base
                 sprintf(
                     'Checking folder #%d (%s)',
                     $folderId,
-                    $folder['name']
+                    self::truncate($folder['name'], self::MAX_LOG_ITEM_WIDTH)
                 )
             );
 
@@ -208,17 +208,18 @@ class Capability extends Base
     private function mergeCapabilities(array $groupedCapabilities, int $folderId): void
     {
         foreach ($groupedCapabilities as $capabilityName => $capabilityIds) {
+            $truncatedName   = self::truncate($capabilityName, self::MAX_LOG_ITEM_WIDTH);
             $capabilityCount = count($capabilityIds);
             if ($capabilityCount <= 1) {
                 $this->log->debug(
-                    self::indent(1) . sprintf('capability "%s" has no duplicates: skipping', $capabilityName)
+                    self::indent(1) . sprintf('capability "%s" has no duplicates: skipping', $truncatedName)
                 );
                 continue;
             }
 
             // We have duplicates. Undupe them
             $this->log->notice(
-                self::indent(1) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
+                self::indent(1) . sprintf('capability "%s" has %d duplicate(s)', $truncatedName, $capabilityCount - 1)
             );
 
 
@@ -289,7 +290,11 @@ class Capability extends Base
 
         foreach ($duplicateIndicators as $duplicateIndicatorId => $duplicateIndicatorName) {
             $this->log->notice(
-                self::indent(3) . sprintf('moving indicator "%s" into original', $duplicateIndicatorName)
+                self::indent(3)
+                . sprintf(
+                    'moving indicator "%s" into original',
+                    self::truncate($duplicateIndicatorName, self::MAX_LOG_ITEM_WIDTH)
+                )
             );
 
             if (in_array($duplicateIndicatorId, $originalIndicators, true)) {

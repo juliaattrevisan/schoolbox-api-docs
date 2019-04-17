@@ -140,7 +140,7 @@ class Indicator extends Base
                 sprintf(
                     'Checking folder #%d (%s)',
                     $folderId,
-                    $folder['name']
+                    self::truncate($folder['name'], self::MAX_LOG_ITEM_WIDTH)
                 )
             );
 
@@ -152,7 +152,8 @@ class Indicator extends Base
             }
 
             foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $capId => $capName) {
-                $this->log->notice(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $capName));
+                $truncatedName = self::truncate($capName, self::MAX_LOG_ITEM_WIDTH);
+                $this->log->notice(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $truncatedName));
                 $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $capId]);
                 if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
                     $this->log->debug(self::indent(2) . 'capability contains no indicators: no action required');
@@ -185,17 +186,18 @@ class Indicator extends Base
     private function deleteIndicators(array $groupedIndicators, int $folderId): void
     {
         foreach ($groupedIndicators as $indicatorName => $indicatorIds) {
+            $truncatedName  = self::truncate($indicatorName, self::MAX_LOG_ITEM_WIDTH);
             $indicatorCount = count($indicatorIds);
             if ($indicatorCount <= 1) {
                 $this->log->debug(
-                    self::indent(1) . sprintf('indicator "%s" has no duplicates: skipping', $indicatorName)
+                    self::indent(1) . sprintf('indicator "%s" has no duplicates: skipping', $truncatedName)
                 );
                 continue;
             }
 
             // We have duplicates. Undupe them
             $this->log->notice(
-                self::indent(1) . sprintf('indicator "%s" has %d duplicate(s)', $indicatorName, $indicatorCount - 1)
+                self::indent(1) . sprintf('indicator "%s" has %d duplicate(s)', $truncatedName, $indicatorCount - 1)
             );
 
             // Delete any duplicates which are not in use

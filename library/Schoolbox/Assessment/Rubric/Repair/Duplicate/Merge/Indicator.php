@@ -161,7 +161,7 @@ class Indicator extends Base
                 sprintf(
                     'Checking folder #%d (%s)',
                     $folderId,
-                    $folder['name']
+                    self::truncate($folder['name'], self::MAX_LOG_ITEM_WIDTH)
                 )
             );
 
@@ -201,17 +201,18 @@ class Indicator extends Base
     private function mergeIndicators(array $groupedIndicators, int $folderId): void
     {
         foreach ($groupedIndicators as $indicatorName => $indicatorIds) {
+            $truncatedName  = self::truncate($indicatorName, self::MAX_LOG_ITEM_WIDTH);
             $indicatorCount = count($indicatorIds);
             if ($indicatorCount <= 1) {
                 $this->log->debug(
-                    self::indent(2) . sprintf('indicator "%s" has no duplicates: skipping', $indicatorName)
+                    self::indent(2) . sprintf('indicator "%s" has no duplicates: skipping', $truncatedName)
                 );
                 continue;
             }
 
             // We have duplicates. Undupe them
             $this->log->notice(
-                self::indent(2) . sprintf('indicator "%s" has %d duplicate(s)', $indicatorName, $indicatorCount - 1)
+                self::indent(2) . sprintf('indicator "%s" has %d duplicate(s)', $truncatedName, $indicatorCount - 1)
             );
 
 
