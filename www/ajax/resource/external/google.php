@@ -36,7 +36,17 @@ $mapper  = Storage\Mapper::getInstance();
 $files   = array();
 
 foreach ($_POST['docs'] as $doc) {
-    $meta = $grive->fetchMetaData($doc['id']);
+    try {
+        $meta = $grive->fetchMetaData($doc['id']);
+    } catch (DomainException $e) {
+
+        /* Some mysterious error - skip this file, leave a bootprint in sentry
+         */
+        trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
+
+        continue;
+    }
+
     $filename = $grive->deriveFileName($meta);
     $dest = $grive->fetchToFile($doc['id']);
 

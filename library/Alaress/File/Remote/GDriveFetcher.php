@@ -1,6 +1,7 @@
 <?php
 /**
- * 
+ * Yank down Google Drive files to upload into schoolbox
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,43 +10,88 @@
 
 namespace Alaress\File\Remote;
 
-
+use DomainException;
 use OutOfBoundsException;
 use \Schoolbox\Config\Loader as ConfigLoader;
 
 class GDriveFetcher implements FetcherInterface
 {
+    /**
+     * Google API Endpoint
+     */
+    private const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
 
-    const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
+    /**
+     * The mimetypeMapping key that stores file extensions
+     */
+    private const CONTEXT_EXTENSION = 'ext';
 
+    /**
+     * The mimetypeMapping key that stores download urls (exportLinks)
+     */
+    private const CONTEXT_EXPORTLINKS = 'exportLinks';
 
-    /** @var resource */
-    protected $ch;
+    /**
+     * Metadata fields that might contain a download url
+     * Google API sometimes changes causing fields to no longer exist
+     */
+    private const FIELDS_EXPORTLINKS = ['downloadUrl'];
 
-    /** @var string */
-    protected $dir;
+    /**
+     * Mimetypes and their corresponding exportLinks, ext values
+     *
+     * @var array
+     */
+    private const MIMETYPE_MAPPING = [
 
-    /** @var array */
-    protected $metaCache = array();
+        /* Powerpoint slides
+         */
+        'application/vnd.google-apps.presentation' => [
+            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            self::CONTEXT_EXTENSION => 'pptx',
+        ],
 
-    /** @var ConfigLoader */
-    protected $configLoader;
+        /* Word doc
+         */
+        'application/vnd.google-apps.document' => [
+            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            self::CONTEXT_EXTENSION => 'docx',
+        ],
 
-    public function getConfigLoader() {
-        return $this->configLoader;
-    }
+        /* Spreadsheets
+         */
+        'application/vnd.google-apps.spreadsheet' => [
+            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            self::CONTEXT_EXTENSION => 'xlsx'
+        ]
+    ];
 
-    public function setConfigLoader($configLoader) {
-        $this->configLoader = $configLoader;
-        return $this;
-    }
+    /**
+     * @var ConfigLoader
+     */
+    private $configLoader;
+
+    /**
+     * @var false|resource
+     */
+    private $ch;
+
+    /**
+     * @var string
+     */
+    private $dir;
+
+    /**
+     * @var array
+     */
+    private $metaCache = [];
 
     /**
      * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
      * @param resource $curl       - a custom curl handle if a default won't suffice
      * @param string   $httpAuth   - an authorization header if not using an anonymous connection
      */
-    public function __construct($storageDir, $curl = null, $httpAuth = '')
+    public function __construct(string $storageDir, $curl = null, string $httpAuth = '')
     {
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
@@ -56,7 +102,7 @@ class GDriveFetcher implements FetcherInterface
             ));
         }
 
-        $this->setConfigLoader(new ConfigLoader());
+        $this->configLoader = new ConfigLoader();
     }
 
 
@@ -68,18 +114,32 @@ class GDriveFetcher implements FetcherInterface
         curl_close($this->ch);
     }
 
+
+    /**
+     * The config option "Google Drive Always Convert To PDF" is on
+     *
+     * @param array $metadata
+     * @return bool
+     */
+    private function isPdfExportEnabled(array $metadata): bool
+    {
+        return $this->configLoader->get('googledrive_export_pdf') && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
+    }
+
+
     /**
      * Retrieves the metadata for the given fileId
      *
-     * @param int $fileId
+     * @param int  $fileId
      * @param bool $refresh
      * @return array
+     * @throws DomainException
      */
-    function fetchMetaData($fileId, $refresh = false)
+    public function fetchMetaData($fileId, $refresh = false): array
     {
-        if (empty($this->metaCache[$fileId]) || $refresh) {
-            $ch = $this->cUrlPrepare(array(
-                CURLOPT_URL            => self::GOOGLE_API . "/files/$fileId",
+        if ($refresh || empty($this->metaCache[$fileId])) {
+            $ch = $this->curlPrepare(array(
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}",
                 CURLOPT_RETURNTRANSFER => 1,
             ));
 
@@ -87,7 +147,27 @@ class GDriveFetcher implements FetcherInterface
             curl_close($ch);
         }
 
-        return $this->metaCache[$fileId];
+        /* On some mysterious occasions google drive will return you an error payload
+         * If any were encountered, detonate with it - this crashes everything anyway
+         */
+        $metadata = $this->metaCache[$fileId];
+
+        if (isset($metadata['error'])) {
+            $errors = [];
+
+            /** @var array $errorIndex */
+            $errorIndex = $metadata['error']['errors'];
+
+            foreach ($errorIndex as $currentError) {
+                $errors[] = $currentError['message'];
+            }
+
+            $errorMessage = implode('; ', $errors);
+
+            throw new DomainException($errorMessage);
+        }
+
+        return $metadata;
     }
 
 
@@ -95,51 +175,39 @@ class GDriveFetcher implements FetcherInterface
      * Attempts to retrieve remote source to local destination, returns the path of the saved file.
      *
      * @param int $fileId
-     * @throws OutOfBoundsException
      * @return string
+     * @throws DomainException
+     * @throws OutOfBoundsException
      */
-    function fetchToFile($fileId)
+    public function fetchToFile($fileId): string
     {
         $metadata = $this->fetchMetaData($fileId);
 
         if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
             // if this file has been flagged by Drive as "restricted", disallow any download
             return null;
-
-        } elseif ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
+        } elseif ($this->isPdfExportEnabled($metadata)) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-            $url = $metadata['exportLinks']['application/pdf'];
+            $url = $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
         } else {
-            if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
-                // Get PPTX format slides
-                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.presentationml.presentation'];
-            } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
-                // Get DOCX format spreadsheet
-                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-            } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
-                // Get XLSX format spreadsheet
-                $url = $metadata['exportLinks']['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
-            } else if (!empty($metadata['downloadUrl'])) {
-                // Fall back to the download URL
-                $url = $metadata['downloadUrl'];
-            } else {
-                // Last ditched PDF attempt if the download URL not set
-                $url = $metadata['exportLinks']['application/pdf'];
-            }
+
+            /* Inspect metadata fields to find a download url
+             */
+            $url = $this->inspectExportLinks($metadata);
         }
 
         if (!$url) {
             // no valid URL was found
-            throw new OutOfBoundsException("No url found for download");
+            throw new OutOfBoundsException('No url found for download');
         }
 
         $destination = tempnam($this->dir, 'gdrive-');
 
         if (!($fp = fopen($destination, 'w'))) {
-            throw new OutOfBoundsException("Could not open target");
+            throw new OutOfBoundsException('Could not open target');
         }
 
-        $ch = $this->cUrlPrepare(array(
+        $ch = $this->curlPrepare(array(
             CURLOPT_URL  => $url,
             CURLOPT_FILE => $fp,
         ));
@@ -153,62 +221,52 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
+     * Inspect metadata fields to find a download url
+     *
+     * @param array $metadata
+     * @return string
+     */
+    private function inspectExportLinks(array $metadata): string
+    {
+        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
+            $key = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
+
+            return $metadata[self::CONTEXT_EXPORTLINKS][$key];
+        }
+
+        foreach (self::FIELDS_EXPORTLINKS as $field) {
+            if (!empty($metadata[$field])) {
+                return $metadata[$field];
+            }
+        }
+
+        /* If you got here, the api no longer provides the fields we were originally looking at
+         * https://developers.google.com/drive/api/v2/reference/
+         */
+        trigger_error('Google api fields for exportLinks not found: check api docs', E_USER_WARNING);
+
+        return '';
+    }
+
+
+    /**
      * Derive the file name from the metadata
      *
      * @param array $metadata
      * @return string
      */
-    public function deriveFileName(array $metadata)
+    public function deriveFileName(array $metadata): string
     {
-            if ($this->getConfigLoader()->get('googledrive_export_pdf') == '1' && isset($metadata['exportLinks']['application/pdf'])) {
-                // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-                $ext = '.pdf';
-            } else {
-                if ($metadata['mimeType'] == "application/vnd.google-apps.presentation") {
-                    $ext = '.pptx';
-                } else if ($metadata['mimeType'] == "application/vnd.google-apps.document") {
-                    // Get DOCX format spreadsheet
-                    $ext = '.docx';
-                } else if ($metadata['mimeType'] == "application/vnd.google-apps.spreadsheet") {
-                    // Get XLSX format spreadsheet
-                    $ext = '.xlsx';
-                } else if ($metadata['fullFileExtension']) {
-                    // attempt to use the file extension proper
-                    $ext = '.' . $metadata['fullFileExtension'];
-                } else {
-                    $ext = '.pdf';
-                }
-            }
-
-            return $metadata['title'].$ext;
-    }
-
-
-    /**
-     * Append the given extension to the title *if not already suffixed*
-     *
-     * @param string $title
-     * @param string $ext
-     * @return string
-     */
-    protected function parseTitle($title, $ext)
-    {
-        $titleLen = strlen($title);
-        $extLen   = strlen($ext);
-        if ($titleLen < 1) {
-            throw new OutOfBoundsException("Title must contain characters");
+        /* if there is a PDF-export option for this file (and the config is set to do pdf export),
+         * always give that preference
+         *
+         * There seems to be different behaviour for pdf-able files and other ones
+         */
+        if ($this->isPdfExportEnabled($metadata) && isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
+            return "{$metadata['title']}.pdf";
         }
 
-        // true if the extension is already suffixed
-        $endsWith = substr_compare($title, $ext, $titleLen - $extLen, $extLen) === 0;
-
-        if ($endsWith) {
-            // title is correct, just return that
-            return $title;
-        }
-
-        // append extension and return
-        return $title . $ext;
+        return $metadata['title'];
     }
 
 
@@ -216,10 +274,11 @@ class GDriveFetcher implements FetcherInterface
      * @param array $opts
      * @return resource
      */
-    protected function cUrlPrepare($opts)
+    private function curlPrepare(array $opts)
     {
         $ch = curl_copy_handle($this->ch);
         curl_setopt_array($ch, $opts);
+
         return $ch;
     }
 } 
