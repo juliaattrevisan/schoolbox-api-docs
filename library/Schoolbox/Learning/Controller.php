@@ -355,7 +355,7 @@ class Controller extends Base
      *
      * @throws Mapper\Exception
      */
-    public function getStudentListByClassCode(string $classCode)
+    public function getStudentListByClassCode(string $classCode): void
     {
         $students = (new StudentLists(new External_Class(), new UserMapper(), $this->folderMapper, new Folder\Log\Mapper()))
             ->setClassCode($classCode)
@@ -371,7 +371,7 @@ class Controller extends Base
      * @throws Mapper\Exception
      * @throws ServiceNotFound
      */
-    public function getClassListPage(string $classCode)
+    public function getClassListPage(string $classCode): void
     {
         $folder = $this->folderMapper->findByCode($classCode);
 
