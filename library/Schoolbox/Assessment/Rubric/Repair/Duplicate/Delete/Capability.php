@@ -189,32 +189,42 @@ class Capability extends Base
                 self::indent(1) . sprintf('capability "%s" has %d duplicate(s)', $capabilityName, $capabilityCount - 1)
             );
 
-            // Delete any duplicates which are not in use
+            // Delete any duplicates which contain no indicators, and are not in use
             array_shift($capabilityIds);
             foreach ($capabilityIds as $capabilityId) {
-
+                // Indicator check
                 $this->countCapabilityIndicatorsQuery->execute(['capabilityId' => $capabilityId]);
-                $this->countCapabilityUsagesQuery->execute(['capabilityId' => $capabilityId]);
                 $indicatorCount = (int)$this->countCapabilityIndicatorsQuery->fetchColumn();
-                $usageCount     = (int)$this->countCapabilityUsagesQuery->fetchColumn();
-                if ($indicatorCount === 0 && $usageCount === 0) {
-                    $this->log->notice(
-                        self::indent(2) . sprintf('deleting unused duplicate capability #%d', $capabilityId)
+                if ($indicatorCount > 0) {
+                    $this->log->warning(
+                        self::indent(2)
+                        . sprintf('refusing to delete capability #%d, as it contains indicators', $capabilityId)
                     );
-                    $this->deleteCapabilityQuery->execute([
-                        'capabilityId' => $capabilityId,
-                        'now'          => $this->now->getDatabase(),
-                    ]);
-                    $this->fixedCapabilities[$capabilityId] = [
-                        'id'       => $capabilityId,
-                        'name'     => $capabilityName,
-                        'folderId' => $folderId,
-                    ];
-                } else {
+                    continue;
+                }
+
+                // Usage check
+                $this->countCapabilityUsagesQuery->execute(['capabilityId' => $capabilityId]);
+                $usageCount = (int)$this->countCapabilityUsagesQuery->fetchColumn();
+                if ($usageCount > 0) {
                     $this->log->warning(
                         self::indent(2) . sprintf('refusing to delete capability #%d, as it is in use', $capabilityId)
                     );
+                    continue;
                 }
+
+                $this->log->notice(
+                    self::indent(2) . sprintf('deleting unused duplicate capability #%d', $capabilityId)
+                );
+                $this->deleteCapabilityQuery->execute([
+                    'capabilityId' => $capabilityId,
+                    'now'          => $this->now->getDatabase(),
+                ]);
+                $this->fixedCapabilities[$capabilityId] = [
+                    'id'       => $capabilityId,
+                    'name'     => $capabilityName,
+                    'folderId' => $folderId,
+                ];
             }
         }
     }
