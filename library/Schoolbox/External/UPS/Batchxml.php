@@ -24,6 +24,13 @@ class Batchxml implements ISync
      */
     private $api;
 
+    /**
+     * Cache the xml that we downloaded so we don't end up re-fetching it
+     * if we run more than one roletype's ups
+     *
+     * @var string
+     */
+    private $xmlCache;
 
     /**
      * Batchxml constructor.
@@ -40,20 +47,41 @@ class Batchxml implements ISync
 
 
     /**
-     * {@inheritDoc}
+     * Fetch xml contents
+     *
+     * If it was already downloaded once before, don't download it again
+     *
+     * @param string $path
+     * @return \SimpleXMLElement[]
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    public function findAllStudents()
+    private function fetchXml(string $path): array
     {
-        $xml = $this->api->retrieveDocument();
+        if (!$this->xmlCache) {
+            $this->xmlCache = $this->api->retrieveDocument();
+        }
+
+        $nodes = new \SimpleXMLElement($this->xmlCache);
+
+        return $nodes->xpath($path);
 
         /* Faster, for now
          */
 //        $source = __DIR__ .'/../../../../www/temp.xml';
 //        $xml = file_get_contents($source);
+//        $nodes = new SimpleXMLElement($xml);
+//        return $nodes->xpath($path);
+    }
 
-        $nodes = new \SimpleXMLElement($xml);
 
-        $students = $nodes->xpath('/iSAMS/PupilManager/CurrentPupils/Pupil');
+    /**
+     * {@inheritDoc}
+     */
+    public function findAllStudents()
+    {
+        $students = $this->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         $collection = new Collection();
 
@@ -104,16 +132,7 @@ class Batchxml implements ISync
      */
     public function findAllStaff()
     {
-        $xml = $this->api->retrieveDocument();
-
-        /* Faster, for now
-         */
-//        $source = __DIR__ .'/../../../../www/temp.xml';
-//        $xml = file_get_contents($source);
-
-        $nodes = new \SimpleXMLElement($xml);
-
-        $staffs = $nodes->xpath('/iSAMS/HRManager/CurrentStaff/StaffMember');
+        $staffs = $this->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
         $collection = new Collection();
 
