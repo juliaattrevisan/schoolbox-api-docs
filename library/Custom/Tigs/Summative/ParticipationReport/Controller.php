@@ -112,8 +112,6 @@ class Controller extends Web\Controller\Base
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes);
 
-        $adf = new Alaress_Date_Format($now, Alaress_Date_Format::DATABASE_DATE_FORMAT);
-        $calendarYear = $now ? $adf->getYear() : \Alaress_Date_Format::now()->getYear();
         $data   = [
             'user'          => $user,
             'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_PARTICIPATION_REPORT_ENABLED),
@@ -127,7 +125,6 @@ class Controller extends Web\Controller\Base
             'deansComments' => $deansComments,
             'explanation'   => $explanation,
             'nowOverride'   => $now,
-            'calendarYear'  => $calendarYear
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
