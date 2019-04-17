@@ -17,7 +17,6 @@ use RuntimeException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
-use Scrub;
 use Swift_SwiftException;
 
 /**
@@ -61,6 +60,11 @@ abstract class Base extends CliTool\App
         AND    deleted_at  IS NULL
         ORDER BY name, id
     ";
+
+
+    // If a capability or indicator is more than this many characters:
+    // truncate it to this width.
+    protected const MAX_LOG_ITEM_WIDTH = 50;
 
 
     /**
@@ -310,21 +314,39 @@ abstract class Base extends CliTool\App
 
 
     /**
+     * Truncate `$string` to `$length` characters.
+     *
+     * @param string $string
+     * @param int    $length
+     * @param string $trailing If `$string` is truncated, trail it with this.
+     * @return string
+     */
+    protected static function truncate(string $string, int $length, string $trailing = '...'): string
+    {
+        $encoding = 'UTF-8';
+        if (mb_strlen($string, $encoding) > $length) {
+            return mb_substr($string, $length - mb_strlen($trailing, $encoding), $encoding) . $trailing;
+        }
+        return $string;
+    }
+
+
+    /**
      * Prepare any queries this script may need.
      */
-    protected abstract function setupQueries(): void;
+    abstract protected function setupQueries(): void;
 
 
     /**
      * Actually run the repair. Run after queries are set up.
      */
-    protected abstract function repair(): void;
+    abstract protected function repair(): void;
 
 
     /**
      * Output a summary of what this script will do.
      */
-    protected abstract function outputIntro(): void;
+    abstract protected function outputIntro(): void;
 
 
     /**
