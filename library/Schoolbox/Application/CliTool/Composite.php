@@ -87,6 +87,8 @@ class Composite extends App
                 $subApp->run();
             } catch (Throwable $e) {
                 $lastException = $e;
+            } finally {
+                $this->getLogger()->notice('==========');
             }
         }
         if ($lastException) {
