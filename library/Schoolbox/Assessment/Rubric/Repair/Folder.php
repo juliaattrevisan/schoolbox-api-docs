@@ -63,17 +63,29 @@ class Folder extends Composite
      * All sub-apps are wrapped in a transaction before running.
      *
      * @throws Di\Exception\ServiceNotFound
+     * @throws \Throwable if any sub-app threw anything
      */
     public function run(): void
     {
         /** @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
         $db->beginTransaction();
-        parent::run();
+
+        $lastException = null;
+        try {
+            parent::run();
+        } catch (\Throwable $e) {
+            $lastException = $e;
+        }
+
         if ($this->perform()) {
             $db->commit();
         } else {
             $db->rollBack();
+        }
+
+        if ($lastException) {
+            throw $lastException;
         }
     }
 }

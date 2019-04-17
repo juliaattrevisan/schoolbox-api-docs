@@ -19,10 +19,7 @@ $options = [
 ];
 
 try {
-    (new CliTool\Kernel(new Repair\Duplicate\Merge\Capability(), null, $options))->runApp();
-    (new CliTool\Kernel(new Repair\Duplicate\Merge\Indicator(), null, $options))->runApp();
-    (new CliTool\Kernel(new Repair\Duplicate\Delete\Indicator(), null, $options))->runApp();
-    (new CliTool\Kernel(new Repair\Duplicate\Delete\Capability(), null, $options))->runApp();
+    (new CliTool\Kernel(new Repair\Folder(), null, $options))->runApp();
 } catch (Throwable $e) {
     /** @noinspection PhpUnhandledExceptionInspection */
     throw $e;
