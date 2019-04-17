@@ -44,7 +44,6 @@ class Batchxml implements ISync
      */
     public function findAllStudents()
     {
-
         $xml = $this->api->retrieveDocument();
 
         /* Faster, for now
@@ -101,16 +100,61 @@ class Batchxml implements ISync
 
 
     /**
-     * Gets a collection of normalized staff objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return User\Staff[]
+     * {@inheritDoc}
      */
     public function findAllStaff()
     {
-        // TODO: Implement findAllStaff() method.
+        $xml = $this->api->retrieveDocument();
+
+        /* Faster, for now
+         */
+//        $source = __DIR__ .'/../../../../www/temp.xml';
+//        $xml = file_get_contents($source);
+
+        $nodes = new \SimpleXMLElement($xml);
+
+        $staffs = $nodes->xpath('/iSAMS/HRManager/CurrentStaff/StaffMember');
+
+        $collection = new Collection();
+
+        foreach ($staffs as $currentResult) {
+            $staff = new User\Staff();
+
+            $staff
+                ->setId((string)$currentResult->UserName)
+                ->setTitle((string)$currentResult->Title)
+                ->setPreferredName((string)$currentResult->PreferredName)
+                ->setGivenName((string)$currentResult->Forename)
+                ->setLastname((string)$currentResult->Surname)
+                ->setGender((string)$currentResult->Gender)
+                ->setPhoneWork((new User\Common\Phone())->setNumber((string)$currentResult->SchoolMobileNumber))
+                ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->SchoolMobileNumber))
+                ->setPhoneHome((new User\Common\Phone())->setNumber((string)$currentResult->PersonalMobileNumber))
+                ->getMeta()
+                    ->getPosition()
+                        ->setDescription((string)$currentResult->Roles->Role->Name);
+
+            /* Account
+             */
+            $staff
+                ->getAccount()
+                    ->setLogin((string)$currentResult->UserName);
+
+            /* Email - one for every item in stack
+             */
+            $staff
+                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+
+            /* Campus
+             */
+            foreach ($currentResult->Divisions->Division as $division) {
+                $staff->getCampus()->add((new User\Common\Campus())->setName((string)$division->Name));
+            }
+
+            $collection->add($staff);
+        }
+
+        return $collection;
     }
 
 
