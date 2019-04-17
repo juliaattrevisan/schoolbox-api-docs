@@ -82,4 +82,33 @@ class Composite extends App
             $subApp->run();
         }
     }
+
+
+    /**
+     * Options are the union of all sub-app options.
+     *
+     * @return array
+     */
+    public function getShortOpts(): array
+    {
+        $opts = parent::getShortOpts();
+        foreach ($this->subApps as $subApp) {
+            $opts = array_merge($opts, $subApp->getShortOpts());
+        }
+        return array_unique($opts);
+    }
+
+    /**
+     * Options are the union of all sub-app options.
+     *
+     * @return array
+     */
+    public function getLongOpts(): array
+    {
+        $opts = parent::getLongOpts();
+        foreach ($this->subApps as $subApp) {
+            $opts = array_merge($opts, $subApp->getLongOpts());
+        }
+        return array_unique($opts);
+    }
 }
