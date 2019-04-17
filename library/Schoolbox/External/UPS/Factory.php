@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\External\UPS;
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
@@ -50,6 +51,7 @@ class Factory
     {
         // Check if external DB is unavailable and return offline class if we can't access
         $classOffline = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
+
         if (!$databaseExternal instanceof IConnector) {
             return new $classOffline($config, null);
         }
