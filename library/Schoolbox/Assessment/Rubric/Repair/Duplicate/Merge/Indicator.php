@@ -215,44 +215,41 @@ class Indicator extends Base
             );
 
 
-            // Build pairs to merge into one another.
-            // Merge backwards from the last duplicate into the previous one,
-            // ending up at the last.
-            $indicatorIds = array_reverse($indicatorIds);
-            while (count($indicatorIds) >= 2) {
-                $sourceIndicatorId = array_shift($indicatorIds);
-                $result            = [
+            // Merge backwards from the last duplicate into the original.
+            $destinationIndicatorId = array_shift($indicatorIds);
+            $indicatorIds           = array_reverse($indicatorIds);
+
+            foreach ($indicatorIds as $sourceIndicatorId) {
+                $conflict = false;
+                $result   = [
                     'id'       => $sourceIndicatorId,
                     'name'     => $indicatorName,
                     'folderId' => $folderId,
                 ];
-                foreach ($indicatorIds as $destinationIndicatorId) {
-                    $conflict = false;
-                    $this->db->beginTransaction();
-                    try {
-                        // do stuff
-                        $this->log->notice(
-                            self::indent(3)
-                            . sprintf(
-                                'merging duplicate #%d into original #%d',
-                                $sourceIndicatorId,
-                                $destinationIndicatorId
-                            )
-                        );
-                        $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId, $folderId);
-                        $this->fixedIndicators[$sourceIndicatorId] = $result;
-                    } catch (UnexpectedValueException $e) {
-                        $conflict                                   = true;
-                        $this->failedIndicators[$sourceIndicatorId] = $result;
-                    }
+                $this->db->beginTransaction();
+                try {
+                    // do stuff
+                    $this->log->notice(
+                        self::indent(3)
+                        . sprintf(
+                            'merging duplicate #%d into original #%d',
+                            $sourceIndicatorId,
+                            $destinationIndicatorId
+                        )
+                    );
+                    $this->mergeIndicatorUsages($destinationIndicatorId, $sourceIndicatorId, $folderId);
+                    $this->fixedIndicators[$sourceIndicatorId] = $result;
+                } catch (UnexpectedValueException $e) {
+                    $conflict                                   = true;
+                    $this->failedIndicators[$sourceIndicatorId] = $result;
+                }
 
-                    if ($conflict) {
-                        $this->db->rollBack();
-                    } elseif (!$this->perform()) {
-                        $this->db->rollBack();
-                    } else {
-                        $this->db->commit();
-                    }
+                if ($conflict) {
+                    $this->db->rollBack();
+                } elseif (!$this->perform()) {
+                    $this->db->rollBack();
+                } else {
+                    $this->db->commit();
                 }
             }
         }

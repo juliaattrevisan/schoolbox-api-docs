@@ -222,45 +222,41 @@ class Capability extends Base
             );
 
 
-            // Build pairs to merge into one another.
-            // Merge backwards from the last duplicate into the previous one,
-            // ending up at the last.
-            $capabilityIds = array_reverse($capabilityIds);
-            while (count($capabilityIds) >= 2) {
-                $sourceCapabilityId = array_shift($capabilityIds);
-                $result             = [
+            // Merge backwards from the last duplicate into the original.
+            $destinationCapabilityId = array_shift($capabilityIds);
+            $capabilityIds           = array_reverse($capabilityIds);
+            foreach ($capabilityIds as $sourceCapabilityId) {
+                $conflict = false;
+                $result   = [
                     'id'       => $sourceCapabilityId,
                     'name'     => $capabilityName,
                     'folderId' => $folderId,
                 ];
-                foreach ($capabilityIds as $destinationCapabilityId) {
-                    $conflict = false;
-                    $this->db->beginTransaction();
-                    try {
-                        // do stuff
-                        $this->log->notice(
-                            self::indent(2)
-                            . sprintf(
-                                'merging duplicate #%d into original #%d',
-                                $sourceCapabilityId,
-                                $destinationCapabilityId
-                            )
-                        );
-                        $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
-                        $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId, $folderId);
-                        $this->fixedCapabilities[$sourceCapabilityId] = $result;
-                    } catch (UnexpectedValueException $e) {
-                        $conflict                                      = true;
-                        $this->failedCapabilities[$sourceCapabilityId] = $result;
-                    }
+                $this->db->beginTransaction();
+                try {
+                    // do stuff
+                    $this->log->notice(
+                        self::indent(2)
+                        . sprintf(
+                            'merging duplicate #%d into original #%d',
+                            $sourceCapabilityId,
+                            $destinationCapabilityId
+                        )
+                    );
+                    $this->mergeCapabilityIndicators($destinationCapabilityId, $sourceCapabilityId);
+                    $this->mergeCapabilityUsages($destinationCapabilityId, $sourceCapabilityId, $folderId);
+                    $this->fixedCapabilities[$sourceCapabilityId] = $result;
+                } catch (UnexpectedValueException $e) {
+                    $conflict                                      = true;
+                    $this->failedCapabilities[$sourceCapabilityId] = $result;
+                }
 
-                    if ($conflict) {
-                        $this->db->rollBack();
-                    } elseif (!$this->perform()) {
-                        $this->db->rollBack();
-                    } else {
-                        $this->db->commit();
-                    }
+                if ($conflict) {
+                    $this->db->rollBack();
+                } elseif (!$this->perform()) {
+                    $this->db->rollBack();
+                } else {
+                    $this->db->commit();
                 }
             }
         }
