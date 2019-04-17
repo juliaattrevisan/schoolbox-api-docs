@@ -306,6 +306,7 @@ class Controller extends Web\Controller\Base
             $this->getAuthorizer(),
             $this->getRouter()
         );
+        $aam->setSemesters(1, $attributes->getCurriculumSemester());
 
         return $aam->toContext();
     }
@@ -352,6 +353,7 @@ class Controller extends Web\Controller\Base
             $this->getAuthorizer(),
             $this->getRouter()
         );
+        $aas->setSemesters(1, $attributes->getCurriculumSemester());
 
         return $aas->toContext();
     }
@@ -460,49 +462,63 @@ class Controller extends Web\Controller\Base
         // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
         $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
-        if (2 === $semester && $attributes->isMyp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-            $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
-            $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-        } elseif ((12 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
-            $errorMsg     = 'Cannot render DP Report components. Work type not set.';
-            $errorMsgLink = 'Set DP Report Work Type';
-        } else {
-            // Component is not relevant for this report.
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
+        $semesters = [$semester];
+        if (12 === $yearLevel && 2 === $semester && $attributes->isDp()) {
+            $semesters = [2, 1];
         }
 
         // Find relevant assessments and participation and insert into units
-        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-        foreach ($assessables as $assessable) {
-            $unitImpl                                                                        = $assessable->getBaseContext();
-            $baseAssessable                                                                  = $assessable->getBaseAssessable();
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        $reports = [];
+        foreach ($semesters as $reportSemester) {
+            if (2 === $reportSemester && $attributes->isMyp()) {
+                $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
+                $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
+                $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
+            } elseif ((12 === $yearLevel || 2 === $reportSemester) && $attributes->isDp()) {
+                $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
+                $errorMsg     = 'Cannot render DP Report components. Work type not set.';
+                $errorMsgLink = 'Set DP Report Work Type';
+            } else {
+                // Component is not relevant for this report.
+                continue;
+            }
+
+            try {
+                $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
+            } catch (UnexpectedValueException $e) {
+                $reports[] = ['error' => $e->getMessage()];
+                continue;
+            }
+
+            $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+            $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $reportSemester));
+            $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+            foreach ($assessables as $assessable) {
+                $unitImpl                                                                        = $assessable->getBaseContext();
+                $baseAssessable                                                                  = $assessable->getBaseAssessable();
+                $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+            }
+
+            $ib = new InternationalBaccalaureateGraph(
+                $cohortUnitImpls,
+                $student,
+                $attributes,
+                $this->visibility,
+                $this->getUser(),
+                $workTypeId,
+                $this->rubricMapper,
+                $this->getAuthorizer(),
+                $this->getRouter(),
+                $folder
+            );
+            $ib->setSemesters($reportSemester);
+            $context = $ib->toContext();
+            if ($context['showComponent']) {
+                $reports[] = $context;
+            }
         }
 
-        $ib = new InternationalBaccalaureateGraph(
-            $cohortUnitImpls,
-            $student,
-            $attributes,
-            $this->visibility,
-            $this->getUser(),
-            $workTypeId,
-            $this->rubricMapper,
-            $this->getAuthorizer(),
-            $this->getRouter(),
-            $folder
-        );
-
-        return $ib->toContext();
+        return $reports;
     }
 
 
@@ -534,45 +550,55 @@ class Controller extends Web\Controller\Base
         // * MYP S2
         // * HSC-Y11-S2
         $yearLevel = $attributes->getCurriculumYearLevel();
-        $semester  = $attributes->getCurriculumSemester();
-        if (($semester === 1 && $attributes->isMyp()) || (11 === $yearLevel && $semester === 2 && $attributes->isHsc())) {
-            $configName   = Config::_TIGS_WORK_TYPE_NESA_SCORE;
-            $errorMsgLink = 'Set NESA Grade Work Type';
-        } elseif ($semester === 2 && $attributes->isMyp()) {
-            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-            $errorMsgLink = 'Set MYP FAL Work Type';
-        } else {
-            // Component is not relevant for this report.
-            return null;
-        }
-
-        try {
-            $workTypeId = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
-        } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
-        }
+        $semesters = $attributes->getCurriculumSemester() === 2 ? [2, 1] : [1];
 
         // Find relevant assessments and participation and insert into units
-        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
-        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-        foreach ($assessables as $assessable) {
-            $unitImpl                                                                        = $assessable->getBaseContext();
-            $baseAssessable                                                                  = $assessable->getBaseAssessable();
-            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+        $reports = [];
+        foreach ($semesters as $reportSemester) {
+            if (($reportSemester === 1 && $attributes->isMyp()) || (11 === $yearLevel && $reportSemester === 2 && $attributes->isHsc())) {
+                $configName = Config::_TIGS_WORK_TYPE_NESA_SCORE;
+                $errorMsgLink = 'Set NESA Grade Work Type';
+            } elseif ($reportSemester === 2 && $attributes->isMyp()) {
+                $configName = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
+                $errorMsgLink = 'Set MYP FAL Work Type';
+            } else {
+                // Component is not relevant for this report & semester.
+                continue;
+            }
+
+            try {
+            $workTypeId = $this->checkWorkType($configName, 'Cannot render NESA Grade graph. Work type not set.', $errorMsgLink);
+            } catch (UnexpectedValueException $e) {
+                $reports[] = ['error' => $e->getMessage()];
+                continue;
+            }
+
+            $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+            $ids = $this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $reportSemester);
+            $assessables = $this->assessmentMapperProxy->findAllByIds($ids);
+            $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+            foreach ($assessables as $assessable) {
+                $unitImpl = $assessable->getBaseContext();
+                $baseAssessable = $assessable->getBaseAssessable();
+                $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
+            }
+
+            $nesa = new NesaScoreGraph(
+                $cohortUnitImpls,
+                $student,
+                $attributes,
+                $this->visibility,
+                $this->getUser(),
+                $workTypeId,
+                $folder
+            );
+            $nesa->setSemesters($reportSemester);
+            $context = $nesa->toContext();
+            if ($context['showComponent']) {
+                $reports[] = $context;
+            }
         }
-
-        $nesa = new NesaScoreGraph(
-            $cohortUnitImpls,
-            $student,
-            $attributes,
-            $this->visibility,
-            $this->getUser(),
-            $workTypeId,
-            $folder
-        );
-
-        return $nesa->toContext();
+        return $reports;
     }
 
 
@@ -614,7 +640,7 @@ class Controller extends Web\Controller\Base
 
         // Find relevant assessments and participation and insert into units
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, 1, $attributes->getCurriculumSemester()));
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
         foreach ($assessables as $assessable) {
             $unitImpl                                                                        = $assessable->getBaseContext();
@@ -631,6 +657,7 @@ class Controller extends Web\Controller\Base
             $workTypeId,
             $folder
         );
+        $hscTaskMarks->setSemesters(1, $attributes->getCurriculumSemester());
         return ['data' => $hscTaskMarks->toContext()];
     }
 
@@ -675,7 +702,7 @@ class Controller extends Web\Controller\Base
 
         // Find relevant assessments and participation and insert into units
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes));
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, 1, $attributes->getCurriculumSemester()));
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
         foreach ($assessables as $assessable) {
             $unitImpl                                                                        = $assessable->getBaseContext();
@@ -691,6 +718,7 @@ class Controller extends Web\Controller\Base
             $this->getUser(),
             $folder
         );
+        $hscRank->setSemesters(1, $attributes->getCurriculumSemester());
 
         try {
             return $hscRank->toContext();
@@ -729,21 +757,37 @@ class Controller extends Web\Controller\Base
      * @param GenericCollection $unitImpls
      * @param int               $workTypeId
      * @param StudentAttributes $attributes
+     * @param int|null $semesterFrom
+     * @param int|null $semesterTo
      * @return array
      * @throws Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes): array
+    private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes, ?int $semesterFrom = null, ?int $semesterTo = null): array
     {
         if (!\count($unitImpls)) {
             return [];
+        }
+
+        $semesters = $attributes->getCurriculumSemesters();
+        if ($semesterFrom && \key_exists($semesterFrom, $semesters)) {
+            $searchStart = $semesters[$semesterFrom]->getStart();
+            if ($semesterTo && \key_exists($semesterTo, $semesters)) {
+                $searchFinish = $semesters[$semesterTo]->getFinish();
+            } else {
+                // if semesterTo is not set, use the same semester as semesterFrom
+                $searchFinish = $semesters[$semesterFrom]->getFinish();
+            }
+        } else {
+            $searchStart = $attributes->getCurriculumSemesterStart();
+            $searchFinish = $attributes->getCurriculumSemesterFinish();
         }
 
         $pb = (new Predicate\Builder(new \Alaress\Database\Quoter\Mysql\Quoter(), ''))
             ->isNull('a.deleted_at')
             ->in('ui.id', $unitImpls->getPropertyValues('id'))
             ->equals('a.work_type_id', $workTypeId)
-            ->betweenDates('a.due_date', $attributes->getCurriculumSemesterStart(), $attributes->getCurriculumSemesterFinish());
+            ->betweenDates('a.due_date', $searchStart, $searchFinish);
 
         $whereClause = \implode(' AND ', $pb->getWhere());
 

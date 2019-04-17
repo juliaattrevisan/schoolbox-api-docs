@@ -352,6 +352,15 @@ class StudentAttributes
     /**
      * @return int
      */
+    public function getCalendarYear(): int
+    {
+        return $this->nowYear;
+    }
+
+
+    /**
+     * @return int
+     */
     public function getCurriculumYearLevel(): int
     {
         return $this->curriculumYearLevel;

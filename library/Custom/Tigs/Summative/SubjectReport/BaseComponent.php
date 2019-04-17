@@ -23,6 +23,11 @@ class BaseComponent
     /** @var StudentAttributes */
     private $attributes;
 
+    /** @var int $semesterFrom */
+    protected $semesterFrom = 0;
+
+    /** @var int $semesterTo */
+    protected $semesterTo = 0;
 
     /**
      * @param StudentAttributes $attributes
@@ -41,9 +46,16 @@ class BaseComponent
      */
     protected function isDueWithinReportWindow(IAssessable $assessable): bool
     {
+        // If a valid semester is not provided, use semester from attribute.
+        $semesters = $this->attributes->getCurriculumSemesters();
+        if (!\key_exists($this->semesterFrom, $semesters) || !\key_exists($this->semesterTo, $semesters)) {
+            $this->setSemesters($this->attributes->getCurriculumSemester());
+        }
+
         $dueDate      = $assessable->getDueAt();
-        $reportStart  = $this->attributes->getCurriculumSemesterStart();
-        $reportFinish = $this->attributes->getCurriculumSemesterFinish();
+        $reportStart  = $semesters[$this->semesterFrom]->getStart();
+        $reportFinish = $semesters[$this->semesterTo]->getFinish();
+
         return $dueDate->gte($reportStart) && $dueDate->lte($reportFinish);
     }
 
@@ -101,8 +113,6 @@ class BaseComponent
         return $assessable->getWorkType()->getId() === $workTypeId;
     }
 
-    // Getters
-
 
     /**
      * @return StudentAttributes
@@ -111,4 +121,22 @@ class BaseComponent
     {
         return $this->attributes;
     }
+
+
+    /**
+     * Implicitly specify the semester of the report
+     * @param int $semesterFrom
+     * @param int|null $semesterTo
+     */
+    public function setSemesters(int $semesterFrom, ?int $semesterTo = null): void
+    {
+        $this->semesterFrom = $semesterFrom;
+        if ($semesterTo) {
+            $this->semesterTo = $semesterTo;
+        } else {
+            $this->semesterTo = $semesterFrom;
+        }
+    }
+
+
 }

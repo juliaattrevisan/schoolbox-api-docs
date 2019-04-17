@@ -437,17 +437,16 @@ class InternationalBaccalaureateGraph extends BaseComponent
     private function generateHeader(): string
     {
         $year     = $this->getAttributes()->getCurriculumYearLevel();
-        $semester = $this->getAttributes()->getCurriculumSemester();
 
-        if ($year <= 10 && $semester === 2) {
+        if ($year <= 10 && $this->semesterFrom === 2) {
             return 'MYP Grade';
         }
-        if (($year === 11 && $semester === 2) || ($year === 12 && $semester === 1)) {
+        if (($year === 11 && $this->semesterFrom === 2) || ($year === 12 && $this->semesterFrom === 1)) {
             return 'Early Indicator';
         }
-        if ($year === 12 && $semester === 2) {
+        if ($year === 12 && $this->semesterFrom === 2) {
             return 'Predicted Grade';
         }
-        throw new LogicException("Unable to determine header. Curriculum Year: {$year}, Curriculum Semester: {$semester}");
+        throw new LogicException("Unable to determine header. Curriculum Year: {$year}, Curriculum Semester: {$this->semesterFrom}");
     }
 }

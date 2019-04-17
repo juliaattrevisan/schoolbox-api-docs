@@ -107,6 +107,7 @@ class NesaScoreGraph extends BaseComponent
             'data'          => $markData,
             'studentMark'   => $studentMark,
             'showComponent' => $showComponent,
+            'semester'      => $this->semesterFrom,
         ];
         if (isset($error)) {
             $context['error'] = $error;
