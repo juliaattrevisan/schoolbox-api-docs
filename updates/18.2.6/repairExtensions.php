@@ -80,7 +80,7 @@ $app = new class extends CliTool\App
             $newFilename = substr($row['filename'], 0, \strrpos($row['filename'], '.'));
 
             $updateStorage->execute([
-                'filename' => substr($row['filename'], 0, \strrpos($row['filename'], '.')),
+                'filename' => $newFilename,
                 'ext' => $row['original_extension'],
                 'storageId' => $row['storage_id']
             ]);
