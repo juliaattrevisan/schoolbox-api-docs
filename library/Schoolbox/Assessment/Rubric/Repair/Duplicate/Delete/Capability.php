@@ -25,8 +25,8 @@ use Schoolbox\Assessment\Rubric\Repair\Base;
  * ** if it's neither in use on any due works, nor containing any indicators:
  * *** deletes the capability
  *
- * This script will raise an error (and not continue to merge the capability)
- * if both the original and duplicate are in use on the same assessment.
+ * This script will refuse to delete a duplicate capability which is still in
+ * use on a due work, or which still contains indicators.
  */
 class Capability extends Base
 {

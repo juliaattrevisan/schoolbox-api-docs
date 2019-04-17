@@ -25,8 +25,8 @@ use Schoolbox\Assessment\Rubric\Repair\Base;
  * ** if it's not in use on any due works:
  * *** deletes the capability
  *
- * This script will raise an error (and not continue to merge the indicator)
- * if both the original and duplicate are in use on the same assessment.
+ * This script will refuse to delete a duplicate indicator which is still in
+ * use on a due work.
  */
 class Indicator extends Base
 {
