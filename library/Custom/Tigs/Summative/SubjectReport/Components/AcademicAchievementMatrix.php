@@ -140,7 +140,7 @@ class AcademicAchievementMatrix extends BaseComponent
         // Did we find 2+ AAM assessments in this unit?
         $countAam = \count($aamAssessables);
         if ($countAam >= 2) {
-            return ['error' => "A unit may have 0 or 1 Academic Achievement Matrix assessments per unit. Found {$countAam}."];
+            return ['error' => "A unit may have 0 or 1 Approaches to Learning assessments per unit. Found {$countAam}."];
         }
 
         // Did we find no data?

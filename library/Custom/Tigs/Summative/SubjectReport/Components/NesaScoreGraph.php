@@ -22,7 +22,7 @@ use UnexpectedValueException;
 use LogicException;
 
 /**
- * Builds a suitable data structure for rendering the NESA Score Graph component.
+ * Builds a suitable data structure for rendering the NESA Grade Graph component.
  */
 class NesaScoreGraph extends BaseComponent
 {
@@ -128,7 +128,7 @@ class NesaScoreGraph extends BaseComponent
     {
         $assessables = [];
         foreach ($this->unitImpls as $unitImpl) {
-            // Get the NESA Score assessable out of each unit impl
+            // Get the NESA Grade assessable out of each unit impl
             // We only care about assessments due within the report's window
             $folder   = $unitImpl->getBaseContext()->getFolder();
             $folderId = $folder->getId();
@@ -153,7 +153,7 @@ class NesaScoreGraph extends BaseComponent
                 if (!$assessment instanceof DueWork\Model) {
                     throw new UnexpectedValueException(
                         sprintf(
-                            'Only due works can be used for the NESA Score graph. Assessment "%s" in folder "%s" is a %s.',
+                            'Only due works can be used for the NESA Grade graph. Assessment "%s" in folder "%s" is a %s.',
                             $assessment->getTitle(),
                             $folder->getTitle(),
                             $assessment->getTypeName()
@@ -164,7 +164,7 @@ class NesaScoreGraph extends BaseComponent
                 if ($assessment->getMarkType()->getSlug() !== MarkType::SLUG_LETTER) {
                     throw new UnexpectedValueException(
                         sprintf(
-                            "A NESA Score due work must have Mark Type of 'Letter Grade'. Assessment '%s' in folder '%s' has a mark type of  '%s'",
+                            "A NESA Grade due work must have Mark Type of 'Letter Grade'. Assessment '%s' in folder '%s' has a mark type of  '%s'",
                             $assessment->getTitle(),
                             $folder->getTitle(),
                             $assessment->getMarkType()->getName()
@@ -225,7 +225,7 @@ class NesaScoreGraph extends BaseComponent
             if ($count > 1 || ($count === 0 && $folderId === $this->folder->getId())) {
                 throw new UnexpectedValueException(
                     sprintf(
-                        'A folder must have exactly one NESA Score assessment. Folder "%s" contains %d.',
+                        'A folder must have exactly one NESA Grade assessment. Folder "%s" contains %d.',
                         $folder->getTitle(),
                         $count
                     )
