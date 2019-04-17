@@ -28,6 +28,12 @@
         </div>
     </div>
 
+    <div class="checklist small-12 island" v-if="! showSkeletonLoader && !studentLists.length">
+        <div class="content clearfix" style="background-color: #FFF;">
+            Sorry, the system is unable to find any student in this class.
+        </div>
+    </div>
+
     <template v-if="actionsPlaceholder">
         {#  Just a place holder. Cause currently when we remove this line, the actions doesn't work.
             Seems like when the page has loaded, foundation JS looks for this element right-away.
