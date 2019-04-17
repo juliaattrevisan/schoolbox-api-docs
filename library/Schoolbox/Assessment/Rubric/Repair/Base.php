@@ -325,7 +325,7 @@ abstract class Base extends CliTool\App
     {
         $encoding = 'UTF-8';
         if (mb_strlen($string, $encoding) > $length) {
-            return mb_substr($string, $length - mb_strlen($trailing, $encoding), $encoding) . $trailing;
+            return mb_substr($string, 0, $length - mb_strlen($trailing, $encoding), $encoding) . $trailing;
         }
         return $string;
     }
