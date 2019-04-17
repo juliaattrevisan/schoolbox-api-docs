@@ -3,10 +3,12 @@
 <div class="row" id="email-class-lists">
     <div class="small-12 island">
         {% block header %}{% endblock %}
-        {% block content %}{% endblock %}
+        <table id="contact-table" v-if="! showSkeletonLoader && studentLists.length">
+            {% block content %}{% endblock %}
+        </table>
     </div>
 
-    <div class="checklist small-12 island" v-if="! showSkeletonLoader && mailEnabled">
+    <div class="checklist small-12 island" v-if="! showSkeletonLoader && mailEnabled && studentLists.length">
         <div class="content clearfix" style="background-color: #FFF;">
             <ul class="inline-list no-margin left">
                 <template v-for="(group, index) in groups">
