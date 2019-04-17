@@ -10,6 +10,7 @@ namespace Schoolbox\Application\CliTool;
 
 use Aura\Di;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 /**
  * A composite app: contains one or more sub-apps to be run in sequence.
@@ -75,11 +76,21 @@ class Composite extends App
 
     /**
      * Runs all sub-apps.
+     *
+     * @throws Throwable The last exception from a sub-app
      */
     public function run(): void
     {
+        $lastException = null;
         foreach ($this->subApps as $subApp) {
-            $subApp->run();
+            try {
+                $subApp->run();
+            } catch (Throwable $e) {
+                $lastException = $e;
+            }
+        }
+        if ($lastException) {
+            throw $e;
         }
     }
 

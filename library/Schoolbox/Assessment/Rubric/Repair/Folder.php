@@ -13,6 +13,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Composite;
+use Throwable;
 
 /**
  * Composite app for repairing sub-apps.
@@ -63,7 +64,7 @@ class Folder extends Composite
      * All sub-apps are wrapped in a transaction before running.
      *
      * @throws Di\Exception\ServiceNotFound
-     * @throws \Throwable if any sub-app threw anything
+     * @throws Throwable if any sub-app threw anything
      */
     public function run(): void
     {
@@ -71,21 +72,17 @@ class Folder extends Composite
         $db = $this->getDi()->get('databaseInternal');
         $db->beginTransaction();
 
-        $lastException = null;
         try {
             parent::run();
-        } catch (\Throwable $e) {
-            $lastException = $e;
+        } catch (Throwable $e) {
+            $db->rollBack();
+            throw $e;
         }
 
         if ($this->perform()) {
             $db->commit();
         } else {
             $db->rollBack();
-        }
-
-        if ($lastException) {
-            throw $lastException;
         }
     }
 }
