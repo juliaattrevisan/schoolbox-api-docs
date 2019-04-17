@@ -384,8 +384,8 @@ class Controller extends Base
                 'classCode'         => $classCode,
                 'specialNeeds'      => $this->getDi()->get('sitePage')->getLocalisedTerm('specialNeeds', false, true),
                 'replyTo'           => $this->getUser()->getEmail(),
-                'mailEnabled'       => ConfigMapper::getInstance()->get('mail_enable'),
-                'pastoralEnabled'   => ConfigMapper::getInstance()->get('pastoral_enabled'),
+                'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
+                'pastoralEnabled'   => $this->getConfigLoader()->get('pastoral_enabled'),
                 'today'             => Alaress_Date_Format::now()->getURLDate(),
                 'mailHandle'        => $this->getSession()->get('mailhandle'),
                 'emailGroups'       => $this->getClassListsEmailGroups(),
@@ -403,14 +403,14 @@ class Controller extends Base
             'isChecked' => true,
         ];
 
-        if (ConfigMapper::getInstance()->get('email_all_parents')) {
+        if ($this->getConfigLoader()->get('email_all_parents')) {
             $result[] = [
                 'label' => 'parents',
                 'isChecked' => false,
             ];
         }
 
-        if (ConfigMapper::getInstance()->get('email_housemasters')) {
+        if ($this->getConfigLoader()->get('email_housemasters')) {
             $result[] = [
                 'label' => 'housemasters',
                 'isChecked' => false,
