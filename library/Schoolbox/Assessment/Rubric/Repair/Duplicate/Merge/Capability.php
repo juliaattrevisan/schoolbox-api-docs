@@ -233,7 +233,7 @@ class Capability extends Base
                     'name'     => $capabilityName,
                     'folderId' => $folderId,
                 ];
-                $this->db->beginTransaction();
+                $this->createSavepoint();
                 try {
                     // do stuff
                     $this->log->notice(
@@ -253,11 +253,11 @@ class Capability extends Base
                 }
 
                 if ($conflict) {
-                    $this->db->rollBack();
+                    $this->rollbackSavepoint();
                 } elseif (!$this->perform()) {
-                    $this->db->rollBack();
+                    $this->rollbackSavepoint();
                 } else {
-                    $this->db->commit();
+                    $this->commitSavepoint();
                 }
             }
         }

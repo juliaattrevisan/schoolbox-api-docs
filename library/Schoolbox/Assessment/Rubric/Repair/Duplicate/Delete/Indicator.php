@@ -165,12 +165,12 @@ class Indicator extends Base
                     $groupedIndicators[$indName][] = $indId;
                 }
 
-                $this->db->beginTransaction();
+                $this->createSavepoint();
                 $this->deleteIndicators($groupedIndicators, $folderId);
                 if ($this->perform()) {
-                    $this->db->commit();
+                    $this->commitSavepoint();
                 } else {
-                    $this->db->rollBack();
+                    $this->rollbackSavepoint();
                 }
             }
         }
