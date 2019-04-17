@@ -12,26 +12,26 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 
 /**
- * A composite app: contains one or more apps to be run in sequence.
+ * A composite app: contains one or more sub-apps to be run in sequence.
  */
 class Composite extends App
 {
     /**
-     * A set of apps to run.
+     * A set of sub-apps to run.
      *
      * @var array|App[]
      */
-    private $apps = [];
+    private $subApps = [];
 
 
     /**
      * Constructor
      *
-     * @param App ...$apps
+     * @param App ...$subApps
      */
-    public function __construct(App... $apps)
+    public function __construct(App... $subApps)
     {
-        $this->apps = $apps;
+        $this->subApps = $subApps;
     }
 
 
@@ -43,10 +43,33 @@ class Composite extends App
     public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): App
     {
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
-        foreach ($this->apps as $app) {
-            $app->setup($appOptions, $di, $outStream, $logger, $perform);
+        foreach ($this->subApps as $subApp) {
+            $this->setupSubApp($subApp, $appOptions, $di, $outStream, $logger, $perform);
         }
         return $this;
+    }
+
+
+    /**
+     * Overridable setup for sub-apps.
+     *
+     * @param App             $subApp
+     * @param array           $appOptions
+     * @param Di\Container    $di
+     * @param                 $outStream
+     * @param LoggerInterface $logger
+     * @param bool            $perform
+     * @throws Di\Exception\ServiceNotFound
+     */
+    protected function setupSubApp(
+        App $subApp,
+        array $appOptions,
+        Di\Container $di,
+        $outStream,
+        LoggerInterface $logger,
+        bool $perform
+    ): void {
+        $subApp->setup($appOptions, $di, $outStream, $logger, $perform);
     }
 
 
@@ -55,8 +78,8 @@ class Composite extends App
      */
     public function run(): void
     {
-        foreach ($this->apps as $app) {
-            $app->run();
+        foreach ($this->subApps as $subApp) {
+            $subApp->run();
         }
     }
 }
