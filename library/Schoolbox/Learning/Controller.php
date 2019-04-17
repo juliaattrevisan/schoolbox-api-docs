@@ -13,9 +13,9 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use function func_get_args;
 use External_Class;
+use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -35,6 +35,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Resource\Folder;
 use UnexpectedValueException;
+use Schoolbox\L10n\RosettaStone;
 
 class Controller extends Base
 {
@@ -65,8 +66,20 @@ class Controller extends Base
     /** @var Folder\ClassListFactory */
     private $classListFactory;
 
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var Folder\Log\Mapper */
+    private $logMapper;
+
+    /** @var External_ClassInterface */
+    private $externalClass;
+
+    private $rosettaStone;
 
     /**
+     * Controller constructor.
+     *
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param FolderMapper               $folderMapper
      * @param TermMapper                 $termMapper
@@ -74,6 +87,9 @@ class Controller extends Base
      * @param Filter\Selection\Mapper    $filterSelectionMapper
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
      * @param Folder\ClassListFactory    $classListFactory
+     * @param UserMapper                 $userMapper
+     * @param Folder\Log\Mapper          $logMapper
+     * @param External_ClassInterface   $externalClass
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -82,7 +98,11 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        Folder\ClassListFactory $classListFactory
+        Folder\ClassListFactory $classListFactory,
+        UserMapper $userMapper,
+        Folder\Log\Mapper $logMapper,
+        External_ClassInterface $externalClass,
+        RosettaStone $rosettaStone
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->termMapper                 = $termMapper;
@@ -91,6 +111,10 @@ class Controller extends Base
         $this->filterSelectionMapper      = $filterSelectionMapper;
         $this->assessmentIdFinder         = $assessmentIdFinder;
         $this->classListFactory           = $classListFactory;
+        $this->userMapper                 = $userMapper;
+        $this->logMapper                  = $logMapper;
+        $this->externalClass              = $externalClass;
+        $this->rosettaStone               = $rosettaStone;
     }
 
 
@@ -357,7 +381,7 @@ class Controller extends Base
      */
     public function getStudentListByClassCode(string $classCode): void
     {
-        $students = (new StudentLists(new External_Class(), new UserMapper(), $this->folderMapper, new Folder\Log\Mapper()))
+        $students = (new StudentLists($this->externalClass, $this->userMapper, $this->folderMapper, $this->logMapper))
             ->setClassCode($classCode)
             ->getStudentLists();
 
@@ -382,7 +406,7 @@ class Controller extends Base
                 'homepageId'        => $folder->getId(),
                 'subjectName'       => $subjectName,
                 'classCode'         => $classCode,
-                'specialNeeds'      => $this->getDi()->get('sitePage')->getLocalisedTerm('specialNeeds', false, true),
+                'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
                 'replyTo'           => $this->getUser()->getEmail(),
                 'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'   => $this->getConfigLoader()->get('pastoral_enabled'),

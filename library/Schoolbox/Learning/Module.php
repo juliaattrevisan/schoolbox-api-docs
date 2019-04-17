@@ -181,6 +181,10 @@ class Module extends BaseModule
             'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
             'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
+            'externalClass'              => $this->getInjector()->get('externalClass'),
+            'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'logMapper'                  => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
+            'rosettaStone'               => $injector->lazyGet('l10n'),
             'assessmentIdFinder'         => $injector->lazy(function(){
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);

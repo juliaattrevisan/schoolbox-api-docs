@@ -7,7 +7,7 @@
 namespace Schoolbox\Learning\Students;
 
 
-use External_Class;
+use External_ClassInterface;
 
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Log\Mapper as LogMapper;
@@ -27,15 +27,8 @@ class StudentLists
 
     private $folderMapper;
 
-    /**
-     * StudentLists constructor.
-     *
-     * @param External_Class $externalClass
-     * @param UserMapper     $userMapper
-     * @param FolderMapper   $folderMapper
-     * @param LogMapper      $logMapper
-     */
-    public function __construct(External_Class $externalClass,
+
+    public function __construct(External_ClassInterface $externalClass,
                                 UserMapper $userMapper,
                                 FolderMapper $folderMapper,
                                 LogMapper $logMapper
