@@ -193,6 +193,12 @@ class Capability extends Base
             // Delete any duplicates which contain no indicators, and are not in use
             array_shift($capabilityIds);
             foreach ($capabilityIds as $capabilityId) {
+                $result = [
+                    'id'       => $capabilityId,
+                    'name'     => $capabilityName,
+                    'folderId' => $folderId,
+                ];
+
                 // Indicator check
                 $this->countCapabilityIndicatorsQuery->execute(['capabilityId' => $capabilityId]);
                 $indicatorCount = (int)$this->countCapabilityIndicatorsQuery->fetchColumn();
@@ -201,6 +207,7 @@ class Capability extends Base
                         self::indent(2)
                         . sprintf('refusing to delete capability #%d, as it contains indicators', $capabilityId)
                     );
+                    $this->failedCapabilities[$capabilityId] = $result;
                     continue;
                 }
 
@@ -211,6 +218,7 @@ class Capability extends Base
                     $this->log->warning(
                         self::indent(2) . sprintf('refusing to delete capability #%d, as it is in use', $capabilityId)
                     );
+                    $this->failedCapabilities[$capabilityId] = $result;
                     continue;
                 }
 
@@ -221,11 +229,7 @@ class Capability extends Base
                     'capabilityId' => $capabilityId,
                     'now'          => $this->now->getDatabase(),
                 ]);
-                $this->fixedCapabilities[$capabilityId] = [
-                    'id'       => $capabilityId,
-                    'name'     => $capabilityName,
-                    'folderId' => $folderId,
-                ];
+                $this->fixedCapabilities[$capabilityId] = $result;
             }
         }
     }

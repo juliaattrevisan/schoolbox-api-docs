@@ -203,6 +203,11 @@ class Indicator extends Base
             // Delete any duplicates which are not in use
             array_shift($indicatorIds);
             foreach ($indicatorIds as $indicatorId) {
+                $result = [
+                    'id'       => $indicatorId,
+                    'name'     => $indicatorName,
+                    'folderId' => $folderId,
+                ];
 
                 $this->countIndicatorUsagesQuery->execute(['indicatorId' => $indicatorId]);
                 $usageCount = (int)$this->countIndicatorUsagesQuery->fetchColumn();
@@ -214,15 +219,12 @@ class Indicator extends Base
                         'indicatorId' => $indicatorId,
                         'now'         => $this->now->getDatabase(),
                     ]);
-                    $this->fixedIndicators[$indicatorId] = [
-                        'id'       => $indicatorId,
-                        'name'     => $indicatorName,
-                        'folderId' => $folderId,
-                    ];
+                    $this->fixedIndicators[$indicatorId] = $result;
                 } else {
                     $this->log->warning(
                         self::indent(2) . sprintf('refusing to delete indicator #%d, as it is in use', $indicatorId)
                     );
+                    $this->failedIndicators[$indicatorId] = $result;
                 }
             }
         }
