@@ -1,344 +1,87 @@
-{% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-    [ subjectName, '/homepage/' ~ homepageId ],
-    ['Class List']
-) }}
+{% extends '@learning/baseClassLists.twig' %}
 
-<div class="row" id="email-class-lists">
-    <div class="small-12 island">
-        <h1>${ subject }</h1>
-        <template v-if="showSkeletonLoader" v-for="n in 3">
-            <div class="list-item">
-                <div class="small-12 card skeleton">
-                    <div class="img"></div>
-                    <h3></h3>
-                    <p class="meta"></p>
-                </div>
-            </div>
-        </template>
-        <table id="contact-table" v-if="! showSkeletonLoader">
-            <thead>
+{% block header %}
+    {% include '@learning/component/classLists/header.twig' %}
+{% endblock %}
+
+{% block content %}
+    <table id="contact-table" v-if="! showSkeletonLoader">
+        <thead>
+        <tr>
+            <th v-if="mailEnabled">
+                <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
+                <label for="select-all" class="checkbox-label"></label>
+            </th>
+            <th></th>
+            <th>Name</th>
+            <th class="show-for-large-up">Year Level</th>
+            <th class="show-for-large-up">Tutor Group</th>
+            <th class="show-for-medium-up">Core Group</th>
+            <th class="show-for-medium-up">Last Visited</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <template v-for="student in studentLists">
             <tr>
-                <th v-if="mailEnabled">
-                    <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
-                    <label for="select-all" class="checkbox-label"></label>
-                </th>
-                <th></th>
-                <th>Name</th>
-                <th class="show-for-large-up">Year Level</th>
-                <th class="show-for-large-up">Tutor Group</th>
-                <th class="show-for-medium-up">Core Group</th>
-                <th class="show-for-medium-up">Last Visited</th>
-                <th></th>
+                <td v-if="mailEnabled">
+                    <input type="checkbox" name="students[]" :id="'id-' + student.synergy_id"
+                           :value="student.synergy_id" @click="select"/>
+                    <label :for="'id-' + student.synergy_id" class="checkbox-label"></label>
+                </td>
+                <td>
+                    <img :src="'/portrait.php?userId=' + student.synergy_id + '&size=square64'"
+                         :alt="student.lastname + ', ' + student.firstname"></a>
+                </td>
+                <td>
+                    <template v-if="student.id">
+                        <a :href="'/search/user/' + student.id">${ student.lastname + ', ' + student.firstname }</a>
+                    </template>
+                    <template v-else>
+                        ${ student.lastname + ', ' + student.firstname }
+                    </template>
+                    <span class="meta">(${ student.synergy_id })</span>
+                    <span class="show-for-print"><br>${ student.email }</span>
+                    <p class="meta">
+                        <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight"
+                              title="English as a second language"></span>
+                        <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning"
+                              :title="specialNeeds"></span>
+                        <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert"
+                              :title="'Medical Alert: ' + student.StudentMedicalAlert"></span>
+                    </p>
+
+                    <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
+                        <li><a :href="'/learning/due/' + student.id" class="icon-due-work">${
+                                linkTitle.dueWork.capitalise() }</a></li>
+                        <li><a :href="'/learning/grades/' + student.id" class="icon-approve">${
+                                linkTitle.grades.capitalise() }</a></li>
+                        <li v-if="student.ePortfolioIsEnabled"><a :href="'/eportfolio/' + student.id + '/profile'"
+                                                                  class="icon-eportfolio">${ linkTitle.ePortfolio }</a>
+                        </li>
+                        <li v-if="pastoralIsEnabled"><a :href="'/pastoral/student/' + student.id" class="icon-pastoral">${
+                                linkTitle.pastoralCare.capitalise() }</a></li>
+                        <li><a :href="calendarPath + '/' + student.id" class="icon-calendar">${
+                                linkTitle.calendar.capitalise() }</a></li>
+                        <li><a :href="/timetable/+ student.synergy_id" class="icon-timetable">${
+                                linkTitle.timetable.capitalise() }</a></li>
+                        <li v-if="student.email"><a :href="mailHandle + student.email" class="icon-mail"
+                                                    title="Send Email">${ linkTitle.email.capitalise() }</a></li>
+                    </ul>
+                </td>
+                <td class="show-for-large-up">${ student.yearlevel }</td>
+                <td class="show-for-medium-up">${ student.StudentTutorDescription }</td>
+                <td class="show-for-medium-up">${ student.StudentForm }</td>
+                <td class="show-for-medium-up">${ student.lastAccessTime }</td>
+                <td class="no-pad">
+                    <div class="actions-small-1" v-if="student.id">
+                        <nav>
+                            <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
+                        </nav>
+                    </div>
+                </td>
             </tr>
-            </thead>
-            <tbody>
-            <template v-for="student in studentLists">
-                <tr>
-                    <td v-if="mailEnabled">
-                        <input type="checkbox" name="students[]" :id="'id-' + student.synergy_id" :value="student.synergy_id" @click="select" />
-                        <label :for="'id-' + student.synergy_id" class="checkbox-label"></label>
-                    </td>
-                    <td>
-                        <img :src="'/portrait.php?userId=' + student.synergy_id + '&size=square64'" :alt="student.lastname + ', ' + student.firstname"></a>
-                    </td>
-                    <td>
-                        <template v-if="student.id">
-                            <a :href="'/search/user/' + student.id">${ student.lastname + ', ' + student.firstname }</a>
-                        </template>
-                        <template v-else>
-                            ${ student.lastname + ', ' + student.firstname }
-                        </template>
-                        <span class="meta">(${ student.synergy_id })</span>
-                        <span class="show-for-print"><br>${ student.email }</span>
-                        <p class="meta">
-                            <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight" title="English as a second language"></span>
-                            <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" :title="specialNeeds"></span>
-                            <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + student.StudentMedicalAlert"></span>
-                        </p>
-
-                        <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
-                            <li><a :href="'/learning/due/' + student.id" class="icon-due-work">${ linkTitle.dueWork.capitalise() }</a></li>
-                            <li><a :href="'/learning/grades/' + student.id" class="icon-approve">${ linkTitle.grades.capitalise() }</a></li>
-                            <li v-if="student.ePortfolioIsEnabled"><a :href="'/eportfolio/' + student.id + '/profile'" class="icon-eportfolio">${ linkTitle.ePortfolio }</a></li>
-                            <li v-if="pastoralIsEnabled"><a :href="'/pastoral/student/' + student.id" class="icon-pastoral">${ linkTitle.pastoralCare.capitalise() }</a></li>
-                            <li><a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar.capitalise() }</a></li>
-                            <li><a :href="/timetable/+ student.synergy_id" class="icon-timetable">${ linkTitle.timetable.capitalise() }</a></li>
-                            <li v-if="student.email"><a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email.capitalise() }</a></li>
-                        </ul>
-                    </td>
-                    <td class="show-for-large-up">${ student.yearlevel }</td>
-                    <td class="show-for-medium-up">${ student.StudentTutorDescription }</td>
-                    <td class="show-for-medium-up">${ student.StudentForm }</td>
-                    <td class="show-for-medium-up">${ student.lastAccessTime }</td>
-                    <td class="no-pad">
-                        <div class="actions-small-1" v-if="student.id">
-                            <nav>
-                                <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
-                            </nav>
-                        </div>
-                    </td>
-                </tr>
-            </template>
-            </tbody>
-        </table>
-    </div>
-
-    <div class="checklist small-12 island" v-if="! showSkeletonLoader && mailEnabled">
-        <div class="content clearfix" style="background-color: #FFF;">
-            <ul class="inline-list no-margin left">
-                <template v-for="(group, index) in groups">
-                    <li v-bind:class="index < 1 ? 'no-margin' : ''">
-                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" />
-                        <label :for="group.label">${ group.label.capitalise() }</label>
-                    </li>
-                </template>
-            </ul>
-            <span class="right">
-                <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
-                    <input type="hidden" name="replyto" :value="replyTo"/>
-                    <input type="hidden" name="bcc" v-model="emailLists.join(emailDelimiter)" />
-                    <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
-                </form>
-            </span>
-        </div>
-    </div>
-
-    <template v-if="actionsPlaceholder">
-        {#  Just a place holder. Cause currently when we remove this line, the actions doesn't work.
-            Seems like when the page has loaded, foundation JS looks for this element right-away.
-         #}
-        <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
-    </template>
-</div>
-
-<script src="/javascript/components/schoolbox-vue.min.js"></script>
-<script type="text/javascript">
-    Vue.config.devtools = true;
-
-    var postHeaders = {
-        'X-Requested-With' : 'XMLHttpRequest',
-    };
-
-    var app = new Vue({
-        el: '#email-class-lists',
-        delimiters: ['${', '}'],
-        data: {
-            subjectName: '{{ subjectName }}',
-            classCode: '{{ classCode }}',
-            replyToEmail: '{{ replyTo }}',
-            mailEnabled: Boolean({{ mailEnabled }}),
-            specialNeeds: '{{ specialNeeds }}',
-            studentLists: [],
-            showSkeletonLoader: true,
-            isAllSelected: false,
-            selectedStudentIds: [],
-            studentsCheckboxElements: undefined,
-            groups: [
-                {label: 'students', isChecked: true},
-                {label: 'parents', isChecked: false},
-                {label: 'housemasters', isChecked: false},
-            ],
-            groupsCheckboxElements: [],
-            selectedGroups: [],
-            enableSendEmailButton: false,
-            sendEmailButtonText: 'Email Selected',
-            emailLists: [],
-            emailDelimiter: String.fromCharCode(30),
-            classListsEndpointPrefix: '/subject/classList/ajax/',
-            getStudentListsEndpointPrefix: '/learning/class/lists/',
-            formIsReady: false,
-            linkTitle: {
-                'dueWork':      '{{ locale.dueWork }}',
-                'grades':       '{{ locale.grades.plural }}',
-                'pastoralCare': '{{ locale.pastoralCare.proper }}',
-                'calendar':     '{{ locale.calendar }}',
-                'ePortfolio':   'ePortfolio',
-                'timetable':    'Timetable',
-                'email':        'Email',
-            },
-            calendarPath: '{{ '/calendar/full/' ~ today }}',
-            pastoralIsEnabled: Boolean({{ pastoralEnabled }}),
-            mailHandle: '{{ mailHandle }}',
-            actionsPlaceholder: true,
-        },
-        mounted: function() {
-            new Promise(resolve => {
-                this.getStudents();
-            });
-        },
-        methods: {
-            async getStudents()
-            {
-                var self = this;
-
-                var studentLists;
-
-                studentLists = axios.get(self.getStudentListsEndpointPrefix + self.classCode)
-                    .then(function (response) {
-                        self.studentLists = response.data;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    }).finally(function() {
-                        self.showSkeletonLoader = false; // Hide skeleton loader and show class list table
-                    });
-
-                await studentLists;
-
-                self.studentsCheckboxElements = document.getElementsByName('students[]');
-                self.groupsCheckboxElements = document.getElementsByName('groups[]');
-                self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
-
-                // On initial load, set group checkboxes to checked if the isChecked value from the array groups is true
-                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
-                    if (self.groups[i].isChecked) {
-                        self.groupsCheckboxElements[i].checked = true;
-                        self.selectedGroups.push(self.groupsCheckboxElements[i].value);
-                    }
-                }
-
-                this.selectAllStudents();
-            },
-            async fetchEmails(event)
-            {
-                var self = this;
-
-                var endpoint = '';
-
-                var promises = [];
-
-                self.emailLists = [];
-
-                // While the system is preparing the email lists, disable the button
-                self.enableSendEmailButton = false;
-
-                self.sendEmailButtonText = 'Please wait...';
-
-                // Prepare endpoints to requests. Loop through the selected groups.
-                for (var i = 0; i < self.selectedGroups.length; i++) {
-                    var groupname = self.selectedGroups[i];
-
-                    switch(groupname) {
-                        case 'students':
-                            endpoint = 'emailStudentsById.php';
-                            break;
-                        case 'parents':
-                            endpoint = 'emailParentsById.php';
-                            break;
-                        case 'housemasters':
-                            endpoint = 'emailHousemastersById.php';
-                            break;
-                    }
-                    promises.push(self.requestData(event, endpoint));
-                }
-
-                await Promise.all(promises);
-
-                // Once all the requests are done, set the ready flag to true.
-                // The watcher will then trigger the submit
-                // More for watchers: https://vuejs.org/v2/guide/computed.html#Watchers
-                self.formIsReady = true
-            },
-            async requestData(event, endpoint)
-            {
-                var self = this;
-
-                if (endpoint !== '') {
-                    return axios.post(self.classListsEndpointPrefix + endpoint,
-                        {classCode: self.classCode, allIds: self.selectedStudentIds},
-                        {headers: postHeaders})
-                        .then(function (response) {
-                            if (response.data[0].length > 0) {
-                                self.emailLists.push(response.data);
-                            }
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
-                }
-            },
-            selectAllStudents: function(event) {
-                var self = this;
-                var isChecked = (event === undefined || event.target.checked);
-
-                self.selectedStudentIds.length = 0;
-
-                // Loop through the list of students and check all of them
-                for (var i = 0; i < self.studentsCheckboxElements.length; i++) {
-                    self.studentsCheckboxElements[i].checked = isChecked;
-                    if (isChecked) {
-                        self.selectedStudentIds.push(self.studentsCheckboxElements[i].value);
-                    }
-                }
-
-                self.updateSendEmailButtonState();
-
-                self.isAllSelected = true;
-            },
-            select: function(event) {
-                var self = this;
-
-                // If selected, add the student ids into the array. Otherwise, just remove the id
-                if (event.target.checked) {
-                    self.selectedStudentIds.push(event.target.value);
-                } else {
-                    self.selectedStudentIds = self.selectedStudentIds.filter(item => item !== event.target.value)
-                }
-
-                // Check whether all the students are selected. If so make the select all checkbox ticked
-                if (self.selectedStudentIds.length < self.studentsCheckboxElements.length) {
-                    this.isAllSelected = false;
-                } else {
-                    self.isAllSelected = true;
-                }
-
-                self.updateSendEmailButtonState();
-            },
-            sendEmail: function(event) {
-                var self = this;
-
-                self.fetchEmails();
-            },
-            updateSelectedGroups: function(event)
-            {
-                var self = this;
-
-                if (!self.groupsCheckboxElements) {
-                    return;
-                }
-
-                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
-                    if (self.groupsCheckboxElements[i].checked) {
-                        if (!self.selectedGroups.includes(self.groupsCheckboxElements[i].value)) {
-                            self.selectedGroups.push(self.groupsCheckboxElements[i].value);
-                        }
-                    } else {
-                        self.selectedGroups = self.selectedGroups.filter(item => item !== self.groupsCheckboxElements[i].value)
-                    }
-                }
-
-                self.updateSendEmailButtonState();
-            },
-            updateSendEmailButtonState: function()
-            {
-                var self = this;
-
-                self.enableSendEmailButton = self.selectedStudentIds.length > 0 && self.selectedGroups.length > 0;
-            },
-        },
-        computed: {
-            replyTo: function() {
-                return '"' + this.subject + '"' + ' <' + this.replyToEmail + '>';
-            },
-            subject: function() {
-                return this.subjectName + ' (' + this.classCode + ')';
-            }
-        },
-        watch: {
-            formIsReady: function(val) {
-                this.$refs.form.submit();
-            }
-        }
-    });
-</script>
+        </template>
+        </tbody>
+    </table>
+{% endblock %}
