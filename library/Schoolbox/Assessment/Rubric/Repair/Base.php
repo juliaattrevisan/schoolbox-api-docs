@@ -403,7 +403,7 @@ abstract class Base extends CliTool\App
                     '%s due work %s (%s)',
                     'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
                     'https://' . $this->fqdn . '/' . sprintf($dueWorkBaseUrl, $id),
-                    $data['name']
+                    self::truncate($data['name'], self::MAX_LOG_ITEM_WIDTH)
                 )
             );
         }
@@ -416,15 +416,16 @@ abstract class Base extends CliTool\App
             if ($failedCapabilityCount > 0) {
                 $this->log->warning(self::indent(1) . sprintf('%d capabilities:', $failedCapabilityCount));
                 foreach ($this->failedCapabilities as $id => $data) {
-                    $failures[] = [
+                    $truncatedName = self::truncate($data['name'], self::MAX_LOG_ITEM_WIDTH);
+                    $failures[]    = [
                         'url'   => sprintf($folderBaseUrl, $data['folderId']),
-                        'title' => sprintf('capability #%d (%s)', $id, $data['name']),
+                        'title' => sprintf('capability #%d (%s)', $id, $truncatedName),
                     ];
                     $failureMsg = sprintf(
                         '%s capability #%d (%s)',
                         'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
                         $id,
-                        $data['name']
+                        $truncatedName
                     );
                     $this->log->warning(self::indent(2) . $failureMsg);
                 }
@@ -433,15 +434,16 @@ abstract class Base extends CliTool\App
             if ($failedIndicatorCount > 0) {
                 $this->log->warning(self::indent(1) . sprintf('%d indicators:', $failedIndicatorCount));
                 foreach ($this->failedIndicators as $id => $data) {
-                    $failures[] = [
+                    $truncatedName = self::truncate($data['name'], self::MAX_LOG_ITEM_WIDTH);
+                    $failures[]    = [
                         'url'   => sprintf($folderBaseUrl, $data['folderId']),
-                        'title' => sprintf('indicator #%d (%s)', $id, $data['name']),
+                        'title' => sprintf('indicator #%d (%s)', $id, $truncatedName),
                     ];
                     $failureMsg = sprintf(
                         '%s indicator #%d (%s)',
                         'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
                         $id,
-                        $data['name']
+                        $truncatedName
                     );
                     $this->log->warning(self::indent(2) . $failureMsg);
                 }
@@ -450,15 +452,16 @@ abstract class Base extends CliTool\App
             if ($failedDueWorkCount > 0) {
                 $this->log->warning(self::indent(1) . sprintf('%d due works:', $failedDueWorkCount));
                 foreach ($this->failedDueWorks as $id => $data) {
-                    $failures[] = [
+                    $truncatedName = self::truncate($data['name'], self::MAX_LOG_ITEM_WIDTH);
+                    $failures[]    = [
                         'url'   => sprintf($dueWorkBaseUrl, $id),
-                        'title' => sprintf('due work #%d (%s)', $id, $data['name']),
+                        'title' => sprintf('due work #%d (%s)', $id, $truncatedName),
                     ];
                     $failureMsg = sprintf(
                         '%s due work %s (%s)',
                         'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
                         'https://' . $this->fqdn . '/' . sprintf($dueWorkBaseUrl, $id),
-                        $data['name']
+                        $truncatedName
                     );
                     $this->log->warning(self::indent(2) . $failureMsg);
                 }
