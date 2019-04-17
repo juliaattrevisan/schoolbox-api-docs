@@ -158,11 +158,7 @@ class Capability extends Base
 
             $this->createSavepoint();
             $this->deleteCapabilities($groupedCapabilities, $folderId);
-            if ($this->perform()) {
-                $this->commitSavepoint();
-            } else {
-                $this->rollbackSavepoint();
-            }
+            $this->commitSavepoint();
         }
     }
 

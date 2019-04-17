@@ -167,11 +167,7 @@ class Indicator extends Base
 
                 $this->createSavepoint();
                 $this->deleteIndicators($groupedIndicators, $folderId);
-                if ($this->perform()) {
-                    $this->commitSavepoint();
-                } else {
-                    $this->rollbackSavepoint();
-                }
+                $this->commitSavepoint();
             }
         }
     }

@@ -254,8 +254,6 @@ class Capability extends Base
 
                 if ($conflict) {
                     $this->rollbackSavepoint();
-                } elseif (!$this->perform()) {
-                    $this->rollbackSavepoint();
                 } else {
                     $this->commitSavepoint();
                 }
