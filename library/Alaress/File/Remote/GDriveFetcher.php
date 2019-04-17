@@ -27,12 +27,6 @@ class GDriveFetcher implements FetcherInterface
     private const CONTEXT_EXTENSION = 'ext';
 
     /**
-     * Metadata fields that might contain a file extension
-     * Google API sometimes changes causing fields to no longer exist
-     */
-    private const FIELDS_EXTENSION = ['fileExtension', 'fullFileExtension'];
-
-    /**
      * The mimetypeMapping key that stores download urls (exportLinks)
      */
     private const CONTEXT_EXPORTLINKS = 'exportLinks';
@@ -256,33 +250,6 @@ class GDriveFetcher implements FetcherInterface
 
 
     /**
-     * Inspect metadata fields to find a file extension
-     *
-     * @param array $metadata
-     * @return string
-     */
-    private function inspectFileExtension(array $metadata): string
-    {
-        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
-            return self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXTENSION];
-        }
-
-        foreach (self::FIELDS_EXTENSION as $field) {
-            if (!empty($metadata[$field])) {
-                return $metadata[$field];
-            }
-        }
-
-        /* If you got here, the api no longer provides the fields we were originally looking at
-         * https://developers.google.com/drive/api/v2/reference/
-         */
-        trigger_error('Google api fields for extension not found: check api docs', E_USER_WARNING);
-
-        return '';
-    }
-
-
-    /**
      * Derive the file name from the metadata
      *
      * @param array $metadata
@@ -299,11 +266,7 @@ class GDriveFetcher implements FetcherInterface
             return "{$metadata['title']}.pdf";
         }
 
-        /* Inspect metadata fields to find a file extension
-         */
-        $ext = $this->inspectFileExtension($metadata);
-
-        return "{$metadata['title']}.{$ext}";
+        return $metadata['title'];
     }
 
 
