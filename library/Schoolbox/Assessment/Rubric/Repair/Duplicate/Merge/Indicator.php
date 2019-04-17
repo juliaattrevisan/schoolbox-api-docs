@@ -173,7 +173,8 @@ class Indicator extends Base
             }
 
             foreach ($this->findCapabilitiesQuery->fetchColumnArray('name', 'id') as $capId => $capName) {
-                $this->log->notice(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $capName));
+                $truncatedName = self::truncate($capName, self::MAX_LOG_ITEM_WIDTH);
+                $this->log->notice(sprintf(self::indent(1) . 'Checking capability #%d (%s)', $capId, $truncatedName));
                 $this->findCapabilityIndicatorsQuery->execute(['capabilityId' => $capId]);
                 if ($this->findCapabilityIndicatorsQuery->rowCount() === 0) {
                     $this->log->debug(self::indent(2) . 'capability contains no indicators: no action required');
