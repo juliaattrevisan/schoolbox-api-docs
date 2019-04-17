@@ -15,8 +15,6 @@ $page->setDi($kernel->getDependencyInjector());
 
 $groupHandler = new Group;
 
-error_log(print_r($_REQUEST, true), 3, './testing.log');
-
 if (Cfg::get('mail_enable') == 1) {
 
     // Parse out list of emails passed
