@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
 
+use Alaress\Database\Connector\IConnector;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
@@ -49,6 +50,10 @@ abstract class App
     /** @var IConfigLoader */
     private $config;
 
+    /**
+     * @var IConnector
+     */
+    private $databaseInternal;
 
     /**
      * Returns the short options recognised by this App
@@ -88,12 +93,13 @@ abstract class App
      */
     public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): self
     {
-        $this->appOptions = $appOptions;
-        $this->di         = $di;
-        $this->outStream  = $outStream;
-        $this->logger     = $logger;
-        $this->perform    = $perform;
-        $this->config     = $di->get('config');
+        $this->appOptions       = $appOptions;
+        $this->di               = $di;
+        $this->outStream        = $outStream;
+        $this->logger           = $logger;
+        $this->perform          = $perform;
+        $this->config           = $di->get('config');
+        $this->databaseInternal = $di->get('databaseInternal');
 
         return $this;
     }
@@ -179,6 +185,15 @@ abstract class App
     protected function getConfig(): IConfigLoader
     {
         return $this->config;
+    }
+
+
+    /**
+     * @return IConnector
+     */
+    protected function getDatabaseInternal(): IConnector
+    {
+        return $this->databaseInternal;
     }
 
 

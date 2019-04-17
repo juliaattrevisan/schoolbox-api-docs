@@ -37,9 +37,7 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
-        $database = $this->getDi()->get('databaseInternal');
-
-        $updateStorage = $database->prepareQuery(self::UPDATE_QUERY);
+        $updateStorage = $this->getDatabaseInternal()->prepareQuery(self::UPDATE_QUERY);
 
         /* Always run this file, because it's in the updates folder
          */
@@ -70,9 +68,9 @@ $app = new class extends CliTool\App
         /* If it was a valid allowedFiles extension in the `filename` column, and it has
          * a `pdf` extension, then assume it needs correction
          */
-        $statement = $database->executeQuery($query);
+        $statement = $this->getDatabaseInternal()->executeQuery($query);
 
-        $database->beginTransaction();
+        $this->getDatabaseInternal()->beginTransaction();
 
         $count = 0;
 
@@ -92,7 +90,7 @@ $app = new class extends CliTool\App
             $count++;
         }
 
-        $database->commit();
+        $this->getDatabaseInternal()->commit();
 
         /* "Helpful" count
          */
