@@ -28,6 +28,7 @@ abstract class Base extends CliTool\App
     // This tools CLI options
     private const OPT_SHORT_FOLDER = 'f:';
     private const OPT_LONG_MAILTO = 'mailto:';
+    private const OPT_LONG_NO_TRANSACTION = 'no-transaction';
 
 
     // An indentation constant.
@@ -284,6 +285,12 @@ abstract class Base extends CliTool\App
             $this->log->info('Restricting to folders: ' . implode(',', $this->folders));
         }
 
+        // Is this wrapped in a transaction?
+        $transaction = !(bool)$this->getOpt(self::OPT_LONG_NO_TRANSACTION);
+        if ($transaction) {
+            $this->db->beginTransaction();
+        }
+
         $this->log->notice('-----');
         $this->repair();
         $this->log->notice('-----');
@@ -291,8 +298,14 @@ abstract class Base extends CliTool\App
         $this->log->notice('-----');
 
         if ($this->perform()) {
+            if ($transaction) {
+                $this->db->commit();
+            }
             $this->log->alert('Changes written to database');
         } else {
+            if ($transaction) {
+                $this->db->rollBack();
+            }
             $this->log->alert('Dry-run complete - no changes written to database');
         }
 
@@ -412,8 +425,9 @@ abstract class Base extends CliTool\App
      */
     protected function createSavepoint(): bool
     {
-        return $this->db->prepareQuery('SAVEPOINT :name')
-                        ->execute(['name' => $this->generateSavepointName()]);
+        // You'll just have to trust there's no SQL injection here:
+        // I can't bind inputs to a query returned via $this->db->prepareQuery.
+        return $this->db->execute('SAVEPOINT ' . $this->generateSavepointName());
     }
 
 
@@ -431,8 +445,9 @@ abstract class Base extends CliTool\App
      */
     protected function commitSavepoint(): bool
     {
-        return $this->db->prepareQuery('RELEASE SAVEPOINT :name')
-                        ->execute(['name' => $this->retrieveLastSavepointName()]);
+        // You'll just have to trust there's no SQL injection here:
+        // I can't bind inputs to a query returned via $this->db->prepareQuery.
+        return $this->db->execute('RELEASE SAVEPOINT ' . $this->retrieveLastSavepointName());
     }
 
 
@@ -449,9 +464,9 @@ abstract class Base extends CliTool\App
      */
     protected function rollbackSavepoint(): bool
     {
-        $savepoint = array_pop(self::$savepointStack);
-        return $this->db->prepareQuery('ROLLBACK TO SAVEPOINT :name')
-                        ->execute(['name' => $this->retrieveLastSavepointName()]);
+        // You'll just have to trust there's no SQL injection here:
+        // I can't bind inputs to a query returned via $this->db->prepareQuery.
+        return $this->db->execute('ROLLBACK TO SAVEPOINT ' . $this->retrieveLastSavepointName());
     }
 
 
