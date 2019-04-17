@@ -321,8 +321,10 @@ abstract class Base extends CliTool\App
      * @param string $trailing If `$string` is truncated, trail it with this.
      * @return string
      */
-    protected static function truncate(string $string, int $length, string $trailing = '...'): string
+    protected static function truncate($string, int $length, string $trailing = '...'): string
     {
+        // Apparently `$string` needn't be a string?
+        $string   = (string)$string;
         $encoding = 'UTF-8';
         if (mb_strlen($string, $encoding) > $length) {
             return mb_substr($string, 0, $length - mb_strlen($trailing, $encoding), $encoding) . $trailing;
