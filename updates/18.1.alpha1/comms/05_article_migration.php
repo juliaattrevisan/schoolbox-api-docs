@@ -32,7 +32,9 @@ function importSchoolNews(IDatabase $db, LoggerInterface $log)
         /* Figger out all the relations, ram them in accordingly
          */
         if ($articleId) {
-            createSchoolNewsTopics($db, $articleId, $row, $log);
+            if ($row['item_topic_id']) {
+                createSchoolNewsTopics($db, $articleId, (int)$row['item_topic_id'], $log);
+            }
             createSchoolNewsUserAudience($db, $row['item_id'], $articleId, $log);
             createSchoolNewsCampusRoleAudience($db, $row['item_id'], $articleId, $log);
         } else {
@@ -162,10 +164,10 @@ function createSchoolNewsArticle(IDatabase $db, array $row, LoggerInterface $log
  *
  * @param IDatabase       $db
  * @param int             $articleId
- * @param array           $row
+ * @param int             $topicId
  * @param LoggerInterface $log
  */
-function createSchoolNewsTopics(IDatabase $db, int $articleId, array $row, LoggerInterface $log)
+function createSchoolNewsTopics(IDatabase $db, int $articleId, int $topicId, LoggerInterface $log)
 {
     $query = '
         INSERT INTO comms_news_article_topic (article_id, topic_id) 
@@ -174,12 +176,12 @@ function createSchoolNewsTopics(IDatabase $db, int $articleId, array $row, Logge
 
     $db->prepare($query)->execute([
         'articleId' => $articleId,
-        'topicId' => $row['item_topic_id']
+        'topicId' => $topicId
     ]);
 
     /* Log it
      */
-    $log->info("School News article_id {$articleId} assigned topic {$row['item_topic_id']}");
+    $log->info("School News article_id {$articleId} assigned topic {$topicId}");
 }
 
 /**
