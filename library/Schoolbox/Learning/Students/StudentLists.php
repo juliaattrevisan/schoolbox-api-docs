@@ -4,6 +4,8 @@
  * @link      https://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Learning\Students;
 
 use External_ClassInterface;
@@ -60,7 +62,7 @@ class StudentLists
      *
      * @return $this
      */
-    public function setClassCode(string $classCode)
+    public function setClassCode(string $classCode): self
     {
         $this->classCode = $classCode;
 
@@ -70,7 +72,7 @@ class StudentLists
     /**
      * @return string
      */
-    public function getClassCode()
+    public function getClassCode(): string
     {
         return $this->classCode;
     }
