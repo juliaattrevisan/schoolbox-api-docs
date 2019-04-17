@@ -1,0 +1,262 @@
+{% include '@learning/component/classLists/breadcrumbs.twig' %}
+
+<div class="row" id="email-class-lists">
+    <div class="small-12 island">
+        {% block header %}{% endblock %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <div class="checklist small-12 island" v-if="! showSkeletonLoader && mailEnabled">
+        <div class="content clearfix" style="background-color: #FFF;">
+            <ul class="inline-list no-margin left">
+                <template v-for="(group, index) in groups">
+                    <li v-bind:class="index < 1 ? 'no-margin' : ''">
+                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" />
+                        <label :for="group.label">${ group.label.capitalise() }</label>
+                    </li>
+                </template>
+            </ul>
+            <span class="right">
+                <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
+                    <input type="hidden" name="replyto" :value="replyTo"/>
+                    <input type="hidden" name="bcc" v-model="emailLists.join(emailDelimiter)" />
+                    <button type="submit" class="button icon-email" :disabled="! enableSendEmailButton" @click="sendEmail">${ sendEmailButtonText }</button>
+                </form>
+            </span>
+        </div>
+    </div>
+
+    <template v-if="actionsPlaceholder">
+        {#  Just a place holder. Cause currently when we remove this line, the actions doesn't work.
+            Seems like when the page has loaded, foundation JS looks for this element right-away.
+         #}
+        <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
+    </template>
+</div>
+
+<script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script type="text/javascript">
+    var postHeaders = {
+        'X-Requested-With' : 'XMLHttpRequest',
+    };
+
+    var app = new Vue({
+        el: '#email-class-lists',
+        delimiters: ['${', '}'],
+        data: {
+            subjectName: '{{ subjectName }}',
+            classCode: '{{ classCode }}',
+            replyToEmail: '{{ replyTo }}',
+            mailEnabled: Boolean({{ mailEnabled }}),
+            specialNeeds: '{{ specialNeeds }}',
+            studentLists: [],
+            showSkeletonLoader: true,
+            isAllSelected: false,
+            selectedStudentIds: [],
+            studentsCheckboxElements: undefined,
+            groups: {{ emailGroups | raw }},
+            groupsCheckboxElements: [],
+            selectedGroups: [],
+            enableSendEmailButton: false,
+            sendEmailButtonText: 'Email Selected',
+            emailLists: [],
+            emailDelimiter: String.fromCharCode(30),
+            classListsEndpointPrefix: '/subject/classList/ajax/',
+            getStudentListsEndpointPrefix: '/learning/class/lists/',
+            formIsReady: false,
+            linkTitle: {
+                'dueWork':      '{{ locale.dueWork }}',
+                'grades':       '{{ locale.grades.plural }}',
+                'pastoralCare': '{{ locale.pastoralCare.proper }}',
+                'calendar':     '{{ locale.calendar }}',
+                'ePortfolio':   'ePortfolio',
+                'timetable':    'Timetable',
+                'email':        'Email',
+            },
+            calendarPath: '{{ '/calendar/full/' ~ today }}',
+            pastoralIsEnabled: Boolean({{ pastoralEnabled }}),
+            mailHandle: '{{ mailHandle }}',
+            actionsPlaceholder: true,
+        },
+        mounted: function() {
+            new Promise(resolve => {
+                this.getStudents();
+            });
+        },
+        methods: {
+            async getStudents()
+            {
+                var self = this;
+
+                var studentLists;
+
+                studentLists = axios.get(self.getStudentListsEndpointPrefix + self.classCode)
+                    .then(function (response) {
+                        self.studentLists = response.data;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    }).finally(function() {
+                        self.showSkeletonLoader = false; // Hide skeleton loader and show class list table
+                    });
+
+                await studentLists;
+
+                self.studentsCheckboxElements = document.getElementsByName('students[]');
+                self.groupsCheckboxElements = document.getElementsByName('groups[]');
+                self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
+
+                // On initial load, set group checkboxes to checked if the isChecked value from the array groups is true
+                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
+                    if (self.groups[i].isChecked) {
+                        self.groupsCheckboxElements[i].checked = true;
+                        self.selectedGroups.push(self.groupsCheckboxElements[i].value);
+                    }
+                }
+
+                this.selectAllStudents();
+            },
+            async fetchEmails(event)
+            {
+                var self = this;
+
+                var endpoint = '';
+
+                var promises = [];
+
+                self.emailLists = [];
+
+                // While the system is preparing the email lists, disable the button
+                self.enableSendEmailButton = false;
+
+                self.sendEmailButtonText = 'Please wait...';
+
+                // Prepare endpoints to requests. Loop through the selected groups.
+                // We need to do this for now as our endpoints to fetch email addresses are designed this way.
+                // TODO: Re-architect fetching of email address to prevent doing this
+                for (var i = 0; i < self.selectedGroups.length; i++) {
+                    var groupname = self.selectedGroups[i];
+
+                    switch(groupname) {
+                        case 'students':
+                            endpoint = 'emailStudentsById.php';
+                            break;
+                        case 'parents':
+                            endpoint = 'emailParentsById.php';
+                            break;
+                        case 'housemasters':
+                            endpoint = 'emailHousemastersById.php';
+                            break;
+                    }
+                    promises.push(self.requestData(event, endpoint));
+                }
+
+                await Promise.all(promises);
+
+                // Once all the requests are done, set the ready flag to true.
+                // The watcher will then trigger the submit
+                // More for watchers: https://vuejs.org/v2/guide/computed.html#Watchers
+                self.formIsReady = true
+            },
+            async requestData(event, endpoint)
+            {
+                var self = this;
+
+                if (endpoint !== '') {
+                    return axios.post(self.classListsEndpointPrefix + endpoint,
+                        {classCode: self.classCode, allIds: self.selectedStudentIds},
+                        {headers: postHeaders})
+                        .then(function (response) {
+                            if (response.data[0].length > 0) {
+                                self.emailLists.push(response.data);
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        });
+                }
+            },
+            selectAllStudents: function(event) {
+                var self = this;
+                var isChecked = (event === undefined || event.target.checked);
+
+                self.selectedStudentIds.length = 0;
+
+                // Loop through the list of students and check all of them
+                for (var i = 0; i < self.studentsCheckboxElements.length; i++) {
+                    self.studentsCheckboxElements[i].checked = isChecked;
+                    if (isChecked) {
+                        self.selectedStudentIds.push(self.studentsCheckboxElements[i].value);
+                    }
+                }
+
+                self.updateSendEmailButtonState();
+
+                self.isAllSelected = true;
+            },
+            select: function(event) {
+                var self = this;
+
+                // If selected, add the student ids into the array. Otherwise, just remove the id
+                if (event.target.checked) {
+                    self.selectedStudentIds.push(event.target.value);
+                } else {
+                    self.selectedStudentIds = self.selectedStudentIds.filter(item => item !== event.target.value)
+                }
+
+                // Check whether all the students are selected. If so make the select all checkbox ticked
+                if (self.selectedStudentIds.length < self.studentsCheckboxElements.length) {
+                    this.isAllSelected = false;
+                } else {
+                    self.isAllSelected = true;
+                }
+
+                self.updateSendEmailButtonState();
+            },
+            sendEmail: function(event) {
+                var self = this;
+
+                self.fetchEmails();
+            },
+            updateSelectedGroups: function(event)
+            {
+                var self = this;
+
+                if (!self.groupsCheckboxElements) {
+                    return;
+                }
+
+                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
+                    if (self.groupsCheckboxElements[i].checked) {
+                        if (!self.selectedGroups.includes(self.groupsCheckboxElements[i].value)) {
+                            self.selectedGroups.push(self.groupsCheckboxElements[i].value);
+                        }
+                    } else {
+                        self.selectedGroups = self.selectedGroups.filter(item => item !== self.groupsCheckboxElements[i].value)
+                    }
+                }
+
+                self.updateSendEmailButtonState();
+            },
+            updateSendEmailButtonState: function()
+            {
+                var self = this;
+
+                self.enableSendEmailButton = self.selectedStudentIds.length > 0 && self.selectedGroups.length > 0;
+            },
+        },
+        computed: {
+            replyTo: function() {
+                return '"' + this.subject + '"' + ' <' + this.replyToEmail + '>';
+            },
+            subject: function() {
+                return this.subjectName + ' (' + this.classCode + ')';
+            }
+        },
+        watch: {
+            formIsReady: function(val) {
+                this.$refs.form.submit();
+            }
+        }
+    });
+</script>

@@ -1,0 +1,10 @@
+<h1>${ subject }</h1>
+<template v-if="showSkeletonLoader" v-for="n in 3">
+    <div class="list-item">
+        <div class="small-12 card skeleton">
+            <div class="img"></div>
+            <h3></h3>
+            <p class="meta"></p>
+        </div>
+    </div>
+</template>
