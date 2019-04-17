@@ -365,7 +365,6 @@ abstract class Base extends CliTool\App
         }
 
 
-        // Report on what failed
         $failedCapabilityCount = count($this->failedCapabilities);
         $failedIndicatorCount  = count($this->failedIndicators);
         $failedDueWorkCount    = count($this->failedDueWorks);
@@ -373,6 +372,21 @@ abstract class Base extends CliTool\App
         $dueWorkBaseUrl        = 'learning/assessments/%d/modify';
         $failures              = [];
 
+
+        // Output which due works were fixed
+        foreach ($fixedDueWorks as $id => $data) {
+            $this->log->notice(
+                self::indent(2) . sprintf(
+                    '%s due work %s (%s)',
+                    'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
+                    'https://' . $this->fqdn . '/' . sprintf($dueWorkBaseUrl, $id),
+                    $data['name']
+                )
+            );
+        }
+
+
+        // Report on what failed
         if (($failedCapabilityCount + $failedIndicatorCount + $failedDueWorkCount) > 0) {
             $this->log->warning('Manual intervention is required to repair:');
 
@@ -385,7 +399,7 @@ abstract class Base extends CliTool\App
                     ];
                     $failureMsg = sprintf(
                         '%s capability #%d (%s)',
-                        'https://' . $this->fqdn . sprintf($folderBaseUrl, $data['folderId']),
+                        'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
                         $id,
                         $data['name']
                     );
@@ -402,7 +416,7 @@ abstract class Base extends CliTool\App
                     ];
                     $failureMsg = sprintf(
                         '%s indicator #%d (%s)',
-                        'https://' . $this->fqdn . sprintf($folderBaseUrl, $data['folderId']),
+                        'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
                         $id,
                         $data['name']
                     );
@@ -419,8 +433,8 @@ abstract class Base extends CliTool\App
                     ];
                     $failureMsg = sprintf(
                         '%s due work %s (%s)',
-                        'https://' . $this->fqdn . sprintf($folderBaseUrl, $data['folderId']),
-                        'https://' . $this->fqdn . sprintf($dueWorkBaseUrl, $id),
+                        'https://' . $this->fqdn . '/' . sprintf($folderBaseUrl, $data['folderId']),
+                        'https://' . $this->fqdn . '/' . sprintf($dueWorkBaseUrl, $id),
                         $data['name']
                     );
                     $this->log->warning(self::indent(2) . $failureMsg);
