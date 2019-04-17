@@ -206,7 +206,7 @@ class AcademicAchievementSummary extends BaseComponent
         }
 
         return [
-            'duedate' => $dueWork->getDueAt(),
+            'dueDate' => $dueWork->getDueAt(),
             'link'    => $this->getAasLink($dueWork),
             'marks'   => $this->getMarks($dueWork, $dueWork->getParticipant($this->student)),
         ];

@@ -174,7 +174,7 @@ class HscAssessmentTasks extends BaseComponent
             'cohortAverage' => null === $cohortAverage ? null : "$cohortAverage %",
             'comment'       => $feedback ? $feedback->getComment() : null,
             'commentBy'     => $feedback ? $feedback->getReviewer() : null,
-            'duedate'       => $classAssessment->getDueAt(),
+            'dueDate'       => $classAssessment->getDueAt(),
         ];
     }
 

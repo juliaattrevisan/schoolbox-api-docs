@@ -158,27 +158,38 @@ class Controller extends Web\Controller\Base
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
             foreach ($unitSpecs as $unitSpecId => $unitSpec) {
-                $duedate = null;
-                if (isset ($aasData['data']) && isset ($aasData['data'][$unitSpecId])) {
-                    $duedate = $aasData['data'][$unitSpecId]['duedate'];
-                } else if (isset ($aamData['data']) && isset ($aamData['data'][$unitSpecId])) {
-                    $duedate = $aamData['data'][$unitSpecId]['duedate'];
-                } else if (isset ($hscTaskMarks['data']) && isset ($hscTaskMarks['data'][$unitSpecId])) {
-                    $duedate = $hscTaskMarks['data'][$unitSpecId]['duedate'];
+                /** @var \Alaress_Date_Format $dueDate */
+                $dueDate = null;
+                if (isset ($aasData['data'][$unitSpecId])) {
+                    $dueDate = $aasData['data'][$unitSpecId]['dueDate'];
                 }
-                if ($duedate) {
-                    $unitSpecsWithData->add(['id' => $unitSpecId, 'duedate' => $duedate, 'title' => $unitSpec->getTitle()]);
+                if (isset ($aamData['data'][$unitSpecId])) {
+                    /** @var \Alaress_Date_Format $dueDateAam */
+                    $dueDateAam = $aamData['data'][$unitSpecId]['dueDate'];
+                    if (!$dueDate || $dueDateAam->gt($dueDate)) {
+                        $dueDate = $dueDateAam;
+                    }
+                }
+                if (isset ($hscTaskMarks['data'][$unitSpecId])) {
+                    /** @var \Alaress_Date_Format $dueDateHsc */
+                    $dueDateHsc = $hscTaskMarks['data'][$unitSpecId]['dueDate'];
+                    if (!$dueDate || $dueDateHsc->gt($dueDate)) {
+                        $dueDate = $dueDateHsc;
+                    }
+                }
+                if ($dueDate) {
+                    $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $dueDate, 'title' => $unitSpec->getTitle()]);
                 }
             }
 
             // Sort the unit specs by date
             $unitSpecsWithData->sortByCallback(
                 function (array $a, array $b) {
-                    /** @var \Alaress_Date_Format $duedateA */
-                    $duedateA = $a['duedate'];
-                    /** @var \Alaress_Date_Format $duedateB */
-                    $duedateB = $b['duedate'];
-                    return $duedateA->lt($duedateB);
+                    /** @var \Alaress_Date_Format $dueDateA */
+                    $dueDateA = $a['dueDate'];
+                    /** @var \Alaress_Date_Format $dueDateB */
+                    $dueDateB = $b['dueDate'];
+                    return $dueDateA->lt($dueDateB);
                 }
             );
         }
