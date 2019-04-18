@@ -39,9 +39,7 @@
                 observerParent: options.observerParent ? (element.selector + " " + options.observerParent) : element.selector
             };
 
-            var merged = $.extend(defaults, options, derived);
-
-            return merged;
+            return $.extend(defaults, options, derived);
         }
 
         /** Select or deselect all checkboxes via the Select All checkbox. */
