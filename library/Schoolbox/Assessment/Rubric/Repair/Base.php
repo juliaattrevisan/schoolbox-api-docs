@@ -596,7 +596,7 @@ abstract class Base extends CliTool\App
                 $subject,
                 ['output' => $failures,]
             );
-            throw new RuntimeException('Merging incomplete, could not merge non-destructively.');
+            $this->log->alert('Merging incomplete, could not merge non-destructively.');
         }
     }
 }
