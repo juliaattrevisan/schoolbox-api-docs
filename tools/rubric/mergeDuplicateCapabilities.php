@@ -1,0 +1,26 @@
+#!/usr/bin/php
+<?php
+/**
+ * Merge duplicate rubric capabilities.
+ *
+ * @copyright Copyright 2019, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+declare(strict_types=1);
+
+use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Rubric\Repair\Duplicate\Merge\Capability;
+
+require __DIR__ . '/../../conf/core/require.php';
+
+$options = [
+    CliTool\Kernel::OPTION_ERRORS => E_ALL,
+];
+
+try {
+    (new Schoolbox\Application\CliTool\Kernel(new Capability(), null, $options))->runApp();
+} catch (Throwable $e) {
+    /** @noinspection PhpUnhandledExceptionInspection */
+    throw $e;
+}
