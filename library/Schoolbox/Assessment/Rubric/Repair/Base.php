@@ -487,27 +487,7 @@ abstract class Base extends CliTool\App
 
 
         // Collate a list of failures
-        $failures = [];
-        foreach ($this->failedCapabilities as $id => $data) {
-            $failures[$data['folderId']]['capability:' . $id] = [
-                'name' => $data['name'],
-                'type' => 'capability',
-            ];
-        }
-        foreach ($this->failedIndicators as $id => $data) {
-            $failures[$data['folderId']]['indicator:' . $id] = [
-                'name' => $data['name'],
-                'type' => 'indicator',
-            ];
-        }
-        foreach ($this->failedDueWorks as $id => $data) {
-            $failures[$data['folderId']]['duework:' . $id] = [
-                'name' => $data['name'],
-                'type' => 'duework',
-            ];
-        }
-
-
+        $failures              = [];
         $failedCapabilityCount = count($this->failedCapabilities);
         $failedIndicatorCount  = count($this->failedIndicators);
         $failedDueWorkCount    = count($this->failedDueWorks);
