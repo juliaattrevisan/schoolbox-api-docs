@@ -32,6 +32,9 @@ class ValidFiles
         'txt'  => 'text/plain',
         'rtf'  => 'text/richtext',
         'html' => 'text/html',
+        'keynote' => 'application/vnd.apple.keynote',
+        'pages'   => 'application/vnd.apple.pages',
+        'numbers' => 'application/vnd.apple.numbers',
     ];
 
     /**
