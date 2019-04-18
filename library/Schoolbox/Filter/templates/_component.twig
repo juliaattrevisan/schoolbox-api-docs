@@ -36,8 +36,10 @@
         <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
     {% else %}
     <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
+        {% if roleSelections | length > 1 %}
         <input id="selectAllFilterOptions-{{ definition.filter.id }}" type="checkbox">
         <label for="selectAllFilterOptions-{{ definition.filter.id }}" class="select-all">Select All</label>
+        {% endif %}
         {% block userOptions %}
             {% for selection in roleSelections %}
                 {% include '@filters/_selectionCheckbox.twig' with {
@@ -47,7 +49,6 @@
                     disabled:           isDisabled
                 } only %}
             {% endfor %}
-
         {% endblock %}
     </div>
     {% endif %}
