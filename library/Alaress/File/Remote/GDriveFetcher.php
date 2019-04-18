@@ -105,7 +105,6 @@ class GDriveFetcher implements FetcherInterface
         $this->configLoader = new ConfigLoader();
     }
 
-
     /**
      * Clean up the cURL handle
      */
@@ -113,7 +112,6 @@ class GDriveFetcher implements FetcherInterface
     {
         curl_close($this->ch);
     }
-
 
     /**
      * The config option "Google Drive Always Convert To PDF" is on
@@ -125,7 +123,6 @@ class GDriveFetcher implements FetcherInterface
     {
         return $this->configLoader->get('googledrive_export_pdf') && isset($metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']);
     }
-
 
     /**
      * Retrieves the metadata for the given fileId
@@ -170,6 +167,25 @@ class GDriveFetcher implements FetcherInterface
         return $metadata;
     }
 
+
+    /**
+     * Restore icon to attachzone for this file
+     * The mimeType field doesn't contain a string that's known to our allowedFileTypes.mime
+     * so we re-write this particular field in a way that supports allowedFileTypes.mime
+     *
+     * @param array $metadata
+     * @return string
+     */
+    public function determineMimeIcon(array $metadata): string
+    {
+        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS] ?? null;
+
+        if ($allowedFilesMime) {
+            return $allowedFilesMime;
+        }
+
+        return $metadata['mimeType'];
+    }
 
     /**
      * Attempts to retrieve remote source to local destination, returns the path of the saved file.
@@ -219,7 +235,6 @@ class GDriveFetcher implements FetcherInterface
         return $destination;
     }
 
-
     /**
      * Inspect metadata fields to find a download url
      *
@@ -268,7 +283,6 @@ class GDriveFetcher implements FetcherInterface
 
         return $metadata['title'];
     }
-
 
     /**
      * @param array $opts

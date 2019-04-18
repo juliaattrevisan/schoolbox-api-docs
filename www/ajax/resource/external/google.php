@@ -56,6 +56,10 @@ foreach ($_POST['docs'] as $doc) {
         $meta['hash']     = NodeFactory::STORE . ':' . $storageFile->getHash();
         $meta['filesize'] = $storageFile->getSize();
 
+        /* Get correct mimetype for compatibility with attachzone rendering
+         */
+        $meta['mimeType'] = $grive->determineMimeIcon($meta);
+
         $files[] = $meta;
     }
     catch (Schoolbox\File\Exception $e) {
