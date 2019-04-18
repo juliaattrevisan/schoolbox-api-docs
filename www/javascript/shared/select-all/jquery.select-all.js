@@ -1,15 +1,27 @@
 (function ($) {
+    /**
+     * Expected to be initiated on a container that contains the constituent checkbox elements
+     *
+     * @param {Object}   options                      Required
+     * @param {string}   options.selector             Required   jQuery selector to identify the 'select-all' checkbox
+     * @param {string}   options.checkboxes           Required   jQuery selector to identify the set of all relevant checkboxes
+     * @var   {string}   options.childCheckboxes      Optional   jQuery selector to identify the child checkboxes
+     * @var   {string}   options.childCheckboxGroups  Optional   jQuery selector to identify the child checkbox group containers
+     * @var   {string}   options.observerParent       Optional   jQuery selector to identify the direct parent of elements in the DOM that will be added or removed via AJAX
+     * @var   {function} options.change               Optional   callback to execute when the 'select-all' checkbox is toggled
+     */
     $.fn.selectAll = function (options) {
-        options = options || {};
 
-        var config = {};
+        var config = {},
+            $this  = this;
+
+        validateConstructionOptions(options);
 
         function setup() {
             config = init(options, $this);
             start();
         }
 
-        var $this = this;
         setup();
 
         // Reinitialise on DOM change
@@ -17,6 +29,46 @@
         var observerOptions = {childList: true, attributes: true};
         var observer = new MutationObserver(setup);
         observer.observe(targetNode, observerOptions);
+
+        /**
+         * Validate plugin construction args
+         *
+         * @param {object} options
+         */
+        function validateConstructionOptions(options) {
+            var required = ['selector', 'checkboxes'],
+                optional = ['childCheckboxes', 'childCheckboxGroups', 'observerParent', 'change'],
+                all      = required.concat(optional),
+                errors   = [];
+
+            // Check that options is an object.
+            if (options === null) {
+                errors.push('options cannot be null');
+            } else if (typeof options !== 'object') {
+                errors.push("options must be an object. Found: '" + typeof options + "'");
+            } else {
+                // Check only valid args were specified
+                for (var i in options) {
+                    if (!options.hasOwnProperty(i)) {
+                        continue;
+                    }
+                    if (-1 === all.indexOf(i)) {
+                        errors.push("unrecognised option: '" + i + "'");
+                    }
+                }
+
+                // check all required args were supplied
+                for (var j in required) {
+                    if (!options.hasOwnProperty(required[j])) {
+                        errors.push("required option missing: '" + required[j] + "'");
+                    }
+                }
+            }
+
+            if (errors.length) {
+                throw new Error('Invalid construction args: ' + errors.join('; '));
+            }
+        }
 
         function init(options, element) {
             var defaults = {
