@@ -3,7 +3,7 @@
     /**
      * Replace all placeholders with html elements
      */
-    $.fn.schoolboxResource_ProxyReplacment = function() {
+    $.fn.schoolboxResource_ProxyReplacement = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
             var type = $(element).attr('data-schoolboxresource-type');
             var thumbnail = $(element).attr('data-schoolboxresource-thumbnail');

@@ -29,7 +29,7 @@ $(function () {
 
     /* Replace all editor video/audio placeholders
     */
-    $.fn.schoolboxResource_ProxyReplacment();
+    $.fn.schoolboxResource_ProxyReplacement();
 
     // Notifications dock/undock
     $('#right-menu-dock').on('click', function() {

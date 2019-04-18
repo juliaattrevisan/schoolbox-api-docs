@@ -317,9 +317,9 @@
                 }).finally(function () {
                     /**
                      * Since schoolbox.min.js is being executed first before VueJS content gets rendered,
-                     * the schoolboxResource_ProxyReplacment is unable to locate the DOM yet.
+                     * the schoolboxResource_ProxyReplacement is unable to locate the DOM yet.
                      * With that for a quick fix, we need to read the DOM when the contents has been loaded and let
-                     * schoolboxResource_ProxyReplacment do what it's supposed to do.
+                     * schoolboxResource_ProxyReplacement do what it's supposed to do.
                      */
                     self.reInitialiseMediaPlayer();
                 });
@@ -431,7 +431,7 @@
                 });
             },
             reInitialiseMediaPlayer: function () {
-                $.fn.schoolboxResource_ProxyReplacment();
+                $.fn.schoolboxResource_ProxyReplacement();
             }
         },
         mounted: function() {
