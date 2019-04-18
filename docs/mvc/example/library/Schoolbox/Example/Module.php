@@ -1,15 +1,16 @@
 <?php
 /**
- * Module
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\Example;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
@@ -17,8 +18,6 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use Twig_Loader_Chain;
-
 
 class Module extends BaseModule
 {
@@ -27,12 +26,14 @@ class Module extends BaseModule
      */
     protected $basename = 'example';
 
+
     /**
      * Hook method for setting up routes via self::register()
      *
      * @return void
+     * @throws InvalidArgumentException
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         /* Anyone can see the form
          */
@@ -53,6 +54,7 @@ class Module extends BaseModule
         $this->register('POST', '/user', 'postExample', $postPerms, null);
     }
 
+
     /**
      * Preload a User instance
      *
@@ -61,7 +63,7 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadUser(array $params)
+    private function preloadUser(array $params): array
     {
         try {
             $user = $this->getUserMapper()->findById($params['id']);
@@ -75,21 +77,24 @@ class Module extends BaseModule
         ];
     }
 
+
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
+
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
+
 
     /**
      * Override with any steps required for a controller and its routes
@@ -101,13 +106,14 @@ class Module extends BaseModule
      * @param Container|ContainerInterface $injector The dependency injection container.
      * @throws InvalidArgumentException
      */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
         ];
     }
+
 
     /**
      * @return Mapper|UserMapper
@@ -118,6 +124,3 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 }
-
-
-

@@ -1,10 +1,11 @@
 <?php
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
+
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
@@ -18,11 +19,11 @@ class Example implements ModuleConfigInterface
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel)
+    public function configure($kernel): void
     {
         $namespace = 'example';
 
         $module = new Module($kernel->getDependencyInjector());
-        $module->init("/$namespace");
+        $module->init("/{$namespace}");
     }
 }

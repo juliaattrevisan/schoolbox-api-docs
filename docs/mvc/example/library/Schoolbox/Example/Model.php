@@ -1,17 +1,16 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: matt.schembri
- * Date: 30/04/18
- * Time: 1:28 PM
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Example;
 
-
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-
+use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
@@ -21,29 +20,28 @@ class Model implements ISoftDeletable
     use ModelTrait\DeletedAtDate;
 
     /**
-     * @var \Schoolbox\User
+     * User
      */
     private $user;
 
 
     /**
-     * @return \Schoolbox\User
+     * @return User
      */
-    public function getUser(): \Schoolbox\User
+    public function getUser(): User
     {
         return $this->user;
     }
 
 
     /**
-     * @param \Schoolbox\User $user
+     * @param User $user
      * @return $this
      *
      */
-    public function setUser(\Schoolbox\User $user): void
+    public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;
     }
-
 }
