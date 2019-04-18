@@ -203,6 +203,12 @@ class Batchxml implements ISync
                  */
                 ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->Mobile));
 
+            /* Account
+             */
+            $guardian
+                ->getAccount()
+                    ->setLogin((string)$currentResult->EmailAddress);
+
             $collection->add($guardian);
         }
 
