@@ -21,6 +21,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Resource\Folder;
@@ -135,7 +136,7 @@ class Controller extends Web\Controller\Base
                 $error .= \sprintf(' <a href="%s">Manage Course imports</a>', $route);
             }
             $errors[]  = $error;
-            $unitSpecs = $aamData = $aasData = $hscTaskMarks = [];
+            $unitSpecsWithData = $aamData = $aasData = $hscTaskMarks = [];
             $falData   = $ibGraphData = $nesaGraphData = $courseSpec = $hscRankData = $courseDescription = null;
         } else {
             $this->loadParticipation($courseImplsWithUnits);
@@ -153,6 +154,44 @@ class Controller extends Web\Controller\Base
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user);
+
+            // Filter out unit specs without any data
+            $unitSpecsWithData = new Collection();
+            foreach ($unitSpecs as $unitSpecId => $unitSpec) {
+                /** @var \Alaress_Date_Format $dueDate */
+                $dueDate = null;
+                if (isset ($aasData['data'][$unitSpecId])) {
+                    $dueDate = $aasData['data'][$unitSpecId]['dueDate'];
+                }
+                if (isset ($aamData['data'][$unitSpecId])) {
+                    /** @var \Alaress_Date_Format $dueDateAam */
+                    $dueDateAam = $aamData['data'][$unitSpecId]['dueDate'];
+                    if (!$dueDate || $dueDateAam->gt($dueDate)) {
+                        $dueDate = $dueDateAam;
+                    }
+                }
+                if (isset ($hscTaskMarks['data'][$unitSpecId])) {
+                    /** @var \Alaress_Date_Format $dueDateHsc */
+                    $dueDateHsc = $hscTaskMarks['data'][$unitSpecId]['dueDate'];
+                    if (!$dueDate || $dueDateHsc->gt($dueDate)) {
+                        $dueDate = $dueDateHsc;
+                    }
+                }
+                if ($dueDate) {
+                    $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $dueDate, 'title' => $unitSpec->getTitle()]);
+                }
+            }
+
+            // Sort the unit specs by date
+            $unitSpecsWithData->sortByCallback(
+                function (array $a, array $b) {
+                    /** @var \Alaress_Date_Format $dueDateA */
+                    $dueDateA = $a['dueDate'];
+                    /** @var \Alaress_Date_Format $dueDateB */
+                    $dueDateB = $b['dueDate'];
+                    return $dueDateA->lt($dueDateB);
+                }
+            );
         }
 
         $data   = [
@@ -163,7 +202,7 @@ class Controller extends Web\Controller\Base
             'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'attributes'    => $attributes,
             'errors'        => $errors,
-            'unitSpecs'     => $unitSpecs,
+            'unitSpecs'     => $unitSpecsWithData,
             'courseDescription' => $courseDescription,
             'falData'       => $falData,
             'aamData'       => $aamData,

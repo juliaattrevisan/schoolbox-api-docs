@@ -223,6 +223,7 @@ class AcademicAchievementMatrix extends BaseComponent
                 }
             }
         }
+        $data['dueDate'] = $dueWork->getDueAt();
         return $data;
     }
 }
