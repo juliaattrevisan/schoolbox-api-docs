@@ -178,7 +178,7 @@ class GDriveFetcher implements FetcherInterface
      */
     public function determineMimeIcon(array $metadata): string
     {
-        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
+        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS] ?? null;
 
         if ($allowedFilesMime) {
             return $allowedFilesMime;
