@@ -179,15 +179,32 @@ class Batchxml implements ISync
 
 
     /**
-     * Gets a collection of normalized parent objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return User\Guardian[]
+     * {@inheritDoc}
      */
     public function findAllParents()
     {
-        // TODO: Implement findAllParents() method.
+        $guardians = $this->fetchXml('/iSAMS/PupilManager/Contacts/Contact');
+
+        $collection = new Collection();
+
+        foreach ($guardians as $currentResult) {
+            $guardian = new User\Guardian();
+
+            $guardian
+                ->setId((string)$currentResult->xpath('@PersonId')[0]->PersonId)
+                ->setTitle((string)$currentResult->Title)
+                ->setPreferredName((string)$currentResult->Forename)
+                ->setGivenName((string)$currentResult->Forename)
+                ->setLastname((string)$currentResult->Surname)
+
+                /* <Telephone> seems to contain email addresses, so I'm not going to use this
+                 * There appears to be no other phone fields except <Mobile>
+                 */
+                ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->Mobile));
+
+            $collection->add($guardian);
+        }
+
+        return $collection;
     }
 }
