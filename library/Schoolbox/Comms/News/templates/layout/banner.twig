@@ -321,7 +321,7 @@
                      * With that for a quick fix, we need to read the DOM when the contents has been loaded and let
                      * schoolboxResource_ProxyReplacment do what it's supposed to do.
                      */
-                    self.reInitaliseMediaPlayer();
+                    self.reInitialiseMediaPlayer();
                 });
             },
             deleteComment: function(id, index, confirmed = false) {
@@ -399,7 +399,7 @@
                         self.postCommentButtonIsEnabled = true;
                         $toast.toastTimeout({text: self.errorAddingCommentText, duration: 2000, css: 'alert'});
                     }).finally(function () {
-                        self.reInitaliseMediaPlayer();
+                        self.reInitialiseMediaPlayer();
                     });
                 }
             },
@@ -430,7 +430,7 @@
                     }
                 });
             },
-            reInitaliseMediaPlayer: function () {
+            reInitialiseMediaPlayer: function () {
                 $.fn.schoolboxResource_ProxyReplacment();
             }
         },
