@@ -31,7 +31,7 @@ interface IMailer {
 
 	/**
 	 * @param string $string
-	 * @return array ['valid' => ['email' => 'name'], 'invalid' => ['email' => 'name']]
+	 * @return array ['valid' => [['email' => 'name']], 'invalid' => [['email' => 'name']]]
 	 */
 	public static function parseAddressString($string): ?array;
 

@@ -355,9 +355,12 @@ abstract class AbstractMailer implements IMailer
      * @param bool $returnValidEmailsOnly
      * @return array
      */
-    public static function parseAddressString($string, $returnValidEmailsOnly = true): ?array
+    public static function parseAddressString($string, $returnValidEmailsOnly = true): array
     {
-        $return_list  = [];
+        $return_list = [
+            self::KEY_VALID => [],
+            self::KEY_INVALID => [],
+        ];
 
         if (\trim($string) === '') {
             return $return_list;
