@@ -25,10 +25,11 @@
         setup();
 
         // Reinitialise on DOM change
-        var targetNode = document.querySelectorAll(config.observerParent)[0];
+        var targetNode = config.observerParent.get(0);
         var observerOptions = {childList: true, attributes: true};
         var observer = new MutationObserver(setup);
         observer.observe(targetNode, observerOptions);
+
 
         /**
          * Validate plugin construction args
@@ -94,7 +95,7 @@
                 checkboxes: $element.find(derived.checkboxes).not(":disabled"),
                 childCheckboxes: $element.find(derived.childCheckboxes).not(":disabled"),
                 childCheckboxGroups: $element.find(derived.childCheckboxGroups),
-                observerParent: derived.observerParent ? ($element.selector + " " + derived.observerParent) : $element.selector,
+                observerParent: derived.observerParent ? $(derived.observerParent) : $element,
                 change: derived.change
             };
         }
