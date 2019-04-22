@@ -1,6 +1,6 @@
 (function ($) {
     /**
-     * Expected to be initiated on a container that contains the constituent checkbox elements
+     * Expected to be initiated on a container that contains the inter-related checkboxes
      *
      * @param {Object}   options                      Required
      * @param {string}   options.selector             Required   jQuery selector to identify the 'select-all' checkbox
@@ -70,28 +70,33 @@
             }
         }
 
-        function init(options, element) {
+        /**
+         * Builds and returns plugin config
+         *
+         * @param {object} options   Plugin construction options
+         * @param {object} $element  jQuery object the plugin is attached to
+         * @return {object}
+         */
+        function init(options, $element) {
             var defaults = {
-                change: function () {},
-                selector: '',
-                checkboxes: '',
-                childCheckboxes: '',
-                childCheckboxGroups: '',
-                observerParent: '',
-                parent: element.selector
-            };
+                    childCheckboxes: '',
+                    childCheckboxGroups: '',
+                    observerParent: '',
+                    change: function () {
+                    }
+                },
+                derived = $.extend(defaults, options);
 
             // This is necessary because we only want to select things
             // inside the element we're initialising the plugin on.
-            var derived = {
-                selector: $(element.selector).find(options.selector),
-                checkboxes: $(element.selector).find(options.checkboxes).not(":disabled"),
-                childCheckboxes: $(element.selector).find(options.childCheckboxes).not(":disabled"),
-                childCheckboxGroups: $(element.selector).find(options.childCheckboxGroups),
-                observerParent: options.observerParent ? (element.selector + " " + options.observerParent) : element.selector
+            return {
+                selector: $element.find(derived.selector),
+                checkboxes: $element.find(derived.checkboxes).not(":disabled"),
+                childCheckboxes: $element.find(derived.childCheckboxes).not(":disabled"),
+                childCheckboxGroups: $element.find(derived.childCheckboxGroups),
+                observerParent: derived.observerParent ? ($element.selector + " " + derived.observerParent) : $element.selector,
+                change: derived.change
             };
-
-            return $.extend(defaults, options, derived);
         }
 
         /** Select or deselect all checkboxes via the Select All checkbox. */
