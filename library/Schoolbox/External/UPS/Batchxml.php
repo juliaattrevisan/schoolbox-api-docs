@@ -140,7 +140,7 @@ class Batchxml implements ISync
             $staff = new User\Staff();
 
             $staff
-                ->setId((string)$currentResult->UserName)
+                ->setId((string)$currentResult->UserCode)
                 ->setTitle((string)$currentResult->Title)
                 ->setPreferredName((string)$currentResult->PreferredName)
                 ->setGivenName((string)$currentResult->Forename)
