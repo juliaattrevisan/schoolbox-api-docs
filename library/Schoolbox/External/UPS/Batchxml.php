@@ -61,6 +61,7 @@ class Batchxml implements ISync
     {
         if (!$this->xmlCache) {
             $this->xmlCache = $this->api->retrieveDocument();
+            echo 'retrieving doc';
         }
 
         $nodes = new \SimpleXMLElement($this->xmlCache);
@@ -77,6 +78,52 @@ class Batchxml implements ISync
 
 
     /**
+     * Hydrate a User\Student() instance from a simplexml node
+     *
+     * @param \SimpleXMLElement $currentResult
+     * @return User\Student
+     */
+    private function hydrateStudent(\SimpleXMLElement $currentResult): User\Student
+    {
+        $student = new User\Student();
+
+        $student
+            ->setId((string)$currentResult->SchoolCode)
+            ->setTitle((string)$currentResult->Title)
+            ->setGivenName((string)$currentResult->Forename)
+            ->setPreferredName((string)$currentResult->Preferredname)
+            ->setLastname((string)$currentResult->Surname)
+            ->setGender((string)$currentResult->Gender)
+            ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
+
+        $student
+            ->getYear()
+            ->setDescription((string)$currentResult->NCYear)
+            ->setLevel((int)$currentResult->NCYear);
+
+        /* "Form" seems to be some kind of string, not an int
+         * so we don't use setLevel()
+         */
+        $student
+            ->getForm()
+            ->setDescription((string)$currentResult->Form);
+        $student
+            ->getHouse()
+            ->setCode((string)$currentResult->AcademicHouse);
+
+        $student
+            ->getAccount()
+            ->setLogin((string)$currentResult->UserName)
+            ->setActive(true);
+
+        $student
+            ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+        return $student;
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function findAllStudents()
@@ -84,41 +131,7 @@ class Batchxml implements ISync
         $students = $this->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         foreach ($students as $currentResult) {
-            $student = new User\Student();
-
-            $student
-                ->setId((string)$currentResult->SchoolCode)
-                ->setTitle((string)$currentResult->Title)
-                ->setGivenName((string)$currentResult->Forename)
-                ->setPreferredName((string)$currentResult->Preferredname)
-                ->setLastname((string)$currentResult->Surname)
-                ->setGender((string)$currentResult->Gender)
-                ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
-
-            $student
-                ->getYear()
-                    ->setDescription((string)$currentResult->NCYear)
-                    ->setLevel((int)$currentResult->NCYear);
-
-            /* "Form" seems to be some kind of string, not an int
-             * so we don't use setLevel()
-             */
-            $student
-                ->getForm()
-                    ->setDescription((string)$currentResult->Form);
-            $student
-                ->getHouse()
-                    ->setCode((string)$currentResult->AcademicHouse);
-
-            $student
-                ->getAccount()
-                    ->setLogin((string)$currentResult->UserName)
-                    ->setActive(true);
-
-            $student
-                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
-
-            yield $student;
+            yield $this->hydrateStudent($currentResult);
         }
     }
 
