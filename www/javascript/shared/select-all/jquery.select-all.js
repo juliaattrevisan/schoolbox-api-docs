@@ -108,20 +108,20 @@
         /** Select or deselect all checkboxes via the Select All checkbox. */
         function selectAllCheckboxes() {
             if ( config.selector.is(':checked') ) {
-                config.checkboxes.prop('checked', true);
+                config.checkboxes.filter(':unchecked').prop('checked', true).trigger('change');
             } else {
-                config.checkboxes.prop('checked', false);
+                config.checkboxes.filter(':checked').prop('checked', false).trigger('change');
             }
 
             // If we have nested checkboxes, affect them as well
             if ( config.childCheckboxes ) {
                 if ( config.selector.is(':checked') ) {
                     config.childCheckboxGroups.show();
-                    config.childCheckboxes.prop("checked", true);
+                    config.childCheckboxes.filter(':unchecked').prop("checked", true).trigger('change');
                     config.checkboxes.siblings("label").find("i").removeClass("icon-click-view").addClass("icon-dropdown");
                 } else {
                     config.childCheckboxGroups.hide();
-                    config.childCheckboxes.prop("checked", false);
+                    config.childCheckboxes.filter(':checked').prop("checked", false).trigger('change');
                     config.checkboxes.siblings("label").find("i").removeClass("icon-dropdown").addClass("icon-click-view");
                 }
             }
