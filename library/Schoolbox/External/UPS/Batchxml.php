@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\UPS;
 
-use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
@@ -84,8 +83,6 @@ class Batchxml implements ISync
     {
         $students = $this->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-        $collection = new Collection();
-
         foreach ($students as $currentResult) {
             $student = new User\Student();
 
@@ -121,10 +118,8 @@ class Batchxml implements ISync
             $student
                 ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
 
-            $collection->add($student);
+            yield $student;
         }
-
-        return $collection;
     }
 
 
@@ -134,8 +129,6 @@ class Batchxml implements ISync
     public function findAllStaff()
     {
         $staffs = $this->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
-
-        $collection = new Collection();
 
         foreach ($staffs as $currentResult) {
             $staff = new User\Staff();
@@ -172,10 +165,8 @@ class Batchxml implements ISync
                 $staff->getCampus()->add((new User\Common\Campus())->setName((string)$division->Name));
             }
 
-            $collection->add($staff);
+            yield $staff;
         }
-
-        return $collection;
     }
 
 
@@ -185,8 +176,6 @@ class Batchxml implements ISync
     public function findAllParents()
     {
         $guardians = $this->fetchXml('/iSAMS/PupilManager/Contacts/Contact');
-
-        $collection = new Collection();
 
         foreach ($guardians as $currentResult) {
             $guardian = new User\Guardian();
@@ -210,9 +199,7 @@ class Batchxml implements ISync
                     ->setLogin((string)$currentResult->EmailAddress)
                     ->setActive(true);
 
-            $collection->add($guardian);
+            yield $guardian;
         }
-
-        return $collection;
     }
 }
