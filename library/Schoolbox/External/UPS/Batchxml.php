@@ -20,7 +20,7 @@ class Batchxml implements ISync
 {
 
     /**
-     * @var Batchxml
+     * @var Batchxml/Api
      */
     private $api;
 
