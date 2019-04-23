@@ -67,7 +67,8 @@ class Batchxml implements ISync
                 ->setGivenName((string)$currentResult->Forename)
                 ->setPreferredName((string)$currentResult->Preferredname)
                 ->setLastname((string)$currentResult->Surname)
-                ->setGender((string)$currentResult->Gender);
+                ->setGender((string)$currentResult->Gender)
+                ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
 
             $student
                 ->getYear()
