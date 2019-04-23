@@ -43,6 +43,7 @@ Usage:
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
         var $resetToDefaultsBtn  = $filterPanel.find('#defaults_reset');
+        var $countMoreModalList  = $('#filter-options [data-selected-list]');
         var $clearAllBtn    = $filterPanel.find('#clear-all');
 
         //  Error messages to display for different server errors
@@ -72,7 +73,7 @@ Usage:
         // Listen for user removing an applied filter
         $appliedFilters.on('click', '[data-close]', function(){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
-            clearFilter($filterTab.find('[data-filter]').data('filter'));
+            clearFilter($filterTab.data('applied-filter-tab'));
             $filterTab.remove();
             return false; // don't bubble
         });
@@ -93,6 +94,12 @@ Usage:
                 $checkbox.prop('checked', $checkbox.data('value-default'));
             });
             updateFiltersInUseLabel();
+        });
+
+        // Clicking on "X more" modal reveal
+        $filterPanel.on('click', '[data-reveal-id]', function(a){
+            var filterId = $(a.currentTarget).closest('[data-applied-filter-tab]').data('applied-filter-tab');
+            updateCountMoreModal(filterId);
         });
 
         // ============== Helpers
@@ -185,14 +192,15 @@ Usage:
         }
 
         /**
-         * Converts the filter selections to a URL and updates the browser history so that the URL
-         * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
-         * as expected.
+         * Returns the panel's serialised filter option selections in object structure.
          *
-         * @param {string} encodedSelections
+         * Includes all options, regardless of whether checked or unchecked. (ie [0|1])
+         *
+         * @param {string} serialised
+         * @return {object}
          */
-        function updateHistoryState(encodedSelections) {
-            var decodedData = decodeURIComponent(encodedSelections),
+        function deserialize(serialised){
+            var decodedData = decodeURIComponent(serialised),
                 flatArray   = decodedData.split('&'),
                 nestedObj   = {},
                 regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/; // eg 'filter_selection[1][task]=1'
@@ -212,15 +220,48 @@ Usage:
                     nestedObj[filterId] = {};
                 }
 
-                // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
-                if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
-                    // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
-                    // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
-                    nestedObj[filterId][optionKey] = optionVal;
-                } else {
-                    // We only need to know about checked values
-                    if ("1" === optionVal) {
+                nestedObj[filterId][optionKey] = optionVal;
+            }
+            return nestedObj;
+        }
+
+        /**
+         * Converts the filter selections to a URL and updates the browser history so that the URL
+         * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
+         * as expected.
+         *
+         * @param {string} encodedSelections
+         */
+        function updateHistoryState(encodedSelections)
+        {
+            var decodedSelections = deserialize(encodedSelections),
+                nestedObj         = {};
+
+            // Convert flat string array to nested object
+            for (var filterId in decodedSelections) {
+                // Don't include inherited properties
+                if (!decodedSelections.hasOwnProperty(filterId)) {
+                    continue;
+                }
+                nestedObj[filterId] = {};
+
+                for(var optionKey in decodedSelections[filterId]){
+                    // Don't include inherited properties
+                    if (!decodedSelections[filterId].hasOwnProperty(optionKey)) {
+                        continue;
+                    }
+                    var optionVal = decodedSelections[filterId][optionKey];
+
+                    // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
+                    if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
+                        // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
+                        // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
                         nestedObj[filterId][optionKey] = optionVal;
+                    } else {
+                        // We only need to know about checked values
+                        if ("1" === optionVal) {
+                            nestedObj[filterId][optionKey] = optionVal;
+                        }
                     }
                 }
             }
@@ -394,14 +435,33 @@ Usage:
                 for (var property in componentsInUse) {
                     if (componentsInUse.hasOwnProperty(property)) {
                         var $newTab = $tabAppliedFilter.clone();
-                        $newTab.find('[data-filter]').attr('data-filter', property).html(componentsInUse[property]);
+                        $newTab.attr('data-applied-filter-tab', property).find('[data-filter-name]').html(componentsInUse[property]);
                         $appliedFilters.append($newTab);
                     }
                 }
             } else {
                 $appliedFilters.html('<div class="small-12 columns">None</div>');
             }
+        }
 
+        /**
+         * Updates the modal with all selected options for this filter
+         *
+         * @param {Number} filterId
+         */
+        function updateCountMoreModal(filterId) {
+
+            var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
+                decodedData = deserialize($optionCheckboxes.serialize())[filterId];
+
+            $countMoreModalList.html('');
+            for(var key in decodedData){
+                if(decodedData.hasOwnProperty(key) && decodedData[key] === "1"){
+                    var label      = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html(),
+                        optionHtml = '<li data-selected-option>'+label+'</li>';
+                    $countMoreModalList.append(optionHtml);
+                }
+            }
         }
 
         /**
@@ -458,26 +518,24 @@ Usage:
 {% endautoescape %}
 
 {# Rip outta DOM on load, and remove 'hide' #}
-<div data-applied-filter-tab class="hide">
+<div data-applied-filter-tab="{FILTER ID}" class="hide applied-filter-tab">
     <span class="label filter">
-        <span data-filter></span>
+        <span data-filter-name>{FILTER NAME}</span>
         <a href="#" data-close class="close" title="Remove filter">×</a>
     </span>
-    <div><p>{ filter option }</p></div>
-    <div><p>{ filter option }</p></div>
-    <div><p>{ filter option }</p></div>
-    <div><p>{ filter option }</p></div>
-    <div>
-        <p><a data-reveal-id="filter-options" title="+ { count } more">+ { count } more</a></p>
+    <ul data-selected-list class="selected-list">
+        <li data-selected-item class="selected-item">{ filter option }</li>
+        <li data-selected-item class="selected-item">{ filter option }</li>
+    </ul>
+    <div data-more-count>
+        <p class="more-count"><a data-reveal-id="filter-options" title="+ { count } more">+ { count } more</a></p>
     </div>
 </div>
 
 <div id="filter-options" class="reveal-modal" data-reveal>
     <h2>Selected filters in { filter name }</h2>
-    <ul>
-        <li>{ filter option }</li>
-        <li>{ filter option }</li>
-        <li>{ filter option }</li>
+    <ul data-selected-list class="selected-list">
+        {#<li data-selected-option>{ filter option }</li>#}
     </ul>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
