@@ -85,7 +85,8 @@ class Batchxml implements ISync
 
             $student
                 ->getAccount()
-                    ->setLogin((string)$currentResult->UserName);
+                    ->setLogin((string)$currentResult->UserName)
+                    ->setActive(true);
 
             $student
                 ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
