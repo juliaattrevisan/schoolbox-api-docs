@@ -11,24 +11,92 @@
 
 namespace Schoolbox\External\UPS;
 
+use Schoolbox\Collection;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
-
 
 class Batchxml implements ISync
 {
 
     /**
-     * Gets a collection of normalized student objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return User\Student[]
+     * @var Batchxml
+     */
+    private $api;
+
+
+    /**
+     * Batchxml constructor.
+     */
+    public function __construct()
+    {
+        $config = new Loader();
+
+        $host = $config->get('external_ups_provider_batchxml_host');
+        $key = $config->get('external_ups_provider_batchxml_key');
+
+        $this->api = new Batchxml\Api($host, $key);
+    }
+
+
+    /**
+     * {@inheritDoc}
      */
     public function findAllStudents()
     {
-        // TODO: Implement findAllStudents() method.
+
+        $xml = $this->api->retrieveDocument();
+
+        /* Faster, for now
+         */
+//        $source = __DIR__ .'/../../../../www/temp.xml';
+//        $xml = file_get_contents($source);
+
+        $nodes = new \SimpleXMLElement($xml);
+
+        $students = $nodes->xpath('/iSAMS/PupilManager/CurrentPupils/Pupil');
+
+        $collection = new Collection();
+
+        foreach ($students as $currentResult) {
+            $student = new User\Student();
+
+            $student
+                ->setId((string)$currentResult->SchoolCode)
+                ->setTitle((string)$currentResult->Title)
+                ->setGivenName((string)$currentResult->Forename)
+                ->setPreferredName((string)$currentResult->Preferredname)
+                ->setLastname((string)$currentResult->Surname)
+                ->setGender((string)$currentResult->Gender)
+                ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
+
+            $student
+                ->getYear()
+                    ->setDescription((string)$currentResult->NCYear)
+                    ->setLevel((int)$currentResult->NCYear);
+
+            /* "Form" seems to be some kind of string, not an int
+             * so we don't use setLevel()
+             */
+            $student
+                ->getForm()
+                    ->setDescription((string)$currentResult->Form);
+            $student
+                ->getHouse()
+                    ->setCode((string)$currentResult->AcademicHouse);
+
+            $student
+                ->getAccount()
+                    ->setLogin((string)$currentResult->UserName)
+                    ->setActive(true);
+
+            $student
+                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+            $collection->add($student);
+        }
+
+        return $collection;
     }
 
 
