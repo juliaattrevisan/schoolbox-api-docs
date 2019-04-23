@@ -19,7 +19,7 @@ Usage:
 
     $(function() {
 
-        // ============== Plugins
+        // ============== Other Plugins
 
         $('[data-component]').selectMulti({});
         $('[data-collapser]').collapsable();
@@ -31,8 +31,10 @@ Usage:
             });
         });
 
-        // ============== Vars
+        // ============== Global Variables & Constants
+        var MAX_VISIBLE_SELECTIONS = 4;
 
+        // ============== jQuery DOM handles
         var $reportContent       = $('#{{ contentId }}');
         var $filterPanel         = $('#filter_panel');
         var $panelComponents     = $filterPanel.find('[data-component]');
@@ -43,8 +45,10 @@ Usage:
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
         var $resetToDefaultsBtn  = $filterPanel.find('#defaults_reset');
-        var $countMoreModalList  = $('#filter-options [data-selected-list]');
-        var $clearAllBtn    = $filterPanel.find('#clear-all');
+        var $countMoreModal      = $('#filter-options');
+        var $countMoreModalName  = $countMoreModal.find('[data-filter-name]');
+        var $countMoreModalList  = $countMoreModal.find('[data-selected-list]');
+        var $clearAllBtn         = $filterPanel.find('#clear-all');
 
         //  Error messages to display for different server errors
         var $alertOutOfMemory       = null;
@@ -54,6 +58,9 @@ Usage:
 
         // A tab to insert in filter summary - illustrating what filters are being used
         var $tabAppliedFilter  = null;
+
+        // A selected option in the modal's option list
+        var $modalListItem     = null;
 
         // ============== Event Handlers
 
@@ -102,7 +109,7 @@ Usage:
             updateCountMoreModal(filterId);
         });
 
-        // ============== Helpers
+        // ============== Internal Helpers
 
         /**
          * To ensure each checkbox's original value data attribute is synchronised with the DB, we need to
@@ -386,10 +393,11 @@ Usage:
         }
 
         /**
-         * Grab the applied filter template so we can insert as required
+         * Grab and store DOM element markup so we can clone and insert as required
          */
-        function cacheAppliedFilterTab() {
+        function cacheDomElements() {
             $tabAppliedFilter = $('[data-applied-filter-tab]').remove().removeClass('hide');
+            $modalListItem    = $countMoreModalList.find('[data-selected-option]').remove();
         }
 
         /**
@@ -413,29 +421,62 @@ Usage:
          * A filter is not selected if either:
          * * all options are selected, or
          * * no options are selected.
+         *
+         * Always sorts in the same order as the options appear in the full list, regardless of selection order.
+         * This is because otherwise we would need to store selection order to ensure we could re-create layout on page reload.
          */
         function updateFiltersInUseLabel() {
             var componentsInUse = {};
             $panelComponents.each(function (idx, component) {
-                var $component = $(component);
-                var filterId   = $component.data('component');
-                var countAvailable = $component.find('input[type=checkbox]').length;
-                var countSelected = $component.find('input:checked[type=checkbox]').length;
+                var $component = $(component),
+                    filterId   = $component.data('component'),
+                    $available = $component.find('input[type=checkbox]'),
+                    $selected  = $component.find('input:checked[type=checkbox]');
 
                 // Are a subset of available options selected ?
-                if(countSelected !== 0 && countSelected !== countAvailable){
-                    // Filter is being applied
-                    componentsInUse[filterId] = $component.find('[data-filter-name]').html();
+                if($selected.length !== 0 && $selected.length !== $available.length){
+                    // Filter is being applied, add its name and selected option labels.
+                    componentsInUse[filterId]           = {};
+                    componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
+                    componentsInUse[filterId]['labels'] = [];
+                    $selected.each(function(idx, elem){
+                        var label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                        componentsInUse[filterId]['labels'].push(label);
+                    });
                 }
             });
 
             // Are any filters being used?
             if(Object.keys(componentsInUse).length){
                 $appliedFilters.html('');
-                for (var property in componentsInUse) {
-                    if (componentsInUse.hasOwnProperty(property)) {
+                for (var filterId in componentsInUse) {
+                    if (componentsInUse.hasOwnProperty(filterId)) {
+                        // Create a new brick
                         var $newTab = $tabAppliedFilter.clone();
-                        $newTab.attr('data-applied-filter-tab', property).find('[data-filter-name]').html(componentsInUse[property]);
+                        // Set the filter id and name
+                        $newTab.attr('data-applied-filter-tab', filterId).find('[data-filter-name]').html(componentsInUse[filterId]['name']);
+                        // Get handle to selected option list and option
+                        var $selectedOptionList = $newTab.find('[data-selected-list]'),
+                            $selectedOption     = $newTab.find('[data-selected-item]').remove();
+                        // Add selected options to list
+                        var labels = componentsInUse[filterId]['labels'];
+                        for(var i in labels){
+                            if(!labels.hasOwnProperty(i)){
+                                continue;
+                            }
+                            if(i >= MAX_VISIBLE_SELECTIONS){
+                                break;
+                            }
+                            $selectedOptionList.append($selectedOption.clone().html(labels[i]));
+                        }
+                        // Configure 'more' count
+                        var $moreCount = $newTab.find('[data-more-count]');
+                        if(labels.length <= MAX_VISIBLE_SELECTIONS){
+                            $moreCount.addClass('hide');
+                        } else {
+                            var moreCountText = '+ '+(labels.length - MAX_VISIBLE_SELECTIONS)+' more';
+                            $moreCount.find('[data-count]').attr('title', moreCountText).html(moreCountText);
+                        }
                         $appliedFilters.append($newTab);
                     }
                 }
@@ -449,17 +490,18 @@ Usage:
          *
          * @param {Number} filterId
          */
-        function updateCountMoreModal(filterId) {
-
+        function updateCountMoreModal(filterId)
+        {
             var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
                 decodedData = deserialize($optionCheckboxes.serialize())[filterId];
+
+            $countMoreModalName.html($component.find('[data-filter-name]').html());
 
             $countMoreModalList.html('');
             for(var key in decodedData){
                 if(decodedData.hasOwnProperty(key) && decodedData[key] === "1"){
-                    var label      = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html(),
-                        optionHtml = '<li data-selected-option>'+label+'</li>';
-                    $countMoreModalList.append(optionHtml);
+                    var label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html();
+                    $countMoreModalList.append($modalListItem.clone().html(label));
                 }
             }
         }
@@ -506,7 +548,7 @@ Usage:
          */
         function init() {
             cacheErrorAlerts();
-            cacheAppliedFilterTab();
+            cacheDomElements();
             updateFiltersInUseLabel();
             fetchReport();
         }
@@ -525,17 +567,17 @@ Usage:
     </span>
     <ul data-selected-list class="selected-list">
         <li data-selected-item class="selected-item">{ filter option }</li>
-        <li data-selected-item class="selected-item">{ filter option }</li>
     </ul>
     <div data-more-count>
-        <p class="more-count"><a data-reveal-id="filter-options" title="+ { count } more">+ { count } more</a></p>
+        <p class="more-count"><a data-count data-reveal-id="filter-options" title="+ { count } more">+ { count } more</a></p>
     </div>
 </div>
 
+{# Modal contents #}
 <div id="filter-options" class="reveal-modal" data-reveal>
-    <h2>Selected filters in { filter name }</h2>
+    <h2>Selected filters in <span data-filter-name>{ filter name }</span></h2>
     <ul data-selected-list class="selected-list">
-        {#<li data-selected-option>{ filter option }</li>#}
+        <li data-selected-option>{ filter option }</li>
     </ul>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
