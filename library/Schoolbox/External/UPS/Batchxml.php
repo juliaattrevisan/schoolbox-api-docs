@@ -207,7 +207,8 @@ class Batchxml implements ISync
              */
             $guardian
                 ->getAccount()
-                    ->setLogin((string)$currentResult->EmailAddress);
+                    ->setLogin((string)$currentResult->EmailAddress)
+                    ->setActive(true);
 
             $collection->add($guardian);
         }
