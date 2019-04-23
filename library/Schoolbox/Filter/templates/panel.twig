@@ -617,23 +617,17 @@ Usage:
                         </div>
                     {% endif %}
                     <li class="filter-component btn">
-                        <a class="button" id="clear-all" title="Revert to your most recently applied filter">Clear all</a>
+                        {#<a class="button" id="clear-all" title="Revert to your most recently applied filter">Clear all</a>#}
+                        <a class="button" id="defaults_reset" title="Reset to default selections">Reset to defaults</a>
                     </li>
                     <li class="filter-component btn">
                         <input id="submit_button"
                                type="submit"
-                               data-value="Apply Filters"
-                               value="Apply Filters"
+                               data-value="Apply filters"
+                               value="Apply filters"
                                data-href="{{ panel.route }}" data-working="Submitting...">
                     </li>
                 </ul>
-
-                {#<div class="component-action">#}
-                    {#<section>#}
-                        {#<a class="button" id="defaults_reset" title="Revert to default selections">Reset to Defaults</a>#}
-
-                    {#</section>#}
-                {#</div>#}
             </div>
         </section>
 
