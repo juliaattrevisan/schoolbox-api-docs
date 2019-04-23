@@ -186,6 +186,7 @@ class Batchxml implements ISync
                 ->setPreferredName((string)$currentResult->Forename)
                 ->setGivenName((string)$currentResult->Forename)
                 ->setLastname((string)$currentResult->Surname)
+                ->setType((string)$currentResult->Relationship)
 
                 /* <Telephone> seems to contain email addresses, so I'm not going to use this
                  * There appears to be no other phone fields except <Mobile>
