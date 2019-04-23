@@ -24,11 +24,11 @@
                 aria-controls="{{ definition.filter.id }}"
                 aria-expanded="false"
                 data-filter-name>
-            {{ block('filterName') }}
+            {%- block filterName %}{{ definition.filter.name}}{% endblock -%}
 
-            {% if isDisabled %}
+            {%- if isDisabled -%}
                 <span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>
-            {% endif %}
+            {%- endif -%}
         </span>
     {% endif %}
 
