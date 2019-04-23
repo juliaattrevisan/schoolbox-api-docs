@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\External\UPS;
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
@@ -27,14 +28,12 @@ class Factory
     private const EXTERNAL_UPS_PROVIDER_DEFAULT = ['', 'default'];
 
     /**
-     * If $type == EXTERNAL_SYNC then we're spawning UPS-related provider classes
-     * and if external_ups_provider is set to a non-default value
+     * Check if external_ups_provider is set to a non-default value
      *
      * @param string $provider
-     * @param string $type
      * @return bool
      */
-    private function hasUPSProvider(string $provider, string $type): bool
+    private function hasUPSProvider(string $provider): bool
     {
         return !\in_array($provider, self::EXTERNAL_UPS_PROVIDER_DEFAULT, true);
     }
@@ -52,6 +51,7 @@ class Factory
     {
         // Check if external DB is unavailable and return offline class if we can't access
         $classOffline = "\\Schoolbox\\External\\Connector\\Offline\\Base\\{$type}";
+
         if (!$databaseExternal instanceof IConnector) {
             return new $classOffline($config, null);
         }
@@ -59,7 +59,7 @@ class Factory
         /* If config->get('external_ups_provider') is '' or 'default', use the same value as External Db
          * Otherwise, use its value which is one of a set of hardcoded options
          */
-        if ($this->hasUPSProvider($config->get('external_ups_provider'), $type)) {
+        if ($this->hasUPSProvider($config->get('external_ups_provider'))) {
             $providerName = ucwords($config->get('external_ups_provider'));
 
             $upsProviderClass = "\\Schoolbox\\External\\UPS\\{$providerName}";

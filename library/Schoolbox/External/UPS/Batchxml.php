@@ -20,10 +20,17 @@ class Batchxml implements ISync
 {
 
     /**
-     * @var Batchxml
+     * @var Batchxml/Api
      */
     private $api;
 
+    /**
+     * Cache the xml that we downloaded so we don't end up re-fetching it
+     * if we run more than one roletype's ups
+     *
+     * @var string
+     */
+    private $xmlCache;
 
     /**
      * Batchxml constructor.
@@ -40,21 +47,41 @@ class Batchxml implements ISync
 
 
     /**
-     * {@inheritDoc}
+     * Fetch xml contents
+     *
+     * If it was already downloaded once before, don't download it again
+     *
+     * @param string $path
+     * @return \SimpleXMLElement[]
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    public function findAllStudents()
+    private function fetchXml(string $path): array
     {
+        if (!$this->xmlCache) {
+            $this->xmlCache = $this->api->retrieveDocument();
+        }
 
-        $xml = $this->api->retrieveDocument();
+        $nodes = new \SimpleXMLElement($this->xmlCache);
+
+        return $nodes->xpath($path);
 
         /* Faster, for now
          */
 //        $source = __DIR__ .'/../../../../www/temp.xml';
 //        $xml = file_get_contents($source);
+//        $nodes = new SimpleXMLElement($xml);
+//        return $nodes->xpath($path);
+    }
 
-        $nodes = new \SimpleXMLElement($xml);
 
-        $students = $nodes->xpath('/iSAMS/PupilManager/CurrentPupils/Pupil');
+    /**
+     * {@inheritDoc}
+     */
+    public function findAllStudents()
+    {
+        $students = $this->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         $collection = new Collection();
 
@@ -101,16 +128,53 @@ class Batchxml implements ISync
 
 
     /**
-     * Gets a collection of normalized staff objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return User\Staff[]
+     * {@inheritDoc}
      */
     public function findAllStaff()
     {
-        // TODO: Implement findAllStaff() method.
+        $staffs = $this->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
+
+        $collection = new Collection();
+
+        foreach ($staffs as $currentResult) {
+            $staff = new User\Staff();
+
+            $staff
+                ->setId((string)$currentResult->UserCode)
+                ->setTitle((string)$currentResult->Title)
+                ->setPreferredName((string)$currentResult->PreferredName)
+                ->setGivenName((string)$currentResult->Forename)
+                ->setLastname((string)$currentResult->Surname)
+                ->setGender((string)$currentResult->Gender)
+                ->setPhoneWork((new User\Common\Phone())->setNumber((string)$currentResult->SchoolMobileNumber))
+                ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->SchoolMobileNumber))
+                ->setPhoneHome((new User\Common\Phone())->setNumber((string)$currentResult->PersonalMobileNumber))
+                ->getMeta()
+                    ->getPosition()
+                        ->setDescription((string)$currentResult->Roles->Role->Name);
+
+            /* Account
+             */
+            $staff
+                ->getAccount()
+                    ->setLogin((string)$currentResult->UserName)
+                    ->setActive(true);
+
+            /* Email - one for every item in stack
+             */
+            $staff
+                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+
+            /* Campus
+             */
+            foreach ($currentResult->Divisions->Division as $division) {
+                $staff->getCampus()->add((new User\Common\Campus())->setName((string)$division->Name));
+            }
+
+            $collection->add($staff);
+        }
+
+        return $collection;
     }
 
 
