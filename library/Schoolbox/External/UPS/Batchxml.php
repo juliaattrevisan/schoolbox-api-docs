@@ -71,9 +71,13 @@ class Batchxml implements ISync
 
             $student
                 ->getYear()
-                    ->setDescription((string)$currentResult->Form)
+                    ->setDescription((string)$currentResult->NCYear)
                     ->setLevel((string)$currentResult->NCYear);
 
+            $student
+                ->getForm()
+                    ->setDescription((string)$currentResult->Form)
+                    ->setLevel((string)$currentResult->Form);
             $student
                 ->getHouse()
                     ->setCode((string)$currentResult->AcademicHouse);
