@@ -24,11 +24,15 @@
 
         setup();
 
-        // Reinitialise on DOM change
-        var targetNode = config.observerParent.get(0);
-        var observerOptions = {childList: true, attributes: true};
-        var observer = new MutationObserver(setup);
-        observer.observe(targetNode, observerOptions);
+        // TODO this 'if' block is just a temp hack to get this plugin working with other plugins that disable/enable form inputs.
+        //      Probably should expose the disconnect() method so other plugin can disable/enable the observation.
+        if(config.observerParent) {
+            // Reinitialise on DOM change
+            var targetNode = config.observerParent.get(0);
+            var observerOptions = {childList: true, attributes: true};
+            var observer = new MutationObserver(setup);
+            observer.observe(targetNode, observerOptions);
+        }
 
 
         /**
@@ -95,7 +99,8 @@
                 checkboxes: $element.find(derived.checkboxes).not(":disabled"),
                 childCheckboxes: $element.find(derived.childCheckboxes).not(":disabled"),
                 childCheckboxGroups: $element.find(derived.childCheckboxGroups),
-                observerParent: derived.observerParent ? $(derived.observerParent) : $element,
+                // observerParent: derived.observerParent ? $(derived.observerParent) : $element,
+                observerParent: derived.observerParent ? $(derived.observerParent) : null, // TODO uncomment line above, delete this line. (see TODO above)
                 change: derived.change
             };
         }
