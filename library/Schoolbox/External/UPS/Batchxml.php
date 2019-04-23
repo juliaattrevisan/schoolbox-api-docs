@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\UPS;
 
+use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
@@ -61,7 +62,6 @@ class Batchxml implements ISync
     {
         if (!$this->xmlCache) {
             $this->xmlCache = $this->api->retrieveDocument();
-            echo 'retrieving doc';
         }
 
         $nodes = new \SimpleXMLElement($this->xmlCache);
@@ -209,6 +209,36 @@ class Batchxml implements ISync
                 ->getAccount()
                     ->setLogin((string)$currentResult->EmailAddress)
                     ->setActive(true);
+
+            /* Find all the pupils for this parent and stack them up
+             */
+            $allStudents = [];
+
+            foreach ($currentResult->xpath('Pupils/Pupil/@Id') as $studentNode) {
+                $studentId = (string)$studentNode;
+
+                /* Find the first instance of a Pupil with Id = $studentId
+                 * For some reason they've duped the data for us
+                 */
+                $student = $this->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+                /* Hydrate it into a User/Student() instance
+                 * Ensure de-dupe
+                 */
+                if (null !== $student) {
+                    $hydratedStudent = $this->hydrateStudent($student);
+
+                    $allStudents[$hydratedStudent->getId()] = $hydratedStudent;
+                }
+            }
+
+            /* If we found any students, throw them into a Collection
+             * Then throw the Collection into $guardian
+             * Otherwise the defaults are fine
+             */
+            if (\count($allStudents)) {
+                $guardian->setStudents(new Collection(array_values($allStudents)));
+            }
 
             yield $guardian;
         }
