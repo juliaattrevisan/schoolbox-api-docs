@@ -30,16 +30,17 @@ use ZipArchive;
 class CliPdfGenerator extends CliTool\App
 {
     // This tools CLI options
-    private const OPT_SHORT_HELP      = 'h';            // print help
-    private const OPT_LONG_HELP       = 'help';         // print help
-    private const OPT_LONG_HASH       = 'hash:';        // session hash
-    private const OPT_LONG_USERNAME   = 'username:';    // username
-    private const OPT_LONG_STUDENT_ID = 'student-id:';  // student-id
-    private const OPT_LONG_YEAR_LEVEL = 'year-level:';  // year-level
-    private const OPT_LONG_CURRICULUM = 'curriculum:';  // curriculum
-    private const OPT_LONG_MAX_FAILS  = 'max-fails:';   // Number of consecutive fails after which to abort the script's execution.
-    private const OPT_LONG_JS_DELAY   = 'js-delay:';    // How many milliseconds to let JS run before attempting to print page
-    private const OPT_LONG_NOW        = 'now:';         // to simulate time
+    private const OPT_SHORT_HELP            = 'h';                 // print help
+    private const OPT_LONG_HELP             = 'help';              // print help
+    private const OPT_LONG_HASH             = 'hash:';             // session hash
+    private const OPT_LONG_USERNAME         = 'username:';         // username
+    private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student-id
+    private const OPT_LONG_YEAR_LEVEL       = 'year-level:';       // year-level
+    private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
+    private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
+    private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
+    private const OPT_LONG_NOW              = 'now:';              // to simulate time
+    private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
 
     private const DEFAULT_MAX_FAILS   = 3;
     private const DEFAULT_JS_DELAY    = 1000;
@@ -103,6 +104,12 @@ class CliPdfGenerator extends CliTool\App
      */
     private $jsDelay;
 
+    /**
+     * A user style sheet, to load with every page
+     * @var string
+     */
+    private $userStyleSheet;
+
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -124,6 +131,7 @@ class CliPdfGenerator extends CliTool\App
             self::OPT_LONG_MAX_FAILS,
             self::OPT_LONG_JS_DELAY,
             self::OPT_LONG_NOW,
+            self::OPT_LONG_USER_STYLE_SHEET,
         ];
     }
 
@@ -185,6 +193,7 @@ class CliPdfGenerator extends CliTool\App
         $this->nowOverride = $this->getOpt(self::OPT_LONG_NOW);
         $maxFailures       = $this->getOpt(self::OPT_LONG_MAX_FAILS);
         $jsDelay           = $this->getOpt(self::OPT_LONG_JS_DELAY);
+        $userStyleSheet    = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
 
         if ($this->sessionHash) {
             $this->getLogger()->info('Command-line session hash supplied, validating...');
@@ -250,6 +259,16 @@ class CliPdfGenerator extends CliTool\App
             $this->jsDelay = (int)$jsDelay;
         }
 
+        if ($userStyleSheet === null) {
+            // this option is not specified
+            $this->userStyleSheet = '';
+        } else if (!\file_exists($userStyleSheet)) {
+            $this->getLogger()->alert("Invalid 'user-style-sheet' option: '$userStyleSheet'");
+            $valid = false;
+        } else {
+            $this->userStyleSheet = $userStyleSheet;
+        }
+
         $this->getLogger()->debug("Command Line Options:");
         $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
         $this->getLogger()->debug("    username: {$this->username}");
@@ -259,6 +278,7 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
         $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
         $this->getLogger()->debug("    now: {$this->nowOverride}");
+        $this->getLogger()->debug("    user-style-sheet: {$this->userStyleSheet}");
 
         return $valid;
     }
@@ -511,6 +531,7 @@ class CliPdfGenerator extends CliTool\App
         $urls = $this->generateUrlsForStudent($student, $externalStudent, $excludedClassCodes);
         $this->getLogger()->info("Generating PDF...");
         $javascriptDelayMs = $this->jsDelay;
+        $userStyleSheet    = $this->userStyleSheet;
         $maxAttempts       = 10;
         $attempts          = 0;
         $previousException = null;
@@ -520,7 +541,7 @@ class CliPdfGenerator extends CliTool\App
                 throw new RuntimeException("Unable to generate report after $maxAttempts attempts, skipping", 0, $previousException);
             }
             try {
-                $this->snapshotUrlsToPdf($urls, $sessionHash, $fp, $javascriptDelayMs);
+                $this->snapshotUrlsToPdf($urls, $sessionHash, $fp, $javascriptDelayMs, $userStyleSheet);
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
@@ -596,10 +617,11 @@ class CliPdfGenerator extends CliTool\App
      * @param string   $sessionHash
      * @param resource $fp The temp file to write the PDF to
      * @param int      $javascriptDelayMs
+     * @param string   $userStyleSheet
      * @throws RuntimeException If unable to generate the PDF contents
      * @throws \InvalidArgumentException
      */
-    private function snapshotUrlsToPdf(array $urls, string $sessionHash, $fp, int $javascriptDelayMs): void
+    private function snapshotUrlsToPdf(array $urls, string $sessionHash, $fp, int $javascriptDelayMs, string $userStyleSheet): void
     {
         $this->getLogger()->debug("Setting 'javascript-delay' to $javascriptDelayMs ms");
 
@@ -608,6 +630,10 @@ class CliPdfGenerator extends CliTool\App
         $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
         $snappy->setOption('orientation', 'Landscape');
         $snappy->setOption('javascript-delay', $javascriptDelayMs);
+        if ($userStyleSheet !== '') {
+            $this->getLogger()->debug("Setting 'user-style-sheet' to $userStyleSheet");
+            $snappy->setOption('user-style-sheet', $userStyleSheet);
+        }
 
         \fwrite($fp, $snappy->getOutput($urls));
     }
@@ -900,6 +926,9 @@ DESCRIPTION
     $yellow--now=NOW$white
          Attempt to produce a report for some specific point in time.
          Supports any format accepted by PHP's strtotime()
+         
+    $yellow--user-style-sheet=STYLE_FILE$white
+         Filename of a style sheet to load with every page.
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
