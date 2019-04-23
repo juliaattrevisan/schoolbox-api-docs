@@ -187,10 +187,7 @@ class Batchxml implements ISync
                 ->setGivenName((string)$currentResult->Forename)
                 ->setLastname((string)$currentResult->Surname)
                 ->setType((string)$currentResult->Relationship)
-
-                /* <Telephone> seems to contain email addresses, so I'm not going to use this
-                 * There appears to be no other phone fields except <Mobile>
-                 */
+                ->setPhoneWork((new User\Common\Phone())->setNumber((string)$currentResult->Telephone))
                 ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->Mobile));
 
             /* Account
