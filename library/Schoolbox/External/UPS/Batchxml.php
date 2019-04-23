@@ -157,7 +157,8 @@ class Batchxml implements ISync
              */
             $staff
                 ->getAccount()
-                    ->setLogin((string)$currentResult->UserName);
+                    ->setLogin((string)$currentResult->UserName)
+                    ->setActive(true);
 
             /* Email - one for every item in stack
              */
