@@ -6,26 +6,34 @@
 
 namespace Schoolbox\Filter\Test;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Filter;
 use Schoolbox\Collection;
+use Schoolbox\Filter\AbstractIdFinder;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\IdFinder;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use UnderflowException;
+use UnexpectedValueException;
 
 class LogicTests extends TestCase
 {
+
     /**
      * @dataProvider provider_doContextFiltersGuaranteeEmptySet
-     * @param null|int[] $uis              UnitImplSpec
-     * @param null|int[] $f                Folder
-     * @param null|int[] $p                Project
-     * @param null|int[] $ui               UnitImpl
-     * @param null|int[] $us               UnitSpec
-     * @param bool       $expected         Are results possible? (ie not guaranteed empty set)
+     * @param null|int[] $uis      UnitImplSpec
+     * @param null|int[] $f        Folder
+     * @param null|int[] $p        Project
+     * @param null|int[] $ui       UnitImpl
+     * @param null|int[] $us       UnitSpec
+     * @param bool       $expected Are results possible? (ie not guaranteed empty set)
+     * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_contextFilters($uis, $f, $p, $ui, $us, $expected)
+    public function test_areResultsPossible_contextFilters($uis, $f, $p, $ui, $us, $expected): void
     {
         $qbt             = $this->getTester();
         $filters         = $this->buildContextFilterArray($uis, $f, $p, $ui, $us);
@@ -43,6 +51,7 @@ class LogicTests extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_doNonContextGuaranteeEmptySet
      * @param null|int[] $a        AssessmentType
@@ -51,8 +60,9 @@ class LogicTests extends TestCase
      * @param null|int[] $wt       Weighting
      * @param null|int[] $wk       WorkType
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
+     * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_nonContextFilters($a, $tc, $td, $wt, $wk, $expected)
+    public function test_areResultsPossible_nonContextFilters($a, $tc, $td, $wt, $wk, $expected): void
     {
         $qbt             = $this->getTester();
         $filters         = $this->buildNonContextFilterArray($a, $tc, $td, $wt, $wk);
@@ -96,20 +106,25 @@ class LogicTests extends TestCase
 
     /**
      * @dataProvider provider_subQueriesRequired
-     * @param null|int[] $uis              UnitImplSpec
-     * @param null|int[] $f                Folder
-     * @param null|int[] $p                Project
-     * @param null|int[] $ui               UnitImpl
-     * @param null|int[] $us               UnitSpec
-     * @param bool       $expected         The sub-queries that are required for this combination of filters
+     * @param null|int[] $uis      UnitImplSpec
+     * @param null|int[] $f        Folder
+     * @param null|int[] $p        Project
+     * @param null|int[] $ui       UnitImpl
+     * @param null|int[] $us       UnitSpec
+     * @param bool       $expected The sub-queries that are required for this combination of filters
+     * @throws Filter\BrokenFilterException
+     * @throws InvalidColumnException
+     * @throws AssertionFailedError
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
-    public function test_requiredSubQueries($uis, $f, $p, $ui, $us, $expected)
+    public function test_requiredSubQueries($uis, $f, $p, $ui, $us, $expected): void
     {
         $qbt             = $this->getTester();
         $filters         = $this->buildContextFilterArray($uis, $f, $p, $ui, $us);
         $completeFilters = $qbt->insertMissingFilters($filters);
 
-        list($query, $params) = $qbt->getSqlStringForFilters($completeFilters);
+        [$query, $params] = $qbt->getSqlStringForFilters($completeFilters);
 
         $message = $this->toStr($uis) . $this->toStr($f) . $this->toStr($p) . $this->toStr($ui) . $this->toStr($us) .
             "Query: '$query'\n                    Params: {$this->paramsString($params)}\n";
@@ -130,11 +145,11 @@ class LogicTests extends TestCase
     /**
      * Return a compact string representation of NULL or an int[] for debugging
      *
-     * @param Collection|mixed[]|int[] $var
-     * @param int                      $level
+     * @param Collection|mixed[]|int[]|null[] $var
+     * @param int                             $level
      * @return string
      */
-    private function toStr($var, $level = 0)
+    private function toStr($var, $level = 0): string
     {
         if(null === $var){
             return 'NULL' . (!$level ? "\n" : '');
@@ -159,7 +174,8 @@ class LogicTests extends TestCase
      * @param array $params
      * @return string
      */
-    private function paramsString(array $params){
+    private function paramsString(array $params): string
+    {
         $string = '[';
         $first = true;
         foreach($params as $key => $val){
@@ -180,7 +196,7 @@ class LogicTests extends TestCase
      * @param null|int[] $us               UnitSpec
      * @return mixed[]
      */
-    private function buildContextFilterArray($uis, $f, $p, $ui, $us)
+    private function buildContextFilterArray($uis, $f, $p, $ui, $us): array
     {
         return [
             AssessmentFilters\NullableContext\UnitImportSpec\Definition::class => null === $uis ? null : new Collection($uis),
@@ -201,7 +217,7 @@ class LogicTests extends TestCase
      * @param null|int[] $wk WorkType
      * @return mixed[]
      */
-    private function buildNonContextFilterArray($a, $tc, $td, $wt, $wk)
+    private function buildNonContextFilterArray($a, $tc, $td, $wt, $wk): array
     {
         return [
             AssessmentFilters\AssessmentType\Definition::class => null === $a  ? null : new Collection($a),
@@ -230,7 +246,7 @@ class LogicTests extends TestCase
 
 
     /**
-     * @return \Schoolbox\Filter\AbstractIdFinder|\Schoolbox\Filter\IdFinder|AssessmentFilters\TestableIdFinder
+     * @return AbstractIdFinder|IdFinder|AssessmentFilters\TestableIdFinder
      */
     private function getTester()
     {
@@ -244,7 +260,7 @@ class LogicTests extends TestCase
      * Returns all 3^5 = 243 permutations and whether results are possible
      * @return array
      */
-    public function provider_doContextFiltersGuaranteeEmptySet()
+    public function provider_doContextFiltersGuaranteeEmptySet(): array
     {
         $nll = null;  // Filter is not applied
         $emt = [];    // Return items that do not JOIN to this filter. ie Logically a LEFT JOIN other o ON o.a_id = a.id WHERE a.id IS NULL
@@ -503,7 +519,8 @@ class LogicTests extends TestCase
      * (and hence we can short-circuit without hitting the DB)
      * @return array
      */
-    public function provider_doNonContextGuaranteeEmptySet(){
+    public function provider_doNonContextGuaranteeEmptySet(): array
+    {
 
         $nll = null;
         $emt = [];
@@ -828,7 +845,7 @@ class LogicTests extends TestCase
      * For all 108 permutations that are not guaranteed to return empty sets, which subQueries are required?
      * @return array
      */
-    public function provider_subQueriesRequired()
+    public function provider_subQueriesRequired(): array
     {
         $nll = null;
         $emt = [];
