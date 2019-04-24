@@ -211,7 +211,7 @@
      * or relative URL.
      * Should match a (possible full) subset of values permitted in library/Url.php::isValidUrl()
      */
-    var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(:[0-9]+)?(/\\S*)?)|([/#?]\\S*))$|mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4})");
+    var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(:[0-9]+)?(/\\S*)?)|([/#?]\\S*))$|^mailto:([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4})$");
     $.validator.addMethod("isURL", function (value, element) {
         if (this.optional(element)) {
             return true;
