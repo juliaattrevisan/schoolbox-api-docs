@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
@@ -24,7 +24,7 @@ class TestableIdFinder extends IdFinder
      * @param array $completeFilters
      * @return bool
      */
-    public function getFiltersGuaranteeEmptySet(array $completeFilters)
+    public function getFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return $this->doFiltersGuaranteeEmptySet($completeFilters);
     }
@@ -33,7 +33,7 @@ class TestableIdFinder extends IdFinder
      * @param array $completeFilters
      * @return bool
      */
-    public function getDoContextFiltersGuaranteeEmptySet(array $completeFilters)
+    public function getDoContextFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return $this->doContextFiltersGuaranteeEmptySet($completeFilters);
     }
@@ -42,7 +42,7 @@ class TestableIdFinder extends IdFinder
      * @param array $completeFilters
      * @return bool
      */
-    public function getDoNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    public function getDoNonContextFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return $this->doNonContextFiltersGuaranteeEmptySet($completeFilters);
     }
@@ -56,7 +56,7 @@ class TestableIdFinder extends IdFinder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    public function getSqlStringForFilters(array $completeFilters)
+    public function getSqlStringForFilters(array $completeFilters): array
     {
         return $this->buildQuery($completeFilters, false);
     }
@@ -69,7 +69,7 @@ class TestableIdFinder extends IdFinder
      * @return Collection[]|null[]|mixed[][]
      * @throws Filter\BrokenFilterException
      */
-    public function insertMissingFilters($filters)
+    public function insertMissingFilters($filters): array
     {
         return $this->normaliseFilters($filters);
     }
