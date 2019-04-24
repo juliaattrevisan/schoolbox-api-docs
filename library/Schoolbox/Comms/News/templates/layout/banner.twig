@@ -441,47 +441,33 @@
                 }
 
                 // Before we render the elements into the front-end, let's try to update the necessary Vue comments model first.
-                // The script below, came from schoolboxResource_ProxyReplacement. Understand that it's an almost a copy-pasta,
-                // but for now this is a quick fix solution to prevent elements being re-replaced.
+                // So that we can easily initialise mediaelementplayer()
                 for (var index = 0; index < commentsToAnalyse; index++) {
                     // Convert the content into a DOM so that it will be parsable
-                    var content = self.comments[index].content;
-                    var parser = new DOMParser();
-                    var el = parser.parseFromString(content, 'text/xml');
+                    var content = $(self.comments[index].content);
 
-                    var type = $(el).find('[data-schoolboxresource-type]').attr('data-schoolboxresource-type');
+                    var type = content.find('[data-schoolboxresource-type]').attr('data-schoolboxresource-type');
 
                     // Do nothing for comments that doesn't have an embedded media
                     if (type !== undefined) {
-                        var thumbnail = $(el).find('[data-schoolboxresource-thumbnail]').attr('data-schoolboxresource-thumbnail');
-                        var fullwidth = $(el).find('[data-schoolboxresource-fullwidth]').attr('data-schoolboxresource-fullwidth');
-                        var source = $(el).find('[data-schoolboxresource-source]').attr('data-schoolboxresource-source');
-                        var style = el.getElementsByTagName('img')[0].getAttribute("style");
-                        var classes = el.getElementsByTagName('img')[0].getAttribute("class");
+                        var thumbnail = content.find('[data-schoolboxresource-thumbnail]').attr('data-schoolboxresource-thumbnail');
+                        var fullwidth = content.find('[data-schoolboxresource-fullwidth]').attr('data-schoolboxresource-fullwidth');
+                        var source = content.find('[data-schoolboxresource-source]').attr('data-schoolboxresource-source');
+                        var style = content.find('[data-schoolboxresource-type]').attr('style');
+                        var classes = content.find('[data-schoolboxresource-type]').attr('class');
+                        var width = content.find('[data-schoolboxresource-width]').attr('data-schoolboxresource-width');
+                        var height = content.find('[data-schoolboxresource-height]').attr('data-schoolboxresource-height');
 
-                        if (typeof source == 'undefined') {
-                            source = '';
-                        }
-                        source = source.replace('type=browse', 'type=sbfs').replace('type=store', 'type=storage');
-
-                        /* Replace video/audio placeholder elements
-                        */
-                        if (type == 'video') {
-                            var width = $(el).find('[data-schoolboxresource-width]').attr('data-schoolboxresource-width');
-                            var height = $(el).find('[data-schoolboxresource-height]').attr('data-schoolboxresource-height')
-                            var maxwidth = width;
-
-                            /* Simulate fullwidth while retaining responsiveness
-                             */
-                            if (fullwidth == 'true') {
-                                maxwidth = '9999';
-                            }
-
-                            self.comments[index].content = '<div style="max-width:'+maxwidth+'px;'+style+'"><video width="'+width+'" height="'+height+'" data-schoolboxmedia-replacement controls preload="none" poster="' + thumbnail + '" class="' + classes + '" style="width:100%;height:100%;"><source src="' + source + '" type="video/mp4"></video></div>';
-                        }
-                        else if (type == 'audio') {
-                            self.comments[index].content = '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:30px;border:0px;"><source src="' + source + '" type="audio/mpeg"></audio>';
-                        }
+                        self.comments[index].content = $.fn.schoolboxResource_MediaPlayerReplacement({
+                            'style': style,
+                            'width': width,
+                            'height': height,
+                            'thumbnail': thumbnail,
+                            'classes': classes,
+                            'source': source,
+                            'type': type,
+                            'fullwidth': fullwidth
+                        });
                     }
                 }
 
