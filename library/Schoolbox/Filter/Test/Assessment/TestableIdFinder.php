@@ -82,7 +82,7 @@ class TestableIdFinder extends IdFinder
      * @param Filter\Mapper $filterMapper The filter instance mapper
      * @param IMapper       $entityMapper A mapper for the entity being filtered, eg 'assessments'
      */
-    protected function buildRegistry(Filter\Mapper $filterMapper, IMapper $entityMapper)
+    protected function buildRegistry(Filter\Mapper $filterMapper, IMapper $entityMapper): void
     {
         $filterClasses = [
             AssessmentType\Definition::class,
@@ -100,6 +100,7 @@ class TestableIdFinder extends IdFinder
             WorkType\Definition::class,
             YearDue\Definition::class,
             RubricUsage\Definition::class,
+            MarkPerCap\Definition::class,
         ];
         $this->setRegistry(array_combine($filterClasses, $filterClasses));
     }
