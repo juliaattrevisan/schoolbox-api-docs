@@ -176,6 +176,6 @@ $(function() {
         });
     });
 </script>
-{{ config.site_analytics | raw }}
+{{ config.site_analytics | replace({'{USER_ROLE}':''}) | raw }}
 </body>
 </html>
