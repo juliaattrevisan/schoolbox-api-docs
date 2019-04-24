@@ -13,9 +13,8 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Filter;
 use Schoolbox\Collection;
-use Schoolbox\Filter\AbstractIdFinder;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
-use Schoolbox\Filter\IdFinder;
+use Schoolbox\Filter\Test\Assessment\TestableIdFinder;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnderflowException;
 use UnexpectedValueException;
@@ -82,23 +81,23 @@ class LogicTests extends TestCase
 
 
     /**
-     * @dataProvider provider_doesCapabilityIndicatorFiltersGuaranteeEmptySet
-     * @param null|int[] $a        AssessmentType
+     * @dataProvider provider_doRubricUsageFiltersGuaranteeEmptySet
+     * @param null|int[] $aType    AssessmentType
      * @param array|null $capInd   Capabilities/Indicators
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
      * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_CapabilityIndicatorFilter(?array $a, ?array $capInd, bool $expected): void
+    public function test_areResultsPossible_RubricUsageFilter(?array $aType, ?array $capInd, bool $expected): void
     {
         $qbt             = $this->getTester();
-        $filters         = $this->buildIndicatorCapabilityFilterArray($a, $capInd);
+        $filters         = $this->buildRubricUsageFilterArray($aType, $capInd);
         $completeFilters = $qbt->insertMissingFilters($filters);
         $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\AssessmentType\Definition::class      . ':  '. $this->toStr($a).
-            AssessmentFilters\RubricUsage\Definition::class . ':  '. $this->toStr($capInd).
-            $this->toStr($completeFilters)."\n";
+            AssessmentFilters\AssessmentType\Definition::class . ':  ' . $this->toStr($aType) .
+            AssessmentFilters\RubricUsage\Definition::class . ':  ' . $this->toStr($capInd) .
+            $this->toStr($completeFilters) . "\n";
 
         $this->assertEquals($expected, $actual, $message);
     }
@@ -236,7 +235,7 @@ class LogicTests extends TestCase
      * @param array|null $capInd
      * @return mixed[]
      */
-    private function buildIndicatorCapabilityFilterArray(?array $a, ?array $capInd): array
+    private function buildRubricUsageFilterArray(?array $a, ?array $capInd): array
     {
         return [
             AssessmentFilters\AssessmentType\Definition::class => null === $a       ? null : new Collection($a),
@@ -246,12 +245,11 @@ class LogicTests extends TestCase
 
 
     /**
-     * @return AbstractIdFinder|IdFinder|AssessmentFilters\TestableIdFinder
+     * @return TestableIdFinder
      */
-    private function getTester()
+    private function getTester(): TestableIdFinder
     {
-        require_once __DIR__ . '/TestableIdFinder.php';
-        return AssessmentFilters\TestableIdFinder::getInstance(Filter\Mapper::getInstance(), Assessment\Mapper::getInstance());
+        return TestableIdFinder::getInstance(Filter\Mapper::getInstance(), Assessment\Mapper::getInstance());
     }
 
     // ---------------- data providers --------------
@@ -781,7 +779,7 @@ class LogicTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function provider_doesCapabilityIndicatorFiltersGuaranteeEmptySet(): array
+    public function provider_doRubricUsageFiltersGuaranteeEmptySet(): array
     {
         // Activity Type keys
         $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;

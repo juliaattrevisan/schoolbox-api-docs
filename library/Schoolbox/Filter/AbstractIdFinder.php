@@ -43,7 +43,7 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public static function getInstance(Mapper $filterMapper, IMapper $mapper)
+    public static function getInstance(Mapper $filterMapper, IMapper $mapper): IdFinder
     {
         $className = get_called_class();
         if (!isset(self::$instance[$className])) {

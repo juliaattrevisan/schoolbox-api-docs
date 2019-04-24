@@ -5,17 +5,21 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment;
+namespace Schoolbox\Filter\Test\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\IMapper;
 use UnderflowException;
 use UnexpectedValueException;
+use Schoolbox\Filter\Filters\Assessment;
 
 /**
  * Enables unit testing of the parent's logic by exposing internal methods.
+ *
+ * @method static TestableIdFinder getInstance(\Schoolbox\Filter\Mapper $filterMapper, \Schoolbox\IMapper $mapper)
  */
 class TestableIdFinder extends IdFinder
 {
@@ -85,22 +89,22 @@ class TestableIdFinder extends IdFinder
     protected function buildRegistry(Filter\Mapper $filterMapper, IMapper $entityMapper): void
     {
         $filterClasses = [
-            AssessmentType\Definition::class,
-            Folder\TeacherInvolved\Definition::class,
-            Folder\StudentInteractions\Definition::class,
-            Folder\CourseImports\Definition::class,
-            NullableContext\UnitImportSpec\Definition::class,
-            NullableContext\Project\Definition::class,
-            NullableContext\UnitImpl\Definition::class,
-            NullableContext\UnitSpec\Definition::class,
-            TemporalState\Definition::class,
-            Term\Due\Definition::class,
-            Term\Close\Definition::class,
-            WeightingType\Definition::class,
-            WorkType\Definition::class,
-            YearDue\Definition::class,
-            RubricUsage\Definition::class,
-            MarkPerCap\Definition::class,
+            Assessment\AssessmentType\Definition::class,
+            Assessment\Folder\TeacherInvolved\Definition::class,
+            Assessment\Folder\StudentInteractions\Definition::class,
+            Assessment\Folder\CourseImports\Definition::class,
+            Assessment\NullableContext\UnitImportSpec\Definition::class,
+            Assessment\NullableContext\Project\Definition::class,
+            Assessment\NullableContext\UnitImpl\Definition::class,
+            Assessment\NullableContext\UnitSpec\Definition::class,
+            Assessment\TemporalState\Definition::class,
+            Assessment\Term\Due\Definition::class,
+            Assessment\Term\Close\Definition::class,
+            Assessment\WeightingType\Definition::class,
+            Assessment\WorkType\Definition::class,
+            Assessment\YearDue\Definition::class,
+            Assessment\RubricUsage\Definition::class,
+            Assessment\MarkPerCap\Definition::class,
         ];
         $this->setRegistry(array_combine($filterClasses, $filterClasses));
     }
