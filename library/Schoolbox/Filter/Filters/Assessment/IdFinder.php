@@ -1148,41 +1148,60 @@ class IdFinder extends Filter\AbstractIdFinder
             return true;
         }
 
-
         $rubricUsage = $completeFilters[RubricUsage\Definition::class];
-        if($rubricUsage instanceOf Collection){
-            // The full set of capability/indicator keys includes a 'none' key, so the full set is essentially [no usages, specific usages ...].
-            // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
-            if(!$rubricUsage->count()){
-                return true;
-            }
-            // It is valid to request assessment that use no capabilities or indicators.
-            // Is request for assessments that are non-DueWork, but also use Capabilities or Indicators?
-            if (
-                $assessmentTypes instanceOf Collection &&
-                !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
-                !$rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE))
-            {
-                // No assessments can logically match request.
-                return true;
-            }
+        $markPerCap  = $completeFilters[MarkPerCap\Definition::class];
+
+        // The full set of capability/indicator keys includes a 'none' key, so the full set is essentially [no usages, specific usages ...].
+        // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
+        if ($rubricUsage instanceOf Collection && !$rubricUsage->count()) {
+            return true;
         }
 
-        $markPerCap = $completeFilters[MarkPerCap\Definition::class];
-        if($markPerCap instanceOf Collection){
-            // The full set of markPerCap keys includes a 'none' key, so the full set is essentially [no rubric, markPerCap ON, markPerCap OFF].
-            // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
-            if(!$markPerCap->count()){
+        // The full set of markPerCap keys includes a 'none' key, so the full set is essentially [no rubric, markPerCap ON, markPerCap OFF].
+        // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
+        if ($markPerCap instanceOf Collection && !$markPerCap->count()) {
+            return true;
+        }
+
+        // Intersection: AssessmentType + RubricUsage.
+        // Not a DueWork && Specific Rubric Usage/s?
+        if (
+            $assessmentTypes instanceOf Collection &&
+            $rubricUsage instanceOf Collection &&
+            !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
+            !$rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE)
+        ) {
+            return true;
+        }
+
+        // Intersection: AssessmentType + MarkPerCap.
+        // Not a DueWork && MarkPerCap set?
+        if (
+            $assessmentTypes instanceOf Collection &&
+            $markPerCap instanceOf Collection &&
+            !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
+            !$markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)
+        ) {
+            return true;
+        }
+
+        // Intersection: RubricUsage + MarkPerCap.
+        if ($rubricUsage instanceOf Collection && $markPerCap instanceOf Collection) {
+            // No rubric usage && using mark per cap?
+            if (
+                $rubricUsage->count() === 1 &&
+                $rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE) &&
+                !$markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)
+            ) {
                 return true;
             }
-            // It is valid to request assessment that does not use rubric
-            // Is request for assessments that are non-DueWork, but must be markPerCap ON/OF?
+
+            // Specific rubric usage/s & markPerCap not set?
             if (
-                $assessmentTypes instanceOf Collection &&
-                !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
-                !$markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE))
-            {
-                // No assessments can logically match request.
+                !$rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE) &&
+                $markPerCap->count() === 1 &&
+                $markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)
+            ) {
                 return true;
             }
         }

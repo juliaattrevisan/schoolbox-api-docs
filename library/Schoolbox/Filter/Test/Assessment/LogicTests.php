@@ -7,6 +7,7 @@
 namespace Schoolbox\Filter\Test;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+use function array_merge;
 use InvalidArgumentException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
@@ -81,22 +82,24 @@ class LogicTests extends TestCase
 
 
     /**
-     * @dataProvider provider_doRubricUsageFiltersGuaranteeEmptySet
-     * @param null|int[] $aType    AssessmentType
-     * @param array|null $capInd   Capabilities/Indicators
+     * @dataProvider provider_doRubricsFiltersGuaranteeEmptySet
+     * @param null|int[] $aType      AssessmentType
+     * @param array|null $capInd     Capabilities/Indicators Usage
+     * @param array|null $markPerCap MarkPerCap
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
      * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_RubricUsageFilter(?array $aType, ?array $capInd, bool $expected): void
+    public function test_areResultsPossible_RubricsFilters(?array $aType, ?array $capInd, ?array $markPerCap, bool $expected): void
     {
         $qbt             = $this->getTester();
-        $filters         = $this->buildRubricUsageFilterArray($aType, $capInd);
+        $filters         = $this->buildRubricUsageFilterArray($aType, $capInd, $markPerCap);
         $completeFilters = $qbt->insertMissingFilters($filters);
         $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
             AssessmentFilters\AssessmentType\Definition::class . ':  ' . $this->toStr($aType) .
             AssessmentFilters\RubricUsage\Definition::class . ':  ' . $this->toStr($capInd) .
+            AssessmentFilters\MarkPerCap\Definition::class . ':  ' . $this->toStr($markPerCap) .
             $this->toStr($completeFilters) . "\n";
 
         $this->assertEquals($expected, $actual, $message);
@@ -233,13 +236,15 @@ class LogicTests extends TestCase
      *
      * @param null|int[] $a AssessmentType
      * @param array|null $capInd
+     * @param array|null $markPerCap
      * @return mixed[]
      */
-    private function buildRubricUsageFilterArray(?array $a, ?array $capInd): array
+    private function buildRubricUsageFilterArray(?array $a, ?array $capInd, ?array $markPerCap): array
     {
         return [
-            AssessmentFilters\AssessmentType\Definition::class => null === $a       ? null : new Collection($a),
-            AssessmentFilters\RubricUsage\Definition::class    => null === $capInd  ? null : new Collection($capInd),
+            AssessmentFilters\AssessmentType\Definition::class => null === $a          ? null : new Collection($a),
+            AssessmentFilters\RubricUsage\Definition::class    => null === $capInd     ? null : new Collection($capInd),
+            AssessmentFilters\MarkPerCap\Definition::class     => null === $markPerCap ? null : new Collection($markPerCap),
         ];
     }
 
@@ -779,63 +784,191 @@ class LogicTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function provider_doRubricUsageFiltersGuaranteeEmptySet(): array
+    public function provider_doRubricsFiltersGuaranteeEmptySet(): array
     {
         // Activity Type keys
         $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
-        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
+        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_PROJECT;
 
-        // CapabilityIndicator keys
-        $noneKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
+        // RubricUsage keys
+        $noRubricUsageKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
         $codec      = new AssessmentFilters\RubricUsage\Codec();
-        $exampleKey = $codec->encodeCapability((new Group())->setId(1));
+        $aRubricUsageKey = $codec->encodeCapability((new Group())->setId(1));
+
+        // MarkPerCap keys
+        $noMarkPerCapKey = AssessmentFilters\MarkPerCap\Definition::KEY_NONE;
+        $aMarkPerCapKey  = AssessmentFilters\MarkPerCap\Definition::KEY_ON;
 
         // Various filter sets possible
         $null  = null;
-        $empty = [];
+        $emty = [];
 
         // Activity filter sets
-        $dueWork       = [$dueWorkKey => $dueWorkKey];
-        $notDueWork    = [$projectKey => $projectKey];
-        $mixedActivity = [$dueWorkKey => $dueWorkKey, $projectKey => $projectKey];
+        $duWk = [$dueWorkKey => $dueWorkKey];               // Just DueWorks
+        $ntDW = [$projectKey => $projectKey];               // Just something not a dueWork
+        $mixd = array_merge($duWk, $ntDW);                  // Mixed DueWorks and non-DueWorks
 
-        // CapabilityIndicator filter sets
-        $noCapInd    = [$noneKey => $noneKey];
-        $aCapInd     = [$exampleKey => $exampleKey];
-        $mixedCapInd = [$noneKey => $noneKey, $exampleKey => $exampleKey];
+        // Rubric Usage filter sets
+        $noCI = [$noRubricUsageKey => $noRubricUsageKey];   // No capabilities or indicators used
+        $aCpI = [$aRubricUsageKey => $aRubricUsageKey];     // One specific capability/indicator usage
+        $mxCI = array_merge($noCI, $aCpI);                  // Mixed capability/indicator usage
 
-        // Activity Set, CapInd Set, alwaysEmpty?
+        // MarkPerCap filter sets
+        $nMPC = [$noMarkPerCapKey => $noMarkPerCapKey];     // No MarkPerCap attribute
+        $aMPC = [$aMarkPerCapKey => $aMarkPerCapKey];       // MarkPerCap ON
+        $mMPC = array_merge($nMPC, $aMPC);                  // Mixed of no MarkPerCap, and some specific value
+
+        // [ActivityType, RubricUsage, MarkPerCap, alwaysEmpty]?
         return [
-            [$null, $null, false],
-            [$null, $empty, true],
-            [$null, $noCapInd, false],
-            [$null, $aCapInd, false],
-            [$null, $mixedCapInd, false],
+            [$null, $null, $null, false],
+            [$null, $emty, $null, true],
+            [$null, $noCI, $null, false],
+            [$null, $aCpI, $null, false],
+            [$null, $mxCI, $null, false],
 
-            // All assessments are of an assessment type
-            [$empty, $null, true],
-            [$empty, $empty, true],
-            [$empty, $noCapInd, true],
-            [$empty, $aCapInd, true],
-            [$empty, $mixedCapInd, true],
+            [$emty, $null, $null, true],
+            [$emty, $emty, $null, true],
+            [$emty, $noCI, $null, true],
+            [$emty, $aCpI, $null, true],
+            [$emty, $mxCI, $null, true],
 
-            [$dueWork, $null, false],
-            [$dueWork, $empty, true],
-            [$dueWork, $noCapInd, false],
-            [$dueWork, $aCapInd, false],
-            [$dueWork, $mixedCapInd, false],
+            [$duWk, $null, $null, false],
+            [$duWk, $emty, $null, true],
+            [$duWk, $noCI, $null, false],
+            [$duWk, $aCpI, $null, false],
+            [$duWk, $mxCI, $null, false],
 
-            [$notDueWork, $null, false],
-            [$notDueWork, $empty, true],
-            [$notDueWork, $noCapInd, false],
-            [$notDueWork, $aCapInd, false],
-            [$notDueWork, $mixedCapInd, false],
+            [$ntDW, $null, $null, false],
+            [$ntDW, $emty, $null, true],
+            [$ntDW, $noCI, $null, false],
+            [$ntDW, $aCpI, $null, true],
+            [$ntDW, $mxCI, $null, false],
 
-            [$mixedActivity, $null, false],
-            [$mixedActivity, $empty, true],
-            [$mixedActivity, $noCapInd, false],
-            [$mixedActivity, $aCapInd, false],
-            [$mixedActivity, $mixedCapInd, false],
+            [$mixd, $null, $null, false],
+            [$mixd, $emty, $null, true],
+            [$mixd, $noCI, $null, false],
+            [$mixd, $aCpI, $null, false],
+            [$mixd, $mxCI, $null, false],
+            //
+            [$null, $null, $emty, true],
+            [$null, $emty, $emty, true],
+            [$null, $noCI, $emty, true],
+            [$null, $aCpI, $emty, true],
+            [$null, $mxCI, $emty, true],
+
+            [$emty, $null, $emty, true],
+            [$emty, $emty, $emty, true],
+            [$emty, $noCI, $emty, true],
+            [$emty, $aCpI, $emty, true],
+            [$emty, $mxCI, $emty, true],
+
+            [$duWk, $null, $emty, true],
+            [$duWk, $emty, $emty, true],
+            [$duWk, $noCI, $emty, true],
+            [$duWk, $aCpI, $emty, true],
+            [$duWk, $mxCI, $emty, true],
+
+            [$ntDW, $null, $emty, true],
+            [$ntDW, $emty, $emty, true],
+            [$ntDW, $noCI, $emty, true],
+            [$ntDW, $aCpI, $emty, true],
+            [$ntDW, $mxCI, $emty, true],
+
+            [$mixd, $null, $emty, true],
+            [$mixd, $emty, $emty, true],
+            [$mixd, $noCI, $emty, true],
+            [$mixd, $aCpI, $emty, true],
+            [$mixd, $mxCI, $emty, true],
+
+            [$null, $null, $nMPC, false],
+            [$null, $emty, $nMPC, true],
+            [$null, $noCI, $nMPC, false],
+            [$null, $aCpI, $nMPC, true],
+            [$null, $mxCI, $nMPC, false],
+
+            [$emty, $null, $nMPC, true],
+            [$emty, $emty, $nMPC, true],
+            [$emty, $noCI, $nMPC, true],
+            [$emty, $aCpI, $nMPC, true],
+            [$emty, $mxCI, $nMPC, true],
+
+            [$duWk, $null, $nMPC, false],
+            [$duWk, $emty, $nMPC, true],
+            [$duWk, $noCI, $nMPC, false],
+            [$duWk, $aCpI, $nMPC, true],
+            [$duWk, $mxCI, $nMPC, false],
+
+            [$ntDW, $null, $nMPC, false],
+            [$ntDW, $emty, $nMPC, true],
+            [$ntDW, $noCI, $nMPC, false],
+            [$ntDW, $aCpI, $nMPC, true],
+            [$ntDW, $mxCI, $nMPC, false],
+
+            [$mixd, $null, $nMPC, false],
+            [$mixd, $emty, $nMPC, true],
+            [$mixd, $noCI, $nMPC, false],
+            [$mixd, $aCpI, $nMPC, true],
+            [$mixd, $mxCI, $nMPC, false],
+            //
+            [$null, $null, $aMPC, false],
+            [$null, $emty, $aMPC, true],
+            [$null, $noCI, $aMPC, true],
+            [$null, $aCpI, $aMPC, false],
+            [$null, $mxCI, $aMPC, false],
+
+            [$emty, $null, $aMPC, true],
+            [$emty, $emty, $aMPC, true],
+            [$emty, $noCI, $aMPC, true],
+            [$emty, $aCpI, $aMPC, true],
+            [$emty, $mxCI, $aMPC, true],
+
+            [$duWk, $null, $aMPC, false],
+            [$duWk, $emty, $aMPC, true],
+            [$duWk, $noCI, $aMPC, true],
+            [$duWk, $aCpI, $aMPC, false],
+            [$duWk, $mxCI, $aMPC, false],
+
+            [$ntDW, $null, $aMPC, true],
+            [$ntDW, $emty, $aMPC, true],
+            [$ntDW, $noCI, $aMPC, true],
+            [$ntDW, $aCpI, $aMPC, true],
+            [$ntDW, $mxCI, $aMPC, true],
+
+            [$mixd, $null, $aMPC, false],
+            [$mixd, $emty, $aMPC, true],
+            [$mixd, $noCI, $aMPC, true],
+            [$mixd, $aCpI, $aMPC, false],
+            [$mixd, $mxCI, $aMPC, false],
+            //
+            [$null, $null, $mMPC, false],
+            [$null, $emty, $mMPC, true],
+            [$null, $noCI, $mMPC, false],
+            [$null, $aCpI, $mMPC, false],
+            [$null, $mxCI, $mMPC, false],
+
+            [$emty, $null, $mMPC, true],
+            [$emty, $emty, $mMPC, true],
+            [$emty, $noCI, $mMPC, true],
+            [$emty, $aCpI, $mMPC, true],
+            [$emty, $mxCI, $mMPC, true],
+
+            [$duWk, $null, $mMPC, false],
+            [$duWk, $emty, $mMPC, true],
+            [$duWk, $noCI, $mMPC, false],
+            [$duWk, $aCpI, $mMPC, false],
+            [$duWk, $mxCI, $mMPC, false],
+
+            [$ntDW, $null, $mMPC, false],
+            [$ntDW, $emty, $mMPC, true],
+            [$ntDW, $noCI, $mMPC, false],
+            [$ntDW, $aCpI, $mMPC, true],
+            [$ntDW, $mxCI, $mMPC, false],
+
+            [$mixd, $null, $mMPC, false],
+            [$mixd, $emty, $mMPC, true],
+            [$mixd, $noCI, $mMPC, false],
+            [$mixd, $aCpI, $mMPC, false],
+            [$mixd, $mxCI, $mMPC, false],
         ];
     }
 

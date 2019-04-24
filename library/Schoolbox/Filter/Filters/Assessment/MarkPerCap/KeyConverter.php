@@ -9,15 +9,12 @@ namespace Schoolbox\Filter\Filters\Assessment\MarkPerCap;
 
 use function in_array;
 use InvalidArgumentException;
-use function preg_match;
 use Schoolbox\Collection;
-use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
 
 class KeyConverter extends AbstractKeyConverter
 {
-
 
     /**
      * @inheritdoc
@@ -35,8 +32,7 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems()
     {
-        // TODO, for now just assuming the selections will never represent all capabilities and indicators in the system
-        return new Collection();
+        return new Collection(Definition::getStaticCustomKeys());
     }
 
 
