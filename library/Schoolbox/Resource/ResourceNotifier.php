@@ -4,8 +4,8 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource;
 
@@ -21,13 +21,11 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\ScheduleException;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -110,10 +108,9 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string                   $action
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $effector
-     * @throws ScheduleException
      * @return void
      */
-    protected function notifySystem($action, $resource, $effector)
+    protected function notifySystem($action, $resource, $effector): void
     {
         $notif = Notifactory::create(Notif::TOPIC_CMS);
 
@@ -136,32 +133,33 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string $filter   - optionally limit to a particular kind of resource
      * @return Collection|Instance[]
      */
-    protected function getFeedInternal($context, $roletype, $limit = self::HARD_LIMIT, $offset = 0, $filter)
+    protected function getFeedInternal($context, $roletype, $limit, $offset, $filter)
     {
-        $logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
-
         $c = new Collection();
+
+        try {
+            $logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset);
+        } catch (Mapper\Exception|\Error $e) {
+            return $c;
+            // mute failures where things were logged about resources that no longer exist
+        }
 
         foreach ($logs as $log) {
 
-            try {
-                $resource = $log->getObject();
-                $user     = $log->getUser();
-                $time     = $log->getTimestamp()->getUnixTimeStamp();
+            $resource = $log->getObject();
+            $user     = $log->getUser();
+            $time     = $log->getTimestamp()->getUnixTimeStamp();
 
-                switch ($log->getAction()) {
-                    case LogMapper::ACTION_CREATE:
-                        $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
-                        break;
-                    case LogMapper::ACTION_UPDATE:
-                        $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
-                        break;
-                    case LogMapper::ACTION_DELETE:
-                        $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
-                        break;
-                }
-            } catch (Mapper\Exception|\Error $e) {
-                // mute failures where things were logged about resources that no longer exist
+            switch ($log->getAction()) {
+                case LogMapper::ACTION_CREATE:
+                    $c = $c->merge(new Collection($this->notifyCreated($roletype, $resource, $user)->getAll($time)));
+                    break;
+                case LogMapper::ACTION_UPDATE:
+                    $c = $c->merge(new Collection($this->notifyUpdated($roletype, $resource, $user)->getAll($time)));
+                    break;
+                case LogMapper::ACTION_DELETE:
+                    $c = $c->merge(new Collection($this->notifyDeleted($roletype, $resource, $user)->getAll($time)));
+                    break;
             }
 
         }
@@ -179,9 +177,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                  $effector
      * @param Folder|ISoftDeletable $category
      * @param string                $roletype
+     * @param int                   $accessLevel
      * @return Envelope
      */
-    protected function notify($kind, $id, $action, $param, $effector, $category, $roletype, $accessLevel)
+    protected function notify(string $kind, int $id, string $action, ParameterInterface $param, User $effector,
+                              $category, string $roletype, int $accessLevel): Envelope
     {
         $envelope = new Envelope();
 
@@ -194,22 +194,24 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
                 $category = $this->folderMapper->findById($categoryId);
             } catch (Mapper\Exception\Deleted $e) {
                 $category = $e->getDeletedObject();
+            } catch (Mapper\Exception $e) {
+                return $envelope;
             }
         }
 
         $bob = new Builder();
         $bob->setIcon("/portrait.php?userId=$effectorExtId&size={$this->iconSize}")
-            ->setHref("/homepage/$categoryId#$kind-$id")
+            ->setHref("/homepage/$categoryId#$kind")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams([
                 'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                'resource' => $param,
+                'resource' => new Param($param->getText(), $param->getHref(), ParameterInterface::STACKING_APPEND),
                 'category' => new CategoryParam($category),
             ])
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.$kind.$id.$action")
-            ->addFilter('roletype', $roletype);
+            ->addFilter('roletype', [$roletype]);
 
 
         $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
@@ -225,7 +227,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return void
      */
-    public function notifySystemCreated($resource, $effector)
+    public function notifySystemCreated($resource, $effector): void
     {
         $this->notifySystem(LogMapper::ACTION_CREATE, $resource, $effector);
     }
@@ -237,7 +239,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return void
      */
-    public function notifySystemUpdated($resource, $effector, $diff)
+    public function notifySystemUpdated($resource, $effector, $diff): void
     {
         /* We don't need this
          */
@@ -262,11 +264,12 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $effector
-     * @return void
+     * @return Envelope
      */
-    public function notifySystemDeleted($resource, $effector)
+    public function notifySystemDeleted($resource, $effector): Envelope
     {
         $this->notifySystem(LogMapper::ACTION_DELETE, $resource, $effector);
+        return $this->retractEventObject(new Envelope(), $resource);
     }
 
 
@@ -277,7 +280,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public function notifyUpdated($roleType, $resource, $effector, $diff = null)
+    public function notifyUpdated($roleType, $resource, $effector, $diff = null): Envelope
     {
         $envelope = new Envelope();
 
@@ -301,7 +304,13 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         // manuel hydration
         if (!$category->getName()) {
-            $category = $this->folderMapper->findById($categoryId);
+            try {
+                $category = $this->folderMapper->findById($categoryId);
+            } catch (Mapper\Exception\Deleted $e) {
+                $category = $e->getDeletedObject();
+            } catch (Mapper\Exception $e) {
+                return $envelope;
+            }
         }
 
         $bob = new Builder();
@@ -420,7 +429,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return Envelope
      */
-    public function notifyStudentCreated($resource, $effector)
+    public function notifyStudentCreated($resource, $effector): Envelope
     {
         return $this->notifyCreated(Role::STUDENT, $resource, $effector);
     }
@@ -432,7 +441,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated($resource, $effector, $diff = null)
+    public function notifyStudentUpdated($resource, $effector, $diff = null): Envelope
     {
         return $this->notifyUpdated(Role::STUDENT, $resource, $effector, $diff);
     }
@@ -443,7 +452,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return Envelope
      */
-    public function notifyStudentDeleted($resource, $effector)
+    public function notifyStudentDeleted($resource, $effector): Envelope
     {
         return $this->notifyDeleted(Role::STUDENT, $resource, $effector);
     }
@@ -454,7 +463,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return Envelope
      */
-    public function notifyStaffCreated($resource, $effector)
+    public function notifyStaffCreated($resource, $effector): Envelope
     {
         return $this->notifyCreated(Role::STAFF, $resource, $effector);
     }
@@ -466,7 +475,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public function notifyStaffUpdated($resource, $effector, $diff = null)
+    public function notifyStaffUpdated($resource, $effector, $diff = null): Envelope
     {
         return $this->notifyUpdated(Role::STAFF, $resource, $effector, $diff);
     }
@@ -477,7 +486,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return Envelope
      */
-    public function notifyStaffDeleted($resource, $effector)
+    public function notifyStaffDeleted($resource, $effector): Envelope
     {
         return $this->notifyDeleted(Role::STAFF, $resource, $effector);
     }
@@ -488,7 +497,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return Envelope
      */
-    public function notifyParentCreated($resource, $effector)
+    public function notifyParentCreated($resource, $effector): Envelope
     {
         return $this->notifyCreated(Role::PARENT, $resource, $effector);
     }
@@ -500,7 +509,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public function notifyParentUpdated($resource, $effector, $diff = null)
+    public function notifyParentUpdated($resource, $effector, $diff = null): Envelope
     {
         return $this->notifyUpdated(Role::PARENT, $resource, $effector, $diff);
     }
@@ -511,7 +520,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param User                     $effector
      * @return Envelope
      */
-    public function notifyParentDeleted($resource, $effector)
+    public function notifyParentDeleted($resource, $effector): Envelope
     {
         return $this->notifyDeleted(Role::PARENT, $resource, $effector);
     }
