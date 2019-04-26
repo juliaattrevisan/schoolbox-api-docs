@@ -164,6 +164,12 @@ class Batchxml implements ISync
         $student
             ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
 
+        /* Assign campuses
+         */
+        $student
+            ->getCampus()
+                ->add($this->campusMapping[(int)$currentResult->NCYear]);
+
         return $student;
 
     }
