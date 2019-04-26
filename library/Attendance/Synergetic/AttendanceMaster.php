@@ -126,6 +126,7 @@ class Attendance_Synergetic_AttendanceMaster
      */
     protected function getTimetableGroup()
     {
+        // Sorting with TimetableGroup is to make sure that we get TimetableGroup with value rather than empty.
         $query = "
 			SELECT  *
 			FROM    dbo.Timetable
@@ -135,8 +136,9 @@ class Attendance_Synergetic_AttendanceMaster
 			AND     PeriodNumber = :periodNumber
 			AND     ClassCode = :classCode
 			AND     ClassCampus = :classCampus
+			ORDER BY TimetableGroup DESC
 		";
-        
+
         $statement = $this->connector->executeQuery($query, [
             'fileType'      => $this->getClassFileType(),
             'fileYear'      => $this->getFileYear(),
