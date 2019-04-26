@@ -290,7 +290,8 @@
                         });
                     });
                 </script>
-                {{ config.site_analytics | replace({'{USER_ROLE}':user.current.role.name}) | raw }}
+                {% set user_role = user.current.role.name | escape('js') %}
+                {{ config.site_analytics | replace({'{USER_ROLE}':user_role}) | raw }}
             {% endblock %}
 
             {{ debugBar.head | raw }}
