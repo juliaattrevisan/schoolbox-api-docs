@@ -27,12 +27,12 @@ class Batchxml implements ISync
 
 
     /**
-     * Cache the xml that we downloaded so we don't end up re-fetching it
-     * if we run more than one roletype's ups
+     * Cache the xml nodes that we downloaded so we don't end up re-fetching it
+     * if we run more than one roletype's ups.
      *
-     * @var string
+     * @var \SimpleXMLElement
      */
-    private $xmlCache;
+    private $nodes;
 
 
     /**
@@ -73,36 +73,34 @@ class Batchxml implements ISync
      */
     private function fetchXml(string $path): array
     {
-        if (!$this->xmlCache) {
-            $this->xmlCache = $this->api->retrieveDocument();
+        if (!$this->nodes) {
+            $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
-
-        $nodes = new \SimpleXMLElement($this->xmlCache);
 
         /* Faster, for now
          */
 //        $source = __DIR__ .'/../../../../www/temp.xml';
 //        $xml = file_get_contents($source);
-//        $nodes = new \SimpleXMLElement($xml);
+//        $this->nodes = new \SimpleXMLElement($xml);
 
         /* Prefetch (Campus, NCYear) relations as a lookup
          */
         if (!\count($this->campusMapping)) {
-            $this->campusMapping = $this->prefetchCampuses($nodes);
+            $this->campusMapping = $this->prefetchCampuses();
         }
 
-        return $nodes->xpath($path);
+        return $this->nodes->xpath($path);
     }
 
 
     /**
      * Mine $nodes for Campus elements and the NCYear levels to which they relate
      *
-     * @param \SimpleXMLElement $nodes
      * @return array
      */
-    private function prefetchCampuses(\SimpleXMLElement $nodes) {
-        $campuses = $nodes->xpath('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
+    private function prefetchCampuses(): array
+    {
+        $campuses = $this->nodes->xpath('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
 
         $mapping = [];
 
