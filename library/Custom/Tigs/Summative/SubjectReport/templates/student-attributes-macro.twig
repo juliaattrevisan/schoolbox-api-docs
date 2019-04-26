@@ -1,0 +1,24 @@
+{#
+    Renders a set of CSS classes specific to the student's attributes:
+    Data:
+        studentAttributes   StudentAttributes
+#}
+{% macro cssClasses(studentAttributes) %}
+    {%- spaceless %}
+        {% set classes = [
+            'schoolbox-year-level-' ~ studentAttributes.yearLevel,
+            'curriculum-year-level-' ~ studentAttributes.curriculumYearLevel,
+            'curriculum-semester-' ~ studentAttributes.curriculumSemester
+        ] %}
+        {% if studentAttributes.myp %}
+            {% set classes = classes|merge(['myp']) %}
+        {% endif %}
+        {% if studentAttributes.dp %}
+            {% set classes = classes|merge(['dp']) %}
+        {% endif %}
+        {% if studentAttributes.hsc %}
+            {% set classes = classes|merge(['hsc']) %}
+        {% endif %}
+        {{ classes|join(' ') }}
+    {% endspaceless %}
+{% endmacro %}
