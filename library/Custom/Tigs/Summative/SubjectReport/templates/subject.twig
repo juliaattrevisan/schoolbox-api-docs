@@ -41,7 +41,7 @@ Data:
 </style>
 <script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <div class="tigs-crp subject-report {{ macro.cssClasses(attributes) }}">
-    <div class="row">
+    <div class="row header">
         <div class="island small-12">
             <h1>{{ courseSpec ? courseSpec.title : folder.title }}</h1>
             <p class="meta">Curriculum Year {{ attributes.curriculumYearLevel }}, Semester {{ attributes.curriculumSemester }}</p>
@@ -73,8 +73,8 @@ Data:
         </div>
     </div>
 
-    <div class="row">
-        <div class="column small-12 medium-6">
+    <div class="row student-teacher">
+        <div class="column small-12 medium-6 student">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
                 <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
@@ -82,7 +82,7 @@ Data:
                 <p class="meta">{{ user.role.name }}</p>
             </div>
         </div>
-        <div class="column small-12 medium-6">
+        <div class="column small-12 medium-6 teacher">
             <h2 class="subheader">Class Teacher{% if teachers | length > 1 %}s{% endif %}</h2>
             {% for teacher in teachers %}
                 <div class="card small-12">
@@ -95,7 +95,7 @@ Data:
     </div>
     <hr/>
     {% if courseDescription %}
-    <div class="row">
+    <div class="row course-description">
         <div class="island small-12">
             <h2 class="subheader">Description</h2>
             <section class="content">
@@ -118,7 +118,7 @@ Data:
             {% endif %}
         </div>
 
-        <div class="column small-12 medium-6">
+        <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.0.semester }}">
             {% if nesaGraphData.0 %}
                 <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.0.semester }})</h2>
                 {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0 only %}
@@ -127,11 +127,11 @@ Data:
             {% endif %}
         </div>
 
-        <div class="column small-12 medium-6">
+        <div class="column small-12 medium-6 empty">
                 <p><!-- New Curriculum Year Report--></p>
         </div>
 
-        <div class="column small-12 medium-6">
+        <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.1.semester }}">
             {% if nesaGraphData.1 %}
                 <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.1.semester }})</h2>
                 {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1 only %}
@@ -141,13 +141,13 @@ Data:
         </div>
 
         {% if falData %}
-        <div class="column small-12">
+        <div class="column small-12 final-achievement-levels">
             {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData only %}
         </div>
         {% endif %}
         {% for unitSpec in unitSpecs %}
             {% set unitSpecId = unitSpec.id %}
-            <div class="column small-12">
+            <div class="column small-12 unit">
                 {# Do we have a link to an AAS assessment for this unit? #}
                 {% set unitRoute = (aasData.data is defined and aasData.data[unitSpecId] is defined) ? aasData.data[unitSpecId].link : '' %}
                 {% if unitRoute %}
@@ -181,7 +181,7 @@ Data:
                 {% set commentData = aasData.data[unitSpecId].marks %}
             {% endif %}
             {% if commentData.comment %}
-                <div class="column island small-12">
+                <div class="column island small-12 comments">
                     <h2 class="subheader">Comments by {{ commentData.commentBy.fullname }}</h2>
                     <section class="content">
                         <p>{{ commentData.comment | nl2br }}</p>
