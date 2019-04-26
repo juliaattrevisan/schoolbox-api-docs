@@ -69,7 +69,7 @@ class IdFinder extends Filter\AbstractIdFinder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    protected function buildQuery(array $completeFilters, $deleted)
+    protected function buildQuery(array $completeFilters, $deleted): array
     {
         // Filters which effect which sub-queries are required
         $teacherFolderIds      = $completeFilters[Folder\TeacherInvolved\Definition::class];
@@ -578,10 +578,16 @@ class IdFinder extends Filter\AbstractIdFinder
             return ['', 'TRUE', []];
         }
 
-        // How should we join to usage tables?
-        $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
-        $includeNoUsage       = $rubricUsages->keyExists(RubricUsage\Definition::KEY_NONE);
-        $joinType             = $otherAssessmentTypes || $includeNoUsage ? 'LEFT' : 'INNER';
+        // Do we need to join to usage table?
+        if($rubricUsages->count() === 1 && $rubricUsages->keyExists(RubricUsage\Definition::KEY_NONE)){
+            // No need to join to usage, we can just examine the `submission_box.use_rubric` column.
+            $join = '';
+        } else {
+            // We need to examine, usage, how should we join?
+            $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
+            $joinType             = $otherAssessmentTypes ? 'LEFT' : 'INNER';
+            $join                 = "$joinType JOIN rubric_group_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id";
+        }
 
         $pb    = $this->getMapper()->getPredicateBuilder();
         $codex = new RubricUsage\Codec();
@@ -590,7 +596,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
         foreach($rubricUsages as $rubricUsage){
             if($rubricUsage === RubricUsage\Definition::KEY_NONE){
-                $pb->isNull('rgu.rubric_group_id');
+                $pb->isFalse("$dueWorkAlias.use_rubric");
             } else {
                 // This assumes that if an assessment is using an indicator, it is using the indicator's capability.
                 // Hence we can just JOIN to capability usage
@@ -603,11 +609,7 @@ class IdFinder extends Filter\AbstractIdFinder
             $pb->equals('rgu.rubric_group_id', $uniqueCapId);
         }
 
-        return [
-            "$joinType JOIN rubric_group_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id",
-            '(' . implode(' OR ', $pb->getWhere()) . ')',
-            $pb->getParams()
-        ];
+        return [$join, '(' . implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];
     }
 
 
@@ -1036,6 +1038,83 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         return false;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    protected function simplifyFilters(array $completeFilters): array
+    {
+        // Get handles to the interrelated filters.
+        $assessmentTypes = $completeFilters[AssessmentType\Definition::class];
+        $rubricUsage     = $completeFilters[RubricUsage\Definition::class];
+        $markPerCap      = $completeFilters[MarkPerCap\Definition::class];
+
+        // Are we filtering to specific assessment types?
+        if ($assessmentTypes instanceof Collection) {
+            // And also filtering to assessments that either:
+            // 1. Use specific rubric components, or
+            // 2. Have mark-per-cap ON/OFF (but not NULL)
+            if (
+                ($rubricUsage instanceof Collection && !$rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE)) ||
+                ($markPerCap instanceof Collection && !$markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE))
+            ) {
+                // We can ignore the assessment type filter (the usage/mark-per-cap filter implies a sub-set of due-works)
+                // This is a relatively substantial optimisation as we can avoid the LEFT joins to large assessment tables in all 8 sub-queries
+                $assessmentTypes = null;
+            }
+        }
+
+        if ($assessmentTypes instanceof Collection && !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK)) {
+            // Filtering to [!DW ∩ some usage combo)]?
+            if ($rubricUsage instanceof Collection) {
+                // Can be simplified to just [!DW]
+                $rubricUsage = null;
+            }
+            // Filtering to [!DW ∩ some mark-per-cap combo]?
+            if ($markPerCap instanceof Collection) {
+                // Can be simplified to just [!DW]
+                $markPerCap = null;
+            }
+        }
+
+        // Filtering to [DW ∩ mark-per-cap = ON|OFF]
+        if (
+            $assessmentTypes instanceof Collection &&
+            $markPerCap instanceof Collection &&
+            $assessmentTypes->count() === 1 &&
+            $assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
+            !$markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)
+        ) {
+            // DW check is redundant, [mark-per-cap = ON|OFF] is complete sub-set
+            $assessmentTypes = null;
+        }
+
+        // Filtering to intersection of rubric usage and mark-per-cap, and both include the NULL option?
+        if (
+            $rubricUsage instanceof Collection &&
+            $markPerCap instanceof Collection &&
+            $markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE) &&
+            $rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE)
+        ) {
+            // Filtering to just assessment with no rubric usage?
+            if ($rubricUsage->count() === 1) {
+                // Simplify to [no rubric usage]
+                $markPerCap = null;
+            } // Filtering to just assessments with no relevant mark-per-cap attribute?
+            elseif ($markPerCap->count() === 1) {
+                // Simplify to [NULL mark-per-cap]
+                $markPerCap = null;
+            }
+        }
+
+        // Insert possibly simplified filters back in filter set
+        $completeFilters[AssessmentType\Definition::class] = $assessmentTypes;
+        $completeFilters[RubricUsage\Definition::class]    = $rubricUsage;
+        $completeFilters[MarkPerCap\Definition::class]     = $markPerCap;
+
+        return $completeFilters;
     }
 
 
