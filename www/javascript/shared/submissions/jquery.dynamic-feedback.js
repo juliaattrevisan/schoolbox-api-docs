@@ -63,7 +63,7 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                timeoutDurationMs: 600, // After how many milliseconds should we auto-save user input
+                timeoutDurationMs: 100, // After how many milliseconds should we auto-save user input
 
                 /* Label to indicate current status of action being undertaken
                  */
