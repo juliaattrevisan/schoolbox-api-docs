@@ -18,6 +18,8 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\Filter\Filters\Assessment\WorkType;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType;
+use Schoolbox\Filter\Mapper;
+use Schoolbox\IMapper;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -47,7 +49,7 @@ use UnexpectedValueException;
  * eg, if Weighting filter is specified as both weighted and unweighted, logically we
  * don't need to apply that filter, but that optimisation is NOT done here.
  *
- * @method static IdFinder getInstance(\Schoolbox\Filter\Mapper $filterMapper, \Schoolbox\IMapper $mapper)
+ * @method static IdFinder getInstance(Mapper $filterMapper, IMapper $mapper)
  */
 class IdFinder extends Filter\AbstractIdFinder
 {
