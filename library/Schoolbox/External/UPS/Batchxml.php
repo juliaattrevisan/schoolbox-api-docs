@@ -106,6 +106,7 @@ class Batchxml implements ISync
 
         foreach ($campuses as $currentResult) {
             $campus = (new User\Common\Campus())
+                ->setId((string)$currentResult->xpath('@Id')[0])
                 ->setCode((string)$currentResult->Code)
                 ->setName((string)$currentResult->Name);
 
