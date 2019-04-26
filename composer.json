@@ -82,6 +82,7 @@
         "lox/xhprof": "dev-master",
         "codeception/codeception": "^2.3",
         "phpunit/phpunit": "~6.4.3",
-        "fzaninotto/faker": "^1.8"
+        "fzaninotto/faker": "^1.8",
+        "phpstan/phpstan": "^0.11.5"
     }
 }
