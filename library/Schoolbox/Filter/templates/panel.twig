@@ -12,7 +12,6 @@ Usage:
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
 <script type="text/javascript" src="/javascript/shared/jquery.select-multi-checkboxes.js"></script>
-<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
 
 {% autoescape 'js' %}
 <script type="text/javascript">
@@ -23,13 +22,6 @@ Usage:
 
         $('[data-component]').selectMulti({});
         $('[data-collapser]').collapsable();
-        $('[data-select-all]').each(function (idx, elem) {
-            var $elem = $(elem);
-            $elem.selectAll({
-                selector: '#selectAllFilterOptions-' + $elem.attr('data-component'),
-                checkboxes: '[data-filter-options]'
-            });
-        });
 
         // ============== Global Variables & Constants
         var MAX_VISIBLE_SELECTIONS = 4;

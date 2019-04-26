@@ -337,11 +337,6 @@ th, td{
 
     }
 
-	+ #{$label-selector}.select-all {
-		border-bottom: 1px solid $gainsboro;
-		padding-bottom: .5rem;
-	}
-
     &:checked {
         + #{$label-selector} {
             &:before, &:after {
