@@ -25,6 +25,7 @@ class Batchxml implements ISync
      */
     private $api;
 
+
     /**
      * Cache the xml that we downloaded so we don't end up re-fetching it
      * if we run more than one roletype's ups
@@ -32,6 +33,18 @@ class Batchxml implements ISync
      * @var string
      */
     private $xmlCache;
+
+
+    /**
+     * A mapping between (NCYear, Campus) instances
+     *
+     * Campuses are stored separately from Students and are joined on NCYear
+     * so create a lookup instead of traversing every time
+     *
+     * @var array
+     */
+    private $campusMapping = [];
+
 
     /**
      * Batchxml constructor.
@@ -66,14 +79,48 @@ class Batchxml implements ISync
 
         $nodes = new \SimpleXMLElement($this->xmlCache);
 
-        return $nodes->xpath($path);
-
         /* Faster, for now
          */
 //        $source = __DIR__ .'/../../../../www/temp.xml';
 //        $xml = file_get_contents($source);
-//        $nodes = new SimpleXMLElement($xml);
-//        return $nodes->xpath($path);
+//        $nodes = new \SimpleXMLElement($xml);
+
+        /* Prefetch (Campus, NCYear) relations as a lookup
+         */
+        if (!\count($this->campusMapping)) {
+            $this->campusMapping = $this->prefetchCampuses($nodes);
+        }
+
+        return $nodes->xpath($path);
+    }
+
+
+    /**
+     * Mine $nodes for Campus elements and the NCYear levels to which they relate
+     *
+     * @param \SimpleXMLElement $nodes
+     * @return array
+     */
+    private function prefetchCampuses(\SimpleXMLElement $nodes) {
+        $campuses = $nodes->xpath('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
+
+        $mapping = [];
+
+        foreach ($campuses as $currentResult) {
+            $campus = (new User\Common\Campus())
+                ->setCode((string)$currentResult->Code)
+                ->setName((string)$currentResult->Name);
+
+            /* Map campuses to their NCYear levels
+             */
+            $years = $currentResult->xpath('Years/Year[@YearId]');
+
+            foreach ($years as $year) {
+                $mapping[(int)$year->xpath('@YearId')[0]->YearId] = $campus;
+            }
+        }
+
+        return $mapping;
     }
 
 
