@@ -211,13 +211,13 @@
      * or relative URL.
      * Should match a (possible full) subset of values permitted in library/Url.php::isValidUrl()
      */
-    var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(:[0-9]+)?(/\\S*)?)|([/#?]\\S*))$");
+    var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(:[0-9]+)?(/\\S*)?)|([/#?]\\S*))$|^mailto:(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$");
     $.validator.addMethod("isURL", function (value, element) {
         if (this.optional(element)) {
             return true;
         }
         return regExURL.test(value.trim().toLowerCase());
-    }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with '/', '#', or '?')");
+    }, "Please enter a URL beginning with http://, https://, ftp://, mailto:, or a relative URL (beginning with '/', '#', or '?')");
 
 
     /**

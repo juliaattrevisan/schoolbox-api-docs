@@ -250,7 +250,7 @@ class Controller extends Base
         }
 
         $item->setTitle($post['title']);
-        $item->setUrl($post['url']);
+        $item->setUrl(trim($post['url']));
         $item->setTarget($post['target']);
         $this->getMenuSideMapper()->save($item);
 
