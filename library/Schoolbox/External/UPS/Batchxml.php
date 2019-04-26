@@ -8,6 +8,7 @@
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\External\UPS;
 
@@ -77,53 +78,61 @@ class Batchxml implements ISync
 
 
     /**
+     * Hydrate a User\Student() instance from a simplexml node
+     *
+     * @param \SimpleXMLElement $currentResult
+     * @return User\Student
+     */
+    private function hydrateStudent(\SimpleXMLElement $currentResult): User\Student
+    {
+        $student = new User\Student();
+
+        $student
+            ->setId((string)$currentResult->SchoolCode)
+            ->setTitle((string)$currentResult->Title)
+            ->setGivenName((string)$currentResult->Forename)
+            ->setPreferredName((string)$currentResult->Preferredname)
+            ->setLastname((string)$currentResult->Surname)
+            ->setGender((string)$currentResult->Gender)
+            ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
+
+        $student
+            ->getYear()
+            ->setDescription((string)$currentResult->NCYear)
+            ->setLevel((int)$currentResult->NCYear);
+
+        /* "Form" seems to be some kind of string, not an int
+         * so we don't use setLevel()
+         */
+        $student
+            ->getForm()
+            ->setDescription((string)$currentResult->Form);
+        $student
+            ->getHouse()
+            ->setCode((string)$currentResult->AcademicHouse);
+
+        $student
+            ->getAccount()
+            ->setLogin((string)$currentResult->UserName)
+            ->setActive(true);
+
+        $student
+            ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+        return $student;
+
+    }
+
+    /**
      * {@inheritDoc}
      */
     public function findAllStudents()
     {
         $students = $this->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
-        $collection = new Collection();
-
         foreach ($students as $currentResult) {
-            $student = new User\Student();
-
-            $student
-                ->setId((string)$currentResult->SchoolCode)
-                ->setTitle((string)$currentResult->Title)
-                ->setGivenName((string)$currentResult->Forename)
-                ->setPreferredName((string)$currentResult->Preferredname)
-                ->setLastname((string)$currentResult->Surname)
-                ->setGender((string)$currentResult->Gender)
-                ->setDob(\Alaress_Date_Format::newFromTimestamp(strtotime((string)$currentResult->DOB)));
-
-            $student
-                ->getYear()
-                    ->setDescription((string)$currentResult->NCYear)
-                    ->setLevel((int)$currentResult->NCYear);
-
-            /* "Form" seems to be some kind of string, not an int
-             * so we don't use setLevel()
-             */
-            $student
-                ->getForm()
-                    ->setDescription((string)$currentResult->Form);
-            $student
-                ->getHouse()
-                    ->setCode((string)$currentResult->AcademicHouse);
-
-            $student
-                ->getAccount()
-                    ->setLogin((string)$currentResult->UserName)
-                    ->setActive(true);
-
-            $student
-                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
-
-            $collection->add($student);
+            yield $this->hydrateStudent($currentResult);
         }
-
-        return $collection;
     }
 
 
@@ -133,8 +142,6 @@ class Batchxml implements ISync
     public function findAllStaff()
     {
         $staffs = $this->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
-
-        $collection = new Collection();
 
         foreach ($staffs as $currentResult) {
             $staff = new User\Staff();
@@ -171,23 +178,69 @@ class Batchxml implements ISync
                 $staff->getCampus()->add((new User\Common\Campus())->setName((string)$division->Name));
             }
 
-            $collection->add($staff);
+            yield $staff;
         }
-
-        return $collection;
     }
 
 
     /**
-     * Gets a collection of normalized parent objects.
-     *
-     * This method should return an iterator instead of an array, for memory
-     * efficiency reasons.
-     *
-     * @return User\Guardian[]
+     * {@inheritDoc}
      */
     public function findAllParents()
     {
-        // TODO: Implement findAllParents() method.
+        $guardians = $this->fetchXml('/iSAMS/PupilManager/Contacts/Contact');
+
+        foreach ($guardians as $currentResult) {
+            $guardian = new User\Guardian();
+
+            $guardian
+                ->setId((string)$currentResult->xpath('@PersonId')[0]->PersonId)
+                ->setTitle((string)$currentResult->Title)
+                ->setPreferredName((string)$currentResult->Forename)
+                ->setGivenName((string)$currentResult->Forename)
+                ->setLastname((string)$currentResult->Surname)
+                ->setType((string)$currentResult->Relationship)
+                ->setPhoneWork((new User\Common\Phone())->setNumber((string)$currentResult->Telephone))
+                ->setPhoneMobile((new User\Common\Phone())->setNumber((string)$currentResult->Mobile));
+
+            /* Account
+             */
+            $guardian
+                ->getAccount()
+                    ->setLogin((string)$currentResult->EmailAddress)
+                    ->setActive(true);
+
+            /* Find all the pupils for this parent and stack them up
+             */
+            $allStudents = [];
+
+            foreach ($currentResult->xpath('Pupils/Pupil/@Id') as $studentNode) {
+                $studentId = (string)$studentNode;
+
+                /* Find the first instance of a Pupil with Id = $studentId
+                 * For some reason they've duped the data for us
+                 */
+                $student = $this->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+                /* Hydrate it into a User/Student() instance
+                 * Ensure de-dupe
+                 */
+                if (null !== $student) {
+                    $hydratedStudent = $this->hydrateStudent($student);
+
+                    $allStudents[$hydratedStudent->getId()] = $hydratedStudent;
+                }
+            }
+
+            /* If we found any students, throw them into a Collection
+             * Then throw the Collection into $guardian
+             * Otherwise the defaults are fine
+             */
+            if (\count($allStudents)) {
+                $guardian->setStudents(new Collection(array_values($allStudents)));
+            }
+
+            yield $guardian;
+        }
     }
 }
