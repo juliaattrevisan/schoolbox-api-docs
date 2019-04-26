@@ -6,47 +6,68 @@
 [ 'Search Results' ]
 ) }}
 
-<div class="row">
+<div class="row actions-small-1">
     <div class="list-item">
-        <div class="small-12 island">
-
+        <div class="small-12 column">
             <h1>Search {{ locale.pastoral.proper }} Records</h1>
-
-            <h2 class="subheader">Search Results</h2>
-            {% include '@pastoral/search_field.twig' with {'search': search} %}
-
-            {# ------------------------------------------------------------------------------------------------------ #}
-            {# Ensure Minimum Length Of Search #}
-            {# ------------------------------------------------------------------------------------------------------ #}
-
-            {% if search | length >= minimumSearchLength %}
-
-                {# ------------------------------------------------------------------------------------------------------ #}
-                {# Show Matching Pastoral Records #}
-                {# ------------------------------------------------------------------------------------------------------ #}
-
-                <h2 class="subheader">Matching {{ locale.pastoral.proper }} Records</h2>
-
-                {% if results | length %}
-                    {% include "@pastoral/search_results_records.twig" %}
-                {% else %}
-                    {% include "@pastoral/search_results_records_empty.twig" %}
-                {% endif %}
-
-                {# ------------------------------------------------------------------------------------------------------ #}
-                {# Show Matching Students #}
-                {# ------------------------------------------------------------------------------------------------------ #}
-
-                <h2 class="subheader">Matching Students</h2>
-
-                {% if students | length %}
-                    {% include "@pastoral/search_results_students.twig" %}
-                {% else %}
-                    {% include "@pastoral/search_results_students_empty.twig" %}
-                {% endif %}
-            {% else %}
-                {% include "@pastoral/search_results_error_short.twig" %}
-            {% endif %}
         </div>
+    </div>
+    <nav>
+        {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
+        {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
+        {% set routeGetAudiences = routeLookupIfAuthorized('pastoralAudience.getAudiences') %}
+
+        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
+    </nav>
+    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
+        {% if routeReportBuilder %}
+            <li><a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder">Report Builder</a></li>
+        {% endif %}
+        {% if routeGetGroups %}
+            <li><a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups">Manage Groups</a></li>
+        {% endif %}
+        {% if routeGetAudiences %}
+            <li><a href="{{ routeGetAudiences }}" class="icon-settings" title="Manage {{ locale.pastoral.proper }} Audience Defaults">Manage Visibility Defaults</a></li>
+        {% endif %}
+    </ul>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Search Results</h2>
+        {% include '@pastoral/search_field.twig' with {'search': search} %}
+
+        {# ------------------------------------------------------------------------------------------------------ #}
+        {# Ensure Minimum Length Of Search #}
+        {# ------------------------------------------------------------------------------------------------------ #}
+
+        {% if search | length >= minimumSearchLength %}
+
+            {# ------------------------------------------------------------------------------------------------------ #}
+            {# Show Matching Pastoral Records #}
+            {# ------------------------------------------------------------------------------------------------------ #}
+
+            <h2 class="subheader">Matching {{ locale.pastoral.proper }} Records</h2>
+
+            {% if results | length %}
+                {% include "@pastoral/search_results_records.twig" %}
+            {% else %}
+                {% include "@pastoral/search_results_records_empty.twig" %}
+            {% endif %}
+
+            {# ------------------------------------------------------------------------------------------------------ #}
+            {# Show Matching Students #}
+            {# ------------------------------------------------------------------------------------------------------ #}
+
+            <h2 class="subheader">Matching Students</h2>
+
+            {% if students | length %}
+                {% include "@pastoral/search_results_students.twig" %}
+            {% else %}
+                {% include "@pastoral/search_results_students_empty.twig" %}
+            {% endif %}
+        {% else %}
+            {% include "@pastoral/search_results_error_short.twig" %}
+        {% endif %}
     </div>
 </div>
