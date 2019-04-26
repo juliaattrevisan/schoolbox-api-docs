@@ -31,11 +31,18 @@
     var autoSaveInProgress = [];
 
     /**
-     * Has a student made more changes during a draft auto-save?
+     * Has the instructor made more changes during a draft auto-save?
      *
      * @type {boolean[]} Indexed by user.id
      */
     var autoSavePending = [];
+
+    /**
+     * Have other inputs been changed before previous draft(s) finished saving?
+     *
+     * @type {int[]} Timeout handles, indexed by element ID
+     */
+    var clearTimeoutPending = [];
 
 
     /**
@@ -63,7 +70,7 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                timeoutDurationMs: 100, // After how many milliseconds should we auto-save user input
+                timeoutDurationMs: 600, // After how many milliseconds should we auto-save user input
 
                 /* Label to indicate current status of action being undertaken
                  */
@@ -222,11 +229,13 @@
          */
         function timeoutUpdate() {
             var input = this;
-            window.clearTimeout(timeoutHandle);
 
             timeoutHandle = window.setTimeout(function () {
                 onFeedbackChanged.apply(input);
             }, config.timeoutDurationMs);
+
+            // Keep a record of this timeout: we'll need to clear it later, when it's safe to do so.
+            clearTimeoutPending[$(input).attr('id')] = timeoutHandle;
 
             if ($(this).val() == $(this).data('preval')) {
                 return;
@@ -267,6 +276,19 @@
 
             // No auto-saves currently queued for participant - so initiate a draft auto-save.
             autoSaveDraft($participant);
+            // And clear the timeout for the element that triggered the save
+            clearPendingTimeout($participant);
+        }
+
+        /**
+         * Clear the timeout on any inputs that were waiting to be saved
+         *
+         * @param $participant
+         */
+        function clearPendingTimeout($participant) {
+            var elementId = $($participant.context).attr('id');
+            var timeoutHandle = clearTimeoutPending[elementId];
+            window.clearTimeout(timeoutHandle);
         }
 
         /**
@@ -334,6 +356,8 @@
                         // Clear the flag and save those pending changes.
                         autoSavePending[userId] = false;
                         autoSaveDraft($participant);
+                        // Clear the timeout on the element that triggered the draft save
+                        clearPendingTimeout($participant);
                     }
                 });
         }
