@@ -1099,11 +1099,11 @@ class IdFinder extends Filter\AbstractIdFinder
             $rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE)
         ) {
             // Filtering to just assessment with no rubric usage?
-            if ($rubricUsage->count() === 1) {
+            if ($markPerCap->count() === 1) {
                 // Simplify to [no rubric usage]
-                $markPerCap = null;
+                $rubricUsage = null;
             } // Filtering to just assessments with no relevant mark-per-cap attribute?
-            elseif ($markPerCap->count() === 1) {
+            elseif ($rubricUsage->count() === 1) {
                 // Simplify to [NULL mark-per-cap]
                 $markPerCap = null;
             }
