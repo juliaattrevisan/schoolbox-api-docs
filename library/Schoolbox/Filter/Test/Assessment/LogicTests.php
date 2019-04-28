@@ -141,6 +141,41 @@ class LogicTests extends TestCase
     }
 
 
+    /**
+     * Test that the simplification logic produces expected results
+     *
+     * @dataProvider provider_simplificationLogic
+     * @param array|null $aTypeIn
+     * @param array|null $capIndIn
+     * @param array|null $markPerCapIn
+     * @param array|null $aTypeOut
+     * @param array|null $capIndOut
+     * @param array|null $markPerCapOut
+     * @throws Filter\BrokenFilterException
+     */
+    public function test_simplificationLogic(
+        ?array $aTypeIn,
+        ?array $capIndIn,
+        ?array $markPerCapIn,
+        ?array $aTypeOut,
+        ?array $capIndOut,
+        ?array $markPerCapOut
+    ): void {
+        $qbt             = $this->getTester();
+        $filters         = $this->buildRubricUsageFilterArray($aTypeIn, $capIndIn, $markPerCapIn);
+        $completeFilters = $qbt->insertMissingFilters($filters);
+        $simplified      = $qbt->simplifyFilters($completeFilters);
+
+        $expectedAType = $aTypeOut === null ? null : new Collection($aTypeOut);
+        $expectedCapInd = $capIndOut === null ? null : new Collection($capIndOut);
+        $expectedMarkPerCap = $markPerCapOut === null ? null : new Collection($markPerCapOut);
+
+        $this->assertEquals($expectedAType, $simplified[AssessmentFilters\AssessmentType\Definition::class]);
+        $this->assertEquals($expectedCapInd, $simplified[AssessmentFilters\RubricUsage\Definition::class]);
+        $this->assertEquals($expectedMarkPerCap, $simplified[AssessmentFilters\MarkPerCap\Definition::class]);
+    }
+
+
     // ---------------- helpers --------------
 
 
@@ -1094,4 +1129,64 @@ class LogicTests extends TestCase
         ];
     }
 
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public function provider_simplificationLogic(): array
+    {
+        // Activity Type keys
+        $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
+        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_PROJECT;
+
+        // RubricUsage keys
+        $noRubricUsageKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
+        $codec      = new AssessmentFilters\RubricUsage\Codec();
+        $aRubricUsageKey = $codec->encodeCapability((new Group())->setId(1));
+
+        // MarkPerCap keys
+        $noMarkPerCapKey = AssessmentFilters\MarkPerCap\Definition::KEY_NONE;
+        $aMarkPerCapKey  = AssessmentFilters\MarkPerCap\Definition::KEY_ON;
+
+        // Various filter sets possible
+
+        // Activity filter sets
+        $duWk = [$dueWorkKey => $dueWorkKey];               // Just DueWorks
+        $ntDW = [$projectKey => $projectKey];               // Just something not a dueWork
+        $mixd = array_merge($duWk, $ntDW);                  // Mixed DueWorks and non-DueWorks
+
+        // Rubric Usage filter sets
+        $noCI = [$noRubricUsageKey => $noRubricUsageKey];   // No capabilities or indicators used
+        $aCpI = [$aRubricUsageKey => $aRubricUsageKey];     // One specific capability/indicator usage
+        $mxCI = array_merge($noCI, $aCpI);                  // Mixed capability/indicator usage
+
+        // MarkPerCap filter sets
+        $nMPC = [$noMarkPerCapKey => $noMarkPerCapKey];     // No MarkPerCap attribute
+        $aMPC = [$aMarkPerCapKey => $aMarkPerCapKey];       // MarkPerCap ON
+        $mMPC = array_merge($nMPC, $aMPC);                  // Mixed of no MarkPerCap, and some specific value
+
+        // [           IN             ] [           OUT              ]
+        // aType, rubricUse, markPerCap, aType, rubricUse, markPerCap,
+        return [
+             0 => [$duWk, $noCI, $nMPC, $duWk,  null, $nMPC, ],
+             1 => [$duWk, $noCI, $mMPC, $duWk, $noCI,  null, ],
+             2 => [$duWk, $aCpI, $aMPC,  null, $aCpI, $aMPC, ],
+             3 => [$duWk, $aCpI, $mMPC,  null, $aCpI, $mMPC, ],
+             4 => [$duWk, $mxCI, $nMPC, $duWk,  null, $nMPC, ],
+             5 => [$duWk, $mxCI, $aMPC,  null, $mxCI, $aMPC, ],
+             6 => [$duWk, $mxCI, $mMPC, $duWk, $mxCI, $mMPC, ],
+             7 => [$ntDW, $noCI, $nMPC, $ntDW,  null,  null, ],
+             8 => [$ntDW, $noCI, $mMPC, $ntDW,  null,  null, ],
+             9 => [$ntDW, $mxCI, $nMPC, $ntDW,  null,  null, ],
+            10 => [$ntDW, $mxCI, $mMPC, $ntDW,  null,  null, ],
+            11 => [$mixd, $noCI, $nMPC, $mixd,  null, $nMPC, ],
+            12 => [$mixd, $noCI, $mMPC, $mixd, $noCI,  null, ],
+            13 => [$mixd, $aCpI, $aMPC,  null, $aCpI, $aMPC, ],
+            14 => [$mixd, $aCpI, $mMPC,  null, $aCpI, $mMPC, ],
+            15 => [$mixd, $mxCI, $nMPC, $mixd,  null, $nMPC, ],
+            16 => [$mixd, $mxCI, $aMPC,  null, $mxCI, $aMPC, ],
+            17 => [$mixd, $mxCI, $mMPC, $mixd, $mxCI, $mMPC, ],
+        ];
+    }
 }

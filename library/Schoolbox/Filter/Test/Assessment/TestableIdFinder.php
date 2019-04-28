@@ -78,6 +78,16 @@ class TestableIdFinder extends IdFinder
         return $this->normaliseFilters($filters);
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function simplifyFilters(array $completeFilters): array
+    {
+        return parent::simplifyFilters($completeFilters);
+    }
+
+
     /**
      * Build a registry of filters known to this class
      *
