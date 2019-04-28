@@ -155,6 +155,15 @@ class Model extends AbstractAssessment
      */
     public function isFeedbackVisibleToUser(User $viewingUser)
     {
+        return $this->isFeedbackVisibleToRoleType($viewingUser->getRole()->getType());
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isFeedbackVisibleToRoleType(string $roleType): bool
+    {
         return true;
     }
 

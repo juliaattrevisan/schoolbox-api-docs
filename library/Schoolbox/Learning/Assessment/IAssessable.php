@@ -445,6 +445,15 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
+     * Returns whether this assessment's feedback is visible to users of the specified role type
+     *
+     * @param string $roleType
+     * @return bool
+     */
+    public function isFeedbackVisibleToRoleType(string $roleType): bool;
+
+
+    /**
      * Returns the number of responses submitted to this assessment.
      *
      * (includes sub-assessment counts for projects)

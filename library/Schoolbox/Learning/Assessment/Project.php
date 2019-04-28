@@ -538,12 +538,22 @@ class Project extends AbstractAssessment implements AssessmentContext
      */
     public function isFeedbackVisibleToUser(User $viewingUser)
     {
+        return $this->isFeedbackVisibleToRoleType($viewingUser->getRole()->getType());
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isFeedbackVisibleToRoleType(string $roleType): bool
+    {
         // Does user lack visibility to any sub-assessment's feedback ?
         foreach ($this->assessables as $subAssessable) {
-            if (!$subAssessable->isFeedbackVisibleToUser($viewingUser)) {
+            if (!$subAssessable->isFeedbackVisibleToRoleType($roleType)) {
                 return false;
             }
         }
+
         return true;
     }
 
