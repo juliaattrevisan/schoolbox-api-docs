@@ -513,7 +513,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Task
-        if ($aTypes->keyExists(AssessmentType\Definition::KEY_TASK)) {
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_TASK)) {
             $joinClause .= "
                 $joinType JOIN task tk           ON tk.assessment_id = a.id
             ";
@@ -523,7 +523,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Quiz
-        if ($aTypes->keyExists(AssessmentType\Definition::KEY_QUIZ)) {
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_QUIZ)) {
             $joinClause .= "
                 $joinType JOIN assess qz         ON qz.assessment_id = a.id
             ";
@@ -543,7 +543,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Project
-        if ($aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
+        if ($aTypes && $aTypes->keyExists(AssessmentType\Definition::KEY_PROJECT)) {
             $joinClause .= "
                 $joinType JOIN project pr ON pr.assessment_id = a.id
             ";
