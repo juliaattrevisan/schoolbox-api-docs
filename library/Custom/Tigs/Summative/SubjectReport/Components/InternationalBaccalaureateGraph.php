@@ -9,6 +9,7 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
@@ -61,12 +62,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
 
 
     /**
-     * @var User
-     */
-    private $viewer;
-
-
-    /**
      * @var int
      */
     private $workTypeId;
@@ -100,6 +95,8 @@ class InternationalBaccalaureateGraph extends BaseComponent
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
      * @param Folder\Model      $folder
+     * @param string|null       $roleTypeOverride
+     * @throws InvalidArgumentException
      */
     public function __construct(
         GenericCollection $unitImpls,
@@ -111,14 +108,14 @@ class InternationalBaccalaureateGraph extends BaseComponent
         RubricMapper $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router,
-        Folder\Model $folder
+        Folder\Model $folder,
+        ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes);
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
 
         $this->unitImpls           = $unitImpls;
         $this->student             = $student;
         $this->visibility          = $visibility;
-        $this->viewer              = $viewer;
         $this->workTypeId          = $workTypeId;
         $this->rubricMapper        = $rubricMapper;
         $this->authorizer          = $authorizer;
@@ -307,13 +304,13 @@ class InternationalBaccalaureateGraph extends BaseComponent
             }
 
             // Assessment not visible to the viewer? Show no results
-            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
+            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
                 continue;
             }
 
 
             // Feedback not visible to the viewer? Show no results
-            if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
+            if (!$this->isFeedbackVisibleToUser($assessment)) {
                 continue;
             }
 
@@ -414,7 +411,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
             'studentId'    => $student->getId(),
             'student'      => $student,
         ];
-        if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+        if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
             $route          = $this->router->generate($routeName, $routeParams);
             /** @noinspection HtmlUnknownTarget */
             $assessmentName = \sprintf('<a href="%s">%s</a>', $route, $assessmentName);

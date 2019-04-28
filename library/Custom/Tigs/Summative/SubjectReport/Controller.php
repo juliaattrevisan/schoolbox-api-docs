@@ -21,6 +21,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -103,7 +104,7 @@ class Controller extends Web\Controller\Base
      * @throws ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
@@ -119,6 +120,7 @@ class Controller extends Web\Controller\Base
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
             $now
         );
+        $roleTypeOverride = $this->request->query->get('role-type');
 
         $errors = [];
 
@@ -148,13 +150,13 @@ class Controller extends Web\Controller\Base
 
             // Build component data
             $courseDescription = $this->buildCourseDescription($courseSpec);
-            $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user);
-            $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user);
-            $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user);
-            $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user);
-            $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user);
-            $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user);
-            $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user);
+            $ibGraphData   = $this->buildInternationalBaccalaureateGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $nesaGraphData = $this->buildNesaScoreGraphData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $falData       = $this->buildFinalAchievementLevelsData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
+            $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
+            $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
+            $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
+            $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
 
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
@@ -327,12 +329,19 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes                  $attributes
      * @param GenericCollection|UnitSpec\Model[] $unitSpecs
      * @param User                               $student
+     * @param string|null                        $roleTypeOverride
      * @return array
+     * @throws InvalidArgumentException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function buildAcademicAchievementMatrixData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): array
-    {
+    private function buildAcademicAchievementMatrixData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        GenericCollection $unitSpecs,
+        User $student,
+        ?string $roleTypeOverride
+    ): array {
         $configName = Config::_TIGS_WORK_TYPE_ACADEMIC_ACHIEVEMENT_MATRIX;
 
         try {
@@ -355,7 +364,8 @@ class Controller extends Web\Controller\Base
             $workTypeId,
             $this->rubricMapper,
             $this->getAuthorizer(),
-            $this->getRouter()
+            $this->getRouter(),
+            $roleTypeOverride
         );
         $aam->setSemesters(1, $attributes->getCurriculumSemester());
 
@@ -370,13 +380,20 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes                  $attributes
      * @param GenericCollection|UnitSpec\Model[] $unitSpecs
      * @param User                               $student
+     * @param string|null                        $roleTypeOverride
      * @return array
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
-     * @throws UnexpectedValueException
      */
-    private function buildAcademicAchievementSummaryData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): array
-    {
+    private function buildAcademicAchievementSummaryData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        GenericCollection $unitSpecs,
+        User $student,
+        ?string $roleTypeOverride
+    ): array {
         // Only relevant for MYP students
         if (!$attributes->isMyp()) {
             return [];
@@ -402,7 +419,8 @@ class Controller extends Web\Controller\Base
             $workTypeId,
             $this->rubricMapper,
             $this->getAuthorizer(),
-            $this->getRouter()
+            $this->getRouter(),
+            $roleTypeOverride
         );
         $aas->setSemesters(1, $attributes->getCurriculumSemester());
 
@@ -417,13 +435,20 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes                  $attributes
      * @param GenericCollection|UnitSpec\Model[] $unitSpecs
      * @param User                               $student
+     * @param string|null                        $roleTypeOverride
      * @return array|null
+     * @throws InvalidArgumentException
      * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function buildFinalAchievementLevelsData(Folder\Model $folder, StudentAttributes $attributes, GenericCollection $unitSpecs, User $student): ?array
-    {
+    private function buildFinalAchievementLevelsData(
+        Folder\Model $folder,
+        StudentAttributes $attributes,
+        GenericCollection $unitSpecs,
+        User $student,
+        ?string $roleTypeOverride
+    ): ?array {
         // Only relevant for MYP students in Curriculum Semester 2
         if (!$attributes->isMyp() || $attributes->getCurriculumSemester() !== 2) {
             return null;
@@ -449,7 +474,8 @@ class Controller extends Web\Controller\Base
             $workTypeId,
             $this->rubricMapper,
             $this->getAuthorizer(),
-            $this->getRouter()
+            $this->getRouter(),
+            $roleTypeOverride
         );
 
         return $fal->toContext();
@@ -492,12 +518,13 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @param CourseSpec\Model  $courseSpec
      * @param User              $student
+     * @param string|null       $roleTypeOverride
      * @return null|array
+     * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
@@ -506,7 +533,8 @@ class Controller extends Web\Controller\Base
         Folder\Model $folder,
         StudentAttributes $attributes,
         CourseSpec\Model $courseSpec,
-        User $student
+        User $student,
+        ?string $roleTypeOverride
     ): ?array {
         // Only relevant for:
         // * MYP-S2
@@ -560,7 +588,8 @@ class Controller extends Web\Controller\Base
                 $this->rubricMapper,
                 $this->getAuthorizer(),
                 $this->getRouter(),
-                $folder
+                $folder,
+                $roleTypeOverride
             );
             $ib->setSemesters($reportSemester);
             $context = $ib->toContext();
@@ -580,12 +609,13 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @param CourseSpec\Model  $courseSpec
      * @param User              $student
+     * @param string|null       $roleTypeOverride
      * @return array|null
+     * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
@@ -594,7 +624,8 @@ class Controller extends Web\Controller\Base
         Folder\Model $folder,
         StudentAttributes $attributes,
         CourseSpec\Model $courseSpec,
-        User $student
+        User $student,
+        ?string $roleTypeOverride
     ): ?array {
         // Only relevant for:
         // * MYP S1
@@ -641,7 +672,8 @@ class Controller extends Web\Controller\Base
                 $this->visibility,
                 $this->getUser(),
                 $workTypeId,
-                $folder
+                $folder,
+                $roleTypeOverride
             );
             $nesa->setSemesters($reportSemester);
             $context = $nesa->toContext();
@@ -654,16 +686,17 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * @param Folder\Model                       $folder
-     * @param StudentAttributes                  $attributes
-     * @param CourseSpec\Model                   $courseSpec
-     * @param User                               $student
+     * @param Folder\Model      $folder
+     * @param StudentAttributes $attributes
+     * @param CourseSpec\Model  $courseSpec
+     * @param User              $student
+     * @param string|null       $roleTypeOverride
      * @return array|null
+     * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
@@ -672,7 +705,8 @@ class Controller extends Web\Controller\Base
         Folder\Model $folder,
         StudentAttributes $attributes,
         CourseSpec\Model $courseSpec,
-        User $student
+        User $student,
+        ?string $roleTypeOverride
     ): ?array {
         // Only relevant for HSC students
         if (!$attributes->isHsc()) {
@@ -706,7 +740,8 @@ class Controller extends Web\Controller\Base
             $this->visibility,
             $this->getUser(),
             $workTypeId,
-            $folder
+            $folder,
+            $roleTypeOverride
         );
         $hscTaskMarks->setSemesters(1, $attributes->getCurriculumSemester());
         return ['data' => $hscTaskMarks->toContext()];
@@ -720,12 +755,13 @@ class Controller extends Web\Controller\Base
      * @param StudentAttributes $attributes
      * @param CourseSpec\Model  $courseSpec
      * @param User              $student
+     * @param string|null       $roleTypeOverride
      * @return array|null
+     * @throws InvalidArgumentException
      * @throws Predicate\InvalidColumnException
      * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
@@ -734,7 +770,8 @@ class Controller extends Web\Controller\Base
         Folder\Model $folder,
         StudentAttributes $attributes,
         CourseSpec\Model $courseSpec,
-        User $student
+        User $student,
+        ?string $roleTypeOverride
     ): ?array {
         // Only relevant for HSC students in Semester 2
         if (!$attributes->isHsc() || 2 !== $attributes->getCurriculumSemester()) {
@@ -767,7 +804,8 @@ class Controller extends Web\Controller\Base
             $attributes,
             $this->visibility,
             $this->getUser(),
-            $folder
+            $folder,
+            $roleTypeOverride
         );
         $hscRank->setSemesters(1, $attributes->getCurriculumSemester());
 

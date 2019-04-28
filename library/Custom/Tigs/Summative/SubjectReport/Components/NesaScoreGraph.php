@@ -19,7 +19,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
-use LogicException;
 
 /**
  * Builds a suitable data structure for rendering the NESA Grade Graph component.
@@ -45,9 +44,6 @@ class NesaScoreGraph extends BaseComponent
     /** @var Visibility */
     private $visibility;
 
-    /** @var User */
-    private $viewer;
-
     /** @var int */
     private $workTypeId;
 
@@ -65,6 +61,8 @@ class NesaScoreGraph extends BaseComponent
      * @param User              $viewer
      * @param int               $workTypeId
      * @param Folder\Model      $folder
+     * @param string|null       $roleTypeOverride
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         GenericCollection $unitImpls,
@@ -73,14 +71,14 @@ class NesaScoreGraph extends BaseComponent
         Visibility $visibility,
         User $viewer,
         int $workTypeId,
-        Folder\Model $folder
+        Folder\Model $folder,
+        ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes);
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
 
         $this->unitImpls  = $unitImpls;
         $this->student    = $student;
         $this->visibility = $visibility;
-        $this->viewer     = $viewer;
         $this->workTypeId = $workTypeId;
         $this->folder     = $folder;
     }
@@ -240,12 +238,12 @@ class NesaScoreGraph extends BaseComponent
             }
 
             // Assessment not visible to the viewer? Show no results
-            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
+            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
                 continue;
             }
 
             // Feedback not visible to the viewer? Show no results
-            if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
+            if (!$this->isFeedbackVisibleToUser($assessment)) {
                 continue;
             }
 
