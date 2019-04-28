@@ -64,8 +64,7 @@
                             {% for capabilityId, capability in assessment.capabilities %}
                                 <tr class="capability">
                                     {% for studentId, student in students %}
-
-                                        {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                        {% if not capability.show or (exclusions[assessmentId] and studentId in exclusions[assessmentId]) %}
                                         <td class="excluded"></td>
                                         {% else %}
                                             {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}

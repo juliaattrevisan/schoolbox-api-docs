@@ -13,6 +13,8 @@ use function array_merge;
 use Aura\Di\Exception\ServiceNotFound;
 use function count;
 use function func_get_args;
+use function implode;
+use function in_array;
 use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
@@ -39,6 +41,7 @@ use Schoolbox\Filter;
 use Aura\Router;
 use DomainException;
 use UnexpectedValueException;
+use Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 class Controller extends Base
 {
@@ -69,6 +72,9 @@ class Controller extends Base
     /** @var Filter\Filters\Assessment\IdFinder */
     private $assessmentIdFinder;
 
+    /** @var Filter\Mapper */
+    private $filterMapper;
+
 
     /**
      * Constructor
@@ -79,6 +85,7 @@ class Controller extends Base
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
      * @param Filter\Selection\Mapper                  $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
+     * @param Filter\Mapper                            $filterMapper
      */
     public function __construct(
         IConnector $internalDb,
@@ -86,7 +93,8 @@ class Controller extends Base
         UserAccessMapper $userAccessMapper,
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
         Filter\Selection\Mapper $filterSelectionMapper,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder
+        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        Filter\Mapper $filterMapper
     ) {
         $this->internalDb            = $internalDb;
         $this->gradeGroupMapper      = $gradeGroupMapper;
@@ -94,6 +102,7 @@ class Controller extends Base
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->assessmentIdFinder    = $assessmentIdFinder;
+        $this->filterMapper          = $filterMapper;
     }
 
 
@@ -152,14 +161,16 @@ class Controller extends Base
      * @throws UnderflowException
      * @throws UnexpectedValueException
      * @throws LogicException
+     * @throws Router\Exception\RouteNotFound
      */
     public function postMarkbook(Folder\Model $folder): void
     {
         $request       = $this->request->post['filter_selection'] ?: [];
         $assessmentIds = $this->getAssessmentIds($folder->getId(), $request);
         $isFiltered    = (new Filter\RequestChecker())->isFilteredRequest($request);
-        $assessments   = $this->buildAssessmentData($assessmentIds);
-        $databaseMarks = $this->retrieveDatabaseMarks($assessments);
+        [$selectedCapabilities, $selectedIndicators] = $this->getRubricUsageSelections($request);
+        $assessments   = $this->buildAssessmentData($assessmentIds, $selectedCapabilities, $selectedIndicators);
+        $databaseMarks = $this->retrieveDatabaseMarks($assessments, $selectedCapabilities, $selectedIndicators);
         $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
@@ -176,6 +187,48 @@ class Controller extends Base
                 ]
             )->getAsString(),
         ]));
+    }
+
+
+    /**
+     * Returns the Capabilities and Indicators selected in the filter panel.
+     *
+     * The RubricUsage (aka Capability/Indicator) filter filters both the
+     * assessment set, and the rendering of the page.
+     *
+     * @param array $request
+     * @return array
+     * @throws UnexpectedValueException
+     */
+    private function getRubricUsageSelections(array $request): array
+    {
+        /** @var Filter\Model[] $filters */
+        $filters               = $this->filterMapper->findByClass(RubricUsage\Definition::class)->indexBy('class');
+        $rubricUsageFilter     = $filters[RubricUsage\Definition::class];
+        $rubricUsageSelections = $request[$rubricUsageFilter->getId()] ?? [];
+
+        $selectedCapabilities = $selectedIndicators = [];
+        $rubricUsageCodec     = new RubricUsage\Codec();
+
+        $countSelected = 0;
+        foreach ($rubricUsageSelections as $key => $val) {
+            if ($val === '1') {
+                $countSelected++;
+            }
+        }
+        $noneSelected = $countSelected === 0;
+
+        foreach ($rubricUsageSelections as $key => $val) {
+            if ($val === '1' || $noneSelected) {
+                [$capId, $indId] = $rubricUsageCodec->decode($key);
+                if ($indId) {
+                    $selectedIndicators[] = $indId;
+                } else {
+                    $selectedCapabilities[] = $capId;
+                }
+            }
+        }
+        return [$selectedCapabilities, $selectedIndicators];
     }
 
 
@@ -218,18 +271,34 @@ class Controller extends Base
      * Fetch assessment data, and return it indexed by assessment ID
      *
      * @param int[] $assessmentIds
+     * @param array $selectedCapabilities
+     * @param array $selectedIndicators
      * @return array
-     * @throws /Aura/Router/Exception/RouteNotFound
+     * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws Router\Exception\RouteNotFound
+     * @throws UnderflowException
      */
-    private function buildAssessmentData(array $assessmentIds): array
+    private function buildAssessmentData(array $assessmentIds, array $selectedCapabilities, array $selectedIndicators): array
     {
         $assessments = [];
-        if (!count($assessmentIds)) {
+        if (!count($assessmentIds) || (!count($selectedCapabilities) && !count($selectedIndicators))) {
             return $assessments;
         }
 
-        $pb  = Database\Predicate\Builder::getBindings($assessmentIds, 'a_id');
-        $sql = "
+        $pb = (new Database\Predicate\Builder($this->internalDb, ''))->in('vr.assessment_id', $assessmentIds);
+
+        $usagePb = new Database\Predicate\Builder($this->internalDb, '');
+        if (count($selectedCapabilities)) {
+            $usagePb->in('vr.capability_id', $selectedCapabilities);
+        }
+        if (count($selectedIndicators)) {
+            $usagePb->in('vr.indicator_id', $selectedIndicators);
+        }
+        $pb->any($usagePb);
+        $whereClause = implode(' AND ', $pb->getWhere());
+
+        $sql  = "
             SELECT
                 vr.assessment_id                  AS assessment_id,
                 vr.assessment_grade_group_id      AS assessment_grade_group_id,
@@ -244,7 +313,7 @@ class Controller extends Base
                 vr.indicator_name                 AS indicator_name,
                 vr.indicator_max_value            AS indicator_max_value
             FROM v_rubric vr
-            WHERE vr.assessment_id IN ({$pb->getPlaceholder()})
+            WHERE {$whereClause}
             ORDER BY
                 vr.assessment_id,
                 vr.capability_sequence ASC,
@@ -266,19 +335,23 @@ class Controller extends Base
                 $capabilities = [];
             }
 
-            if ($lastObservedCapabilityId !== $row['capability_id']) {
+            if ($lastObservedCapabilityId !== $row['capability_id'] || $lastObservedAssessmentId !== $row['assessment_id']) {
                 // Has the capability we're looking at changed? Reset the indicators
                 $indicators = [];
             }
 
-            $indicators[$row['indicator_id']] = [
-                'name' => $row['indicator_name'],
-            ];
+            if (in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                $indicators[$row['indicator_id']] = [
+                    'name' => $row['indicator_name'],
+                ];
+            }
 
             $capabilities[$row['capability_id']] = [
                 'name'       => $row['capability_name'],
                 'indicators' => $indicators,
+                'show'       => in_array((int)$row['capability_id'], $selectedCapabilities, true),
             ];
+
 
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
@@ -288,7 +361,7 @@ class Controller extends Base
                 'markType'       => $row['assessment_mark_type'],
                 'gradeGroupId'   => $row['assessment_grade_group_id'],
                 'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
-                'capabilities'   => $capabilities
+                'capabilities'   => $capabilities,
             ];
 
             $lastObservedAssessmentId = $row['assessment_id'];
@@ -309,17 +382,40 @@ class Controller extends Base
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
      * @param int[] $assessments
+     * @param array $selectedCapabilities
+     * @param array $selectedIndicators
      * @return array
      * @throws Database\Exception
+     * @throws Database\Predicate\InvalidColumnException
+     * @throws UnderflowException
      */
-    private function retrieveDatabaseMarks(array $assessments): array
+    private function retrieveDatabaseMarks(array $assessments, array $selectedCapabilities, array $selectedIndicators): array
     {
         $students = [];
-        if (!count($assessments)) {
+        if (!count($assessments) || (!count($selectedCapabilities) && !count($selectedIndicators))) {
             return $students;
         }
 
-        $assessmentPb = Database\Predicate\Builder::getBindings(array_keys($assessments), 'a_id');
+        $innerPb    = (new Database\Predicate\Builder($this->internalDb, ''))
+            ->isNull('sr.deleted_at')
+            ->notNull('sr.published_at')
+            ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+        $innerWhere = implode(' AND ', $innerPb->getWhere());
+
+        $outerPb = (new Database\Predicate\Builder($this->internalDb, ''))
+            ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
+            ->in('vrm.assessment_id', array_keys($assessments));
+
+        $usagePb = new Database\Predicate\Builder($this->internalDb, '');
+        if (count($selectedCapabilities)) {
+            $usagePb->in('vrm.capability_id', $selectedCapabilities);
+        }
+        if (count($selectedIndicators)) {
+            $usagePb->in('vrm.indicator_id', $selectedIndicators);
+        }
+        $outerPb->any($usagePb);
+        $outerWhere = implode(' AND ', $outerPb->getWhere());
+
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
             SELECT
                 vrm.assessment_id        AS assessment_id,
@@ -340,10 +436,7 @@ class Controller extends Base
                     MAX(sr.published_at) AS max_published_at
                 FROM submission_return sr
                 INNER JOIN submission_box sb on sr.box_id = sb.id
-                WHERE
-                      sr.deleted_at   IS NULL AND
-                      sr.published_at IS NOT NULL AND
-                      sr.review_route = :review_route
+                WHERE {$innerWhere}
                 GROUP BY sb.assessment_id, sr.owner
             ) latest_feedback
             INNER JOIN v_rubric_mark vrm ON
@@ -351,13 +444,11 @@ class Controller extends Base
                 vrm.assessment_id = latest_feedback.assessment_id AND
                 vrm.student_id    = latest_feedback.owner
             INNER JOIN user u ON vrm.student_id = u.id
-            WHERE
-              vrm.feedback_type = :review_route AND
-              vrm.assessment_id IN ({$assessmentPb->getPlaceholder()})
+            WHERE {$outerWhere}
             ORDER BY vrm.student_id, vrm.assessment_id, vrm.capability_id, vrm.indicator_id
             ");
 
-        $params = array_merge($assessmentPb->getParams(), ['review_route' => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR]);
+        $params = array_merge($innerPb->getParams(), $outerPb->getParams());
 
         $assessmentsForStudent = [];
         $capabilityMarks       = [];
@@ -383,20 +474,25 @@ class Controller extends Base
                 $indicatorMarks = [];
             }
 
-            $indicatorMarks[$row['indicator_id']] = [
-                'databaseMark'           => $row['indicator_mark'],
-                'maxMark'                => $row['indicator_max_value'],
-                'selectedDescriptorText' => $row['descriptor_name'],
-            ];
+            if (in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+                $indicatorMarks[$row['indicator_id']] = [
+                    'databaseMark'           => $row['indicator_mark'],
+                    'maxMark'                => $row['indicator_max_value'],
+                    'selectedDescriptorText' => $row['descriptor_name'],
+                ];
+            }
 
-            $capabilityMarks[$row['capability_id']] = [
-                'databaseMark' => $row['capability_mark'],
-                'maxMark'      => $row['capability_max_value'],
-                'indicators'   => $indicatorMarks,
+            $capData = [
+                'indicators' => $indicatorMarks,
             ];
+            if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
+                $capData['databaseMark'] = $row['capability_mark'];
+                $capData['maxMark']      = $row['capability_max_value'];
+            }
+            $capabilityMarks[$row['capability_id']] = $capData;
 
             $assessmentsForStudent[$row['assessment_id']] = [
-                'capabilities' => $capabilityMarks
+                'capabilities' => $capabilityMarks,
             ];
 
             // Stuff everything about the students marks into an array
