@@ -144,14 +144,15 @@
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                // We can safely clear all timeouts now that we're publishing everything
-                commentBoxTimeouts = [];
-
                 var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish  = $actionBar.find('[data-draft=publish]');
+                    $btnPublish  = $actionBar.find('[data-draft=publish]'),
+                    $commentBoxId = "comment-" + $participant.data('participant');
+
+                // We can safely clear this timeout now that we're publishing
+                window.clearTimeout(commentBoxTimeouts[$commentBoxId]);
 
                 $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
 
