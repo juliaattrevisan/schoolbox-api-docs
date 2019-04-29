@@ -198,7 +198,6 @@
              * @param {object} tokens
              */
             function applyTokens(string, tokens) {
-                console.log(tokens);
                 var b  = '<'  + settings.itemTextEmphasis + '>',
                     _b = '</' + settings.itemTextEmphasis + '>';
 
