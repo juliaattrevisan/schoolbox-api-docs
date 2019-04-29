@@ -171,6 +171,7 @@
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
             comments: [],
+            commentsUnmodifiedContent: [], // Will contain the unmodified content of comments. In preparation for comment update.
             showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
@@ -288,6 +289,7 @@
 
                     for (index = 0; index < responseData.data.length; index++) {
                         self.comments.push(responseData.data[index]);
+                        self.commentsUnmodifiedContent.push(responseData.data[index].content);
                     }
 
                     // Hide skeleton loader once the request is done
@@ -386,6 +388,8 @@
                         var responseData = response.data;
                         // Add the latest comment into the top of array
                         self.comments.splice(0,0, responseData);
+                        self.commentsUnmodifiedContent.splice(0,0, responseData.content);
+
                         // On successful comment posting, add one into the total comments count in the UI without hitting the backend
                         self.totalCommentsCount++;
 
