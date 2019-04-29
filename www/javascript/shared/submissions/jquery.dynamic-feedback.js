@@ -219,15 +219,17 @@
         }
 
         /**
-         * Update timeout
+         * Save draft immediately (for grade field), or after a timeout (for comment box)
+         * to prevent excessive draft save requests while typing.
+         * New timeouts are continually added while typing, and cleared to allow saving once the user pauses typing.
          */
         function timeoutUpdate() {
             var input = this;
 
-            /* Only apply a timeout to comment box
-               The timeout is intended to prevent constant draft save requests when typing in a comment,
-               so is not relevant to any other fields.
-            */
+            // Skip if no changes have been made
+            if ($(input).val() === $(input).data('preval')) {
+                return;
+            }
 
             // Comment box elements have this name attribute
             var elementIsCommentBox = $(input).attr("name") === "comment";
@@ -245,11 +247,8 @@
                     onFeedbackChanged.apply(input);
                 }, config.timeoutDurationMs);
             } else {
+                // No point in using a timeout if it's a grade field - save immediately
                 onFeedbackChanged.apply(input);
-            }
-
-            if ($(this).val() == $(this).data('preval')) {
-                return;
             }
 
             var $form = $(this).closest('form');
