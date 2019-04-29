@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Markbook;
 
 use Alaress\Web\Controller\Base;
+use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use Aura\Di\Exception\ServiceNotFound;
@@ -174,6 +175,7 @@ class Controller extends Base
         $derivedMarks  = $this->generateHumanReadableMarks($databaseMarks, $assessments);
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
+        $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
@@ -181,7 +183,7 @@ class Controller extends Base
                 '@rubricMarkbook/markbookInner.twig',
                 [
                     'isFiltered'  => $isFiltered,
-                    'students'    => $studentMarks,
+                    'students'    => $linkedMarks,
                     'assessments' => $assessments,
                     'exclusions'  => $exclusions,
                 ]
@@ -526,14 +528,8 @@ class Controller extends Base
         $markSchemeFactory = new MarkScheme\Factory();
         $totalMarkScheme   = new MarkScheme\TotalMarkFractional();
 
-        foreach($students as $studentId => $student) {
-
+        foreach ($students as $studentId => $student) {
             foreach($student['assessments'] as $assessmentId => $assessmentMarks) {
-                $summaryLink =  $this->getRouter()->generate(
-                    'learningAssessment.getSummary',
-                    ['studentId' => $studentId, 'assessmentId' => $assessmentId]
-                );
-                $students[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
 
                 $assessmentMaxMark        = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
                 $assessmentMarkType       = $assessments[$assessmentId]['markType'];
@@ -679,5 +675,38 @@ class Controller extends Base
             $exclusions[$row['assessment_id']][] = (int)$row['user_id'];
         }
         return $exclusions;
+    }
+
+
+    /**
+     * Insert summary page links for each student/assessment
+     *
+     * @param mixed[] $studentMarks  Indexed by userId
+     * @param int[]   $assessmentIds Indexed by assessmentId
+     * @param int[][] $exclusions    Indexed by assessmentId, userId
+     * @return array
+     * @throws Router\Exception\RouteNotFound
+     */
+    private function insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions): array
+    {
+        // Ensure each student has a summary link, even if they have no marks
+        foreach (array_keys($studentMarks) as $studentId) {
+            foreach ($assessmentIds as $assessmentId) {
+                if (array_key_exists($assessmentId, $exclusions) && in_array($studentId, $exclusions[$assessmentId], true)) {
+                    unset($studentMarks[$studentId]['assessments'][$assessmentId]);
+                    continue;
+                }
+                $summaryLink = $this->getRouter()->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'studentId'    => $studentId,
+                        'assessmentId' => $assessmentId,
+                    ]
+                );
+                $studentMarks[$studentId]['assessments'][$assessmentId]['summaryLink'] = $summaryLink;
+            }
+        }
+
+        return $studentMarks;
     }
 }
