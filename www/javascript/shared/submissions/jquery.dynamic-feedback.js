@@ -224,13 +224,13 @@
          * New timeouts are continually added while typing, and cleared to allow saving once the user pauses typing.
          */
         function timeoutUpdate() {
-            var input = this;
+            var $input = $(this);
 
             // Comment box elements have this name attribute
-            var elementIsCommentBox = $(input).attr("name") === "comment";
+            var elementIsCommentBox = $input.attr("name") === "comment";
 
             // Unique identifier for this comment box, in the format 'comment-{participantId}'
-            var commentId = $(input).attr("id");
+            var commentId = $input.attr("id");
 
             if (elementIsCommentBox) {
                 // Clear any previous timeout set on this comment box
@@ -239,17 +239,17 @@
                 // Store the ID of this timeout so we can clear it safely later
                 // (setTimeout returns a unique identifier for the timeout)
                 commentBoxTimeouts[commentId] = window.setTimeout(function () {
-                    onFeedbackChanged.apply(input);
+                    onFeedbackChanged.apply($input);
                 }, config.timeoutDurationMs);
             } else {
                 // No point in using a timeout if it's a grade field - save immediately
-                onFeedbackChanged.apply(input);
+                onFeedbackChanged.apply($input);
             }
 
             // Skip if no changes have been made
             // This has to go here, rather than at the top of the function,
             // because otherwise rubric descriptor selections don't trigger a draft save??
-            if ($(input).val() === $(input).data('preval')) {
+            if ($input.val() === $input.data('preval')) {
                 return;
             }
 
@@ -265,7 +265,9 @@
         function onFeedbackChanged() {
             // do a preval comparison to find out if we can skip AJAX
             // (Do not skip attachzones)
-            var $this = $(this);
+
+            // We passed in  a 'this' to apply() which was already a jquery object
+            var $this = this;
 
             // Ignore if not an attach-zone or rubric mark, and the value has not changed since previously saved
             var isAttachZoneOrRubricMark = $this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 );
