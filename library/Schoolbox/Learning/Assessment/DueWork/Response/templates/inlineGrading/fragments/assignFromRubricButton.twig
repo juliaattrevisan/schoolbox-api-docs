@@ -80,11 +80,15 @@
 
         // Update the input val when manually assigning grade from rubric
         $assignFromRubricButton.on('click', function(e) {
+            var $markInput = $status.find(markInputSelector);
             // reset customisation state, like we do for cap inputs
-            $status.find(markInputSelector).removeAttr('data-customised');
+            $markInput.removeAttr('data-customised');
 
             e.preventDefault();
             refreshAssignFromRubricInput();
+
+            // Trigger change event manually, so that dynamic feedback JS is aware of the change
+            $markInput.trigger("change");
         });
 
         $status.find(markInputSelector).change(function() {
