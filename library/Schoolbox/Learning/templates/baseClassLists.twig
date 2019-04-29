@@ -13,7 +13,7 @@
             <ul class="inline-list no-margin left">
                 <template v-for="(group, index) in groups">
                     <li v-bind:class="index < 1 ? 'no-margin' : ''">
-                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" />
+                        <input :id="group.label" name="groups[]" type="checkbox" :value="group.label" @click="updateSelectedGroups" v-model="group.isChecked" />
                         <label :for="group.label">${ group.label.capitalise() }</label>
                     </li>
                 </template>
@@ -44,6 +44,8 @@
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 <script type="text/javascript">
+    Vue.config.devtools = true;
+
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
     };
@@ -115,12 +117,11 @@
                 self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
 
                 // On initial load, set group checkboxes to checked if the isChecked value from the array groups is true
-                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
-                    if (self.groups[i].isChecked) {
-                        self.groupsCheckboxElements[i].checked = true;
-                        self.selectedGroups.push(self.groupsCheckboxElements[i].value);
+                self.groupsCheckboxElements.forEach(function (element) {
+                    if (element.checked) {
+                        self.selectedGroups.push(element.value);
                     }
-                }
+                });
 
                 this.selectAllStudents();
             },
@@ -234,14 +235,10 @@
                     return;
                 }
 
-                for (var i = 0; i < self.groupsCheckboxElements.length; i++) {
-                    if (self.groupsCheckboxElements[i].checked) {
-                        if (!self.selectedGroups.includes(self.groupsCheckboxElements[i].value)) {
-                            self.selectedGroups.push(self.groupsCheckboxElements[i].value);
-                        }
-                    } else {
-                        self.selectedGroups = self.selectedGroups.filter(item => item !== self.groupsCheckboxElements[i].value)
-                    }
+                if (event.target.checked) {
+                    self.selectedGroups.push(event.target.value);
+                } else {
+                    self.selectedGroups.splice(self.selectedGroups.indexOf(event.target.value), 1);
                 }
 
                 self.updateSendEmailButtonState();
