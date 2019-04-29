@@ -15,14 +15,7 @@
 
  */
 
-(function() {
-    /**
-     * Draft-saving timeout
-     *
-     * @var {number}
-     */
-    var timeoutHandle;
-
+(function($) {
     /**
      * Is a draft currently being auto-saved for a student?
      *
@@ -38,11 +31,12 @@
     var autoSavePending = [];
 
     /**
-     * Have other inputs been changed before previous draft(s) finished saving?
+     * Timeout IDs for each comment box, indexed by ID of the comment box.
+     * Used to accumulate and clear typing timeouts for each textarea individually.
      *
-     * @type {int[]} Timeout handles, indexed by element ID
+     * @type {Array}
      */
-    var clearTimeoutPending = [];
+    var commentBoxTimeouts = [];
 
 
     /**
@@ -150,14 +144,15 @@
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                // Allow no other save actions nao whilst this one is running
-                window.clearTimeout(timeoutHandle);
-
                 var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
-                    $btnPublish  = $actionBar.find('[data-draft=publish]');
+                    $btnPublish  = $actionBar.find('[data-draft=publish]'),
+                    $commentBoxId = "comment-" + $participant.data('participant');
+
+                // We can safely clear this timeout now that we're publishing
+                window.clearTimeout(commentBoxTimeouts[$commentBoxId]);
 
                 $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
 
@@ -225,19 +220,37 @@
         }
 
         /**
-         * Update timeout
+         * Save draft immediately (for grade field), or after a timeout (for comment box)
+         * to prevent excessive draft save requests while typing.
+         * New timeouts are continually added while typing, and cleared to allow saving once the user pauses typing.
          */
         function timeoutUpdate() {
-            var input = this;
+            var $input = $(this);
 
-            timeoutHandle = window.setTimeout(function () {
-                onFeedbackChanged.apply(input);
-            }, config.timeoutDurationMs);
+            // Comment box elements have this name attribute
+            var elementIsCommentBox = $input.attr("name") === "comment";
 
-            // Keep a record of this timeout: we'll need to clear it later, when it's safe to do so.
-            clearTimeoutPending[$(input).attr('id')] = timeoutHandle;
+            // Unique identifier for this comment box, in the format 'comment-{participantId}'
+            var commentId = $input.attr("id");
 
-            if ($(this).val() == $(this).data('preval')) {
+            if (elementIsCommentBox) {
+                // Clear any previous timeout set on this comment box
+                window.clearTimeout(commentBoxTimeouts[commentId]);
+
+                // Store the ID of this timeout so we can clear it safely later
+                // (setTimeout returns a unique identifier for the timeout)
+                commentBoxTimeouts[commentId] = window.setTimeout(function () {
+                    onFeedbackChanged.apply($input);
+                }, config.timeoutDurationMs);
+            } else {
+                // No point in using a timeout if it's a grade field - save immediately
+                onFeedbackChanged.apply($input);
+            }
+
+            // Skip if no changes have been made
+            // This has to go here, rather than at the top of the function,
+            // because otherwise rubric descriptor selections don't trigger a draft save??
+            if ($input.val() === $input.data('preval')) {
                 return;
             }
 
@@ -253,7 +266,9 @@
         function onFeedbackChanged() {
             // do a preval comparison to find out if we can skip AJAX
             // (Do not skip attachzones)
-            var $this = $(this);
+
+            // We passed in  a 'this' to apply() which was already a jquery object
+            var $this = this;
 
             // Ignore if not an attach-zone or rubric mark, and the value has not changed since previously saved
             var isAttachZoneOrRubricMark = $this.is('.attachzone') || ($this.attr('name') && $this.attr('name').indexOf('rubric') === 0 );
@@ -276,19 +291,6 @@
 
             // No auto-saves currently queued for participant - so initiate a draft auto-save.
             autoSaveDraft($participant);
-            // And clear the timeout for the element that triggered the save
-            clearPendingTimeout($participant);
-        }
-
-        /**
-         * Clear the timeout on any inputs that were waiting to be saved
-         *
-         * @param $participant
-         */
-        function clearPendingTimeout($participant) {
-            var elementId = $($participant.context).attr('id');
-            var timeoutHandle = clearTimeoutPending[elementId];
-            window.clearTimeout(timeoutHandle);
         }
 
         /**
@@ -356,8 +358,6 @@
                         // Clear the flag and save those pending changes.
                         autoSavePending[userId] = false;
                         autoSaveDraft($participant);
-                        // Clear the timeout on the element that triggered the draft save
-                        clearPendingTimeout($participant);
                     }
                 });
         }
