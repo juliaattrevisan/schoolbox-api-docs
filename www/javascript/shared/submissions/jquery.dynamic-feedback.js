@@ -17,13 +17,6 @@
 
 (function() {
     /**
-     * Draft-saving timeout
-     *
-     * @var {number}
-     */
-    var timeoutHandle;
-
-    /**
      * Is a draft currently being auto-saved for a student?
      *
      * @type {boolean[]} Indexed by user.id
@@ -38,11 +31,12 @@
     var autoSavePending = [];
 
     /**
-     * Have other inputs been changed before previous draft(s) finished saving?
+     * Timeout IDs for each comment box, indexed by ID of the comment box.
+     * Used to accumulate and clear typing timeouts for each textarea individually.
      *
-     * @type {int[]} Timeout handles, indexed by element ID
+     * @type {Array}
      */
-    var clearTimeoutPending = [];
+    var commentBoxTimeouts = [];
 
 
     /**
@@ -230,24 +224,29 @@
         function timeoutUpdate() {
             var input = this;
 
+            /* Only apply a timeout to comment box
+               The timeout is intended to prevent constant draft save requests when typing in a comment,
+               so is not relevant to any other fields.
+            */
+
             // Comment box elements have this name attribute
             var elementIsCommentBox = $(input).attr("name") === "comment";
 
-            if (elementIsCommentBox) {
-                // Only apply a timeout to comment box
-                // The timout is intended to prevent constant draft save requests when typing in a comment,
-                // so is not relevant to any other fields.
-                window.clearTimeout(timeoutHandle);
+            // Unique identifier for this comment box, in the format 'comment-{participantId}'
+            var commentId = $(input).attr("id");
 
-                timeoutHandle = window.setTimeout(function () {
+            if (elementIsCommentBox) {
+                // Clear any previous timeout set on this comment box
+                window.clearTimeout(commentBoxTimeouts[commentId]);
+
+                // Store the ID of this timeout so we can clear it safely later
+                // (setTimeout returns a unique identifier for the timeout)
+                commentBoxTimeouts[commentId] = window.setTimeout(function () {
                     onFeedbackChanged.apply(input);
                 }, config.timeoutDurationMs);
             } else {
                 onFeedbackChanged.apply(input);
             }
-
-            // Keep a record of this timeout: we'll need to clear it later, when it's safe to do so.
-            clearTimeoutPending[$(input).attr('id')] = timeoutHandle;
 
             if ($(this).val() == $(this).data('preval')) {
                 return;
@@ -288,19 +287,6 @@
 
             // No auto-saves currently queued for participant - so initiate a draft auto-save.
             autoSaveDraft($participant);
-            // And clear the timeout for the element that triggered the save
-            clearPendingTimeout($participant);
-        }
-
-        /**
-         * Clear the timeout on any inputs that were waiting to be saved
-         *
-         * @param $participant
-         */
-        function clearPendingTimeout($participant) {
-            var elementId = $($participant.context).attr('id');
-            var timeoutHandle = clearTimeoutPending[elementId];
-            window.clearTimeout(timeoutHandle);
         }
 
         /**
@@ -368,8 +354,6 @@
                         // Clear the flag and save those pending changes.
                         autoSavePending[userId] = false;
                         autoSaveDraft($participant);
-                        // Clear the timeout on the element that triggered the draft save
-                        clearPendingTimeout($participant);
                     }
                 });
         }

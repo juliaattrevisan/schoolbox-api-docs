@@ -24,7 +24,7 @@
 <label>Comment
     <textarea
             tabindex="{{ tabIndex }}"
-            name="comment"
+            id="comment-{{ participant.user.id }}" name="comment"
             placeholder="{{ placeholder }}"
             rows="3"
             {% if readonly %}readonly{% endif %}
