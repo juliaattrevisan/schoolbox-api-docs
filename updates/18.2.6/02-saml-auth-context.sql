@@ -3,7 +3,7 @@ VALUES (
   'saml_auth_context',
   'password',
   'Requested Auth Context',
-  '',
+  'Authentication context. Set to unspecified and no AuthContext will be sent in the AuthNRequest.',
   4,
   'password:unspecified',
   (SELECT id from lu_config_type WHERE type = 'SAML'),
