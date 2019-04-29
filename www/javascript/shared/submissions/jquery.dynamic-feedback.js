@@ -230,9 +230,21 @@
         function timeoutUpdate() {
             var input = this;
 
-            timeoutHandle = window.setTimeout(function () {
+            // Comment box elements have this name attribute
+            var elementIsCommentBox = $(input).attr("name") === "comment";
+
+            if (elementIsCommentBox) {
+                // Only apply a timeout to comment box
+                // The timout is intended to prevent constant draft save requests when typing in a comment,
+                // so is not relevant to any other fields.
+                window.clearTimeout(timeoutHandle);
+
+                timeoutHandle = window.setTimeout(function () {
+                    onFeedbackChanged.apply(input);
+                }, config.timeoutDurationMs);
+            } else {
                 onFeedbackChanged.apply(input);
-            }, config.timeoutDurationMs);
+            }
 
             // Keep a record of this timeout: we'll need to clear it later, when it's safe to do so.
             clearTimeoutPending[$(input).attr('id')] = timeoutHandle;
