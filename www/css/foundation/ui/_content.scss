@@ -820,6 +820,9 @@ $rotate-span-width: 11rem;
 }
 
 .filter-interaction {
+    #panel-summary > div {
+        margin-bottom: .5rem;
+    }
     .filter-summary {
         line-height: 2rem;
     }
