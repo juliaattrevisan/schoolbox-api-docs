@@ -16,17 +16,18 @@
 
             var source = $(element).attr('data-schoolboxresource-source');
 
-
-            $(element).replaceWith($.fn.schoolboxResource_MediaPlayerReplacement({
-                'style': style,
-                'width': width,
-                'height': height,
-                'thumbnail': thumbnail,
-                'classes': classes,
-                'source': source,
-                'type': type,
-                'fullwidth': fullwidth
-            }));
+            if (type === 'video' || type === 'audio') {
+                $(element).replaceWith($.fn.schoolboxResource_MediaPlayerReplacement({
+                    'style': style,
+                    'width': width,
+                    'height': height,
+                    'thumbnail': thumbnail,
+                    'classes': classes,
+                    'source': source,
+                    'type': type,
+                    'fullwidth': fullwidth
+                }));
+            }
         });
 
         /* Replace all with mejs
