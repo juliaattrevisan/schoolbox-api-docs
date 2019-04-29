@@ -226,11 +226,6 @@
         function timeoutUpdate() {
             var input = this;
 
-            // Skip if no changes have been made
-            if ($(input).val() === $(input).data('preval')) {
-                return;
-            }
-
             // Comment box elements have this name attribute
             var elementIsCommentBox = $(input).attr("name") === "comment";
 
@@ -249,6 +244,13 @@
             } else {
                 // No point in using a timeout if it's a grade field - save immediately
                 onFeedbackChanged.apply(input);
+            }
+
+            // Skip if no changes have been made
+            // This has to go here, rather than at the top of the function,
+            // because otherwise rubric descriptor selections don't trigger a draft save??
+            if ($(input).val() === $(input).data('preval')) {
+                return;
             }
 
             var $form = $(this).closest('form');
