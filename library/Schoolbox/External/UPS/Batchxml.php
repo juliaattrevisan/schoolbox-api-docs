@@ -25,13 +25,26 @@ class Batchxml implements ISync
      */
     private $api;
 
+
     /**
-     * Cache the xml that we downloaded so we don't end up re-fetching it
-     * if we run more than one roletype's ups
+     * Cache the xml nodes that we downloaded so we don't end up re-fetching it
+     * if we run more than one roletype's ups.
      *
-     * @var string
+     * @var \SimpleXMLElement
      */
-    private $xmlCache;
+    private $nodes;
+
+
+    /**
+     * A mapping between (NCYear, Campus) instances
+     *
+     * Campuses are stored separately from Students and are joined on NCYear
+     * so create a lookup instead of traversing every time
+     *
+     * @var array
+     */
+    private $campusMapping = [];
+
 
     /**
      * Batchxml constructor.
@@ -60,20 +73,53 @@ class Batchxml implements ISync
      */
     private function fetchXml(string $path): array
     {
-        if (!$this->xmlCache) {
-            $this->xmlCache = $this->api->retrieveDocument();
+        if (!$this->nodes) {
+            $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
-
-        $nodes = new \SimpleXMLElement($this->xmlCache);
-
-        return $nodes->xpath($path);
 
         /* Faster, for now
          */
 //        $source = __DIR__ .'/../../../../www/temp.xml';
 //        $xml = file_get_contents($source);
-//        $nodes = new SimpleXMLElement($xml);
-//        return $nodes->xpath($path);
+//        $this->nodes = new \SimpleXMLElement($xml);
+
+        /* Prefetch (Campus, NCYear) relations as a lookup
+         */
+        if (!\count($this->campusMapping)) {
+            $this->campusMapping = $this->prefetchCampuses();
+        }
+
+        return $this->nodes->xpath($path);
+    }
+
+
+    /**
+     * Mine $nodes for Campus elements and the NCYear levels to which they relate
+     *
+     * @return array
+     */
+    private function prefetchCampuses(): array
+    {
+        $campuses = $this->nodes->xpath('/iSAMS/SchoolManager/SchoolDivisions/SchoolDivision');
+
+        $mapping = [];
+
+        foreach ($campuses as $currentResult) {
+            $campus = (new User\Common\Campus())
+                ->setId((string)$currentResult->xpath('@Id')[0])
+                ->setCode((string)$currentResult->Code)
+                ->setName((string)$currentResult->Name);
+
+            /* Map campuses to their NCYear levels
+             */
+            $years = $currentResult->xpath('Years/Year[@YearId]');
+
+            foreach ($years as $year) {
+                $mapping[(int)$year->xpath('@YearId')[0]->YearId] = $campus;
+            }
+        }
+
+        return $mapping;
     }
 
 
@@ -118,6 +164,15 @@ class Batchxml implements ISync
 
         $student
             ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+        /* Assign campuses if they exist in the mapping
+         * Otherwise quietly disregard bad data
+         */
+        if (isset($this->campusMapping[(int)$currentResult->NCYear])) {
+            $student
+                ->getCampus()
+                   ->add($this->campusMapping[(int)$currentResult->NCYear]);
+        }
 
         return $student;
 
