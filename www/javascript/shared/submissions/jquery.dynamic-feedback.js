@@ -15,7 +15,7 @@
 
  */
 
-(function() {
+(function($) {
     /**
      * Is a draft currently being auto-saved for a student?
      *
@@ -144,8 +144,8 @@
             $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                // Allow no other save actions nao whilst this one is running
-                window.clearTimeout(timeoutHandle);
+                // We can safely clear all timeouts now that we're publishing everything
+                commentBoxTimeouts = [];
 
                 var $participant = $(this).closest('[data-participant]'),
                     $form        = $participant.find('[data-feedback-form]'),
