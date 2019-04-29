@@ -8,7 +8,7 @@
     <thead>
     <tr>
         <th v-if="mailEnabled">
-            <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
+            <input type="checkbox" id="select-all" @click="selectAllStudents" v-model="isAllSelected"/>
             <label for="select-all" class="checkbox-label"></label>
         </th>
         <th></th>
