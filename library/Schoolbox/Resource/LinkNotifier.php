@@ -11,9 +11,11 @@ namespace Schoolbox\Resource;
 
 
 use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Mapper\Exception\Deleted;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class LinkNotifier extends ResourceNotifier
@@ -36,13 +38,17 @@ class LinkNotifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyCreated($roletype, $link, $effector, $diff = null)
+    public function notifyCreated($roletype, $link, $effector, $diff = null): Envelope
     {
-        $category = $this->folderMapper->findById($link->getFolder()->getId());
+        try {
+            $category = $this->folderMapper->findById($link->getFolder()->getId());
+        } catch (Exception $e) {
+            return new Envelope();
+        }
 
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
-            new Param($link->getDescription(), $link->getHref()),           // the :resource param
+            new Param($link->getDescription(), $link->getHref(), ParameterInterface::STACKING_APPEND), // the :resource param
             $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }
@@ -55,11 +61,11 @@ class LinkNotifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeleted($roletype, $link, $effector, $diff = null)
+    public function notifyDeleted($roletype, $link, $effector, $diff = null): Envelope
     {
         try {
             $category = $this->folderMapper->findById($link->getFolder()->getId());
-        } catch (Deleted $e) {
+        } catch (Exception $e) {
             return new Envelope();
         }
 
@@ -76,7 +82,7 @@ class LinkNotifier extends ResourceNotifier
      * @param Link $resource
      * @return string
      */
-    protected function getResourceName($resource)
+    protected function getResourceName($resource): string
     {
         return $resource->getDescription();
     }
@@ -84,9 +90,10 @@ class LinkNotifier extends ResourceNotifier
 
     /**
      * @param Link $resource
-     * @return \Schoolbox\Resource\Folder\Model
+     * @return Folder
+     * @throws Exception
      */
-    protected function getResourceCategory($resource)
+    protected function getResourceCategory($resource): Folder
     {
         return $this->folderMapper->findById($resource->getFolder()->getId());
     }
@@ -95,7 +102,7 @@ class LinkNotifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceKind()
+    protected function getResourceKind(): string
     {
         return LogMapper::KIND_LINK;
     }
@@ -104,7 +111,7 @@ class LinkNotifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceNameProperty()
+    protected function getResourceNameProperty(): string
     {
         return 'description';
     }
@@ -113,7 +120,7 @@ class LinkNotifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceCategoryProperty()
+    protected function getResourceCategoryProperty(): string
     {
         return 'folder';
     }

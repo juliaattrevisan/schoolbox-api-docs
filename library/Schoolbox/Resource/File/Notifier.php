@@ -5,13 +5,15 @@
  * @copyright  Copyright 2015, Alaress Pty Ltd
  * @link       http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource\File;
 
 use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Mapper\Exception\Deleted;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -36,11 +38,11 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyCreated($roletype, $file, $effector, $diff = null)
+    public function notifyCreated($roletype, $file, $effector, $diff = null): Envelope
     {
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
-        } catch (Deleted $e) {
+        } catch (Exception $e) {
             return new Envelope();
         }
 
@@ -48,7 +50,7 @@ class Notifier extends ResourceNotifier
             LogMapper::KIND_FILE,
             $file->getId(),
             self::TRIGGER_CREATED, // "file.{id}.created"
-            new Param($file->getTitle(), '/send.php?id=' . $file->getId()), // the :resource param
+            new Param($file->getTitle(), '/send.php?id=' . $file->getId(), ParameterInterface::STACKING_APPEND), // the :resource param
             $effector,
             $category,
             $roletype,
@@ -64,11 +66,11 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeleted($roletype, $file, $effector, $diff = null)
+    public function notifyDeleted($roletype, $file, $effector, $diff = null): Envelope
     {
         try {
             $category = $this->folderMapper->findById($file->getFolder()->getId());
-        } catch (Deleted $e) {
+        } catch (Exception $e) {
             return new Envelope();
         }
 
@@ -90,7 +92,7 @@ class Notifier extends ResourceNotifier
      * @param Model $resource
      * @return string
      */
-    protected function getResourceName($resource)
+    protected function getResourceName($resource): string
     {
         return $resource->getTitle();
     }
@@ -98,9 +100,10 @@ class Notifier extends ResourceNotifier
 
     /**
      * @param Model $resource
-     * @return Folder\Model
+     * @return Folder
+     * @throws Exception
      */
-    protected function getResourceCategory($resource)
+    protected function getResourceCategory($resource): Folder
     {
         return $this->folderMapper->findById($resource->getFolder()->getId());
     }
@@ -109,7 +112,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceKind()
+    protected function getResourceKind(): string
     {
         return LogMapper::KIND_FILE;
     }
@@ -118,7 +121,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceNameProperty()
+    protected function getResourceNameProperty(): string
     {
         return 'title';
     }
@@ -127,7 +130,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceCategoryProperty()
+    protected function getResourceCategoryProperty(): string
     {
         return 'folder';
     }

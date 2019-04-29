@@ -19,6 +19,7 @@ use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -205,7 +206,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams([
                 'effector' => new UserParam($effector, ParameterInterface::STACKING_REPLACE),
-                'resource' => new Param($param->getText(), $param->getHref(), ParameterInterface::STACKING_APPEND),
+                'resource' => $param,
                 'category' => new CategoryParam($category),
             ])
             ->setNamespace($this->getSlug())
@@ -291,7 +292,11 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         // setup data from the different resource types
         $resourceName  = $this->getResourceName($resource);
-        $category      = $this->getResourceCategory($resource);
+        try {
+            $category = $this->getResourceCategory($resource);
+        } catch (Exception $e) {
+            return $envelope;
+        }
         $categoryId    = $category->getId();
         $resourceKind  = $this->getResourceKind();
         $nameField     = $this->getResourceNameProperty();
@@ -319,7 +324,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setHref("/homepage/$categoryId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addFilter('roletype', $roleType)
+            ->addFilter('roletype', [$roleType])
             ->setTopics(["cms.$resourceKind.$resourceId.updated"]);
 
         $userParam = new UserParam($effector, ParameterInterface::STACKING_REPLACE);
@@ -374,32 +379,33 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param Folder|File|Link|Textbox $resource
      * @return string
      */
-    protected abstract function getResourceName($resource);
+    protected abstract function getResourceName($resource): string;
 
 
     /**
      * @param Folder|File|Link|Textbox $resource
+     * @throws Exception
      * @return Folder
      */
-    protected abstract function getResourceCategory($resource);
+    protected abstract function getResourceCategory($resource): Folder;
 
 
     /**
      * @return string
      */
-    protected abstract function getResourceKind();
+    protected abstract function getResourceKind(): string;
 
 
     /**
      * @return string
      */
-    protected abstract function getResourceNameProperty();
+    protected abstract function getResourceNameProperty(): string;
 
 
     /**
      * @return string
      */
-    protected abstract function getResourceCategoryProperty();
+    protected abstract function getResourceCategoryProperty(): string;
 
 
     /**
@@ -409,7 +415,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public abstract function notifyCreated($roletype, $resource, $author, $diff = null);
+    public abstract function notifyCreated($roletype, $resource, $author, $diff = null): Envelope;
 
 
     /**
@@ -419,7 +425,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array                    $diff
      * @return Envelope
      */
-    public abstract function notifyDeleted($roletype, $resource, $author, $diff = null);
+    public abstract function notifyDeleted($roletype, $resource, $author, $diff = null): Envelope;
 
 
     /* ASYNC METHODS */

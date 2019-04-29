@@ -4,15 +4,14 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
 
 
-use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Collection;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -89,11 +88,11 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyCreated($roleType, $category, $creator, $diff = null)
+    public function notifyCreated($roleType, $category, $creator, $diff = null): Envelope
     {
         return $this->notify(
             LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_CREATED,
-            new Param($category->getName(), "/homepage/" . $category->getId()),
+            new Param($category->getName(), "/homepage/" . $category->getId(), ParameterInterface::STACKING_APPEND),
             $creator, $category->getParent(), $roleType, UserAccess::ACCESS_READ
         );
     }
@@ -106,7 +105,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeleted($roleType, $category, $effector, $diff = null)
+    public function notifyDeleted($roleType, $category, $effector, $diff = null): Envelope
     {
         return $this->notify(
             LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_DELETED,
@@ -120,7 +119,7 @@ class Notifier extends ResourceNotifier
      * @param Model $resource
      * @return string
      */
-    protected function getResourceName($resource)
+    protected function getResourceName($resource): string
     {
         return $resource->getName();
     }
@@ -130,7 +129,7 @@ class Notifier extends ResourceNotifier
      * @param Model $resource
      * @return Model
      */
-    protected function getResourceCategory($resource)
+    protected function getResourceCategory($resource): Model
     {
         return $resource->getParent();
     }
@@ -139,7 +138,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceKind()
+    protected function getResourceKind(): string
     {
         return LogMapper::KIND_FOLDER;
     }
@@ -148,7 +147,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceNameProperty()
+    protected function getResourceNameProperty(): string
     {
         return 'name';
     }
@@ -157,7 +156,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceCategoryProperty()
+    protected function getResourceCategoryProperty(): string
     {
         return 'parent';
     }

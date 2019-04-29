@@ -13,6 +13,7 @@ namespace Schoolbox\Realtime\Notification;
 
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -244,6 +245,9 @@ class Decorator extends NotificationBundle
             /** @var ParameterInterface[] $params */
             foreach ($timeParams as $time => $params) {
                 foreach ($params as $param) {
+                    if ($param->getMode() === ParameterInterface::STACKING_APPEND) {
+                        $param->setTimestamp($time);
+                    }
                     $serial = $param->jsonSerialize();
                     $hash   = sha1(json_encode($serial));
 
@@ -297,6 +301,7 @@ class Decorator extends NotificationBundle
                             $subst = $this->param2html($param, $fqdn);
                             break;
                         case ParameterInterface::STACKING_APPEND:
+                            $param->setTimestamp($time);
                             $stack[] = $param;
                             break;
                         case ParameterInterface::STACKING_IGNORE:
