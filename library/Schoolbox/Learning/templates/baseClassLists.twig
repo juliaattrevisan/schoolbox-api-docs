@@ -43,6 +43,7 @@
 </div>
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
+
 <script type="text/javascript">
     Vue.config.devtools = true;
 
@@ -89,44 +90,46 @@
             actionsPlaceholder: true,
         },
         mounted: function() {
-            new Promise(resolve => {
+            new Promise(function () {
                 this.getStudents();
             });
         },
         methods: {
-            async getStudents()
-            {
+            getStudents: function () {
                 var self = this;
 
                 var studentLists;
 
-                studentLists = axios.get(self.getStudentListsEndpointPrefix + self.classCode)
-                    .then(function (response) {
-                        self.studentLists = response.data;
-                    })
-                    .catch(function (error) {
-                        console.log(error);
-                    }).finally(function() {
+                studentLists = new Promise(function (resolve) {
+                    axios.get(self.getStudentListsEndpointPrefix + self.classCode)
+                        .then(function (response) {
+                            self.studentLists = response.data
+                            resolve();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                        }).finally(function() {
                         self.showSkeletonLoader = false; // Hide skeleton loader and show class list table
                     });
-
-                await studentLists;
-
-                self.studentsCheckboxElements = document.getElementsByName('students[]');
-                self.groupsCheckboxElements = document.getElementsByName('groups[]');
-                self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
-
-                // On initial load, set group checkboxes to checked if the isChecked value from the array groups is true
-                self.groupsCheckboxElements.forEach(function (element) {
-                    if (element.checked) {
-                        self.selectedGroups.push(element.value);
-                    }
                 });
 
-                this.selectAllStudents();
+                studentLists.then(function() {
+                    setTimeout(function() {
+                        self.studentsCheckboxElements = document.getElementsByName('students[]');
+                        self.groupsCheckboxElements = document.getElementsByName('groups[]');
+                        self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
+
+                        self.groupsCheckboxElements.forEach(function (element) {
+                            if (element.checked) {
+                                self.selectedGroups.push(element.value);
+                            }
+                        });
+
+                        self.selectAllStudents();
+                    }, 100);
+                });
             },
-            async fetchEmails(event)
-            {
+            fetchEmails: function (event) {
                 var self = this;
 
                 var endpoint = '';
@@ -143,9 +146,7 @@
                 // Prepare endpoints to requests. Loop through the selected groups.
                 // We need to do this for now as our endpoints to fetch email addresses are designed this way.
                 // TODO: Re-architect fetching of email address to prevent doing this
-                for (var i = 0; i < self.selectedGroups.length; i++) {
-                    var groupname = self.selectedGroups[i];
-
+                self.selectedGroups.forEach(function(groupname) {
                     switch(groupname) {
                         case 'students':
                             endpoint = 'emailStudentsById.php';
@@ -157,18 +158,20 @@
                             endpoint = 'emailHousemastersById.php';
                             break;
                     }
+
                     promises.push(self.requestData(event, endpoint));
-                }
+                });
 
-                await Promise.all(promises);
-
-                // Once all the requests are done, set the ready flag to true.
-                // The watcher will then trigger the submit
-                // More for watchers: https://vuejs.org/v2/guide/computed.html#Watchers
-                self.formIsReady = true
+                Promise.all(promises).then(function() {
+                    // Once all the requests are done, set the ready flag to true.
+                    // The watcher will then trigger the submit
+                    // More for watchers: https://vuejs.org/v2/guide/computed.html#Watchers
+                    self.formIsReady = true
+                }).catch(function(e) {
+                    console.log(e);
+                });
             },
-            async requestData(event, endpoint)
-            {
+            requestData: function(event, endpoint) {
                 var self = this;
 
                 if (endpoint !== '') {
@@ -189,15 +192,14 @@
                 var self = this;
                 var isChecked = (event === undefined || event.target.checked);
 
-                self.selectedStudentIds.length = 0;
+                self.selectedStudentIds = [];
 
-                // Loop through the list of students and check all of them
-                for (var i = 0; i < self.studentsCheckboxElements.length; i++) {
-                    self.studentsCheckboxElements[i].checked = isChecked;
+                self.studentsCheckboxElements.forEach(function (element) {
+                    element.checked = isChecked;
                     if (isChecked) {
-                        self.selectedStudentIds.push(self.studentsCheckboxElements[i].value);
+                        self.selectedStudentIds.push(element.value);
                     }
-                }
+                });
 
                 self.updateSendEmailButtonState();
 
@@ -210,7 +212,7 @@
                 if (event.target.checked) {
                     self.selectedStudentIds.push(event.target.value);
                 } else {
-                    self.selectedStudentIds = self.selectedStudentIds.filter(item => item !== event.target.value)
+                    self.selectedStudentIds.splice(self.selectedStudentIds.indexOf(event.target.value), 1);
                 }
 
                 // Check whether all the students are selected. If so make the select all checkbox ticked
