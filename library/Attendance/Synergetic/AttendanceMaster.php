@@ -57,8 +57,9 @@ class Attendance_Synergetic_AttendanceMaster
      * @param int                 $fileSemester
      * @param IConnector          $connector
      * @param int                 $staffId
+     * @param string              $timetableGroup
      */
-    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector, $staffId)
+    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector, $staffId, $timetableGroup)
     {
         // Store database connection
 
@@ -88,7 +89,7 @@ class Attendance_Synergetic_AttendanceMaster
             'AttendanceDayNumber' => $attendanceDay,
             'StaffID' => $staffId,
             'AttendedFlag' => 1,
-            'TimeTableGroup' => $this->getTimetableGroup(),
+            'TimeTableGroup' => $timetableGroup,
             'SynWebFlag' => 1,
         ]);
 
@@ -121,12 +122,11 @@ class Attendance_Synergetic_AttendanceMaster
     /**
      * Find the TimetableGroup value for a particular class, date and period
      * and for a particular FileYear and FileSemester set of values.
-     *
+     * @deprecated
      * @return string|bool
      */
     protected function getTimetableGroup()
     {
-        // Sorting with TimetableGroup is to make sure that we get TimetableGroup with value rather than empty.
         $query = "
 			SELECT  *
 			FROM    dbo.Timetable
@@ -136,7 +136,6 @@ class Attendance_Synergetic_AttendanceMaster
 			AND     PeriodNumber = :periodNumber
 			AND     ClassCode = :classCode
 			AND     ClassCampus = :classCampus
-			ORDER BY TimetableGroup DESC
 		";
 
         $statement = $this->connector->executeQuery($query, [

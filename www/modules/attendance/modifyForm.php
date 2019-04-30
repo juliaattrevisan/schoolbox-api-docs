@@ -58,6 +58,7 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
 
 $attendancePeriod = $_POST['attendancePeriod'];
 $attendanceDay = $_POST['attendanceDay'];
+$timetableGroup = $_POST['timetableGroup'];
 
 // Deal with it all
 
@@ -72,7 +73,8 @@ try {
         $attendancePeriod,
         $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
         $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
-        $_SESSION['user']->getExternalId()
+        $_SESSION['user']->getExternalId(),
+        $timetableGroup
     );
 
 } catch (ExternalException $e) {
