@@ -349,7 +349,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentEmergency3Name,
                         vStudentsAll.StudentEmergency3Phone,
                         vStudentsAll.StudentEmergency3PhoneAlt,
-                        vStudentsAll.StudentMedicalAlert,
+                        CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,  
                         vStudentsAll.StudentMobilePhone,
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.EnglishSecondFlag,
