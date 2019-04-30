@@ -47,8 +47,6 @@
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 
 <script type="text/javascript">
-    Vue.config.devtools = true;
-
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
     };
@@ -221,7 +219,7 @@
 
                 self.updateSendEmailButtonState();
 
-                self.isAllSelected = true;
+                self.isAllSelected = isChecked;
             },
             select: function(event) {
                 var self = this;

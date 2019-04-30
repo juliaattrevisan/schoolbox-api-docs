@@ -12,7 +12,6 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use function func_get_args;
-use External_Class;
 use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
