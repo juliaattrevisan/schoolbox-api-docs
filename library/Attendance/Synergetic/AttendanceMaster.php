@@ -120,43 +120,6 @@ class Attendance_Synergetic_AttendanceMaster
     }
 
     /**
-     * Find the TimetableGroup value for a particular class, date and period
-     * and for a particular FileYear and FileSemester set of values.
-     * @deprecated
-     * @return string|bool
-     */
-    protected function getTimetableGroup()
-    {
-        $query = "
-			SELECT  *
-			FROM    dbo.Timetable
-			WHERE   FileType = :fileType
-			AND     FileYear = :fileYear
-			AND     FileSemester = :fileSemester
-			AND     PeriodNumber = :periodNumber
-			AND     ClassCode = :classCode
-			AND     ClassCampus = :classCampus
-		";
-
-        $statement = $this->connector->executeQuery($query, [
-            'fileType'      => $this->getClassFileType(),
-            'fileYear'      => $this->getFileYear(),
-            'fileSemester'  => $this->getFileSemester(),
-            'periodNumber'  => $this->getAttendancePeriod(),
-            'classCode'     => $this->getClassCode(),
-            'classCampus'   => $this->getClassCampus()
-        ]);
-
-        $result = $statement->fetch();
-
-        if (is_array($result) && isset($result['TimetableGroup'])) {
-            return $result['TimetableGroup'];
-        }
-
-        return false;
-    }
-
-    /**
      * Function to transfer data from work table to live tables, this
      * is called once the update has been done and the user wants to
      * save data
