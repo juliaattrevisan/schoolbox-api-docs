@@ -171,7 +171,7 @@
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
             comments: [],
-            commentsUnmodifiedContent: [], // Will contain the unmodified content of comments. In preparation for comment update.
+            commentsOriginal: [], // Will contain the unmodified content of comments. In preparation for comment update.
             showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
@@ -289,7 +289,7 @@
 
                     for (index = 0; index < responseData.data.length; index++) {
                         self.comments.push(responseData.data[index]);
-                        self.commentsUnmodifiedContent.push(responseData.data[index].content);
+                        self.commentsOriginal.push(responseData.data[index].content);
                     }
 
                     // Hide skeleton loader once the request is done
@@ -323,7 +323,7 @@
                     self.reInitialiseMediaPlayer();
                 });
             },
-            deleteComment: function(id, index, confirmed = false) {
+            deleteComment: function(id, index, confirmed) {
                 var self = this;
 
                 self.commentIdToDelete = id;
@@ -358,7 +358,7 @@
 
                         setTimeout(function() {
                             $('#threads-section').find('[data-schoolboxmedia-replacement]').mediaelementplayer();
-                        }, 0);
+                        }, 300);
 
                         self.closeModal();
                     }).catch(function (error) {
@@ -388,7 +388,7 @@
                         var responseData = response.data;
                         // Add the latest comment into the top of array
                         self.comments.splice(0,0, responseData);
-                        self.commentsUnmodifiedContent.splice(0,0, responseData.content);
+                        self.commentsOriginal.splice(0,0, responseData.content);
 
                         // On successful comment posting, add one into the total comments count in the UI without hitting the backend
                         self.totalCommentsCount++;
@@ -453,32 +453,18 @@
                     var type = content.find('[data-schoolboxresource-type]').attr('data-schoolboxresource-type');
 
                     // Do nothing for comments that doesn't have an embedded media
-                    if (type !== undefined) {
-                        var thumbnail = content.find('[data-schoolboxresource-thumbnail]').attr('data-schoolboxresource-thumbnail');
-                        var fullwidth = content.find('[data-schoolboxresource-fullwidth]').attr('data-schoolboxresource-fullwidth');
-                        var source = content.find('[data-schoolboxresource-source]').attr('data-schoolboxresource-source');
-                        var style = content.find('[data-schoolboxresource-type]').attr('style');
-                        var classes = content.find('[data-schoolboxresource-type]').attr('class');
-                        var width = content.find('[data-schoolboxresource-width]').attr('data-schoolboxresource-width');
-                        var height = content.find('[data-schoolboxresource-height]').attr('data-schoolboxresource-height');
-
-                        self.comments[index].content = $.fn.schoolboxResource_MediaPlayerReplacement({
-                            'style': style,
-                            'width': width,
-                            'height': height,
-                            'thumbnail': thumbnail,
-                            'classes': classes,
-                            'source': source,
-                            'type': type,
-                            'fullwidth': fullwidth
-                        });
+                    if (type !== undefined && (type === 'video' || type === 'audio')) {
+                        var element = content.find('[data-schoolboxresource-type]');
+                        self.comments[index].content = $.fn.schoolboxResource_MediaPlayerReplacement(
+                            $.fn.schoolboxResource_GetParams(element)
+                        );
                     }
                 }
 
                 // Need to add this here. Not really sure why this doesn't get executed when setTimeout is not present...
                 setTimeout(function() {
-                    $('#threads-section').find('[data-schoolboxmedia-replacement]').mediaelementplayer();
-                }, 0);
+                    $.fn.schoolboxResource_InitialiseMediaElementPlayer('#threads-section');
+                }, 100);
             }
         },
         mounted: function() {
@@ -486,10 +472,10 @@
             this.loadCkEditor();
         },
         filters: {
-            fromNow(date) {
+            fromNow: function (date) {
                 return moment(date.database).fromNow();
             },
-            fullString(date) {
+            fullString: function (date) {
                 return moment(date.database).format(dateDisplayFormats.momentJsDatetime);
             }
         }

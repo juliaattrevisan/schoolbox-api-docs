@@ -6,44 +6,49 @@
     $.fn.schoolboxResource_ProxyReplacement = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
             var type = $(element).attr('data-schoolboxresource-type');
-            var thumbnail = $(element).attr('data-schoolboxresource-thumbnail');
-            var style = $(element).attr('style');
-            var classes = $(element).attr('class');
-            var fullwidth = $(element).attr('data-schoolboxresource-fullwidth');
-
-            var width = $(element).attr('data-schoolboxresource-width');
-            var height = $(element).attr('data-schoolboxresource-height');
-
-            var source = $(element).attr('data-schoolboxresource-source');
 
             if (type === 'video' || type === 'audio') {
-                $(element).replaceWith($.fn.schoolboxResource_MediaPlayerReplacement({
-                    'style': style,
-                    'width': width,
-                    'height': height,
-                    'thumbnail': thumbnail,
-                    'classes': classes,
-                    'source': source,
-                    'type': type,
-                    'fullwidth': fullwidth
-                }));
+                $(element).replaceWith(
+                    $.fn.schoolboxResource_MediaPlayerReplacement(
+                        $.fn.schoolboxResource_GetParams(element)
+                    )
+                );
             }
         });
 
-        /* Replace all with mejs
-         */
-        $('#content').find('[data-schoolboxmedia-replacement]').mediaelementplayer();
+        $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
+    }
+
+    $.fn.schoolboxResource_GetParams = function(element) {
+        var e = $(element);
+
+        return {
+            'style': (e.attr('style') !== undefined) ? e.attr('style') : '',
+            'width': (e.attr('data-schoolboxresource-width') !== undefined) ? e.attr('data-schoolboxresource-width') : '',
+            'height': (e.attr('data-schoolboxresource-height') !== undefined) ? e.attr('data-schoolboxresource-height') : '',
+            'thumbnail': (e.attr('data-schoolboxresource-thumbnail') !== undefined) ? e.attr('data-schoolboxresource-thumbnail') : '',
+            'classes': (e.attr('class') !== undefined) ? e.attr('class') : '',
+            'source': (e.attr('data-schoolboxresource-source') !== undefined) ? e.attr('data-schoolboxresource-source') : '',
+            'type': (e.attr('data-schoolboxresource-type') !== undefined) ? e.attr('data-schoolboxresource-type') : '',
+            'fullwidth': (e.attr('data-schoolboxresource-fullwidth') !== undefined) ? e.attr('data-schoolboxresource-fullwidth') : '',
+            'maxwidth': (e.attr('data-schoolboxresource-fullwidth') === 'true') ? '100%' : e.attr('data-schoolboxresource-width') + 'px'
+        };
+    }
+
+    // Replace all with mejs
+    $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
+        $(selector).find('[data-schoolboxmedia-replacement]').mediaelementplayer();
     }
 
     $.fn.schoolboxResource_MediaPlayerReplacement = function (params) {
 
-        var style = (params['style'] !== undefined) ? params['style'] : '';
-        var width = (params['width'] !== undefined) ? params['width'] : '';
-        var height = (params['height'] !== undefined) ? params['height'] : '';
-        var thumbnail = (params['thumbnail'] !== undefined) ? params['thumbnail'] : '';
-        var classes = (params['classes'] !== undefined) ? params['classes'] : '';
-        var source = (params['source'] !== undefined) ? params['source'] : '';
-        var fullwidth = (params['fullwidth'] !== undefined) ? params['fullwidth'] : 'false';
+        var style = params['style'];
+        var width = params['width'];
+        var height = params['height'];
+        var thumbnail = params['thumbnail'];
+        var classes = params['classes'];
+        var source = params['source'];
+        var fullwidth = params['fullwidth'];
         var type = params['type'];
         var maxwidth = width + 'px;';
 
