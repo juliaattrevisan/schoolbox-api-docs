@@ -1,6 +1,11 @@
 parameters:
+    autoload_files:
+        - %rootDir%/../../../test/phpstan/autoload_stan.php
+    autoload_directories:
+        - %rootDir%/../../../conf
+    bootstrap: %rootDir%/../../../conf/core/require.php
     level: 0
-    path:
+    paths:
         - conf
         - dav
         - library
@@ -8,8 +13,3 @@ parameters:
         - tools
         - updates
         - www
-	autoload_files:
-		- %rootDir%/../../../test/phpstan/autoload_stan.php
-	autoload_directories:
-		- %rootDir%/../../../conf
-	bootstrap: %rootDir%/../../../conf/core/require.php
