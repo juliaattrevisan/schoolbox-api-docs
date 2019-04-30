@@ -109,7 +109,7 @@ class Notifier extends ResourceNotifier
     {
         return $this->notify(
             LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_DELETED,
-            new Param($category->getName()),
+            new Param($category->getName(), null, ParameterInterface::STACKING_APPEND),
             $effector, $category->getParent(), $roleType, UserAccess::ACCESS_READ
         );
     }

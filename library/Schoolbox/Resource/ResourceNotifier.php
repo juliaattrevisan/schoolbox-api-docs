@@ -270,7 +270,6 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     public function notifySystemDeleted($resource, $effector): Envelope
     {
         $this->notifySystem(LogMapper::ACTION_DELETE, $resource, $effector);
-        return $this->retractEventObject(new Envelope(), $resource);
     }
 
 

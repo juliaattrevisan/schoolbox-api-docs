@@ -72,7 +72,7 @@ class LinkNotifier extends ResourceNotifier
         // abstract this so far it doesn't even make sense any more
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
-            new Param($link->getDescription()),                             // the :resource param
+            new Param($link->getDescription(), null, ParameterInterface::STACKING_APPEND),                             // the :resource param
             $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }

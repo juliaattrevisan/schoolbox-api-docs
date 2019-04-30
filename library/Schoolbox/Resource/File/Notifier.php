@@ -79,7 +79,7 @@ class Notifier extends ResourceNotifier
             LogMapper::KIND_FILE,
             $file->getId(),
             self::TRIGGER_DELETED, // "file.{id}.deleted"
-            new Param($file->getTitle()), // the :resource param
+            new Param($file->getTitle(), null, ParameterInterface::STACKING_APPEND), // the :resource param
             $effector,
             $category,
             $roletype,
