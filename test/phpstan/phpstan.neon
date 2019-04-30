@@ -1,4 +1,13 @@
 parameters:
+    level: 0
+    path:
+        - conf
+        - dav
+        - library
+        - test
+        - tools
+        - updates
+        - www
 	autoload_files:
 		- %rootDir%/../../../test/phpstan/autoload_stan.php
 	autoload_directories:
