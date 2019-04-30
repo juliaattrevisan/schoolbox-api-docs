@@ -1,0 +1,6 @@
+parameters:
+	autoload_files:
+		- %rootDir%/../../../test/phpstan/autoload_stan.php
+	autoload_directories:
+		- %rootDir%/../../../conf
+	bootstrap: %rootDir%/../../../conf/core/require.php

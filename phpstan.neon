@@ -1,6 +1,0 @@
-parameters:
-	excludes_analysis:
-		- vendor/*
-		- library/Autoloader.php
-	autoload_files:
-		- autoload_stan.php
