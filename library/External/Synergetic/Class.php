@@ -105,7 +105,7 @@ class External_Synergetic_Class implements External_ClassInterface
                         vStudentsAll.StudentPreferred as firstname,
                         vStudentsAll.StudentYearLevelDescription as yearlevel,
                         vStudentsAll.StudentHouseDescription as house,
-                        vStudentsAll.StudentMedicalAlert, 
+                        CASE WHEN vStudentsAll.StudentMedicalAlertFlag= 1 THEN vStudentsAll.StudentMedicalAlert ELSE '' END as StudentMedicalAlert,  
                         vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.StudentTutorDescription,
