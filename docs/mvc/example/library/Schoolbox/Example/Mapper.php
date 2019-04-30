@@ -1,12 +1,13 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: matt.schembri
- * Date: 30/04/18
- * Time: 1:23 PM
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Example;
+
 use Schoolbox\UserMapper;
 
 class Mapper extends \Schoolbox\Mapper
@@ -14,7 +15,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritDoc
      */
-    protected function mapping()
+    protected function mapping(): void
     {
         $this->hasTable('example');
         $this->hasModel(Model::class);
