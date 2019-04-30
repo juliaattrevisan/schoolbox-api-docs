@@ -9,6 +9,6 @@ VALUES (
   (SELECT id from lu_config_type WHERE type = 'SAML'),
   'true',
   'false',
-  'false',
+  'true',
   'settings'
 );
