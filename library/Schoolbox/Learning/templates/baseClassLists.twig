@@ -114,7 +114,7 @@
                 studentLists = new Promise(function (resolve) {
                     axios.get(self.getStudentListsEndpointPrefix + self.classCode)
                         .then(function (response) {
-                            self.studentLists = response.data
+                            self.studentLists = response.data;
                             resolve();
                         })
                         .catch(function (error) {
@@ -130,7 +130,7 @@
                         self.groupsCheckboxElements = document.getElementsByName('groups[]');
                         self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
 
-                        self.groupsCheckboxElements.forEach(function (element) {
+                        $.each(self.groupsCheckboxElements, function (index, element) {
                             if (element.checked) {
                                 self.selectedGroups.push(element.value);
                             }
@@ -157,7 +157,7 @@
                 // Prepare endpoints to requests. Loop through the selected groups.
                 // We need to do this for now as our endpoints to fetch email addresses are designed this way.
                 // TODO: Re-architect fetching of email address to prevent doing this
-                self.selectedGroups.forEach(function(groupname) {
+                $.each(self.selectedGroups, function(index, groupname) {
                     switch(groupname) {
                         case 'students':
                             endpoint = 'emailStudentsById.php';
@@ -178,7 +178,7 @@
                         // Once all the requests are done, set the ready flag to true.
                         // The watcher will then trigger the submit
                         // More for watchers: https://vuejs.org/v2/guide/computed.html#Watchers
-                        self.formIsReady = true
+                        self.formIsReady = true;
                     } else {
                         self.enableSendEmailButton = true;
                         self.sendEmailButtonText = self.sendEmailButtonDefaultText;
@@ -212,7 +212,7 @@
 
                 self.selectedStudentIds = [];
 
-                self.studentsCheckboxElements.forEach(function (element) {
+                $.each(self.studentsCheckboxElements, function (index, element) {
                     element.checked = isChecked;
                     if (isChecked) {
                         self.selectedStudentIds.push(element.value);

@@ -20,8 +20,8 @@
     </tr>
     </thead>
     <tbody>
-    <template v-for="student in studentLists">
-        <tr>
+    <template v-if="studentLists.length > 0">
+        <tr v-for="student in studentLists">
             <td v-if="mailEnabled">
                 <input type="checkbox" name="students[]" :id="'id-' + student.synergy_id" :value="student.synergy_id"
                        @click="select"/>
