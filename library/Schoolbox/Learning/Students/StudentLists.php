@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright Copyright 2019, Alaress Pty Ltd
- * @link      https://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      hhttps://schoolbox.com.au/
  */
 
 declare(strict_types=1);
@@ -60,31 +60,13 @@ class StudentLists
     /**
      * @param string $classCode
      *
-     * @return $this
-     */
-    public function setClassCode(string $classCode): self
-    {
-        $this->classCode = $classCode;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getClassCode(): string
-    {
-        return $this->classCode;
-    }
-
-    /**
      * @return array
      * @throws Exception
      */
-    public function getStudentLists(): array
+    public function getStudentLists(string $classCode): array
     {
-        $students = $this->externalClass->getStudents($this->getClassCode());
-        $folder   = $this->folderMapper->findByCode($this->getClassCode());
+        $students = $this->externalClass->getStudents($classCode);
+        $folder   = $this->folderMapper->findByCode($classCode);
 
         foreach ($students as $key => $student) {
             $user = $this->userMapper->findByExternalId($student['synergy_id']);

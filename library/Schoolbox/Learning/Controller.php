@@ -20,6 +20,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Statistics;
+use Schoolbox\Learning\Classes\ClassCode;
 use Schoolbox\Learning\Classes\ClassList;
 use Schoolbox\Learning\Students\StudentLists;
 use Schoolbox\Mapper\DefinitionException;
@@ -382,8 +383,7 @@ class Controller extends Base
     public function getStudentListByClassCode(string $classCode): void
     {
         $students = (new StudentLists($this->externalClass, $this->userMapper, $this->folderMapper, $this->logMapper))
-            ->setClassCode($classCode)
-            ->getStudentLists();
+            ->getStudentLists((new ClassCode($classCode))->proper());
 
         $this->getResponse()->status->set(200);
         $this->getResponse()->content->set($this->buildJsonOutput($students));
@@ -397,7 +397,9 @@ class Controller extends Base
      */
     public function getClassListPage(string $classCode): void
     {
-        $folder = $this->folderMapper->findByCode($classCode);
+        $classCode = new ClassCode($classCode);
+
+        $folder = $this->getFolderByCode($classCode->proper());
 
         $subjectName = $folder->getName();
 
@@ -405,7 +407,7 @@ class Controller extends Base
             $this->buildHtmlOutput('@learning/classLists.twig', [
                 'homepageId'        => $folder->getId(),
                 'subjectName'       => $subjectName,
-                'classCode'         => $classCode,
+                'classCode'         => $classCode->getClassCode(),
                 'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
                 'replyTo'           => $this->getUser()->getEmail(),
                 'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
@@ -443,6 +445,37 @@ class Controller extends Base
 
         return json_encode($result);
     }
+
+
+    /**
+     * @param string $classCode
+     *
+     * @return Folder\Model
+     * @throws Mapper\Exception
+     */
+    private function getFolderByCode(string $classCode): Folder\Model
+    {
+        try {
+            return $this->folderMapper->findByCode($classCode);
+        } catch (Exception $e) {
+            // Handle the existence of a campus code prefix.
+            // E.g: Class code "EN344" belongs to the Senior campus (code: "S"), and could also be passed in as "S/EN344"
+            // to disambiguate it from a "EN344" which may exist in another campus.
+            try {
+                $codeParts = explode('/', $classCode, 2);
+                if ($codeParts) {
+                    return $this->folderMapper->findByCode($codeParts[1]);
+                }
+                else {
+                    throw new NotFound();
+                }
+            }
+            catch (Exception $e) {
+                throw new NotFound();
+            }
+        }
+    }
+
     /* Getters/Setters
      */
 }
