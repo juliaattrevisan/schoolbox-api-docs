@@ -73,7 +73,7 @@
                                 <td>{{ video.createdAt.database }}</td>
                                 <td>{{ video.storage.filename }}</td>
                                 <td>{{ video.duration }}</td>
-                                <td>{{ video.storage.size | bytes}}</td>
+                                <td data-order="{{ video.storage.size  }}">{{ video.storage.size | bytes }}</td>
                                 <td>{{ video.storage.mime }}</td>
                                 <td class="actions-small-3">
                                     <nav>
