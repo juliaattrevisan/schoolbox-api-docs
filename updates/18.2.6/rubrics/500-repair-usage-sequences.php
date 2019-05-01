@@ -42,6 +42,7 @@ $app = new class extends CliTool\App
             $this->getDatabaseInternal()->commit();
         } catch (Database\Exception $e) {
             $this->getLogger()->error('Database error, rolling back transaction', ['exception' => $e]);
+            $this->getLogger()->error($e->getTraceAsString());
             $this->getDatabaseInternal()->rollBack();
         }
 
