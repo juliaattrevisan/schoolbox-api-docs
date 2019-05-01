@@ -16,6 +16,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+
     /** @var int */
     private $countCapabilityUsagesChanged = 0;
 
@@ -60,13 +61,13 @@ $app = new class extends CliTool\App
      */
     private function checkAndRepairCapabilityUsages(): void
     {
-        $this->getLogger()->info('Finding DueWorks having rubric capability usages with sequence collisions');
-        $submissionBoxIds = $this->getSubmissionBoxIdsWithCapabilitySequenceCollisions();
+        $this->getLogger()->info('Finding DueWorks having Capability Usages with sequence collisions');
+        $submissionBoxIds = $this->getCapabilitySequenceCollisions();
 
         if (!count($submissionBoxIds)) {
-            $this->getLogger()->info('No capability usage sequence collisions found.');
+            $this->getLogger()->info('No Capability Usage sequence collisions found.');
         } else {
-            $this->getLogger()->info(sprintf('%s Submission Boxes found with capability Usage sequence collisions.', count($submissionBoxIds)));
+            $this->getLogger()->info('Repairing Capability Usage sequences');
             $this->repairCapabilityUsages($submissionBoxIds);
         }
     }
@@ -77,14 +78,14 @@ $app = new class extends CliTool\App
      */
     private function checkAndRepairIndicatorUsages(): void
     {
-        $this->getLogger()->info('Finding DueWorks having rubric indicator usages with sequence collisions');
-        $submissionBoxIds = $this->getSubmissionBoxIdsWithIndicatorSequenceCollisions();
+        $this->getLogger()->info('Finding DueWorks having Indicator Usages with sequence collisions');
+        $submissionBoxAndRubricCapabilityIds = $this->getIndicatorSequenceCollisions();
 
-        if (!count($submissionBoxIds)) {
-            $this->getLogger()->info('No indicator usage sequence collisions found.');
+        if (!count($submissionBoxAndRubricCapabilityIds)) {
+            $this->getLogger()->info('No Indicator Usage sequence collisions found.');
         } else {
-            $this->getLogger()->info(sprintf('%s Submission Boxes found with Indicator Usage sequence collisions.', count($submissionBoxIds)));
-            $this->repairIndicatorUsages($submissionBoxIds);
+            $this->getLogger()->info('Repairing Indicator Usage sequences');
+            $this->repairIndicatorUsages($submissionBoxAndRubricCapabilityIds);
         }
     }
 
@@ -94,7 +95,7 @@ $app = new class extends CliTool\App
      *
      * @return array
      */
-    private function getSubmissionBoxIdsWithCapabilitySequenceCollisions(): array
+    private function getCapabilitySequenceCollisions(): array
     {
         $sql = "
             SELECT DISTINCT rgu1.submission_box_id
@@ -109,24 +110,25 @@ $app = new class extends CliTool\App
 
 
     /**
-     * Return the ids of submission boxes that have indicator usages having sequence collisions
+     * Return the ids of submission boxes and rubric capabilities that have indicator usages having sequence collisions
      *
      * @return array
      */
-    private function getSubmissionBoxIdsWithIndicatorSequenceCollisions(): array
+    private function getIndicatorSequenceCollisions(): array
     {
         $sql = "
-            SELECT * FROM rubric_criterion_usage rcu1
-JOIN rubric_criterion rc ON rcu1.criterion_id = rc.id;
-
-            SELECT DISTINCT rcu1.submission_box_id
-            FROM rubric_criterion_usage rcu1
-            JOIN rubric_criterion_usage rcu2 ON 
-                rcu1.criterion_id      != rcu2.criterion_id AND
+            SELECT DISTINCT rcu1.submission_box_id, rc1.rubric_group_id
+            FROM rubric_criterion rc1
+            JOIN rubric_criterion_usage rcu1 ON rcu1.criterion_id = rc1.id
+            JOIN rubric_criterion rc2
+            JOIN rubric_criterion_usage rcu2 ON rcu2.criterion_id = rc2.id
+            WHERE
+                rc1.rubric_group_id    =  rc2.rubric_group_id AND
                 rcu1.submission_box_id =  rcu2.submission_box_id AND
+                rcu1.criterion_id      != rcu2.criterion_id AND
                 rcu1.sequence          =  rcu2.sequence;
         ";
-        return $this->getDatabaseInternal()->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
+        return $this->getDatabaseInternal()->executeQuery($sql)->fetchAll(PDO::FETCH_NUM);
     }
 
 
@@ -178,15 +180,16 @@ JOIN rubric_criterion rc ON rcu1.criterion_id = rc.id;
     /**
      * Repairs Indicator Usage sequences for the specified submission boxes
      *
-     * @param array $submissionBoxIds
+     * @param array $submissionBoxAndRubricCapabilityIds
      * @throws Database\Exception
      */
-    private function repairIndicatorUsages(array $submissionBoxIds): void
+    private function repairIndicatorUsages(array $submissionBoxAndRubricCapabilityIds): void
     {
         $selectStmt = $this->getDatabaseInternal()->prepareQuery('
             SELECT criterion_id, sequence
-            FROM rubric_criterion_usage 
-            WHERE submission_box_id = :submission_box_id
+            FROM rubric_criterion_usage rcu
+            JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
+            WHERE submission_box_id = :submission_box_id AND rc.rubric_group_id = :rubric_group_id
             ORDER BY sequence ASC, criterion_id ASC
         ');
 
@@ -198,9 +201,9 @@ JOIN rubric_criterion rc ON rcu1.criterion_id = rc.id;
                 submission_box_id = :submission_box_id
         ');
 
-        foreach ($submissionBoxIds as $submissionBoxId) {
-            $this->getLogger()->info("Repairing Submission Box ($submissionBoxId)");
-            $selectStmt->execute(['submission_box_id' => $submissionBoxId]);
+        foreach ($submissionBoxAndRubricCapabilityIds as [$submissionBoxId, $rubricCapabilityId]) {
+            $this->getLogger()->info("Repairing Submission Box ($submissionBoxId), Capability: ({$rubricCapabilityId})");
+            $selectStmt->execute(['submission_box_id' => $submissionBoxId, 'rubric_group_id' => $rubricCapabilityId]);
             $indicatorUsages = $selectStmt->fetchAll();
             $this->getLogger()->info("    Old Indicator Usage sequences: {$this->formatSequenceString($indicatorUsages, 'criterion_id')}");
             foreach ($indicatorUsages as $idx => $row) {
