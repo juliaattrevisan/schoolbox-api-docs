@@ -144,10 +144,15 @@
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
                     $btnPublish  = $actionBar.find('[data-draft=publish]'),
-                    $commentBoxId = "comment-" + $participant.data('participant');
+                    participantId = $participant.data('participant'),
+                    commentBoxId = "comment-" + participantId;
+
+                // Clear draft queue for this participant, since we're about to publish
+                autoSavePending[participantId] = false;
+                autoSaveInProgress[participantId] = false;
 
                 // We can safely clear this timeout now that we're publishing
-                window.clearTimeout(commentBoxTimeouts[$commentBoxId]);
+                window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
                 $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
 
