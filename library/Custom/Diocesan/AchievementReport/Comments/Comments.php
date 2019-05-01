@@ -59,6 +59,7 @@ class Comments extends Base
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
             AND StudentYear = '{$this->year}'
+            AND Comment != ''
             ORDER BY CourseDescription, Term
         ";
 
