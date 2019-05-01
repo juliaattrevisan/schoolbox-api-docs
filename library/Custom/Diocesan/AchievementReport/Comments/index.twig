@@ -1,7 +1,10 @@
+{% import '@templates/macro.twig' as macro %}
 {% include '@templates/Avatar.twig' %}
 {% include '@templates/Navigation.twig' %}
 
-{% import '@templates/macro.twig' as macro %}
+{% include '@comments/CommentsNavigation.twig' with {
+    commentsNavigation: commentsNavigation
+} %}
 
 <table>
     <thead>

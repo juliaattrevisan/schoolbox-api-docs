@@ -328,6 +328,12 @@ class Controller extends Base {
      */
     public function comments(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
+        /* The selected year should contain data. If a selected
+         * year contains no data, probably 404 or something - you
+         * could fiddle with the url to get illegal values
+         */
+        $allYears = (new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, $year))->findData();
+
         $output = [
             'template' => '@comments/index.twig',
             'data' => [
@@ -337,6 +343,10 @@ class Controller extends Base {
                 ],
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'commentsNavigation' => [
+                    'all' => $allYears,
+                    'selected' => $year
+                ],
                 'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findData()
             ]
         ];

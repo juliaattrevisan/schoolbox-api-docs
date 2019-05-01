@@ -58,7 +58,8 @@ class Comments extends Base
                 ResultType
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
-            ORDER BY StudentYear, CourseDescription, Term
+            AND StudentYear = '{$this->year}'
+            ORDER BY CourseDescription, Term
         ";
 
         $result = $this->getDb()->getAll($query) ?: [];
