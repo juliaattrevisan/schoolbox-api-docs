@@ -115,11 +115,11 @@ class Controller extends Base {
      */
     public function schoolGrades($db, $user, $externalUser, $year) {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new SchoolGrades\Footer($externalUser, $db, null);
+        $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
-        $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db, $year);
-        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db, $year);
-        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($externalUser, $db, $year);
+        $gradeSummaryTable = new SchoolGrades\GradeSummary($user, $externalUser, $db, $year);
+        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($user, $externalUser, $db, $year);
+        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($user, $externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@schoolgrades/index.twig',
@@ -165,10 +165,10 @@ class Controller extends Base {
      */
     public function ib($db, $user, $externalUser, $year) {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new IB\Footer($externalUser, $db, null);
+        $footer = new IB\Footer($user, $externalUser, $db, null);
 
-        $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db, $year);
-        $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db, $year);
+        $progressGradeSummary = new IB\ProgressGradeSummary($user, $externalUser, $db, $year);
+        $yearlyBreakdown = new IB\YearlyBreakdown($user, $externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@ib/index.twig',
@@ -208,11 +208,11 @@ class Controller extends Base {
      */
     public function ncea($db, $user, $externalUser, $year) {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new NCEA\Footer($externalUser, $db, null);
+        $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
-        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
-        $qualifications = new NCEA\Qualifications($externalUser, $db, null);
-        $creditSummary = new NCEA\CreditSummary($externalUser, $db, null);
+        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
+        $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null);
+        $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null);
 
         $output = array(
             'template' => '@ncea/index.twig',
@@ -262,7 +262,7 @@ class Controller extends Base {
          * year contains no data, probably 404 or something - you
          * could fiddle with the url to get illegal values
          */
-        $navigation = new NCEA\CourseCreditSummaryNavigation($externalUser, $db, null);
+        $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null);
         $allYears = $navigation->findData();
 
         if (count($allYears)) {
@@ -280,9 +280,9 @@ class Controller extends Base {
              * shenanigans altogether
              */
             if ($year) {
-                $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
-                $courseCreditSummary = new NCEA\CourseCreditSummary($externalUser, $db, $year);
-                $entriesAndResults = new NCEA\EntriesAndResults($externalUser, $db, $year);
+                $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year);
+                $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year);
+                $entriesAndResults = new NCEA\EntriesAndResults($user, $externalUser, $db, $year);
 
                 /* Course Credit Summary graphs for a specific year
                  */
@@ -335,7 +335,7 @@ class Controller extends Base {
                     'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
                     'selected' => 'comments'
                 ],
-                'comments' => (new Comments\Comments($externalUser, $db, $year))->findData()
+                'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findData()
             ]
         ];
 
