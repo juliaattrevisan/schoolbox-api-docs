@@ -14,6 +14,7 @@ $this->setFile(TEMPLATE_content, 'forum/thread.html');
 $this->setBlock(TEMPLATE_content, 'post', 'post_block');
 $this->setBlock('post', 'reply_post', 'reply_post_block');
 $this->setBlock('post', 'modify', 'modify_block');
+$this->setBlock('post', 'delete', 'delete_block');
 $this->setBlock('post', 'modified', 'modified_block');
 $this->setBlock('post', 'link_start', 'link_start_block');
 $this->setBlock('post', 'link_end', 'link_end_block');
@@ -145,6 +146,9 @@ if (is_array($postList)) {
     $userHandler = new User();
     $j = 0;
 
+// Assign first array element to variable
+    $first = reset( $postList );
+
     foreach ($postList as $post) {
         $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($post['userID']);
 
@@ -165,7 +169,7 @@ if (is_array($postList)) {
                         'POST_CENSORED' => $post['censored'] == 'true' ? '(Administrator)' : '',
                         'POST_AUTHOR_EXTERNAL_ID' => $post['synergy_id'],
                         'POST_AUTHOR_NAME' => $post['firstname'] . ' ' . $post['lastname'],
-                        'ON_OFF'          => ++$j % 2 ? 'dark' : ''
+                        'ON_OFF'          => ++$j % 2 ? 'dark' : '',
         );
         $this->setVar($output);
 
@@ -178,14 +182,21 @@ if (is_array($postList)) {
             $this->parse('link_end_block', 'link_end');
         }
 
-        // edit / delete post
+        // edit post
         $this->setVar('modify_block', '');
+
+        // delete post
+        if($post != $first)
+            $this->setVar('DELETE_BUTTON', '<a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost=' . $post['postID'] .'" data-action="delete" data-relation="post" title="Delete Post"></a>');
+        else $this->setVar('DELETE_BUTTON', '');
+
         $this->setVar('modify_heading_block', '');
 
         if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission(
             $category->getId()
         ) >= WRITE_ACCESS) {
             $this->parse('modify_block', 'modify');
+            $this->parse('delete_block', 'delete');
 
         }
 

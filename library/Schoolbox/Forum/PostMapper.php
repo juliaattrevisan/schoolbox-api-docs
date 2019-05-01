@@ -181,4 +181,36 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
         return $c;
     }
 
+    /**
+     * @param int $threadId
+     * @return Id of the First post of a forum thread
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findFirstPost($threadID)
+    {
+
+        $query=
+            "SELECT
+                {$this->getColumnString('post')},
+                {$this->getJoinColumnString('owner', 'owner')}
+            FROM {$this->getTable()} AS post
+            LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner', true)}
+			WHERE post.parentID IS NULL AND post.threadID=? 
+			LIMIT 1";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array($threadID));
+
+        if (($row = $statement->fetch()) !== false) {
+            $post = $this->hydrate($row, 'post');
+            $post->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
+            $this->throwIfDeleted($post);
+            return $post;
+        }
+        else {
+            throw new Mapper\Exception('Instance of object not found');
+        }
+
+    }
+
 }
