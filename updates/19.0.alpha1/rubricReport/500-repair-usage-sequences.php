@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Alaress\Database;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsage;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupUsage;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -162,9 +164,9 @@ $app = new class extends CliTool\App
             $selectStmt->execute(['submission_box_id' => $submissionBoxId]);
             $capabilityUsages = $selectStmt->fetchAll();
             $this->getLogger()->info("    Old Capability Usage sequences: {$this->formatSequenceString($capabilityUsages, 'rubric_group_id')}");
-            foreach ($capabilityUsages as $idx => $row) {
+            $newSequence = GroupUsage::SEQUENCE_BASE;
+            foreach ($capabilityUsages as $row) {
                 $oldSequence = (int)$row['sequence'];
-                $newSequence = $idx + 1;
                 if ($oldSequence !== $newSequence) {
                     $updateStmt->execute([
                         'sequence'          => $newSequence,
@@ -173,6 +175,7 @@ $app = new class extends CliTool\App
                     ]);
                     $this->getLogger()->debug("Capability {$row['rubric_group_id']} new sequence: $newSequence");
                     $this->countCapabilityUsagesChanged++;
+                    $newSequence++;
                 }
             }
         }
@@ -208,9 +211,9 @@ $app = new class extends CliTool\App
             $selectStmt->execute(['submission_box_id' => $submissionBoxId, 'rubric_group_id' => $rubricCapabilityId]);
             $indicatorUsages = $selectStmt->fetchAll();
             $this->getLogger()->info("    Old Indicator Usage sequences: {$this->formatSequenceString($indicatorUsages, 'criterion_id')}");
+            $newSequence = CriterionUsage::SEQUENCE_BASE;
             foreach ($indicatorUsages as $idx => $row) {
                 $oldSequence = (int)$row['sequence'];
-                $newSequence = $idx + 1;
                 if ($oldSequence !== $newSequence) {
                     $updateStmt->execute([
                         'sequence'          => $newSequence,
@@ -219,6 +222,7 @@ $app = new class extends CliTool\App
                     ]);
                     $this->getLogger()->debug("Indicator {$row['criterion_id']} new sequence: $newSequence");
                     $this->countIndicatorUsagesChanged++;
+                    $newSequence++;
                 }
             }
         }
