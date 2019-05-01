@@ -231,18 +231,18 @@ class Controller extends Base
         $pb  = Database\Predicate\Builder::getBindings($assessmentIds, 'a_id');
         $sql = "
             SELECT
-                vr.assessment_id             AS assessment_id,
-                vr.assessment_grade_group_id AS assessment_grade_group_id,
-                sb.name                      AS assessment_name,
-                sb.max_mark                  AS assessment_max_mark,
-                sb.mark_type                 AS assessment_mark_type,
-                sb.submission_grade_group_id AS assessment_grade_group_id,
-                sb.rubric_group_marks        AS assessment_rubric_group_marks,
-                vr.capability_id             AS capability_id,
-                vr.capability_name           AS capability_name,
-                vr.indicator_id              AS indicator_id,
-                vr.indicator_name            AS indicator_name,
-                vr.indicator_max_value       AS indicator_max_value
+                vr.assessment_id                  AS assessment_id,
+                vr.assessment_grade_group_id      AS assessment_grade_group_id,
+                vr.assessment_title               AS assessment_name,
+                vr.assessment_max_mark            AS assessment_max_mark,
+                vr.assessment_mark_type           AS assessment_mark_type,
+                vr.assessment_grade_group_id      AS assessment_grade_group_id,
+                vr.assessment_mark_per_capability AS assessment_rubric_group_marks,
+                vr.capability_id                  AS capability_id,
+                vr.capability_name                AS capability_name,
+                vr.indicator_id                   AS indicator_id,
+                vr.indicator_name                 AS indicator_name,
+                vr.indicator_max_value            AS indicator_max_value
             FROM v_rubric vr
             JOIN submission_box sb ON sb.assessment_id = vr.assessment_id
             WHERE vr.assessment_id IN ({$pb->getPlaceholder()})

@@ -5,6 +5,7 @@ CREATE OR REPLACE VIEW v_rubric AS
 SELECT
   -- Assessment fields
   a.id                         AS assessment_id,
+  a.title                      AS assessment_title,
   sb.mark_type                 AS assessment_mark_type,
   sb.max_mark                  AS assessment_max_mark,
   sb.submission_grade_group_id AS assessment_grade_group_id,
