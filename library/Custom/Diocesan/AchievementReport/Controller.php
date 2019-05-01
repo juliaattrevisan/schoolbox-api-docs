@@ -321,12 +321,12 @@ class Controller extends Base {
     /**
      * Get all the comments for $externalUser
      *
-     * @param MSSQL $db
-     * @param User  $user
-     * @param array $externalUser
-     * @param int   $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
      */
-    public function comments(MSSQL $db, User $user, array $externalUser, int $year)
+    public function comments(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $output = [
             'template' => '@comments/index.twig',
@@ -335,6 +335,8 @@ class Controller extends Base {
                     'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
                     'selected' => 'comments'
                 ],
+                'externalUser' => $externalUser,
+                'user' => $user,
                 'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findData()
             ]
         ];
