@@ -23,4 +23,3 @@ Gemfile*
 .bowerrc
 npm-shrinkwrap.json
 phpstan_run.sh
-test/phpstan
