@@ -97,6 +97,7 @@ $app = new class extends CliTool\App
      */
     private function getCapabilitySequenceCollisions(): array
     {
+        // Fetch DueWork which use different capabilities, but have the same sequence
         $sql = "
             SELECT DISTINCT rgu1.submission_box_id
             FROM rubric_group_usage rgu1
@@ -116,6 +117,7 @@ $app = new class extends CliTool\App
      */
     private function getIndicatorSequenceCollisions(): array
     {
+        // Fetch DueWork which use different indicators, that belong to the same capability, but the indicators have the same sequence.
         $sql = "
             SELECT DISTINCT rcu1.submission_box_id, rc1.rubric_group_id
             FROM rubric_criterion rc1
