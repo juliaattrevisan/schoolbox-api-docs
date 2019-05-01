@@ -23,8 +23,12 @@
                     <tr>
                         <td>&nbsp;</td>
                         <td>{{ term }}</td>
-                        <td>{{ termData.terms[term] }}</td>
-                        <td>Teacher</td>
+                        <td>{{ termData.terms[term].comment }}</td>
+                        <td>
+                            {% for teacher in termData.terms[term].teachers %}
+                                <p>{{ teacher.name }} {{ teacher.email }}</p>
+                            {% endfor %}
+                        </td>
                     </tr>
                     {% endif %}
                 {% endfor %}

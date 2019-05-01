@@ -104,7 +104,23 @@ class Comments extends Base
                 $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
             }
 
-            $comments[$year]['courses'][$courseName]['terms'][$term] = $comment;
+            $comments[$year]['courses'][$courseName]['terms'][$term] = [
+                'comment' => $comment,
+                'teachers' => [
+                    [
+                        'name' => $current['ClassTeacher1'],
+                        'email' => $current['ClassTeacher1Email']
+                    ],
+                    [
+                        'name' => $current['ClassTeacher2'],
+                        'email' => $current['ClassTeacher2Email']
+                    ],
+                    [
+                        'name' => $current['ClassTeacher3'],
+                        'email' => $current['ClassTeacher3Email']
+                    ],
+                ]
+            ];
         }
 
         return $comments;
