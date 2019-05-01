@@ -160,7 +160,7 @@
                 var formData = $form.serializeArray();
                 formData.push({name: 'publish', value: 1});
 
-                config.onPrePublishCallback($participant.data('participant'), formData);
+                config.onPrePublishCallback(participantId, formData);
 
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
@@ -199,7 +199,7 @@
 
                     toast.call($participant, config.publishedText, true, false);
                     config.onPublishCallback(
-                        $participant.data('participant'),
+                        participantId,
                         response.success,
                         response.message,
                         response.id
