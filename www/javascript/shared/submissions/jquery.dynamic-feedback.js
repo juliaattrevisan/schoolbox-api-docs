@@ -34,7 +34,7 @@
      * Timeout IDs for each comment box, indexed by ID of the comment box.
      * Used to accumulate and clear typing timeouts for each textarea individually.
      *
-     * @type {Array}
+     * @type {number[]}
      */
     var commentBoxTimeouts = [];
 
