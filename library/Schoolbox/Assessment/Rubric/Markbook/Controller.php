@@ -244,7 +244,6 @@ class Controller extends Base
                 vr.indicator_name                 AS indicator_name,
                 vr.indicator_max_value            AS indicator_max_value
             FROM v_rubric vr
-            JOIN submission_box sb ON sb.assessment_id = vr.assessment_id
             WHERE vr.assessment_id IN ({$pb->getPlaceholder()})
             ORDER BY vr.assessment_id, vr.capability_id
         ";
