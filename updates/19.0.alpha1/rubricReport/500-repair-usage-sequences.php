@@ -30,15 +30,26 @@ $app = new class extends CliTool\App
     {
         $this->getDatabaseInternal()->beginTransaction();
         try {
-            $this->checkAndRepairCapabilityUsages();
-            $this->checkAndRepairIndicatorUsages();
-            $this->printResults();
+            $this->checkAndRepairUsages();
             $this->getDatabaseInternal()->commit();
         } catch (Database\Exception $e) {
             $this->getLogger()->error('Database error, rolling back transaction', ['exception' => $e]);
             $this->getLogger()->error($e->getTraceAsString());
             $this->getDatabaseInternal()->rollBack();
         }
+    }
+
+
+    /**
+     * Checks and repairs usage sequences, then prints results
+     *
+     * @throws Database\Exception
+     */
+    private function checkAndRepairUsages(): void
+    {
+        $this->checkAndRepairCapabilityUsages();
+        $this->checkAndRepairIndicatorUsages();
+        $this->printResults();
     }
 
 
