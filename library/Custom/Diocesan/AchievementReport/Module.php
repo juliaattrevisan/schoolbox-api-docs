@@ -45,6 +45,11 @@ class Module extends BaseModule
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
+
+        $router->addGet('achievementreport.comments', $basePath . '/comments/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
     }
 
     /**
@@ -75,6 +80,13 @@ class Module extends BaseModule
 
         $matcher->add(
             '/^achievementreport\.ncea/',
+            function ($params) {
+                return $this->getEverything($params);
+            }
+        );
+
+        $matcher->add(
+            '/^achievementreport\.comments/',
             function ($params) {
                 return $this->getEverything($params);
             }
@@ -145,6 +157,7 @@ class Module extends BaseModule
         $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolgrades');
         $loader->addPath(__DIR__ . '/IB', 'ib');
         $loader->addPath(__DIR__ . '/NCEA', 'ncea');
+        $loader->addPath(__DIR__ . '/Comments', 'comments');
         $loader->addPath(__DIR__ . '/Templates', 'templates');
         $templateLoader->addLoader($loader);
     }

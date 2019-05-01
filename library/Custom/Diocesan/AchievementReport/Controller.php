@@ -10,6 +10,7 @@
 
 namespace Custom\Diocesan\AchievementReport;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use MSSQL;
 use Schoolbox\User;
@@ -79,6 +80,11 @@ class Controller extends Base {
 
             case 'ncea':
                 header("Location: {$baseUrl}/ncea/{$externalUserId}");
+                die();
+                break;
+
+            case 'comments':
+                header("Location: {$baseUrl}/comments/{$externalUserId}");
                 die();
                 break;
 
@@ -309,6 +315,29 @@ class Controller extends Base {
         }
 
         $this->getResponse()->content->set($output);
+    }
+
+
+    /**
+     * Get all the comments for $externalUser
+     *
+     * @param MSSQL $db
+     * @param User  $user
+     * @param array $externalUser
+     * @param int   $year
+     */
+    public function comments(MSSQL $db, User $user, array $externalUser, int $year)
+    {
+        $output = [
+            'template' => '@comments/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
+                    'selected' => 'comments'
+                ],
+                'comments' => (new Comments\Comments($externalUser, $db, $year))->findData()
+            ]
+        ];
     }
 
     /* Getters/Setters
