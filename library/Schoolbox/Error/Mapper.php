@@ -195,6 +195,8 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_DISCUSSION_THREAD_ALREADY_ASSOCIATED = 225;
 
+    public const ERROR_FORUM_FIRST_POST_CANNOT_BE_DELETED = 226;
+
 
     /**
      * Setup mapping
