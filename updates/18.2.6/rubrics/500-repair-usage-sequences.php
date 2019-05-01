@@ -9,14 +9,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Alaress\Database;
 
-// TODO - START - Delete this once SA-8248 is merged. It will be handled by a single core require.php
-require_once __DIR__ . '/../../../www/conf/conf.php';
-require_once __DIR__ . '/../../../www/include/stdfuncs.php';
-require_once __DIR__ . '/../../../library/constants.php';
-set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
-require_once __DIR__ . '/../../../library/Autoloader.php';
-Autoloader::initialise();
-// TODO - END
+require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
  * Finds any submission boxes that have Capability or Indicator usages with sequence collisions, and repairs them.
@@ -241,7 +234,7 @@ $app = new class extends CliTool\App
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, null, [CliTool\Kernel::OPTION_LEVEL_MIN => Monolog\Logger::DEBUG]))->runApp();
+(new CliTool\Kernel($app, null, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();
 
 
 
