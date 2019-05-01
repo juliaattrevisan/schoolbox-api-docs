@@ -12,6 +12,7 @@ namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use MSSQL;
 use Schoolbox\User;
 
@@ -343,6 +344,7 @@ class Controller extends Base {
                 ],
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'isJuniorSchoolStudent' => (new ValidJuniorSchoolStudent())->isSatisfiedBy($user),
                 'commentsNavigation' => [
                     'all' => $allYears,
                     'selected' => $year
