@@ -60,6 +60,13 @@ class NavigationSelector
     private $hasSchoolGrades = false;
 
     /**
+     * Has Comments
+     *
+     * @var bool
+     */
+    private $hasComments = false;
+
+    /**
      * Available navigation options
      *
      * @var array
@@ -133,9 +140,9 @@ class NavigationSelector
      *
      * Facade method
      */
-    private function navigationData()
+    private function navigationData(): void
     {
-        $availableNavigation = array();
+        $availableNavigation = [];
 
         /* Conditionally add NCEA option
          */
@@ -151,18 +158,48 @@ class NavigationSelector
             $availableNavigation['ib'] = 'IB';
         }
 
-        /* School Grades always available
+        /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
             $this->setHasSchoolGrades(true);
             $availableNavigation['schoolgrades'] = 'School Grades';
         }
 
+        /* Conditionally add Comment option
+         */
+        if ($this->hasComments()) {
+            $this->hasComments = true;
+            $availableNavigation['comments'] = 'Comments';
+        }
+
         $this->setAvailableNavigation($availableNavigation);
     }
 
+
     /**
-     * Find out if they are in the NCEA table
+     * Find out if they are in the Comments table
+     */
+    private function hasComments()
+    {
+        $externalUser = $this->getExternalUser();
+        $externalUserId = $externalUser['StudentID'];
+
+        $query = "
+            SELECT 
+                TOP 1 COUNT(*)
+            FROM 
+                dbo.uvSchoolBoxReportComments
+            WHERE 
+                id = '{$externalUserId}'
+        ";
+
+        $count = $this->getDb()->getRow($query);
+
+        return $count['computed'];
+    }
+    
+    /**
+     * Find out if they are in the School Grades table
      */
     private function hasSchoolGrades()
     {
