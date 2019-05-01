@@ -348,6 +348,9 @@
                     );
                 })
                 .fail(function (xhr) {
+                    $actionBar.show();
+                    $btnDrafted.show().text('Saving failed');
+                    $btnPublish.show();
                     toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
