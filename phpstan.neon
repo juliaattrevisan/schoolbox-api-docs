@@ -1,0 +1,13 @@
+parameters:
+    autoload_directories:
+        - %rootDir%/../../../conf
+    bootstrap: %rootDir%/../../../conf/core/require.php
+    level: 0
+    paths:
+        - conf
+        - dav
+        - library
+        - test
+        - tools
+        - updates
+        - www

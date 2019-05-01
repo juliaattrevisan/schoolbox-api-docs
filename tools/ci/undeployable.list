@@ -22,3 +22,4 @@ www/javascript/components/*/node_modules
 Gemfile*
 .bowerrc
 npm-shrinkwrap.json
+phpstan_run.sh
