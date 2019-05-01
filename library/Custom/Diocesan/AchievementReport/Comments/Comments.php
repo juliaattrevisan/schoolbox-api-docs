@@ -15,10 +15,7 @@ class Comments extends Base
     {
     }
 
-    /**
-     * This is the Junior School Students campus code
-     */
-    private const CAMPUS_JUNIOR_SCHOOL = 'JNR';
+
 
     /**
      * Get all the comments for a given user, ordered by year then term
@@ -56,23 +53,11 @@ class Comments extends Base
 
         /* Special structure for Junior School Students
          */
-        if ($this->isJuniorSchoolStudent()) {
+        if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
             return $this->formatJuniorSchoolData($result);
         }
 
         return $this->formatSeniorSchoolData($result);
-    }
-
-
-    /**
-     * Determine if this->user is a Junior School Student by looking at
-     * their campus involvement
-     *
-     * @return bool
-     */
-    public function isJuniorSchoolStudent(): bool
-    {
-        return null !== $this->user->getCampusCollection()->getBy('extTimetableCode', self::CAMPUS_JUNIOR_SCHOOL);
     }
 
 
