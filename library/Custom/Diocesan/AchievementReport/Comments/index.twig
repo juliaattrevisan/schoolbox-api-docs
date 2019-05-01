@@ -1,6 +1,8 @@
 {% include '@templates/Avatar.twig' %}
 {% include '@templates/Navigation.twig' %}
 
+{% import '@templates/macro.twig' as macro %}
+
 <table>
     <thead>
         <th>Subject</th>
@@ -25,9 +27,7 @@
                         <td>{{ term }}</td>
                         <td>{{ termData.terms[term].comment }}</td>
                         <td>
-                            {% for teacher in termData.terms[term].teachers %}
-                                <p>{{ teacher.name }} {{ teacher.email }}</p>
-                            {% endfor %}
+                            {{ macro.renderTeachers(termData.terms[term].teachers) }}
                         </td>
                     </tr>
                     {% endif %}

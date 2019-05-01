@@ -1,0 +1,9 @@
+{# macro
+ #
+ # A set of useful macros
+ #}
+{% macro renderTeachers(teachers) %}
+    {% for teacher in teachers %}
+        {% if teacher.email != '' %}<a href='mailto:{{ teacher.email }}'>{{ teacher.name }}</a>{% else %}{{ teacher.name }}{% endif %}{% if not loop.last %}, {% endif %}
+    {% endfor %}
+{% endmacro %}
