@@ -147,10 +147,6 @@
                     participantId = $participant.data('participant'),
                     commentBoxId = "comment-" + participantId;
 
-                // Clear draft queue for this participant, since we're about to publish
-                autoSavePending[participantId] = false;
-                autoSaveInProgress[participantId] = false;
-
                 // We can safely clear this timeout now that we're publishing
                 window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
