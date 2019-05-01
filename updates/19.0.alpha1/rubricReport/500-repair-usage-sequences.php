@@ -28,6 +28,8 @@ $app = new class extends CliTool\App
 
     /**
      * Hands off execution over to the App
+     *
+     * @throws PDOException
      */
     public function run(): void
     {
