@@ -29,6 +29,17 @@ class Comments extends Base
      */
     public function findData(): array
     {
+        return $this->findSeniorSchoolData();
+    }
+
+
+    /**
+     * Get comments in the Senior School format
+     *
+     * @return array
+     */
+    private function findSeniorSchoolData(): array
+    {
         $query = "
             SELECT 
                 StudentYear,

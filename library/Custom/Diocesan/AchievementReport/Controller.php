@@ -338,6 +338,8 @@ class Controller extends Base {
                 'comments' => (new Comments\Comments($externalUser, $db, $year))->findData()
             ]
         ];
+
+        $this->getResponse()->content->set($output);
     }
 
     /* Getters/Setters
