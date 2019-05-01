@@ -78,9 +78,6 @@ class Comments extends Base
      */
     private function formatJuniorSchoolData(array $result): array
     {
-        /* Reorganise in the Junior Students' format
-         */
-
         return [];
     }
 
@@ -93,9 +90,6 @@ class Comments extends Base
      */
     private function formatSeniorSchoolData(array $result): array
     {
-
-        /* Reorganise in the Senior Students' format
-         */
         $comments = [];
 
         foreach ($result as $current) {
@@ -113,8 +107,6 @@ class Comments extends Base
             $comments[$year]['courses'][$courseName]['terms'][$term] = $comment;
         }
 
-        new \Alaress_Probe($comments);
-
-        return [];
+        return $comments;
     }
 }
