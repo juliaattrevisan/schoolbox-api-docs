@@ -9,6 +9,9 @@
 
 namespace Custom\Diocesan\AchievementReport\Comments;
 
+use Custom\Diocesan\AchievementReport\NormaliseTeachers;
+
+
 class Comments extends Base
 {
     public function setup()
@@ -92,6 +95,8 @@ class Comments extends Base
     {
         $comments = [];
 
+        $teacherNormaliser = new NormaliseTeachers();
+
         foreach ($result as $current) {
             $year = $current['StudentYear'];
             $courseName = $current['CourseDescription'];
@@ -104,25 +109,9 @@ class Comments extends Base
                 $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
             }
 
-            /* Accumulate teachers
-             */
-            $teachers = [];
-
-            foreach([1, 2, 3] as $currentTeacherIndex) {
-                $key = "ClassTeacher{$currentTeacherIndex}";
-                $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
-
-                $currentTeacher = $current[$key];
-                $currentTeacherEmail = $current[$emailKey];
-
-                if ('' !== trim($currentTeacher)) {
-                    $teachers[$currentTeacher] = $currentTeacherEmail;
-                }
-            }
-
             $comments[$year]['courses'][$courseName]['terms'][$term] = [
                 'comment' => $comment,
-                'teachers' => $teachers
+                'teachers' => $teacherNormaliser->normalise($current)
             ];
         }
 
