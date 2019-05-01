@@ -19,22 +19,35 @@ class Comments extends Base
     /**
      * Get all the comments for a given user, ordered by year then term
      *
+     * ResultType indicates the report each comment is associated with
+     *
+     * SG: School Grades
+     * NCEA: NCEA
+     * IB: IB
+     *
      * @return array
      */
     public function findData(): array
     {
         $query = "
-            SELECT TOP 10 * 
+            SELECT 
+                StudentYear,
+                Term,
+                ClassCode,
+                CourseDescription,
+                Comment,
+                ClassTeacher1,
+                ClassTeacher1Email,
+                ClassTeacher2,
+                ClassTeacher2Email,
+                ClassTeacher3,
+                ClassTeacher3Email,
+                ResultType
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
             ORDER BY StudentYear, Term 
         ";
 
-        $result = $this->getDb()->getAll($query);
-
-        new \Alaress_Probe($result);
-
-
-        return [];
+        return $this->getDb()->getAll($query) ?: [];
     }
 }
