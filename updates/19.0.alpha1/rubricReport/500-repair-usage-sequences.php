@@ -32,14 +32,13 @@ $app = new class extends CliTool\App
         try {
             $this->checkAndRepairCapabilityUsages();
             $this->checkAndRepairIndicatorUsages();
+            $this->printResults();
             $this->getDatabaseInternal()->commit();
         } catch (Database\Exception $e) {
             $this->getLogger()->error('Database error, rolling back transaction', ['exception' => $e]);
             $this->getLogger()->error($e->getTraceAsString());
             $this->getDatabaseInternal()->rollBack();
         }
-
-        $this->printResults();
     }
 
 
@@ -106,6 +105,9 @@ $app = new class extends CliTool\App
     private function getSubmissionBoxIdsWithIndicatorSequenceCollisions(): array
     {
         $sql = "
+            SELECT * FROM rubric_criterion_usage rcu1
+JOIN rubric_criterion rc ON rcu1.criterion_id = rc.id;
+
             SELECT DISTINCT rcu1.submission_box_id
             FROM rubric_criterion_usage rcu1
             JOIN rubric_criterion_usage rcu2 ON 
