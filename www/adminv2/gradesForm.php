@@ -49,7 +49,7 @@ foreach ($_POST['group'] as $groupId => $group) {
                 $gradeModel
                     ->setLowerBound($grade['lower_bound'])
                     ->setRawGrade($grade['raw_grade'])
-                    ->setCaption($grade['caption']);
+                    ->setCaption(trim($grade['caption']));
                 $gradeMapper->save($gradeModel);
             }
         }
