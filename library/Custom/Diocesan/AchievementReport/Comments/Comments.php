@@ -46,7 +46,7 @@ class Comments extends Base
                 ResultType
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
-            ORDER BY StudentYear, Term 
+            ORDER BY StudentYear, CourseDescription, Term
         ";
 
         $result = $this->getDb()->getAll($query) ?: [];
@@ -87,6 +87,18 @@ class Comments extends Base
 
         /* Reorganise in the Senior Students' format
          */
+        $comments = [];
+
+        foreach ($result as $current) {
+            $year = $current['StudentYear'];
+            $courseName = $current['CourseDescription'];
+            $term = $current['Term'];
+            $comment = $current['Comment'];
+
+            $comments[$year]['courses'][$courseName]['terms'][$term] = $comment;
+        }
+
+        new \Alaress_Probe($comments);
 
         return [];
     }
