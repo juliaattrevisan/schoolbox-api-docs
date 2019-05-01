@@ -5,20 +5,21 @@
      */
     $.fn.schoolboxResource_ProxyReplacement = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
-            var type = $(element).attr('data-schoolboxresource-type');
+            var replacement = $.fn.schoolboxResource_MediaPlayerReplacement($.fn.schoolboxResource_GetParams(element));
 
-            if (type === 'video' || type === 'audio') {
-                $(element).replaceWith(
-                    $.fn.schoolboxResource_MediaPlayerReplacement(
-                        $.fn.schoolboxResource_GetParams(element)
-                    )
-                );
+            if (replacement !== false) {
+                $(element).replaceWith(replacement);
             }
         });
 
         $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
     }
 
+    /**
+     * Get parameters from DOM
+     * @param element
+     * @returns {{thumbnail: *, maxwidth: string, classes: *, width: *, style: *, source: *, type: *, height: *, fullwidth: *}}
+     */
     $.fn.schoolboxResource_GetParams = function(element) {
         var e = $(element);
 
@@ -33,13 +34,21 @@
             'fullwidth': (e.attr('data-schoolboxresource-fullwidth') !== undefined) ? e.attr('data-schoolboxresource-fullwidth') : '',
             'maxwidth': (e.attr('data-schoolboxresource-fullwidth') === 'true') ? '100%' : e.attr('data-schoolboxresource-width') + 'px'
         };
-    }
+    };
 
-    // Replace all with mejs
+    /**
+     * Replace all media players with mejs
+     * @param selector
+     */
     $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
         $(selector).find('[data-schoolboxmedia-replacement]').mediaelementplayer();
-    }
+    };
 
+    /**
+     * Replace DOM with a media player
+     * @param params
+     * @returns {string|boolean}
+     */
     $.fn.schoolboxResource_MediaPlayerReplacement = function (params) {
 
         var style = params['style'];
@@ -72,7 +81,9 @@
             return '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:30px;border:0px;">' +
                 '<source src="' + source + '" type="audio/mpeg">' +
                 '</audio>';
+        } else {
+            return false;
         }
-    }
+    };
     
 }(jQuery));

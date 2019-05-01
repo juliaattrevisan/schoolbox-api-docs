@@ -404,7 +404,7 @@
                         self.postCommentButtonIsEnabled = true;
                         $toast.toastTimeout({text: self.errorAddingCommentText, duration: 2000, css: 'alert'});
                     }).finally(function () {
-                        self.reInitialiseMediaPlayer(true);
+                        self.reInitialiseMediaPlayer();
                     });
                 }
             },
@@ -435,31 +435,33 @@
                     }
                 });
             },
-            reInitialiseMediaPlayer: function (replaceNewCommentOnly) {
+            reInitialiseMediaPlayer: function () {
                 var self = this;
 
-                var commentsToAnalyse = self.comments.length;
+                Object.keys(self.comments).forEach(function(key) {
+                    var content = $('<div>' + self.comments[key].content + '</div>');
+                    var replaced = false;
 
-                if (replaceNewCommentOnly) {
-                    commentsToAnalyse = 1;
-                }
+                    $(content).each(function (index, element) {
+                        $(element).find('[data-schoolboxresource-type]').each(function (childIndex, childEl) {
+                            var replacement = $.fn.schoolboxResource_MediaPlayerReplacement($.fn.schoolboxResource_GetParams(childEl));
 
-                // Before we render the elements into the front-end, let's try to update the necessary Vue comments model first.
-                // So that we can easily initialise mediaelementplayer()
-                for (var index = 0; index < commentsToAnalyse; index++) {
-                    // Convert the content into a DOM so that it will be parsable
-                    var content = $(self.comments[index].content);
+                            if (replacement) {
+                                $(childEl).replaceWith(replacement);
 
-                    var type = content.find('[data-schoolboxresource-type]').attr('data-schoolboxresource-type');
+                                replaced = true;
+                            }
+                        });
 
-                    // Do nothing for comments that doesn't have an embedded media
-                    if (type !== undefined && (type === 'video' || type === 'audio')) {
-                        var element = content.find('[data-schoolboxresource-type]');
-                        self.comments[index].content = $.fn.schoolboxResource_MediaPlayerReplacement(
-                            $.fn.schoolboxResource_GetParams(element)
-                        );
-                    }
-                }
+                        // Before we render the elements into the front-end, let's try to update the Vue comments model
+                        // first so that we can easily initialise mediaelementplayer().
+                        // And only update those models who's data has been updated.
+                        // Basically those elements that has a videos/audios.
+                        if (replaced) {
+                            self.comments[key].content = $(element).html();
+                        }
+                    });
+                });
 
                 // Need to add this here. Not really sure why this doesn't get executed when setTimeout is not present...
                 setTimeout(function() {
