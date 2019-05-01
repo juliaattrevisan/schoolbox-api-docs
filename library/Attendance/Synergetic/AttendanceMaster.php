@@ -57,8 +57,9 @@ class Attendance_Synergetic_AttendanceMaster
      * @param int                 $fileSemester
      * @param IConnector          $connector
      * @param int                 $staffId
+     * @param string              $timetableGroup
      */
-    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector, $staffId)
+    public function __construct($class, $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $connector, $staffId, $timetableGroup)
     {
         // Store database connection
 
@@ -88,7 +89,7 @@ class Attendance_Synergetic_AttendanceMaster
             'AttendanceDayNumber' => $attendanceDay,
             'StaffID' => $staffId,
             'AttendedFlag' => 1,
-            'TimeTableGroup' => $this->getTimetableGroup(),
+            'TimeTableGroup' => $timetableGroup,
             'SynWebFlag' => 1,
         ]);
 
@@ -116,43 +117,6 @@ class Attendance_Synergetic_AttendanceMaster
         } else {
             throw new SchoolboxException('Cannot setup attendance record. Unable to retrieve attendance sequence.');
         }        
-    }
-
-    /**
-     * Find the TimetableGroup value for a particular class, date and period
-     * and for a particular FileYear and FileSemester set of values.
-     *
-     * @return string|bool
-     */
-    protected function getTimetableGroup()
-    {
-        $query = "
-			SELECT  *
-			FROM    dbo.Timetable
-			WHERE   FileType = :fileType
-			AND     FileYear = :fileYear
-			AND     FileSemester = :fileSemester
-			AND     PeriodNumber = :periodNumber
-			AND     ClassCode = :classCode
-			AND     ClassCampus = :classCampus
-		";
-        
-        $statement = $this->connector->executeQuery($query, [
-            'fileType'      => $this->getClassFileType(),
-            'fileYear'      => $this->getFileYear(),
-            'fileSemester'  => $this->getFileSemester(),
-            'periodNumber'  => $this->getAttendancePeriod(),
-            'classCode'     => $this->getClassCode(),
-            'classCampus'   => $this->getClassCampus()
-        ]);
-
-        $result = $statement->fetch();
-
-        if (is_array($result) && isset($result['TimetableGroup'])) {
-            return $result['TimetableGroup'];
-        }
-
-        return false;
     }
 
     /**

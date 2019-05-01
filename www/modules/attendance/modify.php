@@ -139,6 +139,7 @@ $periods = array_keys($definition['number'], $attendancePeriod);
 $startTime = $definition['start'][$periods[0]];
 $endTime = $definition['end'][$periods[0]];
 $periodName = $definition['desc'][$periods[0]];
+$timetableGroup = $this->arg[4];
 
 if ($class) {
 
@@ -154,6 +155,7 @@ if ($class) {
             'ATTENDANCE_DATE_FORMATTED' => $attendanceDate->getLongDateOnly(),
             'ATTENDANCE_PERIOD' => $attendancePeriod,
             'ATTENDANCE_PERIOD_LONG' => Scrub::text($periodName),
+            'TIMETABLE_GROUP' => $timetableGroup
         )
     );
 
@@ -170,8 +172,8 @@ if ($class) {
             $attendancePeriod,
             $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
             $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
-            $_SESSION['user']->getExternalId()
-
+            $_SESSION['user']->getExternalId(),
+            $timetableGroup
         );
 
         $allStudents = $attendanceHandler->findAttendanceRecords();
