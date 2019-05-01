@@ -104,7 +104,7 @@ class GroupUsage
 
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getSequence(): ?int
     {
