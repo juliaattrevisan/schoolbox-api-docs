@@ -238,7 +238,7 @@
                     onFeedbackChanged.apply($input);
                 }, config.timeoutDurationMs);
             } else {
-                // No point in using a timeout if it's a grade field - save immediately
+                // No point in using a timeout unless it's a comment box - save immediately
                 onFeedbackChanged.apply($input);
             }
 
