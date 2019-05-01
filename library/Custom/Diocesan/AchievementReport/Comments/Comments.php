@@ -16,6 +16,15 @@ class Comments extends Base
     }
 
 
+    /**
+     * Initialised array of term indices
+     */
+    private const INITIAL_TERMS = [
+        1 => null,
+        2 => null,
+        3 => null,
+        4 => null
+    ];
 
     /**
      * Get all the comments for a given user, ordered by year then term
@@ -94,6 +103,12 @@ class Comments extends Base
             $courseName = $current['CourseDescription'];
             $term = $current['Term'];
             $comment = $current['Comment'];
+
+            /* Initialise an array of Terms
+             */
+            if (!isset($comments[$year]['courses'][$courseName])) {
+                $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
+            }
 
             $comments[$year]['courses'][$courseName]['terms'][$term] = $comment;
         }
