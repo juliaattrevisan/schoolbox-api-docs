@@ -3,7 +3,7 @@
  # A set of useful macros
  #}
 {% macro renderTeachers(teachers) %}
-    {% for teacher in teachers %}
-        {% if teacher.email != '' %}<a href='mailto:{{ teacher.email }}'>{{ teacher.name }}</a>{% else %}{{ teacher.name }}{% endif %}{% if not loop.last %}, {% endif %}
+    {% for name, email in teachers %}
+        {% if email != '' %}<a href='mailto:{{ email }}'>{{ name }}</a>{% else %}{{ name }}{% endif %}{% if not loop.last %}, {% endif %}
     {% endfor %}
 {% endmacro %}

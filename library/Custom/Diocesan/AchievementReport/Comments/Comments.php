@@ -104,22 +104,25 @@ class Comments extends Base
                 $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
             }
 
+            /* Accumulate teachers
+             */
+            $teachers = [];
+
+            foreach([1, 2, 3] as $currentTeacherIndex) {
+                $key = "ClassTeacher{$currentTeacherIndex}";
+                $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
+
+                $currentTeacher = $current[$key];
+                $currentTeacherEmail = $current[$emailKey];
+
+                if ('' !== trim($currentTeacher)) {
+                    $teachers[$currentTeacher] = $currentTeacherEmail;
+                }
+            }
+
             $comments[$year]['courses'][$courseName]['terms'][$term] = [
                 'comment' => $comment,
-                'teachers' => [
-                    [
-                        'name' => $current['ClassTeacher1'],
-                        'email' => $current['ClassTeacher1Email']
-                    ],
-                    [
-                        'name' => $current['ClassTeacher2'],
-                        'email' => $current['ClassTeacher2Email']
-                    ],
-                    [
-                        'name' => $current['ClassTeacher3'],
-                        'email' => $current['ClassTeacher3Email']
-                    ],
-                ]
+                'teachers' => $teachers
             ];
         }
 
