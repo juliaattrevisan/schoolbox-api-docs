@@ -52,8 +52,18 @@
             background-image: url('/custom/diocesan/achievementreport/img/blog.png');
         }
 
+        /* Specify the color to override icon- global style
+         * until Profile Buttons supports enabling/disabling of icons in some manner
+         */
         &.juniorschoolblog {
             background-image: url('/custom/diocesan/achievementreport/img/juniorschoolblog.png');
+            color: #0066b0
+        }
+
+        /* Remove icon
+         */
+        &.juniorschoolblog:before {
+            content: ''
         }
     }
 }
