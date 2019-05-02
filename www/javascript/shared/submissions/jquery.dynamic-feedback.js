@@ -34,7 +34,7 @@
      * Timeout IDs for each comment box, indexed by ID of the comment box.
      * Used to accumulate and clear typing timeouts for each textarea individually.
      *
-     * @type {Array}
+     * @type {number[]}
      */
     var commentBoxTimeouts = [];
 
@@ -128,11 +128,6 @@
                 .on('change', ':input', timeoutUpdate)
                 .on('success.attachzone', '.attachzone', timeoutUpdate)
                 .on('removedfile.attachzone', '.attachzone', timeoutUpdate);
-
-            // Trigger change on final grade input when using the Assign From Rubric button to update it
-            $(config.assessmentList).find("#use-rubric-value").click(function() {
-                $("[data-mark-input]").trigger("change");
-            });
         }
 
 
@@ -141,7 +136,7 @@
          * Set up actions to occur when Publishing Feedback
          */
         function setupPublishAction() {
-            $(config.assessmentList).on('click', '[data-draft="publish"]', function (e) {
+            $(config.assessmentList).on('mousedown', '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
                 var $participant = $(this).closest('[data-participant]'),
@@ -149,10 +144,11 @@
                     $actionBar   = $participant.find('[data-action-bar]'),
                     $btnDrafted  = $actionBar.find('[data-draft=drafted]'),
                     $btnPublish  = $actionBar.find('[data-draft=publish]'),
-                    $commentBoxId = "comment-" + $participant.data('participant');
+                    participantId = $participant.data('participant'),
+                    commentBoxId = "comment-" + participantId;
 
                 // We can safely clear this timeout now that we're publishing
-                window.clearTimeout(commentBoxTimeouts[$commentBoxId]);
+                window.clearTimeout(commentBoxTimeouts[commentBoxId]);
 
                 $btnPublish.attr('disabled', 'disabled').text(config.publishingText);
 
@@ -164,7 +160,7 @@
                 var formData = $form.serializeArray();
                 formData.push({name: 'publish', value: 1});
 
-                config.onPrePublishCallback($participant.data('participant'), formData);
+                config.onPrePublishCallback(participantId, formData);
 
                 $.ajax($form.attr('action'), {
                     dataType: 'json',
@@ -203,7 +199,7 @@
 
                     toast.call($participant, config.publishedText, true, false);
                     config.onPublishCallback(
-                        $participant.data('participant'),
+                        participantId,
                         response.success,
                         response.message,
                         response.id
@@ -243,7 +239,7 @@
                     onFeedbackChanged.apply($input);
                 }, config.timeoutDurationMs);
             } else {
-                // No point in using a timeout if it's a grade field - save immediately
+                // No point in using a timeout unless it's a comment box - save immediately
                 onFeedbackChanged.apply($input);
             }
 
@@ -348,6 +344,9 @@
                     );
                 })
                 .fail(function (xhr) {
+                    $actionBar.show();
+                    $btnDrafted.show().text('Saving failed');
+                    $btnPublish.show();
                     toast.call($participant, xhr.responseText, false, false);
                 })
                 .always(function () {
