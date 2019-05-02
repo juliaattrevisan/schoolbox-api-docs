@@ -160,17 +160,17 @@ class Controller extends Web\Controller\Base
             foreach ($unitSpecs as $unitSpecId => $unitSpec) {
                 /** @var \Alaress_Date_Format $dueDate */
                 $dueDate = null;
-                if (isset ($aasData['data'][$unitSpecId])) {
+                if (isset ($aasData['data'][$unitSpecId]['dueDate'])) {
                     $dueDate = $aasData['data'][$unitSpecId]['dueDate'];
                 }
-                if (isset ($aamData['data'][$unitSpecId])) {
+                if (isset ($aamData['data'][$unitSpecId]['dueDate'])) {
                     /** @var \Alaress_Date_Format $dueDateAam */
                     $dueDateAam = $aamData['data'][$unitSpecId]['dueDate'];
                     if (!$dueDate || $dueDateAam->gt($dueDate)) {
                         $dueDate = $dueDateAam;
                     }
                 }
-                if (isset ($hscTaskMarks['data'][$unitSpecId])) {
+                if (isset ($hscTaskMarks['data'][$unitSpecId]['dueDate'])) {
                     /** @var \Alaress_Date_Format $dueDateHsc */
                     $dueDateHsc = $hscTaskMarks['data'][$unitSpecId]['dueDate'];
                     if (!$dueDate || $dueDateHsc->gt($dueDate)) {
