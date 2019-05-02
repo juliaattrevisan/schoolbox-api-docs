@@ -30,6 +30,14 @@
                         <label for="profile-button-desc">Hover Description</label>
                         <input name='title' id="profile-button-desc" type="text" value="{{ item.title }}">
                     </div>
+                    <div class="small-12 columns">
+                        <label for="profile-button-css">
+                            CSS Class
+                            <span data-tooltip class="has-tip hint" title="Add a css class to this button so it can be used with your custom Sking Config.">?</span>
+                        </label>
+
+                        <input name='css' id="profile-button-css" type="text" value="{{ item.css }}">
+                    </div>
                     <div class="small-10 columns">
                         <label for="icon-select">Icon</label>
                         <select id="icon-select" name="icon">
