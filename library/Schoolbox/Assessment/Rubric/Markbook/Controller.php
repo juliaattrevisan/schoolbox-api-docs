@@ -245,7 +245,12 @@ class Controller extends Base
                 vr.indicator_max_value            AS indicator_max_value
             FROM v_rubric vr
             WHERE vr.assessment_id IN ({$pb->getPlaceholder()})
-            ORDER BY vr.assessment_id, vr.capability_sequence, vr.indicator_sequence
+            ORDER BY
+            	vr.assessment_id,
+            	vr.capability_sequence ASC,
+            	vr.capability_id,
+            	vr.indicator_sequence ASC,
+            	vr.indicator_id
         ";
         $stmt = $this->internalDb->prepareQuery($sql);
 
