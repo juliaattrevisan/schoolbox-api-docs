@@ -241,6 +241,9 @@ else if (is_numeric($_GET['deletePost'])) {
 
         /** @var \Schoolbox\Forum\Thread $thread */
         $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
+
+        /** @var \Schoolbox\Forum\Thread earliest $earliestPost */
+        $earliestPost  = PostMapper::getInstance()->findFirstPost($post->getThread()->getId());
     } catch (Exception $e) {
         error(ErrorMapper::ERROR_INFORMATION_MISSING);
     }
@@ -264,7 +267,11 @@ else if (is_numeric($_GET['deletePost'])) {
 
 	$pageNumber = $forumHandler->getPageNumber($post->getId());
 
-    PostMapper::getInstance()->delete($post);
+    if($earliestPost->getId() !== $post->getId()) {
+        PostMapper::getInstance()->delete($post);
+    }else{
+        error(ErrorMapper::ERROR_FORUM_FIRST_POST_CANNOT_BE_DELETED);
+    }
 
 	SitePage::localRedir('/forum/thread/' . $post->getThread()->getId() . '/' . $pageNumber);
 }

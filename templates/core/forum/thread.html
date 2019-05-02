@@ -27,7 +27,7 @@
         <!-- END reply -->
         <!-- BEGIN modify_thread -->
         <a class="icon-locked" href="/forum/modifyForm.php?toggleLock={THREAD_ID}" title="{LOCK_UNLOCK} Thread"></a>
-        <a class="icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID}" data-action="delete" data-relation="thread" title="Delete Thread"></a>
+        <a class="icon-delete" href="/forum/modifyForm.php?deleteThread={THREAD_ID} disabled" data-action="delete" data-relation="thread" title="Delete Thread"></a>
         <!-- END modify_thread -->
     </nav>
 </div>
@@ -61,8 +61,11 @@
                         <!-- END reply_post -->
                         <!-- BEGIN modify -->
                         <a class="icon-modify no-text" href="/forum/modify/{CATEGORY_ID}/{THREAD_ID}/{POST_ID}" title="Modify Post"></a>
-                        <a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost={POST_ID}" data-action="delete" data-relation="post" title="Delete Post"></a>
                         <!-- END modify -->
+                        <!-- BEGIN delete -->
+                        {DELETE_BUTTON}
+                        <!-- END delete -->
+
                     </nav>
                     <article>{POST_BODY}</article>
                 </li>
