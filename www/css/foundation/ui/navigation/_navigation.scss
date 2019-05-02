@@ -380,7 +380,7 @@ $allow-sidebar-stash: $large-up;
       }
 
       &.active .profile-drop {
-        background-color: $off-canvas;
+        background-color: $accounts-menu-bg-colour;
       }
 
       &.active > a:after {
@@ -573,7 +573,7 @@ $allow-sidebar-stash: $large-up;
 .account-drop {
   a {
     color: $off-canvas-foreground;
-    background-color: $off-canvas;
+    background-color: $accounts-menu-bg-colour;
     display: block;
     padding: 0.625rem 0.8125rem;
     font-size: 1rem;
@@ -590,7 +590,7 @@ $allow-sidebar-stash: $large-up;
 
   .separator {
     color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
-    background: $off-canvas;
+    background: $accounts-menu-bg-colour;
     padding: 0.625rem 0.8125rem;
     font-weight: 300;
     text-transform: uppercase;
@@ -598,12 +598,12 @@ $allow-sidebar-stash: $large-up;
     font-size: 0.8125rem;
 
     &:hover {
-      background: $off-canvas;
+      background: $accounts-menu-bg-colour;
     }
   }
 
   .user {
-    background: $off-canvas;
+    background: $accounts-menu-bg-colour;
     overflow: auto;
 
     &:hover {
