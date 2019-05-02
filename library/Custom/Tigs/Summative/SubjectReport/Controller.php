@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\SubjectReport;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
 use Alaress\Web;
+use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
@@ -158,38 +159,49 @@ class Controller extends Web\Controller\Base
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
             foreach ($unitSpecs as $unitSpecId => $unitSpec) {
-                /** @var \Alaress_Date_Format $dueDate */
-                $dueDate = null;
-                if (isset ($aasData['data'][$unitSpecId])) {
-                    $dueDate = $aasData['data'][$unitSpecId]['dueDate'];
+                // We do need to keep data for units that contain error messages, but which lack dates
+                $hasData =
+                    isset($aasData['data'][$unitSpecId]) ||
+                    isset($aamData['data'][$unitSpecId]) ||
+                    isset($hscTaskMarks['data'][$unitSpecId]);
+                if (!$hasData) {
+                    continue;
                 }
-                if (isset ($aamData['data'][$unitSpecId])) {
-                    /** @var \Alaress_Date_Format $dueDateAam */
-                    $dueDateAam = $aamData['data'][$unitSpecId]['dueDate'];
-                    if (!$dueDate || $dueDateAam->gt($dueDate)) {
-                        $dueDate = $dueDateAam;
+
+                /**
+                 * @var Alaress_Date_Format|null $latestDueDate
+                 * @var Alaress_Date_Format|null $dueDateAas
+                 * @var Alaress_Date_Format|null $dueDateAam
+                 * @var Alaress_Date_Format|null $dueDateHsc
+                 */
+                $latestDueDate = null;
+                $dueDateAas    = $aasData['data'][$unitSpecId]['dueDate'] ?? null;
+                $dueDateAam    = $aamData['data'][$unitSpecId]['dueDate'] ?? null;
+                $dueDateHsc    = $hscTaskMarks['data'][$unitSpecId]['dueDate'] ?? null;
+
+                /** @var Alaress_Date_Format|null $dueDate */
+                foreach ([$dueDateAas, $dueDateAam, $dueDateHsc] as $dueDate) {
+                    if ($dueDate && (!$latestDueDate || $dueDate->gt($latestDueDate))) {
+                        $latestDueDate = $dueDate;
                     }
                 }
-                if (isset ($hscTaskMarks['data'][$unitSpecId])) {
-                    /** @var \Alaress_Date_Format $dueDateHsc */
-                    $dueDateHsc = $hscTaskMarks['data'][$unitSpecId]['dueDate'];
-                    if (!$dueDate || $dueDateHsc->gt($dueDate)) {
-                        $dueDate = $dueDateHsc;
-                    }
-                }
-                if ($dueDate) {
-                    $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $dueDate, 'title' => $unitSpec->getTitle()]);
-                }
+
+                $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $latestDueDate, 'title' => $unitSpec->getTitle()]);
             }
 
             // Sort the unit specs by date
+            // If we were unable to find a due-date, order this unit first to give prominence to it
             $unitSpecsWithData->sortByCallback(
-                function (array $a, array $b) {
-                    /** @var \Alaress_Date_Format $dueDateA */
+                static function (array $a, array $b): int {
+                    /** @var Alaress_Date_Format|null $dueDateA */
                     $dueDateA = $a['dueDate'];
-                    /** @var \Alaress_Date_Format $dueDateB */
+                    /** @var Alaress_Date_Format|null $dueDateB */
                     $dueDateB = $b['dueDate'];
-                    return $dueDateA->lt($dueDateB);
+
+                    if (!$dueDateA) {
+                        return $dueDateB ? -1 : 0;
+                    }
+                    return $dueDateB ? $dueDateA->compare($dueDateB) : +1;
                 }
             );
         }
