@@ -186,9 +186,11 @@ if (is_array($postList)) {
         $this->setVar('modify_block', '');
 
         // delete post
-        if($post != $first)
-            $this->setVar('DELETE_BUTTON', '<a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost=' . $post['postID'] .'" data-action="delete" data-relation="post" title="Delete Post"></a>');
-        else $this->setVar('DELETE_BUTTON', '');
+        if ($post !== $first) {
+            $this->setVar('DELETE_BUTTON', '<a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost=' . $post['postID'] . '" data-action="delete" data-relation="post" title="Delete Post"></a>');
+        } else {
+            $this->setVar('DELETE_BUTTON', '');
+        }
 
         $this->setVar('modify_heading_block', '');
 
