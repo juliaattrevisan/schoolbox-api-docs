@@ -63,7 +63,8 @@
         /* Remove icon
          */
         &.juniorschoolblog:before {
-            content: ''
+            content: '';
+            font-size: 0;
         }
     }
 }
