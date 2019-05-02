@@ -44,22 +44,10 @@ class Comments extends Base
     {
         $query = "
             SELECT 
-                StudentYear,
-                Term,
-                ClassCode,
-                CourseDescription,
-                Comment,
-                ClassTeacher1,
-                ClassTeacher1Email,
-                ClassTeacher2,
-                ClassTeacher2Email,
-                ClassTeacher3,
-                ClassTeacher3Email,
-                ResultType
+                *
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
             AND StudentYear = '{$this->year}'
-            AND Comment != ''
             ORDER BY CourseDescription, Term
         ";
 
@@ -83,7 +71,32 @@ class Comments extends Base
      */
     private function formatJuniorSchoolData(array $result): array
     {
-        return [];
+        $comments = [];
+
+        $teacherNormaliser = new NormaliseTeachers();
+
+        /* TODO: Reformat this according to a spec they provided
+         * but the data doesn't quite match all the way
+         */
+        foreach ($result as $current) {
+            $year = $current['StudentYear'];
+            $courseName = $current['CourseDescription'];
+            $term = $current['Term'];
+            $comment = $current['Comment'];
+
+            /* Initialise an array of Terms
+             */
+            if (!isset($comments[$year]['courses'][$courseName])) {
+                $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
+            }
+
+            $comments[$year]['courses'][$courseName]['terms'][$term] = [
+                'comment' => $comment,
+                'teachers' => $teacherNormaliser->normalise($current)
+            ];
+        }
+
+        return $comments;
     }
 
 
