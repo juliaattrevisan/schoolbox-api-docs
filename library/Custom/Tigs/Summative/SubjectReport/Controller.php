@@ -159,6 +159,15 @@ class Controller extends Web\Controller\Base
             // Filter out unit specs without any data
             $unitSpecsWithData = new Collection();
             foreach ($unitSpecs as $unitSpecId => $unitSpec) {
+                // We do need to keep data for units that contain error messages, but which lack dates
+                $hasData =
+                    isset($aasData['data'][$unitSpecId]) ||
+                    isset($aamData['data'][$unitSpecId]) ||
+                    isset($hscTaskMarks['data'][$unitSpecId]);
+                if (!$hasData) {
+                    continue;
+                }
+
                 /**
                  * @var Alaress_Date_Format|null $latestDueDate
                  * @var Alaress_Date_Format|null $dueDateAas
@@ -177,15 +186,7 @@ class Controller extends Web\Controller\Base
                     }
                 }
 
-                // We do need to keep data for units that contain error messages, but which lack dates
-                $hasData =
-                    isset($aasData['data'][$unitSpecId]) ||
-                    isset($aamData['data'][$unitSpecId]) ||
-                    isset($hscTaskMarks['data'][$unitSpecId]);
-
-                if ($hasData) {
-                    $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $latestDueDate, 'title' => $unitSpec->getTitle()]);
-                }
+                $unitSpecsWithData->add(['id' => $unitSpecId, 'dueDate' => $latestDueDate, 'title' => $unitSpec->getTitle()]);
             }
 
             // Sort the unit specs by date
