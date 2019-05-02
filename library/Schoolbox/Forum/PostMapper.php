@@ -114,7 +114,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getJoinColumnString('owner', 'owner')}
             FROM {$this->getTable()} AS post
             LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner', true)}
-			WHERE post.postID=? ";
+            WHERE post.postID=? ";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array($id));
@@ -182,9 +182,10 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
     }
 
     /**
-     * @param int $threadId
-     * @return Id of the First post of a forum thread
-     * @throws \Schoolbox\Mapper\Exception
+     * @param $threadID
+     * @return object|null
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      */
     public function findFirstPost($threadID)
     {
@@ -195,8 +196,8 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
                 {$this->getJoinColumnString('owner', 'owner')}
             FROM {$this->getTable()} AS post
             LEFT JOIN {$this->getJoinSql('owner', 'post', 'owner', true)}
-			WHERE post.parentID IS NULL AND post.threadID=? 
-			LIMIT 1";
+            WHERE post.parentID IS NULL AND post.threadID=? 
+            LIMIT 1";
 
         $statement = $this->database->prepare($query);
         $statement->execute(array($threadID));
