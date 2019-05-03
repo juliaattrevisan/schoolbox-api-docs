@@ -335,8 +335,6 @@ class Controller extends Base
                 vrm.indicator_max_value  AS indicator_max_value
             FROM (
                 SELECT
-                    sb.assessment_id,
-                    sr.owner AS student_id,
                     MAX(sr.published_at) AS max_published_at
                 FROM submission_return sr
                 INNER JOIN submission_box sb on sr.box_id = sb.id
