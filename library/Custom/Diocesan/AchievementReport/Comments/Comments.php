@@ -29,6 +29,7 @@ class Comments extends Base
         4 => null
     ];
 
+
     /**
      * Get all the comments for a given user, ordered by year then term
      *
@@ -42,9 +43,87 @@ class Comments extends Base
      */
     public function findData(): array
     {
+        /* Special structure for Junior School Students
+        */
+        if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
+            return $this->findJuniorSchoolData();
+        }
+
+        return $this->findSeniorSchoolData();
+    }
+
+
+    /**
+     * Get all the comments for a given user, ordered by year then term
+     *
+     * ResultType indicates the report each comment is associated with
+     *
+     * Junior School uses SortOrder to sequence their subjects
+     *
+     * SG: School Grades
+     * NCEA: NCEA
+     * IB: IB
+     *
+     * @return array
+     */
+    private function findJuniorSchoolData(): array
+    {
         $query = "
             SELECT 
-                *
+                StudentYear,
+                Term,
+                ClassCode,
+                CourseDescription,
+                Comment,
+                ClassTeacher1,
+                ClassTeacher1Email,
+                ClassTeacher2,
+                ClassTeacher2Email,
+                ClassTeacher3,
+                ClassTeacher3Email,
+                ResultType
+            FROM dbo.uvSchoolBoxReportComments
+            WHERE id = '{$this->getExternalUserId()}'
+            AND StudentYear = '{$this->year}'
+            ORDER BY SortOrder, CourseDescription, Term
+        ";
+
+        $result = $this->getDb()->getAll($query) ?: [];
+
+        return $this->formatData($result);
+
+    }
+
+
+    /**
+     * Get all the comments for a given user, ordered by year then term
+     *
+     * ResultType indicates the report each comment is associated with
+     *
+     * Senior School uses alphabetical CourseDescription to sequence their subjects
+     *
+     * SG: School Grades
+     * NCEA: NCEA
+     * IB: IB
+     *
+     * @return array
+     */
+    private function findSeniorSchoolData(): array
+    {
+        $query = "
+            SELECT 
+                StudentYear,
+                Term,
+                ClassCode,
+                CourseDescription,
+                Comment,
+                ClassTeacher1,
+                ClassTeacher1Email,
+                ClassTeacher2,
+                ClassTeacher2Email,
+                ClassTeacher3,
+                ClassTeacher3Email,
+                ResultType
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
             AND StudentYear = '{$this->year}'
@@ -53,60 +132,17 @@ class Comments extends Base
 
         $result = $this->getDb()->getAll($query) ?: [];
 
-        /* Special structure for Junior School Students
-         */
-        if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            return $this->formatJuniorSchoolData($result);
-        }
-
-        return $this->formatSeniorSchoolData($result);
+        return $this->formatData($result);
     }
 
 
     /**
-     * Get comments in the Junior School format
+     * Restructure flat array into hierarchy
      *
      * @param array $result
      * @return array
      */
-    private function formatJuniorSchoolData(array $result): array
-    {
-        $comments = [];
-
-        $teacherNormaliser = new NormaliseTeachers();
-
-        /* TODO: Reformat this according to a spec they provided
-         * but the data doesn't quite match all the way
-         */
-        foreach ($result as $current) {
-            $year = $current['StudentYear'];
-            $courseName = $current['CourseDescription'];
-            $term = $current['Term'];
-            $comment = $current['Comment'];
-
-            /* Initialise an array of Terms
-             */
-            if (!isset($comments[$year]['courses'][$courseName])) {
-                $comments[$year]['courses'][$courseName]['terms'] = self::INITIAL_TERMS;
-            }
-
-            $comments[$year]['courses'][$courseName]['terms'][$term] = [
-                'comment' => $comment,
-                'teachers' => $teacherNormaliser->normalise($current)
-            ];
-        }
-
-        return $comments;
-    }
-
-
-    /**
-     * Get comments in the Senior School format
-     *
-     * @param array $result
-     * @return array
-     */
-    private function formatSeniorSchoolData(array $result): array
+    private function formatData(array $result): array
     {
         $comments = [];
 
