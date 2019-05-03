@@ -1,6 +1,5 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
@@ -12,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
-
 
 /**
  * Converts between concrete keys (workType.ids or KEY_NONE) and workType.id or NULL
