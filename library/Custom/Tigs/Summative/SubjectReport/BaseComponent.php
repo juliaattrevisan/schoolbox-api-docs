@@ -49,7 +49,7 @@ class BaseComponent
     {
         // Validate $roleTypeOverride is valid and permitted
         $role       = $viewer->getRole();
-        $escalation = false;
+        $escalation = true;
         switch ($roleTypeOverride) {
             case Role::GUEST:
             case null:
@@ -57,20 +57,20 @@ class BaseComponent
                 break;
             case Role::STAFF:
                 // Only staff can simulate staff
-                if (!$role->isStaff()) {
-                    $escalation = true;
+                if ($role->isStaff()) {
+                    $escalation = false;
                 }
                 break;
             case Role::STUDENT:
                 // Only staff/student can simulate student
-                if (!$role->isStaff() && !$role->isStudent()) {
-                    $escalation = true;
+                if ($role->isStaff() || $role->isStudent()) {
+                    $escalation = false;
                 }
                 break;
             case Role::PARENT:
                 // Only staff/student/parent can simulate parent
-                if (!$role->isStaff() && !$role->isStudent() && !$role->isParent()) {
-                    $escalation = true;
+                if ($role->isStaff() || $role->isStudent() || $role->isParent()) {
+                    $escalation = false;
                 }
                 break;
             default:
