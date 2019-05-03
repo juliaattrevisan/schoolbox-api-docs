@@ -344,6 +344,7 @@ class Controller extends Base {
                 ],
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'year' => $year,
                 'isJuniorSchoolStudent' => (new ValidJuniorSchoolStudent())->isSatisfiedBy($user),
                 'commentsNavigation' => [
                     'all' => $allYears,

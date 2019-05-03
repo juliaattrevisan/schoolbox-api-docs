@@ -7,6 +7,7 @@
  #}
 {% import '@templates/macro.twig' as macro %}
 
+{% if comments|length %}
 <div class="row">
     <div class="small-12 island">
         <section>
@@ -48,4 +49,6 @@
         </section>
     </div>
 </div>
-
+{% else %}
+    <div class="alert-box">There are no comments for {{ year }}; please choose another.</div>
+{% endif %}
