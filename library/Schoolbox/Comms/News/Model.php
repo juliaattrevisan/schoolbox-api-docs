@@ -56,6 +56,8 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     // Action=Archive
     private const VALID_STATES_TO_ARCHIVE   = [self::STATE_AWAITING_PUBLICATION, self::STATE_PUBLISHED];
 
+    private const COMMENT_NOTIFIER = 'Schoolbox\Comms\News\Discussion\Comment\Notifier';
+
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -1038,6 +1040,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function getCommentNotifier(): string
     {
-        return 'Schoolbox\Comms\News\Discussion\Comment\Notifier';
+        return self::COMMENT_NOTIFIER;
     }
 }

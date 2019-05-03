@@ -44,7 +44,7 @@ class Notifier extends AbstractModuleNotifier
     public const TRIGGER_COMMENTED = 'commented';
     public const TRIGGER_FOLLOWED = 'followed';
 
-    private const PATTERN_COMMENTED_TITLE = ':user commented on your article, :title';
+    private const PATTERN_COMMENTED_TITLE = ':user commented on your article :title';
     private const PATTERN_ARTICLE_HREF = '/news/%d';
 
     private const PATTERN_FOLLOWED_TITLE = ':user commented on the article :title';
@@ -298,7 +298,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob->setTitle(self::PATTERN_COMMENTED_TITLE)
             ->setNamespace($this->getSlug())
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setIcon("/portrait?id={$effector->getId()}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
             ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
@@ -307,7 +307,6 @@ class Notifier extends AbstractModuleNotifier
                 'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
                     Param::STACKING_APPEND),
             ])
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_COMMENTED);
 
         $envelope->targetToUser($article->getAuthor()->getId(), $bob->build());
@@ -402,7 +401,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob->setTitle(self::PATTERN_FOLLOWED_TITLE)
             ->setNamespace($this->getSlug())
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
+            ->setIcon("/portrait?id={$effector->getId()}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
             ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
@@ -411,7 +410,6 @@ class Notifier extends AbstractModuleNotifier
                 'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
                     Param::STACKING_APPEND),
             ])
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_FOLLOWED);
 
         foreach ($recipientIds as $recipient) {

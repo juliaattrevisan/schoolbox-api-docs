@@ -134,16 +134,14 @@ class ThreadLocator implements IThreadLocator
      *
      * @param Thread\Model $thread
      * @param Thread\Context\IThreadLocation $context
+     * @throws Exception
      */
     public function deleteThread(Thread\Model $thread, Thread\Context\IThreadLocation $context): void
     {
-        try {
-            $this->threadMapper->delete($thread);
-            $commentMapper = $this->threadMapper->getJoinMapper('comments');
-            $commentMapper->hasModuleNotifier($context->getCommentNotifier());
-            $commentMapper->deleteByColumn('discussion_thread_id', $thread->getId());
-        } catch (Exception $e) {
-            // noop
-        }
+        $this->threadMapper->delete($thread);
+        $commentMapper = $this->threadMapper->getJoinMapper('comments');
+        // Explicitly associate the notifier to trigger notifications within the context of a comms article
+        $commentMapper->hasModuleNotifier($context->getCommentNotifier());
+        $commentMapper->deleteByColumn('discussion_thread_id', $thread->getId());
     }
 }
