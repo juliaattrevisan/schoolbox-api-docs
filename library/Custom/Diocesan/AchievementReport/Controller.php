@@ -333,7 +333,7 @@ class Controller extends Base {
          * year contains no data, probably 404 or something - you
          * could fiddle with the url to get illegal values
          */
-        $allYears = (new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, $year))->findData();
+        $allYears = (new Comments\CommentsNavigation($user, $externalUser, $db, $year))->findData();
 
         $output = [
             'template' => '@comments/index.twig',

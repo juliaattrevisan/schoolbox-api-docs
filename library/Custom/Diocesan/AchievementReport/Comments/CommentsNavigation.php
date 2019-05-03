@@ -36,6 +36,7 @@ class CommentsNavigation extends Base
             SELECT StudentYear
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
+            GROUP BY StudentYear
             ORDER BY StudentYear DESC
         ";
 
