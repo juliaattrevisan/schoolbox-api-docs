@@ -469,7 +469,7 @@ class CliPdfGenerator extends CliTool\App
             $messageParts[] = \sprintf("user.year of '%s'", $this->yearLevel);
         }
 
-        $this->getLogger()->info("Fetching users from schoolbox with" . implode(' and ', $messageParts));
+        $this->getLogger()->info("Fetching users from schoolbox with " . implode(' and ', $messageParts));
         $db = $this->userMapper->getDatabase();
         $whereClause = implode(' AND ', $pb->getWhere());
 
