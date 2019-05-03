@@ -69,7 +69,7 @@ class BaseComponent
                 break;
             case Role::PARENT:
                 // Only staff/student/parent can simulate parent
-                if (!$role->isStaff() && !$role->isStudent() && $role->isParent()) {
+                if (!$role->isStaff() && !$role->isStudent() && !$role->isParent()) {
                     $escalation = true;
                 }
                 break;
