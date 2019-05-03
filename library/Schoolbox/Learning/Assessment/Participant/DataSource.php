@@ -23,6 +23,7 @@ use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -396,7 +397,6 @@ class DataSource
             // Assessment specifications have no participants
             return $students;
         }
-
         $folder = $context->getFolder();
 
         // Use cached list of users for a folder
@@ -406,7 +406,12 @@ class DataSource
                 // Class members: convert to list of users
                 $classCodes = $this->externalDb->getStudents($folder->getCodeString());
                 if (!empty($classCodes)) {
-                    $students = $students->merge($this->userMapper->findByColumn('synergy_id', array_column($classCodes, 'synergy_id')))->indexBy('id');
+
+                    $pb = $this->userMapper->getPredicateBuilder()
+                        ->in('synergy_id', array_column($classCodes, 'synergy_id'))
+                        ->equals('g.group_type', Role::STUDENT);
+
+                    $students = $students->merge($this->userMapper->findByPredicates($pb))->indexBy('id');
                 }
             }
 
