@@ -159,9 +159,10 @@ Usage:
                     {% if assessment.useRubric %}
                         <fieldset class="content">
                             {% set rubricTemplate = readonly
-                            ? 'grid.twig'
-                            : 'grid-markable.twig'
+                                ? 'grid.twig'
+                                : 'grid-markable.twig'
                             %}
+
                             {% include '@rubric/' ~ rubricTemplate with {
                                 useMarkRange: assessment.useMarkRange,
                                 rubricGrid: assessment.rubricGrid,
@@ -187,14 +188,14 @@ Usage:
                  # Presence of a Learner-authored (marker, owner) tuple activates this
                  #}
                 {% block readonlyFeedback %}
-                    {% if latestSelfReflectedFeedback %}
+                    {% if selfAssessmentFeedback %}
                         {% import '@learning/macro/urgency.twig' as urgency %}
                         <fieldset class="content">
                             <div class="small-12 columns">
                                 <fieldset>
                                     <legend>
                                         {% spaceless %}
-                                            {% if latestSelfReflectedFeedback.isSelfGrading %}
+                                            {% if selfAssessmentFeedback.isSelfGrading %}
                                                 {{ locale.selfAssessment.proper }}
                                             {% else %}
                                                 {{ locale.selfReflection.proper }}
@@ -209,16 +210,16 @@ Usage:
                                                         <div class="card small-12">
                                                             <a href="/search/user/{{ participant.user.id }}">
                                                                 <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square32" title="{{ participant.user.fullname }}" />
-                                                                <p>{{ participant.user.fullname }}<span class="pipe meta">{{ latestSelfReflectedFeedback.publishedAt.short }}</span></p>
+                                                                <p>{{ participant.user.fullname }}<span class="pipe meta">{{ selfAssessmentFeedback.publishedAt.short }}</span></p>
                                                             </a>
                                                         </div>
-                                                        <article>{{ latestSelfReflectedFeedback.comment|nl2br }}</article>
+                                                        <article>{{ selfAssessmentFeedback.comment|nl2br }}</article>
                                                     </li>
                                                 </ul>
                                             </li>
                                         </ul>
-                                        <div class="grade {{ urgency.marks(latestSelfReflectedFeedback.normalisedMark) }}-bg">
-                                            <span>{{ latestSelfReflectedFeedback.humanReadableMark }}</span>
+                                        <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg">
+                                            <span>{{ selfAssessmentFeedback.humanReadableMark }}</span>
                                         </div>
                                     </div>
                                 </fieldset>
