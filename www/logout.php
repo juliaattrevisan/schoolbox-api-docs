@@ -4,7 +4,7 @@
 require_once '../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-if (Cfg::get('saml_enabled') && Cfg::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
+if (Cfg::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
     // Initiate SLO
     header('Location: /saml/logout.php');
     exit;
