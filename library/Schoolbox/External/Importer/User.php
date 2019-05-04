@@ -423,8 +423,7 @@ class User extends AbstractImporter
             $userResult->setOriginalUser(clone $user);
 
             // Step 2: are they deleted?
-            // Users aren't currently soft-deletable, so they stay deleted.
-            if ($this->parseStringBoolean($row['Delete?'])) {
+            if ($this->parseStringBoolean($row['Delete?'] ?? 'false')) {
                 $userResult->setIsUserDeleted(true);
             }
 
