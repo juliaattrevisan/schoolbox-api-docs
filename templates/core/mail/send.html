@@ -40,8 +40,10 @@ $(function() {
         }
     }
 
+    // Supported special characters: !#$%&'*+-/=?^_`{|}~
+    // Source: https://en.wikipedia.org/wiki/Email_address
     function validateEmail(email) {
-        var validEmailFilter = /^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
+        var validEmailFilter = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         var emailIsInBetweenRegex = /\<([^)]+)\>/; // Is email string in between <>? E.g <alaress@alaress.com.au>
 
         if (emailIsInBetweenRegex.test(email)) {
