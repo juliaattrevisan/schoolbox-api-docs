@@ -52,17 +52,22 @@ class UserResolver implements IUserResolver
      *  - in all other cases, only superusers and comms officers can moderate (since sub-moderators don't yet exist)
      *
      * @param \Schoolbox\Comms\News\Model $article
+     * @param bool $includeFolderWriteUsers
      * @throws \Schoolbox\Mapper\Exception
      * @return int[]
      * @todo Add logic to handle the case when an article has 0 audience segments. See SA-6839
      */
-    public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article): array
+    public function findModeratorsForArticle(\Schoolbox\Comms\News\Model $article, bool $includeFolderWriteUsers = true): array
     {
         // Default moderators (superusers and comms officers)
         $superuserIds = $this->db->executeQuery(
             'SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')
             ->fetchAll(PDO::FETCH_COLUMN);
         $moderators = array_unique(array_merge($superuserIds, $this->findModeratorIds()));
+
+        if (!$includeFolderWriteUsers) {
+            return $moderators;
+        }
 
         $rootSegments = $this->audienceMapper->findByColumn(AudienceMapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 

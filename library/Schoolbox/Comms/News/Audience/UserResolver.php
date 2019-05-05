@@ -75,13 +75,14 @@ class UserResolver implements IUserResolver
      *
      * @param \Schoolbox\Comms\News\Model $article
      * @param bool $excludeMuted set this true to exclude users who has muted folders
+     * @param bool $includeAuthor set this true to add author to users (this is for notification)
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
      * @TODO This is too poorly implemented and needs to be optimised. See SA-7431
      */
-    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false): array
+    public function findUsersForArticle(\Schoolbox\Comms\News\Model $article, bool $excludeMuted = false, bool $includeAuthor = false): array
     {
         $userIds = [];
         $rootSegments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
@@ -100,12 +101,13 @@ class UserResolver implements IUserResolver
      *
      * @param Model $audienceSegment
      * @param bool $excludeMuted
+     * @param int|null $authorId
      * @return int[]
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws UnexpectedValueException If we attempt to build a query with an unrecognised entity type
      * @throws \UnderflowException
      */
-    private function findUsersForAudienceSegment(Model $audienceSegment, bool $excludeMuted = false): array
+    private function findUsersForAudienceSegment(Model $audienceSegment, bool $excludeMuted = false, ?int $authorId = null): array
     {
         $entityType = $audienceSegment->getEntityType();
 
@@ -125,6 +127,9 @@ class UserResolver implements IUserResolver
             }
             $userIds = $this->getUserIds($audienceSegment->getEntityType(), $entityValue);
             $userIds = $this->applyRelationshipFilter($userIds, $audienceSegment->getRelationship());
+            if ($authorId) {
+                $userIds[] = $authorId;
+            }
             // Exclude the users who has muted the current folder.
             if ($excludeMuted && $audienceSegment->getEntityType() === Segment\Strategy\Folder::getEntityType()) {
                 $parameters = [

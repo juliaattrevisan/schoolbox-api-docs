@@ -285,10 +285,12 @@ class Notifier extends AbstractModuleNotifier
         /** @var Article $article */
         $article = $articles->first();
 
-        // filter out recipients with audience
+        // filter out recipients with audience (this is more to apply mute settings)
         $validUserIds = \array_merge(
-            $this->audienceResolver->findUsersForArticle($article, true),
-            $this->moderatorResolver->findModeratorsForArticle($article)
+            // adding author to apply mute setting
+            $this->audienceResolver->findUsersForArticle($article, true, true),
+            // permission for folder is handled above. getting global moderators only.
+            $this->moderatorResolver->findModeratorsForArticle($article, false)
         );
         if (!\in_array($article->getAuthor()->getId(), $validUserIds)) {
             return $envelope;
