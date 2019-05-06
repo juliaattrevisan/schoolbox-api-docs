@@ -357,7 +357,7 @@
                         }
 
                         setTimeout(function() {
-                            $('#threads-section').find('[data-schoolboxmedia-replacement]').mediaelementplayer();
+                            $.fn.schoolboxResource_InitialiseMediaElementPlayer($('#threads-section'));
                         }, 300);
 
                         self.closeModal();
