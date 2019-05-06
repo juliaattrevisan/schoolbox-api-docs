@@ -5,7 +5,7 @@
      */
     $.fn.schoolboxResource_ProxyReplacement = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
-            var replacement = $.fn.schoolboxResource_MediaPlayerReplacement($.fn.schoolboxResource_GetParams(element));
+            var replacement = $.fn.schoolboxResource_GenerateReplacement($.fn.schoolboxResource_GetParams(element));
 
             if (replacement !== false) {
                 $(element).replaceWith(replacement);
@@ -45,11 +45,12 @@
     };
 
     /**
-     * Replace DOM with a media player
+     * Generate html compatible with media player
+     *
      * @param params
      * @returns {string|boolean}
      */
-    $.fn.schoolboxResource_MediaPlayerReplacement = function (params) {
+    $.fn.schoolboxResource_GenerateReplacement = function (params) {
 
         var style = params['style'];
         var width = params['width'];
@@ -81,9 +82,9 @@
             return '<audio data-schoolboxmedia-replacement controls preload="none" style="' + style + ';width:100%;height:30px;border:0px;">' +
                 '<source src="' + source + '" type="audio/mpeg">' +
                 '</audio>';
-        } else {
-            return false;
         }
+
+        return false;
     };
     
 }(jQuery));
