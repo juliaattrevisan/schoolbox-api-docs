@@ -15,6 +15,9 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 
 /**
  * Finds any submission boxes that have Capability or Indicator usages with sequence collisions, and repairs them.
+ * Invalid if:
+ * * sequence set contains a value that is 0
+ * * sequence set is not distinct
  */
 $app = new class extends CliTool\App
 {
@@ -35,7 +38,7 @@ $app = new class extends CliTool\App
     {
         $this->getDatabaseInternal()->beginTransaction();
         try {
-            $this->checkAndRepairUsages();
+            $this->executeCheckAndRepair();
             $this->getDatabaseInternal()->commit();
         } catch (Database\Exception $e) {
             $this->getLogger()->error('Database error, rolling back transaction', ['exception' => $e]);
@@ -50,7 +53,7 @@ $app = new class extends CliTool\App
      *
      * @throws Database\Exception
      */
-    private function checkAndRepairUsages(): void
+    private function executeCheckAndRepair(): void
     {
         $this->checkAndRepairCapabilityUsages();
         $this->checkAndRepairIndicatorUsages();
@@ -66,14 +69,15 @@ $app = new class extends CliTool\App
     private function checkAndRepairCapabilityUsages(): void
     {
         $this->getLogger()->info('Finding DueWorks having Capability Usages with sequence collisions');
-        $submissionBoxIds = $this->getCapabilitySequenceCollisions();
+        $submissionBoxIdsWithCollisions = $this->getCapabilitySequenceCollisions();
+        $this->getLogger()->info(sprintf('%s Capability Usage sequence collisions found.', count($submissionBoxIdsWithCollisions) ?: 'No'));
 
-        if (!count($submissionBoxIds)) {
-            $this->getLogger()->info('No Capability Usage sequence collisions found.');
-        } else {
-            $this->getLogger()->info('Repairing Capability Usage sequences');
-            $this->repairCapabilityUsages($submissionBoxIds);
-        }
+        $this->getLogger()->info('Finding DueWorks having Capability Usages with a 0 sequence');
+        $submissionBoxIdsWithInvalid = $this->findCapabilityUsagesWithInvalidSequence();
+        $this->getLogger()->info(sprintf('%s Submission boxes found with invalid Capability sequences.', count($submissionBoxIdsWithInvalid) ?: 'No'));
+
+        $submissionBoxIds = array_unique(array_merge($submissionBoxIdsWithCollisions, $submissionBoxIdsWithInvalid));
+        $this->repairCapabilityUsages($submissionBoxIds);
     }
 
 
@@ -83,14 +87,34 @@ $app = new class extends CliTool\App
     private function checkAndRepairIndicatorUsages(): void
     {
         $this->getLogger()->info('Finding DueWorks having Indicator Usages with sequence collisions');
-        $submissionBoxAndRubricCapabilityIds = $this->getIndicatorSequenceCollisions();
+        $submissionBoxAndCapabilitiesWithCollisions = $this->getIndicatorSequenceCollisions();
+        $this->getLogger()->info(sprintf('%s Indicator Usage sequence sets with collisions found.', count($submissionBoxAndCapabilitiesWithCollisions) ?: 'No'));
 
-        if (!count($submissionBoxAndRubricCapabilityIds)) {
-            $this->getLogger()->info('No Indicator Usage sequence collisions found.');
-        } else {
-            $this->getLogger()->info('Repairing Indicator Usage sequences');
-            $this->repairIndicatorUsages($submissionBoxAndRubricCapabilityIds);
+        $this->getLogger()->info('Finding DueWorks having Indicator Usages with a 0 sequence');
+        $submissionBoxIdsWithInvalid = $this->findIndicatorUsagesWithInvalidSequence();
+        $this->getLogger()->info(sprintf('%s Submission box / Capability found with invalid Indicator sequences.', count($submissionBoxIdsWithInvalid) ?: 'No'));
+
+
+        // Combine and get distinct submissionBox/Capability
+        $unique = [];
+        foreach ([$submissionBoxAndCapabilitiesWithCollisions, $submissionBoxIdsWithInvalid] as $submissionBoxAndCapabilityId) {
+            foreach ($submissionBoxAndCapabilityId as [$submissionBoxId, $rubricCapabilityId]) {
+                if (!array_key_exists($submissionBoxId, $unique)) {
+                    $unique[$submissionBoxId] = [];
+                }
+                $unique[$submissionBoxId][$rubricCapabilityId] = (int)$rubricCapabilityId;
+            }
         }
+
+        // Flatten
+        $flat = [];
+        foreach ($unique as $submissionBoxId => $rubricCapabilityIds) {
+            foreach ($rubricCapabilityIds as $rubricCapabilityId) {
+                $flat[] = [$submissionBoxId, $rubricCapabilityId];
+            }
+        }
+
+        $this->repairIndicatorUsages($flat);
     }
 
 
@@ -115,6 +139,45 @@ $app = new class extends CliTool\App
 
 
     /**
+     * Return the ids of submission boxes that have capability usages with invalid sequences.
+     *
+     * An invalid sequence is 0 (column type is unsigned, so negative numbers are impossible)
+     *
+     * @return array
+     */
+    private function findCapabilityUsagesWithInvalidSequence(): array
+    {
+        $sql = "
+            SELECT DISTINCT submission_box_id
+            FROM rubric_group_usage
+            WHERE sequence = 0
+            ORDER BY submission_box_id
+        ";
+        return $this->getDatabaseInternal()->executeQuery($sql)->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+
+    /**
+     * Return the ids of submission boxes that have indicator usages with invalid sequences.
+     *
+     * An invalid sequence is 0 (column type is unsigned, so negative numbers are impossible)
+     *
+     * @return array
+     */
+    private function findIndicatorUsagesWithInvalidSequence(): array
+    {
+        $sql = "
+            SELECT DISTINCT rcu.submission_box_id, rc.rubric_group_id
+            FROM rubric_criterion_usage rcu
+            JOIN rubric_criterion rc ON rcu.criterion_id = rc.id
+            WHERE sequence = 0
+            ORDER BY submission_box_id, rubric_group_id
+        ";
+        return $this->getDatabaseInternal()->executeQuery($sql)->fetchAll(PDO::FETCH_NUM);
+    }
+
+
+    /**
      * Return the ids of submission boxes and rubric capabilities that have indicator usages having sequence collisions
      *
      * @return array
@@ -132,7 +195,8 @@ $app = new class extends CliTool\App
                 rc1.rubric_group_id    =  rc2.rubric_group_id AND
                 rcu1.submission_box_id =  rcu2.submission_box_id AND
                 rcu1.criterion_id      != rcu2.criterion_id AND
-                rcu1.sequence          =  rcu2.sequence;
+                rcu1.sequence          =  rcu2.sequence
+            ORDER BY submission_box_id, rubric_group_id;
         ";
         return $this->getDatabaseInternal()->executeQuery($sql)->fetchAll(PDO::FETCH_NUM);
     }
@@ -146,6 +210,12 @@ $app = new class extends CliTool\App
      */
     private function repairCapabilityUsages(array $submissionBoxIds): void
     {
+        if (!count($submissionBoxIds)) {
+            $this->getLogger()->info('No Capability Usage sequences require repair');
+            return;
+        }
+        $this->getLogger()->info(sprintf('Repairing %d distinct Capability Usage sequence sets', count($submissionBoxIds)));
+
         $selectStmt = $this->getDatabaseInternal()->prepareQuery('
             SELECT rubric_group_id, sequence
             FROM rubric_group_usage 
@@ -192,6 +262,12 @@ $app = new class extends CliTool\App
      */
     private function repairIndicatorUsages(array $submissionBoxAndRubricCapabilityIds): void
     {
+        if (!count($submissionBoxAndRubricCapabilityIds)) {
+            $this->getLogger()->info('No SubmissionBox / Capabilities found with invalid Indicator Usage sequences');
+        } else {
+            $this->getLogger()->info(sprintf('Repairing %d distinct Indicator Usage sequence sets', count($submissionBoxAndRubricCapabilityIds)));
+        }
+
         $selectStmt = $this->getDatabaseInternal()->prepareQuery('
             SELECT criterion_id, sequence
             FROM rubric_criterion_usage rcu
