@@ -60,35 +60,35 @@ class Module extends BaseModule
         $matcher->add(
             '/^achievementreport\.selector/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.schoolGrades/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.ib/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.ncea/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.comments/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
     }
@@ -103,7 +103,7 @@ class Module extends BaseModule
      * @return array
      * @throws \Exception
      */
-    public function getEverything($params): array
+    public function getPreloads($params): array
     {
         $externalUserHandler = $this->getExternalUser();
         $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
