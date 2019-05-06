@@ -444,7 +444,7 @@
 
                     $(content).each(function (index, element) {
                         $(element).find('[data-schoolboxresource-type]').each(function (childIndex, childEl) {
-                            var replacement = $.fn.schoolboxResource_GenerateReplacement($.fn.schoolboxResource_GetParams(childEl));
+                            var replacement = $.fn.schoolboxResource_GenerateReplacement(childEl);
 
                             if (replacement) {
                                 $(childEl).replaceWith(replacement);

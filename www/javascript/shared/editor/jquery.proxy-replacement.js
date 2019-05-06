@@ -5,7 +5,7 @@
      */
     $.fn.schoolboxResource_ProxyReplacement = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
-            var replacement = $.fn.schoolboxResource_GenerateReplacement($.fn.schoolboxResource_GetParams(element));
+            var replacement = $.fn.schoolboxResource_GenerateReplacement(element);
 
             if (replacement !== false) {
                 $(element).replaceWith(replacement);
@@ -47,10 +47,11 @@
     /**
      * Generate html compatible with media player
      *
-     * @param params
+     * @param element a jquery selection that we must examine
      * @returns {string|boolean}
      */
-    $.fn.schoolboxResource_GenerateReplacement = function (params) {
+    $.fn.schoolboxResource_GenerateReplacement = function (element) {
+        var params = $.fn.schoolboxResource_GetParams(element);
 
         var style = params['style'];
         var width = params['width'];
