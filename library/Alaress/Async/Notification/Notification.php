@@ -22,7 +22,10 @@ class Notification
     /** @var Instance[] */
     protected $instances;
 
-    /** @var array [<token> => <instance time> => Param[] ] */
+    /**
+     * Stores Params per token indexed by instance time. [<token> => <instance time> => Param[] ]
+     * @var array
+     */
     protected $params;
 
     /** @var array */
