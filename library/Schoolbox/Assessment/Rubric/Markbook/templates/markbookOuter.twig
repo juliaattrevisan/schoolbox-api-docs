@@ -1,22 +1,21 @@
-<h1>Rubric Markbook for {{ folder.name }}</h1>
-
-{% import '@learning/macro/urgency.twig' as urgency %}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
 
 <script>
     $(function() {
-        // Hide/show a drop shadow when scrolling the markbook horizontally
-        // The shadow only appears when you have scrolled past a certain threshold
-        $("#rubric-marksheet-container").scroll(function(e) {
-            const scrollAmount = e.target.scrollLeft;
-            const scrollPixelThreshold = 10;
-            const $leftColumns = $("#left-columns");
-            if (scrollAmount > scrollPixelThreshold && !$leftColumns.hasClass(".drop-shadow")) {
-                $leftColumns.addClass("drop-shadow");
-            } else {
-                $leftColumns.removeClass("drop-shadow");
-            }
+        $('#{{ reportContentId }}').on('filterContentLoaded', function() {
+            // Hide/show a drop shadow when scrolling the markbook horizontally
+            // The shadow only appears when you have scrolled past a certain threshold
+            $("#rubric-marksheet-container").scroll(function(e) {
+                const scrollAmount = e.target.scrollLeft;
+                const scrollPixelThreshold = 10;
+                const $leftColumns = $("#left-columns");
+                if (scrollAmount > scrollPixelThreshold && !$leftColumns.hasClass(".drop-shadow")) {
+                    $leftColumns.addClass("drop-shadow");
+                } else {
+                    $leftColumns.removeClass("drop-shadow");
+                }
+            });
         });
     });
 </script>
@@ -113,118 +112,26 @@
     }
 </style>
 
-{% if assessments|length and students|length %}
-<div id="table-container">
-
-    <table id="left-columns">
-        <thead>
-        {% for assessmentId, assessment in assessments %}
-            {% for capabilityId, capability in assessment.capabilities %}
-
-                <tr>
-                    {% if loop.index == 1 %}
-                        <th class="column-1 assessment" title="{{ assessment.name }}">
-                            <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
-                        </th>
-                    {% else %}
-                        <th class="column-1 placeholder">&nbsp;</th>
-                    {% endif %}
-
-                    <th class="column-2 capability" title="{{ capability.name }}">{{ capability.name }}</th>
-                </tr>
-
-                {% for indicatorId, indicator in capability.indicators %}
-                    <tr>
-                        <th class="column-1 placeholder">&nbsp;</th>
-                        <th class="column-2 indicator" title="{{ indicator.name }}">{{ indicator.name }}</th>
-                    </tr>
-                {% endfor %}
-
-            {% endfor %}
-        {% endfor %}
-        </thead>
-    </table>
-
-    <div id="rubric-marksheet-container">
-        {# Marksheet class IS being used; do not delete it #}
-        <table id="rubric-marksheet" class="marksheet" data-mark-sheet>
-            <thead>
-                <tr class="rotate-headers" data-headers>
-                    {% for studentId, student in students %}
-                        <th>
-                            <div>
-                                <span>
-                                    <a href="{{ student.profileLink }}">
-                                        {{ student.lastname ~ ', ' ~ student.firstname}}
-                                    </a>
-                                </span>
-                            </div>
-                        </th>
-                    {% endfor %}
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for assessmentId, assessment in assessments %}
-
-                    {% for capabilityId, capability in assessment.capabilities %}
-                        <tr class="capability">
-                            {% for studentId, student in students %}
-                                {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
-                                {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
-                                {% set summaryLink = student.assessments[assessmentId].summaryLink %}
-
-                                {% set gradientClass = urgency.marks(normalisedCapabilityMark) %}
-                                {% if capabilityMark is null %}
-                                    {% set gradientClass = "" %}
-                                {% endif %}
-
-                                <td>
-                                    <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ capabilityMark ? : 'no-mark' }}">{{ capabilityMark|default('-') }}</a>
-                                </td>
-                            {% endfor %}
-                        </tr>
-
-                        {% for indicatorId, indicator in capability.indicators %}
-                            <tr class="indicator">
-                                {% for studentId, student in students %}
-                                    {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
-                                    {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}
-                                    {% set descriptorText = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].selectedDescriptorText %}
-                                    {% set summaryLink = student.assessments[assessmentId].summaryLink %}
-
-                                    {% set gradientClass = urgency.marks(normalisedIndicatorMark) %}
-                                    {% if normalisedIndicatorMark is null %}
-                                        {% set gradientClass = "" %}
-                                    {% endif %}
-
-                                    {% if descriptorText %}
-                                        <td title="{{ descriptorText }}">
-                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ indicatorMark|default('✓') }}</a>
-                                        </td>
-                                    {% else %}
-                                        <td>
-                                            <a href="{{ summaryLink }}" class="{{ gradientClass }} {{ indicatorMark ? : 'no-mark' }}">{{ indicatorMark|default('-') }}</a>
-                                        </td>
-                                    {% endif %}
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    {% endfor %}
-
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="row">
+    <div class="small-12">
+        <h1>Rubric Markbook for {{ folder.name }}</h1>
     </div>
-
 </div>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-progress"></i>
-        {% if not assessments|length %}
-            <p>There are no assessments that use a rubric in this folder.</p>
-        {% else %}
-            <p>There are no students in this folder.</p>
-        {% endif %}
+
+
+{% set reportContentId = 'rubric-markbook-content' %}
+
+{% include '@filters/panel.twig' with {
+    contentId: reportContentId,
+    panel:     filterPanel,
+    quickload: true,
+    page:      page
+} only %}
+
+<div id="{{ reportContentId }}">
+    <div class="small-12 island" data-placeholder>
+        <section class="content">
+            <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+        </section>
     </div>
-{% endif %}
+</div>

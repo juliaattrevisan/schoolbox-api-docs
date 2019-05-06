@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
 
+use Alaress_Date_Format;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\GenericCollection;
@@ -42,12 +43,7 @@ abstract class Factory extends AbstractFactory
     }
 
     /**
-     * @param Filter\IDefinition                                               $definition
-     * @param User                                                             $user
-     * @param Filter\Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                        $viewee
-     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|Component
      * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
@@ -57,6 +53,7 @@ abstract class Factory extends AbstractFactory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         return new Component(
@@ -87,7 +84,7 @@ abstract class Factory extends AbstractFactory
      */
     protected function getCurrentTerm(GenericCollection $terms): ?Term\Model
     {
-        $now = \Alaress_Date_Format::now();
+        $now = Alaress_Date_Format::now();
         foreach ($terms as $term) {
             if ($term->contains($now)) {
                 return $term;

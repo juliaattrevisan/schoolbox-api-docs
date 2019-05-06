@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
@@ -41,14 +42,9 @@ class Factory extends FolderFilter\Factory
      * * It inserts any folders specified in GET args if user has READ+ perm to them
      * * Inserts any folders where GET-injected UnitImportSpecs reside
      *
-     * @param Filter\IDefinition                                        $definition
-     * @param User                                                      $user
-     * @param Filter\Page\Model                                         $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]           $selections Indexed selection.key
-     * @param null|User                                                 $viewee
-     * @param GenericCollection|Collection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
-     * @throws \InvalidArgumentException If $viewee is null
+     * @throws InvalidArgumentException If $viewee is null
      */
     public function buildComponent(
         Filter\IDefinition $definition,
@@ -56,10 +52,11 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
-            throw new \InvalidArgumentException('Viewee cannot be null');
+            throw new InvalidArgumentException('Viewee cannot be null');
         }
 
         // Should this role type see classes for this page?

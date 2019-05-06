@@ -25,9 +25,9 @@
     {% for project in projects %}
         {% set selection = roleSelections[project.id] %}
         {% if project.assessmentModel.assessmentContext is unitImplementation %}
-            {% set title = project.title ~ ' (' ~ project.folder.title ~ ')' %}
+            {% set title = project.assessmentModel.title ~ ' (' ~ project.folder.title ~ ')' %}
         {% else %}
-            {% set title = project.title %}
+            {% set title = project.assessmentModel.title %}
         {% endif %}
 
         {% include '@filters/_selectionCheckbox.twig' with {

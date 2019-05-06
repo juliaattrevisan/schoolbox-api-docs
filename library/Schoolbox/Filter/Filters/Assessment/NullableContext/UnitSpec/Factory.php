@@ -57,12 +57,7 @@ class Factory extends NullableContext\Factory
 
 
     /**
-     * @param Filter\IDefinition                                               $definition
-     * @param User                                                             $user
-     * @param Filter\Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                        $viewee
-     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|Component
      * @throws \InvalidArgumentException If neither $selections or $overrides are supplied
      */
@@ -72,8 +67,10 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
+        // TODO inject any units that belong to folder in route args, depending on page
         return new Component(
             $definition,
             $user,

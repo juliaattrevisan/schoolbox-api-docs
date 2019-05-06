@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\AssessmentType;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -28,10 +29,10 @@ class Definition extends Filter\AbstractDefinition
     // The name to expose in the UI
     protected const NAME = 'Activity Type';
 
-    const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
-    const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
-    const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
-    const KEY_TASK = AssessmentType::TYPE_TASK;
+    public const KEY_PROJECT = AssessmentType::TYPE_PROJECT;
+    public const KEY_QUIZ = AssessmentType::TYPE_QUIZ;
+    public const KEY_DUE_WORK = AssessmentType::TYPE_DUE_WORK;
+    public const KEY_TASK = AssessmentType::TYPE_TASK;
 
     /** @var Collection|string[] */
     private $assessmentTypes;
@@ -57,12 +58,12 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
             Filter\Page\Model::PAGE_GRADES,
-            Filter\Page\Model::PAGE_MARK_BOOK,
+            Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
             Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
             Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
         ];
@@ -86,7 +87,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_TASK) {
             return 'Task';
         }
-        throw new \InvalidArgumentException("Unknown AssessmentType key: $key");
+        throw new InvalidArgumentException("Unknown AssessmentType key: $key");
     }
 
 

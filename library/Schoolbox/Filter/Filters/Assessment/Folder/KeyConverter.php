@@ -7,11 +7,13 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 
 /**
  * No conversion. A int is converted to the same int (representing a folder.id)
@@ -52,7 +54,7 @@ class KeyConverter extends AbstractKeyConverter
      * @inheritdoc
      * @return int
      */
-    public function getItem(string $key, \Schoolbox\User $user, string $page): int
+    public function getItem(string $key, User $user, string $page): int
     {
         $this->assertValidKey($key, $user, $page);
         return $this->folderIds[$key];
@@ -73,19 +75,19 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
+    protected function assertValidKey(string $key, User $user, string $page): void
     {
         if (!$this->folderIds->offsetExists($key)) {
-            throw new \InvalidArgumentException("No Folder ID found for key: $key");
+            throw new InvalidArgumentException("No Folder ID found for key: $key");
         }
 
         switch ($page) {
-            case Filter\Page\Model::PAGE_MARK_BOOK:
+            case Filter\Page\Model::PAGE_CLASS_MARK_BOOK:
             case Filter\Page\Model::PAGE_COURSE_MARK_BOOK:
                 // Must be staff or instructor
                 $notStaff = !$user->getRole()->isStaff();
                 if ($notStaff && $this->access->getFolderAccess($user, (int)$key) < UserAccess::ACCESS_WRITE) {
-                    throw new \InvalidArgumentException("Session user lacks read perm to folder: $key");
+                    throw new InvalidArgumentException("Session user lacks read perm to folder: $key");
                 }
                 break;
             case Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS:

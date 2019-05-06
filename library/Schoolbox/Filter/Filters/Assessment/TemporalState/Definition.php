@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 
@@ -81,12 +82,13 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
-            Filter\Page\Model::PAGE_MARK_BOOK,
+            Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
             Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
+            Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK,
 //            Filter\Page\Model::PAGE_GRADES,
         ];
     }
@@ -115,7 +117,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_CUSTOM_UNPUBLISHED === $key) {
             return 'Custom Plan Publish Date';
         }
-        throw new \InvalidArgumentException("Unknown TemporalState key: $key");
+        throw new InvalidArgumentException("Unknown TemporalState key: $key");
     }
 
 

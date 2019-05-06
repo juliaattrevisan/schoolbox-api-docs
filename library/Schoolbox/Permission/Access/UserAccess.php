@@ -122,6 +122,18 @@ class UserAccess
     /** @var int */
     protected $accessLevel;
 
+
+    /**
+     * Returns the set of all known access levels
+     *
+     * @return int[]
+     */
+    public static function getAccessLevels(): array
+    {
+        return [self::ACCESS_DENY, self::ACCESS_READ, self::ACCESS_WRITE, self::ACCESS_FULL,];
+    }
+
+
     /**
      * @param User $user
      * @return self

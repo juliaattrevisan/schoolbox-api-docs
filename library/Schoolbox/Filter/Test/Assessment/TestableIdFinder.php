@@ -7,9 +7,12 @@
 
 namespace Schoolbox\Filter\Filters\Assessment;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\IMapper;
+use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * Enables unit testing of the parent's logic by exposing internal methods.
@@ -44,11 +47,14 @@ class TestableIdFinder extends IdFinder
         return $this->doNonContextFiltersGuaranteeEmptySet($completeFilters);
     }
 
+
     /**
      * @param int[][]|null[] $completeFilters All keys must exists (to avoid needing a heap of isset() calls)
      * @return mixed[] UNION sub-query string + params array
      * @throws Filter\BrokenFilterException If filter SQL fragment cannot be built
-     * @throws \InvalidArgumentException If no filter name injected when building a BrokenFilterException
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function getSqlStringForFilters(array $completeFilters)
     {
@@ -61,6 +67,7 @@ class TestableIdFinder extends IdFinder
      *
      * @param $filters
      * @return Collection[]|null[]|mixed[][]
+     * @throws Filter\BrokenFilterException
      */
     public function insertMissingFilters($filters)
     {

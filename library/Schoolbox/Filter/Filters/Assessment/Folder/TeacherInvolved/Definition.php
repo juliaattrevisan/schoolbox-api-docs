@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
+use InvalidArgumentException;
 use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
@@ -29,11 +30,11 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,
-            Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_CLASS_MARK_BOOK,
         ];
     }
 
@@ -80,6 +81,6 @@ class Definition extends FolderFilter\Definition
             case self::KEY_GROUPS:
                 return 'Groups';
         }
-        throw new \InvalidArgumentException("Unknown FolderFilter key: $key");
+        throw new InvalidArgumentException("Unknown FolderFilter key: $key");
     }
 }

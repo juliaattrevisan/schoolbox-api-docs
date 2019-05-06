@@ -30,13 +30,14 @@ class Definition extends AssessmentTermFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS,
 //            Page\Model::PAGE_GRADES,
-            Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_CLASS_MARK_BOOK,
             Page\Model::PAGE_COURSE_MARK_BOOK,
+            Page\Model::PAGE_RUBRIC_MARK_BOOK,
 //            Page\Model::PAGE_UPCOMING_ASSESSMENTS,
         ];
     }

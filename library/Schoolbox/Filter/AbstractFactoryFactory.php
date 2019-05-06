@@ -7,6 +7,9 @@
 
 namespace Schoolbox\Filter;
 
+use function count;
+use DomainException;
+use function in_array;
 use Schoolbox\Collection;
 use Schoolbox\MapperFactory;
 use Schoolbox\GenericCollection;
@@ -38,12 +41,12 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * Return the mapper class of the entity being filtered by this FactoryFactory
      *
      * @return string
-     * @throws \DomainException If called on abstract, or concrete class that does not override
+     * @throws DomainException If called on abstract, or concrete class that does not override
      */
     public static function getEntity(): string
     {
         if ('' === static::ENTITY) {
-            throw new \DomainException('Concrete classes must define this constant');
+            throw new DomainException('Concrete classes must define this constant');
         }
         return static::ENTITY;
     }
@@ -62,8 +65,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If unable to find the filter mapper class
-     * @throws \ReflectionException                  If the specified class does not exist
-     * @throws \DomainException                      If this class has not defined what entity it is filtering
+     * @throws DomainException                       If this class has not defined what entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
@@ -89,8 +91,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If unable to find the filter mapper class
-     * @throws \ReflectionException                  If the specified class does not exist
-     * @throws \DomainException                      If this class has not defined what entity it is filtering
+     * @throws DomainException                       If this class has not defined what entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
@@ -107,10 +108,9 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException             If no filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException                  If the specified class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
-     * @throws \DomainException                      If attempting to fetch the entity from an abstract factoryFactory
+     * @throws DomainException                       If attempting to fetch the entity from an abstract factoryFactory
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
     public function buildCurrentState($page, $enabledOnly)
@@ -129,7 +129,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
             $class = $filter->getClass();
 
             // Can this filter never appear on this page?
-            if (!\in_array($page, $class::getPages(), true)) {
+            if (!in_array($page, $class::getPages(), true)) {
                 continue;
             }
             $filterId = $filter->getId();
@@ -171,18 +171,18 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
+     * @param array     $routeArgs  Any route params, as received by the controller's public API method
      * @param array     $request Indexed by filter.id
      * @return Panel
      * @throws \InvalidArgumentException             If unable to locate Filter mapper class, or required filter definition classes
-     * @throws \ReflectionException                  If the specified class does not exist
-     * @throws \DomainException                      If this class has not defined the entity it is filtering
+     * @throws DomainException                       If this class has not defined the entity it is filtering
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception           If an alias is incorrect
      * @throws InvalidColumnException                If unable to parse a PB's column
      * @throws \UnderflowException                   If we generate an empty PB IN query
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = []): Panel
+    public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel
     {
         // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
         if (array_key_exists('page', $request)) {
@@ -226,6 +226,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
                 $pageFilter,
                 $selections[$filter->getId()],
                 $viewee,
+                $routeArgs,
                 $overrides
             );
         }
@@ -254,7 +255,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         $filterIds = array_diff($visibleFilterIds, $overrideSelections->keys());
 
         // If ignoring all saved user-selections (because everything is overridden)
-        if (0 === \count($filterIds)) {
+        if (0 === count($filterIds)) {
             return new Collection();
         }
 
@@ -288,7 +289,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \InvalidArgumentException If PageFilter mapper class not found
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
-     * @throws \DomainException If attempting to fetch the entity for an abstract factory factory
+     * @throws DomainException If attempting to fetch the entity for an abstract factory factory
      */
     private function buildPageFilters($page, $enabledOnly, $userConfigurableOnly)
     {
@@ -296,7 +297,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
         /** @var GenericCollection|Model[] $availableFilters */
         $availableFilters = $this->getFilterMapper()->findForEntity(static::getEntity())->filter(function (Model $instance) use ($page) {
             $definitionClass = $instance->getClass();
-            return \in_array($page, $definitionClass::getPages(), true);
+            return in_array($page, $definitionClass::getPages(), true);
         });
 
         $pageFilterMapper = $this->getPageMapper();
@@ -372,28 +373,6 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     private function createComponentCollection(array $contents = [])
     {
         return new GenericCollection(IComponent::class, $contents);
-    }
-
-
-    /**
-     * Builds a filter factory using the base dependencies, plus any factory-specific ones
-     *
-     * @param            $factoryClass
-     * @param array|null $extraArgs
-     * @return IFactory|object
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException If the specified class does not exist
-     */
-    protected function buildFactory($factoryClass, array $extraArgs = [])
-    {
-        $args = array_merge([
-            'filterOptionMapper'    => $this->getOptionMapper(),
-            'filterDefaultMapper'   => $this->getDefaultsMapper(),
-            'filterSelectionMapper' => $this->getSelectionMapper(),
-        ], $extraArgs);
-
-        $reflector = new \ReflectionClass($factoryClass);
-        return $reflector->newInstanceArgs($args);
     }
 
 

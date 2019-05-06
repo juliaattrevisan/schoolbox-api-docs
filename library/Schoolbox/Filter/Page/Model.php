@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Page;
 
+use DomainException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Filter;
@@ -22,17 +23,47 @@ class Model
     // These are enums in DB, you will need to update column definition if you add to this list
     public const PAGE_PENDING_ASSESSMENTS = 'pending';
     public const PAGE_GRADES              = 'grades';
-    public const PAGE_MARK_BOOK           = 'markbook';
+    public const PAGE_CLASS_MARK_BOOK     = 'classMarkbook';          // AKA 'teacher markbook'
     public const PAGE_COURSE_MARK_BOOK    = 'courseMarkbook';
+    public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
     public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
+
+
+    /**
+     * Returns the set of pages that display a list of folders related to the viewee
+     *
+     * @return string[]
+     */
+    public static function getInvolvedFoldersPages(): array
+    {
+        return [
+            self::PAGE_PENDING_ASSESSMENTS,
+            self::PAGE_CLASS_MARK_BOOK,
+            self::PAGE_UPCOMING_ASSESSMENTS,
+        ];
+    }
+
+
+    /**
+     * Returns the set of pages where the Controller's public API method has a Folder\Model in the route args
+     *
+     * @return string[]
+     */
+    public static function getSingleFolderPages(): array
+    {
+        return [
+            self::PAGE_GRADES,
+            self::PAGE_RUBRIC_MARK_BOOK,
+        ];
+    }
 
 
     /**
      * @param string $page
      * @return string[]
      */
-    public static function getRoleTypesForPage($page)
+    public static function getRoleTypesForPage(string $page): array
     {
         return self::getPageRoleTypes()[$page];
     }
@@ -43,7 +74,7 @@ class Model
      *
      * @return string[][]
      */
-    public static function getPageRoleTypes()
+    public static function getPageRoleTypes(): array
     {
         return [
             self::PAGE_PENDING_ASSESSMENTS  => [
@@ -54,10 +85,13 @@ class Model
                 Role::PARENT,
                 Role::STUDENT,
             ],
-            self::PAGE_MARK_BOOK            => [
+            self::PAGE_CLASS_MARK_BOOK      => [
                 Role::STAFF,
             ],
             self::PAGE_COURSE_MARK_BOOK     => [
+                Role::STAFF,
+            ],
+            self::PAGE_RUBRIC_MARK_BOOK     => [
                 Role::STAFF,
             ],
             self::PAGE_LEARNING_ANALYTICS   => [
@@ -103,7 +137,7 @@ class Model
 
 
     /**
-     * @var GenericCollection|\Schoolbox\Filter\Page\Option\Model[]
+     * @var GenericCollection|Option\Model[]
      */
     private $options;
 
@@ -202,7 +236,7 @@ class Model
 
 
     /**
-     * @return GenericCollection|\Schoolbox\Filter\Page\Option\Model[]
+     * @return GenericCollection|Option\Model[]
      */
     public function getOptions()
     {
@@ -211,9 +245,9 @@ class Model
 
 
     /**
-     * @param GenericCollection|\Schoolbox\Filter\Page\Option\Model[] $options
+     * @param GenericCollection|Option\Model[] $options
      * @return $this
-     * @throws \UnexpectedValueException If Collection of wrong type
+     * @throws DomainException
      */
     public function setOptions(GenericCollection $options)
     {

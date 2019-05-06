@@ -100,6 +100,15 @@ interface IMapper
      */
     public function getModelAsCollection($object);
 
+
+    /**
+     * Retrieves identifier for this mapper (if it exists)
+     *
+     * @return array|null
+     */
+    public function getIdentifier(): ?array;
+
+
     /**
      * Retrieves identifier property name.
      *

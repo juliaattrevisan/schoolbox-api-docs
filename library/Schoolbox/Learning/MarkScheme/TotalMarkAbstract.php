@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use \InvalidArgumentException;
+use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Quiz\Attempt as QuizAttempt;
 
@@ -34,18 +35,17 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
 
     /**
      * @param null|int|float $totalMark
-     * @throws \RangeException If $totalMark is negative
+     * @throws RangeException If $totalMark is negative
      */
     public function __construct($totalMark)
     {
-        $this->rangeCheck($totalMark);
-        $this->totalMark = $totalMark;
+        $this->setTotalMark($totalMark);
     }
 
 
     /**
      * @param null|int|float $totalMark
-     * @throws \RangeException If $totalMark outside valid range
+     * @throws RangeException If $totalMark outside valid range
      */
     protected abstract function rangeCheck($totalMark);
 
@@ -57,7 +57,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param float|null     $normalisedMark
      * @param IResponse|null $response
      * @return string|null
-     * @throws \RangeException If normalised mark is outside valid range
+     * @throws RangeException If normalised mark is outside valid range
      * @throws \DomainException If unable to derive a denominator
      * @throws \InvalidArgumentException  If $normalisedMark isn't a numeric type
      */
@@ -105,7 +105,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param IResponse|null $response
      * @return float|null Returns null if denominator = 0
      * @throws InvalidArgumentException If unable to parse numerator from human-readable mark
-     * @throws \RangeException If evaluated normalised mark is below 0 or above 100
+     * @throws RangeException If evaluated normalised mark is below 0 or above 100
      * @throws \DomainException If unable to derive a denominator
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
@@ -131,6 +131,19 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
 
     /* Getters / Setters
      */
+
+    /**
+     * @param int|float|null $totalMark
+     * @return $this
+     * @throws RangeException
+     */
+    public function setTotalMark(?float $totalMark): self
+    {
+        $this->rangeCheck($totalMark);
+        $this->totalMark = $totalMark;
+        return $this;
+    }
+
 
     /**
      * @return int|float

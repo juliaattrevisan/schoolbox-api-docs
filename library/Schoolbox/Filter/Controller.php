@@ -9,6 +9,7 @@ namespace Schoolbox\Filter;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
+use function count;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
@@ -62,7 +63,7 @@ class Controller extends BaseController
      * @level 17.0
      * @throws ServiceNotFound
      */
-    public function getIndex()
+    public function getIndex(): void
     {
         $filtersPerPage = $this->findAvailableFiltersPerPage();
 
@@ -85,11 +86,10 @@ class Controller extends BaseController
      * @param string          $page
      * @throws ServiceNotFound
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException If a definition class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      */
-    public function getPageSettings(IFactoryFactory $factoryFactory, $page)
+    public function getPageSettings(IFactoryFactory $factoryFactory, $page): void
     {
         $enabledOnly = false;
         $definitions = $factoryFactory->buildCurrentState($page, $enabledOnly);
@@ -119,7 +119,6 @@ class Controller extends BaseController
      * @throws \PDOException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \InvalidArgumentException If a filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException If a definition class does not exist
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
      * @throws \UnderflowException
@@ -210,10 +209,10 @@ class Controller extends BaseController
     /**
      * @return GenericCollection[]|Model[][] $visibleFilters Indexed by page, then filterDefinition.name
      */
-    private function findAvailableFiltersPerPage()
+    private function findAvailableFiltersPerPage(): array
     {
         /** @var GenericCollection|Model[] $visibleFilters */
-        $visibleFilters = $this->filterMapper->findAll()->filter(function (Model $instance) {
+        $visibleFilters = $this->filterMapper->findAll()->filter(static function (Model $instance) {
             $definitionClass = $instance->getClass();
             return count($definitionClass::getPages()) > 0;
         });
@@ -240,8 +239,9 @@ class Controller extends BaseController
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$this->rosettaStone->translate('assessment', true, true)}",
             Page\Model::PAGE_GRADES               => 'Grades',
-            Page\Model::PAGE_MARK_BOOK            => 'Class Markbook',
+            Page\Model::PAGE_CLASS_MARK_BOOK      => 'Class Markbook',
             Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
+            Page\Model::PAGE_RUBRIC_MARK_BOOK     => 'Rubric Markbook',
             Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
             Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
         ];

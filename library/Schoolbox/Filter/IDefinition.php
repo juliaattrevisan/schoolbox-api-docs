@@ -84,7 +84,7 @@ interface IDefinition
      * @see FilterOption::PAGE_* constants
      * @return string[]
      */
-    public static function getPages();
+    public static function getPages(): array;
 
 
     /**

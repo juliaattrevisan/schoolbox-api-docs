@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
+use InvalidArgumentException;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
 use Schoolbox\Filter\Page;
 
@@ -72,11 +73,12 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
-            Page\Model::PAGE_MARK_BOOK,
+            Page\Model::PAGE_CLASS_MARK_BOOK,
             Page\Model::PAGE_COURSE_MARK_BOOK,
+            Page\Model::PAGE_RUBRIC_MARK_BOOK,
             Page\Model::PAGE_PENDING_ASSESSMENTS,
         ];
     }
@@ -121,7 +123,7 @@ class Definition extends NullableContext\Definition
             case self::KEY_IMPORTED_TO_GROUP:
                 return 'Units imported to groups';
         }
-        throw new \InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
+        throw new InvalidArgumentException("Unknown 'UnitSpec' filter key: $key");
     }
 
 

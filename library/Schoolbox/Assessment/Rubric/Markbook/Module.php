@@ -21,25 +21,31 @@ use Aura\Di\Container;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\UserMapper;
-use External_Class;
+use Schoolbox\Filter;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 class Module extends BaseModule
 {
+
     protected $basename = 'rubricMarkbook';
+
 
     /**
      * @inheritdoc
-     * @throws \InvalidArgumentException
-     * @throws NotFound If a class was specified but it does not exist
+     * @throws InvalidArgumentException
      */
-    public function registerRoutes() : void
+    public function registerRoutes(): void
     {
         $preloadFolder = function (array $params) {
             try {
-                return ['folder' => $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId'])];
+                if (($params['folder'] ?? null) instanceof Folder\Model) {
+                    $folder = $params['folder'];
+                } else {
+                    $folder = $this->getMapperFactory()->get(Folder\Mapper::class)->findById($params['folderId']);
+                }
+                return ['folder' => $folder];
             } catch (Mapper\Exception $e) {
-                throw new NotFound("No folder found for id: {$params['folderId']}");
+                throw new NotFound("No folder found for id: {$params['folderId']}", 0, $e);
             }
         };
 
@@ -54,23 +60,25 @@ class Module extends BaseModule
                 // Allow staff regardless of access level to the folder
                 new Rule\HasRole(Role::STAFF),
                 // Allow instructors (anyone with write+ access to folder)
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function (array $params) : int {
+                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
                     return (int)$params['folderId'];
                 }, Access::getInstance())
             )
         );
 
         $this->register('GET', '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
+        $this->register('POST', '/{folderId:\d+}', 'postMarkbook', $canViewPage, $preloadFolder);
     }
 
 
     /**
      * @inheritdoc
      */
-    public function initControllers(ContainerInterface $injector) : void
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
+
 
     /**
      * @param Container|ContainerInterface $injector The dependency injection container.
@@ -79,18 +87,29 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         $injector->params[Controller::class] = [
-            'internalDb' => $injector->lazyGet('databaseInternal'),
-            'externalDb' => $injector->lazyNew(External_Class::class),
-            'gradeGroupMapper' => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
-            'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class)
+            'internalDb'            => $injector->lazyGet('databaseInternal'),
+            'gradeGroupMapper'      => $this->getMapperFactory()->getLazy(GradeGroup\Mapper::class),
+            'userAccessMapper'      => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+            'filterFactoryFactory'  => $injector->lazy(function () {
+                return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+            }),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
+            'assessmentIdFinder'    => $injector->lazy(function () {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper,
+                    $this->getMapperFactory()->get(Assessment\Mapper::class)
+                );
+            })
         ];
     }
+
 
     /**
      * @inheritdoc
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) : void
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }

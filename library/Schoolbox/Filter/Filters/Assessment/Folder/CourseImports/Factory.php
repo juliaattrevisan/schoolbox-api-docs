@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
+use function count;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
@@ -17,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Mapper;
 
 /**
  * A factory for building CourseImport 'Folder' filter objects
@@ -75,12 +77,7 @@ class Factory extends FolderFilter\Factory
      * * It inserts any folders specified in GET args if user has READ+ perm to them
      * * Inserts any folders where GET-injected UnitImportSpecs reside
      *
-     * @param Filter\IDefinition                                        $definition
-     * @param User                                                      $user
-     * @param Filter\Page\Model                                         $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]           $selections Indexed selection.key
-     * @param null|User                                                 $viewee
-     * @param GenericCollection|Collection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
+     * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
      * @throws \InvalidArgumentException If $viewee is null
      * @throws \Schoolbox\Mapper\Exception
@@ -92,6 +89,7 @@ class Factory extends FolderFilter\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         $folders = $this->getFolderMapper()->createCollection();
@@ -111,6 +109,7 @@ class Factory extends FolderFilter\Factory
         }
 
         // Course Markbook enables insertion of unit-import-specs and their host folders
+        // TODO inspect new $routeArgs to more-reliably determine CourseSpec if on PAGE_COURSE_MARK_BOOK
         if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
             if (null === $folderOverrides) {
                 $folderOverrides = new GenericCollection(Filter\Selection\Model::class);
@@ -172,7 +171,7 @@ class Factory extends FolderFilter\Factory
         $unitSpecFilter    = $this->filterMapper->findByClass($definitionClass)->first();
         $unitSpecOverrides = $overrides[$unitSpecFilter->getId()];
 
-        if (!$unitSpecOverrides || \count($unitSpecOverrides) === 0) {
+        if (!$unitSpecOverrides || count($unitSpecOverrides) === 0) {
             // If no UnitSpecs requested via query args, then no folders require insertion and we are done.
             return;
         }
@@ -214,6 +213,8 @@ class Factory extends FolderFilter\Factory
      * @param Folder\Model                                 $folder
      * @param GenericCollection|Filter\Page\Option\Model[] $options
      * @return bool
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\Deleted
      */
     private function isAvailable(Folder\Model $folder, GenericCollection $options): bool
     {

@@ -34,17 +34,17 @@ class Module extends AlaressModule
      * @throws NotFound If invalid roleType
      * @throws \InvalidArgumentException
      * @throws ServiceNotFound
-     * @throws \ReflectionException If the filter definition class cannot be found in code base
      */
-    protected function registerRoutes()
+    protected function registerRoutes(): void
     {
         $isSuper = new IsSuperuser();
 
         $loadFactoryFactory = function (array $params) {
             switch ($params['page']) {
                 case Page\Model::PAGE_PENDING_ASSESSMENTS:
-                case Page\Model::PAGE_MARK_BOOK:
+                case Page\Model::PAGE_CLASS_MARK_BOOK:
                 case Page\Model::PAGE_COURSE_MARK_BOOK:
+                case Page\Model::PAGE_RUBRIC_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
                     return ['factoryFactory' => new Filters\Assessment\FactoryFactory($this->getMapperFactory())];

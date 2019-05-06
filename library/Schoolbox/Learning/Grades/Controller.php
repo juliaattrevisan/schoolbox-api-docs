@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Grades;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use function func_get_args;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Collection;
@@ -337,7 +338,7 @@ class Controller extends Base
             'subjectId' => $subject->getId(),
         ]);
         $request     = $this->getRequest()->query->getArrayCopy();
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $request);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $request);
 
         /* Build an markbook of assessments that:
          * * Belong to this folder

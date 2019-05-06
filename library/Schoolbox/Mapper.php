@@ -168,7 +168,9 @@ abstract class Mapper implements IMapper, Serializable
     protected $joins = array();
 
     /**
-     * @var array
+     * Will be NULL if entity does not have an identifier
+     *
+     * @var array|null
      */
     protected $identifier;
 
@@ -1738,11 +1740,9 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Retrieves identifier for this mapper.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getIdentifier()
+    public function getIdentifier(): ?array
     {
         return $this->identifier;
     }

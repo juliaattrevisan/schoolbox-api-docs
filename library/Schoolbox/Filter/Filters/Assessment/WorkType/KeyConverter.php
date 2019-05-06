@@ -1,16 +1,16 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
 namespace Schoolbox\Filter\Filters\Assessment\WorkType;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-
+use Schoolbox\User;
 
 /**
  * Converts between concrete keys (workType.ids or KEY_NONE) and workType.id or NULL
@@ -40,7 +40,7 @@ class KeyConverter extends AbstractKeyConverter
     /**
      * @inheritdoc
      */
-    public function getItem(string $key, \Schoolbox\User $user, string $page): ?int
+    public function getItem(string $key, User $user, string $page): ?int
     {
         if(Definition::KEY_NONE === $key){
             return null;
@@ -58,17 +58,17 @@ class KeyConverter extends AbstractKeyConverter
      */
     public function getAllPossibleItems()
     {
-        return $this->workTypeIds->shallowClone();
+        return $this->workTypeIds->shallowClone()->offsetSet(Definition::KEY_NONE, null);
     }
 
 
     /**
      * @inheritdoc
      */
-    protected function assertValidKey(string $key, \Schoolbox\User $user, string $page): void
+    protected function assertValidKey(string $key, User $user, string $page): void
     {
         if ($key !== Definition::KEY_NONE && !$this->workTypeIds->offsetExists($key)) {
-            throw new \InvalidArgumentException("No WorkType found for key: $key");
+            throw new InvalidArgumentException("No WorkType found for key: $key");
         }
     }
 }

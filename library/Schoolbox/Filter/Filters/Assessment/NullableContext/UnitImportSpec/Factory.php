@@ -72,13 +72,7 @@ class Factory extends NullableContext\Factory
 
 
     /**
-     * @param Filter\IDefinition                                               $definition
-     * @param User                                                             $user
-     * @param Filter\Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                        $viewee
-     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
-     * @return Filter\IComponent
+     * @inheritDoc
      * @throws \InvalidArgumentException If $viewee is NULL or neither $selections or $overrides are supplied
      * @throws \UnexpectedValueException
      */
@@ -88,6 +82,7 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
@@ -98,11 +93,17 @@ class Factory extends NullableContext\Factory
         $folders = $this->folderMapper->createCollection();
 
         // Course-markbook does not insert folders that are related to current user.
-        if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK !== $pageFilter->getPage()) {
+        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
             $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
         }
 
-        /* If we inserted an extra folder/s, we need to also insert any units imported to that folder,
+        // Are we in the context of a filtered page that is for a single folder?
+        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
+            $folder                    = $this->findFolderModel($routeArgs);
+            $folders[$folder->getId()] = $folder;
+        }
+
+        /* If we inserted any extra folder/s, we need to also insert any units imported to that folder,
          * otherwise any assessments inside units imported to the extra folder will never be visible.
          */
         $extraFolderIds = $this->parseFolderIds($overrides);
@@ -112,7 +113,7 @@ class Factory extends NullableContext\Factory
         }
 
         // Get all courses imported to these folders
-        $courseImpls = $this->courseImplMapper->findByFolderId($folders->getColumnValues('id'));
+        $courseImpls = $this->courseImplMapper->findByFolderId($folders->getPropertyValues('id'));
 
         // Get all unitSpecs imported to relevant folders
         $unitSpecsImportedToFolders = $this->unitSpecMapper->createCollection();

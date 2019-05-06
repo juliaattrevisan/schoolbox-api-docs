@@ -7,6 +7,10 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
 
+use function count;
+use function in_array;
+use InvalidArgumentException;
+use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
@@ -19,6 +23,10 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
+use Alaress\Database\Predicate;
+use PDOException;
+use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * A factory for building 'Project' filter objects
@@ -83,17 +91,14 @@ class Factory extends NullableContext\Factory
      * * reside in the contexts set by admin
      * * are linked to folders taught by the $viewee
      *
-     * @param Filter\IDefinition                                               $definition
-     * @param User                                                             $user
-     * @param Filter\Page\Model                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                  $selections Indexed selection.key
-     * @param null|User                                                        $viewee
-     * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides  Indexed filter.id, selection.key
-     * @return Filter\IComponent
+     * @inheritDoc
      * @throws DefinitionException If unable to find a joined mapper
+     * @throws InvalidArgumentException If $viewee is null
      * @throws Mapper\Exception If unable to hydrate a row
-     * @throws \InvalidArgumentException If $viewee is null
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     public function buildComponent(
         Filter\IDefinition $definition,
@@ -101,11 +106,13 @@ class Factory extends NullableContext\Factory
         Filter\Page\Model $pageFilter,
         ?GenericCollection $selections,
         ?User $viewee,
+        array $routeArgs,
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
-            throw new \InvalidArgumentException('$viewee cannot be null');
+            throw new InvalidArgumentException('$viewee cannot be null');
         }
+
         return new Component(
             $definition,
             $user,
@@ -113,7 +120,7 @@ class Factory extends NullableContext\Factory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
-            $this->getProjects($pageFilter, $viewee, $overrides)
+            $this->getProjects($pageFilter, $viewee, $routeArgs, $overrides)
         );
     }
 
@@ -136,30 +143,41 @@ class Factory extends NullableContext\Factory
     /**
      * @param Filter\Page\Model                                                $pageFilter
      * @param User                                                             $viewee
+     * @param array                                                            $routeArgs
      * @param GenericCollection|GenericCollection[]|Filter\Selection\Model[][] $overrides Indexed by filter.id, selection.key
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
-     * @throws \UnexpectedValueException
+     * @throws PDOException
+     * @throws Predicate\InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
-    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, GenericCollection $overrides)
+    private function getProjects(Filter\Page\Model $pageFilter, User $viewee, array $routeArgs, GenericCollection $overrides)
     {
         // Determine which folders we are ultimately interested in getting projects from:
         $options = $pageFilter->getOptions();
 
-        // Course-markbook does not insert folders that are related to current user.
-        if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK !== $pageFilter->getPage()) {
+        // Is this filter being used on a page that renders involved folders?
+        if (in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
             [$directFolders, $indirectFolders] = $this->fetchRelatedFolders($options, $pageFilter, $viewee);
         } else {
             $directFolders   = $this->folderMapper->createCollection();
             $indirectFolders = $this->folderMapper->createCollection();
         }
 
+        // Is component being used on a page that has a folder in the URL?
+        if (in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
+            $folder                            = $this->findFolderModel($routeArgs);
+            $directFolders[$folder->getId()]   = $folder;
+            $indirectFolders[$folder->getId()] = $folder;
+        }
+
         /* If we inserted an extra folder/s, we need to also insert any projects on that folder,
          * otherwise any assessments inside projects in the extra folder will never be visible.
          */
         $extraFolderIds = $this->parseFolderIds($overrides);
-        if (\count($extraFolderIds)) {
+        if (count($extraFolderIds)) {
             // An inserted folder may be neither a class or group, so look for project
             // on it directly, and via an unitImpl.
             $extraFolders    = $this->folderMapper->findByColumn('id', $extraFolderIds);
@@ -249,6 +267,10 @@ class Factory extends NullableContext\Factory
      * @return GenericCollection|Project\Model[]
      * @throws DefinitionException If unable to find a joined mapper
      * @throws Mapper\Exception If unable to hydrate a row
+     * @throws Predicate\InvalidColumnException
+     * @throws PDOException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
     private function fetchProjects(GenericCollection $directFolders, GenericCollection $indirectFolders)
     {
@@ -294,7 +316,7 @@ class Factory extends NullableContext\Factory
             $statement->execute($builder->getParams());
 
             /** @noinspection PhpAssignmentInConditionInspection */
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $folderId       = $row['f.id'];
                 $folderCodeCode = $row['fc.code'];
@@ -306,7 +328,6 @@ class Factory extends NullableContext\Factory
                     $projects->setOffset($projectId, $this->projectMapper->hydrate($row, 'p'));
                     $projects[$projectId]->setAssessmentModel($assessmentMapper->hydrate($row, 'a'));
                     $projects[$projectId]->getAssessmentModel()->setContextFolder($folderCache[$folderId]);
-                    $projects[$projectId]->setTitle($projects[$projectId]->getAssessmentModel()->getTitle());
                 }
                 if ($folderCodeCode && !$codeCache->offsetExists($folderCodeCode)) {
                     $codeCache->setOffset($folderCodeCode, $folderCodeMapper->hydrate($row, 'fc'));
@@ -346,7 +367,7 @@ class Factory extends NullableContext\Factory
             $statement->execute($builder->getParams());
 
             /** @noinspection PhpAssignmentInConditionInspection */
-            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 $projectId      = $row['p.id'];
                 $unitImplId     = $row['ui.id'];
                 $folderId       = $row['f.id'];
@@ -361,10 +382,9 @@ class Factory extends NullableContext\Factory
                     $unitImplCache[$unitImplId]->setFolder($folderCache[$folderId]);
                 }
                 if (!$projects->offsetExists($projectId)) {
-                    $projects->setOffset($projectId, $this->projectMapper->hydrate($row, 'p'));
+                    $projects[$projectId] = $this->projectMapper->hydrate($row, 'p');
                     $projects[$projectId]->setAssessmentModel($assessmentMapper->hydrate($row, 'a'));
                     $projects[$projectId]->getAssessmentModel()->setContextUnitImplementation($unitImplCache[$unitImplId]);
-                    $projects[$projectId]->setTitle($projects[$projectId]->getAssessmentModel()->getTitle());
                 }
                 if ($folderCodeCode && !$codeCache->offsetExists($folderCodeCode)) {
                     $codeCache->setOffset($folderCodeCode, $folderCodeMapper->hydrate($row, 'fc'));

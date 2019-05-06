@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Upcoming;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use External_ClassInterface;
+use function func_get_args;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
@@ -185,7 +186,7 @@ class Controller extends Base
 
         $page        = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
         $route       = $this->getRouter()->generate("learningUpcoming.postUpcomingForStudent", ['student' => $student, 'studentId' => $student->getId()]);
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $student, func_get_args());
 
         // Only get subjects from external if student's timetable isn't hidden.
         // I don't get this logic as class list != timetable, but apparently
@@ -339,7 +340,7 @@ class Controller extends Base
             'upcomingWork'    => $upcomingWork->limit(self::UPCOMING_WORK_LIMIT),
             'returnUrl'       => Redirect::queryString($this->getRequest()->query->get('page')),
             'readableFolders' => \array_unique($readableFolders),
-            'isFiltered'      => $this->isFilteredRequest($request),
+            'isFiltered'      => (new Filter\RequestChecker())->isFilteredRequest($request),
         ];
 
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
@@ -365,33 +366,5 @@ class Controller extends Base
             $filterIdMap[$definition->getFilter()->getId()] = $definition::getSlug();
         }
         return $filterIdMap;
-    }
-
-
-    /**
-     * Returns whether the payload indicates we are filtering to a sub-set of available upcoming assessments
-     *
-     * @param array $request
-     * @return bool
-     */
-    private function isFilteredRequest(array $request): bool
-    {
-        foreach ($request as $options) {
-            $countSelected = 0;
-            if (!\is_array($options)) {
-                // This will be an empty string when no concrete options are available. eg no READ-level folders.
-                // @see Codec::convertRequestToSelections()
-                continue;
-            }
-            foreach ($options as $option) {
-                if ($option) {
-                    $countSelected++;
-                }
-            }
-            if ($countSelected && $countSelected !== \count($options)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

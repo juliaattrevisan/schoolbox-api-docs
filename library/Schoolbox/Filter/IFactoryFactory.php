@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -35,10 +36,9 @@ interface IFactoryFactory
      *
      * @param string $filterDefinitionClass
      * @return IFactory
-     * @throws \InvalidArgumentException if no filter definition class not found, or filter factory not registered
-     * @throws \ReflectionException If the specified class does not exist
+     * @throws InvalidArgumentException if no filter definition class not found, or filter factory not registered
      */
-    public function buildFilterFactoryForFilter($filterDefinitionClass);
+    public function buildFilterFactoryForFilter(string $filterDefinitionClass): IFactory;
 
 
     /**
@@ -87,12 +87,12 @@ interface IFactoryFactory
      * @param string    $page
      * @param string    $route
      * @param null|User $viewee
+     * @param array     $routeArgs  Any route params, as received by the controller method
      * @param array     $request
      * @return Panel
      * @throws \InvalidArgumentException If unable to locate Filter mapper class, or required filter definition classes
-     * @throws \ReflectionException If the specified class does not exist
      * @throws \DomainException If this class has not defined the entity it is filtering
      */
-    public function buildPanel(User $user, $page, $route, User $viewee = null, array $request = []);
+    public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel;
 
 }

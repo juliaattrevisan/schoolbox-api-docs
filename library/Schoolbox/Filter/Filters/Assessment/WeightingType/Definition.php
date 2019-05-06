@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 
@@ -60,13 +61,14 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public static function getPages()
+    public static function getPages(): array
     {
         return [
             Filter\Page\Model::PAGE_PENDING_ASSESSMENTS,
             Filter\Page\Model::PAGE_GRADES,
-            Filter\Page\Model::PAGE_MARK_BOOK,
+            Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
             Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
+            Filter\Page\Model::PAGE_RUBRIC_MARK_BOOK,
             Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
         ];
     }
@@ -83,7 +85,7 @@ class Definition extends Filter\AbstractDefinition
         if (self::KEY_WEIGHTED === $key) {
             return 'Weighted';
         }
-        throw new \InvalidArgumentException("Unknown Weighting key: $key");
+        throw new InvalidArgumentException("Unknown Weighting key: $key");
     }
 
 

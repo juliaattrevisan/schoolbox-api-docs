@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Markbook;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
+use function func_get_args;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -148,7 +149,7 @@ class Controller extends Base
         $selection
             ->setFilter($filter)
             ->setUser($this->getUser())
-            ->setPage(Filter\Page\Model::PAGE_MARK_BOOK)
+            ->setPage(Filter\Page\Model::PAGE_CLASS_MARK_BOOK)
             ->setKey($key)
             ->setSelected(true);
         return $selection;
@@ -178,11 +179,11 @@ class Controller extends Base
         if (null === $viewee) {
             $viewee = $this->getUser();
         }
-        $page      = Filter\Page\Model::PAGE_MARK_BOOK;
+        $page      = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
         $route     = $this->getRouter()->generate('learningMarkbook.postMarkbook', ['userId' => $viewee->getId()]);
         $queryArgs = $this->getRequest()->query->getArrayCopy();
 
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $viewee, func_get_args(), $queryArgs);
 
         // Is a teacher looking at their own markbook, or admin looking at a teacher's markbook?
         $pageTitle = 'Markbook';
@@ -266,7 +267,7 @@ class Controller extends Base
     private function convertRequestToFilters(array $request, User $viewee, $saveToDB)
     {
         $selectionMapper = Filter\Selection\Mapper::getInstance(); // TODO pull from DI
-        $page            = Filter\Page\Model::PAGE_MARK_BOOK;
+        $page            = Filter\Page\Model::PAGE_CLASS_MARK_BOOK;
         $codec           = $this->filterFactoryFactory->buildCodec();
 
         // Convert Request to Selection models
