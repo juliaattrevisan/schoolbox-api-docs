@@ -485,17 +485,18 @@ class Controller extends Base
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = null;
                     }
 
-                    foreach($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
-                        $indicatorMaxMark      = $decimalHydrator->hydrate($indicatorMarks['maxMark']);
-                        $indicatorDatabaseMark = $decimalHydrator->hydrate($indicatorMarks['databaseMark']);
+                    foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
+                        $indicatorMaxMark           = $decimalHydrator->hydrate($indicatorMarks['maxMark']);
+                        $indicatorDatabaseMark      = $decimalHydrator->hydrate($indicatorMarks['databaseMark']);
+                        $humanReadableIndicatorMark = null;
+                        $normalisedIndicatorMark    = null;
 
-                        $totalMarkScheme->setTotalMark($indicatorMaxMark);
-
-                        $normalisedIndicatorMark = $indicatorMaxMark !== 0 && $indicatorMaxMark !== null && $indicatorDatabaseMark !== null
-                            ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
-                            : null;
-
-                        $humanReadableIndicatorMark = $totalMarkScheme->getHumanReadableMark($normalisedIndicatorMark);
+                        if ($indicatorMaxMark) {
+                            $normalisedIndicatorMark    = $indicatorDatabaseMark !== null
+                                ? ($indicatorDatabaseMark / $indicatorMaxMark) * 100
+                                : null;
+                            $humanReadableIndicatorMark = $totalMarkScheme->setTotalMark($indicatorMaxMark)->getHumanReadableMark($normalisedIndicatorMark);
+                        }
 
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] = $normalisedIndicatorMark;
