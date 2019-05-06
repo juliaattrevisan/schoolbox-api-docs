@@ -236,7 +236,7 @@ $app = new class extends CliTool\App
             $selectStmt->execute(['submission_box_id' => $submissionBoxId]);
             $capabilityUsages = $selectStmt->fetchAll();
             $newSequences     = [];
-            $this->getLogger()->debug("    Old Capability Usage sequences: {$this->formatSequenceString($capabilityUsages, 'rubric_group_id')}");
+            $this->getLogger()->debug($this->formatSequenceString('Old Capability Usage sequences', $capabilityUsages, 'rubric_group_id'));
             $newSequence = GroupUsage::SEQUENCE_BASE;
             foreach ($capabilityUsages as $row) {
                 $oldSequence = (int)$row['sequence'];
@@ -251,7 +251,7 @@ $app = new class extends CliTool\App
                     $newSequence++;
                 }
             }
-            $this->getLogger()->debug("    New Capability Usage sequences: {$this->formatSequenceString($newSequences, 'rubric_group_id')}");
+            $this->getLogger()->debug($this->formatSequenceString('New Capability Usage sequences', $newSequences, 'rubric_group_id'));
         }
     }
 
@@ -291,7 +291,7 @@ $app = new class extends CliTool\App
             $selectStmt->execute(['submission_box_id' => $submissionBoxId, 'rubric_group_id' => $rubricCapabilityId]);
             $indicatorUsages = $selectStmt->fetchAll();
             $newSequences    = [];
-            $this->getLogger()->debug("    Old Indicator Usage sequences: {$this->formatSequenceString($indicatorUsages, 'criterion_id')}");
+            $this->getLogger()->debug($this->formatSequenceString('Old Indicator Usage sequences', $indicatorUsages, 'criterion_id'));
             $newSequence = CriterionUsage::SEQUENCE_BASE;
             foreach ($indicatorUsages as $idx => $row) {
                 $oldSequence = (int)$row['sequence'];
@@ -306,7 +306,7 @@ $app = new class extends CliTool\App
                     $newSequence++;
                 }
             }
-            $this->getLogger()->debug("    New Indicator Usage sequences: {$this->formatSequenceString($newSequences, 'criterion_id')}");
+            $this->getLogger()->debug($this->formatSequenceString('New Indicator Usage sequences', $newSequences, 'criterion_id'));
         }
     }
 
@@ -314,16 +314,17 @@ $app = new class extends CliTool\App
     /**
      * Returns a set of Capability/Indicator usages as a human-friendly string
      *
+     * @param string $prefix
      * @param array  $usages
      * @param string $entityIdField
      * @return string
      */
-    private function formatSequenceString(array $usages, string $entityIdField): string
+    private function formatSequenceString(string $prefix, array $usages, string $entityIdField): string
     {
         $mapped = array_map(static function (array $usage) use ($entityIdField) {
             return $usage[$entityIdField] . ' => ' . $usage['sequence'];
         }, $usages);
-        return '[' . implode(', ', $mapped) . ']';
+        return "    $prefix  (id => seq.): [" . implode(', ', $mapped) . ']';
     }
 
 
