@@ -13,7 +13,8 @@
         });
 
         $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
-    }
+    };
+
 
     /**
      * Get parameters from DOM
@@ -36,13 +37,6 @@
         };
     };
 
-    /**
-     * Replace all media players with mejs
-     * @param selector
-     */
-    $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
-        $(selector).find('[data-schoolboxmedia-replacement]').mediaelementplayer();
-    };
 
     /**
      * Generate html compatible with media player
@@ -86,6 +80,15 @@
         }
 
         return false;
+    };
+
+
+    /**
+     * Replace all media players with mejs
+     * @param selector
+     */
+    $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
+        $(selector).find('[data-schoolboxmedia-replacement]').mediaelementplayer();
     };
     
 }(jQuery));
