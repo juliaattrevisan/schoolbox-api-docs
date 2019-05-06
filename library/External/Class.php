@@ -12,26 +12,26 @@ use Alaress\Redis;
 class External_Class implements External_ClassInterface{
     use External_CacheTrait;
 
-	private $database;
+    private $database;
 
-	/**
-	 * @var External_Offline_Class
-	 */
-	private $offline;
-	
-	/**
-	 * Constructor
-	 *
-	 * @throws Exception
-	 * @param String $databaseName
-	 */
-	public function __construct($databaseName = '') {
-		$factory = new External_DatabaseFactory();
-		$this->setDatabase($factory->buildClassConnector($databaseName));
-		$this->setOffline(new External_Offline_Class());
-		$this->setCache(Redis::getInstance());
+    /**
+     * @var External_Offline_Class
+     */
+    private $offline;
+
+    /**
+     * Constructor
+     *
+     * @throws Exception
+     * @param String $databaseName
+     */
+    public function __construct($databaseName = '') {
+        $factory = new External_DatabaseFactory();
+        $this->setDatabase($factory->buildClassConnector($databaseName));
+        $this->setOffline(new External_Offline_Class());
+        $this->setCache(Redis::getInstance());
         $this->setTimeout(Config::get('external_cache_timeout'));
-	}
+    }
 
     public function getStudents(string $classCode): array
     {
@@ -60,40 +60,40 @@ class External_Class implements External_ClassInterface{
     public function getTeacherName(string $classCode): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-	}
+    }
 
 
-	public function __call ($methodName, $argumentList) {
-		$database = $this->getDatabase();
+    public function __call ($methodName, $argumentList) {
+        $database = $this->getDatabase();
 
-		$methodReflection = new ReflectionMethod($database, $methodName);
+        $methodReflection = new ReflectionMethod($database, $methodName);
 
-		return $methodReflection->invokeArgs($database, $argumentList);
-	}
+        return $methodReflection->invokeArgs($database, $argumentList);
+    }
 
-	private function setDatabase ($database) {
-		$this->database = $database;
-	}
+    private function setDatabase ($database) {
+        $this->database = $database;
+    }
 
-	private function getDatabase () {
-		return $this->database;
-	}
-	
-	/**
-	 * @return External_Offline_Class
-	 */
-	public function getOffline()
-	{
-		return $this->offline;
-	}
+    private function getDatabase () {
+        return $this->database;
+    }
 
-	/**
-	 * @param External_Offline_Class $offline
-	 */
-	public function setOffline($offline)
-	{
-		$this->offline = $offline;
-	}
+    /**
+     * @return External_Offline_Class
+     */
+    public function getOffline()
+    {
+        return $this->offline;
+    }
+
+    /**
+     * @param External_Offline_Class $offline
+     */
+    public function setOffline($offline)
+    {
+        $this->offline = $offline;
+    }
 
     /**
      * @return array

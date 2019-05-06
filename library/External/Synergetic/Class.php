@@ -121,7 +121,7 @@ class External_Synergetic_Class implements External_ClassInterface
           vStudentsAll.ID = sy.ID AND
           vStudentsAll.FileYear = sy.FileYear
         )
-		JOIN dbo.Community cstu ON (vStudentsAll.ID = cstu.ID)
+        JOIN dbo.Community cstu ON (vStudentsAll.ID = cstu.ID)
         WHERE $classQuery
             AND (StudentClasses.FileYear='" . $fileYear . "')
             AND (StudentClasses.FileSemester='" . $fileSemester . "')

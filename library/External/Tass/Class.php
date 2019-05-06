@@ -8,20 +8,20 @@
 ************************************************************/
 
 class External_Tass_Class implements External_ClassInterface {
-	/**
-	 * @var MSSQL
-	 */
-	private $database;
+    /**
+     * @var MSSQL
+     */
+    private $database;
 
     /**
      * @var External_UserInterface
      */
     private $externalUser;
 
-	function __construct () {
-		$this->setDatabase(MSSQL::getInstance());
+    function __construct () {
+        $this->setDatabase(MSSQL::getInstance());
         $this->externalUser = new External_User('tass');
-	}
+    }
 
 
     /**
@@ -35,27 +35,27 @@ class External_Tass_Class implements External_ClassInterface {
         }
 
         $classQuery = '';
-		if(stristr($classCode, ',')) {
-			$subCodeArray = explode(',',$classCode);
-			foreach($subCodeArray as $code) {
-				list($year,$code,$class) = explode('-',$code);
-				$yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
+        if(stristr($classCode, ',')) {
+            $subCodeArray = explode(',',$classCode);
+            foreach($subCodeArray as $code) {
+                list($year,$code,$class) = explode('-',$code);
+                $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
-				$classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
-			}
-			$classQuery .= '1=0';
-		}
-		else {
-			list($year,$code,$class) = explode('-',$classCode);
+                $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
+            }
+            $classQuery .= '1=0';
+        }
+        else {
+            list($year,$code,$class) = explode('-',$classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
-			$classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
-		}
+            $classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
+        }
 
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-		$query = "
+        $query = "
             SELECT DISTINCT 
                 studsub.stud_code as synergy_id, 
                 student.preferred_name as firstname, 
@@ -74,61 +74,61 @@ class External_Tass_Class implements External_ClassInterface {
                 AND ( $classQuery )
             ORDER BY lastname, firstname";
 
-		return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
-	}
+        return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+    }
 
 
     /**
      * @inheritdoc
      */
-	public function getTeacherName(string $classCode): array
+    public function getTeacherName(string $classCode): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
             return [];
         }
 
-		$classQuery = '';
-		if(stristr($classCode, ',')) {
-			$subCodeArray = explode(',',$classCode);
-			foreach($subCodeArray as $code) {
-				list($year,$code,$class) = explode('-',$code);
+        $classQuery = '';
+        if(stristr($classCode, ',')) {
+            $subCodeArray = explode(',',$classCode);
+            foreach($subCodeArray as $code) {
+                list($year,$code,$class) = explode('-',$code);
                 $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 
-				$classQuery .= " ( $yearQuery sub_code = '$code' AND class = '$class' ) OR ";
-			}
-			$classQuery .= '1=0';
-		}
-		else {
-			list($year,$code,$class) = explode('-',$classCode);
+                $classQuery .= " ( $yearQuery sub_code = '$code' AND class = '$class' ) OR ";
+            }
+            $classQuery .= '1=0';
+        }
+        else {
+            list($year,$code,$class) = explode('-',$classCode);
             $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
-			$classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
-		}
+            $classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
+        }
 
 
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-		$query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
-					   AND ( $classQuery )";
+        $query = "SELECT DISTINCT tch_code FROM tchsub WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
+                       AND ( $classQuery )";
 
         $statement = $this->getDatabase()->query($query);
         $teachers = [];
-		while ($synrow = $statement->fetch()) {
-			$teachers[] = $synrow['tch_code'];
-		}
+        while ($synrow = $statement->fetch()) {
+            $teachers[] = $synrow['tch_code'];
+        }
 
-		return array_unique($teachers);
-	}
+        return array_unique($teachers);
+    }
 
-	private function setDatabase ($database) {
-		$this->database = $database;
-	}
+    private function setDatabase ($database) {
+        $this->database = $database;
+    }
 
-	private function getDatabase () {
-		return $this->database;
-	}
+    private function getDatabase () {
+        return $this->database;
+    }
 
     /**
      * @return array
