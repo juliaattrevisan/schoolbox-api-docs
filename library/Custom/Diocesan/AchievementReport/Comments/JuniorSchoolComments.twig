@@ -14,10 +14,10 @@
             <div class="scrollable">
                 <table>
                     <thead>
-                    <th>Subject</th>
-                    <th class="centered">Term</th>
-                    <th>Comment</th>
-                    <th>Teacher</th>
+                        <th>Subject</th>
+                        <th class="centered">Term</th>
+                        <th>Comment</th>
+                        <th>Teacher</th>
                     </thead>
                     <tbody>
                     {% for year, courseData in comments %}
@@ -50,5 +50,11 @@
     </div>
 </div>
 {% else %}
-<div class="alert-box">There are no comments for {{ year }}; please choose another.</div>
+<div class="alert-box">
+    {% if year is null %}
+    Please choose a year.
+    {% else %}
+    There are no comments for {{ year }}; please choose another.
+    {% endif %}
+</div>
 {% endif %}

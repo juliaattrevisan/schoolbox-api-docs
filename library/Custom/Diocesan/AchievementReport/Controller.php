@@ -326,6 +326,7 @@ class Controller extends Base {
      * @param User     $user
      * @param array    $externalUser
      * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function comments(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
@@ -334,6 +335,17 @@ class Controller extends Base {
          * could fiddle with the url to get illegal values
          */
         $allYears = (new Comments\CommentsNavigation($user, $externalUser, $db, $year))->findData();
+
+        /* If $year wasn't provided, go with the most recent year we have
+         */
+        if (null === $year && \count($allYears)) {
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('achievementreport.comments', [
+                    'externalUserId' => $externalUser['StudentID'],
+                    'year' => $allYears[0]
+                ])
+            );
+        }
 
         $output = [
             'template' => '@comments/index.twig',
