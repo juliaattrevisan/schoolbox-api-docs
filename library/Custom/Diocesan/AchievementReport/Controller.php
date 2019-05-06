@@ -357,6 +357,7 @@ class Controller extends Base {
                 'externalUser' => $externalUser,
                 'user' => $user,
                 'year' => $year,
+                'terms' => Comments\Comments::INITIAL_TERMS,
                 'isJuniorSchoolStudent' => (new ValidJuniorSchoolStudent())->isSatisfiedBy($user),
                 'commentsNavigation' => [
                     'all' => $allYears,

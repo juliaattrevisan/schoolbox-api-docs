@@ -29,7 +29,7 @@
                             {# Inspect every term for content
                              # Only render terms which have comments in them
                              #}
-                            {% for term in [1,2,3,4] %}
+                            {% for term in terms|keys %}
                                 {% if termData.terms[term] != '' %}
                                     <tr>
                                         <td>&nbsp;</td>

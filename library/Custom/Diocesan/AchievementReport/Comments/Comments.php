@@ -22,7 +22,7 @@ class Comments extends Base
     /**
      * Initialised array of term indices
      */
-    private const INITIAL_TERMS = [
+    public const INITIAL_TERMS = [
         1 => null,
         2 => null,
         3 => null,
