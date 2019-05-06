@@ -443,15 +443,7 @@
                     var replaced = false;
 
                     $(content).each(function (index, element) {
-                        $(element).find('[data-schoolboxresource-type]').each(function (childIndex, childEl) {
-                            var replacement = $.fn.schoolboxResource_GenerateReplacement(childEl);
-
-                            if (replacement) {
-                                $(childEl).replaceWith(replacement);
-
-                                replaced = true;
-                            }
-                        });
+                        replaced = $.fn.schoolboxResource_ReplaceAll($(element));
 
                         // Before we render the elements into the front-end, let's try to update the Vue comments model
                         // first so that we can easily initialise mediaelementplayer().
