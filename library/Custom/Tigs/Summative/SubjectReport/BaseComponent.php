@@ -54,6 +54,7 @@ class BaseComponent
             case Role::GUEST:
             case null:
                 // These are always fine
+                $escalation = false;
                 break;
             case Role::STAFF:
                 // Only staff can simulate staff
