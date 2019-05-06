@@ -14,6 +14,9 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 class CriterionUsage
 {
 
+    /** @var int */
+    public const SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
+
     /**
      * @var Criterion
      */
@@ -25,11 +28,9 @@ class CriterionUsage
     private $submission_box;
 
     /**
-     * 0-based
-     *
      * @var int
      */
-    private $sequence = 0;
+    private $sequence;
 
     /**
      * @param  Criterion $criterion
@@ -69,9 +70,9 @@ class CriterionUsage
 
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getSequence()
+    public function getSequence(): ?int
     {
         return $this->sequence;
     }
@@ -81,7 +82,7 @@ class CriterionUsage
      * @param int $sequence
      * @return static
      */
-    public function setSequence($sequence)
+    public function setSequence(int $sequence): self
     {
         $this->sequence = $sequence;
         return $this;

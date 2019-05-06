@@ -554,7 +554,7 @@ class RubricMapper
         $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
         $capabilityUsageModels = $capabilityUsageMapper->createCollection();
         $descriptorModels      = $descriptorMapper->createCollection();
-        $capabilitySequence    = 1;
+        $capabilitySequence    = GroupUsage::SEQUENCE_BASE;
         $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
@@ -568,7 +568,7 @@ class RubricMapper
                 ->setSequence($capabilitySequence++);
             $capabilityUsageModels->add($capabilityUsageModel);
 
-            $indicatorSequence = 1;
+            $indicatorSequence = CriterionUsage::SEQUENCE_BASE;
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
                 $indicatorUsageModel = $indicatorUsageMapper->createModel()
