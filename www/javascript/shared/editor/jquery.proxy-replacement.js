@@ -5,14 +5,28 @@
      */
     $.fn.schoolboxResource_ProxyReplacement = function() {
         $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
-            var replacement = $.fn.schoolboxResource_GenerateReplacement(element);
-
-            if (replacement !== false) {
-                $(element).replaceWith(replacement);
-            }
+            var replaced = $.fn.schoolboxResource_ReplaceOne(element);
         });
 
         $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
+    };
+
+
+    /**
+     * Replace all the placeholders that were found in element
+     *
+     * @param element
+     */
+    $.fn.schoolboxResource_ReplaceOne = function(element) {
+        var replacement = $.fn.schoolboxResource_GenerateReplacement(element);
+
+        if (replacement !== false) {
+            $(element).replaceWith(replacement);
+
+            return true;
+        }
+
+        return false;
     };
 
 
