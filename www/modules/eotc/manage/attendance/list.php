@@ -59,31 +59,30 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
     $this->setVar('filetype_block', '');
 
-    // Execute only when external database is set to Synergetic
-    if (\Schoolbox\Config\ConfigMapper::getInstance()->get('external_type') === 'synergetic') {
-        $externalHandler = new External_Synergetic_Class();
-        $allFiletypes = $externalHandler->findFiletypes();
+    $externalHandler = new External_Class();
+    
+    $allFiletypes = $externalHandler->findClassTypes();
 
-        if (is_array($allFiletypes) && count($allFiletypes)) {
-            foreach ($allFiletypes as $currentFiletype) {
-                $fileType = trim(strtoupper($currentFiletype['Code']));
+    if (is_array($allFiletypes) && count($allFiletypes)) {
+        foreach ($allFiletypes as $currentFiletype) {
+            $fileType = trim(strtoupper($currentFiletype['Code']));
 
-                // Ensure this file type is not in blacklist
+            // Ensure this file type is not in blacklist
 
-                if (!in_array($fileType, $externalFiletypeBlacklist)) {
+            if (!in_array($fileType, $externalFiletypeBlacklist)) {
 
-                    // Was not in blacklist, add it to the dropdown
+                // Was not in blacklist, add it to the dropdown
 
-                    $this->setVar([
-                        'FILETYPE_ID' => $fileType,
-                        'FILETYPE_NAME' => $currentFiletype['Description']
-                    ]);
+                $this->setVar([
+                    'FILETYPE_ID' => $fileType,
+                    'FILETYPE_NAME' => $currentFiletype['Description']
+                ]);
 
-                    $this->parse('filetype_block', 'filetype', true);
-                }
+                $this->parse('filetype_block', 'filetype', true);
             }
         }
     }
+
 
     if ($event->getMetadata()->getStudentAttendees()->count()) {
         $roleMapper = RoleMapper::getInstance();

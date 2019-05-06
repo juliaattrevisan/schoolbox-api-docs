@@ -100,7 +100,7 @@ class External_Class implements External_ClassInterface{
      */
     public function findClassTypes(): array
     {
-        return [];
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 
     /**
@@ -111,6 +111,6 @@ class External_Class implements External_ClassInterface{
      */
     public function findClassesByType(string $filetype, array $timetableCode): array
     {
-        return [];
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }
 }
