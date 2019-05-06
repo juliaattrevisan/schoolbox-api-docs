@@ -60,16 +60,15 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     $this->setVar('filetype_block', '');
 
     $externalHandler = new External_Class();
-    
     $allFiletypes = $externalHandler->findClassTypes();
 
     if (is_array($allFiletypes) && count($allFiletypes)) {
         foreach ($allFiletypes as $currentFiletype) {
-            $fileType = trim(strtoupper($currentFiletype['Code']));
+            $fileType = strtoupper(trim($currentFiletype['Code']));
 
             // Ensure this file type is not in blacklist
 
-            if (!in_array($fileType, $externalFiletypeBlacklist)) {
+            if (!in_array($fileType, $externalFiletypeBlacklist, false)) {
 
                 // Was not in blacklist, add it to the dropdown
 
