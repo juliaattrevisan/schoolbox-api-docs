@@ -2,13 +2,38 @@
 
     /**
      * Replace all placeholders with html elements
+     * By default this replaces everything in #content, our main container
      */
     $.fn.schoolboxResource_ProxyReplacement = function() {
-        $.each($('#content').find('[data-schoolboxresource-type]'), function (index, element) {
+
+        /* Replace all the placeholders with html fragments that a media player can understand
+         */
+        $.fn.schoolboxResource_ReplaceAll($('#content'));
+
+        /* Initialise the media player on this container
+         */
+        $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
+    };
+
+
+    /**
+     *
+     * @param selector  a jquery selection. This element contains all the placeholders
+     *                  that should be replaced with a media player
+     * @return int      the number of things that got replaced
+     */
+    $.fn.schoolboxResource_ReplaceAll = function(selector) {
+        var count = 0;
+
+        $.each(selector.find('[data-schoolboxresource-type]'), function (index, element) {
             var replaced = $.fn.schoolboxResource_ReplaceOne(element);
+
+            if (replaced) {
+                count++;
+            }
         });
 
-        $.fn.schoolboxResource_InitialiseMediaElementPlayer('#content');
+        return count;
     };
 
 
