@@ -129,4 +129,23 @@ class External_Schoolpro_Class implements External_ClassInterface
 
         return array_unique($allTeachers);
     }
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
+    }
 }

@@ -101,4 +101,23 @@ class External_Denbigh_Class implements External_ClassInterface
             $predicate["bindings"]
         )->fetchColumnArray('denbighID');
     }
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
+    }
 }

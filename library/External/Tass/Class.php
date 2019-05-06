@@ -129,4 +129,23 @@ class External_Tass_Class implements External_ClassInterface {
 	private function getDatabase () {
 		return $this->database;
 	}
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
+    }
 }

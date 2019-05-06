@@ -174,10 +174,9 @@ class External_Synergetic_Class implements External_ClassInterface
 
     /**
      * Get all the filetypes in Synergetic
-     *
-     * @return mixed
+     * @return array
      */
-    public function findFiletypes()
+    public function findClassTypes(): array
     {
         $query = "
             SELECT *
@@ -196,7 +195,7 @@ class External_Synergetic_Class implements External_ClassInterface
      *
      * @return mixed
      */
-    public function findSubjectsWithFiletype($filetype, $timetableCode)
+    public function findClassesByType(string $filetype, array $timetableCode): array
     {
         $database = $this->getDatabase();
         $params   = [

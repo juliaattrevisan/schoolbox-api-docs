@@ -36,4 +36,17 @@ interface External_ClassInterface {
      * @return string[]
      */
     public function getTeacherName(string $classCode): array;
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array;
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array;
 }

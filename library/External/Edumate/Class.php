@@ -103,4 +103,23 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         return array_unique($teachers);
     }
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
+    }
 }

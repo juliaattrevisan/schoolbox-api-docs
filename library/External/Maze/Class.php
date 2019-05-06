@@ -258,4 +258,23 @@ class External_Maze_Class implements External_ClassInterface {
 	protected function getHelper() {
 		return $this->helper;
 	}
-} 
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
+    }
+}

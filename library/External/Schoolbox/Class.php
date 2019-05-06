@@ -181,4 +181,23 @@ class External_Schoolbox_Class implements External_ClassInterface
             $predicate["bindings"]
         )->getIterator();
     }
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
+    }
 }
