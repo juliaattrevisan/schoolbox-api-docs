@@ -6,6 +6,7 @@
 
 use Schoolbox\Permission\Access\UserAccess;
 
+use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 
@@ -87,6 +88,16 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                         $this->setVar("STUDENT_SUBJECT_CODE", urlencode(urlencode($subject['code'])));
                         $this->parse("subject_item", "subject_block", true);
                     }
+                }
+            }
+
+            /* Diocesan Junior School Students don't have links to subjects
+             */
+            if ($this->getConfigMapper()->get('site_location') === 'diocesan') {
+                if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)) {
+                    $this->setVar([
+                        'subject_item' => ''
+                    ]);
                 }
             }
 
