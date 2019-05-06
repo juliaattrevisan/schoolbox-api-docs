@@ -93,6 +93,7 @@ class Module extends BaseModule
         );
     }
 
+
     /**
      * Macro method
      *
@@ -100,8 +101,9 @@ class Module extends BaseModule
      *
      * @param $params
      * @return array
+     * @throws \Exception
      */
-    public function getEverything($params)
+    public function getEverything($params): array
     {
         $externalUserHandler = $this->getExternalUser();
         $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
@@ -115,9 +117,7 @@ class Module extends BaseModule
         /* When selected user doesn't exist in schoolbox
          */
         try {
-            $userMapper = $this->getUserMapper();
-            $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
-            $user = $userMapper->findById($user->getId());
+            $user = $this->getUserMapper()->findByExternalId($params['externalUserId']);
         } catch (\Exception $e) {
             error(31);
             exit();
