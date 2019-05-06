@@ -19,14 +19,6 @@ class EntriesAndResults extends Base {
      */
     protected $heading = 'Entries And Results';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering
@@ -110,6 +102,7 @@ class EntriesAndResults extends Base {
 
         return $processed;
     }
+
 
     /**
      * Find individual assessment areas and their marks per term

@@ -10,7 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-class CourseCreditSummary extends Base {
+class CourseCreditSummary extends Base
+{
 
     /**
      * Heading
@@ -19,14 +20,6 @@ class CourseCreditSummary extends Base {
      */
     protected $heading = 'Course Credit Summary';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Find data set

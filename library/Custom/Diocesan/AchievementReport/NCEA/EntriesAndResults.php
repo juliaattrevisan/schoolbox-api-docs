@@ -10,7 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-class EntriesAndResults extends Base {
+class EntriesAndResults extends Base
+{
 
     /**
      * Heading
@@ -19,14 +20,6 @@ class EntriesAndResults extends Base {
      */
     protected $heading = 'Entries And Results';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering
@@ -166,6 +159,7 @@ class EntriesAndResults extends Base {
 
         return $finalStack;
     }
+
 
     /**
      * Find data about Entries and Results

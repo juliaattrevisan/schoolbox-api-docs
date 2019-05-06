@@ -99,8 +99,6 @@ abstract class Base {
         $this->setDb($db);
         $this->setYear($year);
         $this->setCurrentYear(date('Y'));
-
-        $this->setup();
     }
 
     /**
@@ -121,13 +119,6 @@ abstract class Base {
 
         new \Alaress_Probe($stuff);
     }
-
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    abstract protected function setup();
 
     /**
      * Returns data for twig rendering

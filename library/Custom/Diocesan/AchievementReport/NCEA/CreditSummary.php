@@ -10,7 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-class CreditSummary extends Base {
+class CreditSummary extends Base
+{
 
     /**
      * Heading
@@ -19,14 +20,6 @@ class CreditSummary extends Base {
      */
     protected $heading = 'Credit Summary - All Years';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering
@@ -46,6 +39,7 @@ class CreditSummary extends Base {
 
         return $finalStack;
     }
+
 
     /**
      * Find all the numeric data to be used throughout this section
@@ -84,6 +78,7 @@ class CreditSummary extends Base {
 
         return array();
     }
+
 
     /**
      * Find values to populate the Credit Summary - All Years table
@@ -166,6 +161,7 @@ class CreditSummary extends Base {
         return $finalStack;
     }
 
+
     /**
      * Find values to populate Total Achieved Credits graph
      *
@@ -224,6 +220,7 @@ class CreditSummary extends Base {
 
         return $finalStack;
     }
+
 
     /**
      * Find values to populate Standard Type graph
@@ -289,6 +286,7 @@ class CreditSummary extends Base {
         return $finalStack;
     }
 
+
     /**
      * Find values to populate Assessment Type graph
      *
@@ -345,6 +343,7 @@ class CreditSummary extends Base {
 
         return $finalStack;
     }
+
 
     /**
      * Find values to populate Result graph

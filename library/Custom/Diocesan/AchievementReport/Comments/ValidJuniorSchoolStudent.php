@@ -13,6 +13,7 @@ use Schoolbox\User;
 
 class ValidJuniorSchoolStudent
 {
+
     /**
      * This is the Junior School Students campus code
      */

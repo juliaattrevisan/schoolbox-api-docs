@@ -13,14 +13,6 @@ namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 class Footer extends Base {
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering

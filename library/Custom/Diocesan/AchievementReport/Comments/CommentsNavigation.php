@@ -13,17 +13,6 @@ class CommentsNavigation extends Base
 {
 
     /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-        // TODO: Implement setup() method.
-    }
-
-
-    /**
      * Returns data for twig rendering
      *
      * Finds all the years that have data

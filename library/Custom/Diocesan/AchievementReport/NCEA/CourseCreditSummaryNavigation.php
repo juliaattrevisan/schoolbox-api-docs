@@ -13,7 +13,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-class CourseCreditSummaryNavigation extends Base {
+class CourseCreditSummaryNavigation extends Base
+{
 
     /**
      * Heading
@@ -22,14 +23,6 @@ class CourseCreditSummaryNavigation extends Base {
      */
     protected $heading = 'Course Credit Summary';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering

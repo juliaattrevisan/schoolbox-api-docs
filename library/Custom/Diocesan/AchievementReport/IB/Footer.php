@@ -11,16 +11,8 @@
 namespace Custom\Diocesan\AchievementReport\IB;
 
 
-class Footer extends Base {
-
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
+class Footer extends Base
+{
 
     /**
      * Returns data for twig rendering

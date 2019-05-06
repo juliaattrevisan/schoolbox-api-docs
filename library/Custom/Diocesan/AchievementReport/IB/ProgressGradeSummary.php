@@ -10,7 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\IB;
 
-class ProgressGradeSummary extends Base {
+class ProgressGradeSummary extends Base
+{
 
     /**
      * Heading
@@ -19,14 +20,6 @@ class ProgressGradeSummary extends Base {
      */
     protected $heading = 'Progress Grade Summary';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering
@@ -117,6 +110,7 @@ class ProgressGradeSummary extends Base {
 
         return $finalStack;
     }
+
 
     /**
      * Find all progress grades

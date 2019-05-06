@@ -19,14 +19,6 @@ class GradeSummary extends Base {
      */
     protected $heading = 'Grade Summary';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Obtain data

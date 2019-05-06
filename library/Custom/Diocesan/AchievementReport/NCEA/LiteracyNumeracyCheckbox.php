@@ -10,7 +10,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-class LiteracyNumeracyCheckbox extends Base {
+class LiteracyNumeracyCheckbox extends Base
+{
 
     /**
      * Heading
@@ -19,14 +20,6 @@ class LiteracyNumeracyCheckbox extends Base {
      */
     protected $heading = '';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering

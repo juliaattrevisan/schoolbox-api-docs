@@ -14,10 +14,6 @@ use Custom\Diocesan\AchievementReport\NormaliseTeachers;
 
 class Comments extends Base
 {
-    public function setup()
-    {
-    }
-
 
     /**
      * Initialised array of term indices

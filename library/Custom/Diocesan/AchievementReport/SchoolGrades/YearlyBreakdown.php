@@ -19,14 +19,6 @@ class YearlyBreakdown extends Base {
      */
     protected $heading = 'School Grades Summary';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering
