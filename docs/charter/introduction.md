@@ -1,3 +1,3 @@
-# Alaress Product Team Charter
+# Schoolbox Product Team Charter
 
-The co-authored and mutually-agreed-upon charter of practise of the Product Team of Alaress.
+The co-authored and mutually-agreed-upon charter of practise of the Product Team of Schoolbox.

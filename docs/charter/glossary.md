@@ -7,8 +7,8 @@ Full Name | Most commonly known as | Nicknames | GitHub username
 --- | --- | --- | ---
 Dorothea Baker | Dorothea | | d-baker
 Steve Chan | Steve | | stevechan
-Matt Day | The Doctor / Matt / MD | Doctoray, Doctorinox, Mr Matt | emdienn
-Doug MacKenzie | Doug | Dough | dougmackenzie
+<s>Matt Day | The Doctor / Matt / MD | Doctoray, Doctorinox, Mr Matt | emdienn</s>
+<s>Doug MacKenzie | Doug | Dough | dougmackenzie</s>
 Sophia Marinou | Sophia | | sophiamarinou
 Andy Ryan | Andy | Airian-tech | andrewryantech
 Amri Sannang | Amri | | armatronic
@@ -20,8 +20,8 @@ Full Name | Most commonly known as | Nicknames | GitHub username
 --- | --- | --- | ---
 Stuart Mahon | Stuart | Stu | stuart-mahon
 James Leckie | James | Leck-tech | jleckie
-Sam Bailey | Sam | | thatsamguy
-Damian Sloane | Damo | | dddaaammmooo
+<s>Sam Bailey | Sam | | thatsamguy</s>
+<s>Damian Sloane | Damo | | dddaaammmooo</s>
 Josh Cauchi | Josh | Cauchi | joshcauchi
 Natalie Bakhtadze | Nat | | nataliebakhtadze
 
@@ -35,6 +35,7 @@ Breadcrumbs | (n.) See https://en.wikipedia.org/wiki/Breadcrumb_(navigation)
 CK, CKE, CKEditor | (n.) An inline wysiwyg editor.
 Connector | (n.) Software that connects to a SIS from which it draws data.
 Date Picker | (n.) A modal that allows you to specify dates from a calendar-esque view.
+Dev Data | (n.) The test data set that developers usually use. Despite its name, it is named `legacy.tar.gz`  
 Empty State | (n.) The grey block that displays when a component does not contain any content.
 EOTC | (n.) "Education Outside the Classroom". A module in Schoolbox. Search for eotc/README.md.
 eVi | (n.) MGGS' instance name.
@@ -50,6 +51,7 @@ Jewellery | (n.) The colored blobs indicating an assessment's review/submission 
 Joyride | (n.) See **Feature Tour**
 Jube | (n.) See **Jewellery**.
 Kami | (n.) A third party service that allows annotations on documents via the user interface.
+Legacy Data | (n.) See **Dev Data**
 Mage | (n.) A progressive form that isn't as powerful as a wizard.
 Modal | (n.) https://en.wikipedia.org/wiki/Modal_window
 Nat Picker | (n.) The datepicker that Natalie built. See **Date Picker**.
@@ -61,6 +63,7 @@ Plagscan | (n.) A plagiarism checker. Third party service.
 Quick Mark page | (n.) Also known as the Status Page
 Resource Browser | (n.) An in-Schoolbox file and folder browser for SBFS
 Rubicon Atlas | (n.) A curriculum mapping software we are soon to integrate with - https://www.rubicon.com/
+Sales Data | (n.) The test data set that is used by sales and marketing to demo Schoolbox
 Selectize | (n.) A jQuery plugin we use for our autocomplete/tag selector inputs  - https://selectize.github.io/selectize.js/
 Sentry | (n.) An error reporting service that costs us money for everything it encounters.
 SBFS | (n.) Schoolbox File System - the virtual file system that Schoolbox uses for storing folders, as well as their homepages, files and subfolders. 

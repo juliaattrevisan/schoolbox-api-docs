@@ -1,5 +1,7 @@
 # Schoolbox Development Standards
 
+> TODO this is very much a WIP
+
 > “It’s not what you preach, it’s what you tolerate.”
 
 
@@ -17,6 +19,8 @@ This document is intended for:
   * They can continue to grow their craft, by following standards and knowing the reasoning behind them
 * Reviewers and Quality Assurance, so that:
   * They can quickly verify that a proposed code change is of an acceptable standard
+* Tech Leads and other leadership positions, so that:
+  * They can communicate the standards and their importance, and ideally ensure that following them becomes second nature 
 
 
 ## Standards
