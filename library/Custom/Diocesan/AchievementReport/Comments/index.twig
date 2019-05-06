@@ -7,15 +7,8 @@
 
 <div class="row">
     <div class="small-12 columns achievement-report comments">
-        {% if isJuniorSchoolStudent %}
-            {% include '@comments/JuniorSchoolComments.twig' with {
-                comments: comments
-            } %}
-        {% else %}
-            {% include '@comments/SeniorSchoolComments.twig' with {
-                comments: comments
-            } %}
-        {% endif %}
+        {% include '@comments/Comments.twig' with {
+            comments: comments
+        } %}
     </div>
 </div>
-

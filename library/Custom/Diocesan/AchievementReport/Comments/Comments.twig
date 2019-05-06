@@ -1,5 +1,5 @@
 {##
- # Senior School Comments
+ # Comments
  #
  # Renders all the comments for a particular year and a particular student
  #
@@ -50,11 +50,11 @@
     </div>
 </div>
 {% else %}
-<div class="alert-box">
-    {% if year is null %}
-    Please choose a year.
-    {% else %}
-    There are no comments for {{ year }}; please choose another.
-    {% endif %}
-</div>
+    <div class="alert-box">
+        {% if year is null %}
+            Please choose a year.
+        {% else %}
+            There are no comments for {{ year }}; please choose another.
+        {% endif %}
+    </div>
 {% endif %}
