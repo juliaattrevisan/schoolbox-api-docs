@@ -246,11 +246,11 @@ class Controller extends Base
             FROM v_rubric vr
             WHERE vr.assessment_id IN ({$pb->getPlaceholder()})
             ORDER BY
-            	vr.assessment_id,
-            	vr.capability_sequence ASC,
-            	vr.capability_id,
-            	vr.indicator_sequence ASC,
-            	vr.indicator_id
+                vr.assessment_id,
+                vr.capability_sequence ASC,
+                vr.capability_id,
+                vr.indicator_sequence ASC,
+                vr.indicator_id
         ";
         $stmt = $this->internalDb->prepareQuery($sql);
 
@@ -335,6 +335,8 @@ class Controller extends Base
                 vrm.indicator_max_value  AS indicator_max_value
             FROM (
                 SELECT
+                    sb.assessment_id,
+                    sr.owner,
                     MAX(sr.published_at) AS max_published_at
                 FROM submission_return sr
                 INNER JOIN submission_box sb on sr.box_id = sb.id
@@ -344,7 +346,10 @@ class Controller extends Base
                       sr.review_route = :review_route
                 GROUP BY sb.assessment_id, sr.owner
             ) latest_feedback
-            INNER JOIN v_rubric_mark vrm ON vrm.feedback_date = latest_feedback.max_published_at
+            INNER JOIN v_rubric_mark vrm ON
+                vrm.feedback_date = latest_feedback.max_published_at AND
+                vrm.assessment_id = latest_feedback.assessment_id AND
+                vrm.student_id    = latest_feedback.owner
             INNER JOIN user u ON vrm.student_id = u.id
             WHERE
               vrm.feedback_type = :review_route AND
