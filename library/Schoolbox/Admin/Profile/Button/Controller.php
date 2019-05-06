@@ -277,6 +277,7 @@ class Controller extends Base
         $item->setTitle($post['title']);
         $item->setIcon($post['icon']);
         $item->setUrl($post['url']);
+        $item->setCss(trim($post['css']));
         $item->setTarget($post['target']);
         
         $this->profileButtonMapper->save($item);

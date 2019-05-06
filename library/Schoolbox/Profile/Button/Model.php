@@ -26,6 +26,9 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $url;
 
+    /** @var string */
+    protected $css;
+
     /** @var string|null */
     protected $target;
 
@@ -120,6 +123,26 @@ class Model implements ISoftDeletable
     public function getUrl(): string
     {
         return $this->url;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getCss(): ?string
+    {
+        return $this->css;
+    }
+
+
+    /**
+     * @param string|null $css
+     * @return self
+     */
+    public function setCss(?string $css): self
+    {
+        $this->css = $css;
+        return $this;
     }
 
     /**

@@ -145,6 +145,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                     'BUTTON_TITLE' => $customButton->getTitle(),
                     'BUTTON_HREF' => $customButton->getURL(),
                     'BUTTON_ICON' => $customButton->getIcon(),
+                    'BUTTON_CSS' => $customButton->getCss(),
                     'BUTTON_TARGET' => $customButton->getTarget(),
                 ]);
 
