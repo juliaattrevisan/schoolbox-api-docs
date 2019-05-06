@@ -70,11 +70,11 @@ $app = new class extends CliTool\App
     {
         $this->getLogger()->info('Finding DueWorks having Capability Usages with sequence collisions');
         $submissionBoxIdsWithCollisions = $this->getCapabilitySequenceCollisions();
-        $this->getLogger()->info(sprintf('%s Capability Usage sequence collisions found.', count($submissionBoxIdsWithCollisions) ?: 'No'));
+        $this->getLogger()->info(sprintf('%d Capability Usage sequence collisions found.', count($submissionBoxIdsWithCollisions)));
 
         $this->getLogger()->info('Finding DueWorks having Capability Usages with a 0 sequence');
         $submissionBoxIdsWithInvalid = $this->findCapabilityUsagesWithInvalidSequence();
-        $this->getLogger()->info(sprintf('%s Submission boxes found with invalid Capability sequences.', count($submissionBoxIdsWithInvalid) ?: 'No'));
+        $this->getLogger()->info(sprintf('%d Submission boxes found with invalid Capability sequences.', count($submissionBoxIdsWithInvalid)));
 
         $submissionBoxIds = array_unique(array_merge($submissionBoxIdsWithCollisions, $submissionBoxIdsWithInvalid));
         $this->repairCapabilityUsages($submissionBoxIds);
@@ -88,11 +88,11 @@ $app = new class extends CliTool\App
     {
         $this->getLogger()->info('Finding DueWorks having Indicator Usages with sequence collisions');
         $submissionBoxAndCapabilitiesWithCollisions = $this->getIndicatorSequenceCollisions();
-        $this->getLogger()->info(sprintf('%s Indicator Usage sequence sets with collisions found.', count($submissionBoxAndCapabilitiesWithCollisions) ?: 'No'));
+        $this->getLogger()->info(sprintf('%d Indicator Usage sequence sets with collisions found.', count($submissionBoxAndCapabilitiesWithCollisions)));
 
         $this->getLogger()->info('Finding DueWorks having Indicator Usages with a 0 sequence');
         $submissionBoxIdsWithInvalid = $this->findIndicatorUsagesWithInvalidSequence();
-        $this->getLogger()->info(sprintf('%s Submission box / Capability found with invalid Indicator sequences.', count($submissionBoxIdsWithInvalid) ?: 'No'));
+        $this->getLogger()->info(sprintf('%d Submission box / Capability found with invalid Indicator sequences.', count($submissionBoxIdsWithInvalid)));
 
 
         // Combine and get distinct submissionBox/Capability
@@ -235,7 +235,8 @@ $app = new class extends CliTool\App
             $this->getLogger()->info("Repairing Submission Box ($submissionBoxId)");
             $selectStmt->execute(['submission_box_id' => $submissionBoxId]);
             $capabilityUsages = $selectStmt->fetchAll();
-            $this->getLogger()->info("    Old Capability Usage sequences: {$this->formatSequenceString($capabilityUsages, 'rubric_group_id')}");
+            $newSequences     = [];
+            $this->getLogger()->debug("    Old Capability Usage sequences: {$this->formatSequenceString($capabilityUsages, 'rubric_group_id')}");
             $newSequence = GroupUsage::SEQUENCE_BASE;
             foreach ($capabilityUsages as $row) {
                 $oldSequence = (int)$row['sequence'];
@@ -245,11 +246,12 @@ $app = new class extends CliTool\App
                         'rubric_group_id'   => $row['rubric_group_id'],
                         'submission_box_id' => $submissionBoxId,
                     ]);
-                    $this->getLogger()->debug("Capability {$row['rubric_group_id']} new sequence: $newSequence");
+                    $newSequences[] = ['rubric_group_id' => $row['rubric_group_id'], 'sequence' => $newSequence,];
                     $this->countCapabilityUsagesChanged++;
                     $newSequence++;
                 }
             }
+            $this->getLogger()->debug("    New Capability Usage sequences: {$this->formatSequenceString($newSequences, 'rubric_group_id')}");
         }
     }
 
@@ -288,7 +290,8 @@ $app = new class extends CliTool\App
             $this->getLogger()->info("Repairing Submission Box ($submissionBoxId), Capability: ({$rubricCapabilityId})");
             $selectStmt->execute(['submission_box_id' => $submissionBoxId, 'rubric_group_id' => $rubricCapabilityId]);
             $indicatorUsages = $selectStmt->fetchAll();
-            $this->getLogger()->info("    Old Indicator Usage sequences: {$this->formatSequenceString($indicatorUsages, 'criterion_id')}");
+            $newSequences    = [];
+            $this->getLogger()->debug("    Old Indicator Usage sequences: {$this->formatSequenceString($indicatorUsages, 'criterion_id')}");
             $newSequence = CriterionUsage::SEQUENCE_BASE;
             foreach ($indicatorUsages as $idx => $row) {
                 $oldSequence = (int)$row['sequence'];
@@ -298,11 +301,12 @@ $app = new class extends CliTool\App
                         'criterion_id'      => $row['criterion_id'],
                         'submission_box_id' => $submissionBoxId,
                     ]);
-                    $this->getLogger()->debug("Indicator {$row['criterion_id']} new sequence: $newSequence");
+                    $newSequences[] = ['criterion_id' => $row['criterion_id'], 'sequence' => $newSequence,];
                     $this->countIndicatorUsagesChanged++;
                     $newSequence++;
                 }
             }
+            $this->getLogger()->debug("    New Indicator Usage sequences: {$this->formatSequenceString($newSequences, 'criterion_id')}");
         }
     }
 
