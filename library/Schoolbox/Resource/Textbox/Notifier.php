@@ -13,6 +13,7 @@ namespace Schoolbox\Resource\Textbox;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
@@ -37,9 +38,13 @@ class Notifier extends ResourceNotifier
     protected function notifyAffected($action, $roletype, $resource, $effector, $diff = null): Envelope
     {
         $envelope = new Envelope();
-
         $resourceId = $resource->getId();
-        $category = $resource->getCategory();
+
+        try {
+            $category = $this->folderMapper->findById($resource->getCategory()->getId());
+        } catch (Exception $e) {
+            return $envelope;
+        }
 
         $bob = new Builder();
 
