@@ -114,10 +114,10 @@ class Definition extends Filter\AbstractDefinition
             return '(none) - Not using Rubric';
         }
         if (self::KEY_ON === $key) {
-            return "Mark per {$this->rosettaStone->translate('rubricGroup', false, true)} ON";
+            return "Enabled";
         }
         if (self::KEY_OFF === $key) {
-            return "Mark per {$this->rosettaStone->translate('rubricGroup', false, true)} OFF";
+            return "Disabled";
         }
         throw new InvalidArgumentException(sprintf("Unknown '%s' key: '%s'", self::NAME, $key));
     }

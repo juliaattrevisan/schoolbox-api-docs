@@ -573,13 +573,13 @@ class IdFinder extends Filter\AbstractIdFinder
     private function getClauseRubricUsage(?Collection $rubricUsages, ?Collection $aTypes, string $dueWorkAlias): array
     {
         // Do we not wish to apply this filter?
-        if(null === $rubricUsages){
+        if (null === $rubricUsages) {
             // Always return the row, no params
             return ['', 'TRUE', []];
         }
 
         // Do we need to join to usage table?
-        if($rubricUsages->count() === 1 && $rubricUsages->keyExists(RubricUsage\Definition::KEY_NONE)){
+        if ($rubricUsages->count() === 1 && $rubricUsages->keyExists(RubricUsage\Definition::KEY_NONE)) {
             // No need to join to usage, we can just examine the `submission_box.use_rubric` column.
             $join = '';
         } else {
@@ -594,8 +594,8 @@ class IdFinder extends Filter\AbstractIdFinder
 
         $capabilityIds = [];
 
-        foreach($rubricUsages as $rubricUsage){
-            if($rubricUsage === RubricUsage\Definition::KEY_NONE){
+        foreach($rubricUsages as $rubricUsage) {
+            if ($rubricUsage === RubricUsage\Definition::KEY_NONE) {
                 $pb->isFalse("$dueWorkAlias.use_rubric");
             } else {
                 // This assumes that if an assessment is using an indicator, it is using the indicator's capability.
@@ -605,7 +605,7 @@ class IdFinder extends Filter\AbstractIdFinder
             }
         }
 
-        foreach(array_unique($capabilityIds) as $uniqueCapId){
+        foreach(array_unique($capabilityIds) as $uniqueCapId) {
             $pb->equals('rgu.rubric_group_id', $uniqueCapId);
         }
 
@@ -636,7 +636,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
         $pb                   = $this->getMapper()->getPredicateBuilder();
 
-        if($markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)){
+        if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)) {
             // Not a DueWork
             $pb->isNull("$dueWorkAlias.id");
 
@@ -644,10 +644,10 @@ class IdFinder extends Filter\AbstractIdFinder
             $pb->isFalse("$dueWorkAlias.use_rubric");
         }
 
-        if($markPerCap->keyExists(MarkPerCap\Definition::KEY_ON)){
+        if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_ON)) {
             $pb->isTrue("$dueWorkAlias.rubric_group_marks");
         }
-        if($markPerCap->keyExists(MarkPerCap\Definition::KEY_OFF)){
+        if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_OFF)) {
             $pb->isFalse("$dueWorkAlias.rubric_group_marks");
         }
 
@@ -678,15 +678,15 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         $folderIds = null;
-        if($teacherFolderIds){
+        if ($teacherFolderIds) {
             $folderIds = $teacherFolderIds->getAll();
         }
-        if($studentFolderIds){
+        if ($studentFolderIds) {
             $folderIds = null === $folderIds
                 ? $studentFolderIds
                 : array_intersect($folderIds, $studentFolderIds->getAll());
         }
-        if($courseImportFolderIds){
+        if ($courseImportFolderIds) {
             $folderIds = null === $folderIds
                 ? $courseImportFolderIds :
                 array_intersect($folderIds, $courseImportFolderIds->getAll());
@@ -1132,7 +1132,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $courseImportFolderIds = $completeFilters[Folder\CourseImports\Definition::class];
 
         // Did call explicitly request assessments that do not have an ultimate folder?
-        if ($courseImportFolderIds instanceOf Collection && !$courseImportFolderIds->count()) {
+        if ($courseImportFolderIds instanceof Collection && !$courseImportFolderIds->count()) {
             // All assessments have an ultimate folder
             return true;
         }
@@ -1141,7 +1141,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $teacherFolderIds = $completeFilters[Folder\TeacherInvolved\Definition::class];
 
         // Did call explicitly request assessments that do not have an teacher folder?
-        if ($teacherFolderIds instanceOf Collection && !$teacherFolderIds->count()) {
+        if ($teacherFolderIds instanceof Collection && !$teacherFolderIds->count()) {
             // All assessments have an ultimate folder
             return true;
         }
@@ -1150,7 +1150,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $studentFolderIds = $completeFilters[Folder\StudentInteractions\Definition::class];
 
         // Did call explicitly request assessments that do not have an student folder?
-        if ($studentFolderIds instanceOf Collection && !$studentFolderIds->count()) {
+        if ($studentFolderIds instanceof Collection && !$studentFolderIds->count()) {
             // All assessments have an ultimate folder
             return true;
         }
@@ -1159,7 +1159,7 @@ class IdFinder extends Filter\AbstractIdFinder
         $unitSpecIds = $completeFilters[NullableContext\UnitSpec\Definition::class];
 
         // Did caller request assessments that live in unit-impls and unit-specs simultaneously?
-        if ($unitImplIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImplIds->count() && $unitSpecIds->count()) {
+        if ($unitImplIds instanceof Collection && $unitSpecIds instanceof Collection && $unitImplIds->count() && $unitSpecIds->count()) {
             // Assessments cannot live in both a unitImpl and unitSpec at the same time.
             return true;
         }
@@ -1167,14 +1167,14 @@ class IdFinder extends Filter\AbstractIdFinder
         // Did caller specify assessment must reside directly in some unit-spec, and also be
         // directly in a unit-impl (that was imported from some spec)?
         $unitImportSpecIds = $completeFilters[NullableContext\UnitImportSpec\Definition::class];
-        if ($unitImportSpecIds instanceOf Collection && $unitSpecIds instanceOf Collection && $unitImportSpecIds->count() && $unitSpecIds->count()) {
+        if ($unitImportSpecIds instanceof Collection && $unitSpecIds instanceof Collection && $unitImportSpecIds->count() && $unitSpecIds->count()) {
             return true;
         }
 
 
         // Did caller request assessment that live inside unit-impls that were not imported, or were imported from unit-specs
         // but don't live in a unit-spec?
-        if ($unitImplIds instanceOf Collection && $unitImportSpecIds instanceOf Collection && (bool)$unitImplIds->count() !== (bool)$unitImportSpecIds->count()) {
+        if ($unitImplIds instanceof Collection && $unitImportSpecIds instanceof Collection && (bool)$unitImplIds->count() !== (bool)$unitImportSpecIds->count()) {
             return true;
         }
 
@@ -1193,21 +1193,21 @@ class IdFinder extends Filter\AbstractIdFinder
     {
         // Did call explicitly request assessments that do not have an assessment type?
         $assessmentTypes = $completeFilters[AssessmentType\Definition::class];
-        if ($assessmentTypes instanceOf Collection && !$assessmentTypes->count()) {
+        if ($assessmentTypes instanceof Collection && !$assessmentTypes->count()) {
             // All assessments have a type
             return true;
         }
 
         // Did call explicitly request assessments due in some term, but no terms supplied?
         $termsDue = $completeFilters[Term\Due\Definition::class];
-        if ($termsDue instanceOf Collection && !$termsDue->count()) {
+        if ($termsDue instanceof Collection && !$termsDue->count()) {
             // All assessments have due dates
             return true;
         }
 
         // Did call explicitly request assessments close in some term, but no terms supplied?
         $termsClose = $completeFilters[Term\Close\Definition::class];
-        if ($termsClose instanceOf Collection && !$termsClose->count()) {
+        if ($termsClose instanceof Collection && !$termsClose->count()) {
             // All assessments have have a close date
             return true;
         }
@@ -1217,7 +1217,7 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // Did call explicitly request assessments with a weightingType, but no weightingTypes supplied?
         $weightingType = $completeFilters[WeightingType\Definition::class];
-        if ($weightingType instanceOf Collection && !$weightingType->count()) {
+        if ($weightingType instanceof Collection && !$weightingType->count()) {
             // All assessments have a weighting type
             return true;
         }
@@ -1234,21 +1234,21 @@ class IdFinder extends Filter\AbstractIdFinder
 
         // The full set of capability/indicator keys includes a 'none' key, so the full set is essentially [no usages, specific usages ...].
         // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
-        if ($rubricUsage instanceOf Collection && !$rubricUsage->count()) {
+        if ($rubricUsage instanceof Collection && !$rubricUsage->count()) {
             return true;
         }
 
         // The full set of markPerCap keys includes a 'none' key, so the full set is essentially [no rubric, markPerCap ON, markPerCap OFF].
         // This means the full set matches ALL assessments, and hence the empty set matches NO assessments.
-        if ($markPerCap instanceOf Collection && !$markPerCap->count()) {
+        if ($markPerCap instanceof Collection && !$markPerCap->count()) {
             return true;
         }
 
         // Intersection: AssessmentType + RubricUsage.
         // Not a DueWork && Specific Rubric Usage/s?
         if (
-            $assessmentTypes instanceOf Collection &&
-            $rubricUsage instanceOf Collection &&
+            $assessmentTypes instanceof Collection &&
+            $rubricUsage instanceof Collection &&
             !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
             !$rubricUsage->keyExists(RubricUsage\Definition::KEY_NONE)
         ) {
@@ -1258,8 +1258,8 @@ class IdFinder extends Filter\AbstractIdFinder
         // Intersection: AssessmentType + MarkPerCap.
         // Not a DueWork && MarkPerCap set?
         if (
-            $assessmentTypes instanceOf Collection &&
-            $markPerCap instanceOf Collection &&
+            $assessmentTypes instanceof Collection &&
+            $markPerCap instanceof Collection &&
             !$assessmentTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK) &&
             !$markPerCap->keyExists(MarkPerCap\Definition::KEY_NONE)
         ) {
@@ -1267,7 +1267,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         // Intersection: RubricUsage + MarkPerCap.
-        if ($rubricUsage instanceOf Collection && $markPerCap instanceOf Collection) {
+        if ($rubricUsage instanceof Collection && $markPerCap instanceof Collection) {
             // No rubric usage && using mark per cap?
             if (
                 $rubricUsage->count() === 1 &&
