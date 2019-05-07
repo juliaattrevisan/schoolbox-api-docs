@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Alaress\Test;
+namespace Alaress\Specification\Test;
 
 use Alaress\Specification\Conjunction;
 use Alaress\Specification\Disjunction;
