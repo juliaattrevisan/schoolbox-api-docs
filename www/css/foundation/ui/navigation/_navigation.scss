@@ -589,7 +589,7 @@ $allow-sidebar-stash: $large-up;
   }
 
   .separator {
-    color: contrast-bg($background: $off-canvas, $dark: $off-canvas-foreground);
+    color: contrast-bg($background: $accounts-menu-bg-colour, $dark: $accounts-menu-text-colour);
     background: $accounts-menu-bg-colour;
     padding: 0.625rem 0.8125rem;
     font-weight: 300;
@@ -614,8 +614,8 @@ $allow-sidebar-stash: $large-up;
       padding: 0.5rem 0rem 0rem 1rem;
       .meta {
         color: contrast-bg(
-          $background: $off-canvas,
-          $dark: $off-canvas-foreground
+          $background: $accounts-menu-bg-colour,
+          $dark: $accounts-menu-text-colour
         );
       }
       a {
