@@ -40,10 +40,11 @@ $(function() {
         }
     }
 
-    // Supported special characters: !#$%&'*+-/=?^_`{|}~
-    // Source: https://en.wikipedia.org/wiki/Email_address
     function validateEmail(email) {
-        var validEmailFilter = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        // Source: https://www.w3.org/TR/2012/WD-html-markup-20120329/input.email.html
+        // Replaced ’ character with ' as ’ is not even a valid email character for input type email.
+        // Seems like it's a typo from the source.
+        var validEmailFilter = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         var emailIsInBetweenRegex = /\<([^)]+)\>/; // Is email string in between <>? E.g <alaress@alaress.com.au>
 
         if (emailIsInBetweenRegex.test(email)) {
