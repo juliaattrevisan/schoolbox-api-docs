@@ -37,7 +37,7 @@ class IsSchoolboxAdmin implements IAuthorizationRule
             throw new Forbidden();
         }
 
-        if ($user->getUsername() !== 'Schoolbox') {
+        if ($user->getUsername() !== 'Alaress') {
             throw new Forbidden();
         }
 
