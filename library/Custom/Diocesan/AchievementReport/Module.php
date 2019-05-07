@@ -50,6 +50,12 @@ class Module extends BaseModule
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
+
+        $router->addGet('achievementreport.standardisedTest', $basePath . '/standardisedTest/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
+
     }
 
     /**
@@ -87,6 +93,13 @@ class Module extends BaseModule
 
         $matcher->add(
             '/^achievementreport\.comments/',
+            function ($params) {
+                return $this->getPreloads($params);
+            }
+        );
+
+        $matcher->add(
+            '/^achievementreport\.standardisedTest/',
             function ($params) {
                 return $this->getPreloads($params);
             }
@@ -158,6 +171,7 @@ class Module extends BaseModule
         $loader->addPath(__DIR__ . '/IB', 'ib');
         $loader->addPath(__DIR__ . '/NCEA', 'ncea');
         $loader->addPath(__DIR__ . '/Comments', 'comments');
+        $loader->addPath(__DIR__ . '/StandardisedTest', 'standardisedTest');
         $loader->addPath(__DIR__ . '/Templates', 'templates');
         $templateLoader->addLoader($loader);
     }

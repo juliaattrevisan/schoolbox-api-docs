@@ -89,14 +89,9 @@ class Controller extends Base {
                 die();
                 break;
 
-            case 'comingSoon':
-                $this->getResponse()->content->set(array(
-                    'template' => '@templates/ComingSoon.twig',
-                    'data' => [
-                        'externalUser' => $externalUser,
-                    ]
-                ));
-
+            case 'standardisedTest':
+                header("Location: {$baseUrl}/comments/{$externalUserId}");
+                die();
                 break;
 
             /* Error state - render an error page and leave it
@@ -114,6 +109,25 @@ class Controller extends Base {
         }
     }
 
+
+    /**
+     * Standardised Test placeholder
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function standardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
+        $this->getResponse()->content->set(array(
+            'template' => '@templates/StandardisedTest.twig',
+            'data' => [
+                'externalUser' => $externalUser,
+            ]
+        ));
+    }
     /**
      * School Grades page
      */

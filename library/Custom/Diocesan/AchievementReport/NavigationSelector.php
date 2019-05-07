@@ -10,6 +10,7 @@
 
 namespace Custom\Diocesan\AchievementReport;
 
+use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
 use Schoolbox\Campus;
 use MSSQL;
@@ -106,7 +107,7 @@ class NavigationSelector
         $this->setDefaultReport(array('error' => 'Unknown default report.'));
 
         if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
-            $this->setDefaultReport('comingSoon');
+            $this->setDefaultReport('standardisedTest');
         }
         elseif (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
             $this->setDefaultReport('schoolGrades');
@@ -163,6 +164,12 @@ class NavigationSelector
         if ($this->hasSchoolGrades()) {
             $this->setHasSchoolGrades(true);
             $availableNavigation['schoolgrades'] = 'School Grades';
+        }
+
+        /* Conditionally add Standardised Test option
+         */
+        if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
+            $availableNavigation['standardisedTest'] = 'Standardised Test';
         }
 
         /* Conditionally add Comment option

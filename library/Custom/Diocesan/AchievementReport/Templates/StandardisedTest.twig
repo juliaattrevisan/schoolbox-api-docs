@@ -10,9 +10,15 @@
 <div class="row">
     <div class="small-12 columns">
         <ul class="sub-nav">
-            <li>
-                <a href="/modules/custom/diocesan/achievementreport/comingSoon/{{ externalUser.StudentID }}">Standardised Tests</a>
+            {% set standardisedTestRoute = routeLookupIfAuthorized('achievementreport.standardisedTest', {
+                externalUserId: externalUser.StudentID,
+                year: year
+            }) %}
+            {% if standardisedTestRoute %}
+            <li class="active">
+                <a href="{{ standardisedTestRoute }}">Standardised Test</a>
             </li>
+            {% endif %}
 
             {# Provide button only if you can get there
              # Other places hardcode this url, but we can do it properly here
