@@ -22,6 +22,10 @@ class MappingCollection extends Collection
     /**
      * Reverse map of columns to properties for efficient by-column lookup
      *
+     * If the column is a reference to a joined table, it is prefixed with the join name, eg:
+     * * Column on this mapper's table:   "column"
+     * * Column on joined mapper's table: "join.column"
+     *
      * @var string[]
      */
     private $columnToPropertyMap = [];
@@ -97,7 +101,8 @@ class MappingCollection extends Collection
     public function setOffset($index, $value)
     {
         if (array_key_exists('column', $value)) {
-            $this->columnToPropertyMap[$value['column']] = $index;
+            $key = array_key_exists('join', $value) ? "{$value['join']}.{$value['column']}" : $value['column'];
+            $this->columnToPropertyMap[$key] = $index;
         }
         return parent::setOffset($index, $value);
     }
