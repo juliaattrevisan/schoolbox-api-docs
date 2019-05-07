@@ -10,7 +10,6 @@
 #}
 {% set idSuffix = idSuffix ?: '' %}
 
-
 {% if not userSelection %}
     <input
             type="hidden"
@@ -26,6 +25,7 @@
             name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]"
             data-key="{{ userSelection.key }}"
             value="1"
+            data-filter-options
             data-value-original="{% if userSelection.selected %}1{% else %}0{% endif %}"
             data-value-default="{% if roleSelection.selected %}1{% else %}0{% endif %}"
             {% if userSelection.selected %}checked{% endif %}

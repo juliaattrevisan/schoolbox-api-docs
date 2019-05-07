@@ -6,15 +6,25 @@
         roleSelections:     Filter\Selection\Model[] - Default filter selections for current user's role, indexed by selection.key
         userSelections:     Filter\Selection\Model[] - A set of filter selections made by the current user, indexed by selection.key
 #}
+{% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
+{% set isEmpty    = (isUserConfigurable and 0 == roleSelections | length) %}
 
-<div class="item checklist filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
-
+<li class="checklist item filter-component{% if isUserConfigurable %} user-configurable{% endif %}" data-component="{{ definition.filter.id }}">
     {% block scripts %}{% endblock %}
 
-    {% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
-
     {% if isUserConfigurable %}
-        <h4 data-filter-name>{{ block('filterName') }}{% if isDisabled %}<span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>{% endif %}</h4>
+        <span
+                {% if isEmpty %}class="no-option" title="No options available"{% endif %}
+                data-dropdown="filter-component-{{ definition.filter.id }}"
+                aria-controls="{{ definition.filter.id }}"
+                aria-expanded="false"
+                data-filter-name>
+            {%- block filterName %}{{ definition.filter.name}}{% endblock -%}
+
+            {%- if isDisabled -%}
+                <span data-tooltip class="hint has-tip tip-top" title="Toggling a single option has no functional effect.">?</span>
+            {%- endif -%}
+        </span>
     {% endif %}
 
     {# Are any options available? #}
@@ -22,15 +32,9 @@
         {# By default, no available concrete options would mean no entities ever match #}
         {# This intentionally sends an empty string, not an empty array. @see Codec::convertRequestToSelections() #}
         <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="">
-        {% if isUserConfigurable %}
-            <div class="empty-state">
-                <i class="icon-info"></i>
-                <p>No options available. No results possible.<br>
-                Please contact your administrator if you think this is an error.
-                </p>
-            </div>
-        {% endif %}
     {% else %}
+    <div id="filter-component-{{ definition.filter.id }}" data-dropdown-content class="f-dropdown content" aria-hidden="true" tabindex="-1">
+
         {% block userOptions %}
             {% for selection in roleSelections %}
                 {% include '@filters/_selectionCheckbox.twig' with {
@@ -41,6 +45,6 @@
                 } only %}
             {% endfor %}
         {% endblock %}
+    </div>
     {% endif %}
-</div>
-
+</li>

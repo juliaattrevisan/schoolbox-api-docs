@@ -24,7 +24,7 @@
     {% endif %}
 
     {% for course in courseSpecs %}
-        {% if isUserConfigurable and not hideCourseTitle %}{{ course.title }}{% endif %}
+        {% if isUserConfigurable and not hideCourseTitle %}<p class="course-title">{{ course.title }}</p>{% endif %}
         {% for unit in course.units %}
             {% set roleSelection = roleSelections[unit.id] %}
             {% include '@filters/_selectionCheckbox.twig' with {

@@ -18,15 +18,18 @@ Usage:
 
     $(function() {
 
-        // ============== Plugins
+        // ============== Other Plugins
 
         $('[data-component]').selectMulti({});
         $('[data-collapser]').collapsable();
 
-        // ============== Vars
+        // ============== Global Variables & Constants
+        var MAX_VISIBLE_SELECTIONS = 4;
 
+        // ============== jQuery DOM handles
         var $reportContent       = $('#{{ contentId }}');
         var $filterPanel         = $('#filter_panel');
+        var $interactionContainer= $filterPanel.find('[data-interaction-container]');
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
@@ -35,7 +38,10 @@ Usage:
         var $serverErrorFeedback = $filterPanel.find('#server_error_feedback');
         var $filterLoaderIcon    = $filterPanel.find('#filter-loader');
         var $resetToDefaultsBtn  = $filterPanel.find('#defaults_reset');
-        var $cancelChangesBtn    = $filterPanel.find('#cancel_changes');
+        var $countMoreModal      = $('#filter-options');
+        var $countMoreModalName  = $countMoreModal.find('[data-filter-name]');
+        var $countMoreModalList  = $countMoreModal.find('[data-selected-list]');
+        var $clearAllBtn         = $filterPanel.find('#clear-all');
 
         //  Error messages to display for different server errors
         var $alertOutOfMemory       = null;
@@ -45,6 +51,9 @@ Usage:
 
         // A tab to insert in filter summary - illustrating what filters are being used
         var $tabAppliedFilter  = null;
+
+        // A selected option in the modal's option list
+        var $modalListItem     = null;
 
         // ============== Event Handlers
 
@@ -64,13 +73,13 @@ Usage:
         // Listen for user removing an applied filter
         $appliedFilters.on('click', '[data-close]', function(){
             var $filterTab = $(this).closest('[data-applied-filter-tab]');
-            clearFilter($filterTab.find('[data-filter]').data('filter'));
+            clearFilter($filterTab.data('applied-filter-tab'));
             $filterTab.remove();
             return false; // don't bubble
         });
 
         // Cancel changes since last selection submit
-        $cancelChangesBtn.on('click', function (){
+        $clearAllBtn.on('click', function (){
             $filterPanel.find('input[type=checkbox][data-value-original]').each(function(idx, elem){
                 var $checkbox = $(elem);
                 $checkbox.prop('checked', $checkbox.data('value-original'));
@@ -87,7 +96,13 @@ Usage:
             updateFiltersInUseLabel();
         });
 
-        // ============== Helpers
+        // Clicking on "X more" modal reveal
+        $filterPanel.on('click', '[data-reveal-id]', function(a){
+            var filterId = $(a.currentTarget).closest('[data-applied-filter-tab]').data('applied-filter-tab');
+            updateCountMoreModal(filterId);
+        });
+
+        // ============== Internal Helpers
 
         /**
          * To ensure each checkbox's original value data attribute is synchronised with the DB, we need to
@@ -177,14 +192,15 @@ Usage:
         }
 
         /**
-         * Converts the filter selections to a URL and updates the browser history so that the URL
-         * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
-         * as expected.
+         * Returns the panel's serialised filter option selections in object structure.
          *
-         * @param {string} encodedSelections
+         * Includes all options, regardless of whether checked or unchecked. (ie [0|1])
+         *
+         * @param {string} serialised
+         * @return {object}
          */
-        function updateHistoryState(encodedSelections) {
-            var decodedData = decodeURIComponent(encodedSelections),
+        function deserialize(serialised){
+            var decodedData = decodeURIComponent(serialised),
                 flatArray   = decodedData.split('&'),
                 nestedObj   = {},
                 regEx       = /^filter_selection\[(\d+)]\[(\w+)]=([01])$/; // eg 'filter_selection[1][task]=1'
@@ -204,15 +220,48 @@ Usage:
                     nestedObj[filterId] = {};
                 }
 
-                // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
-                if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
-                    // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
-                    // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
-                    nestedObj[filterId][optionKey] = optionVal;
-                } else {
-                    // We only need to know about checked values
-                    if ("1" === optionVal) {
+                nestedObj[filterId][optionKey] = optionVal;
+            }
+            return nestedObj;
+        }
+
+        /**
+         * Converts the filter selections to a URL and updates the browser history so that the URL
+         * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
+         * as expected.
+         *
+         * @param {string} encodedSelections
+         */
+        function updateHistoryState(encodedSelections)
+        {
+            var decodedSelections = deserialize(encodedSelections),
+                nestedObj         = {};
+
+            // Convert flat string array to nested object
+            for (var filterId in decodedSelections) {
+                // Don't include inherited properties
+                if (!decodedSelections.hasOwnProperty(filterId)) {
+                    continue;
+                }
+                nestedObj[filterId] = {};
+
+                for(var optionKey in decodedSelections[filterId]){
+                    // Don't include inherited properties
+                    if (!decodedSelections[filterId].hasOwnProperty(optionKey)) {
+                        continue;
+                    }
+                    var optionVal = decodedSelections[filterId][optionKey];
+
+                    // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
+                    if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
+                        // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
+                        // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
                         nestedObj[filterId][optionKey] = optionVal;
+                    } else {
+                        // We only need to know about checked values
+                        if ("1" === optionVal) {
+                            nestedObj[filterId][optionKey] = optionVal;
+                        }
                     }
                 }
             }
@@ -289,7 +338,7 @@ Usage:
          */
         function enableInputs() {
             $submitButton.attr('disabled', false);
-            $cancelChangesBtn.attr('disabled', false);
+            $clearAllBtn.attr('disabled', false);
             $resetToDefaultsBtn.attr('disabled', false);
             $optionCheckboxes.filter(':not([data-disabled])').attr('disabled', false);
         }
@@ -299,7 +348,7 @@ Usage:
          */
         function disableInputs() {
             $submitButton.attr('disabled', true);
-            $cancelChangesBtn.attr('disabled', true);
+            $clearAllBtn.attr('disabled', true);
             $resetToDefaultsBtn.attr('disabled', true);
             $optionCheckboxes.attr('disabled', true);
         }
@@ -337,10 +386,11 @@ Usage:
         }
 
         /**
-         * Grab the applied filter template so we can insert as required
+         * Grab and store DOM element markup so we can clone and insert as required
          */
-        function cacheAppliedFilterTab() {
+        function cacheDomElements() {
             $tabAppliedFilter = $('[data-applied-filter-tab]').remove().removeClass('hide');
+            $modalListItem    = $countMoreModalList.find('[data-selected-option]').remove();
         }
 
         /**
@@ -364,36 +414,90 @@ Usage:
          * A filter is not selected if either:
          * * all options are selected, or
          * * no options are selected.
+         *
+         * Always sorts in the same order as the options appear in the full list, regardless of selection order.
+         * This is because otherwise we would need to store selection order to ensure we could re-create layout on page reload.
          */
         function updateFiltersInUseLabel() {
             var componentsInUse = {};
             $panelComponents.each(function (idx, component) {
-                var $component = $(component);
-                var filterId   = $component.data('component');
-                var countAvailable = $component.find('input[type=checkbox]').length;
-                var countSelected = $component.find('input:checked[type=checkbox]').length;
+                var $component = $(component),
+                    filterId   = $component.data('component'),
+                    $available = $component.find('input[type=checkbox]'),
+                    $selected  = $component.find('input:checked[type=checkbox]');
 
                 // Are a subset of available options selected ?
-                if(countSelected !== 0 && countSelected !== countAvailable){
-                    // Filter is being applied
-                    componentsInUse[filterId] = $component.find('[data-filter-name]').html();
+                if($selected.length !== 0 && $selected.length !== $available.length){
+                    // Filter is being applied, add its name and selected option labels.
+                    componentsInUse[filterId]           = {};
+                    componentsInUse[filterId]['name']   = $component.find('[data-filter-name]').html();
+                    componentsInUse[filterId]['labels'] = [];
+                    $selected.each(function(idx, elem){
+                        var label = $component.find('label[for='+$(elem).attr('id')+']').html();
+                        componentsInUse[filterId]['labels'].push(label);
+                    });
                 }
             });
 
             // Are any filters being used?
             if(Object.keys(componentsInUse).length){
                 $appliedFilters.html('');
-                for (var property in componentsInUse) {
-                    if (componentsInUse.hasOwnProperty(property)) {
+                for (var filterId in componentsInUse) {
+                    if (componentsInUse.hasOwnProperty(filterId)) {
+                        $interactionContainer.removeClass('hide');
+                        // Create a new brick
                         var $newTab = $tabAppliedFilter.clone();
-                        $newTab.find('[data-filter]').attr('data-filter', property).html(componentsInUse[property]);
+                        // Set the filter id and name
+                        $newTab.attr('data-applied-filter-tab', filterId).find('[data-filter-name]').html(componentsInUse[filterId]['name']);
+                        // Get handle to selected option list and option
+                        var $selectedOptionList = $newTab.find('[data-selected-list]'),
+                            $selectedOption     = $newTab.find('[data-selected-item]').remove();
+                        // Add selected options to list
+                        var labels = componentsInUse[filterId]['labels'];
+                        for(var i in labels){
+                            if(!labels.hasOwnProperty(i)){
+                                continue;
+                            }
+                            if(i >= MAX_VISIBLE_SELECTIONS){
+                                break;
+                            }
+                            $selectedOptionList.append($selectedOption.clone().html(labels[i]));
+                        }
+                        // Configure 'more' count
+                        var $moreCount = $newTab.find('[data-more-count]');
+                        if(labels.length <= MAX_VISIBLE_SELECTIONS){
+                            $moreCount.addClass('hide');
+                        } else {
+                            var moreCountText = '+ '+(labels.length - MAX_VISIBLE_SELECTIONS)+' more';
+                            $moreCount.find('[data-count]').attr('title', moreCountText).html(moreCountText);
+                        }
                         $appliedFilters.append($newTab);
                     }
                 }
             } else {
-                $appliedFilters.html('None');
+                $interactionContainer.addClass('hide');
             }
+        }
 
+        /**
+         * Updates the modal with all selected options for this filter
+         *
+         * @param {Number} filterId
+         */
+        function updateCountMoreModal(filterId)
+        {
+            var $component  = $panelComponents.filter('[data-component=' + filterId + ']'),
+                decodedData = deserialize($optionCheckboxes.serialize())[filterId];
+
+            $countMoreModalName.html($component.find('[data-filter-name]').html());
+
+            $countMoreModalList.html('');
+            for(var key in decodedData){
+                if(decodedData.hasOwnProperty(key) && decodedData[key] === "1"){
+                    var label = $component.find('label[for=filter_selection_' +filterId+ '_'+key+']').html();
+                    $countMoreModalList.append($modalListItem.clone().html(label));
+                }
+            }
         }
 
         /**
@@ -401,7 +505,7 @@ Usage:
          */
         function showFilterLoader() {
             $filterLoaderIcon.prop('disabled', false);
-            $filterLoaderIcon.css('opacity', 1);
+            $filterLoaderIcon.css('display', 'inline-block');
         }
 
         /**
@@ -409,7 +513,7 @@ Usage:
          */
         function hideFilterLoader() {
             $filterLoaderIcon.prop('disabled', true);
-            $filterLoaderIcon.css('opacity', 0);
+            $filterLoaderIcon.css('display', 'none');
         }
 
         /**
@@ -438,7 +542,7 @@ Usage:
          */
         function init() {
             cacheErrorAlerts();
-            cacheAppliedFilterTab();
+            cacheDomElements();
             updateFiltersInUseLabel();
             fetchReport();
         }
@@ -450,58 +554,75 @@ Usage:
 {% endautoescape %}
 
 {# Rip outta DOM on load, and remove 'hide' #}
-<span data-applied-filter-tab class="label filter hide"><span data-filter></span> <a href="#" data-close class="close" title="Remove filter">×</a></span>
+<div data-applied-filter-tab="{FILTER ID}" class="hide applied-filter-tab">
+    <span class="label filter">
+        <span data-filter-name>{FILTER NAME}</span>
+        <a href="#" data-close class="close" title="Remove filter">×</a>
+    </span>
+    <ul data-selected-list class="selected-list">
+        <li data-selected-item class="selected-item">{ filter option }</li>
+    </ul>
+    <div data-more-count>
+        <p class="more-count"><a data-count data-reveal-id="filter-options" title="+ { count } more">+ { count } more</a></p>
+    </div>
+</div>
+
+{# Modal contents #}
+<div id="filter-options" class="reveal-modal" data-reveal>
+    <h2>Selected filters in <i><b data-filter-name>{ filter name }</b></i></h2>
+    <ul data-selected-list class="selected-list">
+        <li data-selected-option>{ filter option }</li>
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">×</a>
+</div>
 
 <div class="toast" data-alert data-relation="submit-label"></div>
 
 <div class="row">
     <div class="small-12 island" id="filter_panel">
         <section>
-            <ul class="information-list expandable-card">
-                <li>
-                    <div class="filter-interaction">
-                        <div id="panel-summary" data-collapser="panel-components" class="expander small-12 medium-9 columns">
-                            <span id="filter-loader" class="loader" title="Request sent ..."></span>Filters: <span id="applied_filters" data-applied-filters></span>
-                        </div>
-                        <div class="small-12 medium-3 columns">
-                            <input id="submit_button" type="submit" data-value="Apply Filters" value="Apply Filters" data-href="{{ panel.route }}" data-working="Submitting ...">
-                        </div>
-
-
+            <div class="filter-interaction content" data-interaction-container>
+                <div id="panel-summary">
+                    <div class="small-12 columns">
+                        <label><span id="filter-loader" class="loader" title="Loading..."></span>Filter(s) selected:</label>
                     </div>
-                    <div class="small-12 column no-pad hide" data-collapse-state="collapsed" data-collapsable="panel-components">
-
-                        {# HIDABLE CONTENT #}
-                        <div class="content flex-container">
-                            {% set countComponents = 0 %}
-                            {% for component in panel.components %}
-                                {% set template = component.template %}
-                                {% set data     = component.toContext() %}
-                                {% if data.isUserConfigurable %}
-                                    {% set countComponents = countComponents + 1 %}
-                                {% endif %}
-                                {% include component.template with data only %}
-                            {% endfor %}
-
-                            {% if not countComponents %}
-                                <div class="empty-state">
-                                    <i class="icon-info"></i>
-                                    <p>No filters are user-configurable on this page.</p>
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="component-action">
-                            <section>
-                                <a class="button" id="defaults_reset" title="Revert to default selections">Reset to Defaults</a>
-                                <a class="button" id="cancel_changes" title="Revert to your most recently applied filter">Cancel Changes</a>
-                            </section>
-                        </div>
-
+                    <div id="applied_filters" data-applied-filters>
                     </div>
-                </li>
-            </ul>
+                </div>
+            </div>
+            <div class="small-12 column no-pad">
 
+                {# HIDABLE CONTENT #}
+                <ul class="filters flex-list flex-wrap">
+                    {% set countComponents = 0 %}
+                    {% for component in panel.components %}
+                        {% set template = component.template %}
+                        {% set data     = component.toContext() %}
+                        {% if data.isUserConfigurable %}
+                            {% set countComponents = countComponents + 1 %}
+                        {% endif %}
+                        {% include component.template with data only %}
+                    {% endfor %}
+
+                    {% if not countComponents %}
+                        <div class="empty-state">
+                            <i class="icon-info"></i>
+                            <p>No filters are user-configurable on this page.</p>
+                        </div>
+                    {% endif %}
+                    <li class="filter-component btn">
+                        {#<a class="button" id="clear-all" title="Revert to your most recently applied filter">Clear all</a>#}
+                        <a class="button" id="defaults_reset" title="Reset to default selections">Reset to defaults</a>
+                    </li>
+                    <li class="filter-component btn">
+                        <input id="submit_button"
+                               type="submit"
+                               data-value="Apply filters"
+                               value="Apply filters"
+                               data-href="{{ panel.route }}" data-working="Submitting...">
+                    </li>
+                </ul>
+            </div>
         </section>
 
         {# Will contain error message HTML, as defined in template below #}
