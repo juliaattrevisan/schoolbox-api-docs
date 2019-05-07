@@ -52,15 +52,6 @@ class Controller extends Base {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $selector->determineDefaultReport();
 
-        /* Do it the old-fashioned way, for report selector
-         * Can't find the base url in the request object etc
-         *
-         * Surely there's a way to get this from Module, but
-         * I haven't found it
-         */
-        $baseUrl = '/modules/custom/diocesan/achievementreport';
-        $externalUserId = $externalUser['StudentID'];
-
         $report = $selector->getDefaultReport();
 
         /* Redirect based on default report selection
@@ -70,29 +61,54 @@ class Controller extends Base {
          * default report when you open a year div
          */
         switch ($report) {
-            case 'schoolGrades':
-                header("Location: {$baseUrl}/" . NavigationSelector::SCHOOLGRADES_KEY. "/{$externalUserId}");
-                die();
+            case NavigationSelector::SCHOOLGRADES_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.schoolGrades', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'ib':
-                header("Location: {$baseUrl}/" . NavigationSelector::IB_KEY. "/{$externalUserId}");
-                die();
+            case NavigationSelector::IB_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.ib', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'ncea':
-                header("Location: {$baseUrl}/" . NavigationSelector::NCEA_KEY. "/{$externalUserId}");
-                die();
+            case NavigationSelector::NCEA_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.ncea', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'comments':
-                header("Location: {$baseUrl}" . NavigationSelector::COMMENTS_KEY. "{$externalUserId}");
-                die();
+            case NavigationSelector::COMMENTS_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.comments', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'standardisedTest':
-                header("Location: {$baseUrl}" . NavigationSelector::STANDARDISEDTEST_KEY. "{$externalUserId}");
-                die();
+            case NavigationSelector::STANDARDISEDTEST_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.standardisedTest', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
             /* Error state - render an error page and leave it
