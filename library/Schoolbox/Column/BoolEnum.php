@@ -39,4 +39,12 @@ class BoolEnum implements IColumnType  {
 		return $value == true ? 'true' : 'false';
 	}
 
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return true;
+    }
 }

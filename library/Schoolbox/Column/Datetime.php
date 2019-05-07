@@ -89,4 +89,13 @@ class Datetime implements IColumnType
         }
         return null;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 }

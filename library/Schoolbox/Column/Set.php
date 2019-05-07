@@ -43,4 +43,12 @@ class Set implements IColumnType
         return implode(',', (array)$value);
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 }

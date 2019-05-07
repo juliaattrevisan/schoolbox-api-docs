@@ -103,19 +103,4 @@ class Factory implements IFactory
         }
         return $column;
     }
-
-
-    /**
-     * @inheritDoc
-     */
-    public function isScalar(IColumnType $columnType): bool
-    {
-        return
-            $columnType instanceof Base ||
-            $columnType instanceof Binary ||
-            $columnType instanceof Boolean ||
-            $columnType instanceof BoolEnum ||
-            $columnType instanceof Decimal ||
-            $columnType instanceof Integer;
-    }
 }

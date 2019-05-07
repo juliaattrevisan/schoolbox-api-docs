@@ -32,4 +32,13 @@ class Decimal implements IColumnType
     {
         return $value === '' ? null : $value;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return true;
+    }
 }

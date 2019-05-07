@@ -32,4 +32,13 @@ class Integer implements IColumnType {
 	public function dehydrate($value, $mapper = null) {
 		return $this->convert($value);
 	}
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return true;
+    }
 }

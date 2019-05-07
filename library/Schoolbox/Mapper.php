@@ -2484,8 +2484,7 @@ abstract class Mapper implements IMapper, Serializable
         }
         $ids        = $stmt->fetchAll(PDO::FETCH_COLUMN);
         $idHydrator = $this->getColumnScalarHydrator($this->getIdentifierColumn());
-        $ids        = array_map([$idHydrator, 'hydrate'], $ids);
-        return $ids;
+        return array_map([$idHydrator, 'hydrate'], $ids);
     }
 
 
@@ -4053,7 +4052,7 @@ abstract class Mapper implements IMapper, Serializable
         // Base Case 1:
         //   Infinite recursion check. FK loops are technically possible at a schema level.
         //   But unlikely we have a valid chain this long.
-        if($depth > 1000){
+        if ($depth > 1000) {
             // This will intentionally throw a TypeError
             return null;
         }
@@ -4063,7 +4062,7 @@ abstract class Mapper implements IMapper, Serializable
 
         // Base Case 2:
         //   Column is a scalar. Respect declared data type.
-        if($this->column_factory->isScalar($hydrator)){
+        if ($hydrator->isScalar()) {
             return $hydrator;
         }
 
@@ -4078,9 +4077,9 @@ abstract class Mapper implements IMapper, Serializable
         //   Hydrator is a Model Hydrator.
         $joinDef = $this->map->getOffsetByColumn($column)['join_def'];
         /** @var self $otherMapper */
-        $otherMapper  = $joinDef['mapper'];
-        $otherMapper  = $otherMapper instanceof IMapper ? $otherMapper : $otherMapper::getInstance();
-        $otherColumn  = $joinDef['other_key'];
+        $otherMapper = $joinDef['mapper'];
+        $otherMapper = $otherMapper instanceof IMapper ? $otherMapper : $otherMapper::getInstance();
+        $otherColumn = $joinDef['other_key'];
         return $otherMapper->getColumnScalarHydrator($otherColumn, $depth + 1);
     }
 }

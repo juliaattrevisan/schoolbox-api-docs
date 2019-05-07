@@ -16,13 +16,4 @@ interface IFactory {
 	 * @return IColumnType
 	 */
 	public function build($type);
-
-
-    /**
-     * Returns whether the specified column type hydrate() method returns a scalar
-     *
-     * @param IColumnType $columnType
-     * @return bool
-     */
-    public function isScalar(IColumnType $columnType): bool;
 }
