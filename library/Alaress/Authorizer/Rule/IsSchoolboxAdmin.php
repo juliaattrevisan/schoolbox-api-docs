@@ -12,13 +12,13 @@ use Schoolbox\User;
 use Alaress\Authorizer\Failure\Forbidden;
 
 /**
- * Class IsAlaressAdmin
+ * Class IsSchoolboxAdmin
  *
- * Specifically isolates the Alaress Admin god-user.
+ * Specifically isolates the Schoolbox Admin god-user.
  *
  * @package Alaress\Authorizer\Rule
  */
-class IsAlaressAdmin implements IAuthorizationRule
+class IsSchoolboxAdmin implements IAuthorizationRule
 {
     /**
      * Performs an authorization check.
@@ -37,11 +37,11 @@ class IsAlaressAdmin implements IAuthorizationRule
             throw new Forbidden();
         }
 
-        if ($user->getUsername() !== 'alaress') {
+        if ($user->getUsername() !== 'Schoolbox') {
             throw new Forbidden();
         }
 
-        $nameCorrect = $user->getFirstname() === 'Alaress' && $user->getLastname() === 'Admin';
+        $nameCorrect = $user->getFirstname() === 'Schoolbox' && $user->getLastname() === 'Admin';
 
         if (!$nameCorrect) {
             throw new Forbidden();
