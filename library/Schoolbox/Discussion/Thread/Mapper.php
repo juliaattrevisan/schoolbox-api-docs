@@ -59,7 +59,7 @@ class Mapper extends BaseMapper
      * @param object $object
      * @param string $verb
      * @param null $previous
-     * @return bool|void
+     * @return bool
      */
     public function raiseNotification($object, $verb, $previous = null)
     {

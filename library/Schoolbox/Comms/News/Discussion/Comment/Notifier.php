@@ -424,5 +424,4 @@ class Notifier extends AbstractModuleNotifier
 
         return $envelope;
     }
-
 }
