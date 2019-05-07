@@ -173,6 +173,6 @@ class NotificationTest extends TestCase
 
         $v = array_values($p['foobar']);
 
-        $this->assertEquals('bazbin', $v[0]->getText());
+        $this->assertEquals('bazbin', $v[0][0]->getText());
     }
 }

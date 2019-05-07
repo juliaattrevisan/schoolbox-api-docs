@@ -5,6 +5,7 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 
 namespace Schoolbox\Realtime\Notification;
@@ -12,6 +13,7 @@ namespace Schoolbox\Realtime\Notification;
 
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -30,7 +32,7 @@ class Decorator extends NotificationBundle
     /**
      * @param Notification $notification
      */
-    public function setNotification($notification)
+    public function setNotification(Notification $notification): void
     {
         $this->notifications = array();
         $this->appendNotification($notification);
@@ -42,7 +44,7 @@ class Decorator extends NotificationBundle
      * @param int $dir
      * @return array
      */
-    protected function toArray($limit = 0, $dir = SORT_DESC)
+    protected function toArray(int $limit = 0, int $dir = SORT_DESC): array
     {
         $array = array();
 
@@ -74,7 +76,7 @@ class Decorator extends NotificationBundle
      * @param int   $sortDirection the direction in which to sort the messages, by timestamp
      * @return array                a context Twig can parse
      */
-    public function renderAsTwigContext($coreContext = array(), $limit = 0, $sortDirection = SORT_DESC)
+    public function renderAsTwigContext(array $coreContext = [], int $limit = 0, int $sortDirection = SORT_DESC): array
     {
         $array = $this->toArray();
         $fqdn  = isset($coreContext['config']['fqdn']) ? 'https://' . $coreContext['config']['fqdn'] : '';
@@ -169,7 +171,7 @@ class Decorator extends NotificationBundle
      * @param int $dir
      * @return array
      */
-    public function renderAsSitePageArray($limit = 0, $dir = SORT_DESC)
+    public function renderAsSitePageArray(int $limit = 0, int $dir = SORT_DESC): array
     {
         $context = $this->toArray();
 
@@ -200,12 +202,12 @@ class Decorator extends NotificationBundle
      * @param int  $dir      - by default, sorting order is reverse chronological
      * @return array
      */
-    public function renderAsSocketArray($asUnread = false, $limit = 0, $dir = SORT_DESC)
+    public function renderAsSocketArray(bool $asUnread = false, int $limit = 0, int $dir = SORT_DESC): array
     {
         $result = array();
 
         foreach ($this->getNotifications($limit, $dir) as $notification) {
-            $id          = $notification->getId();
+            $id = $notification->getId();
             $result[$id] = array(
                 'id'        => $id,
                 'body'      => $notification->getTitle(),
@@ -232,21 +234,27 @@ class Decorator extends NotificationBundle
      * @param Notification $notification
      * @return array
      */
-    public function renderParametersAsArray($notification)
+    public function renderParametersAsArray(Notification $notification): array
     {
         $array = array();
-        foreach ($notification->getParameters() as $token => $params) {
-            /** @var ParameterInterface[] $params */
-
+        foreach ($notification->getParameters() as $token => $timeParams) {
             // perform deduping here: we only want the latest of each distinct param
             $latest = array();
-            foreach ($params as $time => $param) {
-                $serial = $param->jsonSerialize();
-                $hash   = sha1(json_encode($serial));
+            // sort params by reverse timestamp to give precedence to most recent
+            krsort($timeParams);
+            /** @var ParameterInterface[] $params */
+            foreach ($timeParams as $time => $params) {
+                foreach ($params as $param) {
+                    if ($param->getMode() === ParameterInterface::STACKING_APPEND) {
+                        $param->setTimestamp($time);
+                    }
+                    $serial = $param->jsonSerialize();
+                    $hash   = sha1(json_encode($serial));
 
-                if (!isset($latest[$hash]) || $time >= $latest[$hash]) {
-                    $latest[$hash]        = $time;
-                    $array[$token][$hash] = $serial;
+                    if (!isset($latest[$hash]) || $time >= $latest[$hash]) {
+                        $latest[$hash]        = $time;
+                        $array[$token][$hash] = $serial;
+                    }
                 }
             }
         }
@@ -261,43 +269,48 @@ class Decorator extends NotificationBundle
      * @param string       $fqdn
      * @throws UnderflowException
      * @return string
+     * @throws UnderflowException
      */
-    public function renderTitleAsHtml($notification, $fqdn = '')
+    public function renderTitleAsHtml(Notification $notification, string $fqdn = ''): string
     {
         $text = $notification->getTitle();
 
-        foreach ($notification->getParameters() as $token => $params) {
-            /** @var ParameterInterface[] $params */
+        foreach ($notification->getParameters() as $token => $timeParams) {
 
-            if (!count($params)) {
+            if (!count($timeParams)) {
                 // if this occurs, it's a bug in the notifier that created this notification.
                 throw new UnderflowException("Message '$text' contains no params for token '$token'");
             }
-
             // sort params by reverse timestamp to give precedence to most recent
-            krsort($params);
-
-            // probably a bit of a code smell, but retrieves first value.
-            // equivalent to $params[0] but where the keys are unknown
-            $subst = $this->param2html(reset($params), $fqdn);
+            krsort($timeParams);
 
             /** @var ParameterInterface[] $stack */
-            $stack = array();
+            $stack = [];
+            $subst = '';
 
-            foreach ($params as $param) {
-                switch ($param->getMode()) {
-                    case ParameterInterface::STACKING_REPLACE:
-                    case ParameterInterface::STACKING_REPLACE_NO_DECORATION:
-                        $subst = $this->param2html($param, $fqdn);
-                        break;
-                    case ParameterInterface::STACKING_APPEND:
-                        $stack[] = $param;
-                        break;
-                    case ParameterInterface::STACKING_IGNORE:
-                    default:
-                        // ignore? ok, ignored.
-                        continue;
+            foreach ($timeParams as $time => $params) {
+                /** @var ParameterInterface[] $params */
+                // probably a bit of a code smell, but retrieves first value.
+                // equivalent to $timeParams[0][0] but where the keys are unknown
+                $subst = $this->param2html(reset($params), $fqdn);
+
+                foreach ($params as $param) {
+                    switch ($param->getMode()) {
+                        case ParameterInterface::STACKING_REPLACE:
+                        case ParameterInterface::STACKING_REPLACE_NO_DECORATION:
+                            $subst = $this->param2html($param, $fqdn);
+                            break;
+                        case ParameterInterface::STACKING_APPEND:
+                            $param->setTimestamp($time);
+                            $stack[] = $param;
+                            break;
+                        case ParameterInterface::STACKING_IGNORE:
+                        default:
+                            // ignore? ok, ignored.
+                            continue;
+                    }
                 }
+
             }
 
             // use the stack if it was populated
@@ -316,7 +329,7 @@ class Decorator extends NotificationBundle
      * @param Notification $notification
      * @return string
      */
-    public function renderTitleAsPlaintext($notification)
+    public function renderTitleAsPlaintext(Notification $notification): string
     {
         // this might be considered cheating
         return html_entity_decode(strip_tags($this->renderTitleAsHtml($notification)), ENT_QUOTES);
@@ -327,10 +340,10 @@ class Decorator extends NotificationBundle
      * Translate a parameter into an HTML anchor tag
      *
      * @param ParameterInterface $param
-     * @param string             $fqdn
+     * @param string $fqdn
      * @return string
      */
-    protected function param2html(ParameterInterface $param, $fqdn = '')
+    protected function param2html(ParameterInterface $param, string $fqdn = ''): string
     {
         $text = \Scrub::text($param->getText());
 
@@ -351,7 +364,7 @@ class Decorator extends NotificationBundle
      * @param string               $fqdn
      * @return string
      */
-    protected function stack2html($params, $fqdn)
+    protected function stack2html(array $params, string $fqdn): string
     {
         $bits = array();
 
@@ -402,7 +415,7 @@ class Decorator extends NotificationBundle
      * @param Notification $notification
      * @return string
      */
-    protected function getUnprotectedIcon($notification)
+    protected function getUnprotectedIcon(Notification $notification): string
     {
         // icon cannot be a protected link
         $isPortrait = strpos($notification->getIcon(), '/portrait') === 0;

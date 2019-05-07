@@ -4,8 +4,8 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource\Textbox;
 
@@ -13,11 +13,11 @@ namespace Schoolbox\Resource\Textbox;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\CategoryParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
@@ -35,12 +35,16 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    protected function notifyAffected($action, $roletype, $resource, $effector, $diff = null)
+    protected function notifyAffected($action, $roletype, $resource, $effector, $diff = null): Envelope
     {
         $envelope = new Envelope();
-
         $resourceId = $resource->getId();
-        $category   = FolderMapper::getInstance()->findById($resource->getCategory()->getId()); // THERE HAS TO BE A WAY TO NOT NEED TO DO THIS
+
+        try {
+            $category = $this->folderMapper->findById($resource->getCategory()->getId());
+        } catch (Exception $e) {
+            return $envelope;
+        }
 
         $bob = new Builder();
 
@@ -58,7 +62,7 @@ class Notifier extends ResourceNotifier
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.textbox.$resourceId.$action")
-            ->addFilter('roletype', $roletype);
+            ->addFilter('roletype', [$roletype]);
 
         $envelope->broadcastToCategory($category, UserAccess::ACCESS_READ, $bob->build());
 
@@ -73,7 +77,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyCreated($roletype, $resource, $author, $diff = null)
+    public function notifyCreated($roletype, $resource, $author, $diff = null): Envelope
     {
         return $this->notifyAffected(self::TRIGGER_CREATED, $roletype, $resource, $author, $diff);
     }
@@ -86,7 +90,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyUpdated($roletype, $resource, $effector, $diff = null)
+    public function notifyUpdated($roletype, $resource, $effector, $diff = null): Envelope
     {
         return $this->notifyAffected(self::TRIGGER_UPDATED, $roletype, $resource, $effector, $diff);
     }
@@ -99,7 +103,7 @@ class Notifier extends ResourceNotifier
      * @param array  $diff
      * @return Envelope
      */
-    public function notifyDeleted($roletype, $resource, $effector, $diff = null)
+    public function notifyDeleted($roletype, $resource, $effector, $diff = null): Envelope
     {
         return $this->notifyAffected(self::TRIGGER_DELETED, $roletype, $resource, $effector, $diff);
     }
@@ -118,7 +122,7 @@ class Notifier extends ResourceNotifier
      * @param Model $resource
      * @return string
      */
-    protected function getResourceName($resource)
+    protected function getResourceName($resource): string
     {
         if (empty($resource->getHeading())) {
             return "Text Box";
@@ -132,7 +136,7 @@ class Notifier extends ResourceNotifier
      * @param Model $resource
      * @return Folder
      */
-    protected function getResourceCategory($resource)
+    protected function getResourceCategory($resource): Folder
     {
         return $resource->getCategory();
     }
@@ -141,7 +145,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceKind()
+    protected function getResourceKind(): string
     {
         return LogMapper::KIND_CONTENT;
     }
@@ -150,7 +154,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceNameProperty()
+    protected function getResourceNameProperty(): string
     {
         return 'heading';
     }
@@ -159,7 +163,7 @@ class Notifier extends ResourceNotifier
     /**
      * @return string
      */
-    protected function getResourceCategoryProperty()
+    protected function getResourceCategoryProperty(): string
     {
         return 'category';
     }

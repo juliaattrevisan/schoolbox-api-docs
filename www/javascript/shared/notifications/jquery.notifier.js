@@ -208,10 +208,9 @@
                     var instances = [];
 
                     // insert instances into temp array to allow sorting by time
-                    var time;
-                    for(time in value) {
-                        var v = value[time];
-                        v.time = time;
+                    var hash;
+                    for(hash in value) {
+                        var v = value[hash];
                         instances.push(v);
                     }
 
