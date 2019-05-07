@@ -41,12 +41,14 @@ class Controller extends Base {
      * Selects which report to redirect towards, based on certain
      * conditions particular to a student
      *
-     * @param $db
-     * @param $user
-     * @param $externalUser
-     * @param $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function selector($db, User $user, $externalUser, $year) {
+    public function selector(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $selector->determineDefaultReport();
 
@@ -295,7 +297,7 @@ class Controller extends Base {
         $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null);
         $allYears = $navigation->findData();
 
-        if (count($allYears)) {
+        if (\count($allYears)) {
 
             /* Course Credit Summary year selectors
              */
