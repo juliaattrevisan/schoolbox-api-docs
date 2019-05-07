@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Column;
 
-class Date extends Datetime implements IColumnType
+class Date extends Datetime
 {
     protected $input_format  = 'Y-m-d';
     protected $output_format = 'Y-m-d';
