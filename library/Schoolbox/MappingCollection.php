@@ -8,7 +8,7 @@
  */
 
 namespace Schoolbox;
-//use function array_key_exists;
+use function array_key_exists;
 use BadMethodCallException;
 use CallbackFilterIterator;
 
@@ -28,7 +28,7 @@ class MappingCollection extends Collection
      *
      * @var string[]
      */
-//    private $columnToPropertyMap = [];
+    private $columnToPropertyMap = [];
 
 	/**
 	 * Retrieves an iterator which filters out any element in the collection
@@ -73,16 +73,10 @@ class MappingCollection extends Collection
 	 */
     public function getOffsetByColumn(string $column): ?array
     {
-//        if (!array_key_exists($column, $this->columnToPropertyMap)) {
-//            return null;
-//        }
-//        return $this->getOffset($this->columnToPropertyMap[$column]);
-        foreach ($this->getStack() as $property => $mapping) {
-            if ($mapping['column'] ?? '' === $column) {
-                return $mapping;
-            }
+        if (!array_key_exists($column, $this->columnToPropertyMap)) {
+            return null;
         }
-        return null;
+        return $this->getOffset($this->columnToPropertyMap[$column]);
     }
 
 
@@ -106,10 +100,16 @@ class MappingCollection extends Collection
      */
     public function setOffset($index, $value)
     {
-//        if (array_key_exists('column', $value)) {
-//            $key = array_key_exists('join', $value) ? "{$value['join']}.{$value['column']}" : $value['column'];
-//            $this->columnToPropertyMap[$key] = $index;
-//        }
+        if (array_key_exists('column', $value)) {
+            // If the column exists on this table, we only need the column name.
+            // If the column exists on a different table, we need to prefix with the join name
+            // This ensures we don't clobber the array item
+            $key = $value['column'];
+            if (array_key_exists('join', $value) && ($value['join_def']['reverse'] ?? false)) {
+                $key = "{$value['join']}.$key";
+            }
+            $this->columnToPropertyMap[$key] = $index;
+        }
         return parent::setOffset($index, $value);
     }
 
