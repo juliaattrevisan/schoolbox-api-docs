@@ -81,12 +81,7 @@ class Notifier extends ResourceNotifier
 
     /**
      * Notify relevant students that this category has been created
-     *
-     * @param string $roleType
-     * @param Model  $category
-     * @param User   $creator
-     * @param array  $diff
-     * @return Envelope
+     * @inheritDoc
      */
     public function notifyCreated($roleType, $category, $creator, $diff = null): Envelope
     {
@@ -99,11 +94,7 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $roleType
-     * @param Model  $category
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritDoc
      */
     public function notifyDeleted($roleType, $category, $effector, $diff = null): Envelope
     {
@@ -170,5 +161,4 @@ class Notifier extends ResourceNotifier
     {
         return UserAccess::ACCESS_READ;
     }
-
 }

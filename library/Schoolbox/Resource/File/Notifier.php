@@ -32,11 +32,7 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Model  $file
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritdoc
      */
     public function notifyCreated($roletype, $file, $effector, $diff = null): Envelope
     {
@@ -60,11 +56,7 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Model  $file
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritdoc
      */
     public function notifyDeleted($roletype, $file, $effector, $diff = null): Envelope
     {
@@ -148,5 +140,4 @@ class Notifier extends ResourceNotifier
             return UserAccess::ACCESS_READ;
         }
     }
-
 }

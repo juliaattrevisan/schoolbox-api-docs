@@ -4,8 +4,8 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Resource;
 
@@ -32,11 +32,7 @@ class LinkNotifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Link   $link
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritdoc
      */
     public function notifyCreated($roletype, $link, $effector, $diff = null): Envelope
     {
@@ -55,11 +51,7 @@ class LinkNotifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Link   $link
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritdoc
      */
     public function notifyDeleted($roletype, $link, $effector, $diff = null): Envelope
     {
@@ -72,7 +64,7 @@ class LinkNotifier extends ResourceNotifier
         // abstract this so far it doesn't even make sense any more
         return $this->notify(
             LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
-            new Param($link->getDescription(), null, ParameterInterface::STACKING_APPEND),                             // the :resource param
+            new Param($link->getDescription(), null, ParameterInterface::STACKING_APPEND), // the :resource param
             $effector, $category, $roletype, $this->getAccessLevel($link)
         );
     }
