@@ -12,7 +12,6 @@ namespace Custom\Diocesan\AchievementReport;
 
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use Schoolbox\User;
-use Schoolbox\Campus;
 use MSSQL;
 
 class NavigationSelector
@@ -23,21 +22,21 @@ class NavigationSelector
      *
      * @var MSSQL
      */
-    protected $db = null;
+    private $db;
 
     /**
      * An externalUser array
      *
      * @var array
      */
-    protected $externalUser = array();
+    private $externalUser = [];
 
     /**
      * User
      *
      * @var User
      */
-    private $user = null;
+    private $user;
 
     /**
      * Has NCEA records
@@ -72,27 +71,27 @@ class NavigationSelector
      *
      * @var array
      */
-    private $availableNavigation = array();
+    private $availableNavigation = [];
 
     /**
      * Default report information
      *
      * @var null
      */
-    private $defaultReport = null;
+    private $defaultReport;
 
     /**
      * Constructor
      *
-     * @param $db
+     * @param MSSQL $db
      * @param User $user
-     * @param $externalUser
+     * @param array $externalUser
      */
-    public function __construct($db, User $user, $externalUser)
+    public function __construct(MSSQL $db, User $user, array $externalUser)
     {
-        $this->setExternalUser($externalUser);
-        $this->setDb($db);
-        $this->setUser($user);
+        $this->externalUser = $externalUser;
+        $this->db = $db;
+        $this->user = $user;
 
         /* Determine navigation options
          */
@@ -102,33 +101,33 @@ class NavigationSelector
     /**
      * Determine default report
      **/
-    public function determineDefaultReport()
+    public function determineDefaultReport(): void
     {
-        $this->setDefaultReport(array('error' => 'Unknown default report.'));
+        $this->defaultReport = ['error' => 'Unknown default report.'];
 
-        if (($this->getUser()->getYear() >= 1) && ($this->getUser()->getYear() <= 6)) {
-            $this->setDefaultReport('standardisedTest');
+        if (($this->user->getYear() >= 1) && ($this->user->getYear() <= 6)) {
+            $this->defaultReport = 'standardisedTest';
         }
-        elseif (($this->getUser()->getYear() >= 7) && ($this->getUser()->getYear() <= 10)) {
-            $this->setDefaultReport('schoolGrades');
+        elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
+            $this->defaultReport = 'schoolGrades';
         }
         /* NCEA for year 11 specifically
          */
-        elseif ($this->getUser()->getYear() == 11) {
-            if ($this->getHasNcea()) {
-                $this->setDefaultReport('ncea');
+        elseif ($this->user->getYear() == 11) {
+            if ($this->hasNcea) {
+                $this->defaultReport = 'ncea';
             } else {
-                $this->setDefaultReport(array('error' => 'Year 11 student not in NCEA.'));
+                $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
             }
         } /* Need to decide whether this is an IB or an NCEA student
          */
-        elseif (($this->getUser()->getYear() >= 12) && ($this->getUser()->getYear() <= 13)) {
-            if ($this->getHasIb()) {
-                $this->setDefaultReport('ib');
-            } elseif ($this->getHasNcea()) {
-                $this->setDefaultReport('ncea');
+        elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
+            if ($this->hasIb) {
+                $this->defaultReport ='ib';
+            } elseif ($this->hasNcea) {
+                $this->defaultReport = 'ncea';
             } else {
-                $this->setDefaultReport(array('error' => 'Year 12/13 student not in NCEA or IB.'));
+                $this->defaultReport = ['error' => 'Year 12/13 student not in NCEA or IB.'];
             }
         }
     }
@@ -148,21 +147,21 @@ class NavigationSelector
         /* Conditionally add NCEA option
          */
         if ($this->hasNcea()) {
-            $this->setHasNcea(true);
+            $this->hasNcea = true;
             $availableNavigation['ncea'] = 'NCEA';
         }
 
         /* Conditionally add IB option
          */
         if ($this->hasIb()) {
-            $this->setHasIb(true);
+            $this->hasIb = true;
             $availableNavigation['ib'] = 'IB';
         }
 
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
-            $this->setHasSchoolGrades(true);
+            $this->hasSchoolGrades = true;
             $availableNavigation['schoolgrades'] = 'School Grades';
         }
 
@@ -179,7 +178,7 @@ class NavigationSelector
             $availableNavigation['comments'] = 'Comments';
         }
 
-        $this->setAvailableNavigation($availableNavigation);
+        $this->availableNavigation = $availableNavigation;
     }
 
 
@@ -188,19 +187,16 @@ class NavigationSelector
      */
     private function hasComments()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT 
                 TOP 1 COUNT(*)
             FROM 
                 dbo.uvSchoolBoxReportComments
             WHERE 
-                id = '{$externalUserId}'
+                id = '{$this->externalUser['StudentID']}'
         ";
 
-        $count = $this->getDb()->getRow($query);
+        $count = $this->db->getRow($query);
 
         return $count['computed'];
     }
@@ -210,19 +206,16 @@ class NavigationSelector
      */
     private function hasSchoolGrades()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 TOP 1 COUNT(*)
             FROM
                 dbo.uvSchoolBoxSchoolGradeResults
             WHERE
-                ID = '{$externalUserId}'
+                ID = '{$this->externalUser['StudentID']}'
         ";
 
-        $count = $this->getDb()->getRow($query);
+        $count = $this->db->getRow($query);
 
         return $count['computed'];
     }
@@ -232,19 +225,16 @@ class NavigationSelector
      */
     private function hasNcea()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 TOP 1 COUNT(*)
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
-                ID = '{$externalUserId}'
+                ID = '{$this->externalUser['StudentID']}'
         ";
 
-        $count = $this->getDb()->getRow($query);
+        $count = $this->db->getRow($query);
 
         return $count['computed'];
     }
@@ -254,183 +244,42 @@ class NavigationSelector
      */
     private function hasIb()
     {
-        $externalUser = $this->getExternalUser();
-        $externalUserId = $externalUser['StudentID'];
-
         $query = "
             SELECT
                 TOP 1 COUNT(*)
             FROM
                 dbo.uvSchoolBoxIBResults
             WHERE
-                ID = '{$externalUserId}'
+                ID = '{$this->externalUser['StudentID']}'
         ";
 
-        $count = $this->getDb()->getRow($query);
+        $count = $this->db->getRow($query);
 
         return $count['computed'];
     }
+
 
     /* Getters/Setters
      */
 
     /**
-     * Set db
-     *
-     * @param \MSSQL $db
-     */
-    private function setDb($db)
-    {
-        $this->db = $db;
-    }
-
-    /**
-     * Get db
-     *
-     * @return \MSSQL
-     */
-    private function getDb()
-    {
-        return $this->db;
-    }
-
-    /**
-     * Set externalUser
-     *
-     * @param array $externalUser
-     */
-    private function setExternalUser($externalUser)
-    {
-        $this->externalUser = $externalUser;
-    }
-
-    /**
-     * Get externalUser
-     *
-     * @return array
-     */
-    private function getExternalUser()
-    {
-        return $this->externalUser;
-    }
-
-    /**
-     * Set user
-     *
-     * @param \Schoolbox\User $user
-     */
-    private function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * Get user
-     *
-     * @return \Schoolbox\User
-     */
-    private function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set hasIb
-     *
-     * @param boolean $hasIb
-     */
-    private function setHasIb($hasIb)
-    {
-        $this->hasIb = $hasIb;
-    }
-
-    /**
-     * Get hasIb
-     *
-     * @return boolean
-     */
-    private function getHasIb()
-    {
-        return $this->hasIb;
-    }
-
-    /**
-     * Set hasNcea
-     *
-     * @param boolean $hasNcea
-     */
-    private function setHasNcea($hasNcea)
-    {
-        $this->hasNcea = $hasNcea;
-    }
-
-    /**
-     * Get hasNcea
-     *
-     * @return boolean
-     */
-    private function getHasNcea()
-    {
-        return $this->hasNcea;
-    }
-
-    /**
-     * Set default report
-     *
-     * @param null $defaultReport
-     */
-    private function setDefaultReport($defaultReport)
-    {
-        $this->defaultReport = $defaultReport;
-    }
-
-    /**
      * Get default report
      *
-     * @return null
+     * @return mixed
      */
     public function getDefaultReport()
     {
         return $this->defaultReport;
     }
 
-    /**
-     * Set available navigation
-     *
-     * @param array $availableNavigation
-     */
-    private function setAvailableNavigation($availableNavigation)
-    {
-        $this->availableNavigation = $availableNavigation;
-    }
 
     /**
      * Get available navigation
      *
      * @return array
      */
-    public function getAvailableNavigation()
+    public function getAvailableNavigation(): array
     {
         return $this->availableNavigation;
-    }
-
-    /**
-     * Set has school grades
-     *
-     * @param boolean $hasSchoolGrades
-     */
-    private function setHasSchoolGrades($hasSchoolGrades)
-    {
-        $this->hasSchoolGrades = $hasSchoolGrades;
-    }
-
-    /**
-     * Get has school grades
-     *
-     * @return boolean
-     */
-    private function getHasSchoolGrades()
-    {
-        return $this->hasSchoolGrades;
     }
 }
