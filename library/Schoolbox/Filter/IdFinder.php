@@ -24,7 +24,7 @@ interface IdFinder
      * @param IMapper $mapper       A mapper for the entity being filtered, eg 'assessments'
      * @return IdFinder
      */
-    public static function getInstance(Mapper $filterMapper, IMapper $mapper);
+    public static function getInstance(Mapper $filterMapper, IMapper $mapper): self;
 
 
     /**

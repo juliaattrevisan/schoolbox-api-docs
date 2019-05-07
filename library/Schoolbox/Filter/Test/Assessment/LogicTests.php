@@ -6,26 +6,34 @@
 
 namespace Schoolbox\Filter\Test;
 
+use Alaress\Database\Predicate\InvalidColumnException;
+use function array_merge;
 use InvalidArgumentException;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Filter;
 use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Test\Assessment\TestableIdFinder;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use UnderflowException;
+use UnexpectedValueException;
 
 class LogicTests extends TestCase
 {
+
     /**
      * @dataProvider provider_doContextFiltersGuaranteeEmptySet
-     * @param null|int[] $uis              UnitImplSpec
-     * @param null|int[] $f                Folder
-     * @param null|int[] $p                Project
-     * @param null|int[] $ui               UnitImpl
-     * @param null|int[] $us               UnitSpec
-     * @param bool       $expected         Are results possible? (ie not guaranteed empty set)
+     * @param null|int[] $uis      UnitImplSpec
+     * @param null|int[] $f        Folder
+     * @param null|int[] $p        Project
+     * @param null|int[] $ui       UnitImpl
+     * @param null|int[] $us       UnitSpec
+     * @param bool       $expected Are results possible? (ie not guaranteed empty set)
+     * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_contextFilters($uis, $f, $p, $ui, $us, $expected)
+    public function test_areResultsPossible_contextFilters($uis, $f, $p, $ui, $us, $expected): void
     {
         $qbt             = $this->getTester();
         $filters         = $this->buildContextFilterArray($uis, $f, $p, $ui, $us);
@@ -43,6 +51,7 @@ class LogicTests extends TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+
     /**
      * @dataProvider provider_doNonContextGuaranteeEmptySet
      * @param null|int[] $a        AssessmentType
@@ -51,8 +60,9 @@ class LogicTests extends TestCase
      * @param null|int[] $wt       Weighting
      * @param null|int[] $wk       WorkType
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
+     * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_nonContextFilters($a, $tc, $td, $wt, $wk, $expected)
+    public function test_areResultsPossible_nonContextFilters($a, $tc, $td, $wt, $wk, $expected): void
     {
         $qbt             = $this->getTester();
         $filters         = $this->buildNonContextFilterArray($a, $tc, $td, $wt, $wk);
@@ -72,23 +82,25 @@ class LogicTests extends TestCase
 
 
     /**
-     * @dataProvider provider_doesCapabilityIndicatorFiltersGuaranteeEmptySet
-     * @param null|int[] $a        AssessmentType
-     * @param array|null $capInd   Capabilities/Indicators
+     * @dataProvider provider_doRubricsFiltersGuaranteeEmptySet
+     * @param null|int[] $aType      AssessmentType
+     * @param array|null $capInd     Capabilities/Indicators Usage
+     * @param array|null $markPerCap MarkPerCap
      * @param bool       $expected Are results possible? (ie not guaranteed empty set)
      * @throws Filter\BrokenFilterException
      */
-    public function test_areResultsPossible_CapabilityIndicatorFilter(?array $a, ?array $capInd, bool $expected): void
+    public function test_areResultsPossible_RubricsFilters(?array $aType, ?array $capInd, ?array $markPerCap, bool $expected): void
     {
         $qbt             = $this->getTester();
-        $filters         = $this->buildIndicatorCapabilityFilterArray($a, $capInd);
+        $filters         = $this->buildRubricUsageFilterArray($aType, $capInd, $markPerCap);
         $completeFilters = $qbt->insertMissingFilters($filters);
         $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\AssessmentType\Definition::class      . ':  '. $this->toStr($a).
-            AssessmentFilters\RubricUsage\Definition::class . ':  '. $this->toStr($capInd).
-            $this->toStr($completeFilters)."\n";
+            AssessmentFilters\AssessmentType\Definition::class . ':  ' . $this->toStr($aType) .
+            AssessmentFilters\RubricUsage\Definition::class . ':  ' . $this->toStr($capInd) .
+            AssessmentFilters\MarkPerCap\Definition::class . ':  ' . $this->toStr($markPerCap) .
+            $this->toStr($completeFilters) . "\n";
 
         $this->assertEquals($expected, $actual, $message);
     }
@@ -96,20 +108,25 @@ class LogicTests extends TestCase
 
     /**
      * @dataProvider provider_subQueriesRequired
-     * @param null|int[] $uis              UnitImplSpec
-     * @param null|int[] $f                Folder
-     * @param null|int[] $p                Project
-     * @param null|int[] $ui               UnitImpl
-     * @param null|int[] $us               UnitSpec
-     * @param bool       $expected         The sub-queries that are required for this combination of filters
+     * @param null|int[] $uis      UnitImplSpec
+     * @param null|int[] $f        Folder
+     * @param null|int[] $p        Project
+     * @param null|int[] $ui       UnitImpl
+     * @param null|int[] $us       UnitSpec
+     * @param bool       $expected The sub-queries that are required for this combination of filters
+     * @throws Filter\BrokenFilterException
+     * @throws InvalidColumnException
+     * @throws AssertionFailedError
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
      */
-    public function test_requiredSubQueries($uis, $f, $p, $ui, $us, $expected)
+    public function test_requiredSubQueries($uis, $f, $p, $ui, $us, $expected): void
     {
         $qbt             = $this->getTester();
         $filters         = $this->buildContextFilterArray($uis, $f, $p, $ui, $us);
         $completeFilters = $qbt->insertMissingFilters($filters);
 
-        list($query, $params) = $qbt->getSqlStringForFilters($completeFilters);
+        [$query, $params] = $qbt->getSqlStringForFilters($completeFilters);
 
         $message = $this->toStr($uis) . $this->toStr($f) . $this->toStr($p) . $this->toStr($ui) . $this->toStr($us) .
             "Query: '$query'\n                    Params: {$this->paramsString($params)}\n";
@@ -124,17 +141,52 @@ class LogicTests extends TestCase
     }
 
 
+    /**
+     * Test that the simplification logic produces expected results
+     *
+     * @dataProvider provider_simplificationLogic
+     * @param array|null $aTypeIn
+     * @param array|null $capIndIn
+     * @param array|null $markPerCapIn
+     * @param array|null $aTypeOut
+     * @param array|null $capIndOut
+     * @param array|null $markPerCapOut
+     * @throws Filter\BrokenFilterException
+     */
+    public function test_simplificationLogic(
+        ?array $aTypeIn,
+        ?array $capIndIn,
+        ?array $markPerCapIn,
+        ?array $aTypeOut,
+        ?array $capIndOut,
+        ?array $markPerCapOut
+    ): void {
+        $qbt             = $this->getTester();
+        $filters         = $this->buildRubricUsageFilterArray($aTypeIn, $capIndIn, $markPerCapIn);
+        $completeFilters = $qbt->insertMissingFilters($filters);
+        $simplified      = $qbt->simplifyFilters($completeFilters);
+
+        $expectedAType = $aTypeOut === null ? null : new Collection($aTypeOut);
+        $expectedCapInd = $capIndOut === null ? null : new Collection($capIndOut);
+        $expectedMarkPerCap = $markPerCapOut === null ? null : new Collection($markPerCapOut);
+
+        $this->assertEquals($expectedAType, $simplified[AssessmentFilters\AssessmentType\Definition::class]);
+        $this->assertEquals($expectedCapInd, $simplified[AssessmentFilters\RubricUsage\Definition::class]);
+        $this->assertEquals($expectedMarkPerCap, $simplified[AssessmentFilters\MarkPerCap\Definition::class]);
+    }
+
+
     // ---------------- helpers --------------
 
 
     /**
      * Return a compact string representation of NULL or an int[] for debugging
      *
-     * @param Collection|mixed[]|int[] $var
-     * @param int                      $level
+     * @param Collection|mixed[]|int[]|null[] $var
+     * @param int                             $level
      * @return string
      */
-    private function toStr($var, $level = 0)
+    private function toStr($var, $level = 0): string
     {
         if(null === $var){
             return 'NULL' . (!$level ? "\n" : '');
@@ -159,7 +211,8 @@ class LogicTests extends TestCase
      * @param array $params
      * @return string
      */
-    private function paramsString(array $params){
+    private function paramsString(array $params): string
+    {
         $string = '[';
         $first = true;
         foreach($params as $key => $val){
@@ -180,7 +233,7 @@ class LogicTests extends TestCase
      * @param null|int[] $us               UnitSpec
      * @return mixed[]
      */
-    private function buildContextFilterArray($uis, $f, $p, $ui, $us)
+    private function buildContextFilterArray($uis, $f, $p, $ui, $us): array
     {
         return [
             AssessmentFilters\NullableContext\UnitImportSpec\Definition::class => null === $uis ? null : new Collection($uis),
@@ -201,7 +254,7 @@ class LogicTests extends TestCase
      * @param null|int[] $wk WorkType
      * @return mixed[]
      */
-    private function buildNonContextFilterArray($a, $tc, $td, $wt, $wk)
+    private function buildNonContextFilterArray($a, $tc, $td, $wt, $wk): array
     {
         return [
             AssessmentFilters\AssessmentType\Definition::class => null === $a  ? null : new Collection($a),
@@ -218,24 +271,25 @@ class LogicTests extends TestCase
      *
      * @param null|int[] $a AssessmentType
      * @param array|null $capInd
+     * @param array|null $markPerCap
      * @return mixed[]
      */
-    private function buildIndicatorCapabilityFilterArray(?array $a, ?array $capInd): array
+    private function buildRubricUsageFilterArray(?array $a, ?array $capInd, ?array $markPerCap): array
     {
         return [
-            AssessmentFilters\AssessmentType\Definition::class => null === $a       ? null : new Collection($a),
-            AssessmentFilters\RubricUsage\Definition::class    => null === $capInd  ? null : new Collection($capInd),
+            AssessmentFilters\AssessmentType\Definition::class => null === $a          ? null : new Collection($a),
+            AssessmentFilters\RubricUsage\Definition::class    => null === $capInd     ? null : new Collection($capInd),
+            AssessmentFilters\MarkPerCap\Definition::class     => null === $markPerCap ? null : new Collection($markPerCap),
         ];
     }
 
 
     /**
-     * @return \Schoolbox\Filter\AbstractIdFinder|\Schoolbox\Filter\IdFinder|AssessmentFilters\TestableIdFinder
+     * @return TestableIdFinder
      */
-    private function getTester()
+    private function getTester(): TestableIdFinder
     {
-        require_once __DIR__ . '/TestableIdFinder.php';
-        return AssessmentFilters\TestableIdFinder::getInstance(Filter\Mapper::getInstance(), Assessment\Mapper::getInstance());
+        return TestableIdFinder::getInstance(Filter\Mapper::getInstance(), Assessment\Mapper::getInstance());
     }
 
     // ---------------- data providers --------------
@@ -244,7 +298,7 @@ class LogicTests extends TestCase
      * Returns all 3^5 = 243 permutations and whether results are possible
      * @return array
      */
-    public function provider_doContextFiltersGuaranteeEmptySet()
+    public function provider_doContextFiltersGuaranteeEmptySet(): array
     {
         $nll = null;  // Filter is not applied
         $emt = [];    // Return items that do not JOIN to this filter. ie Logically a LEFT JOIN other o ON o.a_id = a.id WHERE a.id IS NULL
@@ -503,7 +557,8 @@ class LogicTests extends TestCase
      * (and hence we can short-circuit without hitting the DB)
      * @return array
      */
-    public function provider_doNonContextGuaranteeEmptySet(){
+    public function provider_doNonContextGuaranteeEmptySet(): array
+    {
 
         $nll = null;
         $emt = [];
@@ -764,63 +819,191 @@ class LogicTests extends TestCase
      * @return array
      * @throws InvalidArgumentException
      */
-    public function provider_doesCapabilityIndicatorFiltersGuaranteeEmptySet(): array
+    public function provider_doRubricsFiltersGuaranteeEmptySet(): array
     {
         // Activity Type keys
         $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
-        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
+        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_PROJECT;
 
-        // CapabilityIndicator keys
-        $noneKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
+        // RubricUsage keys
+        $noRubricUsageKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
         $codec      = new AssessmentFilters\RubricUsage\Codec();
-        $exampleKey = $codec->encodeCapability((new Group())->setId(1));
+        $aRubricUsageKey = $codec->encodeCapability((new Group())->setId(1));
+
+        // MarkPerCap keys
+        $noMarkPerCapKey = AssessmentFilters\MarkPerCap\Definition::KEY_NONE;
+        $aMarkPerCapKey  = AssessmentFilters\MarkPerCap\Definition::KEY_ON;
 
         // Various filter sets possible
         $null  = null;
-        $empty = [];
+        $emty = [];
 
         // Activity filter sets
-        $dueWork       = [$dueWorkKey => $dueWorkKey];
-        $notDueWork    = [$projectKey => $projectKey];
-        $mixedActivity = [$dueWorkKey => $dueWorkKey, $projectKey => $projectKey];
+        $duWk = [$dueWorkKey => $dueWorkKey];               // Just DueWorks
+        $ntDW = [$projectKey => $projectKey];               // Just something not a dueWork
+        $mixd = array_merge($duWk, $ntDW);                  // Mixed DueWorks and non-DueWorks
 
-        // CapabilityIndicator filter sets
-        $noCapInd    = [$noneKey => $noneKey];
-        $aCapInd     = [$exampleKey => $exampleKey];
-        $mixedCapInd = [$noneKey => $noneKey, $exampleKey => $exampleKey];
+        // Rubric Usage filter sets
+        $noCI = [$noRubricUsageKey => $noRubricUsageKey];   // No capabilities or indicators used
+        $aCpI = [$aRubricUsageKey => $aRubricUsageKey];     // One specific capability/indicator usage
+        $mxCI = array_merge($noCI, $aCpI);                  // Mixed capability/indicator usage
 
-        // Activity Set, CapInd Set, alwaysEmpty?
+        // MarkPerCap filter sets
+        $nMPC = [$noMarkPerCapKey => $noMarkPerCapKey];     // No MarkPerCap attribute
+        $aMPC = [$aMarkPerCapKey => $aMarkPerCapKey];       // MarkPerCap ON
+        $mMPC = array_merge($nMPC, $aMPC);                  // Mixed of no MarkPerCap, and some specific value
+
+        // [ActivityType, RubricUsage, MarkPerCap, alwaysEmpty]?
         return [
-            [$null, $null, false],
-            [$null, $empty, true],
-            [$null, $noCapInd, false],
-            [$null, $aCapInd, false],
-            [$null, $mixedCapInd, false],
+            [$null, $null, $null, false],
+            [$null, $emty, $null, true],
+            [$null, $noCI, $null, false],
+            [$null, $aCpI, $null, false],
+            [$null, $mxCI, $null, false],
 
-            // All assessments are of an assessment type
-            [$empty, $null, true],
-            [$empty, $empty, true],
-            [$empty, $noCapInd, true],
-            [$empty, $aCapInd, true],
-            [$empty, $mixedCapInd, true],
+            [$emty, $null, $null, true],
+            [$emty, $emty, $null, true],
+            [$emty, $noCI, $null, true],
+            [$emty, $aCpI, $null, true],
+            [$emty, $mxCI, $null, true],
 
-            [$dueWork, $null, false],
-            [$dueWork, $empty, true],
-            [$dueWork, $noCapInd, false],
-            [$dueWork, $aCapInd, false],
-            [$dueWork, $mixedCapInd, false],
+            [$duWk, $null, $null, false],
+            [$duWk, $emty, $null, true],
+            [$duWk, $noCI, $null, false],
+            [$duWk, $aCpI, $null, false],
+            [$duWk, $mxCI, $null, false],
 
-            [$notDueWork, $null, false],
-            [$notDueWork, $empty, true],
-            [$notDueWork, $noCapInd, false],
-            [$notDueWork, $aCapInd, false],
-            [$notDueWork, $mixedCapInd, false],
+            [$ntDW, $null, $null, false],
+            [$ntDW, $emty, $null, true],
+            [$ntDW, $noCI, $null, false],
+            [$ntDW, $aCpI, $null, true],
+            [$ntDW, $mxCI, $null, false],
 
-            [$mixedActivity, $null, false],
-            [$mixedActivity, $empty, true],
-            [$mixedActivity, $noCapInd, false],
-            [$mixedActivity, $aCapInd, false],
-            [$mixedActivity, $mixedCapInd, false],
+            [$mixd, $null, $null, false],
+            [$mixd, $emty, $null, true],
+            [$mixd, $noCI, $null, false],
+            [$mixd, $aCpI, $null, false],
+            [$mixd, $mxCI, $null, false],
+            //
+            [$null, $null, $emty, true],
+            [$null, $emty, $emty, true],
+            [$null, $noCI, $emty, true],
+            [$null, $aCpI, $emty, true],
+            [$null, $mxCI, $emty, true],
+
+            [$emty, $null, $emty, true],
+            [$emty, $emty, $emty, true],
+            [$emty, $noCI, $emty, true],
+            [$emty, $aCpI, $emty, true],
+            [$emty, $mxCI, $emty, true],
+
+            [$duWk, $null, $emty, true],
+            [$duWk, $emty, $emty, true],
+            [$duWk, $noCI, $emty, true],
+            [$duWk, $aCpI, $emty, true],
+            [$duWk, $mxCI, $emty, true],
+
+            [$ntDW, $null, $emty, true],
+            [$ntDW, $emty, $emty, true],
+            [$ntDW, $noCI, $emty, true],
+            [$ntDW, $aCpI, $emty, true],
+            [$ntDW, $mxCI, $emty, true],
+
+            [$mixd, $null, $emty, true],
+            [$mixd, $emty, $emty, true],
+            [$mixd, $noCI, $emty, true],
+            [$mixd, $aCpI, $emty, true],
+            [$mixd, $mxCI, $emty, true],
+
+            [$null, $null, $nMPC, false],
+            [$null, $emty, $nMPC, true],
+            [$null, $noCI, $nMPC, false],
+            [$null, $aCpI, $nMPC, true],
+            [$null, $mxCI, $nMPC, false],
+
+            [$emty, $null, $nMPC, true],
+            [$emty, $emty, $nMPC, true],
+            [$emty, $noCI, $nMPC, true],
+            [$emty, $aCpI, $nMPC, true],
+            [$emty, $mxCI, $nMPC, true],
+
+            [$duWk, $null, $nMPC, false],
+            [$duWk, $emty, $nMPC, true],
+            [$duWk, $noCI, $nMPC, false],
+            [$duWk, $aCpI, $nMPC, true],
+            [$duWk, $mxCI, $nMPC, false],
+
+            [$ntDW, $null, $nMPC, false],
+            [$ntDW, $emty, $nMPC, true],
+            [$ntDW, $noCI, $nMPC, false],
+            [$ntDW, $aCpI, $nMPC, true],
+            [$ntDW, $mxCI, $nMPC, false],
+
+            [$mixd, $null, $nMPC, false],
+            [$mixd, $emty, $nMPC, true],
+            [$mixd, $noCI, $nMPC, false],
+            [$mixd, $aCpI, $nMPC, true],
+            [$mixd, $mxCI, $nMPC, false],
+            //
+            [$null, $null, $aMPC, false],
+            [$null, $emty, $aMPC, true],
+            [$null, $noCI, $aMPC, true],
+            [$null, $aCpI, $aMPC, false],
+            [$null, $mxCI, $aMPC, false],
+
+            [$emty, $null, $aMPC, true],
+            [$emty, $emty, $aMPC, true],
+            [$emty, $noCI, $aMPC, true],
+            [$emty, $aCpI, $aMPC, true],
+            [$emty, $mxCI, $aMPC, true],
+
+            [$duWk, $null, $aMPC, false],
+            [$duWk, $emty, $aMPC, true],
+            [$duWk, $noCI, $aMPC, true],
+            [$duWk, $aCpI, $aMPC, false],
+            [$duWk, $mxCI, $aMPC, false],
+
+            [$ntDW, $null, $aMPC, true],
+            [$ntDW, $emty, $aMPC, true],
+            [$ntDW, $noCI, $aMPC, true],
+            [$ntDW, $aCpI, $aMPC, true],
+            [$ntDW, $mxCI, $aMPC, true],
+
+            [$mixd, $null, $aMPC, false],
+            [$mixd, $emty, $aMPC, true],
+            [$mixd, $noCI, $aMPC, true],
+            [$mixd, $aCpI, $aMPC, false],
+            [$mixd, $mxCI, $aMPC, false],
+            //
+            [$null, $null, $mMPC, false],
+            [$null, $emty, $mMPC, true],
+            [$null, $noCI, $mMPC, false],
+            [$null, $aCpI, $mMPC, false],
+            [$null, $mxCI, $mMPC, false],
+
+            [$emty, $null, $mMPC, true],
+            [$emty, $emty, $mMPC, true],
+            [$emty, $noCI, $mMPC, true],
+            [$emty, $aCpI, $mMPC, true],
+            [$emty, $mxCI, $mMPC, true],
+
+            [$duWk, $null, $mMPC, false],
+            [$duWk, $emty, $mMPC, true],
+            [$duWk, $noCI, $mMPC, false],
+            [$duWk, $aCpI, $mMPC, false],
+            [$duWk, $mxCI, $mMPC, false],
+
+            [$ntDW, $null, $mMPC, false],
+            [$ntDW, $emty, $mMPC, true],
+            [$ntDW, $noCI, $mMPC, false],
+            [$ntDW, $aCpI, $mMPC, true],
+            [$ntDW, $mxCI, $mMPC, false],
+
+            [$mixd, $null, $mMPC, false],
+            [$mixd, $emty, $mMPC, true],
+            [$mixd, $noCI, $mMPC, false],
+            [$mixd, $aCpI, $mMPC, false],
+            [$mixd, $mxCI, $mMPC, false],
         ];
     }
 
@@ -828,7 +1011,7 @@ class LogicTests extends TestCase
      * For all 108 permutations that are not guaranteed to return empty sets, which subQueries are required?
      * @return array
      */
-    public function provider_subQueriesRequired()
+    public function provider_subQueriesRequired(): array
     {
         $nll = null;
         $emt = [];
@@ -946,4 +1129,64 @@ class LogicTests extends TestCase
         ];
     }
 
+
+    /**
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public function provider_simplificationLogic(): array
+    {
+        // Activity Type keys
+        $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
+        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_PROJECT;
+
+        // RubricUsage keys
+        $noRubricUsageKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
+        $codec      = new AssessmentFilters\RubricUsage\Codec();
+        $aRubricUsageKey = $codec->encodeCapability((new Group())->setId(1));
+
+        // MarkPerCap keys
+        $noMarkPerCapKey = AssessmentFilters\MarkPerCap\Definition::KEY_NONE;
+        $aMarkPerCapKey  = AssessmentFilters\MarkPerCap\Definition::KEY_ON;
+
+        // Various filter sets possible
+
+        // Activity filter sets
+        $duWk = [$dueWorkKey => $dueWorkKey];               // Just DueWorks
+        $ntDW = [$projectKey => $projectKey];               // Just something not a dueWork
+        $mixd = array_merge($duWk, $ntDW);                  // Mixed DueWorks and non-DueWorks
+
+        // Rubric Usage filter sets
+        $noCI = [$noRubricUsageKey => $noRubricUsageKey];   // No capabilities or indicators used
+        $aCpI = [$aRubricUsageKey => $aRubricUsageKey];     // One specific capability/indicator usage
+        $mxCI = array_merge($noCI, $aCpI);                  // Mixed capability/indicator usage
+
+        // MarkPerCap filter sets
+        $nMPC = [$noMarkPerCapKey => $noMarkPerCapKey];     // No MarkPerCap attribute
+        $aMPC = [$aMarkPerCapKey => $aMarkPerCapKey];       // MarkPerCap ON
+        $mMPC = array_merge($nMPC, $aMPC);                  // Mixed of no MarkPerCap, and some specific value
+
+        // [           IN             ] [           OUT              ]
+        // aType, rubricUse, markPerCap, aType, rubricUse, markPerCap,
+        return [
+             0 => [$duWk, $noCI, $nMPC, $duWk,  null, $nMPC, ],
+             1 => [$duWk, $noCI, $mMPC, $duWk, $noCI,  null, ],
+             2 => [$duWk, $aCpI, $aMPC,  null, $aCpI, $aMPC, ],
+             3 => [$duWk, $aCpI, $mMPC,  null, $aCpI, $mMPC, ],
+             4 => [$duWk, $mxCI, $nMPC, $duWk,  null, $nMPC, ],
+             5 => [$duWk, $mxCI, $aMPC,  null, $mxCI, $aMPC, ],
+             6 => [$duWk, $mxCI, $mMPC, $duWk, $mxCI, $mMPC, ],
+             7 => [$ntDW, $noCI, $nMPC, $ntDW,  null,  null, ],
+             8 => [$ntDW, $noCI, $mMPC, $ntDW,  null,  null, ],
+             9 => [$ntDW, $mxCI, $nMPC, $ntDW,  null,  null, ],
+            10 => [$ntDW, $mxCI, $mMPC, $ntDW,  null,  null, ],
+            11 => [$mixd, $noCI, $nMPC, $mixd,  null, $nMPC, ],
+            12 => [$mixd, $noCI, $mMPC, $mixd, $noCI,  null, ],
+            13 => [$mixd, $aCpI, $aMPC,  null, $aCpI, $aMPC, ],
+            14 => [$mixd, $aCpI, $mMPC,  null, $aCpI, $mMPC, ],
+            15 => [$mixd, $mxCI, $nMPC, $mixd,  null, $nMPC, ],
+            16 => [$mixd, $mxCI, $aMPC,  null, $mxCI, $aMPC, ],
+            17 => [$mixd, $mxCI, $mMPC, $mixd, $mxCI, $mMPC, ],
+        ];
+    }
 }

@@ -1,21 +1,25 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
-namespace Schoolbox\Filter\Filters\Assessment;
+namespace Schoolbox\Filter\Test\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\IMapper;
 use UnderflowException;
 use UnexpectedValueException;
+use Schoolbox\Filter\Filters\Assessment;
 
 /**
  * Enables unit testing of the parent's logic by exposing internal methods.
+ *
+ * @method static TestableIdFinder getInstance(\Schoolbox\Filter\Mapper $filterMapper, \Schoolbox\IMapper $mapper)
  */
 class TestableIdFinder extends IdFinder
 {
@@ -24,7 +28,7 @@ class TestableIdFinder extends IdFinder
      * @param array $completeFilters
      * @return bool
      */
-    public function getFiltersGuaranteeEmptySet(array $completeFilters)
+    public function getFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return $this->doFiltersGuaranteeEmptySet($completeFilters);
     }
@@ -33,7 +37,7 @@ class TestableIdFinder extends IdFinder
      * @param array $completeFilters
      * @return bool
      */
-    public function getDoContextFiltersGuaranteeEmptySet(array $completeFilters)
+    public function getDoContextFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return $this->doContextFiltersGuaranteeEmptySet($completeFilters);
     }
@@ -42,7 +46,7 @@ class TestableIdFinder extends IdFinder
      * @param array $completeFilters
      * @return bool
      */
-    public function getDoNonContextFiltersGuaranteeEmptySet(array $completeFilters)
+    public function getDoNonContextFiltersGuaranteeEmptySet(array $completeFilters): bool
     {
         return $this->doNonContextFiltersGuaranteeEmptySet($completeFilters);
     }
@@ -56,7 +60,7 @@ class TestableIdFinder extends IdFinder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    public function getSqlStringForFilters(array $completeFilters)
+    public function getSqlStringForFilters(array $completeFilters): array
     {
         return $this->buildQuery($completeFilters, false);
     }
@@ -69,10 +73,20 @@ class TestableIdFinder extends IdFinder
      * @return Collection[]|null[]|mixed[][]
      * @throws Filter\BrokenFilterException
      */
-    public function insertMissingFilters($filters)
+    public function insertMissingFilters($filters): array
     {
         return $this->normaliseFilters($filters);
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function simplifyFilters(array $completeFilters): array
+    {
+        return parent::simplifyFilters($completeFilters);
+    }
+
 
     /**
      * Build a registry of filters known to this class
@@ -82,24 +96,25 @@ class TestableIdFinder extends IdFinder
      * @param Filter\Mapper $filterMapper The filter instance mapper
      * @param IMapper       $entityMapper A mapper for the entity being filtered, eg 'assessments'
      */
-    protected function buildRegistry(Filter\Mapper $filterMapper, IMapper $entityMapper)
+    protected function buildRegistry(Filter\Mapper $filterMapper, IMapper $entityMapper): void
     {
         $filterClasses = [
-            AssessmentType\Definition::class,
-            Folder\TeacherInvolved\Definition::class,
-            Folder\StudentInteractions\Definition::class,
-            Folder\CourseImports\Definition::class,
-            NullableContext\UnitImportSpec\Definition::class,
-            NullableContext\Project\Definition::class,
-            NullableContext\UnitImpl\Definition::class,
-            NullableContext\UnitSpec\Definition::class,
-            TemporalState\Definition::class,
-            Term\Due\Definition::class,
-            Term\Close\Definition::class,
-            WeightingType\Definition::class,
-            WorkType\Definition::class,
-            YearDue\Definition::class,
-            RubricUsage\Definition::class,
+            Assessment\AssessmentType\Definition::class,
+            Assessment\Folder\TeacherInvolved\Definition::class,
+            Assessment\Folder\StudentInteractions\Definition::class,
+            Assessment\Folder\CourseImports\Definition::class,
+            Assessment\NullableContext\UnitImportSpec\Definition::class,
+            Assessment\NullableContext\Project\Definition::class,
+            Assessment\NullableContext\UnitImpl\Definition::class,
+            Assessment\NullableContext\UnitSpec\Definition::class,
+            Assessment\TemporalState\Definition::class,
+            Assessment\Term\Due\Definition::class,
+            Assessment\Term\Close\Definition::class,
+            Assessment\WeightingType\Definition::class,
+            Assessment\WorkType\Definition::class,
+            Assessment\YearDue\Definition::class,
+            Assessment\RubricUsage\Definition::class,
+            Assessment\MarkPerCap\Definition::class,
         ];
         $this->setRegistry(array_combine($filterClasses, $filterClasses));
     }

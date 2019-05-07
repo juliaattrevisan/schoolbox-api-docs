@@ -43,7 +43,7 @@ abstract class AbstractIdFinder implements IdFinder
     /**
      * @inheritdoc
      */
-    public static function getInstance(Mapper $filterMapper, IMapper $mapper)
+    public static function getInstance(Mapper $filterMapper, IMapper $mapper): IdFinder
     {
         $className = get_called_class();
         if (!isset(self::$instance[$className])) {
@@ -83,6 +83,9 @@ abstract class AbstractIdFinder implements IdFinder
         if ($this->doFiltersGuaranteeEmptySet($completeFilters)) {
             return [];
         }
+
+        // Can we simplify filters using set theory?
+        $completeFilters = $this->simplifyFilters($completeFilters);
 
         list($query, $params) = $this->buildQuery($completeFilters, $deleted);
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
@@ -177,6 +180,20 @@ abstract class AbstractIdFinder implements IdFinder
      * @return bool
      */
     abstract protected function doFiltersGuaranteeEmptySet(array $completeFilters);
+
+
+    /**
+     * Can we NULL out some filters to make the query faster?
+     *
+     * Filters are combined using logical AND. If one filter is a subset of another, we can NULL out the superset filter.
+     * ie
+     *   A ⊆ B, A ∩ B => A
+     *
+     * @precondition Any filter combinations that guarantee empty assessment sets are not passed to this method
+     * @param Collection[]|null[]|mixed[][] $completeFilters
+     * @return Collection[]|null[]|mixed[][]
+     */
+    abstract protected function simplifyFilters(array $completeFilters): array;
 
 
     /**
