@@ -65,8 +65,10 @@
                                 <tr class="capability">
                                     {% for studentId, student in students %}
 
-                                        {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
-                                        <td class="excluded"></td>
+                                        {% if not capability.show %}
+                                            <td class="excluded"></td>
+                                        {% elseif exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
+                                            <td class="excluded" title="Excluded from assessment"></td>
                                         {% else %}
                                             {% set capabilityMark = student.assessments[assessmentId].capabilities[capabilityId].humanReadableMark %}
                                             {% set normalisedCapabilityMark = student.assessments[assessmentId].capabilities[capabilityId].normalisedMark %}
@@ -89,7 +91,7 @@
                                         {% for studentId, student in students %}
 
                                             {% if exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
-                                                <td class="excluded"></td>
+                                                <td class="excluded" title="Excluded from assessment"></td>
                                             {% else %}
                                                 {% set indicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].humanReadableMark %}
                                                 {% set normalisedIndicatorMark = student.assessments[assessmentId].capabilities[capabilityId].indicators[indicatorId].normalisedMark %}

@@ -107,7 +107,8 @@ class Module extends BaseModule
                     $filterMapper,
                     $this->getMapperFactory()->get(Assessment\Mapper::class)
                 );
-            })
+            }),
+            'filterMapper'          => $this->getMapperFactory()->getLazy(Filter\Mapper::class),
         ];
     }
 
