@@ -47,8 +47,6 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->joins('author_user_id', UserMapper::class, 'id', null, null, 'author', 'author');
-
         $this->hasJoin('trigger', [
             'mapper' => TriggerMapper::class,
             'this_key' => 'uuid',
