@@ -22,7 +22,9 @@ interface ISimpleStrategy extends IStrategy
      * This sql fragment is used as part of a larger UNIONed query with other instances.
      * The result of that mega-query is a set of data containing the following fields:
      *
-     * (id, name, entity_type)
+     * (id, name, entity_type, entity_meta)
+     *
+     * entity_meta is extra information about the entity
      *
      * ...where "name" is a derived human-readable name for the audiencing segment
      *
@@ -31,7 +33,7 @@ interface ISimpleStrategy extends IStrategy
      *     - a Campus name,
      *     - a Year level integer with the prefix "Year"
      *
-     * This data is ultimately used to generate a list of (id, name) tuples originally
+     * This data is ultimately used to generate a list of (id, name, role type) tuples originally
      * used in selectize's search suggestions list for a given keyword.
      *
      * Returns NULL if no query is available. Callers need to check for this.

@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\GenericCollection;
+use Schoolbox\Role;
 
 class User extends SimpleStrategy
 {
@@ -46,9 +47,9 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers($entityMeta = null): array
+    public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
-        if($entityMeta == 'student') {
+        if($entityMeta == Role::STUDENT) {
             return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
         } else {
             return [Model::RELATIONSHIP_SELF];

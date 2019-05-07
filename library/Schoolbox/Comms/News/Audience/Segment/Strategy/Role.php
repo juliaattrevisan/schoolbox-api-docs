@@ -31,7 +31,7 @@ class Role extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers($entityMeta = null): array
+    public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
         return [Model::RELATIONSHIP_SELF];
     }
