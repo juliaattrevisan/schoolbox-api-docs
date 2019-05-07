@@ -575,7 +575,7 @@ class IdFinder extends Filter\AbstractIdFinder
         // Do we not wish to apply this filter?
         if(null === $rubricUsages){
             // Always return the row, no params
-            return ['TRUE', []];
+            return ['', 'TRUE', []];
         }
 
         // How should we join to usage tables?
