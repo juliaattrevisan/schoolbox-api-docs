@@ -11,6 +11,7 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -118,8 +119,13 @@ class Module extends BaseModule
                         $filterMapper, $this->getMapperFactory()->get(Assessment\Mapper::class)
                     );
                 }),
-                'filterFactoryFactory'       => $injector->lazy(function(){
-                    return new Filter\Filters\Assessment\FactoryFactory($this->getMapperFactory());
+                'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+                    /** @var RosettaStone $rosettaStone */
+                    $rosettaStone = $injector->get('l10n');
+                    return new Filter\Filters\Assessment\FactoryFactory(
+                        $this->getMapperFactory(),
+                        $rosettaStone
+                    );
                 }),
             ])
         );

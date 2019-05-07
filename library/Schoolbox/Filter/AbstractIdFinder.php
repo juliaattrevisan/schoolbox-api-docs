@@ -176,7 +176,7 @@ abstract class AbstractIdFinder implements IdFinder
      * @param Collection[]|null[]|mixed[][] $completeFilters
      * @return bool
      */
-    protected abstract function doFiltersGuaranteeEmptySet(array $completeFilters);
+    abstract protected function doFiltersGuaranteeEmptySet(array $completeFilters);
 
 
     /**
@@ -187,7 +187,7 @@ abstract class AbstractIdFinder implements IdFinder
      * @return mixed[]
      * @throws BrokenFilterException If a filter SQL fragment cannot be built
      */
-    protected abstract function buildQuery(array $completeFilters, $deleted);
+    abstract protected function buildQuery(array $completeFilters, $deleted);
 
 
     /* Getters

@@ -201,10 +201,10 @@ abstract class Definition extends Filter\AbstractDefinition
     public function getLabel(string $key): string
     {
         if (self::KEY_ALL === $key) {
-            return 'All Terms';
+            return 'All terms';
         }
         if (self::KEY_FUTURE === $key) {
-            return 'Future Terms';
+            return 'Future terms';
         }
         if (self::KEY_CURRENT === $key) {
             return $this->currentTerm ? "Current ({$this->currentTerm->getCode()})" : '';
@@ -213,7 +213,7 @@ abstract class Definition extends Filter\AbstractDefinition
             return $this->previousTerm ? "Previous ({$this->previousTerm->getCode()})" : '';
         }
         if (self::KEY_PAST === $key) {
-            return 'Past Terms';
+            return 'Past terms';
         }
         return $this->terms[$key]->getCode() . ($this->terms[$key]->getArchived() ? ' [archived]' : '');
     }

@@ -12,7 +12,9 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\IFactory;
 use Schoolbox\Assessment\Term;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\WorkType;
+use Schoolbox\MapperFactory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -33,6 +35,20 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
 {
 
     protected const ENTITY = Assessment\Mapper::class;
+
+    /** @var RosettaStone */
+    private $rosettaStone;
+
+
+    /**
+     * @param MapperFactory $mapperFactory
+     * @param RosettaStone  $rosettaStone
+     */
+    public function __construct(MapperFactory $mapperFactory, RosettaStone $rosettaStone)
+    {
+        parent::__construct($mapperFactory);
+        $this->rosettaStone = $rosettaStone;
+    }
 
 
     /**
@@ -148,6 +164,14 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getOptionMapper(),
                     $this->getDefaultsMapper(),
                     $this->getSelectionMapper()
+                );
+            case RubricUsage\Definition::class:
+                return new RubricUsage\Factory(
+                    $this->getOptionMapper(),
+                    $this->getDefaultsMapper(),
+                    $this->getSelectionMapper(),
+                    $this->getFolderMapper(),
+                    $this->rosettaStone
                 );
         }
         throw new InvalidArgumentException('No filter factory registered for class: ' . $filterDefinitionClass);

@@ -7,7 +7,11 @@
 
 namespace Schoolbox;
 
+use function class_exists;
 use DomainException;
+use function is_a;
+use ReflectionClass;
+use ReflectionException;
 use UnexpectedValueException;
 
 /**
@@ -21,7 +25,7 @@ use UnexpectedValueException;
  */
 class GenericCollection extends Collection
 {
-    /** @var string|null $elementType What type the elements in this Collection are allowed to be */
+    /** @var string|null $elementType What type the elements in this Collection are allowed to be. Class/interface name */
     private $elementType = null;
 
     /**
@@ -135,6 +139,45 @@ class GenericCollection extends Collection
     {
         return $this->elementType;
     }
+
+
+    /**
+     * Returns whether this Generic Collection can only contain elements of the specified type.
+     *
+     * - A collection of *animals* is NOT a collection of *dogs*.
+     * - A collection of *dogs* IS a collection of *animals*.
+     *
+     * @param string $otherElementType
+     * @return bool
+     * @throws ReflectionException
+     */
+    public function isCollectionOf(string $otherElementType): bool
+    {
+        // Are we dealing with classes or interfaces?
+        $thisIsClass  = class_exists($this->elementType);
+        $otherIsClass = class_exists($otherElementType);
+
+        // Both classes?
+        if($thisIsClass && $otherIsClass){
+            return is_a($this->elementType, $otherElementType, true);
+        }
+
+        $thisReflection  = new ReflectionClass($this->elementType);
+
+        // Both interfaces?
+        if(!$thisIsClass && !$otherIsClass){
+            return $thisReflection->implementsInterface($otherElementType);
+        }
+
+        // This is class (hence other is interface)
+        if($thisIsClass){
+            return $thisReflection->implementsInterface($otherElementType);
+        }
+
+        // (this is interface, other is class)
+        return false;
+    }
+
 
     /**
      * Ensures the $item is of the specified type

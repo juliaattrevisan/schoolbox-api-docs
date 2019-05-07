@@ -266,7 +266,7 @@
                             {% for option in options %}
                                 <tr data-options-row>
                                     <th>{% if loop.first %}Options:{% endif %}</th>
-                                    <th>{{ definition.label(option.key) | capitalize }}</th>
+                                    <th>{{ definition.label(option.key) }}</th>
                                     <td>
                                         <span data-available-col {% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>
                                             <input

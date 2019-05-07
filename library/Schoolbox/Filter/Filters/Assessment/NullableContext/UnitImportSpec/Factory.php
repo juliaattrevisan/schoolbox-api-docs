@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
+use function count;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
@@ -73,7 +75,7 @@ class Factory extends NullableContext\Factory
 
     /**
      * @inheritDoc
-     * @throws \InvalidArgumentException If $viewee is NULL or neither $selections or $overrides are supplied
+     * @throws InvalidArgumentException If $viewee is NULL or neither $selections or $overrides are supplied
      * @throws \UnexpectedValueException
      */
     public function buildComponent(
@@ -86,19 +88,19 @@ class Factory extends NullableContext\Factory
         GenericCollection $overrides
     ): Filter\IComponent {
         if (null === $viewee) {
-            throw new \InvalidArgumentException('Viewee cannot be null for UnitImportSpec filter');
+            throw new InvalidArgumentException('Viewee cannot be null for UnitImportSpec filter');
         }
         $unitSpecOverrides = $overrides[$definition->getFilter()->getId()];
 
         $folders = $this->folderMapper->createCollection();
 
         // Course-markbook does not insert folders that are related to current user.
-        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getInvolvedFoldersPages(), true)) {
+        if ($this->isInvolvedFolderPage($pageFilter->getPage())) {
             $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
         }
 
         // Are we in the context of a filtered page that is for a single folder?
-        if (\in_array($pageFilter->getPage(), Filter\Page\Model::getSingleFolderPages(), true)) {
+        if ($this->isSingleFolderPage($pageFilter->getPage())) {
             $folder                    = $this->findFolderModel($routeArgs);
             $folders[$folder->getId()] = $folder;
         }
@@ -107,7 +109,7 @@ class Factory extends NullableContext\Factory
          * otherwise any assessments inside units imported to the extra folder will never be visible.
          */
         $extraFolderIds = $this->parseFolderIds($overrides);
-        if (\count($extraFolderIds)) {
+        if (count($extraFolderIds)) {
             $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
             $folders      = $folders->mergeUnique($extraFolders, 'id');
         }

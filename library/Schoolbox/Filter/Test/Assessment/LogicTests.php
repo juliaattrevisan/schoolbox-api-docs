@@ -1,13 +1,14 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
 namespace Schoolbox\Filter\Test;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
 use Schoolbox\Filter;
 use Schoolbox\Collection;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
@@ -68,6 +69,30 @@ class LogicTests extends TestCase
 
         $this->assertEquals($expected, $actual, $message);
     }
+
+
+    /**
+     * @dataProvider provider_doesCapabilityIndicatorFiltersGuaranteeEmptySet
+     * @param null|int[] $a        AssessmentType
+     * @param array|null $capInd   Capabilities/Indicators
+     * @param bool       $expected Are results possible? (ie not guaranteed empty set)
+     * @throws Filter\BrokenFilterException
+     */
+    public function test_areResultsPossible_CapabilityIndicatorFilter(?array $a, ?array $capInd, bool $expected): void
+    {
+        $qbt             = $this->getTester();
+        $filters         = $this->buildIndicatorCapabilityFilterArray($a, $capInd);
+        $completeFilters = $qbt->insertMissingFilters($filters);
+        $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
+
+        $message =
+            AssessmentFilters\AssessmentType\Definition::class      . ':  '. $this->toStr($a).
+            AssessmentFilters\RubricUsage\Definition::class . ':  '. $this->toStr($capInd).
+            $this->toStr($completeFilters)."\n";
+
+        $this->assertEquals($expected, $actual, $message);
+    }
+
 
     /**
      * @dataProvider provider_subQueriesRequired
@@ -186,6 +211,23 @@ class LogicTests extends TestCase
             AssessmentFilters\WorkType\Definition::class       => null === $wk ? null : new Collection($wk),
         ];
     }
+
+
+    /**
+     * Build a filter array where null filters are included but their value is null
+     *
+     * @param null|int[] $a AssessmentType
+     * @param array|null $capInd
+     * @return mixed[]
+     */
+    private function buildIndicatorCapabilityFilterArray(?array $a, ?array $capInd): array
+    {
+        return [
+            AssessmentFilters\AssessmentType\Definition::class => null === $a       ? null : new Collection($a),
+            AssessmentFilters\RubricUsage\Definition::class    => null === $capInd  ? null : new Collection($capInd),
+        ];
+    }
+
 
     /**
      * @return \Schoolbox\Filter\AbstractIdFinder|\Schoolbox\Filter\IdFinder|AssessmentFilters\TestableIdFinder
@@ -465,7 +507,7 @@ class LogicTests extends TestCase
 
         $nll = null;
         $emt = [];
-        $ntE = [1];
+        $ntE = [1 => 1];
 
         return [
             [$nll, $nll, $nll, $nll, $nll, false],
@@ -711,6 +753,74 @@ class LogicTests extends TestCase
             [$ntE, $ntE, $ntE, $ntE, $nll, false],
             [$ntE, $ntE, $ntE, $ntE, $emt, false],
             [$ntE, $ntE, $ntE, $ntE, $ntE, false],
+        ];
+    }
+
+
+    /**
+     * Truth table for whether some combination of non-context filters guarantees an empty set
+     * (and hence we can short-circuit without hitting the DB)
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    public function provider_doesCapabilityIndicatorFiltersGuaranteeEmptySet(): array
+    {
+        // Activity Type keys
+        $dueWorkKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
+        $projectKey = AssessmentFilters\AssessmentType\Definition::KEY_DUE_WORK;
+
+        // CapabilityIndicator keys
+        $noneKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
+        $codec      = new AssessmentFilters\RubricUsage\Codec();
+        $exampleKey = $codec->encodeCapability((new Group())->setId(1));
+
+        // Various filter sets possible
+        $null  = null;
+        $empty = [];
+
+        // Activity filter sets
+        $dueWork       = [$dueWorkKey => $dueWorkKey];
+        $notDueWork    = [$projectKey => $projectKey];
+        $mixedActivity = [$dueWorkKey => $dueWorkKey, $projectKey => $projectKey];
+
+        // CapabilityIndicator filter sets
+        $noCapInd    = [$noneKey => $noneKey];
+        $aCapInd     = [$exampleKey => $exampleKey];
+        $mixedCapInd = [$noneKey => $noneKey, $exampleKey => $exampleKey];
+
+        // Activity Set, CapInd Set, alwaysEmpty?
+        return [
+            [$null, $null, false],
+            [$null, $empty, true],
+            [$null, $noCapInd, false],
+            [$null, $aCapInd, false],
+            [$null, $mixedCapInd, false],
+
+            // All assessments are of an assessment type
+            [$empty, $null, true],
+            [$empty, $empty, true],
+            [$empty, $noCapInd, true],
+            [$empty, $aCapInd, true],
+            [$empty, $mixedCapInd, true],
+
+            [$dueWork, $null, false],
+            [$dueWork, $empty, true],
+            [$dueWork, $noCapInd, false],
+            [$dueWork, $aCapInd, false],
+            [$dueWork, $mixedCapInd, false],
+
+            [$notDueWork, $null, false],
+            [$notDueWork, $empty, true],
+            [$notDueWork, $noCapInd, false],
+            [$notDueWork, $aCapInd, false],
+            [$notDueWork, $mixedCapInd, false],
+
+            [$mixedActivity, $null, false],
+            [$mixedActivity, $empty, true],
+            [$mixedActivity, $noCapInd, false],
+            [$mixedActivity, $aCapInd, false],
+            [$mixedActivity, $mixedCapInd, false],
         ];
     }
 
