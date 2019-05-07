@@ -131,8 +131,15 @@ class Controller extends Base {
 
     /**
      * School Grades page
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function schoolGrades($db, $user, $externalUser, $year) {
+    public function schoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
@@ -177,12 +184,14 @@ class Controller extends Base {
     /**
      * IB page
      *
-     * @param $db
-     * @param $user
-     * @param $externalUser
-     * @param $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function ib($db, $user, $externalUser, $year) {
+    public function ib(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new IB\Footer($user, $externalUser, $db, null);
 
@@ -220,12 +229,14 @@ class Controller extends Base {
     /**
      * NCEA page
      *
-     * @param $db
-     * @param $user
-     * @param $externalUser
-     * @param $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function ncea($db, $user, $externalUser, $year) {
+    public function ncea(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
