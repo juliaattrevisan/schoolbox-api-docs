@@ -12,24 +12,7 @@
             <h1>Search {{ locale.pastoral.proper }} Records</h1>
         </div>
     </div>
-    <nav>
-        {% set routeGetGroups = routeLookupIfAuthorized('pastoralManagement.getGroups') %}
-        {% set routeReportBuilder = routeLookupIfAuthorized('pastoralReportBuilder.getIndex') %}
-        {% set routeGetAudiences = routeLookupIfAuthorized('pastoralAudience.getAudiences') %}
-
-        <a href="#" class="icon-more" data-dropdown="header-options" title="Actions"></a>
-    </nav>
-    <ul class="f-dropdown fadeInDown" data-dropdown-content="" id="header-options">
-        {% if routeReportBuilder %}
-            <li><a href="{{ routeReportBuilder }}" class="icon-result" title="{{ locale.pastoral.proper }} Report Builder">Report Builder</a></li>
-        {% endif %}
-        {% if routeGetGroups %}
-            <li><a href="{{ routeGetGroups }}" class="icon-group" title="Manage {{ locale.pastoral.proper }} Groups">Manage Groups</a></li>
-        {% endif %}
-        {% if routeGetAudiences %}
-            <li><a href="{{ routeGetAudiences }}" class="icon-settings" title="Manage {{ locale.pastoral.proper }} Audience Defaults">Manage Visibility Defaults</a></li>
-        {% endif %}
-    </ul>
+    {% include '@pastoral/dropdown_actions.twig' %}
 </div>
 
 <div class="row">
