@@ -104,7 +104,7 @@ class Folder extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers($entityMeta = null): array
     {
         return $this->canTargetTeachersOfUsersInFolder
             ? [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF]
@@ -239,7 +239,7 @@ class Folder extends SimpleStrategy
                     THEN CONCAT(' (', GROUP_CONCAT(folder_code.code SEPARATOR ', '), ')')
                     ELSE ''
                     END) AS `name`,
-                '{$entityType}' AS entity_type
+                '{$entityType}' AS entity_type, null as entity_meta
             FROM folder
             LEFT JOIN folder_code ON folder.id = folder_code.folder_id AND folder_code.deleted_at IS NULL
             WHERE (

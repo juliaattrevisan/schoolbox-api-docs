@@ -91,15 +91,18 @@ class Controller extends Base
             $entityType   = $row['entity_type'];
             $value        = $row['id'];
             $name         = $row['name'];
+            $meta         = $row['entity_meta'];
             $encodedValue = $codec->encodeValue($value);
 
-            foreach ($simpleStrategies[$entityType]->getValidRelationshipModifiers() as $modifier) {
+            foreach ($simpleStrategies[$entityType]->getValidRelationshipModifiers($meta) as $modifier) {
                 $key = $codec->encodeSimpleAttributes($entityType, $value, $modifier);
                 $option = new Audience\SegmentSelectizeOption($key, $name);
                 $option->addLabel($entityType, $encodedValue, $name);
                 $options[] = $option;
             }
         }
+
+
 
         $this->getResponse()->content->set($this->buildJsonOutput($options));
     }

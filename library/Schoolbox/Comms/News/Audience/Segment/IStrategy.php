@@ -60,13 +60,15 @@ interface IStrategy
 
 
     /**
+     * @param $entityMeta
+     *
      * Returns the set of valid relationship modifiers for this strategy.
      *
      * Note this is a inherent validity concern, not an authorisation concern.
      *
      * @return string[]
      */
-    public function getValidRelationshipModifiers(): array;
+    public function getValidRelationshipModifiers($entityMeta): array;
 
 
     /**

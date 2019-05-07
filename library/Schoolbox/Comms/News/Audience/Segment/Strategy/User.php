@@ -46,9 +46,13 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers($entityMeta): array
     {
-        return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
+        if($entityMeta == 'student') {
+            return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
+        } else {
+            return [Model::RELATIONSHIP_SELF];
+        }
     }
 
 
@@ -61,9 +65,10 @@ class User extends SimpleStrategy
 
         $entityType = self::getEntityType();
         return "
-            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$entityType}' AS entity_type
-            FROM `user`
-            WHERE deleted_at IS NULL
+            SELECT user.id, CONCAT(firstname, ' ', lastname,' (',`groups`.name,')') AS name, '{$entityType}' AS entity_type, `groups`.group_type as entity_meta
+            FROM `user` 
+            INNER JOIN `groups` ON user.group_id = `groups`.id
+            WHERE user.deleted_at IS NULL
             {$keywordFilter}
         ";
     }

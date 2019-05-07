@@ -49,7 +49,7 @@ class SchoolHouse extends SimpleStrategy
 
         $entityType = self::getEntityType();
         return "
-            SELECT id, house AS name, '{$entityType}' AS entity_type
+            SELECT id, house AS name, '{$entityType}' AS entity_type, null as entity_meta
             FROM house
             {$keywordFilter}
         ";
@@ -74,7 +74,7 @@ class SchoolHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers($entityMeta = null): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

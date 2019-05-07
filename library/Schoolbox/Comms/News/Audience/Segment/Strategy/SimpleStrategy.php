@@ -80,7 +80,7 @@ abstract class SimpleStrategy implements ISimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers($entityMeta): array
     {
         // Default to being disabled
         return [];

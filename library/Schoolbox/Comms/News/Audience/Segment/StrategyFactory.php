@@ -122,15 +122,14 @@ class StrategyFactory
     /**
      * Grouped by by entity_type
      *
+     * @param null $entityMeta
      * @return string[][]
-     * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers($entityMeta = null): array
     {
         $validModifiers = [];
         foreach ($this->makeAllStrategies() as $strategy) {
-            $validModifiers[$strategy::getEntityType()] = $strategy->getValidRelationshipModifiers();
+            $validModifiers[$strategy::getEntityType()] = $strategy->getValidRelationshipModifiers($entityMeta);
         }
         return $validModifiers;
     }
