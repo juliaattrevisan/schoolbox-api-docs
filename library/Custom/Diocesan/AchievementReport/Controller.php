@@ -56,7 +56,7 @@ class Controller extends Base {
 
         /* Redirect based on default report selection
          *
-         * Needs to happen so that the /ib, /schoolgrades and /ncea
+         * Needs to happen so that the /ib, /schoolGrades and /ncea
          * prefixes exist, otherwise you end up at 404 from the
          * default report when you open a year div
          */
@@ -166,7 +166,7 @@ class Controller extends Base {
         $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($user, $externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
-            'template' => '@schoolgrades/index.twig',
+            'template' => '@schoolGrades/index.twig',
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),

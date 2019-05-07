@@ -31,7 +31,7 @@ class Module extends BaseModule
     {
         $router->addGet('achievementreport.selector', $basePath . '/{externalUserId}');
 
-        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}{/year}')
+        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolGrades/{externalUserId}{/year}')
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
@@ -167,7 +167,7 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolgrades');
+        $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolGrades');
         $loader->addPath(__DIR__ . '/IB', 'ib');
         $loader->addPath(__DIR__ . '/NCEA', 'ncea');
         $loader->addPath(__DIR__ . '/Comments', 'comments');
