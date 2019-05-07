@@ -91,7 +91,10 @@ class Controller extends Base {
 
             case 'comingSoon':
                 $this->getResponse()->content->set(array(
-                    'template' => '@templates/ComingSoon.twig'
+                    'template' => '@templates/ComingSoon.twig',
+                    'data' => [
+                        'externalUser' => $externalUser,
+                    ]
                 ));
 
                 break;
