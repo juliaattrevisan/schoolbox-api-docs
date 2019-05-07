@@ -122,7 +122,7 @@ class Controller extends Base {
     public function standardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $this->getResponse()->content->set(array(
-            'template' => '@templates/StandardisedTest.twig',
+            'template' => '@standardisedTest/StandardisedTest.twig',
             'data' => [
                 'externalUser' => $externalUser,
             ]
