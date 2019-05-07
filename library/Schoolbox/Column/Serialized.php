@@ -30,4 +30,14 @@ class Serialized implements IColumnType {
 	public function dehydrate($value, $mapper = null) {
 		return serialize($value);
 	}
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        // cannot guarantee the hydrated value will always be scalar
+        return false;
+    }
 }

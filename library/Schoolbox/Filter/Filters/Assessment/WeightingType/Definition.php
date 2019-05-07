@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\WeightingType;
 
@@ -52,7 +52,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return $this->weightingTypes->getAll();
     }
@@ -77,7 +77,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         if (self::KEY_UNWEIGHTED === $key) {
             return 'Unweighted';
@@ -92,7 +92,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // No options checked
         return false;
@@ -102,7 +102,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // by default, all WeightingTypes are available
         return true;
@@ -112,7 +112,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/WeightingType/templates';
     }

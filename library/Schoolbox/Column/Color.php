@@ -66,4 +66,13 @@ class Color implements IColumnType
         }
         return $this->buildFromValue($value)->getAsHexAlpha();
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 }

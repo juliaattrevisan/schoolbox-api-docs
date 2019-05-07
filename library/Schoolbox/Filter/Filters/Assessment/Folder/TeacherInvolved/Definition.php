@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\TeacherInvolved;
 
@@ -42,7 +42,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_CLASSES,
@@ -54,7 +54,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public static function isMandatory($page)
+    public static function isMandatory(string $page): bool
     {
         // The teacher folder filter must be enabled on all pages. No effect on user-configurability
         return true;
@@ -64,7 +64,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/Folder/TeacherInvolved/templates';
     }
@@ -73,7 +73,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         switch ($key) {
             case self::KEY_CLASSES:

@@ -34,4 +34,13 @@ class JSON implements IColumnType
     {
         return json_encode($value);
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 }

@@ -23,4 +23,13 @@ class Binary implements IColumnType
     {
         return $value;
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return true;
+    }
 }

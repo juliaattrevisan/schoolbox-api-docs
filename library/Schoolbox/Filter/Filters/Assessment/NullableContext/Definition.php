@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
 
@@ -36,7 +36,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_NONE,
@@ -47,7 +47,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // All available by default
         return true;
@@ -57,7 +57,7 @@ abstract class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // Nothing is selected, meaning filter is not applied
         return false;

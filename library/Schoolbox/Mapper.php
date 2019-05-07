@@ -15,11 +15,14 @@ use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Quoter\IQuoter;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\IDatabase;
+use function array_map;
 use Aura\Di;
+use function count;
 use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
+use Schoolbox\Column;
 use Schoolbox\Column\Factory as ColumnFactory;
 use Schoolbox\Column\IColumnType;
 use Schoolbox\Column\IFactory;
@@ -149,6 +152,10 @@ abstract class Mapper implements IMapper, Serializable
     protected $moduleNotifier;
 
     /**
+     * Indexed by model property name (not db column)
+     *
+     * @see MappingCollection::getOffsetByColumn() for O(1) fetch by column
+     *
      * @var MappingCollection
      */
     protected $map;
@@ -2172,7 +2179,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // Build ORDER BY part
-        if (isset($options['order']) && \is_array($options['order']) && \count($options['order'])) {
+        if (isset($options['order']) && \is_array($options['order']) && count($options['order'])) {
             $query .= self::buildOrderByClause($quoted_table, $options['order'], $this->database);
         }
 
@@ -2230,7 +2237,7 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($order as $column => $order_option) {
                 // Is there a . in escaped_name? Assume it's a sort on a join
                 $parts = \explode('.', $column, 2);
-                if (\count($parts) === 1) {
+                if (count($parts) === 1) {
                     $prefix     = $quoted_table;
                     $columnName = $db->quoteIdentifier($column);
                 } else {
@@ -2468,14 +2475,16 @@ abstract class Mapper implements IMapper, Serializable
      * @param array $options
      * @return array
      */
-    public function findIdsByColumnList(array $columnList, array $options = [])
+    public function findIdsByColumnList(array $columnList, array $options = []): array
     {
         try {
             $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifierColumn(), $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $ids        = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $idHydrator = $this->getColumnScalarHydrator($this->getIdentifierColumn());
+        return array_map([$idHydrator, 'hydrate'], $ids);
     }
 
 
@@ -2496,13 +2505,18 @@ abstract class Mapper implements IMapper, Serializable
      * @param array   $options
      * @return array
      */
-    public function findScalarByPredicates($column, Builder $pb, array $options = [])
+    public function findScalarByPredicates(string $column, Builder $pb, array $options = []): array
     {
         try {
-            return $this->selectColumnsByPredicates([ $column ], $pb, $options)->fetchAll(PDO::FETCH_COLUMN);
+            $scalars = $this->selectColumnsByPredicates([$column], $pb, $options)->fetchAll(PDO::FETCH_COLUMN);
         } catch (UnderflowException $e) {
             return [];
         }
+        if (count($scalars)) {
+            $hydrator = $this->getColumnScalarHydrator($column);
+            $scalars  = array_map([$hydrator, 'hydrate'], $scalars);
+        }
+        return $scalars;
     }
 
 
@@ -2512,13 +2526,26 @@ abstract class Mapper implements IMapper, Serializable
      * @param array    $options
      * @return array
      */
-    public function findColumnsByPredicates($columnList, Builder $pb, array $options = [])
+    public function findColumnsByPredicates($columnList, Builder $pb, array $options = []): array
     {
         try {
-            return $this->selectColumnsByPredicates($columnList, $pb, $options)->fetchAll(PDO::FETCH_ASSOC);
+            $rows = $this->selectColumnsByPredicates($columnList, $pb, $options)->fetchAll(PDO::FETCH_ASSOC);
         } catch (UnderflowException $e) {
             return [];
         }
+        if (count($rows)) {
+            /** @var IColumnType[] $hydrators */
+            $hydrators = [];
+            foreach ($columnList as $column) {
+                $hydrators[$column] = $this->getColumnScalarHydrator($column);
+            }
+            foreach ($rows as $rowId => $row) {
+                foreach ($row as $column => $value) {
+                    $rows[$rowId][$column] = $hydrators[$column]->hydrate($value);
+                }
+            }
+        }
+        return $rows;
     }
 
 
@@ -3817,14 +3844,19 @@ abstract class Mapper implements IMapper, Serializable
      *                   'limit' or 'offset')
      * @return array
      */
-    public function findDistinct($column, $columnList = array(), $options = array())
+    public function findDistinct($column, $columnList = array(), $options = array()): array
     {
         try {
             $stmt = $this->selectScalarByColumnList("DISTINCT $column", $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $distinct = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        if (count($distinct)) {
+            $hydrator = $this->getColumnScalarHydrator($column);
+            $distinct = array_map([$hydrator, 'hydrator'], $distinct);
+        }
+        return $distinct;
     }
 
     /**
@@ -3995,5 +4027,51 @@ abstract class Mapper implements IMapper, Serializable
                 throw new \UnexpectedValueException($message ?? 'Joined model has changed');
             }
         }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getColumnScalarHydrator(string $column, int $depth = 0): IColumnType
+    {
+        // If the column is a foreign key to another entity, we need to fetch that other entity's column hydrator.
+        // This ensures we always returning a hydrator whose hydrate() method generates a scalar data type.
+        // We know the data types are the same as that's a pre-requisite for adding the foreign key.
+        // It quite possible for a FK to point to a column that is itself a FK.
+        // This therefore needs to be recursive to follow these relationships.
+
+        // Base Case 1:
+        //   Infinite recursion check. FK loops are technically possible at a schema level.
+        //   But unlikely we have a valid chain this long.
+        if ($depth > 1000) {
+            // This will intentionally throw a TypeError
+            return null;
+        }
+
+        /** @var IColumnType $hydrator */
+        $hydrator = $this->map->getOffsetByColumn($column)['hydrator'];
+
+        // Base Case 2:
+        //   Column is a scalar. Respect declared data type.
+        if ($hydrator->isScalar()) {
+            return $hydrator;
+        }
+
+        // Base Case 3:
+        //   The hydrator is not scalar, but is also not for a Model
+        if (!$hydrator instanceof ModelColumn) {
+            // Don't hydrate at all. Raw data type (null|string) will be returned.
+            return new Column\Base();
+        }
+
+        // Recursive Case:
+        //   Hydrator is a Model Hydrator.
+        $joinDef = $this->map->getOffsetByColumn($column)['join_def'];
+        /** @var self $otherMapper */
+        $otherMapper = $joinDef['mapper'];
+        $otherMapper = $otherMapper instanceof IMapper ? $otherMapper : $otherMapper::getInstance();
+        $otherColumn = $joinDef['other_key'];
+        return $otherMapper->getColumnScalarHydrator($otherColumn, $depth + 1);
     }
 }

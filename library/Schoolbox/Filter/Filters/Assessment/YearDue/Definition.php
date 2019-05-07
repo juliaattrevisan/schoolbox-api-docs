@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\YearDue;
 
@@ -41,7 +41,7 @@ class Definition extends Filter\AbstractDefinition
      * @param string $key
      * @return string
      */
-    public function getLabel($key): string
+    public function getLabel(string $key): string
     {
         return $key;
     }
@@ -53,7 +53,7 @@ class Definition extends Filter\AbstractDefinition
      * @param string $roleType
      * @return bool
      */
-    protected function getInitialSelectedState($key, $page, $roleType): bool
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // No options checked
         return false;
@@ -65,7 +65,7 @@ class Definition extends Filter\AbstractDefinition
      * @param Filter\Page\Model $pageFilter
      * @return bool
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter): bool
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // by default, all YearsDue are available
         return true;

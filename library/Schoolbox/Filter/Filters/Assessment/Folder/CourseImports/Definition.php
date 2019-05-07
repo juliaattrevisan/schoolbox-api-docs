@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
@@ -40,7 +40,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return [
             self::KEY_CLASSES,
@@ -52,7 +52,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/Folder/CourseImports/templates';
     }
@@ -61,7 +61,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         switch ($key) {
             case self::KEY_CLASSES:

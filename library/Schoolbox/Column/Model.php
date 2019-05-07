@@ -117,4 +117,13 @@ class Model implements IColumnType {
 			$mapper->getGetIdentifierMethodName();
 		return $value->$identifier_method();
 	}
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 }

@@ -10,8 +10,6 @@
 
 namespace Schoolbox\Column;
 
-use Schoolbox\GenericCollection;
-
 class Collection implements IColumnType {
 
 	/**
@@ -97,4 +95,12 @@ class Collection implements IColumnType {
 		return $value->getColumnValues($id_property);
 	}
 
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 } 

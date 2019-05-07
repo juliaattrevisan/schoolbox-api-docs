@@ -3,11 +3,13 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\StudentInteractions;
 
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 use Schoolbox\Filter\Page;
+use Schoolbox\GenericCollection;
 
 /**
  * Display a list of folders (either classes, groups or both) where the student has submitted IResponses or received IFeedback.
@@ -56,7 +58,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(Page\Model $pageFilter)
+    protected function unsetInvalidOptions(Page\Model $pageFilter): GenericCollection
     {
         $options = parent::unsetInvalidOptions($pageFilter);
 
@@ -84,7 +86,7 @@ class Definition extends FolderFilter\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key): string
+    public function getLabel(string $key): string
     {
         switch ($key) {
             case self::KEY_CLASSES:

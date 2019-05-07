@@ -65,7 +65,6 @@ class Mapper extends BaseMapper
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('availability', self::TYPE_STRING);
         $this->uses('anonymous_result', self::TYPE_BOOLEAN);
-        $this->uses('anonymous_result', self::TYPE_BOOLEAN);
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'created');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');

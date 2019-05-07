@@ -31,4 +31,16 @@ interface IColumnType {
 	 * @return string
 	 */
 	public function dehydrate($value, $mapper = null);
+
+
+    /**
+     * Returns whether the hydrated data type is *always* scalar
+     *
+     * For clarity, the following are not scalars:
+     * * objects
+     * * arrays
+     *
+     * @return bool
+     */
+    public function isScalar(): bool;
 }

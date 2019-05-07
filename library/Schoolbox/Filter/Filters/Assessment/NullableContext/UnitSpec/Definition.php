@@ -1,9 +1,9 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitSpec;
 
@@ -45,7 +45,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         if (self::KEY_NONE === $key) {
             return 'None (assessment does reside inside a unit specification)';
@@ -57,7 +57,7 @@ class Definition extends NullableContext\Definition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/NullableContext/UnitSpec/templates';
     }

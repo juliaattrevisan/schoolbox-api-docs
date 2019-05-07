@@ -28,4 +28,13 @@ class Base implements IColumnType
         }
         return mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return true;
+    }
 }

@@ -20,7 +20,7 @@ class Set implements IColumnType
      * @param string            $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return mixed
+     * @return array
      */
     public function hydrate($value, $mapper = null)
     {
@@ -43,4 +43,12 @@ class Set implements IColumnType
         return implode(',', (array)$value);
     }
 
-} 
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
+}

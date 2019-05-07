@@ -1,15 +1,16 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
+use Schoolbox\GenericCollection;
 
 
 /**
@@ -73,7 +74,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getCustomKeys()
+    protected function getCustomKeys(): array
     {
         return $this->temporalStates->getAll();
     }
@@ -97,7 +98,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getLabel($key)
+    public function getLabel(string $key): string
     {
         if (self::KEY_UNPUBLISHED === $key) {
             return 'Unpublished';
@@ -124,7 +125,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter)
+    protected function unsetInvalidOptions(Filter\Page\Model $pageFilter): GenericCollection
     {
         $cleanedPageOptions = parent::unsetInvalidOptions($pageFilter);
 
@@ -141,7 +142,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected function getInitialSelectedState($key, $page, $roleType)
+    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
     {
         // No options checked
         return false;
@@ -151,7 +152,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    public function getInitialAvailability($customAbstractKey, Filter\Page\Model $pageFilter)
+    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
     {
         // by default, all TemporalStates are available
         return true;
@@ -161,7 +162,7 @@ class Definition extends Filter\AbstractDefinition
     /**
      * @inheritdoc
      */
-    protected static function getTemplatesDir()
+    protected static function getTemplatesDir(): string
     {
         return '@filterDefinitions/Assessment/TemporalState/templates';
     }

@@ -78,4 +78,12 @@ class Interval implements IColumnType {
         return null;
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function isScalar(): bool
+    {
+        return false;
+    }
 }
