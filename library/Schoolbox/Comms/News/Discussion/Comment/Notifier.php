@@ -298,7 +298,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob->setTitle(self::PATTERN_COMMENTED_TITLE)
             ->setNamespace($this->getSlug())
-            ->setIcon("/portrait?id={$effector->getId()}&size={$this->iconSize}")
+            ->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
             ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
@@ -404,7 +404,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob->setTitle(self::PATTERN_FOLLOWED_TITLE)
             ->setNamespace($this->getSlug())
-            ->setIcon("/portrait?id={$effector->getId()}&size={$this->iconSize}")
+            ->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
             ->setFilter(['roletype' => $roleType])
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
