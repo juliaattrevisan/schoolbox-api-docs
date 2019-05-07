@@ -24,18 +24,18 @@ class Controller extends Base {
      *
      * @var array
      */
-    private $types = array(
-        'IN' => array(
+    private const TYPES = [
+        'IN' => [
             'long' => 'Internally Assessed',
             'short' => 'Internal',
             'css' => 'type-pink',
-        ),
-        'EX' => array(
+        ],
+        'EX' => [
             'long' => 'Externally Assessed',
             'short' => 'External',
             'css' => 'type-blue'
-        )
-    );
+        ]
+    ];
 
     /**
      * Selects which report to redirect towards, based on certain
@@ -281,7 +281,7 @@ class Controller extends Base {
                     'heading' => $creditSummary->getHeading(),
                     'data' => $creditSummary->findData(),
                     'allLetters' => $creditSummary->getLetterRegistry(),
-                    'allTypes' => $this->types,
+                    'allTypes' => self::TYPES,
 
                     /* Suffix for graph div id's
                      */
@@ -339,7 +339,7 @@ class Controller extends Base {
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
-                    'allTypes' => $this->types,
+                    'allTypes' => self::TYPES,
                     'year' => $year,
                     'currentYear' => $entriesAndResults->getCurrentYear()
                 );
