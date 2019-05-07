@@ -18,6 +18,16 @@ class NavigationSelector
 {
 
     /**
+     * Navigation keys
+     */
+    public const STANDARDISEDTEST_KEY = 'standardisedTest';
+    public const SCHOOLGRADES_KEY = 'schoolGrades';
+    public const NCEA_KEY = 'ncea';
+    public const IB_KEY = 'ib';
+    public const COMMENTS_KEY = 'comments';
+
+
+    /**
      * MSSQL db handler
      *
      * @var MSSQL
@@ -80,6 +90,7 @@ class NavigationSelector
      */
     private $defaultReport;
 
+
     /**
      * Constructor
      *
@@ -106,16 +117,16 @@ class NavigationSelector
         $this->defaultReport = ['error' => 'Unknown default report.'];
 
         if (($this->user->getYear() >= 1) && ($this->user->getYear() <= 6)) {
-            $this->defaultReport = 'standardisedTest';
+            $this->defaultReport = self::STANDARDISEDTEST_KEY;
         }
         elseif (($this->user->getYear() >= 7) && ($this->user->getYear() <= 10)) {
-            $this->defaultReport = 'schoolGrades';
+            $this->defaultReport = self::SCHOOLGRADES_KEY;
         }
         /* NCEA for year 11 specifically
          */
         elseif ($this->user->getYear() == 11) {
             if ($this->hasNcea) {
-                $this->defaultReport = 'ncea';
+                $this->defaultReport = self::NCEA_KEY;
             } else {
                 $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
             }
@@ -123,9 +134,9 @@ class NavigationSelector
          */
         elseif (($this->user->getYear() >= 12) && ($this->user->getYear() <= 13)) {
             if ($this->hasIb) {
-                $this->defaultReport ='ib';
+                $this->defaultReport = self::IB_KEY;
             } elseif ($this->hasNcea) {
-                $this->defaultReport = 'ncea';
+                $this->defaultReport = self::NCEA_KEY;
             } else {
                 $this->defaultReport = ['error' => 'Year 12/13 student not in NCEA or IB.'];
             }
@@ -148,34 +159,34 @@ class NavigationSelector
          */
         if ($this->hasNcea()) {
             $this->hasNcea = true;
-            $availableNavigation['ncea'] = 'NCEA';
+            $availableNavigation[self::NCEA_KEY] = 'NCEA';
         }
 
         /* Conditionally add IB option
          */
         if ($this->hasIb()) {
             $this->hasIb = true;
-            $availableNavigation['ib'] = 'IB';
+            $availableNavigation[self::IB_KEY] = 'IB';
         }
 
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
             $this->hasSchoolGrades = true;
-            $availableNavigation['schoolgrades'] = 'School Grades';
+            $availableNavigation[self::SCHOOLGRADES_KEY] = 'School Grades';
         }
 
         /* Conditionally add Standardised Test option
          */
         if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            $availableNavigation['standardisedTest'] = 'Standardised Test';
+            $availableNavigation[self::STANDARDISEDTEST_KEY] = 'Standardised Test';
         }
 
         /* Conditionally add Comment option
          */
         if ($this->hasComments()) {
             $this->hasComments = true;
-            $availableNavigation['comments'] = 'Comments';
+            $availableNavigation[self::COMMENTS_KEY] = 'Comments';
         }
 
         $this->availableNavigation = $availableNavigation;

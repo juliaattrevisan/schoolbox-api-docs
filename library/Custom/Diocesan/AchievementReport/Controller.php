@@ -69,27 +69,27 @@ class Controller extends Base {
          */
         switch ($report) {
             case 'schoolGrades':
-                header("Location: {$baseUrl}/schoolgrades/{$externalUserId}");
+                header("Location: {$baseUrl}/" . NavigationSelector::SCHOOLGRADES_KEY. "/{$externalUserId}");
                 die();
                 break;
 
             case 'ib':
-                header("Location: {$baseUrl}/ib/{$externalUserId}");
+                header("Location: {$baseUrl}/" . NavigationSelector::IB_KEY. "/{$externalUserId}");
                 die();
                 break;
 
             case 'ncea':
-                header("Location: {$baseUrl}/ncea/{$externalUserId}");
+                header("Location: {$baseUrl}/" . NavigationSelector::NCEA_KEY. "/{$externalUserId}");
                 die();
                 break;
 
             case 'comments':
-                header("Location: {$baseUrl}/comments/{$externalUserId}");
+                header("Location: {$baseUrl}" . NavigationSelector::COMMENTS_KEY. "{$externalUserId}");
                 die();
                 break;
 
             case 'standardisedTest':
-                header("Location: {$baseUrl}/comments/{$externalUserId}");
+                header("Location: {$baseUrl}" . NavigationSelector::STANDARDISEDTEST_KEY. "{$externalUserId}");
                 die();
                 break;
 
@@ -127,6 +127,8 @@ class Controller extends Base {
             ]
         ));
     }
+
+
     /**
      * School Grades page
      */
@@ -143,7 +145,7 @@ class Controller extends Base {
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
-                    'selected' => 'schoolgrades'
+                    'selected' => NavigationSelector::SCHOOLGRADES_KEY
                 ),
                 'footer' => array(
                     'data' => $footer->findData(),
@@ -192,7 +194,7 @@ class Controller extends Base {
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
-                    'selected' => 'ib'
+                    'selected' => NavigationSelector::IB_KEY
                 ),
                 'footer' => array(
                     'data' => $footer->findData(),
@@ -236,7 +238,7 @@ class Controller extends Base {
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
-                    'selected' => 'ncea'
+                    'selected' => NavigationSelector::NCEA_KEY
                 ),
                 'footer' => array(
                     'data' => $footer->findData(),
@@ -368,7 +370,7 @@ class Controller extends Base {
             'data' => [
                 'navigation' => [
                     'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
-                    'selected' => 'comments'
+                    'selected' => NavigationSelector::COMMENTS_KEY
                 ],
                 'externalUser' => $externalUser,
                 'user' => $user,
