@@ -200,7 +200,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         }
 
         $bob = new Builder();
-        $bob->setIcon("/portrait?id={$effector->getId()}&size={$this->iconSize}")
+        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
             ->setHref("/homepage/$categoryId#$kind")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams([
@@ -318,7 +318,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         $bob = new Builder();
 
-        $bob->setIcon("/portrait?id={$effector->getId()}&size={$this->iconSize}")
+        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
             ->setHref("/homepage/$categoryId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
