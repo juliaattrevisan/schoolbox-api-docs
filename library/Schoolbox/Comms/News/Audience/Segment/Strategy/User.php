@@ -46,7 +46,7 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers($entityMeta): array
+    public function getValidRelationshipModifiers($entityMeta = null): array
     {
         if($entityMeta == 'student') {
             return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];

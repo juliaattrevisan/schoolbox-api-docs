@@ -120,10 +120,14 @@ class StrategyFactory
 
 
     /**
-     * Grouped by by entity_type
+     * Grouped by entity_type
      *
      * @param null $entityMeta
+     *
      * @return string[][]
+     *
+     * @throws UnexpectedValueException
+     * @throws UnknownEntityTypeException
      */
     public function getValidRelationshipModifiers($entityMeta = null): array
     {

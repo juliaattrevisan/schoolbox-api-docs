@@ -68,7 +68,7 @@ interface IStrategy
      *
      * @return string[]
      */
-    public function getValidRelationshipModifiers($entityMeta): array;
+    public function getValidRelationshipModifiers($entityMeta = null): array;
 
 
     /**
