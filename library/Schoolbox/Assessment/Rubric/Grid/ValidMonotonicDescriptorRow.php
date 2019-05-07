@@ -11,21 +11,42 @@ namespace Schoolbox\Assessment\Rubric\Grid;
 
 use Schoolbox\Collection;
 
-class ValidDescriptorRow extends \Alaress\Specification\Base
+/**
+ * Spec pattern for a collection of descriptors.
+ *
+ * This pattern validates whether the set is monotonic: that is, if the
+ * set of descriptors (when using the descriptor's value for comparison):
+ * * is either ascending or descending in order
+ * * contains no duplicate values
+ *
+ * Any descriptors without values are ignored, and this pattern only applies if
+ * mark ranges are in use.
+ */
+class ValidMonotonicDescriptorRow extends \Alaress\Specification\Base
 {
+    /**
+     * Does the assessment the descriptor set is part of use mark ranges?
+     * This spec doesn't apply if it doesn't use mark ranges.
+     *
+     * @var bool
+     */
     private $usesMarkRange;
 
+    /**
+     * Constructor
+     *
+     * @param bool $usesMarkRange
+     */
     public function __construct(bool $usesMarkRange)
     {
         $this->usesMarkRange = $usesMarkRange;
     }
 
-
     /**
      * @param Collection|Descriptor[] $descriptorRow
      * @return bool
      */
-    public function isSatisfiedBy($descriptorRow) : bool
+    public function isSatisfiedBy($descriptorRow): bool
     {
         // We only enforce monotonicity if mark range is in use
         if ($this->usesMarkRange) {
@@ -38,7 +59,7 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
      * @param Collection|Descriptor[] $descriptors
      * @return bool
      */
-    private function isMonotonic($descriptors) : bool
+    private function isMonotonic($descriptors): bool
     {
         // First remove any descriptors from the list that don't have values
         // since value-less descriptors are permitted in amongst valued descriptors
@@ -55,20 +76,20 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
 
         $descriptors = $descriptors->filter($descriptorHasValue)->map($descriptorValue);
 
-        $prevVal   = $prevDiff = null;
-        foreach($descriptors as $val) {
+        $prevVal = $prevDiff = null;
+        foreach ($descriptors as $val) {
             // Not the first item?
-            if(null !== $prevVal){
+            if (null !== $prevVal) {
                 $diff = $val - $prevVal;
 
                 // No increase/decrease ?
-                if(0.0 === $diff){
+                if (0.0 === $diff) {
                     return false;
                 }
 
                 // Do we have a prev diff to compare against?
                 // Accounts for both ascending and descending possibilities
-                if(null !== $prevDiff && (($prevDiff > 0 && $diff < 0) || ($prevDiff < 0 && $diff > 0))) {
+                if (null !== $prevDiff && (($prevDiff > 0 && $diff < 0) || ($prevDiff < 0 && $diff > 0))) {
                     return false;
                 }
                 $prevDiff = $diff;
@@ -78,5 +99,4 @@ class ValidDescriptorRow extends \Alaress\Specification\Base
 
         return true;
     }
-
 }

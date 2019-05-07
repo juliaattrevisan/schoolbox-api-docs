@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
-use Schoolbox\Assessment\Rubric\Grid\ValidDescriptorRow;
+use Schoolbox\Assessment\Rubric\Grid\ValidMonotonicDescriptorRow;
 use \Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use \Schoolbox\Collection;
 use PHPUnit\Framework\TestCase;
 
-class ValidDescriptorRowTest extends TestCase
+class ValidMonotonicDescriptorRowTest extends TestCase
 {
     public function getTestIsSatisfiedByData() : iterable
     {
@@ -140,7 +140,7 @@ class ValidDescriptorRowTest extends TestCase
 
     /**
      * @dataProvider getTestIsSatisfiedByData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\ValidDescriptorRow::isSatisfiedBy
+     * @covers \Schoolbox\Assessment\Rubric\Grid\ValidMonotonicDescriptorRow::isSatisfiedBy
      *
      * @param bool $usesMarkRange
      * @param Collection $descriptorRow
@@ -148,7 +148,7 @@ class ValidDescriptorRowTest extends TestCase
      */
     public function testIsSatisfiedBy(bool $usesMarkRange, Collection $descriptorRow, bool $expected)
     {
-        $spec = new ValidDescriptorRow($usesMarkRange);
+        $spec = new ValidMonotonicDescriptorRow($usesMarkRange);
         $this->assertSame($expected, $spec->isSatisfiedBy($descriptorRow));
     }
 }

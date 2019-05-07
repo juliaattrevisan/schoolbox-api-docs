@@ -173,7 +173,7 @@ class Factory
 
             // Validate sequence of descriptor points
             if ($validate) {
-                $descriptorRowSpec = new ValidDescriptorRow($usesMarkRange);
+                $descriptorRowSpec = new ValidMonotonicDescriptorRow($usesMarkRange);
                 if (! $descriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
                     throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
                 }
