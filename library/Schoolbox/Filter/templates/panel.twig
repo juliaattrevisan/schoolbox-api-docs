@@ -29,6 +29,7 @@ Usage:
         // ============== jQuery DOM handles
         var $reportContent       = $('#{{ contentId }}');
         var $filterPanel         = $('#filter_panel');
+        var $interactionContainer= $filterPanel.find('[data-interaction-container]');
         var $panelComponents     = $filterPanel.find('[data-component]');
         var $appliedFilters      = $filterPanel.find('[data-applied-filters]');
         var $submitButton        = $('#submit_button');
@@ -443,6 +444,7 @@ Usage:
                 $appliedFilters.html('');
                 for (var filterId in componentsInUse) {
                     if (componentsInUse.hasOwnProperty(filterId)) {
+                        $interactionContainer.removeClass('hide');
                         // Create a new brick
                         var $newTab = $tabAppliedFilter.clone();
                         // Set the filter id and name
@@ -473,7 +475,7 @@ Usage:
                     }
                 }
             } else {
-                $appliedFilters.html('<div class="small-12 columns"><b>None</b></div>');
+                $interactionContainer.addClass('hide');
             }
         }
 
@@ -579,10 +581,10 @@ Usage:
 <div class="row">
     <div class="small-12 island" id="filter_panel">
         <section>
-            <div class="filter-interaction content">
+            <div class="filter-interaction content" data-interaction-container>
                 <div id="panel-summary">
                     <div class="small-12 columns">
-                        <label><span id="filter-loader" class="loader" title="Loading..."></span>Filters(s) selected:</label>
+                        <label><span id="filter-loader" class="loader" title="Loading..."></span>Filter(s) selected:</label>
                     </div>
                     <div id="applied_filters" data-applied-filters>
                     </div>
