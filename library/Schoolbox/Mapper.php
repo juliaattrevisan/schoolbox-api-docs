@@ -4031,17 +4031,9 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Returns a column's scalar hydrator.
-     *
-     * ie, Colour, Collection, Date etc will fall back to no hydration, and their raw database value returned.
-     *
-     * Intentionally throws a TypeError if column does not have a mapping
-     *
-     * @param string $column
-     * @param int    $depth
-     * @return IColumnType
+     * @inheritDoc
      */
-    private function getColumnScalarHydrator(string $column, int $depth = 0): IColumnType
+    public function getColumnScalarHydrator(string $column, int $depth = 0): IColumnType
     {
         // If the column is a foreign key to another entity, we need to fetch that other entity's column hydrator.
         // This ensures we always returning a hydrator whose hydrate() method generates a scalar data type.

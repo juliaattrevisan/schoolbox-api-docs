@@ -10,7 +10,6 @@ namespace Schoolbox\Filter;
 use function array_map;
 use InvalidArgumentException;
 use Schoolbox\Collection;
-use Schoolbox\Column\IColumnType;
 use Schoolbox\IMapper;
 
 /**
@@ -94,17 +93,13 @@ abstract class AbstractIdFinder implements IdFinder
         $uniqueIds = array_unique($ids);
         sort($uniqueIds);
 
-        // Respect id data type if configured
-        $identifier = $this->getMapper()->getIdentifier();
-        /** @var IColumnType $hydrator */
-        $hydrator = $identifier ? $identifier['hydrator'] ?? null : null;
-        if ($hydrator) {
-            $uniqueIds = array_map(static function ($id) use ($hydrator) {
-                return $hydrator->hydrate($id);
-            }, $uniqueIds);
-        }
+        // Respect id data type
+        $hydrator          = $this->getMapper()->getColumnScalarHydrator($this->getMapper()->getIdentifierColumn());
+        $hydratedUniqueIds = array_map(static function ($id) use ($hydrator) {
+            return $hydrator->hydrate($id);
+        }, $uniqueIds);
 
-        return $uniqueIds;
+        return $hydratedUniqueIds;
     }
 
 

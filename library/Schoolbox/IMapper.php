@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use Alaress\Database\Predicate\Builder;
 use Alaress\IDatabase;
+use Schoolbox\Column\IColumnType;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -284,4 +285,18 @@ interface IMapper
      * @return bool
      */
     public function delete($object);
+
+
+    /**
+     * Returns a column's scalar hydrator.
+     *
+     * ie, Colour, Collection, Date etc will fall back to no hydration, and their raw database value returned.
+     *
+     * Intentionally throws a TypeError if column does not have a mapping
+     *
+     * @param string $column
+     * @param int    $depth
+     * @return IColumnType
+     */
+    public function getColumnScalarHydrator(string $column, int $depth = 0): IColumnType;
 }
