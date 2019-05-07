@@ -279,7 +279,7 @@ class Controller extends Base {
                     'heading' => $creditSummary->getHeading(),
                     'data' => $creditSummary->findData(),
                     'allLetters' => $creditSummary->getLetterRegistry(),
-                    'allTypes' => $this->getTypes(),
+                    'allTypes' => $this->types,
 
                     /* Suffix for graph div id's
                      */
@@ -337,7 +337,7 @@ class Controller extends Base {
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
-                    'allTypes' => $this->getTypes(),
+                    'allTypes' => $this->types,
                     'year' => $year,
                     'currentYear' => $entriesAndResults->getCurrentYear()
                 );
@@ -397,28 +397,5 @@ class Controller extends Base {
         ];
 
         $this->getResponse()->content->set($output);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set types
-     *
-     * @param array $types
-     */
-    private function setTypes($types)
-    {
-        $this->types = $types;
-    }
-
-    /**
-     * Get types
-     *
-     * @return array
-     */
-    private function getTypes()
-    {
-        return $this->types;
     }
 }
