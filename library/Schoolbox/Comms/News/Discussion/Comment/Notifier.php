@@ -115,7 +115,6 @@ class Notifier extends AbstractModuleNotifier
     public function __construct($configLoader)
     {
         parent::__construct($configLoader, ['mapper' => CommentMapper::getInstance()]);
-
     }
 
 
@@ -225,13 +224,12 @@ class Notifier extends AbstractModuleNotifier
      * Notifies staff that someone has commented on his article
      * @param Comment $comment
      * @param User $effector
-     * @param array $diff
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyStaffCommented(Comment $comment, User $effector, ?array $diff = []): Envelope
     {
         return $this->notifyCommented(Role::STAFF, $comment, $effector);
-
     }
 
 
@@ -239,7 +237,7 @@ class Notifier extends AbstractModuleNotifier
      * Notifies student that someone has commented on his article
      * @param Comment $comment
      * @param User $effector
-     * @param array $diff
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyStudentCommented(Comment $comment, User $effector, ?array $diff = []): Envelope
@@ -252,7 +250,7 @@ class Notifier extends AbstractModuleNotifier
      * Notifies parent that someone has commented on his article
      * @param Comment $comment
      * @param User $effector
-     * @param array $diff
+     * @param array|null $diff
      * @return Envelope
      */
     public function notifyParentCommented(Comment $comment, User $effector, ?array $diff = []): Envelope
@@ -306,8 +304,11 @@ class Notifier extends AbstractModuleNotifier
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
                 'user' => new UserParam($effector, Param::STACKING_APPEND),
-                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_APPEND),
+                'title' => new Param(
+                    $article->getTitle(),
+                    sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
+                    Param::STACKING_APPEND
+                ),
             ])
             ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_COMMENTED);
 
@@ -409,8 +410,11 @@ class Notifier extends AbstractModuleNotifier
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
                 'user' => new UserParam($effector, Param::STACKING_APPEND),
-                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_APPEND),
+                'title' => new Param(
+                    $article->getTitle(),
+                    sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
+                    Param::STACKING_APPEND
+                ),
             ])
             ->addTopic("{$this->getSlug()}.{$comment->getId()}." . self::TRIGGER_FOLLOWED);
 
