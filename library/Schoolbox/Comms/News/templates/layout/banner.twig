@@ -119,9 +119,7 @@
                         {#<a href="#" class="icon-reply no-text" title="Add Reply"></a>#}
                     </nav>
 
-                    <article>
-                        <p v-html="comment.content"></p>
-                    </article>
+                    <article v-html="comment.content"></article>
                 </li>
                 <li class="actions-small-1" v-if="showSkeletonLoader" v-for="n in 3">
                     <div class="list-item">
@@ -156,7 +154,6 @@
 
 {% autoescape 'js' %}
 <script>
-    
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
     };
@@ -174,6 +171,7 @@
             threadEnabled: Boolean({{ article.discussionThread.open }}),
             isPublished: Boolean({{ article.isPublic }}),
             comments: [],
+            commentsOriginal: [], // Will contain the unmodified content of comments. In preparation for comment update.
             showCommentsCount: false,
             totalCommentsCount: 0,
             cursorNext: '',
@@ -291,6 +289,7 @@
 
                     for (index = 0; index < responseData.data.length; index++) {
                         self.comments.push(responseData.data[index]);
+                        self.commentsOriginal.push(responseData.data[index].content);
                     }
 
                     // Hide skeleton loader once the request is done
@@ -314,9 +313,17 @@
                     self.showCommentsCount = true;
                     self.loadMoreIsEnabled = true;
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
+                }).finally(function () {
+                    /**
+                     * Since schoolbox.min.js is being executed first before VueJS content gets rendered,
+                     * the schoolboxResource_ProxyReplacement is unable to locate the DOM yet.
+                     * With that for a quick fix, we need to read the DOM when the contents has been loaded and let
+                     * schoolboxResource_ProxyReplacement do what it's supposed to do.
+                     */
+                    self.reInitialiseMediaPlayer();
                 });
             },
-            deleteComment: function(id, index, confirmed = false) {
+            deleteComment: function(id, index, confirmed) {
                 var self = this;
 
                 self.commentIdToDelete = id;
@@ -349,6 +356,10 @@
                             self.getThread();
                         }
 
+                        setTimeout(function() {
+                            $.fn.schoolboxResource_InitialiseMediaElementPlayer($('#threads-section'));
+                        }, 300);
+
                         self.closeModal();
                     }).catch(function (error) {
                         self.confirmDeleteButton = true;
@@ -377,6 +388,8 @@
                         var responseData = response.data;
                         // Add the latest comment into the top of array
                         self.comments.splice(0,0, responseData);
+                        self.commentsOriginal.splice(0,0, responseData.content);
+
                         // On successful comment posting, add one into the total comments count in the UI without hitting the backend
                         self.totalCommentsCount++;
 
@@ -390,6 +403,8 @@
                     }).catch(function (error) {
                         self.postCommentButtonIsEnabled = true;
                         $toast.toastTimeout({text: self.errorAddingCommentText, duration: 2000, css: 'alert'});
+                    }).finally(function () {
+                        self.reInitialiseMediaPlayer();
                     });
                 }
             },
@@ -419,6 +434,31 @@
                         }
                     }
                 });
+            },
+            reInitialiseMediaPlayer: function () {
+                var self = this;
+
+                Object.keys(self.comments).forEach(function(key) {
+                    var content = $('<div>' + self.comments[key].content + '</div>');
+                    var replaced = false;
+
+                    $(content).each(function (index, element) {
+                        replaced = $.fn.schoolboxResource_ReplaceAll($(element));
+
+                        // Before we render the elements into the front-end, let's try to update the Vue comments model
+                        // first so that we can easily initialise mediaelementplayer().
+                        // And only update those models who's data has been updated.
+                        // Basically those elements that has a videos/audios.
+                        if (replaced) {
+                            self.comments[key].content = $(element).html();
+                        }
+                    });
+                });
+
+                // Need to add this here. Not really sure why this doesn't get executed when setTimeout is not present...
+                setTimeout(function() {
+                    $.fn.schoolboxResource_InitialiseMediaElementPlayer('#threads-section');
+                }, 100);
             }
         },
         mounted: function() {
@@ -426,13 +466,13 @@
             this.loadCkEditor();
         },
         filters: {
-            fromNow(date) {
+            fromNow: function (date) {
                 return moment(date.database).fromNow();
             },
-            fullString(date) {
+            fullString: function (date) {
                 return moment(date.database).format(dateDisplayFormats.momentJsDatetime);
             }
         }
-    })
+    });
 </script>
 {% endautoescape %}
