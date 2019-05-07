@@ -58,7 +58,7 @@ class Notifier extends ResourceNotifier
                 'homepage' => new CategoryParam($category),
                 'heading'  => new Param($heading, $href, ParameterInterface::STACKING_APPEND),
             ])
-            ->setIcon("/portrait?size={$this->iconSize}&id=" . $effector->getId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $effector->getId())
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
