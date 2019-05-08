@@ -373,20 +373,26 @@ class Controller extends BaseController
     {
         $post         = $this->request->post->get('rb');
         $assessmentId = key($post);
-        $assessment   = $this->assessmentDataSource->findByIdForReview($assessmentId);
-        if (!$assessment instanceof DueWork) {
+
+
+        // Load the current assessment and grid
+        $currentAssessment = $this->assessmentDataSource->findByIdForReview($assessmentId);
+        if (!$currentAssessment instanceof DueWork) {
             $this->sendError('Can only determine mark invalidation for due work');
             return;
         }
-        $assessment->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
+        $currentGrid = $this->mapper->retrieveGrid($currentAssessment, false);
+
+
+        // Load the proposed assessment and grid
+        // Need to load them separately due to object references: if I use the
+        // same assessment in both retrieveGrid calls the current grid thinks
+        // the current assessment state is the same as the proposed state.
+        $proposedAssessment = (clone $currentAssessment)
+            ->setMarkPerCapability($this->request->post->getBool('markPerCapability', false))
             ->setUseMarkRange($this->request->post->getBool('useMarkRange', false));
-
-
-        // Need to fetch current grid and proposed grid's base separately,
-        // because of object references
-        $currentGrid  = $this->mapper->retrieveGrid($assessment, false);
         $proposedGrid = (new GridFactory())->buildFromPostData(
-            $this->mapper->retrieveGrid($assessment, false),
+            $this->mapper->retrieveGrid($proposedAssessment, false),
             $post,
             false
         );
@@ -404,7 +410,7 @@ class Controller extends BaseController
             $linkDecorator = new LinkDecorator($this->router, $this->authorizer);
 
             // Determine who's actually affected?
-            foreach ($assessment->getAllParticipants() as $participant) {
+            foreach ($currentAssessment->getAllParticipants() as $participant) {
                 $user   = $participant->getUser();
                 $userId = $user->getId();
 
@@ -414,7 +420,7 @@ class Controller extends BaseController
                 }
 
                 // Self-assessment feedback
-                if ($assessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
+                if ($currentAssessment->isSelfAssessable() && $this->mapper->hasSelfAssessedMarkedGrid($participant)) {
                     $response['affectedUsers'][$userId]['selfAssess'] = true;
                 }
 
