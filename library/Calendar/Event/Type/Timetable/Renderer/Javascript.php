@@ -50,6 +50,7 @@ class Javascript extends Base
         $classes = $this->getEvent()->getEventClasses();
 
         $event = array(
+            'resourceId'=> $this->getEvent()->getResourceId(),
             'title'     => $this->getEvent()->getTitle(),
             'start'     => $start,
             'end'       => $end,
