@@ -53,7 +53,8 @@ class Year extends SimpleStrategy
             SELECT DISTINCT
               year AS id,
               IF(year REGEXP '^[0-9]+$', CONCAT('Year ', year), year) AS name,
-              '{$entityType}' AS entity_type
+              '{$entityType}' AS entity_type, 
+              null as entity_meta
             FROM `user`
             WHERE deleted_at IS NULL
             AND year IS NOT NULL
@@ -80,7 +81,7 @@ class Year extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

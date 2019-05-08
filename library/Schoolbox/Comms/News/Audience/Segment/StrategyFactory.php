@@ -120,9 +120,10 @@ class StrategyFactory
 
 
     /**
-     * Grouped by by entity_type
+     * Grouped by entity_type
      *
      * @return string[][]
+     *
      * @throws UnexpectedValueException
      * @throws UnknownEntityTypeException
      */

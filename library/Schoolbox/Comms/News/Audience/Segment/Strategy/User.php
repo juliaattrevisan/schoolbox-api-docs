@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
 
 use Schoolbox\Comms\News\Audience\Model;
 use Schoolbox\GenericCollection;
+use Schoolbox\Role;
 
 class User extends SimpleStrategy
 {
@@ -46,9 +47,13 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
-        return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
+        if($entityMeta === null || $entityMeta === Role::STUDENT) {
+            return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
+        } else {
+            return [Model::RELATIONSHIP_SELF];
+        }
     }
 
 
@@ -61,9 +66,10 @@ class User extends SimpleStrategy
 
         $entityType = self::getEntityType();
         return "
-            SELECT id, CONCAT(firstname, ' ', lastname) AS name, '{$entityType}' AS entity_type
-            FROM `user`
-            WHERE deleted_at IS NULL
+            SELECT user.id, CONCAT(firstname, ' ', lastname,' (',`groups`.name,')') AS name, '{$entityType}' AS entity_type, `groups`.group_type as entity_meta
+            FROM `user` 
+            INNER JOIN `groups` ON user.group_id = `groups`.id
+            WHERE user.deleted_at IS NULL
             {$keywordFilter}
         ";
     }

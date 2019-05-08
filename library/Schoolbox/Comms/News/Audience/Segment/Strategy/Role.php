@@ -31,7 +31,7 @@ class Role extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(): array
+    public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
         return [Model::RELATIONSHIP_SELF];
     }
@@ -57,7 +57,7 @@ class Role extends SimpleStrategy
 
         $entityType = self::getEntityType();
         return "
-            SELECT id, name, '{$entityType}' AS entity_type
+            SELECT id, name, '{$entityType}' AS entity_type, null as entity_meta
             FROM groups
             WHERE deleted_at IS NULL
             {$keywordFilter}

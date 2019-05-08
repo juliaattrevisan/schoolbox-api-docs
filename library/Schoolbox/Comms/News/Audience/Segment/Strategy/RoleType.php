@@ -34,7 +34,7 @@ class RoleType extends SimpleStrategy
      */
     public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
     {
-        return "SELECT 0, 'name todo', 'type todo' from dual WHERE false"; // TODO
+        return "SELECT 0, 'name todo', 'type todo', null as entity_meta from dual WHERE false"; // TODO
     }
 
 

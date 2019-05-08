@@ -58,7 +58,7 @@ class PastoralGroup extends SimpleStrategy
         // Note that we need to collate the output so the result set can be UNIONed with other result sets
         $entityType = self::getEntityType();
         return "
-            SELECT id, name COLLATE utf8mb4_general_ci, '{$entityType}' AS entity_type
+            SELECT id, name COLLATE utf8mb4_general_ci, '{$entityType}' AS entity_type, null as entity_meta
             FROM `pastoral_group`
             WHERE deleted_at IS NULL
             {$keywordFilter}

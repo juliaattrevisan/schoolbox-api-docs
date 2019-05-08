@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News\AudienceBrowser;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception;
 use Schoolbox\Comms\News\Audience;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
@@ -91,16 +92,16 @@ class Controller extends Base
             $entityType   = $row['entity_type'];
             $value        = $row['id'];
             $name         = $row['name'];
+            $meta         = $row['entity_meta'];
             $encodedValue = $codec->encodeValue($value);
 
-            foreach ($simpleStrategies[$entityType]->getValidRelationshipModifiers() as $modifier) {
+            foreach ($simpleStrategies[$entityType]->getValidRelationshipModifiers($meta) as $modifier) {
                 $key = $codec->encodeSimpleAttributes($entityType, $value, $modifier);
                 $option = new Audience\SegmentSelectizeOption($key, $name);
                 $option->addLabel($entityType, $encodedValue, $name);
                 $options[] = $option;
             }
         }
-
         $this->getResponse()->content->set($this->buildJsonOutput($options));
     }
 
@@ -109,7 +110,7 @@ class Controller extends Base
      * Provides a list of available entity values of this entity type for the current user
      *
      * @param string $entityType
-     * @throws \Alaress\Web\Controller\Exception
+     * @throws Exception
      */
     public function getList(string $entityType): void
     {
