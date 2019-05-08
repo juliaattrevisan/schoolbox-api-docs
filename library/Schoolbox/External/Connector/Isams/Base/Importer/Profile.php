@@ -57,18 +57,6 @@ class Profile
      */
     public function import(): void
     {
-        $relations = [];
-
-        /* Find all the parents in this xml feed and build a static relational array
-         */
-//        $parents = $this->api->fetchXml('/iSAMS/PupilManager/Contacts/Contact');
-//
-//        foreach ($parents as $parent) {
-//            new \Alaress_Probe($parent, $parent->xpath('@PersonGuid'));
-////            $parent->xpath('@PersonGuid')
-////            $relations[] = 'tset';
-//        }
-
         $students = $this->api->findAllStudents();
 
         /** @var Student $student */
@@ -111,16 +99,35 @@ class Profile
                 ->setHomegroup($student->getForm()->getDescription())
                 ->setHouse($student->getHouse()->getName());
 
+            /* Assemble parents into profile instance
+             */
             $parents = $this->findParentsNodes($student);
 
-            new \Alaress_Probe($student->getId(), $parents);
-            new \Alaress_Probe('<hr>');
-            die();
+            $profile
+                ->setGuardian1Name($parents[0]['name'])
+                ->setGuardian1HomePhone($parents[0]['phone']['home'])
+                ->setGuardian1WorkPhone($parents[0]['phone']['work'])
+                ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
+                ->setGuardian1Address($parents[0]['address']['home'])
+                ->setGuardian1Suburb($parents[0]['address']['suburb'])
+                ->setGuardian1Postcode($parents[0]['address']['postcode'])
+                ->setGuardian1Email($parents[0]['email'])
+                ->setGuardian1MailAddress($parents[0]['address']['mail']);
 
-new \Alaress_Probe($profile, $student);
-die();
+            $profile
+                ->setGuardian2Name($parents[1]['name'])
+                ->setGuardian2HomePhone($parents[1]['phone']['home'])
+                ->setGuardian2WorkPhone($parents[1]['phone']['work'])
+                ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
+                ->setGuardian2Address($parents[1]['address']['home'])
+                ->setGuardian2Suburb($parents[1]['address']['suburb'])
+                ->setGuardian2Postcode($parents[1]['address']['postcode'])
+                ->setGuardian2Email($parents[1]['email'])
+                ->setGuardian2MailAddress($parents[1]['address']['mail']);
+
             /* Then save it
              */
+            $this->userProfileMapper->save($profile);
         }
     }
 
@@ -134,7 +141,7 @@ die();
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function findParentsNodes(Student $student)
+    private function findParentsNodes(Student $student): array
     {
         /* Find the parents/guardians of this student
          * To do it, we need a specific id value for $student
@@ -186,10 +193,10 @@ die();
                 ],
                 'address' => [
                     'home' => $address,
-                    'mail' => $mailAddress
+                    'mail' => $mailAddress,
+                    'suburb' => (string)$parent->Address->Town,
+                    'postcode' => (string)$parent->Address->Postcode,
                 ],
-                'suburb' => (string)$parent->Address->Town,
-                'postcode' => (string)$parent->Address->Postcode,
                 'email' => (string)$parent->EmailAddress,
             ];
         }
