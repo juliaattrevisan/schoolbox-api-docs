@@ -86,6 +86,12 @@ class Profile
             /** @var UserProfile $profile */
             $profile
 //                ->setUser($user)
+                ->setTitle($student->getTitle())
+                ->setGivenName($student->getGivenName())
+                ->setPreferredName($student->getPreferredName())
+                ->setLastName($student->getLastname())
+                ->setGender($student->getGender())
+                ->setEmail($student->getEmail())
                 ->setDob($student->getDob());
 
             $profile
