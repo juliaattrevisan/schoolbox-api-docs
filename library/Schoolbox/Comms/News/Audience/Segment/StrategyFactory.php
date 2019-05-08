@@ -133,7 +133,7 @@ class StrategyFactory
     {
         $validModifiers = [];
         foreach ($this->makeAllStrategies() as $strategy) {
-            $validModifiers[$strategy::getEntityType()] = $strategy->getValidRelationshipModifiers($entityMeta);
+            $validModifiers[$strategy::getEntityType()] = $strategy->getValidRelationshipModifiers();
         }
         return $validModifiers;
     }
