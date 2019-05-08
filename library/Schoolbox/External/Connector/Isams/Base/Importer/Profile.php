@@ -73,23 +73,6 @@ class Profile
 
         /** @var Student $student */
         foreach ($students as $student) {
-            $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$student->getId()}')]";
-            $node = $this->api->fetchXml($path)[0];
-
-            /* This isn't the primary identifier that we use in $student
-             * This is some sort of internal relation id in the xml
-             */
-            $studentId = (string)$node->xpath('@Id')[0];
-
-            /* Use that to find the parents in similar fashion
-             * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
-             */
-            $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
-            $parents = $this->api->fetchXml($path);
-
-            new \Alaress_Probe($student->getId(), $parents, $path);
-            new \Alaress_Probe('<hr>');
-            die();
 
             /* Firstly try to find out if the user already exists in schoolbox
              * If they don't exist, we can't assign a profile to them yet
@@ -128,13 +111,89 @@ class Profile
                 ->setHomegroup($student->getForm()->getDescription())
                 ->setHouse($student->getHouse()->getName());
 
-            /* Find the parents/guardians of this student
-             */
+            $parents = $this->findParentsNodes($student);
+
+            new \Alaress_Probe($student->getId(), $parents);
+            new \Alaress_Probe('<hr>');
+            die();
 
 new \Alaress_Probe($profile, $student);
 die();
             /* Then save it
              */
         }
+    }
+
+
+    /**
+     * Find the parents of $student
+     *
+     * @param Student $student
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findParentsNodes(Student $student)
+    {
+        /* Find the parents/guardians of this student
+         * To do it, we need a specific id value for $student
+         * ($student contains multiple ids, some of which seem internal to usams)
+         */
+        $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$student->getId()}')]";
+        $node = $this->api->fetchXml($path)[0];
+
+        /* This isn't the primary identifier that we use in $student
+         * This is some sort of internal relation id in the xml
+         */
+        $studentId = (string)$node->xpath('@Id')[0];
+
+        /* Use that to find the parents in similar fashion
+         * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
+         */
+        $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
+        $parents = $this->api->fetchXml($path);
+
+        $stack = [];
+
+        foreach ($parents as $parent) {
+
+            /* Implode non-empty address fields into one big string for our schema
+             */
+            $address = implode(', ', array_filter([
+                (string)$parent->Address->AddressLines->Address1,
+                (string)$parent->Address->AddressLines->Address2,
+                (string)$parent->Address->AddressLines->Address3
+            ]));
+
+            /* Full, formal address that you could paste on an envelope
+             */
+            $mailAddress = implode(', ', [
+                $address,
+                (string)$parent->Address->Town,
+                (string)$parent->Address->Postcode,
+                (string)$parent->Address->Country
+            ]);
+
+            /* Stack 'em up
+             */
+            $stack[] = [
+                'name' => (string)$parent->Forename . ' ' . (string)$parent->Surname,
+                'phone' => [
+                    'home' =>  (string)$parent->Telephone,
+                    'work' => (string)$parent->Telephone,
+                    'mobile' => (string)$parent->Mobile,
+                ],
+                'address' => [
+                    'home' => $address,
+                    'mail' => $mailAddress
+                ],
+                'suburb' => (string)$parent->Address->Town,
+                'postcode' => (string)$parent->Address->Postcode,
+                'email' => (string)$parent->EmailAddress,
+            ];
+        }
+
+        return $stack;
     }
 }
