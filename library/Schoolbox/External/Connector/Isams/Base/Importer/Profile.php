@@ -15,6 +15,7 @@ use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfile;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\Mapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class Profile
@@ -68,7 +69,7 @@ class Profile
              * We have to wait for the UPS to make this user
              */
             try {
-                $user = $this->userMapper->findByExternalId($student->getId());
+                $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
             } catch (Mapper\Exception $e) {
                 continue;
             }
