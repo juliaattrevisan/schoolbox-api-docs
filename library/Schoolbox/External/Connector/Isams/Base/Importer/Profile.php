@@ -41,12 +41,13 @@ class Profile
     /**
      * Profile constructor.
      *
+     * @param Batchxml          $batchxml
      * @param UserMapper        $userMapper
      * @param UserProfileMapper $userProfileMapper
      */
-    public function __construct(UserMapper $userMapper, UserProfileMapper $userProfileMapper)
+    public function __construct(Batchxml $batchxml, UserMapper $userMapper, UserProfileMapper $userProfileMapper)
     {
-        $this->api = new Batchxml();
+        $this->api = $batchxml;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
     }
