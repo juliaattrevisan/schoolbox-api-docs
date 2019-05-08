@@ -168,11 +168,11 @@ abstract class Kernel
     {
         // run the launch sequence
         $this->initialiseExternalConnections();
-        $this->initialiseDebugging();
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
         $this->installDependencies();
+        $this->initialiseDebugging();
         $this->checkServerApiEnvironment();
     }
 

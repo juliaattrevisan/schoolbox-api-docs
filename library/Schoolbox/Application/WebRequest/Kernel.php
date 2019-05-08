@@ -393,7 +393,9 @@ class Kernel extends WebKernelAbstract
             }
 
             // Install Tideways into the debug bar
-            if (Config::get('debug_xhprof') && extension_loaded('tideways')) {
+            /** @var IConfigLoader $config */
+            $config = $this->getDependencyInjector()->get('config');
+            if ($config->get('debug_xhprof') && extension_loaded('tideways')) {
                 $tidewaysCollector = new TidewaysCollector();
                 if (!$debugBar->hasCollector($tidewaysCollector->getName())) {
                     $debugBar->addCollector(new TidewaysCollector());
