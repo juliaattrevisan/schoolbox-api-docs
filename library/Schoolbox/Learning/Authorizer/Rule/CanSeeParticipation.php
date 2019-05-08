@@ -94,6 +94,11 @@ class CanSeeParticipation extends AbstractParticipationRule
             return true;
         }
 
+        // Staffs the has at least a read access should be able to see the summary page
+        if ($accessLevel >= UserAccess::ACCESS_READ && $user->getRole()->isStaff()) {
+            return true;
+        }
+
         // from here on, we've exhausted all non-parent tests
         if (!$user->getRole()->isParent()) {
             throw new Unauthorized();
