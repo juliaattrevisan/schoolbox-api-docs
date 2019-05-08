@@ -91,6 +91,10 @@ class Profile
                 ->setGivenName($student->getGivenName())
                 ->setPreferredName($student->getPreferredName())
                 ->setLastName($student->getLastname())
+
+                /* Gender is stored as an int(11) !!!! field in our schema, wot
+                 * This string will always end up getting cast to zero for now
+                 */
                 ->setGender($student->getGender())
                 ->setEmail($student->getEmail()->first() ? $student->getEmail()->first()->getAddress() : '')
                 ->setDob($student->getDob());
