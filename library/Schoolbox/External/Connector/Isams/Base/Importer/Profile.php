@@ -10,7 +10,9 @@
  */
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\External\UserProfile;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
@@ -57,6 +59,7 @@ class Profile
     {
         $students = $this->api->findAllStudents();
 
+        /** @var Student $student */
         foreach ($students as $student) {
 
             /* Firstly try to find out if the user already exists in schoolbox
@@ -80,11 +83,20 @@ class Profile
 
             /* Thirdly populate the profile instance with relevant data
              */
+            /** @var UserProfile $profile */
+            $profile
+//                ->setUser($user)
+                ->setDob($student->getDob());
 
+            $profile
+                ->setLevel($student->getYear()->getLevel())
+                ->setHomegroup($student->getForm()->getDescription())
+                ->setHouse($student->getHouse()->getName());
+
+new \Alaress_Probe($profile, $student);
+die();
             /* Then save it
              */
-
-            new \Alaress_Probe($profile);
         }
     }
 }
