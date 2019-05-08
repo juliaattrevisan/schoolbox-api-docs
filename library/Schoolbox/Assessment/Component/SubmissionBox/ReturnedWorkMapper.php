@@ -262,7 +262,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      */
     public function syncToExternalMarkbook(ReturnedWork $object, $previous = null)
     {
-        if ($object->isPublished()) {
+        if ($object->isPublished() && $object->getReviewRoute() === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
             $externalMarkbook = new \External_Markbook();
             $externalMarkbook->setMark($object);
         }
