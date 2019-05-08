@@ -166,6 +166,9 @@ class Profile
 
         /* Use that to find the parents in similar fashion
          * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
+         *
+         * TODO: I would think there was alternative syntax than "position()=2" but I don't know what it is
+         * If isams changes this structure, this will snap (obviously) so yeah, we should pay attention
          */
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
         $parents = $this->api->fetchXml($path);
