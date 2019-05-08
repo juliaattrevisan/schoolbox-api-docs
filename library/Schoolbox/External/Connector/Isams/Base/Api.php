@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\UPS\Batchxml;
+namespace Schoolbox\External\Connector\Isams\Base;
 
 use Alaress_Curl_Url;
 use RuntimeException;
