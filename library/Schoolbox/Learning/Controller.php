@@ -12,18 +12,23 @@ use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use function func_get_args;
+use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Statistics;
+use Schoolbox\Learning\Classes\ClassCode;
 use Schoolbox\Learning\Classes\ClassList;
+use Schoolbox\Learning\Students\StudentLists;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\UserMapper;
 use Timetable_ColourMapper;
 use \Alaress_Date_Format;
 use Schoolbox\Filter;
@@ -31,6 +36,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Resource\Folder;
 use UnexpectedValueException;
+use Schoolbox\L10n\RosettaStone;
 
 class Controller extends Base
 {
@@ -61,8 +67,24 @@ class Controller extends Base
     /** @var Folder\ClassListFactory */
     private $classListFactory;
 
+    /** @var UserMapper */
+    private $userMapper;
+
+    /** @var Folder\Log\Mapper */
+    private $logMapper;
+
+    /** @var External_ClassInterface */
+    private $externalClass;
+
+    private $rosettaStone;
+
+    private const LABEL_KEY = 'label';
+
+    private const ISCHECKED_KEY = 'isChecked';
 
     /**
+     * Controller constructor.
+     *
      * @param AssessmentMapperProxy      $assessmentMapperProxy
      * @param FolderMapper               $folderMapper
      * @param TermMapper                 $termMapper
@@ -70,6 +92,9 @@ class Controller extends Base
      * @param Filter\Selection\Mapper    $filterSelectionMapper
      * @param AssessmentFilters\IdFinder $assessmentIdFinder
      * @param Folder\ClassListFactory    $classListFactory
+     * @param UserMapper                 $userMapper
+     * @param Folder\Log\Mapper          $logMapper
+     * @param External_ClassInterface   $externalClass
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
@@ -78,7 +103,11 @@ class Controller extends Base
         Timetable_ColourMapper $timetableColourMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        Folder\ClassListFactory $classListFactory
+        Folder\ClassListFactory $classListFactory,
+        UserMapper $userMapper,
+        Folder\Log\Mapper $logMapper,
+        External_ClassInterface $externalClass,
+        RosettaStone $rosettaStone
     ) {
         $this->assessmentMapperProxy      = $assessmentMapperProxy;
         $this->termMapper                 = $termMapper;
@@ -87,6 +116,10 @@ class Controller extends Base
         $this->filterSelectionMapper      = $filterSelectionMapper;
         $this->assessmentIdFinder         = $assessmentIdFinder;
         $this->classListFactory           = $classListFactory;
+        $this->userMapper                 = $userMapper;
+        $this->logMapper                  = $logMapper;
+        $this->externalClass              = $externalClass;
+        $this->rosettaStone               = $rosettaStone;
     }
 
 
@@ -344,6 +377,111 @@ class Controller extends Base
         ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', $gridData)->setTab('classes'));
+    }
+
+    /**
+     * @param string $classCode
+     *
+     * @throws Mapper\Exception
+     */
+    public function getStudentListByClassCode(string $classCode): void
+    {
+        $students = (new StudentLists($this->externalClass, $this->userMapper, $this->folderMapper, $this->logMapper))
+            ->getStudentLists((new ClassCode($classCode))->proper());
+
+        $this->getResponse()->status->set(200);
+        $this->getResponse()->content->set($this->buildJsonOutput($students));
+    }
+
+    /**
+     * @param string $classCode
+     *
+     * @throws Mapper\Exception
+     * @throws ServiceNotFound
+     */
+    public function getClassListPage(string $classCode): void
+    {
+        $classCode = new ClassCode($classCode);
+
+        try {
+            $folder = $this->getFolderByCode($classCode->proper());
+        }
+        catch (Mapper\Exception $e) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
+        }
+
+        $subjectName = $folder->getName();
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@learning/classLists.twig', [
+                'homepageId'        => $folder->getId(),
+                'subjectName'       => $subjectName,
+                'classCode'         => $classCode->getClassCode(),
+                'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
+                'replyTo'           => $this->getUser()->getEmail(),
+                'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
+                'pastoralEnabled'   => $this->getConfigLoader()->get('pastoral_enabled'),
+                'today'             => Alaress_Date_Format::now()->getURLDate(),
+                'mailHandle'        => $this->getSession()->get('mailhandle'),
+                'emailGroups'       => $this->getClassListsEmailGroups(),
+            ])->setTab('classes')->setTitle($subjectName)
+        );
+    }
+
+    /**
+     * @return string
+     */
+    private function getClassListsEmailGroups(): string
+    {
+        $availableEmailGroups = ['parents' => 'email_all_parents', 'housemasters' => 'email_housemasters'];
+
+        $result[] = [
+            self::LABEL_KEY => 'students',
+            self::ISCHECKED_KEY => true,
+        ];
+
+        foreach ($availableEmailGroups as $key => $configName) {
+            if ($this->getConfigLoader()->get($configName)) {
+                $result[] = [
+                    self::LABEL_KEY => $key,
+                    self::ISCHECKED_KEY => false,
+                ];
+            }
+        }
+
+        return json_encode($result);
+    }
+
+
+    /**
+     * @param string $classCode
+     *
+     * @return Folder\Model
+     * @throws Mapper\Exception
+     */
+    private function getFolderByCode(string $classCode): Folder\Model
+    {
+        try {
+            return $this->folderMapper->findByCode($classCode);
+        } catch (Exception $e) {
+            // Handle the existence of a campus code prefix.
+            // E.g: Class code "EN344" belongs to the Senior campus (code: "S"), and could also be passed in as "S/EN344"
+            // to disambiguate it from a "EN344" which may exist in another campus.
+            try {
+                $codeParts = explode('/', $classCode, 2);
+                if ($codeParts) {
+
+                    return $this->folderMapper->findByCode($codeParts[1]);
+                }
+                else {
+
+                    throw new NotFound();
+                }
+            }
+            catch (Exception $e) {
+                throw new NotFound();
+            }
+        }
     }
 
     /* Getters/Setters

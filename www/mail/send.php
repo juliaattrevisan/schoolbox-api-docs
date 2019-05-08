@@ -150,7 +150,7 @@ if($hasRecipient && Cfg::get('mail_enable'))
 
     sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments);
 
-    $page->backToTheFuture(2);
+    $page->backToTheFuture(3);
 }
 else
 {

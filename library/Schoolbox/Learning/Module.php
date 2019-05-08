@@ -49,6 +49,8 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
+                '/class/lists/{classCode}'                => 'getStudentListByClassCode',
+                '/class/{classCode}'                      => 'getClassListPage',
             ],
             'POST' => [
                 '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
@@ -71,6 +73,17 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
+
+        $this->addRoutePermission($authorizer,
+            '(?:getStudentListByClassCode|getClassListPage)',
+            new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            )
+        );
 
         // Either a SU or staff viewing their own assessments
         $this->addRoutePermission(
@@ -171,6 +184,10 @@ class Module extends BaseModule
             'termMapper'                 => $this->getMapperFactory()->getLazy(TermMapper::class),
             'timetableColourMapper'      => $this->getMapperFactory()->getLazy(Timetable_ColourMapper::class),
             'filterSelectionMapper'      => $this->getMapperFactory()->getLazy(FilterSelection\Mapper::class),
+            'externalClass'              => $this->getInjector()->get('externalClass'),
+            'userMapper'                 => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'logMapper'                  => $this->getMapperFactory()->getLazy(Folder\Log\Mapper::class),
+            'rosettaStone'               => $injector->lazyGet('l10n'),
             'assessmentIdFinder'         => $injector->lazy(function(){
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);

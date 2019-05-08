@@ -937,6 +937,14 @@ fieldset {
 	min-width: 0;
 }
 
+.class-list-form {
+	margin-bottom: 0;
+
+	.button {
+		margin-bottom: 0;
+	}
+}
+
 @import 'dropzone';
 @import 'datetime';
 @import 'tinymce';
