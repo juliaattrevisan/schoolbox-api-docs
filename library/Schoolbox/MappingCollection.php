@@ -108,13 +108,21 @@ class MappingCollection extends Collection
             if (array_key_exists('join', $value) && ($value['join_def']['reverse'] ?? false)) {
                 $key = "{$value['join']}.$key";
             }
-        } else {
-            // If no 'column', then this is a joinsVia().
+        } elseif (array_key_exists('join_def', $value)) {
+            // This is a joinsVia()
             // Very unlikely we'd ever attempt to reverse lookup, but still store it for completion.
             // eg User model campus collection property => "userCampus.campus"
             $key = "{$value['join']}.{$value['join_def']['multi']['other_key']}";
+        } else {
+            // This is the hasMap() call of a hasMap() + hasJoin()[multi] call pair
+            // Don't bother supporting this.
+            $key = null;
         }
-        $this->columnToPropertyMap[$key] = $index;
+
+        if ($key) {
+            $this->columnToPropertyMap[$key] = $index;
+        }
+
         return parent::setOffset($index, $value);
     }
 
