@@ -8,7 +8,7 @@
 
 namespace Custom\Help\CourseParticipation;
 
-use Alaress\Authorizer\Rule\IsAlaressAdmin;
+use Alaress\Authorizer\Rule\IsSchoolboxAdmin;
 use Alaress;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
@@ -39,12 +39,12 @@ class Module extends Alaress\Module\Module
      */
     protected function registerRoutes()
     {
-        $alaressOnly = new IsAlaressAdmin();
+        $schoolboxOnly = new IsSchoolboxAdmin();
 
-        $this->register('GET', '/apitest', 'getApiTest', $alaressOnly);
-        $this->register('POST', '/apitest', 'postApiTest', $alaressOnly);
-        $this->register('GET', '/{schoolCode:\w+}/digest', 'getRefreshDigest', $alaressOnly);
-        $this->register('GET', '/{schoolCode:\w+}', 'getApiTestEnrolmentTable', $alaressOnly);
+        $this->register('GET', '/apitest', 'getApiTest', $schoolboxOnly);
+        $this->register('POST', '/apitest', 'postApiTest', $schoolboxOnly);
+        $this->register('GET', '/{schoolCode:\w+}/digest', 'getRefreshDigest', $schoolboxOnly);
+        $this->register('GET', '/{schoolCode:\w+}', 'getApiTestEnrolmentTable', $schoolboxOnly);
 
         $this->register('GET', '/{schoolCode:\w+}/courses', 'getFolderAccessBySchool');
         $this->register('POST', '/{schoolCode:\w+}/courses', 'postFolderAccessBySchool');
