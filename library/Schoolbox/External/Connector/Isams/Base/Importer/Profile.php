@@ -57,10 +57,39 @@ class Profile
      */
     public function import(): void
     {
+        $relations = [];
+
+        /* Find all the parents in this xml feed and build a static relational array
+         */
+//        $parents = $this->api->fetchXml('/iSAMS/PupilManager/Contacts/Contact');
+//
+//        foreach ($parents as $parent) {
+//            new \Alaress_Probe($parent, $parent->xpath('@PersonGuid'));
+////            $parent->xpath('@PersonGuid')
+////            $relations[] = 'tset';
+//        }
+
         $students = $this->api->findAllStudents();
 
         /** @var Student $student */
         foreach ($students as $student) {
+            $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$student->getId()}')]";
+            $node = $this->api->fetchXml($path)[0];
+
+            /* This isn't the primary identifier that we use in $student
+             * This is some sort of internal relation id in the xml
+             */
+            $studentId = (string)$node->xpath('@Id')[0];
+
+            /* Use that to find the parents in similar fashion
+             * https://stackoverflow.com/questions/3005370/xpath-to-find-nearest-ancestor-element-that-contains-an-element-that-has-an-attr/40333166
+             */
+            $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
+            $parents = $this->api->fetchXml($path);
+
+            new \Alaress_Probe($student->getId(), $parents, $path);
+            new \Alaress_Probe('<hr>');
+            die();
 
             /* Firstly try to find out if the user already exists in schoolbox
              * If they don't exist, we can't assign a profile to them yet
@@ -98,6 +127,9 @@ class Profile
                 ->setLevel($student->getYear()->getLevel())
                 ->setHomegroup($student->getForm()->getDescription())
                 ->setHouse($student->getHouse()->getName());
+
+            /* Find the parents/guardians of this student
+             */
 
 new \Alaress_Probe($profile, $student);
 die();
