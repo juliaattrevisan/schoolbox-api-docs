@@ -378,8 +378,7 @@ class Kernel extends WebKernelAbstract
         // Set up the debug bar, and add listeners for various parts of the debug bar
         // (database calls, XHProf)
         // Should go in a DI container instead of a static class.
-        $this->setDebugEnabled(DebugBar::isEnabled());
-        if ($this->isDebugEnabled()) {
+        if (DebugBar::isEnabled()) {
             DebugBar::init();
 
             $debugBar = DebugBar::getInstance();

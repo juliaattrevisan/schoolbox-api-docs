@@ -1381,22 +1381,4 @@ abstract class Kernel
             }
         }
     }
-
-
-    /**
-     * @return bool
-     */
-    protected function isDebugEnabled(): bool
-    {
-        return $this->debugEnabled;
-    }
-
-
-    /**
-     * @param bool $debugEnabled
-     */
-    protected function setDebugEnabled(bool $debugEnabled): void
-    {
-        $this->debugEnabled = $debugEnabled;
-    }
 }
