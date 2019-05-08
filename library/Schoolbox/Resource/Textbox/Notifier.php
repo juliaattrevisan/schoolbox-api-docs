@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Textbox;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\UserAccess;
@@ -28,11 +29,11 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $action
-     * @param string $roletype
-     * @param Model  $resource
-     * @param User   $effector
-     * @param array  $diff
+     * @param string     $action
+     * @param string     $roletype
+     * @param Model      $resource
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
     protected function notifyAffected($action, $roletype, $resource, $effector, $diff = null): Envelope
@@ -55,9 +56,9 @@ class Notifier extends ResourceNotifier
             ->setParams([
                 'author'   => new UserParam($effector),
                 'homepage' => new CategoryParam($category),
-                'heading'  => new Param($heading, $href),
+                'heading'  => new Param($heading, $href, ParameterInterface::STACKING_APPEND),
             ])
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $effector->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $effector->getId())
             ->setHref($href)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
@@ -71,11 +72,7 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Model  $resource
-     * @param User   $author
-     * @param array  $diff
-     * @return Envelope
+     * @inheritDoc
      */
     public function notifyCreated($roletype, $resource, $author, $diff = null): Envelope
     {
@@ -84,11 +81,7 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Model  $resource
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritDoc
      */
     public function notifyUpdated($roletype, $resource, $effector, $diff = null): Envelope
     {
@@ -97,11 +90,7 @@ class Notifier extends ResourceNotifier
 
 
     /**
-     * @param string $roletype
-     * @param Model  $resource
-     * @param User   $effector
-     * @param array  $diff
-     * @return Envelope
+     * @inheritDoc
      */
     public function notifyDeleted($roletype, $resource, $effector, $diff = null): Envelope
     {
@@ -177,5 +166,4 @@ class Notifier extends ResourceNotifier
     {
         return UserAccess::ACCESS_READ;
     }
-
 }

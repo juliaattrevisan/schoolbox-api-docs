@@ -187,7 +187,6 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         $envelope = new Envelope();
 
         $categoryId    = $category->getId();
-        $effectorExtId = $effector->getExternalId();
 
         // manuel hydration
         if (!$category->getName()) {
@@ -201,7 +200,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         }
 
         $bob = new Builder();
-        $bob->setIcon("/portrait.php?userId=$effectorExtId&size={$this->iconSize}")
+        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
             ->setHref("/homepage/$categoryId#$kind")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams([
@@ -270,6 +269,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     public function notifySystemDeleted($resource, $effector): Envelope
     {
         $this->notifySystem(LogMapper::ACTION_DELETE, $resource, $effector);
+        return new Envelope();
     }
 
 
@@ -286,7 +286,6 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         $accessLevel = $this->getAccessLevel($resource);
 
-        $effectorExtId = $effector->getExternalId();
         $resourceId    = $resource->getId();
 
         // setup data from the different resource types
@@ -319,7 +318,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         $bob = new Builder();
 
-        $bob->setIcon("/portrait.php?userId=$effectorExtId&size={$this->iconSize}")
+        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
             ->setHref("/homepage/$categoryId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
@@ -411,7 +410,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string                   $roletype
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $author
-     * @param array                    $diff
+     * @param array|null               $diff
      * @return Envelope
      */
     public abstract function notifyCreated($roletype, $resource, $author, $diff = null): Envelope;
@@ -421,7 +420,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param string                   $roletype
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $author
-     * @param array                    $diff
+     * @param array|null               $diff
      * @return Envelope
      */
     public abstract function notifyDeleted($roletype, $resource, $author, $diff = null): Envelope;
@@ -443,7 +442,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $effector
-     * @param array                    $diff
+     * @param array|null               $diff
      * @return Envelope
      */
     public function notifyStudentUpdated($resource, $effector, $diff = null): Envelope
@@ -477,7 +476,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $effector
-     * @param array                    $diff
+     * @param array|null               $diff
      * @return Envelope
      */
     public function notifyStaffUpdated($resource, $effector, $diff = null): Envelope
@@ -511,7 +510,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
     /**
      * @param Folder|File|Link|Textbox $resource
      * @param User                     $effector
-     * @param array                    $diff
+     * @param array|null               $diff
      * @return Envelope
      */
     public function notifyParentUpdated($resource, $effector, $diff = null): Envelope
