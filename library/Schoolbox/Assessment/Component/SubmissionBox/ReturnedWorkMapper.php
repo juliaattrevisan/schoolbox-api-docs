@@ -258,11 +258,10 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * * Saves the data to the remote data connector
      *
      * @param ReturnedWork $object
-     * @param null|ReturnedWork $previous
      */
-    public function syncToExternalMarkbook(ReturnedWork $object, $previous = null)
+    public function syncToExternalMarkbook(ReturnedWork $object): void
     {
-        if ($object->isPublished() && $object->getReviewRoute() === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+        if ($object->isPublished() && !$object->isSelfAssess()) {
             $externalMarkbook = new \External_Markbook();
             $externalMarkbook->setMark($object);
         }

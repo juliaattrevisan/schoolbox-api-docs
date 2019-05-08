@@ -359,4 +359,19 @@ class ReturnedWork implements ISoftDeletable
         $this->reviewRoute = $reviewRoute;
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function isSelfAssess(): bool
+    {
+        return in_array(
+            $this->getReviewRoute(),
+            [
+                self::REVIEW_ROUTE_SELF_REFLECTION,
+                self::REVIEW_ROUTE_SELF_GRADING
+            ],
+            true
+        );
+    }
 }
