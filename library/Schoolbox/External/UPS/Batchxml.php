@@ -14,6 +14,7 @@ namespace Schoolbox\External\UPS;
 
 use Schoolbox\Collection;
 use Schoolbox\Config\Loader;
+use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
 
@@ -21,7 +22,7 @@ class Batchxml implements ISync
 {
 
     /**
-     * @var Batchxml/Api
+     * @var Api
      */
     private $api;
 
@@ -56,7 +57,7 @@ class Batchxml implements ISync
         $host = $config->get('external_ups_provider_batchxml_host');
         $key = $config->get('external_ups_provider_batchxml_key');
 
-        $this->api = new Batchxml\Api($host, $key);
+        $this->api = new Api($host, $key);
     }
 
 
@@ -175,8 +176,8 @@ class Batchxml implements ISync
         }
 
         return $student;
-
     }
+
 
     /**
      * {@inheritDoc}
