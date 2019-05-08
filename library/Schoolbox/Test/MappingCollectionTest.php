@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Test;
 
-
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Column;
