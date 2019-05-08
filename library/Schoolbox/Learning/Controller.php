@@ -419,7 +419,7 @@ class Controller extends Base
     }
 
     /**
-     * @return false|string
+     * @return string
      */
     private function getClassListsEmailGroups(): string
     {
