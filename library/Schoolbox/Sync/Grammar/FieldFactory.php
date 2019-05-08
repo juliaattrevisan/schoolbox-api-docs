@@ -52,14 +52,14 @@ class FieldFactory
         switch($roleType) {
             case Role::STAFF:
                 $augment = [
-                    'year.level'         => 'Year Level',
-                    'house.code'         => 'House Code',
-                    'phoneWork.number'   => 'Work Phone Number',
-                    'phoneWork.silent'   => 'Work Phone Silent Status',
-                    'meta.department'    => 'Department',
-                    'meta.position'      => 'Position',
-                    'meta.category.code' => 'Category Code',
-                    'meta.category.type' => 'Category Type',
+                    'year.level'                => 'Year Level',
+                    'house.code'                => 'House Code',
+                    'phoneWork.number'          => 'Work Phone Number',
+                    'phoneWork.silent'          => 'Work Phone Silent Status',
+                    'meta.department'           => 'Department',
+                    'meta.position.description' => 'Position',
+                    'meta.category.code'        => 'Category Code',
+                    'meta.category.type'        => 'Category Type',
                 ];
                 break;
             case Role::STUDENT:
