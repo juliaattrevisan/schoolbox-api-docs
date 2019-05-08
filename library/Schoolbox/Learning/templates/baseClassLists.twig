@@ -28,9 +28,10 @@
         </div>
     </div>
 
-    <div class="checklist small-12 island" v-if="! showSkeletonLoader && !studentLists.length">
-        <div class="content clearfix" style="background-color: #FFF;">
-            Sorry, the system is unable to find any student in this class.
+    <div class="small-12 island" v-if="! showSkeletonLoader && !studentLists.length">
+        <div class="empty-state">
+            <i class="icon-class-list"></i>
+            <p>Sorry, the system is unable to find any student in this class.</p>
         </div>
     </div>
 

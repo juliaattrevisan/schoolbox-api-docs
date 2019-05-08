@@ -15,6 +15,7 @@ use function func_get_args;
 use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -402,7 +403,12 @@ class Controller extends Base
     {
         $classCode = new ClassCode($classCode);
 
-        $folder = $this->getFolderByCode($classCode->proper());
+        try {
+            $folder = $this->getFolderByCode($classCode->proper());
+        }
+        catch (Mapper\Exception $e) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
+        }
 
         $subjectName = $folder->getName();
 
