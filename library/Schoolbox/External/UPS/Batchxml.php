@@ -72,7 +72,7 @@ class Batchxml implements ISync
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    private function fetchXml(string $path): array
+    public function fetchXml(string $path): array
     {
         if (!$this->nodes) {
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
@@ -130,7 +130,7 @@ class Batchxml implements ISync
      * @param \SimpleXMLElement $currentResult
      * @return User\Student
      */
-    private function hydrateStudent(\SimpleXMLElement $currentResult): User\Student
+    public function hydrateStudent(\SimpleXMLElement $currentResult): User\Student
     {
         $student = new User\Student();
 
