@@ -49,7 +49,7 @@ class User extends SimpleStrategy
      */
     public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
-        if($entityMeta === Role::STUDENT) {
+        if($entityMeta === null || $entityMeta === Role::STUDENT) {
             return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
         } else {
             return [Model::RELATIONSHIP_SELF];
