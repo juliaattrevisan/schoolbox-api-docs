@@ -397,12 +397,14 @@ class Kernel extends WebKernelAbstract
             }
         }
 
-        // XHProf on the debug bar.
-        if ($this->isDebugEnabled() && Config::get('debug_xhprof')) {
-            if (extension_loaded('xhprof')) {
-                DebugBar::getInstance()->addCollector(new XhprofCollector());
-            } elseif (extension_loaded('tideways')) {
-                DebugBar::getInstance()->addCollector(new TidewaysCollector());
+        // XHProf/Tideways on the debug bar.
+        if ($this->isDebugEnabled()
+            && Config::get('debug_xhprof')
+            && extension_loaded('tideways')
+        ) {
+            $tidewaysCollector = new TidewaysCollector();
+            if (!$debug_bar->hasCollector($tidewaysCollector->getName())) {
+                $debug_bar->addCollector(new TidewaysCollector());
             }
         }
     }
