@@ -390,7 +390,11 @@ class Kernel extends WebKernelAbstract
             // Throw away existing connection and reconnect with persistence off
             $database = Database::getInstance();
             $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
-            $debug_bar->addCollector($database->getCollector());
+
+            $collector = $database->getCollector();
+            if (!$debug_bar->hasCollector($collector->getName())) {
+                $debug_bar->addCollector($collector);
+            }
         }
 
         // XHProf on the debug bar.
