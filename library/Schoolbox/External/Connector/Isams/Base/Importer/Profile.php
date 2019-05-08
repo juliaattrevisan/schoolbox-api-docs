@@ -91,7 +91,7 @@ class Profile
                 ->setPreferredName($student->getPreferredName())
                 ->setLastName($student->getLastname())
                 ->setGender($student->getGender())
-                ->setEmail($student->getEmail())
+                ->setEmail($student->getEmail()->first()->getAddress())
                 ->setDob($student->getDob());
 
             $profile
@@ -127,6 +127,7 @@ class Profile
 
             /* Then save it
              */
+            new \Alaress_Probe($profile);
             $this->userProfileMapper->save($profile);
         }
     }
