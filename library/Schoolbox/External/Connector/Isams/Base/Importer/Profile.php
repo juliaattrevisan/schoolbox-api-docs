@@ -125,6 +125,10 @@ class Profile
                 ->setGuardian2Email($parents[1]['email'])
                 ->setGuardian2MailAddress($parents[1]['address']['mail']);
 
+            /* TODO: ESL and IB Flags indeterminate
+             * But the model doesn't support these columns??
+             */
+
             /* Then save it
              */
             $this->userProfileMapper->save($profile);
