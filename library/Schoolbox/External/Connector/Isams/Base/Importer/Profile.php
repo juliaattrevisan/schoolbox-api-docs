@@ -85,7 +85,7 @@ class Profile
              */
             /** @var UserProfile $profile */
             $profile
-//                ->setUser($user)
+                ->setUser($user)
                 ->setTitle($student->getTitle())
                 ->setGivenName($student->getGivenName())
                 ->setPreferredName($student->getPreferredName())
@@ -127,7 +127,6 @@ class Profile
 
             /* Then save it
              */
-            new \Alaress_Probe($profile);
             $this->userProfileMapper->save($profile);
         }
     }
