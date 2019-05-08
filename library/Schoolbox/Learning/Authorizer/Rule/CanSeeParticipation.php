@@ -78,8 +78,8 @@ class CanSeeParticipation extends AbstractParticipationRule
             throw new InvalidPath();
         }
 
-        if ($accessLevel >= UserAccess::ACCESS_WRITE) {
-            // Instructors can always see participants' summary pages
+        // Instructors or staffs can always see participants' summary pages
+        if ($accessLevel >= UserAccess::ACCESS_WRITE || $user->getRole()->isStaff()) {
             return true;
         }
 
@@ -93,7 +93,6 @@ class CanSeeParticipation extends AbstractParticipationRule
             // TODO remove casts once SA-4539 is fixed/merged
             return true;
         }
-
         // from here on, we've exhausted all non-parent tests
         if (!$user->getRole()->isParent()) {
             throw new Unauthorized();
