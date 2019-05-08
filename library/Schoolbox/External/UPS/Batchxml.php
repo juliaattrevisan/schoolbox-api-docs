@@ -156,6 +156,7 @@ class Batchxml implements ISync
             ->setDescription((string)$currentResult->Form);
         $student
             ->getHouse()
+            ->setName((string)$currentResult->AcademicHouse)
             ->setCode((string)$currentResult->AcademicHouse);
 
         $student
