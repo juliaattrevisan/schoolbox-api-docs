@@ -74,7 +74,7 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
 
         $this->addRoutePermission($authorizer,
-            '(?:getStudentListByClassCode)',
+            '(?:getStudentListByClassCode|getClassListPage)',
             new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
