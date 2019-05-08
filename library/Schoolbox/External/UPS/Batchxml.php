@@ -227,7 +227,8 @@ class Batchxml implements ISync
             /* Email - one for every item in stack
              */
             $staff
-                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+                ->getEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
 
             $staff
                 ->getWorkEmail()
