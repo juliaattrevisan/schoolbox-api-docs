@@ -77,6 +77,10 @@ class Controller extends Base
 
     private $rosettaStone;
 
+    private const LABEL_KEY = 'label';
+
+    private const ISCHECKED_KEY = 'isChecked';
+
     /**
      * Controller constructor.
      *
@@ -423,23 +427,20 @@ class Controller extends Base
      */
     private function getClassListsEmailGroups(): string
     {
+        $availableEmailGroups = ['parents' => 'email_all_parents', 'housemasters' => 'email_housemasters'];
+
         $result[] = [
-            'label' => 'students',
-            'isChecked' => true,
+            self::LABEL_KEY => 'students',
+            self::ISCHECKED_KEY => true,
         ];
 
-        if ($this->getConfigLoader()->get('email_all_parents')) {
-            $result[] = [
-                'label' => 'parents',
-                'isChecked' => false,
-            ];
-        }
-
-        if ($this->getConfigLoader()->get('email_housemasters')) {
-            $result[] = [
-                'label' => 'housemasters',
-                'isChecked' => false,
-            ];
+        foreach ($availableEmailGroups as $key => $configName) {
+            if ($this->getConfigLoader()->get($configName)) {
+                $result[] = [
+                    self::LABEL_KEY => $key,
+                    self::ISCHECKED_KEY => false,
+                ];
+            }
         }
 
         return json_encode($result);
@@ -463,9 +464,11 @@ class Controller extends Base
             try {
                 $codeParts = explode('/', $classCode, 2);
                 if ($codeParts) {
+
                     return $this->folderMapper->findByCode($codeParts[1]);
                 }
                 else {
+
                     throw new NotFound();
                 }
             }

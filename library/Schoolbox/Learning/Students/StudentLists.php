@@ -28,9 +28,6 @@ class StudentLists
     /** @var UserMapper */
     private $userMapper;
 
-    /** @var string */
-    private $classCode;
-
     /** @var LogMapper */
     private $logMapper;
 

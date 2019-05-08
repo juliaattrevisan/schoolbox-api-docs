@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Classes;
 
-
 class ClassCode
 {
     private $classCode;
