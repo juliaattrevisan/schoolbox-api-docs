@@ -379,32 +379,26 @@ class Kernel extends WebKernelAbstract
         // (database calls, XHProf)
         // Should go in a DI container instead of a static class.
         $this->setDebugEnabled(DebugBar::isEnabled());
-        if($this->isDebugEnabled()) {
+        if ($this->isDebugEnabled()) {
             DebugBar::init();
-        }
 
-        // Install into database
-        if($this->isDebugEnabled()) {
-            $debug_bar = DebugBar::getInstance();
+            $debugBar = DebugBar::getInstance();
 
             // Throw away existing connection and reconnect with persistence off
             $database = Database::getInstance();
             $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
 
             $collector = $database->getCollector();
-            if (!$debug_bar->hasCollector($collector->getName())) {
-                $debug_bar->addCollector($collector);
+            if (!$debugBar->hasCollector($collector->getName())) {
+                $debugBar->addCollector($collector);
             }
-        }
 
-        // XHProf/Tideways on the debug bar.
-        if ($this->isDebugEnabled()
-            && Config::get('debug_xhprof')
-            && extension_loaded('tideways')
-        ) {
-            $tidewaysCollector = new TidewaysCollector();
-            if (!$debug_bar->hasCollector($tidewaysCollector->getName())) {
-                $debug_bar->addCollector(new TidewaysCollector());
+            // Install Tideways into the debug bar
+            if (Config::get('debug_xhprof') && extension_loaded('tideways')) {
+                $tidewaysCollector = new TidewaysCollector();
+                if (!$debugBar->hasCollector($tidewaysCollector->getName())) {
+                    $debugBar->addCollector(new TidewaysCollector());
+                }
             }
         }
     }
