@@ -78,10 +78,8 @@ class CanSeeParticipation extends AbstractParticipationRule
             throw new InvalidPath();
         }
 
-        // Instructors or staffs that has at least a read access can always see participants' summary pages
-        if ($accessLevel >= UserAccess::ACCESS_WRITE ||
-            ($accessLevel >= UserAccess::ACCESS_READ && $user->getRole()->isStaff())) {
-
+        // Instructors or staffs can always see participants' summary pages
+        if ($accessLevel >= UserAccess::ACCESS_WRITE || $user->getRole()->isStaff()) {
             return true;
         }
 
