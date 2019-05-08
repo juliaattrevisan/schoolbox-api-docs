@@ -110,7 +110,7 @@
                 var studentLists;
 
                 studentLists = new Promise(function (resolve) {
-                    axios.get(self.getStudentListsEndpointPrefix + self.classCode)
+                    axios.get(self.getStudentListsEndpointPrefix + encodeURIComponent(self.classCode))
                         .then(function (response) {
                             self.studentLists = response.data;
                             resolve();
