@@ -91,7 +91,7 @@ class Profile
                 ->setPreferredName($student->getPreferredName())
                 ->setLastName($student->getLastname())
                 ->setGender($student->getGender())
-                ->setEmail($student->getEmail()->first()->getAddress())
+                ->setEmail($student->getEmail()->first() ? $student->getEmail()->first()->getAddress() : '')
                 ->setDob($student->getDob());
 
             $profile
