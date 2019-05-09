@@ -18,7 +18,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
-class Relations
+class Relations implements ImporterInterface
 {
 
     /**

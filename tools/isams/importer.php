@@ -17,6 +17,12 @@ use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
+use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
+use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\External\UserProfileMapper;
+use Schoolbox\External\UserRelationMapper;
+use Schoolbox\UserMapper;
+
 
 $appOpts = [
     'help',
@@ -57,11 +63,12 @@ HELP;
         exit(0);
     }
 
-    /* Throw all the strats in here
-     */
-    $registry = [];
-
-    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $composite = new Composite(
+        new Batchxml(),
+        UserMapper::getInstance(),
+        UserProfileMapper::getInstance(),
+        UserRelationMapper::getInstance()
+    );
 
     pcntl_signal(SIGCHLD, SIG_DFL);
 
@@ -74,11 +81,7 @@ HELP;
 
     $log->info("Beginning import of isams data");
 
-    /* Execute each strat's import() method
-     */
-//    foreach ($registry as $strategy) {
-//        $strategy->import();
-//    }
+    $composite->import();
 
     $lock->release();
 });
