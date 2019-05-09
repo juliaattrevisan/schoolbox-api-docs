@@ -75,21 +75,47 @@ class Relations
 
         /** @var Guardian $parent */
         foreach ($parents as $parent) {
-            if ($parent->getStudents()->count()) {
+
+            /* Find the parent's schoolbox account
+             */
+            try {
+                $parentUser = $this->userMapper->findByExternalId($parent->getId(), Role::PARENT);
+            } catch (Mapper\Exception $e) {
+
+                /* noop: can't find schoolbox account
+                 * therefore cannot build relation
+                 */
+                new \Alaress_Probe(sprintf(
+                    'Could not create relations for parent %s %s (%s) - schoolbox account missing',
+                    $parent->getGivenName(),
+                    $parent->getLastname(),
+                    $parent->getId()
+                ));
+
+                continue;
+            }
+
+            /* If the parents have students, build relations between them
+             * Otherwise nothing to build
+             */
+            foreach ($parent->getStudents() as $student) {
+
+                /* Find the student's schoolbox account
+                 */
                 try {
-                    /* Find the parent's schoolbox account
-                     */
-                    $parentUser = $this->userMapper->findByExternalId($parent->getId(), Role::PARENT);
-
-                    /* Find the student's schoolbox account
-                     */
-                    $studentUser = $this->userMapper->findByExternalId($parent->getId(), Role::STUDENT);
-
+                    $studentUser = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
                 } catch (Mapper\Exception $e) {
 
-                    /* noop: can't find either parent or student
+                    /* noop: can't find schoolbox account
                      * therefore cannot build relation
                      */
+                    new \Alaress_Probe(sprintf(
+                        'Could not create relations for student %s %s (%s) - schoolbox account missing',
+                        $student->getGivenName(),
+                        $student->getLastname(),
+                        $student->getId()
+                    ));
+
                     continue;
                 }
 
@@ -105,6 +131,13 @@ class Relations
                  */
                 $this->userRelationMapper->save($relation);
 
+                new \Alaress_Probe(sprintf(
+                    'Creating relation between %s (%d) and %s (%d)',
+                    $parentUser->getFullName(),
+                    $parentUser->getId(),
+                    $studentUser->getFullName(),
+                    $studentUser->getId()
+                ));
             }
         }
     }
