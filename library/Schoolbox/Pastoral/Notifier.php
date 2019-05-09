@@ -119,12 +119,13 @@ class Notifier extends AbstractModuleNotifier
 
         $timestamp = md5(date("YmdHis"));
 
-        $new = $method == self::TRIGGER_CREATED ? "new " : "";
         $href = "/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}";
+        $severity = strtolower($pastoral->getSeverity()->getName());
+        $type = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
 
         $builder = new Builder();
-        $builder->setTitle("A {$new}:pastoralcare record has been {$method}")
-                ->setParam('pastoralcare', new Param($this->l10n->translate('pastoralCare'), $href))
+        $builder->setTitle("A :pastoralcare record has been {$method}")
+                ->setParam('pastoralcare', new Param("{$severity} severity {$type}", $href))
                 ->setIcon("/portrait.php?size=square32&userId={$pastoral->getOwner()->getExternalId()}")
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
