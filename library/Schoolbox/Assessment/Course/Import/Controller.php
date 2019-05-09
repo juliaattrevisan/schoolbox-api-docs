@@ -318,12 +318,14 @@ class Controller extends Base\Base
 
         if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) < READ_ACCESS) {
             $this->sendError('You do not have permission to import this course');
+            return;
         }
 
         // Test each homepage for write access
         foreach ($targetFolderIds as $folderId) {
             if ($this->access->getFolderAccess($this->getUser(), $folderId) < WRITE_ACCESS) {
                 $this->sendError('You do not have permission to import this unit');
+                return;
             }
         }
 
