@@ -244,6 +244,7 @@ class CriterionMapper extends BaseMapper {
             [
                 'g.parent_id'   => $parentId,
                 'g.parent_type' => $parentType,
+                'g.deleted_at'  => null,
             ],
             [
                 'order' => ['g.name' => 'ASC', 'name' => 'ASC'],
