@@ -223,7 +223,7 @@
                                     {% endif %}
 
                                     {% if marks.draft is defined %}
-                                        <a href="#" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ draftMark['hr'] | default('–') }}</a>
+                                        <a href="{{ participationRoute }}" data-draft-mark style="display: none" data-tooltip="right" class="has-tip tip-right meta" data-width="105" title="Draft Mark">{{ draftMark['hr'] | default('–') }}</a>
                                     {% endif %}
                                 {% endif %}
                                     <span class="indicator indicator-{{ indicator }}" title="{{ notchTitle }}"></span>
