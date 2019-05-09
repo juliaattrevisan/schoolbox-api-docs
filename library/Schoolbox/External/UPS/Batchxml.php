@@ -227,7 +227,16 @@ class Batchxml implements ISync
             /* Email - one for every item in stack
              */
             $staff
-                ->addEmail((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+                ->getEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+
+            $staff
+                ->getWorkEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
+
+            $staff
+                ->getHomeEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->SchoolEmailAddress));
 
             /* Campus
              */
@@ -266,6 +275,20 @@ class Batchxml implements ISync
                 ->getAccount()
                     ->setLogin((string)$currentResult->EmailAddress)
                     ->setActive(true);
+
+            /* Email Address
+             */
+            $guardian
+                ->getEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+            $guardian
+                ->getWorkEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
+
+            $guardian
+                ->getHomeEmail()
+                    ->add((new User\Common\Email())->setAddress((string)$currentResult->EmailAddress));
 
             /* Find all the pupils for this parent and stack them up
              */
