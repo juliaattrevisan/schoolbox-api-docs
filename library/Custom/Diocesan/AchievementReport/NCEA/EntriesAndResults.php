@@ -10,6 +10,9 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
+use Custom\Diocesan\AchievementReport\Comments\Comments;
+
+
 class EntriesAndResults extends Base
 {
 
