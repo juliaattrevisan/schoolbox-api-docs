@@ -45,7 +45,7 @@ class Composite implements ImporterInterface
 
 
     /**
-     * @var
+     * @var UserRelationMapper
      */
     private $userRelationMapper;
 
@@ -71,8 +71,7 @@ class Composite implements ImporterInterface
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
         UserRelationMapper $userRelationMapper
-    )
-    {
+    ) {
         $this->log = $log;
         $this->registry = new Collection();
         $this->api = $api;
