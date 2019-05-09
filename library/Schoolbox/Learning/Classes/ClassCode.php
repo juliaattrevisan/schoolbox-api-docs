@@ -36,7 +36,7 @@ class ClassCode
      */
     public function proper(): string
     {
-        if (strpos($this->classCode, ',')) {
+        if (false !== strpos($this->classCode, ',')) {
             $codeArray = explode(',', $this->classCode);
 
             return $codeArray[0];

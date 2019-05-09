@@ -389,7 +389,6 @@ class Controller extends Base
         $students = (new StudentLists($this->externalClass, $this->userMapper, $this->folderMapper, $this->logMapper))
             ->getStudentLists((new ClassCode($classCode))->proper());
 
-        $this->getResponse()->status->set(200);
         $this->getResponse()->content->set($this->buildJsonOutput($students));
     }
 

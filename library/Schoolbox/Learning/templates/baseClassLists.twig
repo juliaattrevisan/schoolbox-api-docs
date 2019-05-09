@@ -1,3 +1,17 @@
+{#
+Data:
+    homepageId        int       The folder's id
+    subjectName       string    The folder's name
+    classCode         string    The folder's code string
+    specialNeeds      string    A localised label for Special Needs
+    replyTo           string    Current user's email address
+    mailEnabled       bool      Config for whether mail is enabled
+    pastoralEnabled   bool      Config for whether pastoral is enabled
+    today             string    Today's date
+    mailHandle        string    Mail handler
+    emailGroups       array     Data for mail group checkboxes
+#}
+
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
 <div class="row" id="email-class-lists">
@@ -77,7 +91,7 @@
             emailLists: [],
             emailDelimiter: String.fromCharCode(30),
             classListsEndpointPrefix: '/subject/classList/ajax/',
-            getStudentListsEndpointPrefix: '/learning/class/lists/',
+            getStudentListsEndpointPrefix: '{{ routeLookup('learning.getStudentListByClassCode') }}',
             formIsReady: false,
             linkTitle: {
                 'dueWork':      '{{ locale.dueWork }}',
