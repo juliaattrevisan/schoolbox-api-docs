@@ -64,6 +64,7 @@ HELP;
     }
 
     $composite = new Composite(
+        $log,
         new Batchxml(),
         UserMapper::getInstance(),
         UserProfileMapper::getInstance(),

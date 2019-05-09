@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfile;
@@ -20,6 +21,12 @@ use Schoolbox\UserMapper;
 
 class Profile implements ImporterInterface
 {
+
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
+
 
     /**
      * @var Batchxml
@@ -42,12 +49,18 @@ class Profile implements ImporterInterface
     /**
      * Profile constructor.
      *
+     * @param LoggerInterface   $log
      * @param Batchxml          $batchxml
      * @param UserMapper        $userMapper
      * @param UserProfileMapper $userProfileMapper
      */
-    public function __construct(Batchxml $batchxml, UserMapper $userMapper, UserProfileMapper $userProfileMapper)
-    {
+    public function __construct(
+        LoggerInterface $log,
+        Batchxml $batchxml,
+        UserMapper $userMapper,
+        UserProfileMapper $userProfileMapper
+    ) {
+        $this->log = $log;
         $this->api = $batchxml;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;

@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Isams\Base\Importer;
 use Schoolbox\External\UPS\Batchxml;
@@ -28,7 +29,7 @@ class Composite implements ImporterInterface
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private $api;
 
 
     /**
@@ -50,22 +51,31 @@ class Composite implements ImporterInterface
 
 
     /**
+     * @var LoggerInterface
+     */
+    private $log;
+
+
+    /**
      * Composite constructor.
      *
-     * @param Batchxml           $batchxml
+     * @param LoggerInterface    $log
+     * @param Batchxml           $api
      * @param UserMapper         $userMapper
      * @param UserProfileMapper  $userProfileMapper
      * @param UserRelationMapper $userRelationMapper
      */
     public function __construct(
-        Batchxml $batchxml,
+        LoggerInterface $log,
+        Batchxml $api,
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
         UserRelationMapper $userRelationMapper
     )
     {
+        $this->log = $log;
         $this->registry = new Collection();
-        $this->batchxml = $batchxml;
+        $this->api = $api;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
         $this->userRelationMapper = $userRelationMapper;
@@ -78,8 +88,8 @@ class Composite implements ImporterInterface
     public function import(): void
     {
         $this->registry
-            ->add(new Importer\Profile($this->batchxml, $this->userMapper, $this->userProfileMapper))
-            ->add(new Importer\Relations($this->batchxml, $this->userMapper, $this->userRelationMapper));
+            ->add(new Importer\Profile($this->log, $this->api, $this->userMapper, $this->userProfileMapper))
+            ->add(new Importer\Relations($this->log, $this->api, $this->userMapper, $this->userRelationMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();
