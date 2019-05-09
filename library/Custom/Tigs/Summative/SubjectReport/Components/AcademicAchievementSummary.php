@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 use Alaress\Authorizer\Authorizer;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Custom\Tigs\Summative\StudentAttributes;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -41,9 +42,6 @@ class AcademicAchievementSummary extends BaseComponent
     /** @var Visibility */
     private $visibility;
 
-    /** @var User */
-    private $viewer;
-
     /** @var int */
     private $aasWorkTypeId;
 
@@ -68,6 +66,8 @@ class AcademicAchievementSummary extends BaseComponent
      * @param RubricMapper      $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
+     * @param string|null       $roleTypeOverride
+     * @throws InvalidArgumentException
      */
     public function __construct(
         StudentAttributes $attributes,
@@ -79,15 +79,15 @@ class AcademicAchievementSummary extends BaseComponent
         int $aasWorkTypeId,
         RubricMapper $rubricMapper,
         Authorizer $authorizer,
-        Router\Router $router
+        Router\Router $router,
+        ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes);
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
 
         $this->unitSpecs     = $unitSpecs;
         $this->student       = $student;
         $this->folder        = $folder;
         $this->visibility    = $visibility;
-        $this->viewer        = $viewer;
         $this->aasWorkTypeId = $aasWorkTypeId;
         $this->rubricMapper  = $rubricMapper;
         $this->authorizer    = $authorizer;
@@ -155,7 +155,7 @@ class AcademicAchievementSummary extends BaseComponent
             $msg          = \sprintf('Only %ss can have rubrics.', $requiredType);
             $routeName    = 'learningAssessment.getAssessment';
             $routeParams  = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
                 $route      = $this->router->generate($routeName, $routeParams);
                 $actualType = $assessment::getDefaultTypeName();
                 $title      = $assessment->getTitle();
@@ -168,7 +168,7 @@ class AcademicAchievementSummary extends BaseComponent
         if (!$assessment->getUseRubric()) {
             $routeName   = 'learningAssessment.getAssessment';
             $routeParams = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
                 $route = $this->router->generate($routeName, $routeParams);
                 $title = \sprintf('<a href="%s">%s</a>', $route, $assessment->getTitle());
             } else {
@@ -196,12 +196,12 @@ class AcademicAchievementSummary extends BaseComponent
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->viewer, true, null, false)) {
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->getViewer(), true, null, false)) {
             return null;
         }
 
         // Is grade visibility off for the current viewer?
-        if (!$dueWork->isFeedbackVisibleToUser($this->viewer)) {
+        if (!$this->isFeedbackVisibleToUser($dueWork)) {
             return null;
         }
 
@@ -229,7 +229,7 @@ class AcademicAchievementSummary extends BaseComponent
             'student'      => $this->student,
         ];
 
-        if ($this->authorizer->isPathAuthorizedForUser($path, $routeParams, $this->viewer)) {
+        if ($this->authorizer->isPathAuthorizedForUser($path, $routeParams, $this->getViewer())) {
             return $this->router->generate($path, $routeParams);
         }
         return null;

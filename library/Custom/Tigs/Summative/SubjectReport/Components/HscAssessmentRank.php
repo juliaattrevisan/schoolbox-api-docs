@@ -9,6 +9,7 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -32,9 +33,6 @@ class HscAssessmentRank extends BaseComponent
     /** @var Visibility */
     private $visibility;
 
-    /** @var User */
-    private $viewer;
-
     /** @var Folder\Model */
     private $folder;
 
@@ -48,6 +46,8 @@ class HscAssessmentRank extends BaseComponent
      * @param Visibility                      $visibility
      * @param User                            $viewer
      * @param Folder\Model                    $folder
+     * @param string|null                     $roleTypeOverride
+     * @throws InvalidArgumentException
      */
     public function __construct(
         GenericCollection $cohortAssessments,
@@ -55,14 +55,14 @@ class HscAssessmentRank extends BaseComponent
         StudentAttributes $attributes,
         Visibility $visibility,
         User $viewer,
-        Folder\Model $folder
+        Folder\Model $folder,
+        ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes);
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
 
         $this->cohortAssessments = $cohortAssessments;
         $this->student           = $student;
         $this->visibility        = $visibility;
-        $this->viewer            = $viewer;
         $this->folder            = $folder;
     }
 
@@ -111,12 +111,12 @@ class HscAssessmentRank extends BaseComponent
         $classAssessment = $cohortAssessmentsPerClass[$this->folder->getId()]->first();
 
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->viewer, true, null, false)) {
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->getViewer(), true, null, false)) {
             return null;
         }
 
         // Is grade visibility off for the current viewer?
-        if (!$classAssessment->isFeedbackVisibleToUser($this->viewer)) {
+        if (!$this->isFeedbackVisibleToUser($classAssessment)) {
             return null;
         }
 
@@ -169,7 +169,7 @@ class HscAssessmentRank extends BaseComponent
     {
         $cohortMarks = [];
         foreach ($cohortAssessments as $assessable) {
-            if (!$assessable->isFeedbackVisibleToUser($this->viewer)) {
+            if (!$this->isFeedbackVisibleToUser($assessable)) {
                 continue;
             }
             foreach ($assessable->getAllParticipants() as $participant) {

@@ -10,6 +10,7 @@ namespace Custom\Tigs\Summative\SubjectReport\Components;
 use Alaress\Authorizer\Authorizer;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Custom\Tigs\Summative\StudentAttributes;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
@@ -40,9 +41,6 @@ class AcademicAchievementMatrix extends BaseComponent
     /** @var Visibility */
     private $visibility;
 
-    /** @var User */
-    private $viewer;
-
     /** @var int */
     private $aamWorkTypeId;
 
@@ -67,6 +65,8 @@ class AcademicAchievementMatrix extends BaseComponent
      * @param RubricMapper      $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
+     * @param string|null       $roleTypeOverride
+     * @throws InvalidArgumentException
      */
     public function __construct(
         StudentAttributes $attributes,
@@ -78,15 +78,15 @@ class AcademicAchievementMatrix extends BaseComponent
         int $aamWorkTypeId,
         RubricMapper $rubricMapper,
         Authorizer $authorizer,
-        Router\Router $router
+        Router\Router $router,
+        ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes);
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
 
         $this->unitSpecs     = $unitSpecs;
         $this->student       = $student;
         $this->folder        = $folder;
         $this->visibility    = $visibility;
-        $this->viewer        = $viewer;
         $this->aamWorkTypeId = $aamWorkTypeId;
         $this->rubricMapper  = $rubricMapper;
         $this->authorizer    = $authorizer;
@@ -157,7 +157,7 @@ class AcademicAchievementMatrix extends BaseComponent
             $msg          = \sprintf('Only %ss can have rubrics.', $requiredType);
             $routeName    = 'learningAssessment.getAssessment';
             $routeParams  = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
                 $route      = $this->router->generate($routeName, $routeParams);
                 $actualType = $assessment::getDefaultTypeName();
                 $title      = $assessment->getTitle();
@@ -170,7 +170,7 @@ class AcademicAchievementMatrix extends BaseComponent
         if (!$assessment->getUseRubric()) {
             $routeName   = 'learningAssessment.getAssessment';
             $routeParams = ['assessmentId' => $assessment->getId(), 'assessment' => $assessment];
-            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->viewer)) {
+            if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $this->getViewer())) {
                 $route = $this->router->generate($routeName, $routeParams);
                 $title = \sprintf('<a href="%s">%s</a>', $route, $assessment->getTitle());
             } else {
@@ -180,12 +180,12 @@ class AcademicAchievementMatrix extends BaseComponent
         }
 
         // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->viewer, true, null, false)) {
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
             return null;
         }
 
         // Is grade visibility off for the current viewer?
-        if (!$assessment->isFeedbackVisibleToUser($this->viewer)) {
+        if (!$this->isFeedbackVisibleToUser($assessment)) {
             return null;
         }
 

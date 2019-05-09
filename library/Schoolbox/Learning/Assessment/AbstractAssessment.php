@@ -21,6 +21,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Role;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -507,18 +508,25 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function isFeedbackVisibleToUser(User $viewingUser)
     {
-        $role = $viewingUser->getRole();
+        return $this->isFeedbackVisibleToRoleType($viewingUser->getRole()->getType());
+    }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function isFeedbackVisibleToRoleType(string $roleType): bool
+    {
         switch ($this->getMarkVisibility()) {
             case self::MARK_VISIBILITY_PARENT_STUDENT:
-                return $role->isStaff() || $role->isStudent() || $role->isParent();
+                return $roleType === Role::STAFF || $roleType === Role::STUDENT || $roleType === Role::PARENT;
 
             case self::MARK_VISIBILITY_STUDENT:
-                return $role->isStaff() || $role->isStudent();
+                return $roleType === Role::STAFF || $roleType === Role::STUDENT;
 
             case self::MARK_VISIBILITY_PRIVATE:
             default:
-                return $role->isStaff();
+                return $roleType === Role::STAFF;
         }
     }
 

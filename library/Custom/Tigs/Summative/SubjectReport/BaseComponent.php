@@ -8,11 +8,14 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\SubjectReport;
 
 use Custom\Tigs\Summative\StudentAttributes;
+use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Role;
+use Schoolbox\User;
 
 /**
  * Common logic for Report components
@@ -29,12 +32,79 @@ class BaseComponent
     /** @var int $semesterTo */
     protected $semesterTo = 0;
 
+    /** @var User */
+    private $viewer;
+
+    /** @var string|null */
+    private $roleTypeOverride;
+
+
     /**
      * @param StudentAttributes $attributes
+     * @param User              $viewer
+     * @param null|string       $roleTypeOverride
+     * @throws InvalidArgumentException If role type invalid or not permitted for viewer
      */
-    public function __construct(StudentAttributes $attributes)
+    public function __construct(StudentAttributes $attributes, User $viewer, ?string $roleTypeOverride)
     {
-        $this->attributes = $attributes;
+        // Validate $roleTypeOverride is valid and permitted
+        $role       = $viewer->getRole();
+        $escalation = true;
+        switch ($roleTypeOverride) {
+            case Role::GUEST:
+            case null:
+                // These are always fine
+                $escalation = false;
+                break;
+            case Role::STAFF:
+                // Only staff can simulate staff
+                if ($role->isStaff()) {
+                    $escalation = false;
+                }
+                break;
+            case Role::STUDENT:
+                // Only staff/student can simulate student
+                if ($role->isStaff() || $role->isStudent()) {
+                    $escalation = false;
+                }
+                break;
+            case Role::PARENT:
+                // Only staff/student/parent can simulate parent
+                if ($role->isStaff() || $role->isStudent() || $role->isParent()) {
+                    $escalation = false;
+                }
+                break;
+            default:
+                throw new InvalidArgumentException("Unrecognised role type: '$roleTypeOverride'");
+        }
+        if ($escalation) {
+            throw new InvalidArgumentException("{$role->getType()} not permitted to simulate '$roleTypeOverride'");
+        }
+
+        $this->attributes       = $attributes;
+        $this->viewer           = $viewer;
+        $this->roleTypeOverride = $roleTypeOverride;
+    }
+
+
+    /**
+     * @return User
+     */
+    protected function getViewer(): User
+    {
+        return $this->viewer;
+    }
+
+
+    /**
+     * Returns whether the specified assessment's feedback should be visible for the current viewer and role-type override
+     *
+     * @param IAssessable $assessable
+     * @return bool
+     */
+    protected function isFeedbackVisibleToUser(IAssessable $assessable): bool
+    {
+        return $assessable->isFeedbackVisibleToRoleType($this->roleTypeOverride ?? $this->viewer->getRole()->getType());
     }
 
 

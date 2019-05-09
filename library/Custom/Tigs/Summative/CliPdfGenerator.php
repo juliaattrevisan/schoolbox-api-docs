@@ -10,6 +10,8 @@ namespace Custom\Tigs\Summative;
 use Aura\Router\Router;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
+use function implode;
+use function in_array;
 use Knp\Snappy\Pdf;
 use RuntimeException;
 use Schoolbox\Collection;
@@ -41,6 +43,7 @@ class CliPdfGenerator extends CliTool\App
     private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
     private const OPT_LONG_NOW              = 'now:';              // to simulate time
     private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
+    private const OPT_LONG_ROLE_TYPE        = 'role-type:';        // role-type override
 
     private const DEFAULT_MAX_FAILS   = 3;
     private const DEFAULT_JS_DELAY    = 1000;
@@ -110,6 +113,12 @@ class CliPdfGenerator extends CliTool\App
      */
     private $userStyleSheet;
 
+    /**
+     * Enable user to print reports with grade visibility for a role other than current user
+     * @var string
+     */
+    private $roleTypeOverride;
+
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -132,6 +141,7 @@ class CliPdfGenerator extends CliTool\App
             self::OPT_LONG_JS_DELAY,
             self::OPT_LONG_NOW,
             self::OPT_LONG_USER_STYLE_SHEET,
+            self::OPT_LONG_ROLE_TYPE,
         ];
     }
 
@@ -194,6 +204,7 @@ class CliPdfGenerator extends CliTool\App
         $maxFailures       = $this->getOpt(self::OPT_LONG_MAX_FAILS);
         $jsDelay           = $this->getOpt(self::OPT_LONG_JS_DELAY);
         $userStyleSheet    = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
+        $roleTypeOverride  = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
 
         if ($this->sessionHash) {
             $this->getLogger()->info('Command-line session hash supplied, validating...');
@@ -231,7 +242,7 @@ class CliPdfGenerator extends CliTool\App
             }
         }
 
-        if ($this->curriculum && !\in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
+        if ($this->curriculum && !in_array($this->curriculum, [self::CURRICULUM_IB, self::CURRICULUM_HSC], true)) {
             $this->getLogger()->alert("Invalid 'curriculum' option: '$this->curriculum'");
             $valid = false;
         }
@@ -269,6 +280,13 @@ class CliPdfGenerator extends CliTool\App
             $this->userStyleSheet = $userStyleSheet;
         }
 
+        if ($roleTypeOverride === null || in_array($roleTypeOverride, Role::getRoleTypes(), true)) {
+            $this->roleTypeOverride = $roleTypeOverride;
+        } else {
+            $this->getLogger()->alert("Invalid 'role-type' option: '$roleTypeOverride'");
+            $valid = false;
+        }
+
         $this->getLogger()->debug("Command Line Options:");
         $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
         $this->getLogger()->debug("    username: {$this->username}");
@@ -279,6 +297,7 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
         $this->getLogger()->debug("    now: {$this->nowOverride}");
         $this->getLogger()->debug("    user-style-sheet: {$this->userStyleSheet}");
+        $this->getLogger()->debug("    role-type: {$this->roleTypeOverride}");
 
         return $valid;
     }
@@ -378,7 +397,7 @@ class CliPdfGenerator extends CliTool\App
         $singleQuoteWrap = function (string $code): string {
             return \sprintf("'%s'", $code);
         };
-        $this->getLogger()->debug("Class code exclusions: " . \implode(', ', \array_map($singleQuoteWrap, $excluded)));
+        $this->getLogger()->debug("Class code exclusions: " . implode(', ', \array_map($singleQuoteWrap, $excluded)));
         return $excluded;
     }
 
@@ -450,9 +469,9 @@ class CliPdfGenerator extends CliTool\App
             $messageParts[] = \sprintf("user.year of '%s'", $this->yearLevel);
         }
 
-        $this->getLogger()->info("Fetching users from schoolbox with" . \implode(' and ', $messageParts));
+        $this->getLogger()->info("Fetching users from schoolbox with " . implode(' and ', $messageParts));
         $db = $this->userMapper->getDatabase();
-        $whereClause = \implode(' AND ', $pb->getWhere());
+        $whereClause = implode(' AND ', $pb->getWhere());
 
         $sql = "
             SELECT u.id
@@ -577,6 +596,7 @@ class CliPdfGenerator extends CliTool\App
 
         $classFolders     = $this->getClassFolders($student, $externalStudent);
         $filteredClasses  = $this->filterClasses($classFolders, $excludedClassCodes);
+        $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
 
         foreach ($filteredClasses as $folder) {
             $data = [
@@ -584,7 +604,7 @@ class CliPdfGenerator extends CliTool\App
                 'folderId' => $folder->getId(),
                 'now'      => $this->nowOverride,
             ];
-            $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data);
+            $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data) . $queryArgs;
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
             $urls[] = $subjectReportUrl;
         }
@@ -652,7 +672,7 @@ class CliPdfGenerator extends CliTool\App
         foreach ($classFolders as $idx => $folder) {
             $exclude = false;
             foreach ($folder->getCodes() as $code) {
-                if (\in_array($code->getCode(), $excludedClassCodes, true)) {
+                if (in_array($code->getCode(), $excludedClassCodes, true)) {
                     $this->getLogger()->debug("'{$code->getCode()}' is in class exclusion list, skipping folder {$folder->getId()}...");
                     $exclude = true;
                     break;
@@ -867,6 +887,7 @@ class CliPdfGenerator extends CliTool\App
         }
         $defaultMaxFails = self::DEFAULT_MAX_FAILS;
         $defaultJsDelay  = self::DEFAULT_JS_DELAY;
+        $roleTypes       = implode(', ', Role::getRoleTypes());
 
         $green  = self::COLOUR_GREEN;
         $white  = self::COLOUR_WHITE;
@@ -929,6 +950,10 @@ DESCRIPTION
          
     $yellow--user-style-sheet=STYLE_FILE$white
          Filename of a style sheet to load with every page.
+         
+    $yellow--role-type=ROLE_TYPE$white
+         Print Subject Reports as they would appear to users with this role type.
+         Must be one of [{$roleTypes}]
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip

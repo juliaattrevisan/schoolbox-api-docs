@@ -33,9 +33,6 @@ class HscAssessmentTasks extends BaseComponent
     /** @var Visibility */
     private $visibility;
 
-    /** @var User */
-    private $viewer;
-
     /** @var int */
     private $workTypeId;
 
@@ -53,6 +50,8 @@ class HscAssessmentTasks extends BaseComponent
      * @param User              $viewer
      * @param int               $workTypeId
      * @param Folder\Model      $folder
+     * @param string|null       $roleTypeOverride
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         CourseSpec\Model $courseSpec,
@@ -61,14 +60,14 @@ class HscAssessmentTasks extends BaseComponent
         Visibility $visibility,
         User $viewer,
         int $workTypeId,
-        Folder\Model $folder
+        Folder\Model $folder,
+        ?string $roleTypeOverride
     ) {
-        parent::__construct($attributes);
+        parent::__construct($attributes, $viewer, $roleTypeOverride);
 
         $this->courseSpec      = $courseSpec;
         $this->student         = $student;
         $this->visibility      = $visibility;
-        $this->viewer          = $viewer;
         $this->workTypeId      = $workTypeId;
         $this->folder          = $folder;
     }
@@ -134,13 +133,13 @@ class HscAssessmentTasks extends BaseComponent
                 break;
             }
         }
-        if (!$classAssessment || !$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->viewer, true, null, false)) {
+        if (!$classAssessment || !$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->getViewer(), true, null, false)) {
             // Not imported to this class within report window, or not visible?
             return null;
         }
 
         // Is grade visibility off for the current viewer?
-        if (!$classAssessment->isFeedbackVisibleToUser($this->viewer)) {
+        if (!$this->isFeedbackVisibleToUser($classAssessment)) {
             return null;
         }
 
@@ -189,7 +188,7 @@ class HscAssessmentTasks extends BaseComponent
      */
     private function findStudentFeedback(IAssessable $assessable): ?IFeedback
     {
-        if (!$assessable->isFeedbackVisibleToUser($this->viewer)) {
+        if (!$this->isFeedbackVisibleToUser($assessable)) {
             return null;
         }
         $participant = $assessable->getParticipantIfExtant($this->student);
@@ -210,7 +209,7 @@ class HscAssessmentTasks extends BaseComponent
     {
         $cohortMarks = [];
         foreach ($cohortAssessments as $assessable) {
-            if (!$assessable->isFeedbackVisibleToUser($this->viewer)) {
+            if (!$this->isFeedbackVisibleToUser($assessable)) {
                 continue;
             }
             foreach ($assessable->getAllParticipants() as $participant) {
