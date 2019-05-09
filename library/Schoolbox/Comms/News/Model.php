@@ -1031,4 +1031,13 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
             'unsaveForLater' => new AuraLink('commsNewsSaveForLater.postRemove', [ 'article' => $this, 'articleId' => $this->getId() ])
         ];
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getCommentNotifier(): string
+    {
+        return Discussion\Comment\Notifier::class;
+    }
 }

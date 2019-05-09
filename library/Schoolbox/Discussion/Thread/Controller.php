@@ -181,6 +181,7 @@ class Controller extends BaseController
             ->setAuthor($this->getUser())
             ->setContent($data->content);
 
+        $this->commentMapper->hasModuleNotifier($context->getCommentNotifier());
         $this->commentMapper->save($comment);
 
         $responseData = $this->commentDecoratorFactory

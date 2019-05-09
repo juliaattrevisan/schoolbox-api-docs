@@ -38,7 +38,6 @@ class Mapper extends BaseMapper
                 'other_key' => 'discussion_thread_id',
             ]
         );
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteThreads']);
     }
 
 
@@ -55,13 +54,10 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Post-delete for threads: delete all comments within as well.
-     *
-     * @param Model $model
-     * @throws BaseMapper\Exception if a query fails
+     * @inheritDoc
      */
-    public function deleteThreads(Model $model): void
+    public function raiseNotification($object, $verb, $previous = null)
     {
-        $this->getJoinMapper('comments')->deleteByColumn('discussion_thread_id', $model->getId());
+        return true;
     }
 }

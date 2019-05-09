@@ -2988,7 +2988,7 @@ abstract class Mapper implements IMapper, Serializable
         return true;
     }
 
-    protected function hasModuleNotifier($classname)
+    public function hasModuleNotifier($classname)
     {
         if (!is_string($classname) || !class_exists($classname, true)) {
             return false;

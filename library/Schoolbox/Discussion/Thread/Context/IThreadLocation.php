@@ -42,4 +42,12 @@ interface IThreadLocation
      *               this interface
      */
     public function setDiscussionThread(?Model $discussionThread);
+
+
+    /**
+     * Gets notifier class name for this thread comments
+     *
+     * @return string
+     */
+    public function getCommentNotifier(): string;
 }
