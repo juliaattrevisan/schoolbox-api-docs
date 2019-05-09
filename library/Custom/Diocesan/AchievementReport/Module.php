@@ -31,7 +31,7 @@ class Module extends BaseModule
     {
         $router->addGet('achievementreport.selector', $basePath . '/{externalUserId}');
 
-        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolgrades/{externalUserId}{/year}')
+        $router->addGet('achievementreport.schoolGrades', $basePath . '/schoolGrades/{externalUserId}{/year}')
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
@@ -45,6 +45,17 @@ class Module extends BaseModule
             ->addTokens(array(
                 'year' => '\d{4}'
             ));
+
+        $router->addGet('achievementreport.comments', $basePath . '/comments/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
+
+        $router->addGet('achievementreport.standardisedTest', $basePath . '/standardisedTest/{externalUserId}{/year}')
+            ->addTokens(array(
+                'year' => '\d{4}'
+            ));
+
     }
 
     /**
@@ -55,31 +66,46 @@ class Module extends BaseModule
         $matcher->add(
             '/^achievementreport\.selector/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.schoolGrades/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.ib/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
             }
         );
 
         $matcher->add(
             '/^achievementreport\.ncea/',
             function ($params) {
-                return $this->getEverything($params);
+                return $this->getPreloads($params);
+            }
+        );
+
+        $matcher->add(
+            '/^achievementreport\.comments/',
+            function ($params) {
+                return $this->getPreloads($params);
+            }
+        );
+
+        $matcher->add(
+            '/^achievementreport\.standardisedTest/',
+            function ($params) {
+                return $this->getPreloads($params);
             }
         );
     }
+
 
     /**
      * Macro method
@@ -88,8 +114,9 @@ class Module extends BaseModule
      *
      * @param $params
      * @return array
+     * @throws \Exception
      */
-    public function getEverything($params)
+    public function getPreloads($params): array
     {
         $externalUserHandler = $this->getExternalUser();
         $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
@@ -103,9 +130,7 @@ class Module extends BaseModule
         /* When selected user doesn't exist in schoolbox
          */
         try {
-            $userMapper = $this->getUserMapper();
-            $user = $userMapper->findOneByColumn('synergy_id', $params['externalUserId']);
-            $user = $userMapper->findById($user->getId());
+            $user = $this->getUserMapper()->findByExternalId($params['externalUserId']);
         } catch (\Exception $e) {
             error(31);
             exit();
@@ -142,9 +167,11 @@ class Module extends BaseModule
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
         $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolgrades');
+        $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolGrades');
         $loader->addPath(__DIR__ . '/IB', 'ib');
         $loader->addPath(__DIR__ . '/NCEA', 'ncea');
+        $loader->addPath(__DIR__ . '/Comments', 'comments');
+        $loader->addPath(__DIR__ . '/StandardisedTest', 'standardisedTest');
         $loader->addPath(__DIR__ . '/Templates', 'templates');
         $templateLoader->addLoader($loader);
     }

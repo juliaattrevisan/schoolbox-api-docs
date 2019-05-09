@@ -1,0 +1,14 @@
+{% include '@templates/Avatar.twig' %}
+{% include '@templates/Navigation.twig' %}
+
+{% include '@comments/CommentsNavigation.twig' with {
+    commentsNavigation: commentsNavigation
+} %}
+
+<div class="row">
+    <div class="small-12 columns achievement-report comments">
+        {% include '@comments/Comments.twig' with {
+            comments: comments
+        } %}
+    </div>
+</div>

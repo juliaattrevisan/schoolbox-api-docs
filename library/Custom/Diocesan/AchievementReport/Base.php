@@ -14,7 +14,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use MSSQL;
-use Alaress_Probe as Probe;
+use Schoolbox\User;
 
 abstract class Base {
 
@@ -23,14 +23,19 @@ abstract class Base {
      *
      * @var MSSQL
      */
-    protected $db = null;
+    protected $db;
+
+    /**
+     * @var User
+     */
+    protected $user;
 
     /**
      * An externalUser array
      *
      * @var array
      */
-    protected $externalUser = array();
+    protected $externalUser = [];
 
     /**
      * Table heading
@@ -82,17 +87,18 @@ abstract class Base {
     /**
      * Constructor
      *
-     * @param $externalUser
+     * @param User  $user
+     * @param array $externalUser
      * @param MSSQL $db
      * @param $year
      */
-    public function __construct($externalUser, MSSQL $db, $year) {
+    public function __construct(User $user, array $externalUser, MSSQL $db, $year) {
+        $this->user = $user;
+
         $this->setExternalUser($externalUser);
         $this->setDb($db);
         $this->setYear($year);
         $this->setCurrentYear(date('Y'));
-
-        $this->setup();
     }
 
     /**
@@ -111,15 +117,8 @@ abstract class Base {
 
         $stuff = $this->getDb()->getAll($query);
 
-        new Probe($stuff);
+        new \Alaress_Probe($stuff);
     }
-
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    abstract protected function setup();
 
     /**
      * Returns data for twig rendering

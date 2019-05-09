@@ -19,14 +19,6 @@ class YearlyBreakdown extends Base {
      */
     protected $heading = 'Progress Grade Summary';
 
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Returns data for twig rendering
@@ -66,6 +58,7 @@ class YearlyBreakdown extends Base {
 
         return $finalStack;
     }
+
 
     /**
      * Find all progress grades

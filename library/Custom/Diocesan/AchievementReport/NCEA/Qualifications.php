@@ -12,17 +12,8 @@
 
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
-class Qualifications extends Base {
-
-    /**
-     * Hook method
-     *
-     * @return mixed
-     */
-    protected function setup()
-    {
-        // TODO: Implement setup() method.
-    }
+class Qualifications extends Base
+{
 
     /**
      * Returns data for twig rendering

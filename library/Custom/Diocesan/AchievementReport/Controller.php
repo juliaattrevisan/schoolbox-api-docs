@@ -11,6 +11,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
+use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use MSSQL;
 use Schoolbox\User;
 
@@ -23,69 +24,90 @@ class Controller extends Base {
      *
      * @var array
      */
-    private $types = array(
-        'IN' => array(
+    private const TYPES = [
+        'IN' => [
             'long' => 'Internally Assessed',
             'short' => 'Internal',
             'css' => 'type-pink',
-        ),
-        'EX' => array(
+        ],
+        'EX' => [
             'long' => 'Externally Assessed',
             'short' => 'External',
             'css' => 'type-blue'
-        )
-    );
+        ]
+    ];
 
     /**
      * Selects which report to redirect towards, based on certain
      * conditions particular to a student
      *
-     * @param $db
-     * @param $user
-     * @param $externalUser
-     * @param $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function selector($db, User $user, $externalUser, $year) {
+    public function selector(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $selector->determineDefaultReport();
-
-        /* Do it the old-fashioned way, for report selector
-         * Can't find the base url in the request object etc
-         *
-         * Surely there's a way to get this from Module, but
-         * I haven't found it
-         */
-        $baseUrl = '/modules/custom/diocesan/achievementreport';
-        $externalUserId = $externalUser['StudentID'];
 
         $report = $selector->getDefaultReport();
 
         /* Redirect based on default report selection
          *
-         * Needs to happen so that the /ib, /schoolgrades and /ncea
+         * Needs to happen so that the /ib, /schoolGrades and /ncea
          * prefixes exist, otherwise you end up at 404 from the
          * default report when you open a year div
          */
         switch ($report) {
-            case 'schoolGrades':
-                header("Location: {$baseUrl}/schoolgrades/{$externalUserId}");
-                die();
+            case NavigationSelector::SCHOOLGRADES_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.schoolGrades', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'ib':
-                header("Location: {$baseUrl}/ib/{$externalUserId}");
-                die();
+            case NavigationSelector::IB_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.ib', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'ncea':
-                header("Location: {$baseUrl}/ncea/{$externalUserId}");
-                die();
+            case NavigationSelector::NCEA_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.ncea', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
                 break;
 
-            case 'comingSoon':
-                $this->getResponse()->content->set(array(
-                    'template' => '@templates/ComingSoon.twig'
-                ));
+            case NavigationSelector::COMMENTS_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.comments', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
+
+                break;
+
+            case NavigationSelector::STANDARDISEDTEST_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.standardisedTest', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year' => $year
+                    ])
+                );
 
                 break;
 
@@ -104,23 +126,51 @@ class Controller extends Base {
         }
     }
 
+
+    /**
+     * Standardised Test placeholder
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function standardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
+        $this->getResponse()->content->set(array(
+            'template' => '@standardisedTest/StandardisedTest.twig',
+            'data' => [
+                'externalUser' => $externalUser,
+            ]
+        ));
+    }
+
+
     /**
      * School Grades page
+     *
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function schoolGrades($db, $user, $externalUser, $year) {
+    public function schoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new SchoolGrades\Footer($externalUser, $db, null);
+        $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
 
-        $gradeSummaryTable = new SchoolGrades\GradeSummary($externalUser, $db, $year);
-        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($externalUser, $db, $year);
-        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($externalUser, $db, $year);
+        $gradeSummaryTable = new SchoolGrades\GradeSummary($user, $externalUser, $db, $year);
+        $yearlyBreakdownTable = new SchoolGrades\YearlyBreakdown($user, $externalUser, $db, $year);
+        $entriesAndResultsTable = new SchoolGrades\EntriesAndResults($user, $externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
-            'template' => '@schoolgrades/index.twig',
+            'template' => '@schoolGrades/index.twig',
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
-                    'selected' => 'schoolgrades'
+                    'selected' => NavigationSelector::SCHOOLGRADES_KEY
                 ),
                 'footer' => array(
                     'data' => $footer->findData(),
@@ -152,24 +202,26 @@ class Controller extends Base {
     /**
      * IB page
      *
-     * @param $db
-     * @param $user
-     * @param $externalUser
-     * @param $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function ib($db, $user, $externalUser, $year) {
+    public function ib(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new IB\Footer($externalUser, $db, null);
+        $footer = new IB\Footer($user, $externalUser, $db, null);
 
-        $progressGradeSummary = new IB\ProgressGradeSummary($externalUser, $db, $year);
-        $yearlyBreakdown = new IB\YearlyBreakdown($externalUser, $db, $year);
+        $progressGradeSummary = new IB\ProgressGradeSummary($user, $externalUser, $db, $year);
+        $yearlyBreakdown = new IB\YearlyBreakdown($user, $externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@ib/index.twig',
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
-                    'selected' => 'ib'
+                    'selected' => NavigationSelector::IB_KEY
                 ),
                 'footer' => array(
                     'data' => $footer->findData(),
@@ -195,25 +247,27 @@ class Controller extends Base {
     /**
      * NCEA page
      *
-     * @param $db
-     * @param $user
-     * @param $externalUser
-     * @param $year
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function ncea($db, $user, $externalUser, $year) {
+    public function ncea(MSSQL $db, User $user, array $externalUser, ?int $year)
+    {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new NCEA\Footer($externalUser, $db, null);
+        $footer = new NCEA\Footer($user, $externalUser, $db, null);
 
-        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($externalUser, $db, $year);
-        $qualifications = new NCEA\Qualifications($externalUser, $db, null);
-        $creditSummary = new NCEA\CreditSummary($externalUser, $db, null);
+        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
+        $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null);
+        $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null);
 
         $output = array(
             'template' => '@ncea/index.twig',
             'data' => array(
                 'navigation' => array(
                     'all' => $selector->getAvailableNavigation(),
-                    'selected' => 'ncea'
+                    'selected' => NavigationSelector::NCEA_KEY
                 ),
                 'footer' => array(
                     'data' => $footer->findData(),
@@ -243,7 +297,7 @@ class Controller extends Base {
                     'heading' => $creditSummary->getHeading(),
                     'data' => $creditSummary->findData(),
                     'allLetters' => $creditSummary->getLetterRegistry(),
-                    'allTypes' => $this->getTypes(),
+                    'allTypes' => self::TYPES,
 
                     /* Suffix for graph div id's
                      */
@@ -256,10 +310,10 @@ class Controller extends Base {
          * year contains no data, probably 404 or something - you
          * could fiddle with the url to get illegal values
          */
-        $navigation = new NCEA\CourseCreditSummaryNavigation($externalUser, $db, null);
+        $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null);
         $allYears = $navigation->findData();
 
-        if (count($allYears)) {
+        if (\count($allYears)) {
 
             /* Course Credit Summary year selectors
              */
@@ -274,9 +328,9 @@ class Controller extends Base {
              * shenanigans altogether
              */
             if ($year) {
-                $creditSummaryYear = new NCEA\CreditSummary($externalUser, $db, $year);
-                $courseCreditSummary = new NCEA\CourseCreditSummary($externalUser, $db, $year);
-                $entriesAndResults = new NCEA\EntriesAndResults($externalUser, $db, $year);
+                $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year);
+                $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year);
+                $entriesAndResults = new NCEA\EntriesAndResults($user, $externalUser, $db, $year);
 
                 /* Course Credit Summary graphs for a specific year
                  */
@@ -301,7 +355,7 @@ class Controller extends Base {
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
-                    'allTypes' => $this->getTypes(),
+                    'allTypes' => self::TYPES,
                     'year' => $year,
                     'currentYear' => $entriesAndResults->getCurrentYear()
                 );
@@ -311,26 +365,55 @@ class Controller extends Base {
         $this->getResponse()->content->set($output);
     }
 
-    /* Getters/Setters
-     */
 
     /**
-     * Set types
+     * Get all the comments for $externalUser
      *
-     * @param array $types
+     * @param MSSQL    $db
+     * @param User     $user
+     * @param array    $externalUser
+     * @param int|null $year
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    private function setTypes($types)
+    public function comments(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
-        $this->types = $types;
-    }
+        /* The selected year should contain data. If a selected
+         * year contains no data, probably 404 or something - you
+         * could fiddle with the url to get illegal values
+         */
+        $allYears = (new Comments\CommentsNavigation($user, $externalUser, $db, $year))->findData();
 
-    /**
-     * Get types
-     *
-     * @return array
-     */
-    private function getTypes()
-    {
-        return $this->types;
+        /* If $year wasn't provided, go with the most recent year we have
+         */
+        if (null === $year && \count($allYears)) {
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('achievementreport.comments', [
+                    'externalUserId' => $externalUser['StudentID'],
+                    'year' => $allYears[0]
+                ])
+            );
+        }
+
+        $output = [
+            'template' => '@comments/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($db, $user, $externalUser))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::COMMENTS_KEY
+                ],
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+                'terms' => Comments\Comments::INITIAL_TERMS,
+                'isJuniorSchoolStudent' => (new ValidJuniorSchoolStudent())->isSatisfiedBy($user),
+                'commentsNavigation' => [
+                    'all' => $allYears,
+                    'selected' => $year
+                ],
+                'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findData()
+            ]
+        ];
+
+        $this->getResponse()->content->set($output);
     }
 }

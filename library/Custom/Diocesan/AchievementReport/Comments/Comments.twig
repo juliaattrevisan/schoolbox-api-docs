@@ -1,0 +1,60 @@
+{##
+ # Comments
+ #
+ # Renders all the comments for a particular year and a particular student
+ #
+ # @param array comments
+ #}
+{% import '@templates/macro.twig' as macro %}
+
+{% if comments|length %}
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div class="scrollable">
+                <table>
+                    <thead>
+                        <th>Subject</th>
+                        <th class="centered">Term</th>
+                        <th>Comment</th>
+                        <th>Teacher</th>
+                    </thead>
+                    <tbody>
+                    {% for year, courseData in comments %}
+                        {% for course, termData in courseData.courses %}
+                            <tr>
+                                <td class="subheading" colspan="4">{{ course }}</td>
+                            </tr>
+
+                            {# Inspect every term for content
+                             # Only render terms which have comments in them
+                             #}
+                            {% for term in terms|keys %}
+                                {% if termData.terms[term] != '' %}
+                                    <tr>
+                                        <td>&nbsp;</td>
+                                        <td class="centered">{{ term }}</td>
+                                        <td width="67%">{{ termData.terms[term].comment }}</td>
+                                        <td>
+                                            {{ macro.renderTeachers(termData.terms[term].teachers) }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</div>
+{% else %}
+    <div class="alert-box">
+        {% if year is null %}
+            Please choose a year.
+        {% else %}
+            There are no comments for {{ year }}; please choose another.
+        {% endif %}
+    </div>
+{% endif %}
