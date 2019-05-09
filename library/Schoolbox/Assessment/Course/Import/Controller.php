@@ -316,15 +316,15 @@ class Controller extends Base\Base
             $courseSpec = $e->getDeletedObject();
         }
 
-        if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) < READ_ACCESS) {
+        if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) < UserAccess::ACCESS_READ) {
             $this->sendError('You do not have permission to import this course');
             return;
         }
 
         // Test each homepage for write access
         foreach ($targetFolderIds as $folderId) {
-            if ($this->access->getFolderAccess($this->getUser(), $folderId) < WRITE_ACCESS) {
-                $this->sendError('You do not have permission to import this unit');
+            if ($this->access->getFolderAccess($this->getUser(), $folderId) < UserAccess::ACCESS_WRITE) {
+                $this->sendError('You do not have permission to import into this class');
                 return;
             }
         }
