@@ -13,7 +13,9 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use function explode;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -51,6 +53,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
+use Alaress\Database\Predicate;
 
 /**
  * Class Mapper
@@ -979,6 +982,62 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         return $model;
+    }
+
+
+    /**
+     * Returns all folders that use any of the individual codes included in $classCodeCsv
+     *
+     * Does not match soft-deleted folder codes
+     * Does not return soft-deleted folders or folder codes
+     *
+     * @param string $classCodeCsv Comma-separated list of class codes
+     * @param string $campusCode   If provided, use this campus code in the query.
+     * @return GenericCollection|Model[]
+     * @throws Predicate\InvalidColumnException
+     * @throws PDOException
+     */
+    public function findAllByCode(string $classCodeCsv, string $campusCode = ''): GenericCollection
+    {
+        $innerPb    = $this->getPredicateBuilder();
+        $classCodes = explode(',', $classCodeCsv);
+
+        if ($campusCode === '') {
+            foreach ($classCodes as $classCode) {
+                $innerPb->equals('fc.code', $classCode);
+                $innerPb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
+            }
+        } else {
+            foreach ($classCodes as $classCode) {
+                $innerPb->equals('fc.code', $classCode);
+                $innerPb->equals('fc.code', "{$campusCode}/{$classCode}");
+            }
+        }
+
+        $outerPb = $this->getPredicateBuilder()
+                        ->isNull('f.deleted_at')
+                        ->isNull('fc.deleted_at')
+                        ->any($innerPb);
+
+        $pb          = $this->getPredicateBuilder()->all($outerPb);
+        $whereClause = $pb->getWhere()[0];
+
+        // Dont bother fetching attributes to hydrate, as this query will be missing codes
+        // that don't match the code query
+        $query = "
+            SELECT f.id
+            FROM folder f
+            JOIN folder_code fc ON fc.folder_id = f.id
+            WHERE {$whereClause}
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($pb->getParams());
+
+        $folderIds = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+        // Retrieve all codes for folder, not just those specified by $classCodeCsv
+        return $this->findByColumn($this->getIdentifierColumn(), $folderIds);
     }
 
     /**
