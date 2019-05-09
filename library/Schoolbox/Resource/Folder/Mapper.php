@@ -961,7 +961,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Finds a single category based on the category code passed in.
+     * Returns the first folder found that uses any of the codes specified in $code
+     *
      * Does not find codes that have been deleted
      *
      * @param  string $code
@@ -971,37 +972,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByCode($code, $campusCode = '')
     {
-        // Retrieve all codes for category, not just $code
-        $query = "
-            {$this->getSelectString()}
-            {$this->getFromString()}
-            WHERE folder.deleted_at IS NULL
-        ";
-        $params = [];
-        if (strlen($campusCode) === 0) {
-            $query .= ' AND (cc.code = :code OR cc.code LIKE :codeLike)';
-            $params['code']     = $code;
-            $params['codeLike'] = '%/' . $this->database->escapeForLike($code);
-        } else {
-            $query .= ' AND (cc.code = :code OR cc.code = :fullCode)';
-            $params['code']     = $code;
-            $params['fullCode'] = $campusCode . '/' . $code;
-        }
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-        $model = $this->hydrateSelect($statement)->first();
+        $model = $this->findAllByCode($code, $campusCode)->first();
 
         if (!$model instanceof Model) {
             throw new MapperException("Instance of object not found");
-        }
-
-        // Re-load codes into the model,
-        // because the above query won't fetch codes for this category that
-        // don't match the above where part.
-
-        $codeList = $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId());
-        foreach($codeList as $folderCode) {
-            $model->getCodes()[$folderCode->getCode()] = $folderCode;
         }
 
         return $model;
