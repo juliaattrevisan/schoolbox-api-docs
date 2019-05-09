@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -362,11 +363,16 @@ class ReturnedWork implements ISoftDeletable
 
     /**
      * @return bool
+     * @throws InsufficientHydrationException
      */
     public function isSelfAssess(): bool
     {
+        if (null === $this->reviewRoute) {
+            throw new InsufficientHydrationException('Review route is not set');
+        }
+
         return in_array(
-            $this->getReviewRoute(),
+            $this->reviewRoute,
             [
                 self::REVIEW_ROUTE_SELF_REFLECTION,
                 self::REVIEW_ROUTE_SELF_GRADING
