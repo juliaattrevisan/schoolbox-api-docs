@@ -10,9 +10,9 @@ namespace Schoolbox\Learning\Students;
 
 use External_ClassInterface;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Folder\Model;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Log\Mapper as LogMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Log\Model as Log;
 
 /**
@@ -31,43 +31,42 @@ class StudentLists
     /** @var LogMapper */
     private $logMapper;
 
-    /** @var FolderMapper */
-    private $folderMapper;
+    /** @var Folder\Model */
+    private $folder;
 
     /**
      * StudentLists constructor.
      *
      * @param External_ClassInterface $externalClass
      * @param UserMapper              $userMapper
-     * @param FolderMapper            $folderMapper
+     * @param Model                   $folder
      * @param LogMapper               $logMapper
      */
     public function __construct(External_ClassInterface $externalClass,
                                 UserMapper $userMapper,
-                                FolderMapper $folderMapper,
+                                Model $folder,
                                 LogMapper $logMapper
     ) {
 
         $this->externalClass    = $externalClass;
         $this->userMapper       = $userMapper;
         $this->logMapper        = $logMapper;
-        $this->folderMapper     = $folderMapper;
+        $this->folder           = $folder;
     }
 
     /**
-     * @param string $classCode
+     * Get the lists of students in the folder
      *
      * @return array
      * @throws Exception
      */
-    public function getStudentLists(string $classCode): array
+    public function getStudentLists(): array
     {
-        $students = $this->externalClass->getStudents($classCode);
-        $folder   = $this->folderMapper->findByCode($classCode);
+        $students = $this->externalClass->getStudents($this->folder->getCodeString());
 
         foreach ($students as $key => $student) {
             $user = $this->userMapper->findByExternalId($student['synergy_id']);
-            $lastVisit = $this->logMapper->lastVisit($folder, $user)->first();
+            $lastVisit = $this->logMapper->lastVisit($this->folder, $user)->first();
 
             $students[$key]['id']                   = $user->getId();
             $students[$key]['email']                = $user->getEmail();
