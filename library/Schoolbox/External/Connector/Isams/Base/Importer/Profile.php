@@ -109,27 +109,31 @@ class Profile implements ImporterInterface
              */
             $parents = $this->findParentsNodes($student);
 
-            $profile
-                ->setGuardian1Name($parents[0]['name'])
-                ->setGuardian1HomePhone($parents[0]['phone']['home'])
-                ->setGuardian1WorkPhone($parents[0]['phone']['work'])
-                ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
-                ->setGuardian1Address($parents[0]['address']['home'])
-                ->setGuardian1Suburb($parents[0]['address']['suburb'])
-                ->setGuardian1Postcode($parents[0]['address']['postcode'])
-                ->setGuardian1Email($parents[0]['email'])
-                ->setGuardian1MailAddress($parents[0]['address']['mail']);
+            if (isset($parents[0])) {
+                $profile
+                    ->setGuardian1Name($parents[0]['name'])
+                    ->setGuardian1HomePhone($parents[0]['phone']['home'])
+                    ->setGuardian1WorkPhone($parents[0]['phone']['work'])
+                    ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
+                    ->setGuardian1Address($parents[0]['address']['home'])
+                    ->setGuardian1Suburb($parents[0]['address']['suburb'])
+                    ->setGuardian1Postcode($parents[0]['address']['postcode'])
+                    ->setGuardian1Email($parents[0]['email'])
+                    ->setGuardian1MailAddress($parents[0]['address']['mail']);
+            }
 
-            $profile
-                ->setGuardian2Name($parents[1]['name'])
-                ->setGuardian2HomePhone($parents[1]['phone']['home'])
-                ->setGuardian2WorkPhone($parents[1]['phone']['work'])
-                ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
-                ->setGuardian2Address($parents[1]['address']['home'])
-                ->setGuardian2Suburb($parents[1]['address']['suburb'])
-                ->setGuardian2Postcode($parents[1]['address']['postcode'])
-                ->setGuardian2Email($parents[1]['email'])
-                ->setGuardian2MailAddress($parents[1]['address']['mail']);
+            if (isset($parents[1])) {
+                $profile
+                    ->setGuardian2Name($parents[1]['name'])
+                    ->setGuardian2HomePhone($parents[1]['phone']['home'])
+                    ->setGuardian2WorkPhone($parents[1]['phone']['work'])
+                    ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
+                    ->setGuardian2Address($parents[1]['address']['home'])
+                    ->setGuardian2Suburb($parents[1]['address']['suburb'])
+                    ->setGuardian2Postcode($parents[1]['address']['postcode'])
+                    ->setGuardian2Email($parents[1]['email'])
+                    ->setGuardian2MailAddress($parents[1]['address']['mail']);
+            }
 
             /* TODO: ESL and IB Flags indeterminate
              * But the model doesn't support these columns??
