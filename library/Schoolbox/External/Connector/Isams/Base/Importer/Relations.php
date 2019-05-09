@@ -97,12 +97,12 @@ class Relations implements ImporterInterface
                 /* noop: can't find schoolbox account
                  * therefore cannot build relation
                  */
-//                new \Alaress_Probe(sprintf(
-//                    'Could not create relations for parent %s %s (%s) - schoolbox account missing',
-//                    $parent->getGivenName(),
-//                    $parent->getLastname(),
-//                    $parent->getId()
-//                ));
+                $this->log->warning(sprintf(
+                    'Could not create relations for parent %s %s (%s) - schoolbox account missing',
+                    $parent->getGivenName(),
+                    $parent->getLastname(),
+                    $parent->getId()
+                ));
 
                 continue;
             }
@@ -121,12 +121,12 @@ class Relations implements ImporterInterface
                     /* noop: can't find schoolbox account
                      * therefore cannot build relation
                      */
-//                    new \Alaress_Probe(sprintf(
-//                        'Could not create relations for student %s %s (%s) - schoolbox account missing',
-//                        $student->getGivenName(),
-//                        $student->getLastname(),
-//                        $student->getId()
-//                    ));
+                    $this->log->warning(sprintf(
+                        'Could not create relations for student %s %s (%s) - schoolbox account missing',
+                        $student->getGivenName(),
+                        $student->getLastname(),
+                        $student->getId()
+                    ));
 
                     continue;
                 }
@@ -143,13 +143,13 @@ class Relations implements ImporterInterface
                  */
                 $this->userRelationMapper->save($relation);
 
-//                new \Alaress_Probe(sprintf(
-//                    'Creating relation between %s (%d) and %s (%d)',
-//                    $parentUser->getFullName(),
-//                    $parentUser->getId(),
-//                    $studentUser->getFullName(),
-//                    $studentUser->getId()
-//                ));
+                $this->log->info(sprintf(
+                    'Creating relation between %s (%d) and %s (%d)',
+                    $parentUser->getFullName(),
+                    $parentUser->getId(),
+                    $studentUser->getFullName(),
+                    $studentUser->getId()
+                ));
             }
         }
     }
