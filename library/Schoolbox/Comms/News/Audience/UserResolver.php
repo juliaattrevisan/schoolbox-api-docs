@@ -157,10 +157,10 @@ class UserResolver implements IUserResolver
         $firstRow       = true;
         foreach ($this->audienceMapper->findByPredicates($pb) as $childSegment) {
             if ($firstRow) {
-                $aggregateUsers = $this->findUsersForAudienceSegment($childSegment);
+                $aggregateUsers = $this->findUsersForAudienceSegment($childSegment, $excludeMuted, $authorId);
                 $firstRow       = false;
             } else {
-                $aggregateUsers = \array_intersect($aggregateUsers, $this->findUsersForAudienceSegment($childSegment));
+                $aggregateUsers = \array_intersect($aggregateUsers, $this->findUsersForAudienceSegment($childSegment, $excludeMuted, $authorId));
             }
         }
 
