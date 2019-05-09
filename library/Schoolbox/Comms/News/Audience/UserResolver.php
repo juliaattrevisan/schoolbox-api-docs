@@ -87,10 +87,12 @@ class UserResolver implements IUserResolver
         $userIds = [];
         $rootSegments = $this->audienceMapper->findByColumn(Mapper::FIELD_COMMS_NEWS_ARTICLE_ID, $article->getId());
 
+        $authorId = $includeAuthor ? $article->getAuthor()->getId() : null;
+
         foreach ($rootSegments as $rootAudienceSegment) {
             // Root level segments are always a UNION
             /** @noinspection SlowArrayOperationsInLoopInspection */
-            $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment, $excludeMuted));
+            $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment, $excludeMuted, $authorId));
         }
         return \array_unique($userIds);
     }

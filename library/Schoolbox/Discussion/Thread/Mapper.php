@@ -58,6 +58,6 @@ class Mapper extends BaseMapper
      */
     public function raiseNotification($object, $verb, $previous = null)
     {
-        return false;
+        return true;
     }
 }
