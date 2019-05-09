@@ -10,6 +10,9 @@
 
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
+use Custom\Diocesan\AchievementReport\Comments\Comments;
+
+
 class EntriesAndResults extends Base {
 
     /**
@@ -85,6 +88,10 @@ class EntriesAndResults extends Base {
         foreach ($finalStack as $year => $allCourses) {
             $processed[$year] = $allCourses;
 
+            /* Get all the comments for this user and year
+             */
+            $comments = (new Comments($this->user, $this->externalUser, $this->db, $year))->findData();
+
             foreach ($allCourses as $name => $data) {
                 $subjects = $data['allAreas'];
 
@@ -97,6 +104,7 @@ class EntriesAndResults extends Base {
 
                 $processed[$year][$name] = $data;
                 $processed[$year][$name]['allAreas'] = $subjects;
+                $processed[$year][$name]['comments'] = $comments[$year]['courses'][$name]['terms'];
             }
         }
 
