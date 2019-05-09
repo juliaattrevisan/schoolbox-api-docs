@@ -1,90 +1,15 @@
-{% extends '@learning/baseClassLists.twig' %}
+{% extends '@learning/coreClassLists.twig' %}
 
-{% block header %}
-    {% include '@learning/component/classLists/header.twig' %}
+{% block meta %}
+<p class="meta">
+    <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" :title="specialNeeds"></span>
+    <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + student.StudentMedicalAlert"></span>
+    <span v-if="student.StudentNonResidentFlag != 0" class="icon-international-student" title="International Student"></span>
+    <span v-if="student.StudentIBFlag != 0" class="icon-international-baccalaureate" title="International Baccalaureate Student"></span>
+    <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight" title="English as a second language"></span>
+    <span v-if="student.StudentTSIFlag != 0" class="icon-boarder-leave" title="Boarder"></span>
+    <span v-if="student.IntegrationFlag != 0" class="icon-integration-student" title="SAC"></span>
+    <span v-if="student.EMAFlag != 0" class="icon-education-mainentance" title="Ed Psych"></span>
+</p>
 {% endblock %}
 
-{% block content %}
-    <thead>
-    <tr>
-        <th v-if="mailEnabled">
-            <input type="checkbox" id="select-all" @click="selectAllStudents" :checked="isAllSelected"/>
-            <label for="select-all" class="checkbox-label"></label>
-        </th>
-        <th></th>
-        <th>Name</th>
-        <th class="show-for-large-up">Year Level</th>
-        <th class="show-for-medium-up">House</th>
-        <th class="show-for-medium-up">Last Visited</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    <template v-for="student in studentLists">
-        <tr>
-            <td v-if="mailEnabled">
-                <input type="checkbox" name="students[]" :id="'id-' + student.synergy_id"
-                       :value="student.synergy_id" @click="select"/>
-                <label :for="'id-' + student.synergy_id" class="checkbox-label"></label>
-            </td>
-            <td>
-                <img :src="'/portrait.php?userId=' + student.synergy_id + '&size=square64'"
-                     :alt="student.lastname + ', ' + student.firstname"></a>
-            </td>
-            <td>
-                <template v-if="student.id">
-                    <a :href="'/search/user/' + student.id">${ student.lastname + ', ' + student.firstname }</a>
-                </template>
-                <template v-else>
-                    ${ student.lastname + ', ' + student.firstname }
-                </template>
-                <span class="meta">(${ student.synergy_id })</span>
-                <span class="show-for-print"><br>${ student.email }</span>
-                <p class="meta">
-                        <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning"
-                              :title="specialNeeds"></span>
-                    <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert"
-                          :title="'Medical Alert: ' + student.StudentMedicalAlert"></span>
-                    <span v-if="student.StudentNonResidentFlag != 0" class="icon-international-student"
-                          title="International Student"></span>
-                    <span v-if="student.StudentIBFlag != 0" class="icon-international-baccalaureate"
-                          title="International Baccalaureate Student"></span>
-                    <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight"
-                          title="English as a second language"></span>
-                    <span v-if="student.StudentTSIFlag != 0" class="icon-boarder-leave" title="Boarder"></span>
-                    <span v-if="student.IntegrationFlag != 0" class="icon-integration-student" title="SAC"></span>
-                    <span v-if="student.EMAFlag != 0" class="icon-education-mainentance" title="Ed Psych"></span>
-                </p>
-
-                <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id">
-                    <li><a :href="'/learning/due/' + student.id" class="icon-due-work">${
-                            linkTitle.dueWork.capitalise() }</a></li>
-                    <li><a :href="'/learning/grades/' + student.id" class="icon-approve">${
-                            linkTitle.grades.capitalise() }</a></li>
-                    <li v-if="student.ePortfolioIsEnabled"><a :href="'/eportfolio/' + student.id + '/profile'"
-                                                              class="icon-eportfolio">${ linkTitle.ePortfolio }</a>
-                    </li>
-                    <li v-if="pastoralIsEnabled"><a :href="'/pastoral/student/' + student.id" class="icon-pastoral">${
-                            linkTitle.pastoralCare.capitalise() }</a></li>
-                    <li><a :href="calendarPath + '/' + student.id" class="icon-calendar">${
-                            linkTitle.calendar.capitalise() }</a></li>
-                    <li><a :href="/timetable/+ student.synergy_id" class="icon-timetable">${
-                            linkTitle.timetable.capitalise() }</a></li>
-                    <li v-if="student.email"><a :href="mailHandle + student.email" class="icon-mail"
-                                                title="Send Email">${ linkTitle.email.capitalise() }</a></li>
-                </ul>
-            </td>
-            <td class="show-for-large-up">${ student.yearlevel }</td>
-            <td class="show-for-medium-up">${ student.house }</td>
-            <td class="show-for-medium-up">${ student.lastAccessTime }</td>
-            <td class="no-pad">
-                <div class="actions-small-1" v-if="student.id">
-                    <nav>
-                        <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
-                    </nav>
-                </div>
-            </td>
-        </tr>
-    </template>
-    </tbody>
-{% endblock %}
