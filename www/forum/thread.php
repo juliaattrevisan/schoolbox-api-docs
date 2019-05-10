@@ -185,21 +185,19 @@ if (is_array($postList)) {
         // edit post
         $this->setVar('modify_block', '');
 
-        // delete post
-        if ($post !== $first) {
-            $this->setVar('DELETE_BUTTON', '<a class="icon-delete no-text" href="/forum/modifyForm.php?deletePost=' . $post['postID'] . '" data-action="delete" data-relation="post" title="Delete Post"></a>');
-        } else {
-            $this->setVar('DELETE_BUTTON', '');
-        }
-
         $this->setVar('modify_heading_block', '');
+
+        $this->setVar('delete_block', '');
 
         if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission(
             $category->getId()
         ) >= WRITE_ACCESS) {
             $this->parse('modify_block', 'modify');
-            $this->parse('delete_block', 'delete');
 
+            // delete post
+            if ($post !== $first) {
+                $this->parse('delete_block', 'delete');
+            }
         }
 
         // edited time
