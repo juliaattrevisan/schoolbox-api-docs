@@ -5,8 +5,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Feedback;
 
@@ -41,7 +41,9 @@ class FileDecorator
     public function __construct(IFeedback $feedback, $postFiles)
     {
         $this->setFeedback($feedback);
-        $this->setFiles($postFiles);
+        if ($postFiles) {
+            $this->setFiles($postFiles);
+        }
     }
 
     /**
@@ -49,16 +51,14 @@ class FileDecorator
      * So far it's just Due Work, but this makes it trivial to add files
      * from an attachzone to an assessment for other types
      */
-    public function decorate()
+    public function decorate(): void
     {
         if ($this->getFeedback() instanceof DueWorkFeedback) {
             $factory = new CollectorFactory();
+            // Replace files with what was actually submitted
+            // (Only if something was actually submitted)
+            $this->getFeedback()->setAllFiles(new Collection());
             if (!empty($this->getFiles())) {
-
-                // Replace files with what was actually submitted
-                // (Only if something was actually submitted)
-                $this->getFeedback()->setAllFiles(new Collection());
-
                 // And repopulate
                 foreach ($factory->build($this->getFiles())->getAll() as $attachment) {
                     $this->getFeedback()->getAllFiles()->add(
@@ -77,7 +77,7 @@ class FileDecorator
     /**
      * @return IFeedback
      */
-    private function getFeedback()
+    private function getFeedback(): IFeedback
     {
         return $this->feedback;
     }
@@ -86,7 +86,7 @@ class FileDecorator
      * @param IFeedback $feedback
      * @return $this
      */
-    private function setFeedback($feedback)
+    private function setFeedback($feedback): self
     {
         $this->feedback = $feedback;
         return $this;
@@ -95,7 +95,7 @@ class FileDecorator
     /**
      * @return array
      */
-    private function getFiles()
+    private function getFiles(): array
     {
         return $this->files;
     }
@@ -104,7 +104,7 @@ class FileDecorator
      * @param array $files
      * @return $this
      */
-    private function setFiles($files)
+    private function setFiles($files): self
     {
         $this->files = $files;
         return $this;
