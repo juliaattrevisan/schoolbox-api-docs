@@ -379,14 +379,12 @@ class Controller extends Base
     }
 
     /**
-     * @param int $folderId
+     * @param Folder\Model $folder
      *
      * @throws Mapper\Exception
      */
-    public function getStudentListByClassId(int $folderId): void
+    public function getStudentListByClassId(Folder\Model $folder): void
     {
-        $folder = $this->folderMapper->findById($folderId);
-
         $students = (new StudentLists($this->externalClass, $this->userMapper, $folder, $this->logMapper))
             ->getStudentLists();
 
@@ -394,19 +392,12 @@ class Controller extends Base
     }
 
     /**
-     * @param int $folderId
+     * @param Folder\Model $folder
      *
      * @throws ServiceNotFound
      */
-    public function getClassListPage(int $folderId): void
+    public function getClassListPage(Folder\Model $folder): void
     {
-        try {
-            $folder = $this->folderMapper->findById($folderId);
-        }
-        catch (Mapper\Exception $e) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
-        }
-
         $subjectName = $folder->getName();
 
         $this->getResponse()->content->set(
@@ -421,6 +412,7 @@ class Controller extends Base
                 'today'             => Alaress_Date_Format::now()->getURLDate(),
                 'mailHandle'        => $this->getSession()->get('mailhandle'),
                 'emailGroups'       => $this->getClassListsEmailGroups(),
+                'folder'            => $folder,
             ])->setTab('classes')->setTitle($subjectName)
         );
     }

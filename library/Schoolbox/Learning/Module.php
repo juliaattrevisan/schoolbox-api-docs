@@ -10,6 +10,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Module\Module as BaseModule;
+use function array_key_exists;
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -49,8 +50,6 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
-                '/class/lists/{folderId}'                 => 'getStudentListById',
-                '/class/{folderId}'                       => 'getClassListPage',
             ],
             'POST' => [
                 '/pending/{userId}'                       => 'postPendingAssessmentsForUser', // viewee
@@ -64,6 +63,36 @@ class Module extends BaseModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function registerRoutes(): void
+    {
+        $preloadFolder = function ($params) {
+            return $this->preloadFolder($params);
+        };
+
+        $this->register('GET', '/class/lists/{folderId}', 'getStudentListByClassId', $this->canAccessClassLists(), $preloadFolder);
+
+        $this->register('GET', '/class/{folderId}', 'getClassListPage', $this->canAccessClassLists(), $preloadFolder);
+    }
+
+    /**
+     * @return Rule\LazyCallback
+     */
+    private function canAccessClassLists()
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF)
+                )
+            );
+        });
     }
 
     /**
@@ -248,5 +277,31 @@ class Module extends BaseModule
     protected function getErrorMapper()
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+    /**
+     * Loads Folder Model instance from route params
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws InvalidPath
+     * @throws UnexpectedValueException
+     */
+    private function preloadFolder(array $params): array
+    {
+        if (($params['folder'] ?? null) instanceof Folder\Model) {
+            $preload['folder'] = $params['folder'];
+        } elseif (!array_key_exists('folderId', $params)) {
+            throw new UnexpectedValueException("No 'folderId' found in route params");
+        } else {
+            try {
+                $preload['folder'] = $this->getFolderMapper()->findById($params['folderId']);
+            } catch (Mapper\Exception $e) {
+                throw new InvalidPath('Folder Not Found', 0, $e);
+            }
+        }
+
+        return $preload;
     }
 }
