@@ -84,6 +84,13 @@ class Profile implements ImporterInterface
             try {
                 $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
             } catch (Mapper\Exception $e) {
+                $this->log->warning(sprintf(
+                    'Skipped profile for %s %s (%d) - schoolbox account could not be found',
+                    $student->getPreferredName(),
+                    $student->getLastname(),
+                    $student->getId()
+                ));
+
                 continue;
             }
 
@@ -155,6 +162,11 @@ class Profile implements ImporterInterface
             /* Then save it
              */
             $this->userProfileMapper->save($profile);
+
+            $this->log->info(sprintf(
+                "Added profile for %s",
+                $user->getFullName()
+            ));
         }
     }
 
