@@ -54,6 +54,7 @@ HELP;
 
         $composite = new Composite(
             $this->getLogger(),
+            $this->perform(),
             new Batchxml(),
             UserMapper::getInstance(),
             UserProfileMapper::getInstance(),

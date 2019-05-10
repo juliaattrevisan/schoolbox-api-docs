@@ -33,6 +33,14 @@ class Composite implements ImporterInterface
 
 
     /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private $perform;
+
+
+    /**
      * @var UserMapper
      */
     private $userMapper;
@@ -60,6 +68,7 @@ class Composite implements ImporterInterface
      * Composite constructor.
      *
      * @param LoggerInterface    $log
+     * @param bool               $perform
      * @param Batchxml           $api
      * @param UserMapper         $userMapper
      * @param UserProfileMapper  $userProfileMapper
@@ -67,12 +76,14 @@ class Composite implements ImporterInterface
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         Batchxml $api,
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
         UserRelationMapper $userRelationMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->registry = new Collection();
         $this->api = $api;
         $this->userMapper = $userMapper;
@@ -87,8 +98,8 @@ class Composite implements ImporterInterface
     public function import(): void
     {
         $this->registry
-            ->add(new Importer\Profile($this->log, $this->api, $this->userMapper, $this->userProfileMapper))
-            ->add(new Importer\Relations($this->log, $this->api, $this->userMapper, $this->userRelationMapper));
+            ->add(new Importer\Profile($this->log, $this->perform, $this->api, $this->userMapper, $this->userProfileMapper))
+            ->add(new Importer\Relations($this->log, $this->perform, $this->api, $this->userMapper, $this->userRelationMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();

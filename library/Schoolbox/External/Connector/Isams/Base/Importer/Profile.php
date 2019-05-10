@@ -29,6 +29,14 @@ class Profile implements ImporterInterface
 
 
     /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private $perform;
+
+
+    /**
      * @var Batchxml
      */
     private $api;
@@ -50,17 +58,20 @@ class Profile implements ImporterInterface
      * Profile constructor.
      *
      * @param LoggerInterface   $log
+     * @param bool              $perform
      * @param Batchxml          $batchxml
      * @param UserMapper        $userMapper
      * @param UserProfileMapper $userProfileMapper
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         Batchxml $batchxml,
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->api = $batchxml;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
@@ -161,12 +172,18 @@ class Profile implements ImporterInterface
 
             /* Then save it
              */
-            $this->userProfileMapper->save($profile);
+            if ($this->perform) {
+                $this->userProfileMapper->save($profile);
+            }
 
             $this->log->info(sprintf(
-                "Added profile for %s",
+                'Added profile for %s',
                 $user->getFullName()
             ));
+        }
+
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
         }
     }
 

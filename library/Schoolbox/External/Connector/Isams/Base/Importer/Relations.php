@@ -29,6 +29,14 @@ class Relations implements ImporterInterface
 
 
     /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private $perform;
+
+
+    /**
      * @var Batchxml
      */
     private $api;
@@ -49,17 +57,21 @@ class Relations implements ImporterInterface
     /**
      * Profile constructor.
      *
+     * @param LoggerInterface    $log
+     * @param bool               $perform
      * @param Batchxml           $batchxml
      * @param UserMapper         $userMapper
      * @param UserRelationMapper $userRelationMapper
      */
     public function __construct(
         LoggerInterface $log,
+        bool $perform,
         Batchxml $batchxml,
         UserMapper $userMapper,
         UserRelationMapper $userRelationMapper
     ) {
         $this->log = $log;
+        $this->perform = $perform;
         $this->api = $batchxml;
         $this->userMapper = $userMapper;
         $this->userRelationMapper = $userRelationMapper;
@@ -141,7 +153,9 @@ class Relations implements ImporterInterface
 
                 /* Save them into user_relation
                  */
-                $this->userRelationMapper->save($relation);
+                if ($this->perform) {
+                    $this->userRelationMapper->save($relation);
+                }
 
                 $this->log->info(sprintf(
                     'Creating relation between %s (%d) and %s (%d)',
@@ -151,6 +165,10 @@ class Relations implements ImporterInterface
                     $studentUser->getId()
                 ));
             }
+        }
+
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
         }
     }
 }
