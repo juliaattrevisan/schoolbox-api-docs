@@ -60,11 +60,7 @@ HELP;
             UserRelationMapper::getInstance()
         );
 
-        $this->getDatabaseInternal()->beginTransaction();
-
         $composite->import();
-
-        $this->getDatabaseInternal()->commit();
     }
 };
 
