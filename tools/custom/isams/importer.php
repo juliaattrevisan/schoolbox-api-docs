@@ -24,12 +24,34 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
 
     /**
      * Execute each strat in the composite
      */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+Import user_profile and user_relation data from ISAMS xml into local schema
+
+Usage: importer.php
+
+HELP;
+            exit;
+        }
+
         $composite = new Composite(
             $this->getLogger(),
             new Batchxml(),
