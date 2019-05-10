@@ -86,13 +86,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     /**
      * Constants used for date comparison
      */
-    private CONST PAST_TO_FUTURE = 1;
-    private CONST FUTURE_TO_PAST = 2;
-    private CONST ANY = 3;
+    private const PAST_TO_FUTURE = 1;
+    private const FUTURE_TO_PAST = 2;
+    private const ANY = 3;
 
-    private CONST DATE_OPEN = 'openDate';
-    private CONST DATE_DUE = 'dueDate';
-    private CONST DATE_CLOSE = 'closeDate';
+    private const DATE_OPEN = 'openDate';
+    private const DATE_DUE = 'dueDate';
+    private const DATE_CLOSE = 'closeDate';
 
     /**
      * Hours in advance to inform a user that due work is upcoming.
@@ -385,7 +385,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_OVERDUE,
             ]);
             $bundle->attach(self::TRIGGER_CLOSED, self::IMMEDIATELY);
-        } else if ($this->dateChanged($planDiff, self::DATE_CLOSE, self::PAST_TO_FUTURE)) {
+        } elseif ($this->dateChanged($planDiff, self::DATE_CLOSE, self::PAST_TO_FUTURE)) {
             /**
              * Re-opened.
              */
@@ -400,7 +400,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
              */
             if ($this->dateChanged($planDiff, self::DATE_OPEN, self::FUTURE_TO_PAST)) {
                 $bundle->detach(self::TRIGGER_OPEN);
-            } else if ($openDate->isFuture() && $this->dateChanged($planDiff, self::DATE_OPEN, self::ANY)) {
+            } elseif ($openDate->isFuture() && $this->dateChanged($planDiff, self::DATE_OPEN, self::ANY)) {
                 $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
             }
             /**
@@ -409,7 +409,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($this->dateChanged($planDiff, self::DATE_DUE, self::FUTURE_TO_PAST)) {
                 $bundle->detach(self::TRIGGER_OVERDUE);
                 $bundle->detach(self::TRIGGER_UPCOMING);
-            } else if ($dueDate->isFuture() && $this->dateChanged($planDiff, self::DATE_DUE, self::ANY)) {
+            } elseif ($dueDate->isFuture() && $this->dateChanged($planDiff, self::DATE_DUE, self::ANY)) {
                 $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
                 $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
             }
