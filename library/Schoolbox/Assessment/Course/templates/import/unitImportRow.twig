@@ -27,6 +27,14 @@
                             {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
                             <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
                         </div>
+
+                        {% if not canReadUnitSpec %}
+                            <p class="alert warning">
+                                You don't have read permission on this unit. You can modify the dates on assessments,
+                                and remove them from your course, but you can't add assessments that aren't already in
+                                your course.
+                            </p>
+                        {% endif %}
                     </div>
                     <nav>
                         <a data-collapser="unit-{{ unitSpec.id }}" href="#" class="icon-down-arrow collapse" title="Collapse Content"></a>
@@ -45,7 +53,8 @@
                                 project:         null,
                                 hideRows:        false,
                                 unitSpec:        unitSpec,
-                                unitImpl:        unitImpl
+                                unitImpl:        unitImpl,
+                                canReadUnitSpec: canReadUnitSpec,
                             } only %}
                         {% else %}
                             <p class="content">This {{ locale.unit }} contains no coursework.</p>
