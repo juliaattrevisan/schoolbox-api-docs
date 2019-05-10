@@ -49,7 +49,7 @@ class Module extends BaseModule
                 '/pending'                                => 'getPendingAssessments',        // (no preload)
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser', // viewee
                 '/classes{/termCode}'                     => 'getClasses',                   // (no preload)
-                '/class/lists/{folderId}'                 => 'getStudentListByClassCode',
+                '/class/lists/{folderId}'                 => 'getStudentListById',
                 '/class/{folderId}'                       => 'getClassListPage',
             ],
             'POST' => [

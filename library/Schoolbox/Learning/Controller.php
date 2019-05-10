@@ -383,7 +383,7 @@ class Controller extends Base
      *
      * @throws Mapper\Exception
      */
-    public function getStudentListByClassCode(int $folderId): void
+    public function getStudentListByClassId(int $folderId): void
     {
         $folder = $this->folderMapper->findById($folderId);
 
