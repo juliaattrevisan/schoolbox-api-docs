@@ -629,6 +629,7 @@ class CliPdfGenerator extends CliTool\App
         $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
         $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
         $snappy->setOption('orientation', 'Landscape');
+        $snappy->setOption('disable-external-links', true);
         $snappy->setOption('javascript-delay', $javascriptDelayMs);
         if ($userStyleSheet !== '') {
             $this->getLogger()->debug("Setting 'user-style-sheet' to $userStyleSheet");
