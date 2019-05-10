@@ -136,8 +136,9 @@
 {% for unitImpl in dto.unitImplementations %}
 
     {% include '@course/import/unitImportRow.twig' with {
-        unitImpl: unitImpl,
-        dto:      dto,
+        unitImpl:        unitImpl,
+        dto:             dto,
+        canReadUnitSpec: canReadUnitSpecs[unitImpl.specification.id] ?? false,
     } only %}
 
 {% endfor %}
