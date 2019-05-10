@@ -300,15 +300,19 @@ class Batchxml implements ISync
                 /* Find the first instance of a Pupil with Id = $studentId
                  * For some reason they've duped the data for us
                  */
-                $student = $this->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+                $node = $this->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']");
 
-                /* Hydrate it into a User/Student() instance
-                 * Ensure de-dupe
-                 */
-                if (null !== $student) {
-                    $hydratedStudent = $this->hydrateStudent($student);
+                if ($node) {
+                    $student = $node[0];
 
-                    $allStudents[$hydratedStudent->getId()] = $hydratedStudent;
+                    /* Hydrate it into a User/Student() instance
+                     * Ensure de-dupe
+                     */
+                    if (null !== $student) {
+                        $hydratedStudent = $this->hydrateStudent($student);
+
+                        $allStudents[$hydratedStudent->getId()] = $hydratedStudent;
+                    }
                 }
             }
 

@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserRelation;
@@ -18,8 +19,22 @@ use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
-class Relations
+class Relations implements ImporterInterface
 {
+
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
+
+
+    /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private $perform;
+
 
     /**
      * @var Batchxml
@@ -42,12 +57,21 @@ class Relations
     /**
      * Profile constructor.
      *
+     * @param LoggerInterface    $log
+     * @param bool               $perform
      * @param Batchxml           $batchxml
      * @param UserMapper         $userMapper
      * @param UserRelationMapper $userRelationMapper
      */
-    public function __construct(Batchxml $batchxml, UserMapper $userMapper, UserRelationMapper $userRelationMapper)
-    {
+    public function __construct(
+        LoggerInterface $log,
+        bool $perform,
+        Batchxml $batchxml,
+        UserMapper $userMapper,
+        UserRelationMapper $userRelationMapper
+    ) {
+        $this->log = $log;
+        $this->perform = $perform;
         $this->api = $batchxml;
         $this->userMapper = $userMapper;
         $this->userRelationMapper = $userRelationMapper;
@@ -85,7 +109,7 @@ class Relations
                 /* noop: can't find schoolbox account
                  * therefore cannot build relation
                  */
-                new \Alaress_Probe(sprintf(
+                $this->log->warning(sprintf(
                     'Could not create relations for parent %s %s (%s) - schoolbox account missing',
                     $parent->getGivenName(),
                     $parent->getLastname(),
@@ -109,7 +133,7 @@ class Relations
                     /* noop: can't find schoolbox account
                      * therefore cannot build relation
                      */
-                    new \Alaress_Probe(sprintf(
+                    $this->log->warning(sprintf(
                         'Could not create relations for student %s %s (%s) - schoolbox account missing',
                         $student->getGivenName(),
                         $student->getLastname(),
@@ -129,9 +153,11 @@ class Relations
 
                 /* Save them into user_relation
                  */
-                $this->userRelationMapper->save($relation);
+                if ($this->perform) {
+                    $this->userRelationMapper->save($relation);
+                }
 
-                new \Alaress_Probe(sprintf(
+                $this->log->info(sprintf(
                     'Creating relation between %s (%d) and %s (%d)',
                     $parentUser->getFullName(),
                     $parentUser->getId(),
@@ -139,6 +165,10 @@ class Relations
                     $studentUser->getId()
                 ));
             }
+        }
+
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
         }
     }
 }

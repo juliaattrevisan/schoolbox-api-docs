@@ -10,6 +10,7 @@
  */
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfile;
@@ -18,8 +19,22 @@ use Schoolbox\Mapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
-class Profile
+class Profile implements ImporterInterface
 {
+
+    /**
+     * @var LoggerInterface
+     */
+    private $log;
+
+
+    /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private $perform;
+
 
     /**
      * @var Batchxml
@@ -42,12 +57,21 @@ class Profile
     /**
      * Profile constructor.
      *
+     * @param LoggerInterface   $log
+     * @param bool              $perform
      * @param Batchxml          $batchxml
      * @param UserMapper        $userMapper
      * @param UserProfileMapper $userProfileMapper
      */
-    public function __construct(Batchxml $batchxml, UserMapper $userMapper, UserProfileMapper $userProfileMapper)
-    {
+    public function __construct(
+        LoggerInterface $log,
+        bool $perform,
+        Batchxml $batchxml,
+        UserMapper $userMapper,
+        UserProfileMapper $userProfileMapper
+    ) {
+        $this->log = $log;
+        $this->perform = $perform;
         $this->api = $batchxml;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
@@ -71,6 +95,13 @@ class Profile
             try {
                 $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
             } catch (Mapper\Exception $e) {
+                $this->log->warning(sprintf(
+                    'Skipped profile for %s %s (%d) - schoolbox account could not be found',
+                    $student->getPreferredName(),
+                    $student->getLastname(),
+                    $student->getId()
+                ));
+
                 continue;
             }
 
@@ -109,27 +140,31 @@ class Profile
              */
             $parents = $this->findParentsNodes($student);
 
-            $profile
-                ->setGuardian1Name($parents[0]['name'])
-                ->setGuardian1HomePhone($parents[0]['phone']['home'])
-                ->setGuardian1WorkPhone($parents[0]['phone']['work'])
-                ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
-                ->setGuardian1Address($parents[0]['address']['home'])
-                ->setGuardian1Suburb($parents[0]['address']['suburb'])
-                ->setGuardian1Postcode($parents[0]['address']['postcode'])
-                ->setGuardian1Email($parents[0]['email'])
-                ->setGuardian1MailAddress($parents[0]['address']['mail']);
+            if (isset($parents[0])) {
+                $profile
+                    ->setGuardian1Name($parents[0]['name'])
+                    ->setGuardian1HomePhone($parents[0]['phone']['home'])
+                    ->setGuardian1WorkPhone($parents[0]['phone']['work'])
+                    ->setGuardian1MobilePhone($parents[0]['phone']['mobile'])
+                    ->setGuardian1Address($parents[0]['address']['home'])
+                    ->setGuardian1Suburb($parents[0]['address']['suburb'])
+                    ->setGuardian1Postcode($parents[0]['address']['postcode'])
+                    ->setGuardian1Email($parents[0]['email'])
+                    ->setGuardian1MailAddress($parents[0]['address']['mail']);
+            }
 
-            $profile
-                ->setGuardian2Name($parents[1]['name'])
-                ->setGuardian2HomePhone($parents[1]['phone']['home'])
-                ->setGuardian2WorkPhone($parents[1]['phone']['work'])
-                ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
-                ->setGuardian2Address($parents[1]['address']['home'])
-                ->setGuardian2Suburb($parents[1]['address']['suburb'])
-                ->setGuardian2Postcode($parents[1]['address']['postcode'])
-                ->setGuardian2Email($parents[1]['email'])
-                ->setGuardian2MailAddress($parents[1]['address']['mail']);
+            if (isset($parents[1])) {
+                $profile
+                    ->setGuardian2Name($parents[1]['name'])
+                    ->setGuardian2HomePhone($parents[1]['phone']['home'])
+                    ->setGuardian2WorkPhone($parents[1]['phone']['work'])
+                    ->setGuardian2MobilePhone($parents[1]['phone']['mobile'])
+                    ->setGuardian2Address($parents[1]['address']['home'])
+                    ->setGuardian2Suburb($parents[1]['address']['suburb'])
+                    ->setGuardian2Postcode($parents[1]['address']['postcode'])
+                    ->setGuardian2Email($parents[1]['email'])
+                    ->setGuardian2MailAddress($parents[1]['address']['mail']);
+            }
 
             /* TODO: ESL and IB Flags indeterminate
              * But the model doesn't support these columns??
@@ -137,7 +172,18 @@ class Profile
 
             /* Then save it
              */
-            $this->userProfileMapper->save($profile);
+            if ($this->perform) {
+                $this->userProfileMapper->save($profile);
+            }
+
+            $this->log->info(sprintf(
+                'Added profile for %s',
+                $user->getFullName()
+            ));
+        }
+
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
         }
     }
 
