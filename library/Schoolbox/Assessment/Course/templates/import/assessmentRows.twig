@@ -176,20 +176,21 @@
                 {% endif %}
             </div>
 
-            {#Recurse #}
+            {# Recurse #}
             {% if assessmentPair.subPairs|length %}
                 {% include '@course/import/assessmentRows.twig' with {
-                assessmentPairs: assessmentPair.subPairs,
-                inputPrefix:     inputPrefix ~ '[' ~ assessment.id ~ '][a]',
-                depth:           depth + 1,
-                unitAction:      unitAction,
-                startDate:       startDate,
-                endDate:         endDate,
-                maximumDate:     maximumDate,
-                project:         assessment,
-                hideRows:        not isChecked,
-                unitSpec:        unitSpec,
-                unitImpl:        unitImpl
+                    assessmentPairs: assessmentPair.subPairs,
+                    inputPrefix:     inputPrefix ~ '[' ~ assessment.id ~ '][a]',
+                    depth:           depth + 1,
+                    unitAction:      unitAction,
+                    startDate:       startDate,
+                    endDate:         endDate,
+                    maximumDate:     maximumDate,
+                    project:         assessment,
+                    hideRows:        not isChecked,
+                    unitSpec:        unitSpec,
+                    unitImpl:        unitImpl,
+                    canReadUnitSpec: canReadUnitSpec,
                 } only %}
             {% endif %}
         </li>
