@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
+use Alaress\Specification\NotEmpty;
 use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
@@ -173,8 +174,12 @@ class Factory
 
             // Validate sequence of descriptor points
             if ($validate) {
-                $descriptorRowSpec = new ValidDescriptorRow($usesMarkRange);
-                if (! $descriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
+                $notEmptySpec = new NotEmpty();
+                if (!$notEmptySpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
+                    throw new \InvalidArgumentException("have at least one non-empty descriptor in each selected indicator");
+                }
+                $monotonicDescriptorRowSpec = new ValidMonotonicDescriptorRow($usesMarkRange);
+                if (!$monotonicDescriptorRowSpec->isSatisfiedBy($indicatorUsage->getDescriptors())) {
                     throw new \InvalidArgumentException("only use descriptor values that form an ascending or descending sequence within a row");
                 }
             }
