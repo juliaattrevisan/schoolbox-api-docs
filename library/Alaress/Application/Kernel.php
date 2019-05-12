@@ -34,7 +34,7 @@ use Alaress_Date_Locale_Config;
 use External_ClassInterface;
 use External_UserInterface;
 use GuzzleHttp;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
 use Schoolbox\Bookmark\Mapper as BookmarkMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
@@ -1217,11 +1217,16 @@ abstract class Kernel
         $di->set(
             'defaultGradeGroup',
             $di->lazy(
-                function () use ($di, $mapperFactory) {
-                    // A default group surely must be set up?
-                    return $mapperFactory->get(GradeGroupMapper::class)->findById(
-                        $di->get('config')->get('default_grade_group')
-                    );
+                static function () use ($di, $mapperFactory) {
+                    /** @var IConfigLoader $config */
+                    $config              = $di->get('config');
+                    $defaultGradeGroupId = $config->get('default_grade_group');
+                    if ($defaultGradeGroupId) {
+                        // If configured, return the configured grade group, error out if not found
+                        return $mapperFactory->get(GradeGroup\Mapper::class)->findById($defaultGradeGroupId);
+                    }
+                    // Not set, return empty model to satisfy method signatures (graceful degradation)
+                    return new GradeGroup\Model();
                 }
             )
         );
