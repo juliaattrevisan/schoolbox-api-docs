@@ -398,13 +398,8 @@ class Controller extends Base
      */
     public function getClassListPage(Folder\Model $folder): void
     {
-        $subjectName = $folder->getName();
-
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learning/classLists.twig', [
-                'homepageId'        => $folder->getId(),
-                'subjectName'       => $subjectName,
-                'classCode'         => $folder->getCodeString(),
                 'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
                 'replyTo'           => $this->getUser()->getEmail(),
                 'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
@@ -413,7 +408,7 @@ class Controller extends Base
                 'mailHandle'        => $this->getSession()->get('mailhandle'),
                 'emailGroups'       => $this->getClassListsEmailGroups(),
                 'folder'            => $folder,
-            ])->setTab('classes')->setTitle($subjectName)
+            ])->setTab('classes')->setTitle($folder->getName())
         );
     }
 

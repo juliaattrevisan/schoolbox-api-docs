@@ -1,8 +1,6 @@
 {#
 Data:
-    homepageId        int       The folder's id
-    subjectName       string    The folder's name
-    classCode         string    The folder's code string
+    folder            object    The folder object
     specialNeeds      string    A localised label for Special Needs
     replyTo           string    Current user's email address
     mailEnabled       bool      Config for whether mail is enabled
@@ -175,8 +173,8 @@ Data:
         el: '#email-class-lists',
         delimiters: ['${', '}'],
         data: {
-            subjectName: '{{ subjectName }}',
-            classCode: '{{ classCode }}',
+            subjectName: '{{ folder.getName }}',
+            classCode: '{{ folder.getCodeString }}',
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
             specialNeeds: '{{ specialNeeds }}',
@@ -194,7 +192,7 @@ Data:
             emailLists: [],
             emailDelimiter: String.fromCharCode(30),
             classListsEndpointPrefix: '/subject/classList/ajax/',
-            getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: homepageId, folder: folder}) }}',
+            getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}',
             formIsReady: false,
             linkTitle: {
                 'dueWork':      '{{ locale.dueWork }}',
