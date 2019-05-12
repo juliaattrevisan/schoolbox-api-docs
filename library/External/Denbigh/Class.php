@@ -97,8 +97,27 @@ class External_Denbigh_Class implements External_ClassInterface
                 JOIN            Staff s ON s.staffCode = c.staffCode
                 JOIN            People p ON p.denbighID = s.peopleDenbighID
                 WHERE           c.ClassCode IN ({$predicate["placeholders"]})
-		    ",
+            ",
             $predicate["bindings"]
         )->fetchColumnArray('denbighID');
+    }
+
+    /**
+     * @return array
+     */
+    public function findClassTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
     }
 }
