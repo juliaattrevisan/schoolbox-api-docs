@@ -9,5 +9,7 @@
         externalUser: externalUser
     } %}
 
-    {% include '@ib/YearlyBreakdown.twig' %}
+    {% include '@ib/YearlyBreakdown.twig' with {
+        yearlyBreakdown: yearlyBreakdown
+    } %}
 </div>
