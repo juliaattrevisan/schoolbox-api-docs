@@ -211,6 +211,23 @@ class Controller extends Base {
      */
     public function ib(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
+        /* The selected year should contain data. If a selected
+         * year contains no data, probably 404 or something - you
+         * could fiddle with the url to get illegal values
+         */
+        $allYears = (new IB\Navigation($user, $externalUser, $db, $year))->findData();
+
+        /* If $year wasn't provided, go with the most recent year we have
+         */
+        if (null === $year && \count($allYears)) {
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('achievementreport.ib', [
+                    'externalUserId' => $externalUser['StudentID'],
+                    'year' => $allYears[0]
+                ])
+            );
+        }
+
         $selector = new NavigationSelector($db, $user, $externalUser);
 
         $this->getResponse()->content->set([
@@ -226,6 +243,10 @@ class Controller extends Base {
                 'user' => $user,
 
                 'yearlyBreakdown' => [
+                    'navigation' => [
+                        'all' => $allYears,
+                        'selected' => $year
+                    ],
                     'terms' => IB\YearlyBreakdown::INITIAL_TERMS,
                     'data' => (new IB\YearlyBreakdown($user, $externalUser, $db, $year))->findData(),
                 ]

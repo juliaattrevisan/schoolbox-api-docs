@@ -4,5 +4,10 @@
 {% include '@templates/Navigation.twig' %}
 
 <div class="achievement-report ib">
+    {% include '@ib/Navigation.twig' with {
+        navigation: yearlyBreakdown.navigation,
+        externalUser: externalUser
+    } %}
+
     {% include '@ib/YearlyBreakdown.twig' %}
 </div>
