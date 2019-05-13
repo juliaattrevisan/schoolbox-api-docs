@@ -44,7 +44,12 @@ class YearlyBreakdown extends Base
             $assessment = $current['AssessAreaHeading'];
             $result = $current['AssessResultsResult'];
 
-            $finalStack[$courseName]['assessments'][$assessment] = $result;
+            /* Assemble assessments if they have a title; otherwise disregard
+             */
+            if ($assessment) {
+                $finalStack[$courseName]['assessments'][$assessment] = $result;
+            }
+
             $finalStack[$courseName]['teachers'] = $teacherNormaliser->normalise($current);
         }
 
