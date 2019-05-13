@@ -241,6 +241,7 @@ class Controller extends Base {
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'year' => $year,
 
                 'yearlyBreakdown' => [
                     'navigation' => [

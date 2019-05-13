@@ -3,8 +3,17 @@
  # A list of all the subjects, their assessments, results and comments
  #
  # @param array yearlyBreakdown
+ # @param int   year
  #}
 {% import '@templates/macro.twig' as macro %}
+
+<div class="row">
+    <div class="small-12 island">
+        <section class="content generic-heading-highlight no-margin">
+            IB Summary for {{ year }}
+        </section>
+    </div>
+</div>
 
 {% for courseName, courseData in yearlyBreakdown.data %}
 <div class="row">
