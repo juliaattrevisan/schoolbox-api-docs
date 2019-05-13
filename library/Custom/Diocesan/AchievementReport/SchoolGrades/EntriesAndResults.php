@@ -90,7 +90,7 @@ class EntriesAndResults extends Base {
 
             /* Get all the comments for this user and year
              */
-            $comments = (new Comments($this->user, $this->externalUser, $this->db, $year))->findData();
+            $comments = (new Comments($this->user, $this->externalUser, $this->db, $year))->findSchoolGradesData();
 
             foreach ($allCourses as $name => $data) {
                 $subjects = $data['allAreas'];

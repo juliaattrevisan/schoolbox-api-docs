@@ -27,9 +27,19 @@ class Comments extends Base
 
 
     /**
+     * Consts corresponding to ResultType (that's synonymous with a report type)
+     * Each comment belongs to one of these reports
+     */
+    private const REPORT_TYPE_IB = 'IB';
+    private const REPORT_TYPE_NCEA = 'NCEA';
+    private const REPORT_TYPE_SCHOOLGRADES = 'SG';
+
+
+    /**
      * Get all the comments for a given user, ordered by year then term
      *
      * ResultType indicates the report each comment is associated with
+     * Use this method to get all the comments for every report everywhere
      *
      * SG: School Grades
      * NCEA: NCEA
@@ -39,13 +49,58 @@ class Comments extends Base
      */
     public function findData(): array
     {
+        return $this->findCommentsForReport(null);
+    }
+
+
+    /**
+     * Find NCEA Comments
+     *
+     * @return array
+     */
+    public function findNCEAData(): array
+    {
+        return $this->findCommentsForReport(self::REPORT_TYPE_NCEA);
+    }
+
+
+    /**
+     * Find School Grades Comments
+     *
+     * @return array
+     */
+    public function findSchoolGradesData(): array
+    {
+        return $this->findCommentsForReport(self::REPORT_TYPE_SCHOOLGRADES);
+    }
+
+
+    /**
+     * Find IB Comments
+     *
+     * @return array
+     */
+    public function findIBData(): array
+    {
+        return $this->findCommentsForReport(self::REPORT_TYPE_IB);
+    }
+
+
+    /**
+     * Get the comments for a particular report
+     *
+     * @param null|string $resultType
+     * @return array
+     */
+    private function findCommentsForReport(?string $resultType): array
+    {
         /* Special structure for Junior School Students
-        */
+         */
         if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($this->user)) {
-            return $this->findJuniorSchoolData();
+            return $this->findJuniorSchoolData($resultType);
         }
 
-        return $this->findSeniorSchoolData();
+        return $this->findSeniorSchoolData($resultType);
     }
 
 
@@ -60,9 +115,10 @@ class Comments extends Base
      * NCEA: NCEA
      * IB: IB
      *
+     * @param string|null $resultType
      * @return array
      */
-    private function findJuniorSchoolData(): array
+    private function findJuniorSchoolData(?string $resultType): array
     {
         $query = "
             SELECT 
@@ -81,8 +137,15 @@ class Comments extends Base
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
             AND StudentYear = '{$this->year}'
-            ORDER BY SortOrder, CourseDescription, Term
         ";
+
+        if (null !== $resultType) {
+            $query .= " AND type = '{$resultType}' ";
+        }
+
+        $query .= '
+            ORDER BY SortOrder, CourseDescription, Term
+        ';
 
         $result = $this->getDb()->getAll($query) ?: [];
 
@@ -102,9 +165,10 @@ class Comments extends Base
      * NCEA: NCEA
      * IB: IB
      *
+     * @param string|null $resultType
      * @return array
      */
-    private function findSeniorSchoolData(): array
+    private function findSeniorSchoolData(?string $resultType): array
     {
         $query = "
             SELECT 
@@ -123,8 +187,15 @@ class Comments extends Base
             FROM dbo.uvSchoolBoxReportComments
             WHERE id = '{$this->getExternalUserId()}'
             AND StudentYear = '{$this->year}'
-            ORDER BY CourseDescription, Term
         ";
+
+        if (null !== $resultType) {
+            $query .= " AND ResultType = '{$resultType}' ";
+        }
+
+        $query .= '
+            ORDER BY CourseDescription, Term
+        ';
 
         $result = $this->getDb()->getAll($query) ?: [];
 
