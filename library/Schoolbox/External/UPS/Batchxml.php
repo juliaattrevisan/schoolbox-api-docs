@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\UPS;
 
 use Schoolbox\Collection;
-use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
