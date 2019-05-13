@@ -22,6 +22,8 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
+use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 use Schoolbox\UserMapper;
 use Crell\ApiProblem\ApiProblem;
 
@@ -290,19 +292,39 @@ try {
             break;
 
         case 'resource':
+
+            $api = new Calendar_Api_Composite();
+
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
-                $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
-                    getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForItem::class)->getId(),
+
+                $item = ItemMapper::getInstance()->findById($resourceId);
+                $roomCode = trim($item->getRoomCode());
+
+                // Add the resource API
+                $resourceApi = new Calendar_Api_EventType_ResourceBooking_Booking_ForItem(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
                     $user,
-                    $viewer,
+                    $user,
                     [$resourceId]
                 );
+
+                $api->add($resourceApi);
+
+                $timetableApi = new Calendar_Api_EventType_Timetable_Room(
+                    Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                    $user,
+                    $user,
+                    $kernel->getDependencyInjector()->get('externalTimetable'),
+                    [$roomCode => $item->getId()]
+                );
+
+                $api->add($timetableApi);
+
             }
-            else {
-                $api = new Calendar_Api_Composite();
-            }
+
+            $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
 
             $filename = sprintf('resource%d', $resourceId);
             break;
@@ -311,14 +333,19 @@ try {
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if (ConfigMapper::getInstance()->get('resource_booking_enabled')) {
-                $api = new Calendar_Api_EventType_ResourceBooking_Booking_ForCategory(
-                    getConnector(Calendar_Api_EventType_ResourceBooking_Booking_ForCategory::class)->getId(),
-                    $user,
-                    $viewer,
-                    $resourceCategoryId
+
+                $apiFactory = new CalendarApiFactory($user, $kernel->getDependencyInjector()->get('externalTimetable'));
+                $api = $apiFactory->buildFromResourceCollection(
+                    ItemMapper::getInstance()->findByColumn(
+                        'resource_category_id',
+                        $resourceCategoryId,
+                        ['order' => ['name' => 'asc',]]
+                    )
                 );
-            }
-            else {
+
+                $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
+
+            } else {
                 $api = new Calendar_Api_Composite();
             }
 
