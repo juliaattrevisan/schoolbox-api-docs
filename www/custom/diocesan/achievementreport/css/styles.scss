@@ -134,6 +134,16 @@
         }
     }
 
+    .sequential-table {
+        .scrollable {
+            margin-bottom: 2rem;
+        }
+
+        table {
+            margin: 0;
+        }
+    }
+
     /**
      * School Grades Report
      */
@@ -178,16 +188,6 @@
                 th.level, td.level {
                     width: 6rem;
                 }
-            }
-        }
-
-        .sequential-table {
-            .scrollable {
-                margin-bottom: 2rem;
-            }
-
-            table {
-                margin: 0;
             }
         }
     }
