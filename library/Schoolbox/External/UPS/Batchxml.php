@@ -75,12 +75,6 @@ class Batchxml implements ISync
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
 
-        /* Faster, for now
-         */
-//        $source = __DIR__ .'/../../../../www/temp.xml';
-//        $xml = file_get_contents($source);
-//        $this->nodes = new \SimpleXMLElement($xml);
-
         /* Prefetch (Campus, NCYear) relations as a lookup
          */
         if (!\count($this->campusMapping)) {
