@@ -1,3 +1,5 @@
+{% import '@templates/macro.twig' as macro %}
+
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
@@ -10,7 +12,7 @@
                     </tr>
 
                     <tr>
-                        <td>TeacherName</td>
+                        <td>{{ macro.renderTeachers(courseData.teachers) }}</td>
                         <td>&nbsp;</td>
                     </tr>
 
