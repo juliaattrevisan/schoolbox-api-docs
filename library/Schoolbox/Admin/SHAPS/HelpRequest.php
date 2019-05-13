@@ -90,12 +90,13 @@ class HelpRequest
      * @param string $method
      * @param string $endpoint
      * @param array  $formParams
+     * @param array  $queryParams
      * @return array
      * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      * @throws GuzzleException                         4xx, 5xx, connect, tooManyRedirect
      * @throws Exception\UnexpectedResponseException   2xx response, but response is unrecognisable
      */
-    private function execute(string $method, string $endpoint, array $formParams = null): array
+    private function execute(string $method, string $endpoint, array $formParams = null, array $queryParams = []): array
     {
         /* Get the four pieces of the puzzle that we need to request data from Help
          */
@@ -105,7 +106,8 @@ class HelpRequest
          * Host and Origin headers are for working around CSRF protection
          * (which shouldn't be necessary for API calls, but is for some reason)
          */
-        $queryString = \http_build_query(['ts' => $auth['timestamp'], 'digest' => $auth['digest']]);
+        $defaultQueryParams = ['ts' => $auth['timestamp'], 'digest' => $auth['digest']];
+        $queryString = \http_build_query(array_merge($defaultQueryParams, $queryParams));
         $uri         = "{$auth['url']}/api/course-participation/{$auth['schoolCode']}/{$endpoint}?$queryString";
         $headers     = [
             'Host'   => $auth['host'],
@@ -238,7 +240,7 @@ class HelpRequest
         if (!empty($payload)) {
             // Send each user to Help
             try {
-                $this->execute('post', 'users', ['user' => $payload,]);
+                $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
                 $code    = 200;
                 $message = 'OK';
 
