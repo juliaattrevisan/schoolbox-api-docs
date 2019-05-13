@@ -134,11 +134,15 @@ class Controller extends BaseController
         $breadcrumbs = [
             [
                 'text' => $parent->getName(),
+                'href' => '/homepage/' . $parent->getId(),
+            ],
+            [
+                'text' => $folder->getName(),
                 'href' => '/homepage/' . $folder->getId(),
             ],
             [
-                'text' => 'Modify Folder',
-                'href' => '',
+                'text' => 'Modify',
+                'href' => '#',
             ]
         ];
 
