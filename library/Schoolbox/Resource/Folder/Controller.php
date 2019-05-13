@@ -28,7 +28,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
-use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
@@ -106,11 +105,11 @@ class Controller extends BaseController
     /**
      * Display update folder screen
      *
-     * @api GET /resource/folder/modify/:folderId
      * @param $id
-     * @throws SchoolboxException
+     *
+     * @throws MapperException
      */
-    public function getFolderModify($id)
+    public function getFolderModify($id): void
     {
         $access = $this->getAccess();
         $userAccess = $access->getFolderAccess($this->getUser(), $id);
