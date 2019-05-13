@@ -44,7 +44,8 @@ cp -f www/conf/tarball.conf.php www/conf/conf.php;
 echo "Running php unit"
 php vendor/bin/phpunit --testsuite default --coverage-clover clover.xml;
 
-export CC_TEST_REPORTER_ID=baf2d1f70fd896aed53229eb8da1f700d250bead944063cfdb190a9d40eef3cd
-curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-chmod +x ./cc-test-reporter
-./cc-test-reporter after-build -t clover --exit-code $?
+echo "Uploading results to Code Climate"
+export CC_TEST_REPORTER_ID=baf2d1f70fd896aed53229eb8da1f700d250bead944063cfdb190a9d40eef3cd;
+curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
+chmod +x ./cc-test-reporter;
+./cc-test-reporter after-build -t clover --exit-code $?;
