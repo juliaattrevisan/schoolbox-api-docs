@@ -368,7 +368,7 @@ class Controller extends Base {
                  */
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
-                    'comments' => (new Comments($user, $externalUser, $db, $year))->findNCEAData(),
+                    'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findNCEAData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => self::TYPES,
                     'year' => $year,
