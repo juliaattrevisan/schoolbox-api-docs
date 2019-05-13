@@ -16,7 +16,19 @@ namespace Custom\Diocesan\AchievementReport;
 use MSSQL;
 use Schoolbox\User;
 
-abstract class Base {
+abstract class Base
+{
+
+    /**
+     * Initialised array of term indices
+     */
+    public const INITIAL_TERMS = [
+        1 => null,
+        2 => null,
+        3 => null,
+        4 => null
+    ];
+
 
     /**
      * MSSQL db handler
@@ -83,6 +95,7 @@ abstract class Base {
      * @var array
      */
     protected $exclusionLetterRegistry = array('Y', 'V', 'Z');
+
 
     /**
      * Constructor

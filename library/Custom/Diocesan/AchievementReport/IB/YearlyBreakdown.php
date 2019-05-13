@@ -59,7 +59,11 @@ class YearlyBreakdown extends Base
              * I can assemble comments here without running it separately since I'm already
              * rebuilding this entire structure from the ground up
              */
-            $finalStack[$courseName]['comments'][$term] = '';
+            if (!isset($finalStack[$courseName]['comments'])) {
+                $finalStack[$courseName]['comments'] = self::INITIAL_TERMS;
+            }
+
+            $finalStack[$courseName]['comments'][$term] = $current['assesscommentscomment'];
         }
 
 //        new \Alaress_Probe($results, $finalStack);

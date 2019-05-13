@@ -11,7 +11,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
-use Custom\Diocesan\AchievementReport\Comments\Comments;
+use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use MSSQL;
 use Schoolbox\User;
@@ -226,6 +226,7 @@ class Controller extends Base {
                 'user' => $user,
 
                 'yearlyBreakdown' => [
+                    'terms' => IB\YearlyBreakdown::INITIAL_TERMS,
                     'data' => (new IB\YearlyBreakdown($user, $externalUser, $db, $year))->findData(),
                 ]
             ]

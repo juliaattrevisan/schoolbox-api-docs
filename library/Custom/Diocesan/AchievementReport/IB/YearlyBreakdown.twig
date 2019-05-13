@@ -29,9 +29,11 @@
                         <td colspan="2">
                             <p class="subheading">Comments</p>
 
-                            {% if commentData.comment|length %}
-                                <p>Term {{ term }} - {{ commentData.comment }}&mdash;{{ macro.renderTeachers(commentData.teachers) }}</p>
+                            {% for term in yearlyBreakdown.terms|keys %}
+                            {% if courseData.comments[term]|length %}
+                                <p>Term {{ term }} - {{ courseData.comments[term] }} &mdash; {{ macro.renderTeachers(courseData.teachers) }}</p>
                             {% endif %}
+                            {% endfor %}
                         </td>
                     </tr>
 
