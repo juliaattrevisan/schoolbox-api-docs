@@ -6,10 +6,13 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
 
 use Alaress\Paginator\UrlPaginator;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriException;
 use Zend\Uri\Uri;
 
 class Paginator extends UrlPaginator
@@ -19,10 +22,10 @@ class Paginator extends UrlPaginator
      *
      * @param  int $page
      * @return string
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriException
      */
-    public function getUrlForPage($page)
+    public function getUrlForPage($page): string
     {
         // Building a URL using PHP builtins is a complete pain!
         // (There's no http_build_str equivalent for parse_str)
