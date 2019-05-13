@@ -1542,8 +1542,9 @@ class RubricMapper
                 continue;
             }
 
-            $groupId = $groups[$gLookup]['id'];
-            $critId  = $crit['id'];
+            $groupId   = $groups[$gLookup]['id'];
+            $critId    = $crit['id'];
+            $critInUse = false;
 
             for ($j = 2; $j < count($square[$i]); ++$j) {
 
@@ -1556,17 +1557,20 @@ class RubricMapper
                 // Set the group's max value
                 $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
 
-                // turn this criterion on
-                $postdata['criterion'][$critId]['on'] = true;
-
                 if (strlen($dText) || strlen($dVal)) {
                     // assign the descriptor data to the appropriate cell
+                    $critInUse = true;
                     $postdata['descriptor'][$critId][$levelSequence] = [
                         'id'     => null,
                         'text'   => $dText,
                         'points' => $dVal,
                     ];
                 }
+            }
+
+            // turn this criterion on, only if it's actually in use
+            if ($critInUse) {
+                $postdata['criterion'][$critId]['on'] = true;
             }
         }
 
