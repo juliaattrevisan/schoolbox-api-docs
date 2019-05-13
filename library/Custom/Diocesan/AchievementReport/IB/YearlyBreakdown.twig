@@ -20,12 +20,12 @@
         <div class="scrollable">
             <table>
                 <tbody>
-                    <tr>
-                        <td></td>
-                        <td class="subheading result">Result</td>
-                    </tr>
-
                     {% if courseData.assessments|length %}
+                        <tr>
+                            <td class="subheading">Assessment</td>
+                            <td class="subheading result">Result</td>
+                        </tr>
+
                         {% for assessment, result in courseData.assessments %}
                             <tr>
                                 <td>{{ assessment }}</td>
