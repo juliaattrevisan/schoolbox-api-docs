@@ -876,7 +876,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // the actual database- which means we need to shove the file into a SQL query as a hex string
         // which is totally inefficient and very slow :(
 
-        $pastoral = $upload->getPastoral();
+        // Hydrating pastoral data to get Type.
+        $pastoral = $this->pastoralMapper->findById($upload->getPastoral()->getId());
         $storage = $upload->getStorage();
 
         $pastoralDocumentClassificationMapper = DocumentClassificationMapper::getInstance();
