@@ -250,7 +250,9 @@ class Controller extends Base {
                     ],
                     'terms' => IB\YearlyBreakdown::INITIAL_TERMS,
                     'data' => (new IB\YearlyBreakdown($user, $externalUser, $db, $year))->findData(),
-                ]
+                ],
+
+                'footer' => (new IB\Footer($user, $externalUser, $db, $year))->findData()
             ]
         ]);
     }
