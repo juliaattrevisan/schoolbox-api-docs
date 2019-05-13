@@ -105,6 +105,7 @@ class Controller extends BaseController
     /**
      * Display update folder screen
      *
+     * @api GET /resource/folder/modify/:folderId
      * @param $id
      *
      * @throws MapperException
