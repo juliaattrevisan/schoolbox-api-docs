@@ -43,6 +43,7 @@ class YearlyBreakdown extends Base
             $courseName = $current['Heading'];
             $assessment = $current['AssessAreaHeading'];
             $result = $current['AssessResultsResult'];
+            $term = $current['Term'];
 
             /* Assemble assessments if they have a title; otherwise disregard
              */
@@ -50,10 +51,18 @@ class YearlyBreakdown extends Base
                 $finalStack[$courseName]['assessments'][$assessment] = $result;
             }
 
+            /* Teachers
+             */
             $finalStack[$courseName]['teachers'] = $teacherNormaliser->normalise($current);
+
+            /* Comments
+             * I can assemble comments here without running it separately since I'm already
+             * rebuilding this entire structure from the ground up
+             */
+            $finalStack[$courseName]['comments'][$term] = '';
         }
 
-        new \Alaress_Probe($results, $finalStack);
+//        new \Alaress_Probe($results, $finalStack);
 
         return $finalStack;
     }
