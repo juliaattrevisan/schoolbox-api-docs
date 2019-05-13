@@ -212,10 +212,6 @@ class Controller extends Base {
     public function ib(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new IB\Footer($user, $externalUser, $db, null);
-
-        $progressGradeSummary = new IB\ProgressGradeSummary($user, $externalUser, $db, $year);
-        $yearlyBreakdown = new IB\YearlyBreakdown($user, $externalUser, $db, $year);
 
         $this->getResponse()->content->set(array(
             'template' => '@ib/index.twig',
@@ -224,23 +220,10 @@ class Controller extends Base {
                     'all' => $selector->getAvailableNavigation(),
                     'selected' => NavigationSelector::IB_KEY
                 ),
-                'footer' => array(
-                    'data' => $footer->findData(),
-                ),
+
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
-
-                'progressGradeSummary' => array(
-                    'heading' => $progressGradeSummary->getHeading(),
-                    'data' => $progressGradeSummary->findData(),
-                ),
-
-                'yearlyBreakdown' => array(
-                    'heading' => $yearlyBreakdown->getHeading(),
-                    'data' => $yearlyBreakdown->findData(),
-                    'currentYear' => $yearlyBreakdown->getCurrentYear()
-                )
             )
         ));
     }
