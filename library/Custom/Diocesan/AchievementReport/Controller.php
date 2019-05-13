@@ -213,19 +213,23 @@ class Controller extends Base {
     {
         $selector = new NavigationSelector($db, $user, $externalUser);
 
-        $this->getResponse()->content->set(array(
+        $this->getResponse()->content->set([
             'template' => '@ib/index.twig',
-            'data' => array(
-                'navigation' => array(
+            'data' => [
+                'navigation' => [
                     'all' => $selector->getAvailableNavigation(),
                     'selected' => NavigationSelector::IB_KEY
-                ),
+                ],
 
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
-            )
-        ));
+
+                'yearlyBreakdown' => [
+                    'data' => (new IB\YearlyBreakdown($user, $externalUser, $db, $year))->findData(),
+                ]
+            ]
+        ]);
     }
 
     /**
