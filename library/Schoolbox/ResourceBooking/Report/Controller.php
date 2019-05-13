@@ -17,6 +17,8 @@ use Schoolbox\ResourceBooking\Item;
 
 class Controller extends Base
 {
+    protected const MAX_REPORTING_PERIOD = 3;
+
     /**
      * @var Item\Mapper
      */
@@ -81,6 +83,12 @@ class Controller extends Base
         if ($formEnd = $this->getRequest()->query->get('end')) {
             try {
                 $end = Alaress_Date_Format::newLocalShort($formEnd);
+
+                if ($start->diffInMonths($end) > self::MAX_REPORTING_PERIOD) {
+                    $end = clone $start;
+                    $end->addMonths(self::MAX_REPORTING_PERIOD);
+                }
+
             } catch (\Exception $e) {
                 // noop - use default
             }
