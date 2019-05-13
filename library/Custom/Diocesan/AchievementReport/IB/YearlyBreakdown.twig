@@ -1,1 +1,36 @@
-test
+<div class="row">
+    <div class="small-12 columns">
+        <div class="scrollable">
+        <table>
+            <thead>
+                <tr>
+                    <th>CourseName</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>TeacherName</td>
+                    <td>&nbsp;</td>
+                </tr>
+
+                <!-- iterate -->
+                <tr>
+                    <td>Subjectname</td>
+                    <td>Result</td>
+                </tr>
+
+                <tr>
+                    <td colspan="2">
+                        <p class="subheading">Comments</p>
+
+                        {% if commentData.comment|length %}
+                            <p>Term {{ term }} - {{ commentData.comment }}&mdash;{{ macro.renderTeachers(commentData.teachers) }}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>

@@ -9,6 +9,9 @@
 
 namespace Custom\Diocesan\AchievementReport\IB;
 
+use Custom\Diocesan\AchievementReport\NormaliseTeachers;
+
+
 class YearlyBreakdown extends Base
 {
 
@@ -26,13 +29,27 @@ class YearlyBreakdown extends Base
             FROM dbo.uvSchoolBoxIBResultsNEW
             WHERE ID = '{$externalId}'
             AND studentibflag = 1
-            ORDER BY fileyear DESC, Term, Heading
+            AND fileyear = '{$this->year}'
+            ORDER BY Term, Heading, AssessAreaSeq
         ";
 
         $results = $this->getDb()->getAll($query) ?: [];
 
-        new \Alaress_Probe($results);
+        $finalStack = [];
 
-        return $results;
+        $teacherNormaliser = new NormaliseTeachers();
+
+        foreach ($results as $current) {
+            $courseName = $current['Heading'];
+            $assessment = $current['AssessAreaHeading'];
+            $result = $current['AssessResultsResult'];
+
+            $finalStack[$courseName]['assessments'][$assessment] = $result;
+            $finalStack[$courseName]['teachers'] = $teacherNormaliser->normalise($current);
+        }
+
+        new \Alaress_Probe($results, $finalStack);
+
+        return $finalStack;
     }
 }
