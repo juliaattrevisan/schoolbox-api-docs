@@ -11,3 +11,10 @@ parameters:
         - tools
         - updates
         - www
+    ignoreErrors:
+        -
+            message: '#Using \$this outside a class.#'
+            path: %currentWorkingDirectory%/www/*
+        -
+            message: '#Undefined variable: \$this#'
+            path: %currentWorkingDirectory%/www/*
