@@ -8,7 +8,7 @@
                     {% for courseName, courseData in yearlyBreakdown.data %}
                     <tr>
                         <td class="subheading">{{ courseName }}</td>
-                        <td class="subheading numeric">Result</td>
+                        <td class="subheading result">Result</td>
                     </tr>
 
                     <tr>
@@ -20,7 +20,7 @@
                         {% for assessment, result in courseData.assessments %}
                         <tr>
                             <td>{{ assessment }}</td>
-                            <td class="numeric">{{ result }}</td>
+                            <td class="result">{{ result }}</td>
                         </tr>
                         {% endfor %}
                     {% endif %}

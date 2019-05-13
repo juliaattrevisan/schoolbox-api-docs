@@ -151,19 +151,11 @@
      * IB
      */
     &.ib {
-
-        /* Progress Grade Summary
-         */
-        th, td {
-            width: 6rem;
-        }
-
-        tr.progress-grade {
-            width: 6rem;
-        }
-
-        .yearly-breakdown-graph {
-            height: 6rem;
+        td {
+            &.result {
+                width: 1rem;
+                text-align: center;
+            }
         }
     }
 
