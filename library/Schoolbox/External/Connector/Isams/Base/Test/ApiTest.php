@@ -25,6 +25,15 @@ class ApiTest extends TestCase
         $this->assertNotEmpty((new MockApi('', ''))->retrieveDocument());
     }
 
+
+    /**
+     * Test the the Four Pieces are there: Pupil, StaffMember, Contact, SchoolDivision
+     * and that there are the expected number of each item after parsing the xml
+     *
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
     public function testValidStructure(): void
     {
         $batchxml = new Batchxml(new MockApi('', ''));
