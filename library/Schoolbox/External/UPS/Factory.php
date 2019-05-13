@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\UPS;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Config\Loader;
+use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
@@ -27,6 +29,13 @@ class Factory
      * its External DB setting is - no special case for ups
      */
     private const EXTERNAL_UPS_PROVIDER_DEFAULT = ['', 'default'];
+
+
+    /**
+     * ISAMS batch xml reader
+     */
+    private const PROVIDER_ISAMS_BATCH_XML = 'Batchxml';
+
 
     /**
      * Check if external_ups_provider is set to a non-default value
@@ -63,10 +72,16 @@ class Factory
         if ($this->hasUPSProvider($config->get('external_ups_provider'))) {
             $providerName = ucwords($config->get('external_ups_provider'));
 
-            $upsProviderClass = "\\Schoolbox\\External\\UPS\\{$providerName}";
+            /* ISAMS batch xml reader
+             * TODO: This can probably evolve into a switch-case statement when other providers exist
+             */
+            if ($providerName === self::PROVIDER_ISAMS_BATCH_XML) {
+                if (class_exists("\\Schoolbox\\External\\UPS\\Batchxml")) {
+                    $config = new Loader();
+                    $api = new Api($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
 
-            if (class_exists($upsProviderClass)) {
-                return new $upsProviderClass();
+                    return new Batchxml($api);
+                }
             }
         }
 

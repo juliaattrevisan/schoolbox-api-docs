@@ -49,15 +49,12 @@ class Batchxml implements ISync
 
     /**
      * Batchxml constructor.
+     *
+     * @param Api $api
      */
-    public function __construct()
+    public function __construct(Api $api)
     {
-        $config = new Loader();
-
-        $host = $config->get('external_ups_provider_batchxml_host');
-        $key = $config->get('external_ups_provider_batchxml_key');
-
-        $this->api = new Api($host, $key);
+        $this->api = $api;
     }
 
 

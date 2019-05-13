@@ -14,6 +14,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfileMapper;
@@ -52,10 +53,14 @@ HELP;
             exit;
         }
 
+        /* Spawn api
+         */
+        $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+
         $composite = new Composite(
             $this->getLogger(),
             $this->perform(),
-            new Batchxml(),
+            new Batchxml($api),
             UserMapper::getInstance(),
             UserProfileMapper::getInstance(),
             UserRelationMapper::getInstance()
