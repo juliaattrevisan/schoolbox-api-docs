@@ -36,13 +36,13 @@ class FileDecorator
      * FeedbackFileDecorator constructor.
      *
      * @param IFeedback $feedback
-     * @param $postFiles
+     * @param array|null $postFiles
      */
-    public function __construct(IFeedback $feedback, $postFiles)
+    public function __construct(IFeedback $feedback, ?array $postFiles)
     {
-        $this->setFeedback($feedback);
+        $this->feedback = $feedback;
         if ($postFiles) {
-            $this->setFiles($postFiles);
+            $this->files = $postFiles;
         }
     }
 
@@ -53,15 +53,15 @@ class FileDecorator
      */
     public function decorate(): void
     {
-        if ($this->getFeedback() instanceof DueWorkFeedback) {
+        if ($this->feedback instanceof DueWorkFeedback) {
             $factory = new CollectorFactory();
             // Replace files with what was actually submitted
             // (Only if something was actually submitted)
-            $this->getFeedback()->setAllFiles(new Collection());
-            if (!empty($this->getFiles())) {
+            $this->feedback->setAllFiles(new Collection());
+            if (!empty($this->files)) {
                 // And repopulate
-                foreach ($factory->build($this->getFiles())->getAll() as $attachment) {
-                    $this->getFeedback()->getAllFiles()->add(
+                foreach ($factory->build($this->files)->getAll() as $attachment) {
+                    $this->feedback->getAllFiles()->add(
                         (new DueWorkFeedbackFile())
                             ->setStorage($attachment)
                             ->setFilename($attachment->getFilename())
@@ -69,44 +69,5 @@ class FileDecorator
                 }
             }
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return IFeedback
-     */
-    private function getFeedback(): IFeedback
-    {
-        return $this->feedback;
-    }
-
-    /**
-     * @param IFeedback $feedback
-     * @return $this
-     */
-    private function setFeedback($feedback): self
-    {
-        $this->feedback = $feedback;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    private function getFiles(): array
-    {
-        return $this->files;
-    }
-
-    /**
-     * @param array $files
-     * @return $this
-     */
-    private function setFiles($files): self
-    {
-        $this->files = $files;
-        return $this;
     }
 }
