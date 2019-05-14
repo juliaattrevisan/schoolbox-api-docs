@@ -43,10 +43,11 @@ class StudentLists
      * @param Model                   $folder
      * @param LogMapper               $logMapper
      */
-    public function __construct(External_ClassInterface $externalClass,
-                                UserMapper $userMapper,
-                                Folder\Model $folder,
-                                LogMapper $logMapper
+    public function __construct(
+        External_ClassInterface $externalClass,
+        UserMapper $userMapper,
+        Folder\Model $folder,
+        LogMapper $logMapper
     ) {
 
         $this->externalClass    = $externalClass;

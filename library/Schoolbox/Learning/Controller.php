@@ -15,7 +15,6 @@ use function func_get_args;
 use External_ClassInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Collection;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;

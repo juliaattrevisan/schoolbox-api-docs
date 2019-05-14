@@ -290,13 +290,15 @@ class Module extends BaseModule
      */
     private function preloadFolder(array $params): array
     {
-        if (($params['folder'] ?? null) instanceof Folder\Model) {
-            $preload['folder'] = $params['folder'];
+        $folder = 'folder';
+
+        if (($params[$folder] ?? null) instanceof Folder\Model) {
+            $preload[$folder] = $params[$folder];
         } elseif (!array_key_exists('folderId', $params)) {
             throw new UnexpectedValueException("No 'folderId' found in route params");
         } else {
             try {
-                $preload['folder'] = $this->getFolderMapper()->findById($params['folderId']);
+                $preload[$folder] = $this->getFolderMapper()->findById($params['folderId']);
             } catch (Mapper\Exception $e) {
                 throw new InvalidPath('Folder Not Found', 0, $e);
             }
