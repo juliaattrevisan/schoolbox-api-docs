@@ -30,16 +30,18 @@ class SubmissionReturn extends DeprecatedModel
      */
     function getByBoxID($box_id)
     {
+        $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         $query = "SELECT DISTINCT   user.title, 
                                     user.firstname, 
                                     user.lastname, 
                                     user.id AS uid, 
                                     user.synergy_id, 
                                     user.group_id 
-                  FROM              `" . $this->_table . "` r
+                  FROM              submission_return r
                   JOIN              user ON user.id = r.owner
                   WHERE             r.deleted_at IS NULL AND
                                     r.published_at IS NOT NULL AND
+                                    r.review_route = '{$reviewRoute}' AND
                                     box_id = " . $this->db->smartQuote($box_id) . " AND 
                                     user.deleted_at IS NULL
                   ORDER BY          lastname, 
