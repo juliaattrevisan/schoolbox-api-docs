@@ -5,8 +5,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Feedback;
 
@@ -36,12 +36,14 @@ class FileDecorator
      * FeedbackFileDecorator constructor.
      *
      * @param IFeedback $feedback
-     * @param $postFiles
+     * @param array|null $postFiles
      */
-    public function __construct(IFeedback $feedback, $postFiles)
+    public function __construct(IFeedback $feedback, ?array $postFiles)
     {
-        $this->setFeedback($feedback);
-        $this->setFiles($postFiles);
+        $this->feedback = $feedback;
+        if ($postFiles) {
+            $this->files = $postFiles;
+        }
     }
 
     /**
@@ -49,19 +51,17 @@ class FileDecorator
      * So far it's just Due Work, but this makes it trivial to add files
      * from an attachzone to an assessment for other types
      */
-    public function decorate()
+    public function decorate(): void
     {
-        if ($this->getFeedback() instanceof DueWorkFeedback) {
+        if ($this->feedback instanceof DueWorkFeedback) {
             $factory = new CollectorFactory();
-            if (!empty($this->getFiles())) {
-
-                // Replace files with what was actually submitted
-                // (Only if something was actually submitted)
-                $this->getFeedback()->setAllFiles(new Collection());
-
+            // Replace files with what was actually submitted
+            // (Only if something was actually submitted)
+            $this->feedback->setAllFiles(new Collection());
+            if (!empty($this->files)) {
                 // And repopulate
-                foreach ($factory->build($this->getFiles())->getAll() as $attachment) {
-                    $this->getFeedback()->getAllFiles()->add(
+                foreach ($factory->build($this->files)->getAll() as $attachment) {
+                    $this->feedback->getAllFiles()->add(
                         (new DueWorkFeedbackFile())
                             ->setStorage($attachment)
                             ->setFilename($attachment->getFilename())
@@ -69,44 +69,5 @@ class FileDecorator
                 }
             }
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return IFeedback
-     */
-    private function getFeedback()
-    {
-        return $this->feedback;
-    }
-
-    /**
-     * @param IFeedback $feedback
-     * @return $this
-     */
-    private function setFeedback($feedback)
-    {
-        $this->feedback = $feedback;
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    private function getFiles()
-    {
-        return $this->files;
-    }
-
-    /**
-     * @param array $files
-     * @return $this
-     */
-    private function setFiles($files)
-    {
-        $this->files = $files;
-        return $this;
     }
 }
