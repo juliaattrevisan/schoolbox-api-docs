@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Students;
 
 use External_ClassInterface;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Log\Mapper as LogMapper;
@@ -44,7 +45,7 @@ class StudentLists
      */
     public function __construct(External_ClassInterface $externalClass,
                                 UserMapper $userMapper,
-                                Model $folder,
+                                Folder\Model $folder,
                                 LogMapper $logMapper
     ) {
 
@@ -63,7 +64,6 @@ class StudentLists
     public function getStudentLists(): array
     {
         $students = $this->externalClass->getStudents($this->folder->getCodeString());
-
         foreach ($students as $key => $student) {
             $user = $this->userMapper->findByExternalId($student['synergy_id']);
             $lastVisit = $this->logMapper->lastVisit($this->folder, $user)->first();
