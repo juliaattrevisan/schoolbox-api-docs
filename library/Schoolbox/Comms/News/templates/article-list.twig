@@ -59,19 +59,20 @@
                             </h3>
 
                             <p class="meta">
-                                Published by 
-                                <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>
-                                <template v-else>${ article.author.fullname }</template>
-                                <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time>
-                            </p>
-
-                            <p class="meta" v-if="article.topics.length">
-                                Related topics:
-                                <template v-for="(topic, index) in article.topics">
-                                    <template v-if="index">, </template>
-                                    <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">${ topic.name }</a>
-                                    <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">${ topic.name }</a>
-                                </template>
+                                <span>By
+                                    <a v-if="article.author._links && article.author._links.profile" :href="article.author._links.profile.href">${ article.author.fullname }</a>
+                                    <template v-else>${ article.author.fullname }</template>
+                                </span>
+                                <span> &mdash; <time :title="article.publishAt.long">${ article.publishAt.relativeTime }</time></span>
+                                <span v-if="article.topics.length">
+                                    in
+                                    <template v-for="(topic, index) in article.topics">
+                                        <template v-if="index">, </template>
+                                        <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">${ topic.name }</a>
+                                        <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">${ topic.name }</a>
+                                    </template>
+                                </span>
+                                <span> | 10 comment(s)</span>
                             </p>
                         </div>
                     </div>
