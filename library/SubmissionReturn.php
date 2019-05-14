@@ -51,7 +51,7 @@ class SubmissionReturn extends DeprecatedModel
     }
 
     /**
-     * Gets list of all students who have had work returned for this submission box ID.
+     * Gets list of all students who have have instructor-given feedback for this submission box ID.
      * @deprecated
      *
      * @param  int $boxId
