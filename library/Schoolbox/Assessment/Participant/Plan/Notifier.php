@@ -14,8 +14,6 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress_Date_Format;
 use Monolog\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as DueWorkFeedbackMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkNotifier;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionNotifier;
 use Schoolbox\Assessment\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Collection;
 use Schoolbox\Feed\SourceInterface;
@@ -24,6 +22,7 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Assessment\Participant\Plan\Model as Plan;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
@@ -83,6 +82,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
 
     private const PATTERN_UPDATE_STUDENT_TITLE = ':boxType :assessment was updated in :cat';
     private const PATTERN_UPDATE_PARENT_TITLE = ':child\'s :boxType :assessment was updated in :cat';
+
+    /**
+     * Constants used for date comparison
+     */
+    private const PAST_TO_FUTURE = 1;
+    private const FUTURE_TO_PAST = 2;
+    private const ANY = 3;
+
+    private const DATE_OPEN = 'openDate';
+    private const DATE_DUE = 'dueDate';
+    private const DATE_CLOSE = 'closeDate';
 
     /**
      * Hours in advance to inform a user that due work is upcoming.
@@ -209,8 +219,14 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         ];
     }
 
+
     /**
      * If created, raise a notification. No conditions, no other functions. That's it.
+     *
+     * This is called for each of assessment's plans.
+     * If there is one custom plan in an assessment, this is called twice
+     * one for the dynamic plan and the other for the custom plan.
+     * The date change for the assessment is cannot be found in $diff['plan']
      *
      * @param TriggerBundleInterface $bundle
      */
@@ -218,7 +234,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // TODO: handle the case where a plan has been changed for a student.
 
-        /** @var Model $plan */
+        /** @var Plan $plan */
         $plan = $bundle->getEvent()->getObject();
 
         // Trigger different notifs depending on what assessment type was saved
@@ -230,7 +246,17 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $method = $bundle->getMethod();
+
+        // $diff has 'assessment', 'plan', 'participants' as its keys
         $diff = $bundle->getEvent()->getDiff();
+
+        if ($plan->isDynamic() && isset($diff['assessment'])) {
+            $planDiff = $diff['assessment'];
+        } elseif (isset($diff['plan'][$plan->getId()])) {
+            $planDiff = $diff['plan'][$plan->getId()];
+        } else {
+            $planDiff = [];
+        }
 
         /**
          * Deleted
@@ -269,12 +295,13 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             return;
         }
         $closeDate = $this->coalesceDates($plan->getCloseDate(), $assessment->getCloseDate());
-        if ($method === Mapper::METHOD_CREATE && $closeDate && $closeDate->isPast()) {
+        $isCurrentClosed = $closeDate && $closeDate->isPast();
+        if ($method === Mapper::METHOD_CREATE && $isCurrentClosed) {
             return;
         }
 
         /**
-         * Closed or changed to isStaffOrInstructorVisibleOnly
+         * Changed to isStaffOrInstructorVisibleOnly
          */
         $isPreviousHidden = false;
         if ($method === Mapper::METHOD_UPDATE
@@ -292,7 +319,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             }
         }
 
-        if ((!$isPreviousHidden && $isCurrentHidden) || ($closeDate && $closeDate->isPast())) {
+        if (!$isCurrentClosed && !$isPreviousHidden && $isCurrentHidden) {
             $bundle->detachEach([
                 self::TRIGGER_OPEN,
                 self::TRIGGER_UPCOMING,
@@ -302,29 +329,6 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             ]);
             // trigger to retract existing notifications
             $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-            return;
-        }
-
-        /**
-         * Check whether any dates has been changed for the current plan.
-         */
-        $changedDates = [];
-        if ($plan->isDynamic() && \array_key_exists('assessment', $diff)) {
-            $changedDates = \array_intersect(
-                ['openDate', 'publishDate', 'dueDate', 'closeDate'], \array_keys($diff['assessment']));
-        } else if (\array_key_exists('plan', $diff) && \array_key_exists($plan->getId(), $diff['plan'])) {
-            $changedDates = \array_intersect(
-                ['openDate', 'publishDate', 'dueDate', 'closeDate'], \array_keys($diff['plan'][$plan->getId()]));
-        }
-
-        // If no date change, just attach generic update trigger only.
-        $publishDate = $this->coalesceDates($plan->getPublishDate(), $assessment->getPublishDate());
-        if (!$publishDate) {
-            // this date shouldn't be null
-            return;
-        }
-        if (\count($changedDates) === 0 && $publishDate->isPast()) {
-            $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             return;
         }
 
@@ -362,40 +366,56 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         /**
          * Trigger.
          */
-        // New or just switched from is isStaffOrInstructorVisibleOnly to visible status
-        if ($method === Mapper::METHOD_CREATE || ($isPreviousHidden && !$isCurrentHidden)) {
+        if (!$isCurrentClosed && ($method === Mapper::METHOD_CREATE || ($isPreviousHidden && !$isCurrentHidden))) {
+            /**
+             * New or just switched from is isStaffOrInstructorVisibleOnly to visible status
+             */
             $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
+        } elseif ($this->dateChanged($planDiff, self::DATE_CLOSE, self::FUTURE_TO_PAST)) {
+            /**
+             * Manually closed.
+             */
+            $bundle->detachEach([
+                self::TRIGGER_OPEN,
+                self::TRIGGER_UPCOMING,
+                self::TRIGGER_UPDATED,
+                self::TRIGGER_OVERDUE,
+            ]);
+            $bundle->attach(self::TRIGGER_CLOSED, self::IMMEDIATELY);
+        } elseif ($this->dateChanged($planDiff, self::DATE_CLOSE, self::PAST_TO_FUTURE)) {
+            /**
+             * Re-opened.
+             */
+            $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
+            if ($dueDate->isFuture() && $this->dateChanged($planDiff, self::DATE_DUE, self::ANY)) {
+                $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+            }
+            $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
         } else {
-            if (\in_array('publishDate', $changedDates)) {
-                if ($publishDate->isFuture()) {
-                    // trigger to retract existing notifications
-                    $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-                }
-            }
-            if (\in_array('openDate', $changedDates)) {
+            /**
+             * Open date changed.
+             * Ignoring publishDate as handling openDate should be enough.
+             */
+            if ($this->dateChanged($planDiff, self::DATE_OPEN, self::FUTURE_TO_PAST)) {
                 $bundle->detach(self::TRIGGER_OPEN);
-                if ($openDate->isFuture()) {
-                    $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
-                }
+            } elseif ($openDate->isFuture() && $this->dateChanged($planDiff, self::DATE_OPEN, self::ANY)) {
+                $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
             }
-            if (\in_array('dueDate', $changedDates)) {
+            /**
+             * Due date changed.
+             */
+            if ($this->dateChanged($planDiff, self::DATE_DUE, self::FUTURE_TO_PAST)) {
                 $bundle->detach(self::TRIGGER_OVERDUE);
                 $bundle->detach(self::TRIGGER_UPCOMING);
-                if ($dueDate->isFuture()) {
-                    $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
-                    $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
-                }
+            } elseif ($dueDate->isFuture() && $this->dateChanged($planDiff, self::DATE_DUE, self::ANY)) {
+                $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
+                $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
             }
-            if (\in_array('closeDate', $changedDates)) {
-                if ($closeDate->isFuture()) {
-                    $bundle->detach(self::TRIGGER_CLOSED);
-                    $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
-                }
-            }
-            if ($publishDate->isPast()) {
+            if ($openDate->isPast()) {
                 $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
             }
         }
@@ -1426,4 +1446,36 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
         return !($this->conf->get('restrict_student_submissions') || $this->conf->get('restrict_parent_duework_access'));
     }
 
+
+    /**
+     * Check whether the given date has been changed in the given way.
+     * @param array $planDiff
+     * @param string $dateType
+     * @param int $transition
+     * @return bool
+     */
+    private function dateChanged(array $planDiff, string $dateType, int $transition): bool
+    {
+        if (!isset($planDiff[$dateType])) {
+            return false;
+        }
+
+        $current = new \Alaress_Date_Format($planDiff[$dateType][0], Alaress_Date_Format::DATABASE_FORMAT);
+        $previous = new \Alaress_Date_Format($planDiff[$dateType][1], Alaress_Date_Format::DATABASE_FORMAT);
+
+        if (!$current || !$previous) {
+            return false;
+        }
+
+        switch ($transition) {
+            case self::ANY:
+                return !$previous->eq($current);
+            case self::PAST_TO_FUTURE:
+                return $previous->isPast() && $current->isFuture();
+            case self::FUTURE_TO_PAST:
+                return $previous->isFuture() && $current->isPast();
+            default:
+                return false;
+        }
+    }
 }
