@@ -30,10 +30,11 @@ interface IMailer {
     public static function getSwiftTransport($reinitialise = false);
 
     /**
-     * @param string $string
+     * @param string $emailAddresses
+     *
      * @return array ['valid' => [['email' => 'name']], 'invalid' => [['email' => 'name']]]
      */
-    public static function parseAddressString($string): array;
+    public static function parseAddressString(string $emailAddresses): array;
 
     /**
      * @param string $address
