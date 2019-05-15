@@ -26,8 +26,6 @@ use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Csrf\HeaderCheck;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
-use Alaress\DebugBar\DataCollector\XhprofCollector;
-use Config;
 use Database;
 use Psr\Log\NullLogger;
 use Schoolbox\Error\Mapper as ErrorMapper;

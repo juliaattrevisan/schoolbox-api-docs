@@ -151,10 +151,6 @@ abstract class Kernel
 	 */
     private $exceptionCallbacks = [];
 
-    /** @var bool $debugEnabled */
-    private $debugEnabled = false;
-
-
     /**
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
