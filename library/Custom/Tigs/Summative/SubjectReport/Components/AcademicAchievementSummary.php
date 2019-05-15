@@ -177,6 +177,17 @@ class AcademicAchievementSummary extends BaseComponent
             return ['error' => "{$assessment::getDefaultTypeName()} {$title} has a AAS work-type but does not have a rubric grid"];
         }
 
+        // If assessment not visible, or student is not a participant, returns NULL.
+        // Did we find an assessment, but it shouldn't be visible to the current viewer?
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
+            return null;
+        }
+
+        // Is grade visibility off for the current viewer?
+        if (!$this->isFeedbackVisibleToUser($assessment)) {
+            return null;
+        }
+
         return $this->buildAssessmentData($assessment);
     }
 
@@ -184,7 +195,6 @@ class AcademicAchievementSummary extends BaseComponent
     /**
      * Build AAS data from the specified due work
      *
-     * If assessment not visible, or student is not a participant, returns NULL.
      * If no feedback, or viewer not permitted to view feedback, empty marks returned
      *
      * @param DueWork\Model $dueWork
@@ -195,21 +205,31 @@ class AcademicAchievementSummary extends BaseComponent
      */
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
-        // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->getViewer(), true, null, false)) {
-            return null;
-        }
+        $data = [];
+        // Fetch the grid
+        $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
+        $data['grid'] = $dueWork->getRubricGrid();
 
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($dueWork)) {
-            return null;
-        }
+        // Load rubric marks if they exist and current user is permitted to view grades
+        $participant = $dueWork->getParticipantIfExtant($this->student);
+        if ($participant && !$participant->isExcluded()) {
+            /** @var DueWork\Feedback\Model $feedback */
+            $feedback = $participant->getAuthoritativeFeedback(true);
+            if ($feedback) {
+                $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                $data['markedGrid'] = $feedback->getRubricMarkedGrid();
 
-        return [
-            'dueDate' => $dueWork->getDueAt(),
-            'link'    => $this->getAasLink($dueWork),
-            'marks'   => $this->getMarks($dueWork, $dueWork->getParticipant($this->student)),
-        ];
+                // DP students' comments will come from this assessment
+                if ($this->getAttributes()->isDp()) {
+                    $data['comment']   = $feedback->getComment();
+                    $data['commentBy'] = $feedback->getReviewer();
+                }
+            }
+        }
+        $data['dueDate'] = $dueWork->getDueAt();
+        $data['link']    = $this->getAasLink($dueWork);
+        $data['marks']   = $this->getMarks($dueWork, $dueWork->getParticipant($this->student));
+        return $data;
     }
 
 
