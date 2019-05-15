@@ -151,10 +151,6 @@ abstract class Kernel
 	 */
     private $exceptionCallbacks = [];
 
-    /** @var bool $debugEnabled */
-    private $debugEnabled = false;
-
-
     /**
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
@@ -168,11 +164,11 @@ abstract class Kernel
     {
         // run the launch sequence
         $this->initialiseExternalConnections();
-        $this->initialiseDebugging();
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
         $this->installDependencies();
+        $this->initialiseDebugging();
         $this->checkServerApiEnvironment();
     }
 
@@ -1385,23 +1381,5 @@ abstract class Kernel
                 $obj->configure($this);
             }
         }
-    }
-
-
-    /**
-     * @return bool
-     */
-    protected function isDebugEnabled(): bool
-    {
-        return $this->debugEnabled;
-    }
-
-
-    /**
-     * @param bool $debugEnabled
-     */
-    protected function setDebugEnabled(bool $debugEnabled): void
-    {
-        $this->debugEnabled = $debugEnabled;
     }
 }

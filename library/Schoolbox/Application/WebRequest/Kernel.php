@@ -26,8 +26,6 @@ use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\Csrf\HeaderCheck;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
-use Alaress\DebugBar\DataCollector\XhprofCollector;
-use Config;
 use Database;
 use Psr\Log\NullLogger;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -378,27 +376,28 @@ class Kernel extends WebKernelAbstract
         // Set up the debug bar, and add listeners for various parts of the debug bar
         // (database calls, XHProf)
         // Should go in a DI container instead of a static class.
-        $this->setDebugEnabled(DebugBar::isEnabled());
-        if($this->isDebugEnabled()) {
+        if (DebugBar::isEnabled()) {
             DebugBar::init();
-        }
 
-        // Install into database
-        if($this->isDebugEnabled()) {
-            $debug_bar = DebugBar::getInstance();
+            $debugBar = DebugBar::getInstance();
 
             // Throw away existing connection and reconnect with persistence off
             $database = Database::getInstance();
             $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
-            $debug_bar->addCollector($database->getCollector());
-        }
 
-        // XHProf on the debug bar.
-        if ($this->isDebugEnabled() && Config::get('debug_xhprof')) {
-            if (extension_loaded('xhprof')) {
-                DebugBar::getInstance()->addCollector(new XhprofCollector());
-            } elseif (extension_loaded('tideways')) {
-                DebugBar::getInstance()->addCollector(new TidewaysCollector());
+            $collector = $database->getCollector();
+            if (!$debugBar->hasCollector($collector->getName())) {
+                $debugBar->addCollector($collector);
+            }
+
+            // Install Tideways into the debug bar
+            /** @var IConfigLoader $config */
+            $config = $this->getDependencyInjector()->get('config');
+            if ($config->get('debug_xhprof') && extension_loaded('tideways')) {
+                $tidewaysCollector = new TidewaysCollector();
+                if (!$debugBar->hasCollector($tidewaysCollector->getName())) {
+                    $debugBar->addCollector(new TidewaysCollector());
+                }
             }
         }
     }
