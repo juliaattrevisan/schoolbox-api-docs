@@ -485,6 +485,17 @@ interface External_UserInterface {
      */
     public function getHousemasterByHouseId($houseID);
 
+
+    /**
+     * Returns email addresses for any users who are both:
+     * * current housemasters, and
+     * * match $externalUserIds
+     *
+     * @param string[] $externalUserIds
+     * @return string[]
+     */
+    public function getHousemasterEmails($externalUserIds);
+
     /**
      * List of campuses a staff member is involved in based on timetable
      *
