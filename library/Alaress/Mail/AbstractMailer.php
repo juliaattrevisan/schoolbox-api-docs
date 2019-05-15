@@ -12,6 +12,7 @@ namespace Alaress\Mail;
 
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
+use function count;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -24,12 +25,15 @@ use Swift_RfcComplianceException;
 use Swift_SmtpTransport;
 use Swift_SwiftException;
 use Swift_Transport;
+use function trim;
 
 abstract class AbstractMailer implements IMailer
 {
+    // These two const are just a key for an array structure that will separate valid and invalid email addresses
+    // As of the moment, these keys are being used here and in createMail.php::45 only
+    public const KEY_INVALID = 'invalid';
+    public const KEY_VALID = 'valid';
 
-    private const KEY_INVALID = 'invalid';
-    private const KEY_VALID = 'valid';
     private const MAX_RETRIES = 4;
     private const RETRY_TIMEOUT = 1;
 
@@ -351,18 +355,21 @@ abstract class AbstractMailer implements IMailer
     }
 
     /**
-     * @param string $string
-     * @param bool $returnValidEmailsOnly
+     * @param string $emailAddresses A collection of email addresses in a string format that's separated with self::EMAIL_SEPARATOR_CODE
+     *
      * @return array
      */
-    public static function parseAddressString($string, $returnValidEmailsOnly = true): array
+    public static function parseAddressString(string $emailAddresses): array
     {
-        $return_list  = [];
+        $return_list = [
+            self::KEY_VALID => [],
+            self::KEY_INVALID => [],
+        ];
 
-        if (\trim($string) === '') {
+        if (trim($emailAddresses) === '') {
             return $return_list;
         }
-        $address_list = self::parseAddressList($string);
+        $address_list = self::parseAddressList($emailAddresses);
 
         foreach ($address_list[self::KEY_VALID] as $address) {
             $to = $address->mailbox . '@' . $address->host;
@@ -370,11 +377,11 @@ abstract class AbstractMailer implements IMailer
             $return_list[self::KEY_VALID][$to] = $alias;
         }
 
-        if (!$returnValidEmailsOnly && \count($address_list[self::KEY_INVALID]) > 0) {
+        if (count($address_list[self::KEY_INVALID]) > 0) {
             $return_list[self::KEY_INVALID] = $address_list[self::KEY_INVALID];
         }
 
-        return $returnValidEmailsOnly ? $return_list[self::KEY_VALID] : $return_list;
+        return $return_list;
     }
 
     /**

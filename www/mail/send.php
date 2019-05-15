@@ -1,6 +1,7 @@
 <?php
+
+use Alaress\Mail\AbstractMailer;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Storage;
 use Alaress\Mail\AttachmentStream;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
@@ -52,7 +53,9 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
         }
     }
     else {
-        foreach (Mailer::parseAddressString(Mailer::standardiseEmailSeparator($to)) as $address => $name) {
+        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($to));
+
+        foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
                 $mail->addTo($address, $name);
             }
@@ -84,7 +87,9 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     $mail->setSubject($subject);
 
     if (strrchr($cc, '@')) {
-        foreach (Mailer::parseAddressString(Mailer::standardiseEmailSeparator($cc)) as $address => $name) {
+        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($cc));
+
+        foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
                 $mail->addCc($address, $name);
             }
@@ -95,7 +100,9 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments = array())
     }
 
     if (strrchr($bcc, '@')) {
-        foreach (Mailer::parseAddressString(Mailer::standardiseEmailSeparator($bcc)) as $address => $name) {
+        $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($bcc));
+
+        foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
                 $mail->addBcc($address, $name);
             }

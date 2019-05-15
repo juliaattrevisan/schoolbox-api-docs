@@ -5,6 +5,7 @@
  *                                                           *
  ************************************************************/
 //enable users to send email
+use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -29,8 +30,8 @@ if (Cfg::get('mail_enable') == 1) {
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
             $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
-            if(!empty($emailAddresses['valid'])) {
-                foreach ($emailAddresses['valid'] as $email => $name) {
+            if(!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
+                foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $email => $name) {
                     $addressLists[$type][] = Mailer::buildAddress($email, $name);
                 }
             }
@@ -41,7 +42,7 @@ if (Cfg::get('mail_enable') == 1) {
             );
         }
 
-        $invalidEmails[] = $emailAddresses['invalid'];
+        $invalidEmails[] = $emailAddresses[AbstractMailer::KEY_INVALID];
     }
 
     $page->setFile(TEMPLATE_content, 'mail/send.html');
