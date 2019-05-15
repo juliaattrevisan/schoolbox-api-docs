@@ -40,9 +40,8 @@ class ClassCode
             $codeArray = explode(',', $this->classCode);
 
             return $codeArray[0];
-        } else {
-
-            return $this->classCode;
         }
+
+        return $this->classCode;
     }
 }
