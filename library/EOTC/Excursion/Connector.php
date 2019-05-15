@@ -6,7 +6,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 namespace EOTC\Excursion;
 use Alaress\Database\Connector\IConnector;
@@ -16,10 +15,11 @@ use Schoolbox\User;
 class Connector
 {
     /**
-     * A value that exists in dbo.spsEventTypes
-     * This is the "Type" dropdown in Synweb
+     * A value that exists in dbo.spsEventTypes.
+     * This is the "Type" dropdown in Synweb (Develop > Event) and required for creating an excursion event.
+     * However, this event type will be ignored for events with IsExcursion field value = 1.
      */
-    private const DEFAULT_EVENT_TYPE_CODE = 'TESTTYPE';
+    private const DEFAULT_EVENT_TYPE_CODE = '';
 
     /**
      * One of the values in dbo.luEventStatus
