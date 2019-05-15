@@ -7,6 +7,7 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 namespace EOTC\Excursion;
 use Alaress\Database\Connector\IConnector;
 use EOTC\Event as EOTCEvent;
@@ -14,13 +15,6 @@ use Schoolbox\User;
 
 class Connector
 {
-    /**
-     * A value that exists in dbo.spsEventTypes.
-     * This is the "Type" dropdown in Synweb (Develop > Event) and required for creating an excursion event.
-     * However, this event type will be ignored for events with IsExcursion field value = 1.
-     */
-    private const DEFAULT_EVENT_TYPE_CODE = '';
-
     /**
      * One of the values in dbo.luEventStatus
      * This is the "Status" dropdown in Synweb
@@ -49,18 +43,27 @@ class Connector
     private $db;
 
     /**
+     * A value that exists in dbo.spsEventTypes
+     * This is the "Type" dropdown in Synweb
+     * @var string
+     */
+    private $eventType;
+
+    /**
      * Constructor
      *
-     * @param $databaseType
+     * @param string $databaseType
      * @param null|IConnector $db
+     * @param string $eventType
      */
-    public function __construct($databaseType, IConnector $db = null)
+    public function __construct(string $databaseType, IConnector $db = null, string $eventType)
     {
         /* Only set $db when external db supports what we're doing
          */
         if (null !== $db && \in_array($databaseType, $this->availableConnectors, false)) {
             $this->db = $db;
         }
+        $this->eventType = $eventType;
     }
 
 
@@ -97,7 +100,7 @@ class Connector
      */
     private function generateIdentifier($eventId): string
     {
-        return "EOTC_{$eventId}";
+        return "ETTC_{$eventId}";
     }
 
     /**
@@ -128,7 +131,7 @@ class Connector
 
             /* A value that exists in dbo.spsEventTypes
              */
-            'EventTypeCode' => self::DEFAULT_EVENT_TYPE_CODE,
+            'EventTypeCode' => $this->eventType,
 
             /* I guess this is a synergetic id?
              */
@@ -190,7 +193,7 @@ class Connector
             /* A seemingly arbitrary string, but make it one of the
              * dbo.spsEventTypes options
              */
-            'Type' => self::DEFAULT_EVENT_TYPE_CODE,
+            'Type' => $this->eventType,
 
             /* One of the values in dbo.luEventStatus
              */

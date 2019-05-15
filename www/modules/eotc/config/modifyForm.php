@@ -74,6 +74,9 @@ if ($sessionUser->isSuperuser()) {
     $externalFiletypeBlacklist = $allConfigs->getBy('name', 'external_filetype_blacklist');
     $externalFiletypeBlacklist->setValue(implode(",", $validFileTypes));
 
+    $externalEventtype = $allConfigs->getBy('name', 'external_eventtype');
+    $externalEventtype->setValue(trim($_POST['externalEventtype']));
+
     // Save config changes back to database
 
     $configMapper->save($firstReminder);
@@ -84,6 +87,7 @@ if ($sessionUser->isSuperuser()) {
     $configMapper->save($externalDbSync);
     $configMapper->save($externalFiletypeBlacklist);
     $configMapper->save($mandatoryStudents);
+    $configMapper->save($externalEventtype);
 
     // Redirect back to the config page
 
