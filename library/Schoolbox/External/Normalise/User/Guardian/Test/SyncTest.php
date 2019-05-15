@@ -6,7 +6,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\External\Normalise\User\Test\Guardian;
+namespace Schoolbox\External\Normalise\User\Guardian\Test;
 
 use ArrayIterator;
 use Iterator;

@@ -63,7 +63,22 @@ try {
 
                     default: // key has a TTL
                         $level = Monolog\Logger::INFO;
-                        $exp = (new DateIntervalEnhanced(sprintf(self::P_INTERVAL, $ttl)))->recalculate()->format(self::P_TIME);
+                        /**
+                         * Class extending DateInterval
+                         * @courtesy-of http://php.net/manual/en/dateinterval.format.php#113204
+                         */
+                        $exp = (new class(sprintf(self::P_INTERVAL, $ttl)) extends DateInterval{
+
+                            public function recalculate()
+                            {
+                                $from = new DateTime;
+                                $to = clone $from;
+                                $to = $to->add($this);
+                                $diff = $from->diff($to);
+                                foreach ($diff as $k => $v) $this->$k = $v;
+                                return $this;
+                            }
+                        })->recalculate()->format(self::P_TIME);
                         break;
                 }
 
@@ -79,7 +94,7 @@ try {
                     // reset the expiry
                     $redis->expireat($key, $expireTime->getUnixTimeStamp());
 
-                    $log->notice(sprintf('%s NEW EXPIRY: %s', $key, $expireTime->getDatabase()), [ 'char' => '+' ]);
+                    $log->notice(sprintf('%s NEW EXPIRY: %s', $key, $expireTime->getDatabase()), ['char' => '+']);
                 }
 
             }
@@ -90,23 +105,4 @@ try {
     });
 } catch (\Throwable $e) {
     throw $e;
-}
-
-
-/**
- * Class DateIntervalEnhanced
- * @courtesy-of http://php.net/manual/en/dateinterval.format.php#113204
- */
-class DateIntervalEnhanced extends DateInterval {
-
-    public function recalculate()
-    {
-        $from = new DateTime;
-        $to = clone $from;
-        $to = $to->add($this);
-        $diff = $from->diff($to);
-        foreach ($diff as $k => $v) $this->$k = $v;
-        return $this;
-    }
-
 }

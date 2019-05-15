@@ -1,6 +1,9 @@
 parameters:
     autoload_directories:
         - %rootDir%/../../../conf
+        - %rootDir%/../../../test/acceptance
+        - %rootDir%/../../../test/behavior/bootstrap
+        - %rootDir%/../../../test/notif/tests
     bootstrap: %rootDir%/../../../conf/core/require.php
     level: 0
     paths:
@@ -18,3 +21,8 @@ parameters:
         -
             message: '#Undefined variable: \$this#'
             path: %currentWorkingDirectory%/www/*
+    excludes_analyse:
+        -   %rootDir%/../../../tools/RecursiveUndeleter.php
+        -   %rootDir%/../../../library/Alaress/Twitter/Loader/oauth/twitteroauth.php
+        -   %rootDir%/../../../tools/synchronise/abstract/SynchroniseAbstract.php
+        -   %rootDir%/../../../updates/18.0.alpha1/self-assessment/090-linkRubricMarksToResponses.php

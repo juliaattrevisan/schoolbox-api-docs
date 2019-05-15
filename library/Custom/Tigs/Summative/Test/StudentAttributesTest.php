@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Custom\Tigs\Summative\SubjectReport\Test;
+namespace Custom\Tigs\Summative\Test;
 
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;

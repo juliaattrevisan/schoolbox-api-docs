@@ -76,7 +76,10 @@
         "knplabs/knp-snappy": "^1.1",
         "ext-redis": "*",
         "ext-readline": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "ext-mysqli": "*",
+        "ext-pdo": "*"
+
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

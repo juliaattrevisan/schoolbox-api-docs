@@ -4,7 +4,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Filter\Test;
+namespace Schoolbox\Filter\Test\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
 use function array_merge;

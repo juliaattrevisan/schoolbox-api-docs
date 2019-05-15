@@ -6,7 +6,7 @@
  */
 declare(strict_types=1);
 
-namespace Alaress\Database\Predicate\SqlFunc\Test;
+namespace Alaress\Database\Predicate\Test;
 
 use Alaress\Database\Predicate\SqlFunc\Coalesce;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;

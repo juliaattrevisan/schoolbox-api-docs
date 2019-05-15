@@ -9,7 +9,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Reflection\DueWork\Response\Test;
+namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox;
