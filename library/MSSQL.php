@@ -163,7 +163,7 @@ class MSSQL
      * @deprecated
      * @param string $sql_q
      * @param null   $params
-     * @return array|bool
+     * @return string
      */
     function getOne($sql_q, $params = null)
     {
