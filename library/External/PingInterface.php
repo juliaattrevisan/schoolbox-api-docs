@@ -7,16 +7,16 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-interface External_PingInterface
+interface External_PingInterface extends External\IConnector
 {
     /**
      * @return bool
      */
-    function isResponsive();
+    public function isResponsive(): bool;
 
     /**
      * Returns external database schema version
      * @return string
      */
-    function getVersion();
+    public function getVersion(): string;
 }

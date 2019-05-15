@@ -13,10 +13,10 @@ class External_Edumate_Ping extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-	public function isResponsive()
+	public function isResponsive(): bool
     {
 		try {
-			parent::__construct();
+			$this->connect();
 			return true;
 		} catch (Exception $e) {
         }
@@ -27,7 +27,7 @@ class External_Edumate_Ping extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '';
     }

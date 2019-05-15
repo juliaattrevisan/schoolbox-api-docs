@@ -47,15 +47,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Retrieve timetable definition
-     *
-     * @param string $externalUserId User we want the definition for
-     * @param CampusModel $campus Campus we want the definition for
-     * @param int $day School day we want the definition for
-     * @param int $date UNIX timestamp of the date we want to get definition from
-     * @return array
+     * @inheritDoc
      */
-    public function getTimetableDefinition($externalUserId, CampusModel $campus, $day = 1, $date = null)
+    public function getTimetableDefinition(string $externalUserId, CampusModel $campus, $day = 1, $date = null): array
     {
         $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
 
@@ -241,7 +235,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      * @param $dayNumber
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         // Nothing magic here as there is only one week
 
@@ -256,7 +250,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      * @param \Schoolbox\User $user User we are getting the period for (only required by DF)
      * @return array
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         /**
          * TODO: This doesn't/can't work for staff. Because each year level has a different timetable structure and
@@ -386,34 +380,20 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Retrieve timetable for a specific date
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param CampusModel $campus
-     * @param Alaress_Date_Format $date
-     * @return array|mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, CampusModel $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, CampusModel $campus, Alaress_Date_Format $date): array
     {
         $day = $this->helper->getDayNumber($date);
         return $this->getDayTimetable($externalUserId, $userId, $campus, $day, $date);
     }
 
     /**
-     * Get timetabled classes for specified week day
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param CampusModel $campus
-     * @param $dayNumber
-     * @param null $date
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, CampusModel $campus, $dayNumber, $date = null)
+    public function getDayTimetable(string $externalUserId, $userId, CampusModel $campus, $dayNumber, $date = null): array
     {
         // Can't do anything without the user being supplied
-
         if (empty($externalUserId)) {
             return array();
         }
@@ -421,9 +401,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
         // Can't do anything without the timetable definition either
-
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         /**
@@ -621,14 +600,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Get complete timtable
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param CampusModel $campus
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, CampusModel $campus)
+    public function getFullTimetable($externalUserId, $userId, CampusModel $campus): array
     {
         // Can't do anything with the user being supplied
 
@@ -642,7 +616,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         // Can't do anything without the timetable definition either
 
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         /**
@@ -667,7 +641,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             if ($studentDetails) {
                 $type = 'student';
             } else {
-                return false;
+                return [];
             }
         }
 
@@ -871,11 +845,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Gets the timetable for the given room.
-     * @param string $roomCodes
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         return [];
     }

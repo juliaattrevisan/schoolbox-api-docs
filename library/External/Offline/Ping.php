@@ -11,7 +11,7 @@ class External_Offline_Ping implements External_PingInterface
     /**
      * @inheritdoc
      */
-    public function isResponsive()
+    public function isResponsive(): bool
     {
         return false;
     }
@@ -19,7 +19,7 @@ class External_Offline_Ping implements External_PingInterface
     /**
      * @inheritdoc
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '';
     }

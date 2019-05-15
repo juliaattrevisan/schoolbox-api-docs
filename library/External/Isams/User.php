@@ -18,6 +18,7 @@
  *   \  -  /
  *    '{_}`
  */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -58,11 +59,9 @@ class External_Isams_User implements External_UserInterface
 
 
     /**
-     * Gets the parents of student
-     * @param $externalUserId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getParent($externalUserId)
+    public function getParent(string $externalUserId): array
     {
         $query = "
             SELECT      V_Parent.ParentID             AS ID,
@@ -98,23 +97,29 @@ class External_Isams_User implements External_UserInterface
 
     /**
      * I gots me no frigging clue what the difference here is...
-     * @param $externalUserId
-     * @return mixed
+     *
+     * @param array $externalUserIds
+     * @return array
      */
-    public function getParentSync($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
-        return $this->getParent($externalUserId);
+        $parents = [];
+        foreach ($externalUserIds as $externalUserId) {
+            $parents[] = $this->getParent($externalUserId);
+        }
+        return $parents;
     }
 
     /**
      * Get all the parents emails for a class, or group of students
-     * @param array $synergyIds
+     *
+     * @param array $externalUserIds
      * @return array
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
         $emailList = [];
-        $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->in("StudentID", $synergyIds);
+        $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->in("StudentID", $externalUserIds);
         $pb->notEquals("PersonalEmail", "");
         $whereString = implode(" AND " , $pb->getWhere());
 
@@ -137,12 +142,9 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Get a students info
-     *
-     * @param  $externalUserId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStudent($externalUserId)
+    public function getStudent(string $externalUserId): array
     {
         $query = "
             SELECT      StudentID               AS StudentID,
@@ -184,12 +186,12 @@ class External_Isams_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
     }
 
+
     /**
-     * Retrieve selected staff members details
-     * @param $externalUserId
-     * @return array|bool
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaff($externalUserId)
+    public function getStaff(string $externalUserId): array
     {
         $staff = "
             SELECT          StaffID             AS SchoolStaffCode,
@@ -210,15 +212,12 @@ class External_Isams_User implements External_UserInterface
         return $this->getConnector()->executeQuery($staff, ['external_user_id' => $externalUserId])->fetch();
     }
 
+
     /**
-     * Gets a list of Contacts for all Students in a particular year level.
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
-     * @return mixed
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         $query = "
             SELECT      
@@ -275,21 +274,19 @@ class External_Isams_User implements External_UserInterface
             JOIN        V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
 
-        if (!empty($yearlevel)) {
+        if (!empty($yearLevel)) {
             $query .= "WHERE V_Student.Grade = :year_level";
         }
 
         $query .= " ORDER BY StudentSurname, StudentPreferred, StudentID";
 
-        return $this->getConnector()->executeQuery($query, ['year_level' => $yearlevel])->fetchAll();
+        return $this->getConnector()->executeQuery($query, ['year_level' => $yearLevel])->fetchAll();
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
-     * @param $externalUserId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         $query = "
             SELECT      
@@ -319,34 +316,25 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * Retrieve the current semester, same old thing
-     *
-     * @param null $externalUserId
-     * @return int
+     * @inheritDoc
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        return date('m') < 6 ? 1 : 2;
+        return date('m') < 6 ? '1' : '2';
     }
 
     /**
-     * Get current academic year
-     *
-     * @param null $externalUserId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return date("Y");
     }
 
     /**
-     * Get a list of subjects for a given student
-     *
-     * @param User $user
-     * @return array
+     * @inheritDoc
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalUserId = $user->getExternalId();
 
@@ -372,13 +360,12 @@ class External_Isams_User implements External_UserInterface
         return $subjectList;
     }
 
+
     /**
-     * Get the students belonging to specified person
-     *
-     * @param $externalUserId
-     * @return array|bool
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         $query = "
             SELECT    StudentID AS RelatedID
@@ -389,12 +376,12 @@ class External_Isams_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
     }
 
+
     /**
-     * Retrieve email address
-     * @param $id
-     * @return array|bool
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getEmail($id)
+    public function getEmail(string $externalUserId): string
     {
         $query =
             "
@@ -403,15 +390,15 @@ class External_Isams_User implements External_UserInterface
           WHERE   V_Parent.ParentID = :id
         ";
 
-        return $this->getConnector()->executeQuery($query, ['id' => $id])->fetch();
+        return $this->getConnector()->executeQuery($query, ['id' => $externalUserId])->fetchColumn();
     }
 
+
     /**
-     * Gets all Students' account info
-     *
-     * @return array|bool
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $query = "
             SELECT      StudentID               AS StudentID,
@@ -433,12 +420,12 @@ class External_Isams_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
+
     /**
-     * Gets all Parents' account info
-     *
-     * @return array|bool
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         $query = "
             SELECT      
@@ -466,11 +453,10 @@ class External_Isams_User implements External_UserInterface
 
 
     /**
-     * Gets all active Staff's account info
-     *
-     * @return array|bool
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         $query = "
             SELECT      StaffID           AS StaffID,
@@ -500,9 +486,9 @@ class External_Isams_User implements External_UserInterface
      * Exclude people who are on leave (category description for this is 'Staff on leave')
      * TODO: Make exclusion on category configurable, currently excluding
      *
-     * @return mixed
+     * @return array
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         $query = "
             SELECT      StaffID           AS StaffID,
@@ -539,41 +525,33 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return [];
     }
 
     /**
-     * Determine the boarder type based on a value
-     * Returns a human-readable string
-     *
-     * @param $boarderValue
-     * @return string
+     * @inheritDoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         return "Day Student";
     }
 
     /**
-     * @param $houseID
-     * @return bool
+     * @inheritDoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        return false;
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
@@ -581,7 +559,7 @@ class External_Isams_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         return [];
     }

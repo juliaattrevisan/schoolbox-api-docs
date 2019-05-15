@@ -17,7 +17,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable
     /**
      * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
     {
         // Figure out day number if it's not supplied
         if (!$dayNumber) {
@@ -211,7 +211,7 @@ class External_Humanedge_Ngsl_Timetable extends External_Humanedge_Timetable
     /**
      * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
     {
         try {
             $user = \Schoolbox\UserMapper::getInstance()->findById($userId);

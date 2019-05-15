@@ -6,17 +6,18 @@
  */
 declare(strict_types=1);
 
+use External\IOfflineConnector;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-class External_Offline_User implements External_UserInterface
+class External_Offline_User implements External_UserInterface, IOfflineConnector
 {
     /**
      * @inheritdoc
      */
     public function getParent(string $externalUserId): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -24,15 +25,15 @@ class External_Offline_User implements External_UserInterface
      */
     public function getParentSync(array $externalUserIds): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getParentEmails(array $synergyIds): array
+    public function getParentEmails(array $externalUserIds): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -40,7 +41,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getStudent(string $externalUserId): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -48,15 +49,15 @@ class External_Offline_User implements External_UserInterface
      */
     public function getStaff(string $externalUserId): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getStudentContactListExtended(string $yearLevel, string $name, bool $boardingStatus, string $form): array
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -64,13 +65,13 @@ class External_Offline_User implements External_UserInterface
      */
     public function getStudentContactList(string $externalUserId): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester(string $externalUserId = null): string
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         return null;
     }
@@ -78,7 +79,7 @@ class External_Offline_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getCurrentYear(string $externalUserId = null): string
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return null;
     }
@@ -96,7 +97,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getEnrolledStudents(string $externalUserId): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -104,7 +105,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getEmail(string $externalUserId): string
     {
-        // Return nothing
+        return '';
     }
 
     /**
@@ -120,7 +121,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo(): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -128,7 +129,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getParentUserAccountInfo(): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -136,7 +137,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function getStaffUserAccountInfo(): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
@@ -144,7 +145,7 @@ class External_Offline_User implements External_UserInterface
      */
     public function determineBoarderType(string $boarderValue): string
     {
-        // Return nothing
+        return '';
     }
 
     /**
@@ -165,8 +166,6 @@ class External_Offline_User implements External_UserInterface
 
     /**
      * @inheritdoc
-     *
-     * @return array
      */
     public function getStaffContactListExtended(): array
     {
@@ -175,8 +174,6 @@ class External_Offline_User implements External_UserInterface
 
     /**
      * @inheritdoc
-     *
-     * @return array
      */
     public function getStudentForms(): array
     {
@@ -185,9 +182,6 @@ class External_Offline_User implements External_UserInterface
 
     /**
      * @inheritdoc
-     *
-     * @param int $staffID
-     * @return array|bool
      */
     public function getCampusFromTimetable(string $staffID): array
     {

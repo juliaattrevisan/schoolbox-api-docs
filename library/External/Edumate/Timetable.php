@@ -16,14 +16,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     protected $campusCache;
 
     /**
-     * Returns the timetable definition for a particular campus *FOR A PARTICULAR DAY*
-     *
-     * @param string $externalUserId
-     * @param \Schoolbox\Campus $campus
-     * @param int $day
-     * @return array
+     * @inheritDoc
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
     {
 
         $definition = array();
@@ -54,7 +49,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         if ($periodCount == 0) {
-            return false;
+            return [];
         }
 
         $definition['periodCount'] = $periodCount;
@@ -164,24 +159,19 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     /**
-     * Returns the day name
-     *
-     * @param $dayNumber
-     * @return String
+     * @inheritDoc
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return 'Day ' . $dayNumber;
     }
 
+
     /**
-     * Calculates the current period based on the current time
-     *
-     * @param int|\Schoolbox\Campus $campus
-     * @param int $now
-     * @return int
+     * @inheritDoc
+     * @throws Exception
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $now = date('g:ia', $now ?: time());
 
@@ -200,21 +190,15 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     }
 
     /**
-     * Return a user's timetable for a specific day
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param \Schoolbox\Campus $campus
-     * @param $dayNumber
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return array();
         }
         if (!($definition = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber))) {
-            return false;
+            return [];
         }
 
         if ($this->getGroupHandler()->isStudent($userId)) {
@@ -230,7 +214,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 WHERE C.STAFF_NUMBER = :sn
             ";
         } else {
-            return false;
+            return [];
         }
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
@@ -289,37 +273,21 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         return $timetable;
-
     }
 
     /**
-     * Return a user's timetable for a specific date
-     *
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     *
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param Schoolbox\Campus $campus
-     * @param Alaress_Date_Format $date
-     * @return mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus,
             $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
     /**
-     * Return the ENTIRE timetable for a user
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param \Schoolbox\Campus $campus
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -328,7 +296,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $dayCount = is_numeric($definition['dayCount']) ? $definition['dayCount'] : 0;
 
         if (!$dayCount) {
-            return false;
+            return [];
         }
 
         if ($this->getGroupHandler()->isStudent($userId)) {
@@ -342,7 +310,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 WHERE C.STAFF_NUMBER = :sn
             ";
         } else {
-            return false;
+            return [];
         }
 
         $campusCode = explode(',', $campus->getExtTimetableCode());
@@ -414,18 +382,26 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * * Edumate appears to have no concept of campuses
      * * getTimetableDefinition() returns DateTime objects
      *
-     * @param  array|string $roomCodes
+     * @param  string[] $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        if (is_array($roomCodes)) {
-            $result = [];
-            foreach ($roomCodes as $roomCode) {
-                $result = array_merge($result, $this->getRoomTimetable($roomCode));
-            }
-            return $result;
+        $result = [];
+        foreach ($roomCodes as $roomCode) {
+            $result = array_merge($result, $this->getOneRoomTimetable($roomCode));
         }
+        return $result;
+    }
+
+
+    /**
+     * @param string $roomCode
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function getOneRoomTimetable(string $roomCode): array
+    {
         $statement = $this->getConnection()->prepareQuery('
             SELECT
                 T.ROOM AS "RoomCode",
@@ -449,7 +425,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 T.DAY_NUMBER ASC,
                 T.PERIOD_NUMBER ASC
         ');
-        $statement->execute(array('room' => $roomCodes));
+        $statement->execute(array('room' => $roomCode));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
         $campus = new \Schoolbox\Campus;

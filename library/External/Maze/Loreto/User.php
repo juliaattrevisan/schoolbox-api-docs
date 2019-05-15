@@ -9,18 +9,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 class External_Maze_Loreto_User extends External_Maze_User {
 
 	/**
-	 * Get a guy's info from Maze
-	 *
-	 * $synId is the STKEY value.
-	 *
-	 * @param  $synId
-	 * @return array|bool
+	 * @inheritDoc
 	 */
-	public function getStudent($synId) {
+    public function getStudent(string $externalUserId): array
+    {
 
 		/* The School Year is never represented as just an int, it's always a
 		 * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
@@ -90,7 +87,7 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			LEFT JOIN SF COORDINATOR ON KCY.YEAR_COORD = COORDINATOR.SFKEY
 			LEFT JOIN SF HEADOFHOUSE ON KGH.SFLINK = HEADOFHOUSE.SFKEY
 			LEFT JOIN SF COACH ON KCP.SFLINK = COACH.SFKEY
-			WHERE STKEY = '{$synId}'
+			WHERE STKEY = '{$externalUserId}'
 		";
 
 		$student = $this->getDb()->getRow($query);
@@ -132,12 +129,10 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	}
 
 	/**
-	 * Get a list of student contacts (parents) and their contact information
-	 *
-	 * @param string $externalUserId
-	 * @return mixed
+	 * @inheritDoc
 	 */
-	public function getStudentContactList($externalUserId) {
+    public function getStudentContactList(string $externalUserId): array
+    {
 		$query = "
 			SELECT
 				DFKEY AS StudentContactID,
@@ -176,25 +171,10 @@ class External_Maze_Loreto_User extends External_Maze_User {
 	}
 
 	/**
-	 * Gets a list of Contacts for all Students in a particular year level. The
-	 * year level is stored in Synergetic.
-	 *
-	 * Used in reporting.
-	 *
-	 * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
-	 * so I changed it to use CountryCode instead.
-    	 *
-     	 * Note that if a student has split parents, they will appear more than once.
-     	 * They will appear once for each split parent.
-	 *
-	 * @param $yearlevel
-	 * @param $name
-	 * @param $boardingStatus
-	 * @param $form
-	 *
-	 * @return mixed
+	 * @inheritDoc
 	 */
-	public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form) {
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
+    {
 
 		/* Mega select
 		 */
@@ -256,15 +236,15 @@ class External_Maze_Loreto_User extends External_Maze_User {
 
 		/* Search for a particular year level
 		 */
-		if (strlen($yearlevel)) {
+		if (strlen($yearLevel)) {
 
 			/* Translate back to Maze-specific
 			 */
-			if (is_numeric($yearlevel)) {
-				$mazeYearLevel = $yearlevel;
+			if (is_numeric($yearLevel)) {
+				$mazeYearLevel = $yearLevel;
 
-				if ($yearlevel < 10) {
-					$mazeYearLevel = '0' . $yearlevel;
+				if ($yearLevel < 10) {
+					$mazeYearLevel = '0' . $yearLevel;
 				}
 
 				$mazeYearLevel = 'Y' . $mazeYearLevel;

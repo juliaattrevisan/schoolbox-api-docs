@@ -5,9 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-use \Schoolbox\Pastoral\Model as PastoralModel;
-use \Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
-use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
+use Schoolbox\Pastoral;
 use Schoolbox\User;
 
 class External_Pastoral implements External_PastoralInterface
@@ -15,110 +13,76 @@ class External_Pastoral implements External_PastoralInterface
     /** @var External_PastoralInterface */
     private $database;
 
-    /** @var External_Offline_Pastoral */
-    private $offline;
-    
     /**
      * Constructor
      *
      * @throws Exception
      * @param String $databaseName
      */
-    public function __construct($databaseName = '') {
-        $factory = new External_DatabaseFactory();
-        $this->setDatabase($factory->buildPastoralConnector($databaseName));
-        $this->setOffline(new External_Offline_Pastoral());
+    public function __construct(string $databaseName = '')
+    {
+        $this->database = (new External_DatabaseFactory())->buildPastoralConnector($databaseName);
     }
 
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords)
-    {
-        return $this->getDatabase()->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
+    public function importPastoral(
+        User $user,
+        User $defaultOwner,
+        bool $importParentAccess,
+        bool $importRecords,
+        bool $importAttachments,
+        bool $deleteRecords
+    ): void {
+        $this->database->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
     }
 
     /**
      * @inheritdoc
      */
-    public function getPastoral(PastoralModel $pastoral)
+    public function getPastoral(Pastoral\Model $pastoral): array
     {
-        return $this->getDatabase()->getPastoral($pastoral);
+        return $this->database->getPastoral($pastoral);
     }
 
     /**
      * @inheritdoc
      */
-    public function syncPastoral(PastoralModel $pastoral)
+    public function syncPastoral(Pastoral\Model $pastoral): bool
     {
-        return $this->getDatabase()->syncPastoral($pastoral);
+        return $this->database->syncPastoral($pastoral);
     }
 
     /**
      * @inheritDoc
      */
-    public function deletePastoral(PastoralModel $pastoral)
+    public function deletePastoral(Pastoral\Model $pastoral): bool
     {
-        return $this->getDatabase()->deletePastoral($pastoral);
+        return $this->database->deletePastoral($pastoral);
     }
 
     /**
      * @inheritdoc
      */
-    public function createComment(PastoralCommentModel $comment)
+    public function createComment(Pastoral\Comment\Model $comment): bool
     {
-        return $this->getDatabase()->createComment($comment);
+        return $this->database->createComment($comment);
     }
 
     /**
      * @inheritDoc
      */
-    public function deleteComment(PastoralCommentModel $comment)
+    public function deleteComment(Pastoral\Comment\Model $comment): bool
     {
-        return $this->getDatabase()->deleteComment($comment);
+        return $this->database->deleteComment($comment);
     }
 
     /**
      * @inheritDoc
      */
-    public function uploadPastoralDocument(UploadQueue $upload)
+    public function uploadPastoralDocument(Pastoral\UploadQueue\Model $upload): bool
     {
-        return $this->getDatabase()->uploadPastoralDocument($upload);
-    }
-
-    /**
-     * @return External_PastoralInterface
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @param External_PastoralInterface $database
-     * @return self
-     */
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
-    }
-
-    /**
-     * @return External_Offline_Pastoral
-     */
-    public function getOffline()
-    {
-        return $this->offline;
-    }
-
-    /**
-     * @param External_Offline_Pastoral $offline
-     * @return self
-     */
-    public function setOffline($offline)
-    {
-        $this->offline = $offline;
-        return $this;
+        return $this->database->uploadPastoralDocument($upload);
     }
 }

@@ -8,7 +8,10 @@ declare(strict_types=1);
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-interface External_UserInterface
+/**
+ * Provides consistently-structured information about users in the SIS, regardless of underlying SIS implementation
+ */
+interface External_UserInterface extends External\IConnector
 {
 
     /* Student-specific
@@ -153,11 +156,11 @@ interface External_UserInterface
      *
      * @param string $yearLevel
      * @param string $name
-     * @param bool   $boardingStatus
+     * @param string $boardingStatus
      * @param string $form
      * @return array
      */
-    public function getStudentContactListExtended(string $yearLevel, string $name, bool $boardingStatus, string $form): array;
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array;
 
     /**
      * Gets some basic information about a student
@@ -186,13 +189,13 @@ interface External_UserInterface
     /**
      * Returns a list of email parent email addresseses for students.
      *
-     * @param array $synergyIds
+     * @param array $externalUserIds
      *
      * @importance medium - used in the class list to create a list of emails, and the report card.
      *
      * @return array
      */
-    public function getParentEmails(array $synergyIds): array;
+    public function getParentEmails(array $externalUserIds): array;
 
     /* Parent-specific
      */
@@ -374,10 +377,10 @@ interface External_UserInterface
      * @importance low - used everywhere, but if you can't get it from the DB,
      *             Jan-Jun: 1, Jul-Dec: 2
      *
-     * @param string $externalUserId
-     * @return string The current semester
+     * @param string|null $externalUserId
+     * @return string|null The current semester
      */
-    public function getCurrentSemester(string $externalUserId = null): string;
+    public function getCurrentSemester(string $externalUserId = null): ?string;
 
     /**
      * Gets the current year for the user.
@@ -387,10 +390,10 @@ interface External_UserInterface
      * @importance low - used everywhere, but if you can't get it from the DB,
      *             return the current year.
      *
-     * @param string $externalUserId
-     * @return string The current file year for the user
+     * @param string|null $externalUserId
+     * @return string|null The current file year for the user
      */
-    public function getCurrentYear(string $externalUserId = null): string;
+    public function getCurrentYear(string $externalUserId = null): ?string;
 
     /**
      * Get a list of subjects for $externalUserId
@@ -425,7 +428,7 @@ interface External_UserInterface
      *
      * @importance high - used to determine a parent's children, and related permissions.
      *
-     * @param string $externalUserId
+     * @param string   $externalUserId
      * @return string[][]
      * @var string|int $return[idx]['RelatedID']
      */
@@ -490,8 +493,10 @@ interface External_UserInterface
      *
      * @importance low - used in a few sync scripts.
      *
+     * @internal string array[]['campus']
+     *
      * @param string $staffID
-     * @return string[]['campus']
+     * @return string[][]
      */
     public function getCampusFromTimetable(string $staffID): array;
 

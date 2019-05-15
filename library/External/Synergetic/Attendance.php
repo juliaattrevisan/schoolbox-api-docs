@@ -27,7 +27,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
     use External_MssqlConnector;
 
     /** @var Attendance_Synergetic_AttendanceMaster $attendanceMaster An instance of Attendance_Synergetic_AttendanceMaster_Abstract */
-    private $attendanceMaster = null;
+    private $attendanceMaster;
 
 
     /**
@@ -41,6 +41,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      * @param int                 $fileSemester
      * @param int                 $staffId
      * @param string              $timetableGroup
+     * @throws \Schoolbox\Application\Exception\Exception
      */
     public function __construct($class, Alaress_Date_Format $attendanceDate, $attendanceDay, $attendancePeriod, $fileYear, $fileSemester, $staffId, $timetableGroup)
     {
@@ -69,19 +70,17 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
             $timetableGroup
         );
 
-        $this->setAttendanceMaster($attendanceMaster);
+        $this->attendanceMaster = $attendanceMaster;
     }
 
     /**
-     * Get a list of attendees for a particular class, date and period
-     *
-     * @return array
+     * @inheritDoc
      * @throws ExternalException
      */
-    public function findAttendanceRecords()
+    public function findAttendanceRecords(): array
     {
         $statement = $this->connector->executeStoredProcedure('spswkAttendances', [
-            'wkAttendanceMasterSeq' => $this->getAttendanceMasterSeq(),
+            'wkAttendanceMasterSeq' => $this->attendanceMaster->getAttendanceMasterSeq(),
             'FillActualAbsenceColumnsFlag' => 1,
             'CheckPossibleNonAttendFlag' => 1,
             'CalculateTodaysAttendanceStringFlag' => 1
@@ -91,17 +90,18 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
 
         if (count($result) > 0) {
             return $result;
-        } else {
-            throw new ExternalException("Unable to setup work space for attendances, cannot continue");
         }
+
+        throw new ExternalException("Unable to setup work space for attendances, cannot continue");
     }
 
+
     /**
-     * A list of options for the absence type drop-down
-     *
+     * @inheritDoc
      * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function findAbsenceDropdownOptions()
+    public function findAbsenceDropdownOptions(): array
     {
         $statement = $this->connector->executeQuery("SELECT Code, Description FROM dbo.luAbsenceType WHERE ActiveFlag = 1");
         $result = $statement->fetchAll();
@@ -126,12 +126,13 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         return $returnArray;
     }
 
+
     /**
-     * A list of options for the attendance reason drop-down
-     *
+     * @inheritDoc
      * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function findReasonDropdownOptions()
+    public function findReasonDropdownOptions(): array
     {
         $statement = $this->connector->executeQuery("SELECT Code, AbsenceTypeCode, Description FROM dbo.luAbsenceReason WHERE ActiveFlag = 1");
         $result = $statement->fetchAll();
@@ -157,48 +158,14 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         return $returnArray;
     }
 
-    /**
-     * Determine if there are attendance records for this particular
-     * class, date and period by checking if the AttendanceMasterSeq
-     * value was found
-     *
-     * @return bool
-     */
-    public function hasAttendanceMasterSeq()
-    {
-        return $this->getAttendanceMaster()->hasAttendanceMasterSeq();
-    }
-
     // Getters/Setters
-
-    /**
-     * Delegation method
-     *
-     * Get attendance master seq
-     *
-     * @return int
-     */
-    private function getAttendanceMasterSeq()
-    {
-        return $this->getAttendanceMaster()->getAttendanceMasterSeq();
-    }
-
-    /**
-     * Set attendance master
-     *
-     * @param null $attendanceMaster
-     */
-    private function setAttendanceMaster($attendanceMaster)
-    {
-        $this->attendanceMaster = $attendanceMaster;
-    }
 
     /**
      * Get attendance master
      *
      * @return Attendance_Synergetic_AttendanceMaster
      */
-    public function getAttendanceMaster()
+    public function getAttendanceMaster(): Attendance_Synergetic_AttendanceMaster
     {
         return $this->attendanceMaster;
     }

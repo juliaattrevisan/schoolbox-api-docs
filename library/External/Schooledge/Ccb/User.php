@@ -3,9 +3,7 @@
  * @copyright Copyright 2018, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 declare(strict_types=1);
-
 
 /**
  * Class External_Schooledge_Ccb_User

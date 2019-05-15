@@ -8,20 +8,10 @@
  */
 
 use Alaress\Redis;
+use External\CachingConnectorAbstract;
 
-class External_UserDetention implements External_UserDetentionInterface {
+class External_UserDetention extends CachingConnectorAbstract implements External_UserDetentionInterface {
 
-    use External_CacheTrait;
-
-    /**
-     * @var External_UserDetentionInterface
-     */
-    protected $database;
-
-    /**
-     * @var External_Offline_UserDetention
-     */
-    private $offline;
     
     /**
      * Constructor
@@ -30,101 +20,36 @@ class External_UserDetention implements External_UserDetentionInterface {
      * @param String $databaseName
      */
     public function __construct($databaseName = '') {
-        $factory = new External_DatabaseFactory();
-        $this->setDatabase($factory->buildUserDetentionConnector($databaseName));
-        $this->setOffline(new External_Offline_UserDetention());
-        $this->setCache(Redis::getInstance());
-        $this->setTimeout(Config::get('external_cache_timeout'));
+        // TODO inject dependencies
+        parent::__construct(
+            (new External_DatabaseFactory())->buildUserDetentionConnector($databaseName),
+            new External_Offline_UserDetention(),
+            Redis::getInstance(),
+            Config::get('external_cache_timeout')
+        );
     }
 
     /**
-     * Retrieves a user's awards.
-     *
-     * @param mixed $externalId The student's external ID.
-     * @param int   $year
-     * @param int   $semester
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getAwards(
-        $externalId,
-        $year,
-        $semester
-    ) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-    }
-
-    /**
-     * Retrieves a user's detentions.
-     *
-     * @param mixed    $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
-     *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
-     *                             in the future.
-     *
-     * @return array
-     */
-    public function getDetentions(
-        $externalId,
-        DateTime $fromDate = null,
-        DateTime $toDate = null
-    ) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-    }
-
-    /**
-     * Retrieves a user's absences that do not have an absence code.
-     *
-     * @param mixed    $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
-     *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
-     *                             in the future.
-     *
-     * @return array
-     */
-    public function getAbsences(
-        $externalId,
-        DateTime $fromDate = null,
-        DateTime $toDate = null
-    ) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
-    }
-
-    /**
-     * @param External_UserDetentionInterface $database
-     * @return $this
-     */
-    private function setDatabase($database)
+    public function getAwards(string $externalId, string $year, string $semester): array
     {
-        $this->database = $database;
-        return $this;
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
-     * Used by External_CacheTrait->getCachedResult()
-     *
-     * @return External_UserDetentionInterface
+     * @inheritDoc
      */
-    private function getDatabase()
+    public function getDetentions(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
     {
-        return $this->database;
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
-     * @return External_Offline_User
+     * @inheritDoc
      */
-    public function getOffline()
+    public function getAbsences(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
     {
-        return $this->offline;
-    }
-
-    /**
-     * @param External_Offline_User $offline
-     */
-    public function setOffline($offline)
-    {
-        $this->offline = $offline;
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 }

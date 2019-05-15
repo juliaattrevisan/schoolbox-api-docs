@@ -1,46 +1,40 @@
 <?php
 /**
- * @author    Anyone Foolish Enough To Claim It <everyone@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-/** @noinspection PhpUndefinedClassInspection */
 class External_Denbigh_User implements External_UserInterface
 {
     /** @var IConnector $externalDatabase */
     private $externalDatabase;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
 
     /**
      * External_Denbigh_Class constructor.
      */
     public function __construct()
     {
-        $this->configMapper = ConfigMapper::getInstance();
-
         /** @noinspection PhpDeprecationInspection */
         $this->externalDatabase = DatabaseFactory::getInstanceExternal();
     }
 
     /**
      * {@inheritDoc}
-     * @param array $externalIds
+     * @param array $externalUserIds
      *
      * @return array
      */
-    public function getParentEmails($externalIds)
+    public function getParentEmails(array $externalUserIds): array
     {
-        $id_list   = implode(',', array_map('intval', $externalIds));
+        $id_list   = implode(',', array_map('intval', $externalUserIds));
         $parentIds = array_filter(explode(',', $id_list));
 
         if (count($parentIds) == 0) {
@@ -74,34 +68,27 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param int $houseId
-     *
-     * @return string
      */
-    public function getHousemasterByHouseId($houseId)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        /** @noinspection SqlDialectInspection */
         $house = $this->externalDatabase->executeQuery(
             "
                 SELECT    Houses.housemaster_id
                 FROM      Houses
                 WHERE     Houses.id = :houseId
             ",
-            ['houseId' => $houseId]
+            ['houseId' => $houseID]
         )->fetch();
 
-        return isset($house['housemaster_id']) ? $house['housemaster_id'] : null;
+        return $house['housemaster_id'] ?? null;
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalId
-     *
-     * @return array
      */
-    public function getParent($externalId)
+    public function getParent(string $externalUserId): array
     {
-        if (empty($externalId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -129,8 +116,8 @@ class External_Denbigh_User implements External_UserInterface
                             pe.denbighID = :externalId2 DESC
             ",
             [
-                'externalId'  => $externalId,
-                'externalId2' => $externalId,
+                'externalId'  => $externalUserId,
+                'externalId2' => $externalUserId,
             ]
         );
 
@@ -163,7 +150,7 @@ class External_Denbigh_User implements External_UserInterface
             $adaption['DirectoryIncludeFlag'] = '';
         }
 
-        if (!empty($parentList[1]) && $parentList[1]['denbighID'] != $externalId) {
+        if (!empty($parentList[1]) && $parentList[1]['denbighID'] != $externalUserId) {
             $adaption['SpouseID']                   = $parentList[1]['denbighID'];
             $adaption['SpouseTitle']                = $parentList[1]['title'];
             $adaption['SpousePreferred']            = $parentList[1]['preferred_name'];
@@ -176,13 +163,10 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param int $externalId
-     *
-     * @return array
      */
-    public function getStudent($externalId)
+    public function getStudent(string $externalUserId): array
     {
-        if (empty($externalId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -225,7 +209,7 @@ class External_Denbigh_User implements External_UserInterface
                 WHERE       pe.denbighID = :externalId
                 LIMIT       1
             ",
-            ['externalId' => $externalId]
+            ['externalId' => $externalUserId]
         );
 
         $student = $studentQuery->fetch();
@@ -290,13 +274,10 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param int $externalId
-     *
-     * @return array
      */
-    public function getStaff($externalId)
+    public function getStaff(string $externalUserId): array
     {
-        if (empty($externalId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -316,7 +297,7 @@ class External_Denbigh_User implements External_UserInterface
                 LEFT JOIN Staff s ON s.peopleDenbighID = p.denbighID
                 WHERE     p.denbighID = :externalId
             ",
-            ['externalId' => $externalId]
+            ['externalId' => $externalUserId]
         )->fetch();
 
         $adaption = [
@@ -341,13 +322,10 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param string $externalId
-     *
-     * @return array
      */
-    public function getStudentContactList($externalId)
+    public function getStudentContactList(string $externalUserId): array
     {
-        if (empty($externalId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -371,7 +349,7 @@ class External_Denbigh_User implements External_UserInterface
                 WHERE         pe_s.denbighID = :externalId
                 GROUP BY      pe_p.denbighID
             ",
-            ['externalId' => $externalId]
+            ['externalId' => $externalUserId]
         );
 
         $contactAdaptionList = [];
@@ -403,33 +381,26 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param null|string $externalId
-     *
-     * @return string
      */
-    public function getCurrentSemester($externalId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         return date('m') < 6 ? '1' : '2';
     }
 
     /**
      * {@inheritDoc}
-     * @param null|string $externalId
-     *
-     * @return string
      */
-    public function getCurrentYear($externalId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return date('Y');
     }
 
+
     /**
      * {@inheritDoc}
-     * @param User $user
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -438,7 +409,6 @@ class External_Denbigh_User implements External_UserInterface
         }
 
         if ($user->getRole()->isStaff()) {
-            /** @noinspection SqlDialectInspection */
             return $this->externalDatabase->executeQuery(
                 "
                     SELECT      cl.classCode AS code,
@@ -453,8 +423,9 @@ class External_Denbigh_User implements External_UserInterface
                 ",
                 ['externalId' => $externalId]
             )->fetchAll();
-        } elseif ($user->getRole()->isStudent()) {
-            /** @noinspection SqlDialectInspection */
+        }
+
+        if ($user->getRole()->isStudent()) {
             return $this->externalDatabase->executeQuery(
                 "
                         SELECT      cl.classCode AS code,
@@ -475,19 +446,17 @@ class External_Denbigh_User implements External_UserInterface
         return [];
     }
 
+
     /**
      * {@inheritDoc}
-     * @param int $externalId
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getEnrolledStudents($externalId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
-        if (empty($externalId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
-        /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
                 SELECT    s.peopleDenbighID AS RelatedID
@@ -496,7 +465,7 @@ class External_Denbigh_User implements External_UserInterface
                 JOIN Students s ON s.familyDenbighID = pa.familyDenbighID
                 WHERE     pe.denbighID = :externalId
             ",
-            ['externalId' => $externalId]
+            ['externalId' => $externalUserId]
         )->fetchAll();
     }
 
@@ -515,9 +484,9 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
@@ -536,13 +505,13 @@ class External_Denbigh_User implements External_UserInterface
         )->fetchAll();
     }
 
+
     /**
      * {@inheritDoc}
-     * @return mixed
+     * @throws \Alaress\Database\Exception
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
-        /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
                 SELECT    peo.title,
@@ -564,13 +533,13 @@ class External_Denbigh_User implements External_UserInterface
         )->fetchAll();
     }
 
+
     /**
      * {@inheritDoc}
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
-        /** @noinspection SqlDialectInspection */
         return $this->externalDatabase->executeQuery(
             "
                 SELECT    People.denbighID,
@@ -587,11 +556,8 @@ class External_Denbigh_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param $boarderValue
-     *
-     * @return string
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         $boarders = [
             'Boarder'        => 'Boarder',
@@ -601,83 +567,61 @@ class External_Denbigh_User implements External_UserInterface
             'B'              => 'Full Boarder',
         ];
 
-        if (isset($boarders[$boarderValue])) {
-            return $boarders[$boarderValue];
-        }
-
-        return false;
+        return $boarders[$boarderValue] ?? '';
     }
 
     /**
      * {@inheritDoc}
-     * @return array
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalId
-     *
-     * @return array
      */
-    public function getCampusFromTimetable($externalId)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @return array
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param array $externalIds
-     *
-     * @return array
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalId
-     *
-     * @return string
      */
-    public function getEmail($externalId)
+    public function getEmail(string $externalUserId): string
     {
         return '';
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalId
      */
-    public function getParentSync($externalId)
+    public function getParentSync(array $externalUserIds): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param string $yearlevel
-     * @param string $name
-     * @param string $boardingStatus
-     * @param string $form
-     *
-     * @return array
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];
     }

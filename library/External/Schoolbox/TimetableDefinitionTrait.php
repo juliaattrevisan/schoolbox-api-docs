@@ -59,7 +59,7 @@ trait External_Schoolbox_TimetableDefinitionTrait
      *
      * @return array
      */
-    public function getTimetableDefinitionFromDatabase(IConnector $database, \Schoolbox\Campus $campus)
+    public function getTimetableDefinitionFromDatabase(IConnector $database, \Schoolbox\Campus $campus): array
     {
         $timetableQuery = $database->executeQuery(
             "

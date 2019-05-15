@@ -7,7 +7,8 @@
  * To change this template use File | Settings | File Templates.
  */
 
-interface External_ClassInterface {
+interface External_ClassInterface extends External\IConnector
+{
 
     /**
      * Get a list of students in a particular $classCode

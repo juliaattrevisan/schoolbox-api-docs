@@ -54,33 +54,23 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      *
      * @return string
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return "Day {$dayNumber}";
     }
 
     /**
      * {@inheritDoc}
-     * @param Campus $campus
-     * @param int    $now
-     * @param User   $user
-     *
-     * @return array
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param string $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     *
-     * @return array
      */
-    public function getFullTimetable($externalUserId, $userId, Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -178,14 +168,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param string $externalUserId
-     * @param Campus $campus
-     * @param int    $day
-     * @param null   $date
-     *
-     * @return bool|mixed
      */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         return $this->getTimetableDefinitionFromDatabase($this->internalDatabase, $campus);
     }
@@ -213,14 +197,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param string              $externalUserId
-     * @param int                 $userId
-     * @param Campus              $campus
-     * @param Alaress_Date_Format $date
-     *
-     * @return mixed
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable(
             $externalUserId,
@@ -235,14 +213,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param string $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
-     *
-     * @return array
      */
-    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         $periodList = [];
 
@@ -357,11 +329,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param array|string $roomCodes
-     *
-     * @return array
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         if (empty($roomCodes)) {
             return [];
@@ -381,10 +350,6 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         }
 
         $timetableGroup = $queryCampus->fetchColumn();
-
-        if (!is_array($roomCodes)) {
-            $roomCodes = [$roomCodes];
-        }
 
         $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCode');
 

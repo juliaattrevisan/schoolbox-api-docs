@@ -14,7 +14,7 @@ class External_Schoolbox_Ping implements External_PingInterface
      * {@inheritDoc}
      * @return bool
      */
-    public function isResponsive()
+    public function isResponsive(): bool
     {
         try {
             /** @noinspection PhpDeprecationInspection */
@@ -30,7 +30,7 @@ class External_Schoolbox_Ping implements External_PingInterface
      * {@inheritDoc}
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '';
     }

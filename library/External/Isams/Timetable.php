@@ -34,24 +34,9 @@ class External_Isams_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Retrieve timetable definition
-     *
-     * @param string $externalUserId User we want the definition for
-     * @param CampusModel $campus Campus we want the definition for
-     * @param int $day School day we want the definition for
-     * @param int $date UNIX timestamp of the date we want to get definition from
-     * @return array
+     * @inheritDoc
      */
-    /**
-     * Retrieve timetable definition
-     *
-     * @param string $externalUserId User we want the definition for
-     * @param CampusModel $campus Campus we want the definition for
-     * @param int $day School day we want the definition for
-     * @param int $date UNIX timestamp of the date we want to get definition from
-     * @return array
-     */
-    public function getTimetableDefinition($externalUserId, CampusModel $campus, $day = null, $date = null)
+    public function getTimetableDefinition(string $externalUserId, CampusModel $campus, $day = null, $date = null): array
     {
         $dayId = $this->getDayId($campus, $date);
 
@@ -191,7 +176,7 @@ class External_Isams_Timetable implements External_TimetableInterface
      * @param $dayNumber
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         $names = [
             'Monday',
@@ -204,15 +189,12 @@ class External_Isams_Timetable implements External_TimetableInterface
         return $names[($dayNumber - 1) % 5];
     }
 
+
     /**
-     * Returns the period number for the current time.
-     *
-     * @param CampusModel $campus A campus object (internal, not Doublefirst)
-     * @param int $now Optional override of time
-     * @param \Schoolbox\User $user User we are getting the period for (only required by DF)
-     * @return array
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $time = date("U");
 
@@ -244,34 +226,20 @@ class External_Isams_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Retrieve timetable for a specific date
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param CampusModel $campus
-     * @param Alaress_Date_Format $date
-     * @return array|mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, CampusModel $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, CampusModel $campus, Alaress_Date_Format $date): array
     {
         $day = $this->getDayNumber($campus, $date);
         return $this->getDayTimetable($externalUserId, $userId, $campus, $day, $date);
     }
 
     /**
-     * Get timetabled classes for specified week day
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param CampusModel $campus
-     * @param $dayNumber
-     * @param null $date
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, CampusModel $campus, $dayNumber, $date = null)
+    public function getDayTimetable(string $externalUserId, $userId, CampusModel $campus, $dayNumber, $date = null): array
     {
         // Can't do anything without the user being supplied
-
         if (empty($externalUserId)) {
             return array();
         }
@@ -281,15 +249,13 @@ class External_Isams_Timetable implements External_TimetableInterface
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
 
         // Can't do anything without the timetable definition either
-
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         $timetable = array();
 
         // Build the timetable
-
         foreach ($timetabledef as $x => $tt) {
             $timetable[$x]['periodName'] = $tt['desc'];
             $timetable[$x]['periodStart'] = $tt['start'];
@@ -353,17 +319,11 @@ class External_Isams_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Get complete timetable
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param CampusModel $campus
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, CampusModel $campus)
+    public function getFullTimetable($externalUserId, $userId, CampusModel $campus): array
     {
         // Can't do anything with the user being supplied
-
         if (empty($externalUserId)) {
             return array();
         }
@@ -372,9 +332,8 @@ class External_Isams_Timetable implements External_TimetableInterface
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $this->getDayNumber($campus));
 
         // Can't do anything without the timetable definition either
-
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         $queryTimetable = "
@@ -475,11 +434,9 @@ class External_Isams_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Gets the timetable for the given room.
-     * @param string $roomCodes
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         return [];
     }

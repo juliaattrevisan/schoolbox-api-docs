@@ -115,7 +115,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array
     {
         if (!$day) {
             $day = $this->getDayNumber($campus);
@@ -193,7 +193,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         // Kind of requires a campus, be this method doesn't have one.
         return $this->database->getOne("
@@ -208,7 +208,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $dateObject    = $this->getDateObjectFromTimestamp($now);
         $timetableDate = $this->getTimetableDate($campus, $dateObject);
@@ -238,7 +238,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         $extraWhere          = "td.SortOrder = {$this->database->smartQuote($dayNumber)}";
         $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus, $extraWhere);
@@ -263,7 +263,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus);
         if (empty($timetabledClassRows)) {
@@ -299,7 +299,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getFullTimetable($externalUserId, $userId, Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus);
         if (empty($timetabledClassRows)) {
@@ -325,12 +325,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         // Sort out room codes
-        if (!is_array($roomCodes)) {
-            $roomCodes = [$roomCodes];
-        }
         if (empty($roomCodes)) {
             return [];
         }

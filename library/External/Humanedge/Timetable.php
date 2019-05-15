@@ -36,7 +36,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0)
+    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0): array
     {
         if (!$day) {
             $day = $this->getDayNumber($campus);
@@ -114,7 +114,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         $db = $this->loadAPlusDatabase();
         return $db
@@ -128,14 +128,14 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $db   = $this->loadAPlusDatabase();
         $time = $now
             ? new Alaress_Date_Format($now, Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now()
         ;
-        return $db
+        return (array)$db
             ->executeQuery(
             "
                     SELECT [SortOrder]
@@ -152,7 +152,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
     {
         // Figure out day number if it's not supplied
         if (!$dayNumber) {
@@ -344,7 +344,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable(
             $externalUserId,
@@ -357,7 +357,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
     {
         try {
             $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
@@ -517,8 +517,8 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        // TODO: Implement getRoomTimetable() method.
+        return [];
     }
 }

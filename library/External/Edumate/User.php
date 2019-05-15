@@ -7,6 +7,7 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -16,7 +17,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getParent($externalUserId)
+    public function getParent(string $externalUserId): array
     {
         // prepare
 
@@ -88,7 +89,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStudent($externalUserId)
+    public function getStudent(string $externalUserId): array
     {
         // Fields present in Synergetic but not Edumate
         //
@@ -195,7 +196,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         $caseSensitiveFields = array(
             'StudentContactID',
@@ -247,13 +248,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         }
 
         return $parents;
-
     }
 
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         $stmt = $this->getConnection()->prepareQuery("
             SELECT REPORT_PERIOD
@@ -276,7 +276,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return date('Y');
     }
@@ -284,7 +284,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -333,10 +333,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return array_values($classes);
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
@@ -378,7 +380,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT
@@ -399,9 +401,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
-     * @inheritdoc
+     * @inheritDoc
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT
@@ -428,10 +430,12 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         $stmt = $this->getConnection()->prepareQuery('
             SELECT
@@ -457,7 +461,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getParentEmails($externalUserIds)
+    public function getParentEmails(array $externalUserIds): array
     {
         $emails = array();
         foreach ($externalUserIds as $externalUserId) {
@@ -477,7 +481,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @inheritdoc
      * @deprecated
      */
-    public function getParentSync($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
         return [];
     }
@@ -486,7 +490,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @inheritdoc
      * @deprecated
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];
     }
@@ -495,7 +499,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @inheritdoc
      * @deprecated
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         return '';
     }
@@ -504,7 +508,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @inheritdoc
      * @deprecated
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
         return null;
     }
@@ -512,7 +516,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
@@ -520,7 +524,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         return [];
     }
@@ -528,7 +532,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return [];
     }
@@ -536,7 +540,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         return [];
     }
@@ -544,7 +548,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getStaff($externalUserId)
+    public function getStaff(string $externalUserId): array
     {
         return [];
     }
@@ -552,7 +556,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getEmail($externalUserId)
+    public function getEmail(string $externalUserId): string
     {
         return '';
     }

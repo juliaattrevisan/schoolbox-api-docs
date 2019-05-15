@@ -11,7 +11,7 @@ use Schoolbox\Assessment\Activity;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
-interface External_MarkbookInterface
+interface External_MarkbookInterface extends External\IConnector
 {
 
     /**

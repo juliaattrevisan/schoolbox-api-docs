@@ -213,24 +213,22 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         // Grab mapper instances
-
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setPastoralMapper(PastoralMapper::getInstance());
-        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
-        $this->setPastoralDocumentClassificationMapper(PastoralDocumentClassificationMapper::getInstance());
-        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
-        $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
-        $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
-        $this->setPastoralSubTypeMapper(PastoralSubTypeMapper::getInstance());
-        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
-        $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
-        $this->pastoralRevisionMapper = PastoralRevisionMapper::getInstance();
+        $this->userMapper                           = UserMapper::getInstance();
+        $this->pastoralMapper                       = PastoralMapper::getInstance();
+        $this->pastoralAccessMapper                 = PastoralAccessMapper::getInstance();
+        $this->pastoralDocumentClassificationMapper = PastoralDocumentClassificationMapper::getInstance();
+        $this->pastoralCommentMapper                = PastoralCommentMapper::getInstance();
+        $this->pastoralLogMapper                    = PastoralLogMapper::getInstance();
+        $this->pastoralTypeMapper                   = PastoralTypeMapper::getInstance();
+        $this->pastoralSubTypeMapper                = PastoralSubTypeMapper::getInstance();
+        $this->pastoralSeverityMapper               = PastoralSeverityMapper::getInstance();
+        $this->pastoralRevisionMapper               = PastoralRevisionMapper::getInstance();
     }
 
     /**
      * @inheritdoc
      */
-    public function getPastoral(Pastoral $pastoral)
+    public function getPastoral(Pastoral $pastoral): array
     {
         $query = "{$this->getSqlPastoralSelect()} WHERE dbo.tPastoralCare.PastoralCareSeq = :externalId";
 
@@ -250,8 +248,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords)
-    {
+    public function importPastoral(
+        User $user,
+        User $defaultOwner,
+        bool $importParentAccess,
+        bool $importRecords,
+        bool $importAttachments,
+        bool $deleteRecords
+    ): void {
         // Give the import 30 minutes to complete and bump up the memory limit just to make sure we don't bomb out
 
         ini_set('memory_limit', '2048M');
@@ -269,7 +273,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $log->setStudentName(null);
         $log->setCreatorName(null);
         $log->setResult("Parent Importing " . ($importParentAccess ? 'Enabled' : 'Disabled'));
-        $this->getPastoralLogMapper()->save($log);
+        $this->pastoralLogMapper->save($log);
 
         if ($importRecords) {
 
@@ -349,7 +353,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             // The student of the pastoral care record is not available in Schoolbox, skip this record
 
                             $logRecord->setResult("Skipped Unknown Student ({$record["PastoralCareSeq"]})");
-                            $this->getPastoralLogMapper()->save($logRecord);
+                            $this->pastoralLogMapper->save($logRecord);
                             continue;
                         }
 
@@ -357,29 +361,29 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         $logRecord->setStudentName($student->getFullName());
 
                         //Find existing records, if they exist you may either delete them or skip them depending on flag
-                        $existingRecords = $this->getPastoralMapper()->findByColumn('external_id', $record["PastoralCareSeq"]);
+                        $existingRecords = $this->pastoralMapper->findByColumn('external_id', $record["PastoralCareSeq"]);
                         if(count($existingRecords)) {
                             if($deleteRecords) {
                                 // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
                                 // records. Could update the record, but its contents may have deviated it was originally imported, and
                                 // deleting will at least keep that history
-                                $this->getPastoralMapper()->deleteByColumn("external_id", $record["PastoralCareSeq"]);
+                                $this->pastoralMapper->deleteByColumn("external_id", $record["PastoralCareSeq"]);
                             }
                             else {
                                 $logRecord->setResult("Skipped record already exists ({$record["PastoralCareSeq"]})");
-                                $this->getPastoralLogMapper()->save($logRecord);
+                                $this->pastoralLogMapper->save($logRecord);
                                 continue;
                             }
                         }
 
                         $logRecord->setResult("Importing ({$record["PastoralCareSeq"]})");
-                        $this->getPastoralLogMapper()->save($logRecord);
+                        $this->pastoralLogMapper->save($logRecord);
 
                         // Only create record if both public and private aren't blank
 
                         if (!empty($record["Details"]) || !empty($record["PrivateDetails"])) {
                             /** @var Pastoral $pastoralRecord */
-                            $pastoralRecord = $this->getPastoralMapper()->createModel();
+                            $pastoralRecord = $this->pastoralMapper->createModel();
                             $pastoralRecord->setExternalId($record["PastoralCareSeq"]);
                             $pastoralRecord->setOwner($owner);
                             $pastoralRecord->setStudent($student);
@@ -404,7 +408,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                 $pastoralRecord->setSeverity($severity);
                             }
 
-                            $this->getPastoralMapper()->save($pastoralRecord);
+                            $this->pastoralMapper->save($pastoralRecord);
 
                             // Because updated_at is clobbered:
                             $this->pastoralMapper->resetUpdatedTimestamp($pastoralRecord, $modifiedDate);
@@ -454,7 +458,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $attachment->setPrivate(true);
                                         $pastoralAttachmentMapper->save($attachment);
 
-                                        $log = $this->getPastoralLogMapper()->createModel();
+                                        $log = $this->pastoralLogMapper->createModel();
                                         $log->setImportId($importId);
                                         $log->setUserId($user->getId());
                                         $log->setPastoralId($pastoralRecord->getId());
@@ -462,7 +466,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                                         $log->setStudentName($pastoralRecord->getStudent()->getFullName());
                                         $log->setHeading("Imported Attachment '{$document["filename"]}'");
                                         $log->setResult("OK");
-                                        $this->getPastoralLogMapper()->save($log);
+                                        $this->pastoralLogMapper->save($log);
 
                                         unlink($filename);
                                     } catch (MapperException $e) {
@@ -483,7 +487,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         $logRecord->setResult("Import Error: {$e->getMessage()}");
                     }
 
-                    $this->getPastoralLogMapper()->save($logRecord);
+                    $this->pastoralLogMapper->save($logRecord);
                 }
             } while (count($records) > 0);
 
@@ -506,7 +510,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 foreach ($audienceRecords as $audience) {
                     /** @var PastoralLog $logAccess */
-                    $logAccess = $this->getPastoralLogMapper()->createModel();
+                    $logAccess = $this->pastoralLogMapper->createModel();
                     $logAccess->setImportId($importId);
                     $logAccess->setUserId($user->getId());
                     $logAccess->setPastoralId($pastoralRecord->getId());
@@ -521,11 +525,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                         if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
                             /** @var PastoralAccess $accessRecord */
-                            $accessRecord = $this->getPastoralAccessMapper()->createModel();
+                            $accessRecord = $this->pastoralAccessMapper->createModel();
                             $accessRecord->setPastoral($pastoralRecord);
                             $accessRecord->setAccess(PastoralAccessMapper::ACCESS_PUBLIC);
                             $accessRecord->setUser($audienceUser);
-                            $this->getPastoralAccessMapper()->save($accessRecord);
+                            $this->pastoralAccessMapper->save($accessRecord);
 
                             $logAccess->setResult("Audience: {$audienceUser->getFullName()}");
                         } else {
@@ -536,17 +540,17 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         $logAccess->setResult("Error Audience: {$audience["ID"]}");
                     }
 
-                    $this->getPastoralLogMapper()->save($logAccess);
+                    $this->pastoralLogMapper->save($logAccess);
                 }
             }
         }
 
-        $log = $this->getPastoralLogMapper()->createModel();
+        $log = $this->pastoralLogMapper->createModel();
         $log->setImportId($importId);
         $log->setUserId($user->getId());
         $log->setHeading("Import Completed");
         $log->setResult("Completed");
-        $this->getPastoralLogMapper()->save($log);
+        $this->pastoralLogMapper->save($log);
     }
 
     // Pastoral record synchronization
@@ -554,7 +558,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function syncPastoral(Pastoral $pastoral)
+    public function syncPastoral(Pastoral $pastoral): bool
     {
         /** @var Pastoral $pastoral */
         $pastoral = $this->reloadModel($pastoral);
@@ -599,8 +603,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ";
         } else {
             // Don't try to update anything if the pastoral record cannot be found in synergetic
-            if (! $this->checkPastoralRecordExists($pastoral->getExternalId())) {
-                return;
+            if (!$this->checkPastoralRecordExists($pastoral->getExternalId())) {
+                return false;
             }
 
             $query = "
@@ -630,12 +634,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
-                    $propagator = $this->getPastoralMapper()->getEventPropagator();
-                    $this->getPastoralMapper()->setEventPropagator(new MockPropagator());
-                    $this->getPastoralMapper()->save($pastoral);
+                    $propagator = $this->pastoralMapper->getEventPropagator();
+                    $this->pastoralMapper->setEventPropagator(new MockPropagator());
+                    $this->pastoralMapper->save($pastoral);
 
                     // Restore the proper propagator
-                    $this->getPastoralMapper()->setEventPropagator($propagator);
+                    $this->pastoralMapper->setEventPropagator($propagator);
                 }
 
                 // Export the permissions/audience of the pastoral record to Synergetic
@@ -670,8 +674,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         );
 
         // Retrieve all access records stored in Schoolbox
-
-        $access = $this->getPastoralAccessMapper()->findByColumn('pastoral_id', $pastoral->getId(), ['cache' => false]);
+        $access = $this->pastoralAccessMapper->findByColumn('pastoral_id', $pastoral->getId(), ['cache' => false]);
 
         $order = 1;
 
@@ -730,23 +733,21 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function createComment(PastoralComment $comment)
+    public function createComment(PastoralComment $comment): bool
     {
         // Annoyingly the use of self::COLUMN_CREATED_TIMESTAMP does not populate the model with the creation date after saving
         // so we need to reload the model from the database to get the date it was created
-
         try {
             /** @var PastoralComment $comment */
             $comment = $this->reloadModel($comment);
 
             /** @var Pastoral $pastoral */
-            $pastoral = $this->getPastoralMapper()->findById($comment->getPastoral()->getId());
+            $pastoral = $this->pastoralMapper->findById($comment->getPastoral()->getId());
 
             /** @var User $owner */
             $owner = $this->userMapper->findById($pastoral->getOwner()->getId());
         } catch (MapperException $e) {
             // Can't find either the pastoral record or the authors Synergetic ID
-
             return false;
         }
 
@@ -780,7 +781,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         try {
-            $result = $this->connector->executeQuery($query, [
+            $this->connector->executeQuery($query, [
                 'externalId' => $pastoral->getExternalId(),
                 'externalId2' => $pastoral->getExternalId(),
                 'comment' => $comment->getBody(),
@@ -793,13 +794,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
             // notification every time someone creates a pastoral record
-            $propagator = $this->getPastoralCommentMapper()->getEventPropagator();
-            $this->getPastoralCommentMapper()->setEventPropagator(new MockPropagator());
-            $this->getPastoralCommentMapper()->save($comment);
+            $propagator = $this->pastoralCommentMapper->getEventPropagator();
+            $this->pastoralCommentMapper->setEventPropagator(new MockPropagator());
+            $this->pastoralCommentMapper->save($comment);
 
             // Restore the proper propagator
-            $this->getPastoralCommentMapper()->setEventPropagator($propagator);
-            return $result;
+            $this->pastoralCommentMapper->setEventPropagator($propagator);
+            return true;
         } catch (\Alaress\Database\Exception $e) {
             // most likely that corresponding pastoral record is deleted in Synergetic
             return false;
@@ -809,47 +810,43 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
-    public function deleteComment(PastoralComment $comment)
+    public function deleteComment(PastoralComment $comment): bool
     {
         if ($this->isExternalIdValid($comment->getExternalCode())) {
-            return $this->connector->executeQuery(
+            $query = $this->connector->executeQuery(
                 "DELETE FROM PastoralCareComments WHERE PastoralCareCommentsSeq = :external_code",
                 ['external_code' => $comment->getExternalCode()]
             );
+            return $query->rowCount() > 0;
         }
 
-        return true;
+        return false;
     }
 
     /**
      * @inheritDoc
      */
-    public function deletePastoral(Pastoral $pastoral)
+    public function deletePastoral(Pastoral $pastoral): bool
     {
         // Option to delete pastoral records from Synergetic has to be explicitly allowed in the schools configuration
-
         if ($this->config->get('pastoral_external_delete')) {
             // Make sure the pastoral record has a valid external ID
-
             if ($this->isExternalIdValid($pastoral->getExternalId())) {
                 // These must be done in order due to FK constraints in Synergetic database
 
                 // Delete contacts
-
                 $this->connector->executeQuery(
                     "DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = :externalId",
                     ['externalId' => $pastoral->getExternalId()]
                 );
 
                 // Delete comments
-
                 $this->connector->executeQuery(
                     "DELETE FROM PastoralCareComments WHERE PastoralCareSeq = :externalId",
                     ['externalId' => $pastoral->getExternalId()]
                 );
 
                 // Delete the pastoral care record itself now that its dependencies are gone
-
                 $this->connector->executeQuery(
                     "DELETE FROM tPastoralCare WHERE PastoralCareSeq = :externalId",
                     ['externalId' => $pastoral->getExternalId()]
@@ -865,10 +862,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function uploadPastoralDocument(UploadQueue $upload)
+    public function uploadPastoralDocument(UploadQueue $upload): bool
     {
         // Temporarily increase the memory limit and timeout so we can get the file across to Synergetic
-
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
 
@@ -891,7 +887,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         // Save the file into to the database
-
         $externalId = $upload->getExternalId();
         $studentExternalId = $upload->getStudentExternalId();
         $date = date("Y-m-d H:i:s");
@@ -900,7 +895,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoralExternalId = $pastoral->getExternalId();
 
         // Documents get uploaded with a classification code that is based on the pastoral records type
-
         if ($documentClassification instanceof DocumentClassification) {
             $classificationCode = $documentClassification->getExternalCode();
         } else {
@@ -909,7 +903,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Implicit CONVERT(VARBINARY, :document, 1) is a temporary hack due to a bug in PDO_SQLSRV driver, without this you
         // will receive an MSSQL error about type conversion in spite of passing the data as PDO:PARAM_LOB
-
         $sql = "
             INSERT INTO {$this->schemaMedia}.tDocuments
             (
@@ -956,7 +949,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $documentReferencesSeq = $this->connector->lastInsertId();
 
         // Add a document reference to the student so it shows up on their normal community record
-
         $query = $this->connector->prepareQuery(
             "
                 INSERT INTO {$this->schemaMedia}.DocumentReferences (ID, DocumentReferencesSeq) 
@@ -1005,7 +997,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             throw new ExternalException('Error linking pastoral document to record in Synergetic database.');
         }
 
-        return $documentReferencesSeq;
+        return true;
     }
 
     // Helper functions below
@@ -1022,16 +1014,16 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
             try {
                 /** @var PastoralSeverity $severity */
-                $severity = $this->getPastoralSeverityMapper()->findOneByColumn("order", 0);
+                $severity = $this->pastoralSeverityMapper->findOneByColumn("order", 0);
             } catch (Exception $e) {
                 // Pastoral severity was not found, this should never happen as it is a mandatory field in Schoolbox.
                 // We will just create a default one called "Low" in case it every does happen
 
                 /** @var PastoralSeverity $severity */
-                $severity = $this->getPastoralSeverityMapper()->createModel();
+                $severity = $this->pastoralSeverityMapper->createModel();
                 $severity->setOrder(0);
                 $severity->setName("Low");
-                $this->getPastoralSeverityMapper()->save($severity);
+                $this->pastoralSeverityMapper->save($severity);
             }
 
             return $severity;
@@ -1054,7 +1046,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     {
         // Get the students Synergetic ID
 
-        $studentExternalId = $this->getUserMapper()->findByIdWithFallback(
+        $studentExternalId = $this->userMapper->findByIdWithFallback(
             $pastoral->getStudent()->getId()
         )->getExternalId();
 
@@ -1186,7 +1178,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         if (!isset($this->userCache[$externalId])) {
             try {
-                $this->userCache[$externalId] = $this->getUserMapper()->findByExternalId($externalId);
+                $this->userCache[$externalId] = $this->userMapper->findByExternalId($externalId);
             } catch (MapperException $e) {
                 $this->userCache[$externalId] = null;
             }
@@ -1210,14 +1202,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Didn't find a cached record. Try to retrieve an existing pastoral type from Schoolbox
 
             try {
-                $type = $this->getPastoralTypeMapper()->findOneByColumn('name', $record["TypeDescription"]);
+                $type = $this->pastoralTypeMapper->findOneByColumn('name', $record["TypeDescription"]);
             } catch (MapperException $e) {
                 // The records pastoral type doesn't exist in Schoolbox, create one that matches
-
-                $type = $this->getPastoralTypeMapper()->createModel();
+                $type = $this->pastoralTypeMapper->createModel();
                 $type->setName($record["TypeDescription"]);
                 $type->setExternalCode($record["TypeCode"]);
-                $this->getPastoralTypeMapper()->save($type);
+                $this->pastoralTypeMapper->save($type);
             }
 
             $this->typeCache[$record["TypeDescription"]] = $type;
@@ -1244,7 +1235,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $pastoralType = $this->getPastoralType($record);
 
             try {
-                $category = $this->getPastoralSubTypeMapper()->findOneByColumnList([
+                $category = $this->pastoralSubTypeMapper->findOneByColumnList([
                     'name' => $record["CategoryDescription"],
                     'pastoral_type_id' => $pastoralType->getId(),
                 ]);
@@ -1255,214 +1246,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $category->setName($record["CategoryDescription"]);
                 $category->setExternalCode($record["CategoryCode"]);
                 $category->setPastoralType($pastoralType);
-                $this->getPastoralSubTypeMapper()->save($category);
+                $this->pastoralSubTypeMapper->save($category);
             }
 
             $this->pastoralTypeCache[$record["CategoryCode"]] = $category;
         }
 
         return $this->pastoralTypeCache[$record["CategoryCode"]];
-    }
-
-    // Getters & Setters
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param $userMapper
-     *
-     * @return $this
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralMapper
-     */
-    public function getPastoralMapper()
-    {
-        return $this->pastoralMapper;
-    }
-
-    /**
-     * @param PastoralMapper $pastoralMapper
-     *
-     * @return $this
-     */
-    public function setPastoralMapper($pastoralMapper)
-    {
-        $this->pastoralMapper = $pastoralMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralTypeMapper
-     */
-    public function getPastoralTypeMapper()
-    {
-        return $this->pastoralTypeMapper;
-    }
-
-    /**
-     * @param $pastoralTypeMapper
-     *
-     * @return $this
-     */
-    public function setPastoralTypeMapper($pastoralTypeMapper)
-    {
-        $this->pastoralTypeMapper = $pastoralTypeMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralLogMapper
-     */
-    public function getPastoralLogMapper()
-    {
-        return $this->pastoralLogMapper;
-    }
-
-    /**
-     * @param $pastoralLogMapper
-     *
-     * @return $this
-     */
-    public function setPastoralLogMapper($pastoralLogMapper)
-    {
-        $this->pastoralLogMapper = $pastoralLogMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralSubTypeMapper
-     */
-    public function getPastoralSubTypeMapper()
-    {
-        return $this->pastoralSubTypeMapper;
-    }
-
-    /**
-     * @param $pastoralSubTypeMapper
-     *
-     * @return $this
-     */
-    public function setPastoralSubTypeMapper($pastoralSubTypeMapper)
-    {
-        $this->pastoralSubTypeMapper = $pastoralSubTypeMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralAccessMapper
-     */
-    public function getPastoralAccessMapper()
-    {
-        return $this->pastoralAccessMapper;
-    }
-
-    /**
-     * @param $pastoralAccessMapper
-     *
-     * @return $this
-     */
-    public function setPastoralAccessMapper($pastoralAccessMapper)
-    {
-        $this->pastoralAccessMapper = $pastoralAccessMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralAttachmentMapper
-     */
-    public function getPastoralAttachmentMapper()
-    {
-        return $this->pastoralAttachmentMapper;
-    }
-
-    /**
-     * @param $pastoralAttachmentMapper
-     *
-     * @return $this
-     */
-    public function setPastoralAttachmentMapper($pastoralAttachmentMapper)
-    {
-        $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralCommentMapper
-     */
-    public function getPastoralCommentMapper()
-    {
-        return $this->pastoralCommentMapper;
-    }
-
-    /**
-     * @param $pastoralCommentMapper
-     *
-     * @return $this
-     */
-    public function setPastoralCommentMapper($pastoralCommentMapper)
-    {
-        $this->pastoralCommentMapper = $pastoralCommentMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralSeverityMapper
-     */
-    public function getPastoralSeverityMapper()
-    {
-        return $this->pastoralSeverityMapper;
-    }
-
-    /**
-     * @param $pastoralSeverityMapper
-     *
-     * @return $this
-     */
-    public function setPastoralSeverityMapper($pastoralSeverityMapper)
-    {
-        $this->pastoralSeverityMapper = $pastoralSeverityMapper;
-
-        return $this;
-    }
-
-    /**
-     * @return PastoralDocumentClassificationMapper
-     */
-    public function getPastoralDocumentClassificationMapper()
-    {
-        return $this->pastoralDocumentClassificationMapper;
-    }
-
-    /**
-     * @param $pastoralDocumentClassificationMapper
-     *
-     * @return $this
-     */
-    public function setPastoralDocumentClassificationMapper($pastoralDocumentClassificationMapper)
-    {
-        $this->pastoralDocumentClassificationMapper = $pastoralDocumentClassificationMapper;
-
-        return $this;
     }
 }

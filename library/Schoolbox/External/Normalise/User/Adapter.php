@@ -25,16 +25,16 @@ class Adapter {
     /**
      * Crappy alex handler
      *
-     * @var \External_User
+     * @var \External_UserInterface
      */
     private $handler;
 
     /**
-     * Accepts an External_User
+     * Accepts an External_UserInterface
      *
-     * @param \External_User $handler
+     * @param \External_UserInterface $handler
      */
-    public function __construct(\External_User $handler) {
+    public function __construct(\External_UserInterface $handler) {
         $this->handler = $handler;
     }
 
@@ -128,7 +128,7 @@ class Adapter {
     {
         $collection = new Collection();
 
-        $allResults = $this->handler->getParentSync($externalUserId);
+        $allResults = $this->handler->getParentSync((array)$externalUserId);
 
         if (\is_array($externalUserId)) {
             if (\is_array($allResults) && \count($allResults)) {
@@ -1093,10 +1093,10 @@ class Adapter {
     /**
      * Get info for the staff member $externalUserId
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return Staff
      */
-    public function getStaff($externalUserId): Staff
+    public function getStaff(string $externalUserId): Staff
     {
         $currentResult = $this->handler->getStaff($externalUserId);
 
@@ -1342,10 +1342,10 @@ class Adapter {
     /**
      * Set session vars for current semester (fileyear, filesemester)
      *
-     * @param null $externalUserId
-     * @return int
+     * @param string $externalUserId
+     * @return null|string
      */
-    public function getCurrentSemester($externalUserId = null): int
+    public function getCurrentSemester($externalUserId = null): ?string
     {
         return $this->handler->getCurrentSemester($externalUserId);
     }
@@ -1404,7 +1404,7 @@ class Adapter {
      * @param $houseId
      * @return Staff
      */
-    public function getHousemasterByHouseId($houseId): Staff
+    public function getHousemasterByHouseId(string $houseId): Staff
     {
         $currentResult = $this->handler->getHousemasterByHouseId($houseId);
 
@@ -1421,7 +1421,7 @@ class Adapter {
      * @param $boarderValue
      * @return string
      */
-    public function determineBoarderType($boarderValue): string
+    public function determineBoarderType(string $boarderValue): string
     {
         return $this->handler->determineBoarderType($boarderValue);
     }
@@ -1429,10 +1429,10 @@ class Adapter {
     /**
      * List of campuses a staff member is involved in based on timetable
      *
-     * @param int $staffID
-     * @return array|bool
+     * @param string $staffID
+     * @return string[][]
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable($staffID): array
     {
         return $this->handler->getCampusFromTimetable($staffID);
     }

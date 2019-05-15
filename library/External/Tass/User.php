@@ -57,11 +57,11 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentEmails(array $synergyIds): array
+    public function getParentEmails(array $externalUserIds): array
     {
         $emailList = array();
         $db = $this->database;
-        $idList    = implode(',', array_map(array($db, 'smartQuote'), $synergyIds));
+        $idList    = implode(',', array_map(array($db, 'smartQuote'), $externalUserIds));
 
         if (empty($idList)) {
             return array();
@@ -318,7 +318,7 @@ class External_Tass_User implements External_UserInterface
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
                 foreach ($parents as $key2 => $parent2) {
-                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother OR $this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
+                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother or $this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
                         unset($parents[$key]);
                     }
                 }
@@ -331,7 +331,7 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentSemester(string $externalUserId = null): string
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         $query = "
             SELECT curr_sem
@@ -345,7 +345,7 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentYear(string $externalUserId = null): string
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         $query = "
             SELECT curr_year
@@ -408,7 +408,7 @@ class External_Tass_User implements External_UserInterface
     * Get enrolled students
     *
     * @param $externalUserId
-    * @return mixed
+    * @return array
     */
     public function getEnrolledStudents(string $externalUserId): array
     {
@@ -522,19 +522,17 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
-    * Determine the boarder type based on a value
-    * Returns a human-readable string
-    *
-    * @param $boarderValue
-    * @return string
+    * @inheritDoc
     */
     public function determineBoarderType(string $boarderValue): string
     {
         $boarders = array('Y');
 
-        if (!strlen($boarderValue)) {
+        if ($boarderValue === '') {
             return '';
-        } elseif (in_array($boarderValue, $boarders)) {
+        }
+
+        if (in_array($boarderValue, $boarders, true)) {
             return 'Boarder';
         }
 
@@ -618,7 +616,7 @@ class External_Tass_User implements External_UserInterface
         return $this->database->trimAll($this->database->getAll($query));
     }
 
-    public function getStudentContactListExtended(string $yearLevel, string $name, bool $boardingStatus, string $form): array
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];
     }
@@ -877,9 +875,7 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
-     * Not yet implemented for this connector
-     *
-     * @return array
+     * @inheritDoc
      */
     public function getStudentForms(): array
     {

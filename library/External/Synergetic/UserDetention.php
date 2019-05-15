@@ -7,8 +7,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\DebugBar\Instance as DebugBar;
-
 class External_Synergetic_UserDetention implements External_UserDetentionInterface
 {
     use External_Synergetic_ValidateExternalIdTrait;
@@ -67,19 +65,10 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     }
 
     /**
-     * Retrieves a user's awards.
-     *
-     * @param mixed $externalId The student's external ID.
-     * @param int   $year
-     * @param int   $semester
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getAwards(
-        $externalId,
-        $year,
-        $semester
-    ) {
+    public function getAwards(string $externalId, string $year, string $semester): array
+    {
         // Awards: fetch based on year and semester, not a date span?
         if (!$this->isExternalIdValid($externalId)) {
             return [];
@@ -112,21 +101,10 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     }
 
     /**
-     * Retrieves a user's detentions.
-     *
-     * @param mixed    $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
-     *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
-     *                             in the future.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getDetentions(
-        $externalId,
-        DateTime $fromDate = null,
-        DateTime $toDate = null
-    ) {
+    public function getDetentions(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    {
         if (!$this->isExternalIdValid($externalId)) {
             return [];
         }
@@ -149,21 +127,10 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     }
 
     /**
-     * Retrieves a user's absences that do not have an absence code.
-     *
-     * @param mixed    $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
-     *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
-     *                             in the future.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getAbsences(
-        $externalId,
-        DateTime $fromDate = null,
-        DateTime $toDate = null
-    ) {
+    public function getAbsences(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    {
         if (!$this->isExternalIdValid($externalId)) {
             return [];
         }

@@ -15,7 +15,7 @@ use Schoolbox\Permission\Access\UserAccess;
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
 
-    /** @var External_Timetable $externalTimetable */
+    /** @var External_TimetableInterface $externalTimetable */
     private $externalTimetable;
 
     /** @var array $dayName */

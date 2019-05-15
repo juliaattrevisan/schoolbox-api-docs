@@ -34,24 +34,24 @@ class External_Tass_Timetable implements External_TimetableInterface
 
 
 
-    function getCampusCode(\Schoolbox\Campus $campus)
+    private function getCampusCode(\Schoolbox\Campus $campus)
     {
         list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
         return $campusCode;
     }
 
-    function getTimetableCode(\Schoolbox\Campus $campus)
+    private function getTimetableCode(\Schoolbox\Campus $campus)
     {
         list($campusCode, $timetableCode) = explode('-', $campus->getExtTimetableCode());
         return $timetableCode;
     }
 
-    function getDays(\Schoolbox\Campus $campus)
+    private function getDays(\Schoolbox\Campus $campus)
     {
         return $campus->getTimetableDay();
     }
 
-    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
     {
 
         $campusCode    = $this->getCampusCode($campus);
@@ -82,7 +82,6 @@ class External_Tass_Timetable implements External_TimetableInterface
         $timetableDef['periodCount'] = $longestDay['prd_num'];
         $timetableDef['dayCount']    = $this->getDays($campus);
         return $timetableDef;
-
     }
 
     /**
@@ -126,7 +125,7 @@ class External_Tass_Timetable implements External_TimetableInterface
      * @param $dayNumber
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return 'Day ' . $dayNumber;
     }
@@ -150,13 +149,16 @@ class External_Tass_Timetable implements External_TimetableInterface
         return $time;
     }
 
-    //returns the period number for the current time
-    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+
+    /**
+     * @inheritDoc
+     */
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
-        return 0;
+        return [];
     }
 
-    function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -226,25 +228,15 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific date
-     *
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     *
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param Schoolbox\Campus $campus
-     * @param Alaress_Date_Format $date
-     * @return mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
 
-    function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -313,16 +305,10 @@ class External_Tass_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Gets the timetable for the given room.
-     *
-     * @param  array|string $roomCodes
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        if (!is_array($roomCodes)) {
-            $roomCodes = [$roomCodes];
-        }
         if (empty($roomCodes)) {
             return [];
         }

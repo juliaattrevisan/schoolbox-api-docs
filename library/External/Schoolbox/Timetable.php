@@ -29,14 +29,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param string $externalUserId
-     * @param Campus $campus
-     * @param int    $day
-     * @param null   $date
-     *
-     * @return array
      */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         $timetableDef = [];
 
@@ -119,20 +113,17 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      *
      * @return string
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return "Day {$dayNumber}";
     }
 
+
     /**
      * {@inheritDoc}
-     * @param Campus    $campus
-     * @param int       $now
-     * @param null|User $user
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, User $user = null): array
     {
         $dayNumber = $this->getDayNumber($campus, $now);
         $time      = $now
@@ -194,13 +185,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param int    $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     *
-     * @return array
      */
-    public function getFullTimetable($externalUserId, $userId, Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -296,14 +282,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param int                 $externalUserId
-     * @param int                 $userId
-     * @param Campus              $campus
-     * @param Alaress_Date_Format $date
-     *
-     * @return mixed
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable(
             $externalUserId,
@@ -318,14 +298,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param int    $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
-     *
-     * @return array
      */
-    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId) || empty($dayNumber)) {
             return [];
@@ -380,15 +354,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritDoc}
-     * @param array|string $roomCodes
-     *
-     * @return array
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        if (!is_array($roomCodes)) {
-            $roomCodes = [$roomCodes];
-        }
         if (empty($roomCodes)) {
             return [];
         }

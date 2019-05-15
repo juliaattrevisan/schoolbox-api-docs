@@ -1,7 +1,5 @@
 <?php
-
-/* King's Synergetic Classes */
-use Alaress\DebugBar\Instance as DebugBar;
+declare(strict_types=1);
 
 class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 	private $database;
@@ -11,8 +9,9 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 		parent::__construct();
 		 $this->setDatabase(MSSQL::getInstance());
 	}
-	
-	public function getStudent($synID) {
+
+    public function getStudent(string $externalUserId): array
+    {
 		$query = "SELECT
 					vStudents.StudentID,
 					vStudents.StudentGiven1,
@@ -58,7 +57,7 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 					LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
 					LEFT JOIN luBoardingHouse lub ON vStudents.StudentBoardingHouse = lub.Code
 				WHERE
-					vStudents.StudentID = '$synID'
+					vStudents.StudentID = '$externalUserId'
 					AND vStudents.FileSemester='" . $this->getDatabase()->quote($this->getCurrentSemester()) . "'
 					AND vStudents.FileYear='" . $this->getDatabase()->quote($this->getCurrentYear()) . "'
 		";
@@ -76,10 +75,11 @@ class Synchronise_Synergetic_Kings_KingsUser extends External_Synergetic_User {
 			return $student;
 		}
 
-		return false;
+		return [];
 	}
 
-        public function getParentUserAccountInfo() {
+    public function getParentUserAccountInfo(): array
+    {
                 $query = "
 SELECT DISTINCT
 sc.StudentContactID, sc.StudentContactTitle, sc.StudentContactPreferred, sc.StudentContactSurname, sc.StudentContactDefaultEmail,
@@ -106,7 +106,8 @@ and sc.FileSemester = '" . $this->getDatabase()->quote($this->getCurrentSemester
                 return $this->getDatabase()->getAll($query);
         }
 
-		public function getStudentUserAccountInfo() {
+    public function getStudentUserAccountInfo(): array
+    {
 			$query = "
 				SELECT
 					vStudents.StudentID, NetworkLogin, vStudents.StudentTitle, vStudents.StudentPreferred, vStudents.StudentSurname, StudentGender,
