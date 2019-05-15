@@ -9,6 +9,7 @@ namespace Schoolbox\Comms\News\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Comms\News\Audience;
+use Schoolbox\Comms\News\Audience\Mapper;
 use Schoolbox\Comms\News\Audience\Segment\StrategyFactory;
 use Schoolbox\User;
 use InvalidArgumentException;
@@ -44,6 +45,7 @@ class HaveReadPermToAudience extends ArticleAttribute
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
+     * @throws \DomainException
      */
     public function authorize(array $params = [], User $user = null): void
     {
@@ -53,6 +55,13 @@ class HaveReadPermToAudience extends ArticleAttribute
 
         $article  = $this->findArticleInParams($params);
         $audience = $article->getAudience();
+
+        /* Needs audience hydration into $article
+         * Otherwise it throws the Unauthorized exception
+         */
+        $audienceSegments = Mapper::getInstance()->findForArticles([$article->getId()]);
+        $article->setAudience($audienceSegments);
+
         if (!$audience || !$audience->count()) {
             throw new Unauthorized('Article has no audience segments');
         }
