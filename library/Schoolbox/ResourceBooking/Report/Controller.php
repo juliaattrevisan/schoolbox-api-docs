@@ -17,6 +17,9 @@ use Schoolbox\ResourceBooking\Item;
 
 class Controller extends Base
 {
+    /**
+     * The default maximum reporting period for resource bookings
+     */
     protected const MAX_REPORTING_PERIOD = 3;
 
     /**
