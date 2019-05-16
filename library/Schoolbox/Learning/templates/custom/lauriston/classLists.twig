@@ -1,14 +1,19 @@
 {% extends '@learning/coreClassLists.twig' %}
 
 {% block data_dropdown_content %}
-    <li v-if="student.ePortfolioIsEnabled"><a :href="'/eportfolio/' + student.id + '/profile'"
-                                              class="icon-eportfolio">${ linkTitle.ePortfolio }</a></li>
-    <li v-if="pastoralIsEnabled"><a :href="'/pastoral/student/' + student.id" class="icon-pastoral">${
-            linkTitle.pastoralCare.capitalise() }</a></li>
-    <li><a :href="calendarPath + '/' + student.id" class="icon-calendar">${
-            linkTitle.calendar.capitalise() }</a></li>
-    <li><a :href="/timetable/+ student.synergy_id" class="icon-timetable">${
-            linkTitle.timetable.capitalise() }</a></li>
-    <li v-if="student.email && mailEnabled"><a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${
-            linkTitle.email.capitalise() }</a></li>
+    <li v-if="student.ePortfolioIsEnabled">
+        <a :href="'/eportfolio/' + student.id + '/profile'" class="icon-eportfolio">${ linkTitle.ePortfolio }</a>
+    </li>
+    <li v-if="pastoralIsEnabled">
+        <a :href="pastoralGetStudentPathPrefix + student.id" class="icon-pastoral">${ linkTitle.pastoralCare.capitalise() }</a>
+    </li>
+    <li>
+        <a :href="calendarPath + '/' + student.id" class="icon-calendar">${ linkTitle.calendar.capitalise() }</a>
+    </li>
+    <li>
+        <a :href="/timetable/+ student.id" class="icon-timetable">${ linkTitle.timetable.capitalise() }</a>
+    </li>
+    <li v-if="student.email && mailEnabled">
+        <a :href="mailHandle + student.email" class="icon-mail" title="Send Email">${ linkTitle.email.capitalise() }</a>
+    </li>
 {% endblock %}
