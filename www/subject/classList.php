@@ -20,6 +20,7 @@ $classCodeCsv = urldecode(implode('/', $this->arg));
 $folders      = Folder\Mapper::getInstance()->findAllByCode($classCodeCsv);
 
 // Ensure we didn't get 0 or multiple folders for these codes/s
+// Make sure that only a single folder is returned otherwise you get a page not found..
 if ($folders->count() !== 1) {
     $this->pageNotFound();
 }
