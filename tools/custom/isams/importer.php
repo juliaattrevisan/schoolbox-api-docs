@@ -18,6 +18,7 @@ use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelationMapper;
@@ -66,7 +67,8 @@ HELP;
             UserMapper::getInstance(),
             UserProfileMapper::getInstance(),
             UserRelationMapper::getInstance(),
-            TimetableCycleMapper::getInstance()
+            TimetableCycleMapper::getInstance(),
+            TimetablePeriodMapper::getInstance()
         );
 
         $composite->import();
