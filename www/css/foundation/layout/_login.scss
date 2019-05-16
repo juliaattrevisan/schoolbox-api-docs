@@ -77,8 +77,13 @@ $login-img-max-height: 12rem !default; // 192px
             }
         }
 
+        input[type=password] {
+            margin-bottom: .5rem;
+        }
+
         input[type=submit] {
             @extend .expand;
+            margin-top: .5rem;
         }
 
         input[type=checkbox] + label {
@@ -101,8 +106,20 @@ $login-img-max-height: 12rem !default; // 192px
 
         a.button {
             @extend .expand;
-            color:$content-ui-foreground;
+            color: $content-ui-foreground;
             margin-top: 1rem;
+        }
+
+        .login-links {
+            p:first-of-type {
+                margin: .75rem 0 1rem 0;
+                color: calc-text-color($login-overlay);
+                text-align: center;
+            }
+            p:not(:first-of-type) {
+                font-weight: $font-weight-bold;
+                text-align: center;
+            }
         }
 
         #footer,
