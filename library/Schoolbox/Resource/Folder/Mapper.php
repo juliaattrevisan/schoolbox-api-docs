@@ -976,13 +976,24 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByCode($code, $campusCode = '')
     {
-        $model = $this->findAllByCode($code, $campusCode)->first();
+        $folders = $this->findAllByCode($code, $campusCode);
 
-        if (!$model instanceof Model) {
-            throw new MapperException("Instance of object not found");
+        // The set of $code returned exactly one folder (determinate)
+        // return this folder because we're sure
+        if ($folders->count() === 1) {
+            return $folders->first();
         }
 
-        return $model;
+        // no folders match the $code provided
+        if ($folders->count() === 0) {
+            throw new MapperException();
+        }
+
+        // Multiple folders resulted from $code
+        // this is an edge case that cannot happen normally because bidness logic prevents it
+        // you have to mangle the db, or provide bad data on the url to manifest this situation
+        // In either case, pop out an exception because this should never have occurred
+        throw new InvalidArgumentException('Multiple folders returned; indeterminate destination');
     }
 
 

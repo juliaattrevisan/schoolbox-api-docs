@@ -16,20 +16,19 @@ if (!isset($this)) {
     header('Location: /subject/classList/');
     die();
 }
-$classCodeCsv = urldecode(implode('/', $this->arg));
-$folders      = Folder\Mapper::getInstance()->findAllByCode($classCodeCsv);
 
-// Ensure we didn't get 0 or multiple folders for these codes/s
-// Make sure that only a single folder is returned otherwise you get a page not found..
-if ($folders->count() !== 1) {
-    $this->pageNotFound();
+try {
+    /** @var Router $router */
+    $router         = $this->getDi()->get('router');
+    $classCodeCsv   = urldecode(implode('/', $this->arg));
+    $folder         = Folder\Mapper::getInstance()->findByCode($classCodeCsv);
+
+    // redirect to $folder->getId()
+    header("Location: {$router->generate('learning.getClassListPage', ['folderId' => $folder->getId()])}");
+    die();
+
+} catch (InvalidArgumentException $exception) {
+    $this->pageNotFound(); // indeterminate destination, bad input or bad codes in db
+} catch (\Schoolbox\Mapper\Exception $exception) {
+    $this->pageNotFound(); // no models matched
 }
-
-/** @var Folder\Model $firstFolder */
-$firstFolder = $folders->first();
-
-/** @var Router $router */
-$router = $this->getDi()->get('router');
-
-header("Location: {$router->generate('learning.getClassListPage', ['folderId' => $firstFolder->getId()])}");
-die();
