@@ -263,7 +263,9 @@ class Controller extends Base
                     if (!isset($assessmentTasks[$folder->getId()])) {
                         $assessmentTasks[$folder->getId()] = new GenericCollection(IAssessable::class);
                     }
-                    $assessmentTasks[$folder->getId()]->add($assessment);
+                    if ($assessment->getParticipantIfExtant($viewee)) {
+                        $assessmentTasks[$folder->getId()]->add($assessment);
+                    }
                 }
 
                 $markbooksFolders[$folder->getId()]->add($assessment);
