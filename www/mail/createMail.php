@@ -58,7 +58,7 @@ if (Cfg::get('mail_enable') == 1) {
         $page->setBlock('alert_box', 'invalid_address', 'invalid_address_block');
         foreach ($invalidEmails as $email) {
             $page->setVar([
-                'INVALID_EMAIL' => Scrub::text($email)
+                'INVALID_EMAIL' => '"'.Scrub::text($email).'"'
             ]);
             $page->parse('invalid_address_block', 'invalid_address', true);
         }
