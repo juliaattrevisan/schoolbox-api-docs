@@ -1,3 +1,11 @@
+{## NCEA Entries And Results
+ #
+ # @param int $year
+ # @param array $entriesAndResults
+ # @param array $comments
+ #}
+{% import '@templates/macro.twig' as macro %}
+
 <div class="row">
     <div class="small-12 island">
         <section class="content generic-heading-highlight no-margin">
@@ -14,9 +22,7 @@
 
             {% if allData.allTeachers|length %}
                 <p class="meta">
-                    {% for currentTeacherName, currentTeacherEmail in allData.allTeachers %}
-                        {% if currentTeacherEmail != '' %}<a href='mailto:{{ currentTeacherEmail }}'>{{ currentTeacherName }}</a>{% else %}{{ currentTeacherName }}{% endif %}{% if not loop.last %}, {% endif %}
-                    {% endfor %}
+                    {{ macro.renderTeachers(allData.allTeachers) }}
                 </p>
             {% endif %}
         </section>
@@ -46,8 +52,10 @@
                         </tr>
                     {% endif %}
                 {% endfor %}
-                </tbody>
-                <tfoot>
+
+                {# Summary table for Internally and Externally graded assessments
+                 # This is the pink and blue table
+                 #}
                 <tr>
                     <td colspan="6">
                         <table class="no-margin">
@@ -87,7 +95,24 @@
                         </table>
                     </td>
                 </tr>
-                </tfoot>
+
+                {# Comments
+                 # A list of comments per subject, ordered by Term
+                 # Only show this section if there are comments to display
+                 #}
+                {% if entriesAndResults.comments[year].courses[courseName].terms|length %}
+                <tr>
+                    <td colspan="6">
+                        <p class="subheading">Comments</p>
+                        {% for term, commentData in entriesAndResults.comments[year].courses[courseName].terms %}
+                            {% if commentData.comment|length %}
+                                <p>Term {{ term }} - {{ commentData.comment }}&mdash;{{ macro.renderTeachers(commentData.teachers) }}</p>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+                </tbody>
             </table>
         </div>
     </div>

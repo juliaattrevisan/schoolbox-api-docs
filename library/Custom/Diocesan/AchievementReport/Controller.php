@@ -11,6 +11,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
+use Custom\Diocesan\AchievementReport\Comments\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use MSSQL;
 use Schoolbox\User;
@@ -352,8 +353,13 @@ class Controller extends Base {
 
                 /* Entries And Results for a specific year
                  */
+
+                /* Get all the comments for $year for this user
+                 * Then rearrange all the subjects
+                 */
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
+                    'comments' => (new Comments($user, $externalUser, $db, $year))->findNCEAData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => self::TYPES,
                     'year' => $year,

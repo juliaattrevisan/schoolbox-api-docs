@@ -1,3 +1,11 @@
+{##
+ #SchoolGrades Entries And Results
+ #
+ # @param int year
+ # @param array entriesAndResults
+ #}
+{% import '@templates/macro.twig' as macro %}
+
 <div class="row">
     <div class="small-12 island">
         <section class="content generic-heading-highlight no-margin">
@@ -65,11 +73,36 @@
                     {% endif %}
                 {% endif %}
                 {% endfor %}
+
+                {# Comments
+                 # A list of comments per subject, ordered by Term
+                 # Only show this section if there are comments to display
+                 #}
+                {% if areaData.comments|length %}
+                    <tr>
+                        <td colspan="6">
+                            <p class="subheading">Comments</p>
+
+                            {% for term, commentData in areaData.comments %}
+                                {% if commentData.comment|length %}
+                                <p>
+                                    Term {{ term }} - {{ commentData.comment }}&mdash;
+                                    {{ macro.renderTeachers(commentData.teachers) }}
+                                </p>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+
+                {# Spacer row between subjects in this year
+                 # ...because padding
+                 #}
                 {% if not loop.last %}
                 <tr class="spacer">
                     <td colspan="2"></td>
                 </tr>
-            {% endif %}
+                {% endif %}
         {% endfor %}
         </tbody>
     </table>
