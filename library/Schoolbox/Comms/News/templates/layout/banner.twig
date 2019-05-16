@@ -66,9 +66,8 @@
     </section>
 </div>
 <div class="small-12 island">
-    <section class="discussion content">
+    <section class="discussion content" id="threads-section" v-if="showCommentsSection">
         <div class="discussion-threads">
-        <div id="threads-section">
             <div class="row">
                 <div class="small-6 columns">
                     <h2>Comments <span v-if="showCommentsCount">(${ totalCommentsCount })</span></h2>
@@ -142,7 +141,6 @@
                 </ul>
             </div>
         </div>
-        </div>
     </section>
 </div>
 <div id='toaster' class="toast" data-toast></div>
@@ -187,7 +185,6 @@
             deletingCommentText: 'Deleting comment...',
             commentDeletedText: 'Comment deleted',
             errorDeletingCommentText: 'Unable to delete comment',
-            articlesLoading: true,
             commentIdToDelete: undefined,
             commentIndexToDelete: undefined,
             confirmDeleteButton: true,
@@ -199,6 +196,7 @@
             postCommentButtonIsEnabled: true,
             createThreadEndpoint: "{{ routeLookup('commsDiscussionThreads.createThread', {contextId: article.id}) }}",
             associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {articleId: article.id}) }}",
+            showCommentsSection: false,
         },
         // define methods under the `methods` object
         methods: {
@@ -266,6 +264,7 @@
                     self.showSkeletonLoader = false;
                     self.loadMoreIsEnabled = false;
                     self.showCommentsCount = true;
+                    self.showCommentsSection = self.threadCheckboxVisible;
                     return;
                 }
 
@@ -306,6 +305,12 @@
                      * Do not show load more button when all the comments has been loaded
                      */
                     self.showLoadMoreButton = self.comments.length < responseData.metadata.count;
+
+                    /**
+                     * If the user have the rights to modify the thread, despite that there's comments, comments section
+                     * must be rendered
+                     */
+                    self.showCommentsSection = (self.threadCheckboxVisible || self.totalCommentsCount > 0 || self.threadEnabled);
 
                     $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
