@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Isams\Base\Importer;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelationMapper;
@@ -59,6 +60,12 @@ class Composite implements ImporterInterface
 
 
     /**
+     * @var TimetableCycleMapper
+     */
+    private $timetableCycleMapper;
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -80,7 +87,8 @@ class Composite implements ImporterInterface
         Batchxml $api,
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
-        UserRelationMapper $userRelationMapper
+        UserRelationMapper $userRelationMapper,
+        TimetableCycleMapper $timetableCycleMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -89,6 +97,7 @@ class Composite implements ImporterInterface
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
         $this->userRelationMapper = $userRelationMapper;
+        $this->timetableCycleMapper = $timetableCycleMapper;
     }
 
 
@@ -98,8 +107,9 @@ class Composite implements ImporterInterface
     public function import(): void
     {
         $this->registry
-            ->add(new Importer\Profile($this->log, $this->perform, $this->api, $this->userMapper, $this->userProfileMapper))
-            ->add(new Importer\Relations($this->log, $this->perform, $this->api, $this->userMapper, $this->userRelationMapper));
+//            ->add(new Importer\Profile($this->log, $this->perform, $this->api, $this->userMapper, $this->userProfileMapper))
+//            ->add(new Importer\Relations($this->log, $this->perform, $this->api, $this->userMapper, $this->userRelationMapper))
+            ->add(new Importer\Timetable($this->log, $this->perform, $this->api, $this->timetableCycleMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();
