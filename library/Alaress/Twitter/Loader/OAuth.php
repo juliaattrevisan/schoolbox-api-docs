@@ -53,8 +53,8 @@ class Alaress_Twitter_Loader_OAuth implements Alaress_Twitter_Loader_Interface
      */
     public function __construct(string $consumer_key, string $consumer_secret, ?string $oauth_token, ?string $oauth_secret)
     {
-        require_once 'oauth/twitteroauth.php';
-        $this->connection = new twitteroauth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
+        require_once 'oauth/TwitterOAuth.php';
+        $this->connection = new TwitterOAuth($consumer_key, $consumer_secret, $oauth_token, $oauth_secret);
     }
 
     /**
