@@ -53,14 +53,14 @@ class Connector
      * Constructor
      *
      * @param string $databaseType
-     * @param null|IConnector $db
+     * @param IConnector $db
      * @param string $eventType
      */
-    public function __construct(string $databaseType, IConnector $db = null, string $eventType)
+    public function __construct(string $databaseType, IConnector $db, string $eventType)
     {
         /* Only set $db when external db supports what we're doing
          */
-        if (null !== $db && \in_array($databaseType, $this->availableConnectors, false)) {
+        if (\in_array($databaseType, $this->availableConnectors, false)) {
             $this->db = $db;
         }
         $this->eventType = $eventType;
@@ -100,7 +100,7 @@ class Connector
      */
     private function generateIdentifier($eventId): string
     {
-        return "ETTC_{$eventId}";
+        return "EOTC_{$eventId}";
     }
 
     /**
