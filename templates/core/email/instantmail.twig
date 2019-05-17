@@ -47,7 +47,11 @@
                     </td>
                 </tr>
                     <td>
-                        <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+                        {% if msg.meta.blurb %}
+                            <p>{{ msg.meta.blurb | purify }}</p>
+                        {% else %}
+                            <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+                        {% endif %}
                     </td>
                 {% endif %}
             </table>

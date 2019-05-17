@@ -260,7 +260,7 @@ class Instance implements JsonSerializable
 
         foreach ($meta as $key => $value) {
             // check if it's out of bounds
-            if (is_string($value) && strlen($value) > self::MAX_FIELD_SIZE) {
+            if (is_string($value) && ($key !== 'blurb') && strlen($value) > self::MAX_FIELD_SIZE) {
                 // convert to plaintext first as a precaution
                 $plain = new Html2Text($value);
                 $value = TextFormatter::cutSentence($plain->getText(), self::MAX_FIELD_SIZE);
