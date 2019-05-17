@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
@@ -117,6 +118,8 @@ class TimetableClass
             AND g.group_type = '{$groupType}'
         ");
 
+        $users = [];
+
         foreach ($userStatement as $row) {
             $users[$row['synergy_id']] = $row['id'];
         }
@@ -130,7 +133,56 @@ class TimetableClass
         $classes = new TimetableClassIterator($this->batchxml);
 
         foreach ($classes as $class) {
-            new \Alaress_Probe($class);
+
+            /* Process class entry
+             */
+            /** @var ClassEntry $timetableClass */
+            $timetableClass = $this->classEntryMapper->createModel()
+                ->setCode($class['code'])
+                ->setName($class['name'])
+                ->setDescription($class['name']);
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
+
+            $this->log->info(sprintf(
+                'Creating class %s %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode()
+            ));
+
+            /* Process students
+             */
+            foreach ($class['students'] as $student) {
+                if (isset($users[$student['id']])) {
+                    /* Minimum user
+                     */
+                    $user = $this->userMapper->createModel()
+                        ->setId($users[$student['id']]);
+
+                    /** @var ClassInvolvement $timetableClassInvolvement */
+                    $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
+                        ->setUser($user)
+                        ->setClass($timetableClass);
+
+                    if ($this->perform) {
+                        $this->classInvolvementMapper->save($timetableClassInvolvement);
+                    }
+
+                    $this->log->info(sprintf(
+                        'Creating class involvement %s %s for user %s (user %s)',
+                        $timetableClass->getName(),
+                        $timetableClass->getCode(),
+                        $student['preferredName'] . ' ' . $student['surname'],
+                        $timetableClassInvolvement->getUser()->getId()
+                    ));
+                }
+            }
+        }
+
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
         }
     }
 }
