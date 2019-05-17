@@ -167,6 +167,8 @@ class Kernel extends WebKernelAbstract
                 $session->updateLastTime();
             }
 
+            $session->set('no_header', true);
+
             /** @var \Aura\Web\Response $response */
             $response = null;
 

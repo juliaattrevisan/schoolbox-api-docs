@@ -55,6 +55,8 @@ class User implements IDataGenerator
             'previous'       => $previousData['user'] ?? null,
             'impersonated'   => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousData),
             'communityLogin' => $this->session->get('communityLogin'),
+            'no_header'      => $this->session->get('no_header') ?: isset($_REQUEST['no_header']),
+
         ];
     }
 }
