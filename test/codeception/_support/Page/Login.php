@@ -18,8 +18,12 @@ class Login
     const URL                  = '/login/';
     const FIELD_USERNAME       = 'username';
     const FIELD_PASSWORD       = 'password';
+    const SAML_FIELD_USERNAME  = 'UserName';
+    const SAML_FIELD_PASSWORD  = 'Password';
     const CHECKBOX_REMEMBER_ME = '#rememberme';
     const BUTTON_LOGIN         = 'Submit';
+    const SAML_BUTTON          = 'Login using Single Sign-On';
+    const SAML_LOGIN_BUTTON    = ['xpath' => '//span[text()="Sign in"]'];
 
     /**
      * @var AcceptanceTester
@@ -34,6 +38,23 @@ class Login
     public function __construct(AcceptanceTester $i)
     {
         $this->tester = $i;
+    }
+
+    /**
+     * Log in as this user via SAML
+     *
+     * @param $username
+     * @param $password
+     * @param $rememberMe
+     * @throws \Exception
+     */
+    public function loginSAML($username, $password)
+    {
+        $this->tester->click(self::SAML_BUTTON);
+        $this->tester->waitForText("ADFS Schoolbox",5);
+        $this->tester->fillField(self::SAML_FIELD_USERNAME, $username);
+        $this->tester->fillField(self::SAML_FIELD_PASSWORD, $password);
+        $this->tester->click(self::SAML_LOGIN_BUTTON);
     }
 
     /**

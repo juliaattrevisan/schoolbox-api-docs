@@ -21,6 +21,8 @@ suites:
                     user: "root"
                     password: "tnp879"
                     # dump goes here
+                - Cli:
+
         extensions:
             enabled:
                 - Codeception\Extension\RunProcess:
