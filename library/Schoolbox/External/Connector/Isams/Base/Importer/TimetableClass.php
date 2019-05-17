@@ -36,7 +36,7 @@ class TimetableClass
     /**
      * @var Batchxml
      */
-    private $api;
+    private $batchxml;
 
 
     /**
@@ -76,7 +76,7 @@ class TimetableClass
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $batchxml;
+        $this->batchxml = $batchxml;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -98,7 +98,7 @@ class TimetableClass
          * such as period ids, user ids, etc. so we try to get those and assemble them into
          * a convenient struct which we can then just ram home
          */
-        $classes = new TimetableClassIterator($this->api->fetchXml('/iSAMS/TeachingManager/Sets/Set'));
+        $classes = new TimetableClassIterator($this->batchxml);
 
         foreach ($classes as $class) {
             new \Alaress_Probe($class);

@@ -9,6 +9,8 @@
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Schoolbox\External\UPS\Batchxml;
+
 class TimetableClassIterator implements \Iterator
 {
 
@@ -21,28 +23,80 @@ class TimetableClassIterator implements \Iterator
     /**
      * @var array|\SimpleXMLElement[]
      */
-    private $nodes;
+    private $sets;
+
+
+    /**
+     * @var Batchxml
+     */
+    private $batchxml;
 
 
     /**
      * TimetableClassIterator constructor.
-     * @param array|\SimpleXMLElement[] $nodes
+     *
+     * @param Batchxml $batchxml
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      */
-    public function __construct(array $nodes)
+    public function __construct(Batchxml $batchxml)
     {
-        $this->nodes = $nodes;
+        $this->batchxml = $batchxml;
+
+        $this->sets = $this->batchxml->fetchXml('/iSAMS/TeachingManager/Sets/Set');
     }
 
 
     /**
      * Return the current element
+     *
+     * Compile this into an array of convenient pieces
+     *
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      * @since 5.0.0
      */
     public function current()
     {
-        return $this->nodes[$this->position];
+        $set = $this->sets[$this->position];
+
+        /* A list of teachers for this class
+         * Requires UPS to have loaded all Staff members
+         */
+        $teachers = [];
+
+        /* Find the subject's actual name by looking elsewhere in the xml
+         */
+        $subjectId = (string)$set->SubjectId;
+        $subject = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0];
+
+        /* Find the subject's teachers by looking elsewhere in the xml
+         */
+        foreach ($set->xpath('Teachers/Teacher') as $current) {
+            $teacherId = (string)$current->xpath('@StaffId')[0]->StaffId;
+
+            $teacher = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$teacherId}']")[0];
+
+            $teachers[] = [
+                'username' => (string)$teacher->UserName,
+                'preferredName' => (string)$teacher->PreferredName,
+                'surname' => (string)$teacher->Surname,
+            ];
+        }
+
+        /* Basic TimetableClass data
+         */
+        $class = [
+            'name' => (string)$subject->Name,
+            'code' => (string)$set->SetCode,
+            'teachers' => $teachers
+        ];
+
+        return $class;
     }
 
 
@@ -79,7 +133,7 @@ class TimetableClassIterator implements \Iterator
      */
     public function valid(): bool
     {
-        return isset($this->nodes[$this->position]);
+        return isset($this->sets[$this->position]);
     }
 
 
