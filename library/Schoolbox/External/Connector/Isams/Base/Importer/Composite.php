@@ -11,6 +11,9 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Importer;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
@@ -80,6 +83,24 @@ class Composite implements ImporterInterface
 
 
     /**
+     * @var ClassEntryMapper
+     */
+    private $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    private $classInvolvementMapper;
+
+
+    /**
+     * @var ClassPeriodMapper
+     */
+    private $classPeriodMapper;
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -88,15 +109,18 @@ class Composite implements ImporterInterface
     /**
      * Composite constructor.
      *
-     * @param LoggerInterface       $log
-     * @param bool                  $perform
-     * @param Batchxml              $api
-     * @param UserMapper            $userMapper
-     * @param UserProfileMapper     $userProfileMapper
-     * @param UserRelationMapper    $userRelationMapper
-     * @param TimetableCampusMapper $timetableCampusMapper
-     * @param TimetableCycleMapper  $timetableCycleMapper
-     * @param TimetablePeriodMapper $timetablePeriodMapper
+     * @param LoggerInterface        $log
+     * @param bool                   $perform
+     * @param Batchxml               $api
+     * @param UserMapper             $userMapper
+     * @param UserProfileMapper      $userProfileMapper
+     * @param UserRelationMapper     $userRelationMapper
+     * @param TimetableCampusMapper  $timetableCampusMapper
+     * @param TimetableCycleMapper   $timetableCycleMapper
+     * @param TimetablePeriodMapper  $timetablePeriodMapper
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper      $classPeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -107,7 +131,10 @@ class Composite implements ImporterInterface
         UserRelationMapper $userRelationMapper,
         TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
-        TimetablePeriodMapper $timetablePeriodMapper
+        TimetablePeriodMapper $timetablePeriodMapper,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper,
+        ClassPeriodMapper $classPeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -119,6 +146,9 @@ class Composite implements ImporterInterface
         $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
+        $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
+        $this->classPeriodMapper = $classPeriodMapper;
     }
 
 
@@ -130,7 +160,8 @@ class Composite implements ImporterInterface
         $this->registry
 //            ->add(new Importer\Profile($this->log, $this->perform, $this->api, $this->userMapper, $this->userProfileMapper))
 //            ->add(new Importer\Relations($this->log, $this->perform, $this->api, $this->userMapper, $this->userRelationMapper))
-            ->add(new Importer\Timetable($this->log, $this->perform, $this->api, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper));
+            ->add(new Importer\Timetable($this->log, $this->perform, $this->api, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
+            ->add(new Importer\TimetableClass($this->log, $this->perform, $this->api, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();

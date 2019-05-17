@@ -14,6 +14,9 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\TimetableCampusMapper;
@@ -69,7 +72,10 @@ HELP;
             UserRelationMapper::getInstance(),
             TimetableCampusMapper::getInstance(),
             TimetableCycleMapper::getInstance(),
-            TimetablePeriodMapper::getInstance()
+            TimetablePeriodMapper::getInstance(),
+            ClassEntryMapper::getInstance(),
+            ClassInvolvementMapper::getInstance(),
+            ClassPeriodMapper::getInstance()
         );
 
         $composite->import();
