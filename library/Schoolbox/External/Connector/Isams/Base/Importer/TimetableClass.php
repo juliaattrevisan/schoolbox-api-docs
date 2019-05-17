@@ -10,6 +10,7 @@
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -91,9 +92,16 @@ class TimetableClass
         $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
         $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
 
-        $classes = $this->api->fetchXml('/iSAMS/TeachingManager/Sets');
+        /* Find all the classes and their details as best we can
+         *
+         * Some parts will rely on data to have already been imported into local schema,
+         * such as period ids, user ids, etc. so we try to get those and assemble them into
+         * a convenient struct which we can then just ram home
+         */
+        $classes = new TimetableClassIterator($this->api->fetchXml('/iSAMS/TeachingManager/Sets/Set'));
 
-        new \Alaress_Probe($classes);
-
+        foreach ($classes as $class) {
+            new \Alaress_Probe($class);
+        }
     }
 }
