@@ -91,7 +91,6 @@ class Controller extends Base
                     $end = clone $start;
                     $end->addMonths(self::MAX_REPORTING_PERIOD);
                 }
-
             } catch (\Exception $e) {
                 // noop - use default
             }
