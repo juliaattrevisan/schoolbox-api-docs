@@ -209,6 +209,7 @@ class Timetable implements ImporterInterface
 
         foreach ($days as $day) {
             $periods = $day->xpath('Periods/Period');
+            $dayIndex = (string)$day->Day;
 
             /* Figure out which day has the most periods
              * Consider this value and scheme canonical
@@ -219,13 +220,13 @@ class Timetable implements ImporterInterface
                 $struct['maxPeriods'] = $numPeriods;
             }
 
-            $struct['days'][(string)$day->Day] = [];
+            $struct['days'][$dayIndex] = [];
 
             /** @var TimetablePeriod $period */
             foreach ($periods as $period) {
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle((string)$period->Name)
-                    ->setDay((string)$day->Day)
+                    ->setDay($dayIndex)
                     ->setSequence((string)$period->Ordinal)
 
                     /* Is this 12 or 24 hour time? Only seen morning values so far
@@ -233,17 +234,17 @@ class Timetable implements ImporterInterface
                     ->setStart((string)$period->StartTime . ':00')
                     ->setFinish((string)$period->EndTime . ':00');
 
-                $struct['days'][(string)$day->Day][] = $timetablePeriod;
+                $struct['days'][$dayIndex][] = $timetablePeriod;
             }
 
             /* Do a quick analysis in case there might be something amiss
              */
-            if (!\count($struct['days'][(string)$day->Day])) {
+            if (!\count($struct['days'][$dayIndex])) {
                 $this->log->warning(sprintf(
                     'Cycle %s (%s), Day %s has no periods.',
                     (string)$cycle->xpath('@Id')[0],
                     (string)$cycle->Name,
-                    (string)$day->Day
+                    $dayIndex
                 ));
             }
         }
