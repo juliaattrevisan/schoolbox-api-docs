@@ -27,6 +27,6 @@ class MockApi extends Api
      */
     public function retrieveDocument(string $filter = ''): ?string
     {
-        return file_get_contents(__DIR__ .'/../../../../../../www/temp.xml');
+        return file_get_contents(__DIR__ .'/../../../../../../www/test.xml');
     }
 }
