@@ -98,7 +98,15 @@ class Timetable implements ImporterInterface
                  */
                 ->setRegular(1);
 
-            $this->timetableCycleMapper->save($timetableCycle);
+            if ($this->perform) {
+                $this->timetableCycleMapper->save($timetableCycle);
+            }
+
+            $this->log->info(sprintf(
+                'Creating timetable cycle %s with day length %s',
+                $timetableCycle->getId(),
+                $timetableCycle->getDayLength()
+            ));
 
             /* Save all the periods and associate them with a cycle
              */
@@ -108,13 +116,28 @@ class Timetable implements ImporterInterface
             foreach ($days as $day => $periods) {
 
                 /** @var array $periods */
+                /** @var TimetablePeriod $period */
                 foreach ($periods as $period) {
                     $period->setDay($day);
                     $period->setCycle($timetableCycle);
 
-                    $this->timetablePeriodMapper->save($period);
+                    $this->log->info(sprintf(
+                        'Creating period %s (%s-%s) in timetable cycle %s',
+                        $period->getTitle(),
+                        $period->getStart(),
+                        $period->getFinish(),
+                        $timetableCycle->getId()
+                    ));
+
+                    if ($this->perform) {
+                        $this->timetablePeriodMapper->save($period);
+                    }
                 }
             }
+        }
+
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
         }
     }
 
