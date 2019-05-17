@@ -64,15 +64,19 @@ class TimetableClassIterator implements \Iterator
     {
         $set = $this->sets[$this->position];
 
-        /* A list of teachers for this class
-         * Requires UPS to have loaded all Staff members
+        /* Class identifier
          */
-        $teachers = [];
+        $setId = (string)$set->xpath('@Id')[0];
 
         /* Find the subject's actual name by looking elsewhere in the xml
          */
         $subjectId = (string)$set->SubjectId;
         $subject = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0];
+
+        /* A list of teachers for this class
+         * Requires UPS to have loaded all Staff members
+         */
+        $teachers = [];
 
         /* Find the subject's teachers by looking elsewhere in the xml
          */
@@ -88,12 +92,35 @@ class TimetableClassIterator implements \Iterator
             ];
         }
 
+        /* A list of students for this class
+         * Requires UPS to have loaded all Student members
+         */
+        $students = [];
+
+        /* Find the subject's students by looking elsewhere in the xml
+         */
+        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[@SetId='{$setId}']");
+
+        foreach ($setListNodes as $current) {
+            $studentId = (string)$current->xpath('@PupilId')[0];
+
+            $student = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+            $students[] = [
+                'id' => (string)$student->SchoolCode,
+                'username' => (string)$student->UserName,
+                'preferredName' => (string)$student->Preferredname,
+                'surname' => (string)$student->Surname
+            ];
+        }
+
         /* Basic TimetableClass data
          */
         $class = [
             'name' => (string)$subject->Name,
             'code' => (string)$set->SetCode,
-            'teachers' => $teachers
+            'teachers' => $teachers,
+            'students' => $students
         ];
 
         return $class;
