@@ -49,33 +49,17 @@ class TimetableClassIterator implements \Iterator
 
 
     /**
-     * Return the current element
+     * A list of teachers for the class $set
+     * Requires UPS to have loaded all Staff members
      *
-     * Compile this into an array of convenient pieces
-     *
-     * @link  https://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * @param \SimpleXMLElement $set
+     * @return array
      * @throws \RuntimeException
      * @throws \Zend\Uri\Exception\InvalidArgumentException
      * @throws \Zend\Uri\Exception\InvalidUriPartException
-     * @since 5.0.0
      */
-    public function current()
+    private function findTeachers(\SimpleXMLElement $set): array
     {
-        $set = $this->sets[$this->position];
-
-        /* Class identifier
-         */
-        $setId = (string)$set->xpath('@Id')[0];
-
-        /* Find the subject's actual name by looking elsewhere in the xml
-         */
-        $subjectId = (string)$set->SubjectId;
-        $subject = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0];
-
-        /* A list of teachers for this class
-         * Requires UPS to have loaded all Staff members
-         */
         $teachers = [];
 
         /* Find the subject's teachers by looking elsewhere in the xml
@@ -92,10 +76,27 @@ class TimetableClassIterator implements \Iterator
             ];
         }
 
-        /* A list of students for this class
-         * Requires UPS to have loaded all Student members
-         */
+        return $teachers;
+    }
+
+
+    /**
+     * A list of students for this class
+     * Requires UPS to have loaded all Student members
+     *
+     * @param \SimpleXMLElement $set
+     * @return array
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findStudents(\SimpleXMLElement $set): array
+    {
         $students = [];
+
+        /* Class identifier
+         */
+        $setId = (string)$set->xpath('@Id')[0];
 
         /* Find the subject's students by looking elsewhere in the xml
          */
@@ -114,13 +115,38 @@ class TimetableClassIterator implements \Iterator
             ];
         }
 
+        return $students;
+    }
+
+
+    /**
+     * Return the current element
+     *
+     * Compile this into an array of convenient pieces
+     *
+     * @link  https://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @since 5.0.0
+     */
+    public function current()
+    {
+        $set = $this->sets[$this->position];
+
+        /* Find the subject's actual name by looking elsewhere in the xml
+         */
+        $subjectId = (string)$set->SubjectId;
+        $subject = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0];
+
         /* Basic TimetableClass data
          */
         $class = [
             'name' => (string)$subject->Name,
             'code' => (string)$set->SetCode,
-            'teachers' => $teachers,
-            'students' => $students
+            'teachers' => $this->findTeachers($set),
+            'students' => $this->findStudents($set)
         ];
 
         return $class;
