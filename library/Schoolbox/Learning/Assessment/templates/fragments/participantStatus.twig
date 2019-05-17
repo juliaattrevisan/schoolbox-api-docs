@@ -10,7 +10,10 @@
         <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
     </a>
     {% if not user.deleted %}
-        <h3><a href="/search/user/{{ user.id }}" title="View Profile">{{ user.fullName }}</a></h3>
+        <h3>
+            <a href="/search/user/{{ user.id }}" title="View Profile">{{ user.fullName }}</a>
+            <span class="individualisation has-tip tip-top noradius" data-tooltip title="WYSIWYG">i</span>
+        </h3>
     {% else %}
         <h3>{{ user.fullName }}</h3>
     {% endif %}
