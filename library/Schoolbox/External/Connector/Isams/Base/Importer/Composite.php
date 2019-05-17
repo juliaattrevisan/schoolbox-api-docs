@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Isams\Base\Importer;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\External\Connector\Isams\Base\Importer;
+use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
@@ -61,6 +62,12 @@ class Composite implements ImporterInterface
 
 
     /**
+     * @var TimetableCampusMapper
+     */
+    private $timetableCampusMapper;
+
+
+    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -87,6 +94,7 @@ class Composite implements ImporterInterface
      * @param UserMapper            $userMapper
      * @param UserProfileMapper     $userProfileMapper
      * @param UserRelationMapper    $userRelationMapper
+     * @param TimetableCampusMapper $timetableCampusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
@@ -97,6 +105,7 @@ class Composite implements ImporterInterface
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
         UserRelationMapper $userRelationMapper,
+        TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
@@ -107,6 +116,7 @@ class Composite implements ImporterInterface
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
         $this->userRelationMapper = $userRelationMapper;
+        $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -120,7 +130,7 @@ class Composite implements ImporterInterface
         $this->registry
 //            ->add(new Importer\Profile($this->log, $this->perform, $this->api, $this->userMapper, $this->userProfileMapper))
 //            ->add(new Importer\Relations($this->log, $this->perform, $this->api, $this->userMapper, $this->userRelationMapper))
-            ->add(new Importer\Timetable($this->log, $this->perform, $this->api, $this->timetableCycleMapper, $this->timetablePeriodMapper));
+            ->add(new Importer\Timetable($this->log, $this->perform, $this->api, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();

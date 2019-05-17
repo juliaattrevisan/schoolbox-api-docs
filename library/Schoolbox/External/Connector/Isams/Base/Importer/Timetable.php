@@ -10,6 +10,8 @@
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\TimetableCampus;
+use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -40,6 +42,12 @@ class Timetable implements ImporterInterface
 
 
     /**
+     * @var TimetableCampusMapper
+     */
+    private $timetableCampusMapper;
+
+
+    /**
      * @var TimetableCycleMapper
      */
     private $timetableCycleMapper;
@@ -57,6 +65,7 @@ class Timetable implements ImporterInterface
      * @param LoggerInterface       $log
      * @param bool                  $perform
      * @param Batchxml              $batchxml
+     * @param TimetableCampusMapper $timetableCampusMapper
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
@@ -64,15 +73,18 @@ class Timetable implements ImporterInterface
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
+        TimetableCampusMapper $timetableCampusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $batchxml;
+        $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
+
 
     /**
      * Import data from xml into local schema
@@ -98,14 +110,39 @@ class Timetable implements ImporterInterface
                  */
                 ->setRegular(1);
 
+            /* TODO: Campus detection
+             */
+            $campus = new \Schoolbox\Campus();
+            $campus->setId(1)
+                ->setName('Test Campus');
+
+            /* TODO: Associate a TimetableCampus with this TimetableCycle instance
+             */
+            /** @var TimetableCampus $timetableCampus */
+            $timetableCampus = $this->timetableCampusMapper->createModel()
+                ->setCycle($timetableCycle)
+                ->setCampus($campus)
+                ->setStart(\Alaress_Date_Format::newDatabaseDate('2020-01-01 00:00:00'))
+                ->setFinish(\Alaress_Date_Format::newDatabaseDate('2120-01-01 00:00:00'))
+                ->setStartDay(1);
+
             if ($this->perform) {
                 $this->timetableCycleMapper->save($timetableCycle);
+                $this->timetableCampusMapper->save($timetableCampus);
             }
 
             $this->log->info(sprintf(
-                'Creating timetable cycle %s with day length %s',
+                'Creating timetable cycle %s (%s) with day length %s',
                 $timetableCycle->getId(),
+                $timetableCycle->getTitle(),
                 $timetableCycle->getDayLength()
+            ));
+
+            $this->log->info(sprintf(
+                'Associating timetable cycle %s (%s) with campus %s',
+                $timetableCycle->getId(),
+                $timetableCycle->getTitle(),
+                $campus->getName()
             ));
 
             /* Save all the periods and associate them with a cycle
@@ -122,11 +159,12 @@ class Timetable implements ImporterInterface
                     $period->setCycle($timetableCycle);
 
                     $this->log->info(sprintf(
-                        'Creating period %s (%s-%s) in timetable cycle %s',
+                        'Creating period %s (%s-%s) in timetable cycle %s (%s)',
                         $period->getTitle(),
                         $period->getStart(),
                         $period->getFinish(),
-                        $timetableCycle->getId()
+                        $timetableCycle->getId(),
+                        $timetableCycle->getTitle()
                     ));
 
                     if ($this->perform) {
@@ -196,6 +234,17 @@ class Timetable implements ImporterInterface
                     ->setFinish((string)$period->EndTime . ':00');
 
                 $struct['days'][(string)$day->Day][] = $timetablePeriod;
+            }
+
+            /* Do a quick analysis in case there might be something amiss
+             */
+            if (!\count($struct['days'][(string)$day->Day])) {
+                $this->log->warning(sprintf(
+                    'Cycle %s (%s), Day %s has no periods.',
+                    (string)$cycle->xpath('@Id')[0],
+                    (string)$cycle->Name,
+                    (string)$day->Day
+                ));
             }
         }
 
