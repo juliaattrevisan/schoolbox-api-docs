@@ -687,7 +687,7 @@ class Controller extends Base
      * @return array
      * @throws Router\Exception\RouteNotFound
      */
-    private function insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions): array
+    private function insertSummaryPageLinks(array $studentMarks, array $assessmentIds, array $exclusions): array
     {
         // Ensure each student has a summary link, even if they have no marks
         foreach (array_keys($studentMarks) as $studentId) {
