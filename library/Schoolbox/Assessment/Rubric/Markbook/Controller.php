@@ -322,9 +322,9 @@ class Controller extends Base
             WHERE {$whereClause}
             ORDER BY
                 vr.assessment_id,
-                vr.capability_sequence ASC,
+                vr.capability_sequence,
                 vr.capability_id,
-                vr.indicator_sequence ASC,
+                vr.indicator_sequence,
                 vr.indicator_id
         ";
         $stmt = $this->internalDb->prepareQuery($sql);
