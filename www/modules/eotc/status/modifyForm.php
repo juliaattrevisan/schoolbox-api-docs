@@ -5,8 +5,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -36,11 +36,10 @@ $event = false;
 /* Spawn an existing event if id provided
  */
 try {
-	/** @var Event $event */
-	$event = $eventMapper->findById($_POST['eventId']);
-}
-catch (MapperException $e) {
-	error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+    /** @var Event $event */
+    $event = $eventMapper->findById($_POST['eventId']);
+} catch (MapperException $e) {
+    error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
 /** @var User $sessionUser */
@@ -69,61 +68,61 @@ $isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
  * modify it (provided you've the appropriate permissions)
  */
 if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
-	$page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
-}
-/* EOTC Administrators and event authors can edit this event
+    $page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+} /* EOTC Administrators and event authors can edit this event
  */
 elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
-	/* Remember original states so we know which obs to spawn
-	 */
-	$originalStatus = $event->getMetadata()->getStatus()->getId();
-	$originalComment = $event->getMetadata()->getComment();
+    /* Remember original states so we know which obs to spawn
+     */
+    $originalStatus = $event->getMetadata()->getStatus()->getId();
+    $originalComment = $event->getMetadata()->getComment();
 
-	/* Update with values
-	 */
-	$statusMapper = EventStatusMapper::getInstance();
+    /* Update with values
+     */
+    $statusMapper = EventStatusMapper::getInstance();
 
-	/** @var EventStatus $status */
-	$status = $statusMapper->findById($_POST['statusId']);
+    /** @var EventStatus $status */
+    $status = $statusMapper->findById($_POST['statusId']);
 
-	if (!$authenticator->isStatusChangeAllowed($event, $status))  {
-		error(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
-	}
+    if (!$authenticator->isStatusChangeAllowed($event, $status)) {
+        error(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
+    }
 
-	$event->getMetadata()->setStatus($status);
-	$event->getMetadata()->setComment($_POST['comment']);
+    $event->getMetadata()->setStatus($status);
+    $event->getMetadata()->setComment($_POST['comment']);
 
-	$metadataMapper = EventMetadataMapper::getInstance();
-	$metadataMapper->save($event->getMetadata());
+    $metadataMapper = EventMetadataMapper::getInstance();
+    $metadataMapper->save($event->getMetadata());
 
-	/* Activity Log
-	 */
-	$registry = new ActivityLogRegistry();
-	$factory = new ActivityLogFactory($event, $sessionUser);
+    /* Activity Log
+     */
+    $registry = new ActivityLogRegistry();
+    $factory = new ActivityLogFactory($event, $sessionUser);
 
-	/* If a status changed, log it
-	 */
-	if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
-		$registry->add($factory->produce('StatusChange'));
-	}
+    /* If a status changed, log it
+     */
+    if ($originalStatus != $event->getMetadata()->getStatus()->getId()) {
+        $registry->add($factory->produce('StatusChange'));
+    }
 
-	/* If a comment changed, log it
-	 */
-	if ($originalComment != $event->getMetadata()->getComment()) {
-		$registry->add($factory->produce('CommentChange'));
-	}
+    /* If a comment changed, log it
+     */
+    if ($originalComment != $event->getMetadata()->getComment()) {
+        $registry->add($factory->produce('CommentChange'));
+    }
 
-	/* Notify everyone
-	 */
-	$registry->notify();
+    /* Notify everyone
+     */
+    $registry->notify();
 
-	/* Optionally sync with external db
-	 */
+    /* Optionally sync with external db
+     */
     $configMapper = new ConfigMapper();
     $externalDbSync = $configMapper->findOneByColumn('name', 'external_db_sync');
+    $externalDb = $kernel->get('databaseExternal');
 
-    if ((int)$externalDbSync->getValue() == 1) {
+    if ((int)$externalDbSync->getValue() == 1 && $externalDb instanceof \Alaress\Database\Connector\IConnector) {
 
         /* Sync to External DB only when:
          * - the current status is Approved and
@@ -134,15 +133,18 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
          * into External DB by altering its contents after it was already approved
          */
         if ($status->isApproved() && $event->getMetadata()->getPermissionSlipRequired() && ($originalStatus != EventStatusMapper::STATUS_APPROVED)) {
-            $excursionConnector = new ExcursionConnector($kernel->get('config')->get('external_type'), $kernel->get('databaseExternal'));
+            $excursionConnector = new ExcursionConnector(
+                $kernel->get('config')->get('external_type'),
+                $externalDb,
+                $configMapper->findOneByColumn('name', 'external_eventtype')->getValue()
+            );
 
             /* Synchronise all events in a series if appropriate
              * Otherwise just sync one event
              */
             if ($event->getSeriesId()) {
                 $allEvents = $eventMapper->getAllInSeries($event);
-            }
-            else {
+            } else {
                 $allEvents = new Collection();
                 $allEvents->add($event);
             }
@@ -151,8 +153,7 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
             foreach ($allEvents as $currentEvent) {
                 try {
                     $excursionConnector->sync($currentEvent);
-                }
-                catch (\DomainException $e) {
+                } catch (\DomainException $e) {
 
                     /* Occurs when trying to create a new EOTC event, but a Synweb id
                      * already exists for it. This can happen if
@@ -164,10 +165,9 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
         }
     }
 
-	/* Admin redirect back to review screen
-	 */
-	$page->localRedir('/modules/eotc/review/');
-}
-else {
-	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    /* Admin redirect back to review screen
+     */
+    $page->localRedir('/modules/eotc/review/');
+} else {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
