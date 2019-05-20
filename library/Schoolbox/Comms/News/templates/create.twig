@@ -19,6 +19,53 @@
         [article.title |default("(untitled)"), routeLookup('commsNews.getDetail', {articleId: article.id})],
         [action]
     ) }}
+
+    {# Delete article #}
+    {% set deleteRoute = routeLookupIfAuthorized('commsNews.postDelete', {article: article, articleId: article.id}) %}
+
+    {% if deleteRoute %}
+        <script>
+            $(function () {
+                $('#header-options').on('click', 'a[data-delete]', function (event) {
+                    event.preventDefault();
+
+                    var $element = $(this);
+                    var $toast = $('#toast');
+                    var title = $element.attr('data-delete');
+
+                    $element.confirmDialog({
+                        text: 'Are you sure you want to delete ' + title + '?',
+                        confirmEvent: function () {
+                            $toast.toastActivate({
+                                text: 'Deleting ' + title
+                            });
+
+                            $.ajax({
+                                type: 'POST',
+                                url: $element.attr('href'),
+                                data: {articleId: {{ article.id }}},
+                                dataType: 'json'
+                            }).success(function (response) {
+                                $toast.toastTimeout({
+                                    text: title + ' was deleted',
+                                    css: 'success'
+                                });
+
+                                window.location.href = response.redirect;
+                            }).error(function (response) {
+                                var temp = $.parseJSON(response.responseText);
+
+                                $toast.toastTimeout({
+                                    text: 'Error: ' + temp.message,
+                                    css: 'alert'
+                                });
+                            });
+                        }
+                    });
+                });
+            });
+        </script>
+    {% endif %}
 {% endif %}
 
 {% set audienceIsReadOnly = article.isApproved%}
@@ -37,16 +84,41 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-        <ul class="meta">
-            {% if article.acceptedBy.id %}
-                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                    {% if article.isAccepted %}
-                        on {{ article.acceptedAt.local }}
+        <div class="actions-small-2 row">
+
+            {% set hasDropDownRoutes = deleteRoute %}
+
+            <nav>
+                {# Save For Later #}
+                <script src="/javascript/shared/comms/saveforlater.js"></script>
+
+                {% if hasDropDownRoutes %}
+                    <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+                {% endif %}
+            </nav>
+
+            {% if hasDropDownRoutes %}
+                <ul id="header-options" class="f-dropdown" data-dropdown-content>
+
+                    {% if deleteRoute %}
+                        <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString }}"
+                               data-delete="{{ article.title }}">Delete</a></li>
                     {% endif %}
-                </li>
+
+                </ul>
             {% endif %}
-        </ul>
+
+            <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+            <ul class="meta">
+                {% if article.acceptedBy.id %}
+                    <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                        {% if article.isAccepted %}
+                            on {{ article.acceptedAt.local }}
+                        {% endif %}
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
     </div>
 </div>
 <div class="row">
