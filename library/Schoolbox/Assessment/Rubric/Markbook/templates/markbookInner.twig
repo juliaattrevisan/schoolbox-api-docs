@@ -105,8 +105,12 @@
                         {% endif %}
                         <th class="capability-name">{{ capabilityData.name }}</th>
                         {% for studentId, studentData in students %}
-                            {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised) %}
-                            <td{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
+                            {% if capabilityData.show %}
+                                {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised) %}
+                                <td{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
+                            {% else %}
+                                <td class="excluded"></td>
+                            {% endif %}
                         {% endfor %}
                     </tr>
                     {% for indicatorId, indicatorData in capabilityData.indicators %}
