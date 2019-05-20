@@ -57,7 +57,7 @@
                                     {% if capabilityMark is null %}
                                         {% set gradientClass = "" %}
                                     {% endif %}
-                                    <td>
+                                    <td class="mark">
                                         <a href="{{ summaryLink }}" class="{{ gradientClass }} {% if capabilityMark is null %}no-mark{% endif %}">{{ capabilityMark|default('–') }}</a>
                                     </td>
                                 {% endif %}
@@ -86,7 +86,7 @@
 
                                         {% set renderedIndicatorMark = descriptorText ? indicatorMark|default('✓') : indicatorMark|default('–') %}
 
-                                        <td{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
+                                        <td class="mark"{% if descriptorText %} title="{{ descriptorText }}"{% endif %}>
                                             <a href="{{ summaryLink }}" class="{{ gradientClass }} {% if indicatorMark is null %}no-mark{% endif %}">{{ renderedIndicatorMark }}</a>
                                         </td>
                                     {% endif %}
@@ -107,7 +107,7 @@
                         {% for studentId, studentData in students %}
                             {% if capabilityData.show %}
                                 {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised) %}
-                                <td{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
+                                <td class="mark{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
                             {% else %}
                                 <td class="excluded"></td>
                             {% endif %}
@@ -119,7 +119,7 @@
                             <th class="indicator-name">{{ indicatorData.name }}</th>
                             {% for studentId, studentData in students %}
                                 {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised) %}
-                                <td{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>{{ indicatorData.marks[studentId].humanReadable|default('–') }}</td>
+                                <td class="mark{% if gradientClass %} {{ gradientClass }}{% endif %}">{{ indicatorData.marks[studentId].humanReadable|default('–') }}</td>
                             {% endfor %}
                         </tr>
                     {% endfor %}
