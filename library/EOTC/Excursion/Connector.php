@@ -100,7 +100,7 @@ class Connector
      */
     private function generateIdentifier($eventId): string
     {
-        return "TEOTC_{$eventId}";
+        return "EOTC_{$eventId}";
     }
 
     /**
