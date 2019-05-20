@@ -21,7 +21,6 @@ use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
-
 class TimetableClass
 {
 
@@ -99,17 +98,12 @@ class TimetableClass
 
 
     /**
-     * Import data from xml into local schema
+     * Get a list of (user_id, synergy_id) tuples
+     *
+     * @return array
      */
-    public function import(): void
+    private function findUserLookup(): array
     {
-        $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
-        $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
-        $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
-
-        /* Cache a flat key-value array of (user.id, user.synergy_id)
-         * The alternative would be to iterate findById() in a loop which probably costs more at scale
-         */
         $groupType = RoleMapper::ROLE_STUDENT;
 
         $userStatement = $this->userMapper->getDatabase()->query("
@@ -125,6 +119,24 @@ class TimetableClass
         foreach ($userStatement as $row) {
             $users[$row['synergy_id']] = $row['id'];
         }
+
+        return $users;
+    }
+
+
+    /**
+     * Import data from xml into local schema
+     */
+    public function import(): void
+    {
+        $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
+        $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
+        $this->classPeriodMapper->getDatabase()->query("DELETE FROM {$this->classPeriodMapper->getTable()}");
+
+        /* Cache a flat key-value array of (user.id, user.synergy_id)
+         * The alternative would be to iterate findById() in a loop which probably costs more at scale
+         */
+        $users = $this->findUserLookup();
 
         /* Find all the classes and their details as best we can
          *
