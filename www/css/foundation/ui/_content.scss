@@ -749,15 +749,16 @@ $rotate-span-width: 11rem;
 
 .individualisation {
     background-color: #9a9a9a;
-    border-radius: 50%;
     display: inline-block;
-    width: 1rem;
-    height: 1rem;
+    width: rem-calc($base-font-size - 2);
+    height: rem-calc($base-font-size - 2);
+    line-height: 1;
     font-family: serif;
     font-style: italic;
     text-align: center;
 
     &.has-tip {
+        border-bottom: 0;
         color: $white;
         font-weight: 400;
 
@@ -768,15 +769,16 @@ $rotate-span-width: 11rem;
 }
 
 .marksheet .individualisation {
+    border-bottom-left-radius: 50%;
     position: absolute;
-    top: 2px;
-    right: 2px;
-    line-height: 1.2;
+    top: 0;
+    right: 0;
 }
 
 .card .individualisation {
     margin-left: .5rem;
-    line-height: 1;
+    width: 1rem;
+    height: 1rem;
 }
 
 // Hints

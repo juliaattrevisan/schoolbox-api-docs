@@ -149,7 +149,7 @@
                                     <a class="{{ urgency.marks(normalisedMark) }}"
                                        href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}"
                                        title="{{ participant.authoritativeFeedback(true).comment }}">{{ label }}</a>
-                                    <span class="individualisation has-tip tip-top noradius" data-tooltip title="WYSIWYG">i</span>
+                                    <span class="individualisation has-tip tip-top" data-tooltip title="Customisation: {{ name.of.plan }}">i</span>
                                 {% endif %}
                             {% endif %}
                         </td>
