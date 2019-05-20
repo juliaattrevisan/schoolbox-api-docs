@@ -110,7 +110,7 @@
                         <div class="row actions-small-{{ pActionCount }}">
                             <div class="list-item">
                                 {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                                    user: participant.user,
+                                    participant: participant,
                                     statusClass: pStatusClass,
                                     statusText: pStatusText,
                                     statusTip: pTooltip

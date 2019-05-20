@@ -6,16 +6,18 @@
     - cardSize:    (string) sizing for foundation
  #}
 <div class="{{ cardSize ?: 'small-12' }} card">
-    <a href="/search/user/{{ user.id }}" title="View Profile">
-        <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" />
+    <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
     </a>
-    {% if not user.deleted %}
+    {% if not participant.user.deleted %}
         <h3>
-            <a href="/search/user/{{ user.id }}" title="View Profile">{{ user.fullName }}</a>
-            <span class="individualisation has-tip tip-top" data-tooltip title="Customisation: {{ name.of.plan }}">i</span>
+            <a href="{{ actionUrl }}" title="View Profile">{{ participant.user.fullName }}</a>
+            {% if not participant.plan.isDynamic %}
+                <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
+            {% endif %}
         </h3>
     {% else %}
-        <h3>{{ user.fullName }}</h3>
+        <h3>{{ participant.user.fullName }}</h3>
     {% endif %}
     <p class="meta">
         <span title="{{ statusTip }}" data-status class="progress-tick tiny {{ statusClass }}"></span>
