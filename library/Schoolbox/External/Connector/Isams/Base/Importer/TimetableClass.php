@@ -180,34 +180,47 @@ class TimetableClass
             /* Process students
              */
             foreach ($class['students'] as $student) {
+
+                /* If we have no record of this student id existing then we
+                 * we can't assign them to any classes - they don't have a
+                 * schoolbox user account
+                 */
                 if (isset($users[$student['id']])) {
-
-                    /* Minimum user
-                     */
-                    $user = $this->userMapper->createModel()
-                        ->setId($users[$student['id']]);
-
-                    /** @var ClassInvolvement $timetableClassInvolvement */
-                    $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                        ->setUser($user)
-                        ->setClass($timetableClass);
-
-                    if ($this->perform) {
-                        $this->classInvolvementMapper->save($timetableClassInvolvement);
-                    }
-
-                    $this->log->info(sprintf(
-                        'Creating class involvement %s %s for user %s (user %s)',
+                    $this->log->warning(sprintf(
+                        'Tried to assign nonexistent schoobox account %s to class %s %s; skipping',
+                        $student['id'],
                         $timetableClass->getName(),
-                        $timetableClass->getCode(),
-                        $student['preferredName'] . ' ' . $student['surname'],
-                        $timetableClassInvolvement->getUser()->getId()
+                        $timetableClass->getCode()
                     ));
 
-                    /* TODO: Assign class (set) to period
-                     * Currently isams doesn't have this information for some reason
-                     */
+                    continue;
                 }
+
+                /* Minimum user
+                 */
+                $user = $this->userMapper->createModel()
+                    ->setId($users[$student['id']]);
+
+                /** @var ClassInvolvement $timetableClassInvolvement */
+                $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setUser($user)
+                    ->setClass($timetableClass);
+
+                if ($this->perform) {
+                    $this->classInvolvementMapper->save($timetableClassInvolvement);
+                }
+
+                $this->log->info(sprintf(
+                    'Creating class involvement %s %s for user %s (user %s)',
+                    $timetableClass->getName(),
+                    $timetableClass->getCode(),
+                    $student['preferredName'] . ' ' . $student['surname'],
+                    $timetableClassInvolvement->getUser()->getId()
+                ));
+
+                /* TODO: Assign class (set) to period
+                 * Currently isams doesn't have this information for some reason
+                 */
             }
         }
 
