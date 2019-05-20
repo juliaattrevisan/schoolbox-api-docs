@@ -100,7 +100,7 @@ class Connector
      */
     private function generateIdentifier($eventId): string
     {
-        return "EOTC_{$eventId}";
+        return "TEOTC_{$eventId}";
     }
 
     /**
@@ -159,7 +159,7 @@ class Connector
             throw new \DomainException('Could not save Excursion: maybe need a unique EventCode identifier?');
         }
 
-        return $eventsSeq;
+        return (int)$eventsSeq;
     }
 
     /**
