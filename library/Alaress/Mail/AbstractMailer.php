@@ -418,6 +418,9 @@ abstract class AbstractMailer implements IMailer
         $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
 
         foreach ($emailList as $email) {
+
+            $email = trim($email);
+
             // Check if string is a valid email OR
             // Check if the email within a string is valid e.g: "9AH French (FREA1)" <alaress@schoolbox.com.au>
             if (filter_var($email, FILTER_VALIDATE_EMAIL) || self::emailFromStringIsValid($email)) {
