@@ -153,12 +153,6 @@ class Relations implements ImporterInterface
                     ->setRelation($studentUser)
                     ->setRelationType(UserRelation::RELATION_TYPE_PARENT);
 
-                /* Save them into user_relation
-                 */
-                if ($this->perform) {
-                    $this->userRelationMapper->save($relation);
-                }
-
                 $this->log->info(sprintf(
                     'Creating relation between %s (%d) and %s (%d)',
                     $parentUser->getFullName(),
@@ -166,6 +160,12 @@ class Relations implements ImporterInterface
                     $studentUser->getFullName(),
                     $studentUser->getId()
                 ));
+
+                /* Save them into user_relation
+                 */
+                if ($this->perform) {
+                    $this->userRelationMapper->save($relation);
+                }
             }
         }
 

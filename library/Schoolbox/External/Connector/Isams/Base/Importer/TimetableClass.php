@@ -167,15 +167,15 @@ class TimetableClass
                 ->setName($class['name'])
                 ->setDescription($class['name']);
 
-            if ($this->perform) {
-                $this->classEntryMapper->save($timetableClass);
-            }
-
             $this->log->info(sprintf(
                 'Creating class %s %s',
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
 
             /* Process students
              */
@@ -206,10 +206,6 @@ class TimetableClass
                     ->setUser($user)
                     ->setClass($timetableClass);
 
-                if ($this->perform) {
-                    $this->classInvolvementMapper->save($timetableClassInvolvement);
-                }
-
                 $this->log->info(sprintf(
                     'Creating class involvement %s %s for user %s (user %s)',
                     $timetableClass->getName(),
@@ -217,6 +213,10 @@ class TimetableClass
                     $student['preferredName'] . ' ' . $student['surname'],
                     $timetableClassInvolvement->getUser()->getId()
                 ));
+
+                if ($this->perform) {
+                    $this->classInvolvementMapper->save($timetableClassInvolvement);
+                }
 
                 /* TODO: Assign class (set) to period
                  * Currently isams doesn't have this information for some reason

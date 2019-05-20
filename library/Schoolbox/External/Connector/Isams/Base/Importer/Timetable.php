@@ -128,11 +128,6 @@ class Timetable implements ImporterInterface
                 ->setFinish(\Alaress_Date_Format::newDatabaseDate('2120-01-01 00:00:00'))
                 ->setStartDay(1);
 
-            if ($this->perform) {
-                $this->timetableCycleMapper->save($timetableCycle);
-                $this->timetableCampusMapper->save($timetableCampus);
-            }
-
             $this->log->info(sprintf(
                 'Creating timetable cycle %s (%s) with day length %s',
                 $timetableCycle->getId(),
@@ -140,12 +135,20 @@ class Timetable implements ImporterInterface
                 $timetableCycle->getDayLength()
             ));
 
+            if ($this->perform) {
+                $this->timetableCycleMapper->save($timetableCycle);
+            }
+
             $this->log->info(sprintf(
                 'Associating timetable cycle %s (%s) with campus %s',
                 $timetableCycle->getId(),
                 $timetableCycle->getTitle(),
                 $campus->getName()
             ));
+
+            if ($this->perform) {
+                $this->timetableCampusMapper->save($timetableCampus);
+            }
 
             /* Save all the periods and associate them with a cycle
              */

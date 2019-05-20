@@ -96,7 +96,7 @@ class Profile implements ImporterInterface
                 $user = $this->userMapper->findByExternalId($student->getId(), Role::STUDENT);
             } catch (Mapper\Exception $e) {
                 $this->log->warning(sprintf(
-                    'Skipped profile for %s %s (%d) - schoolbox account could not be found',
+                    'Skipping profile for %s %s (%d) - schoolbox account could not be found',
                     $student->getPreferredName(),
                     $student->getLastname(),
                     $student->getId()
@@ -170,16 +170,16 @@ class Profile implements ImporterInterface
              * But the model doesn't support these columns??
              */
 
+            $this->log->info(sprintf(
+                'Adding profile for %s',
+                $user->getFullName()
+            ));
+
             /* Then save it
              */
             if ($this->perform) {
                 $this->userProfileMapper->save($profile);
             }
-
-            $this->log->info(sprintf(
-                'Added profile for %s',
-                $user->getFullName()
-            ));
         }
 
         if (!$this->perform) {
