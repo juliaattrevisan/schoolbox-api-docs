@@ -138,7 +138,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 
             foreach ($existingAnswer as $val) {
                 $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-                $replace = " <input name='fillgap_{$question_id}[]' type='text' value=\"$val\" /> ";
+                $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value=\"$val\" /> ";
 
                 $ans = preg_replace($pattern, $replace, $ans, 1, $x);
             }
@@ -154,7 +154,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
              * %%token%% tokens with inputs.
              */
             $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-            $replace = " <input name='fillgap_{$question_id}[]' type='text' value='' /> ";
+            $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(
 				'QUESTION_ID' => $question_id,
