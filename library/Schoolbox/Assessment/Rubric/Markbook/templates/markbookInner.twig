@@ -3,7 +3,7 @@
     assessments  array       Assessment and rubric data
     students     array       Student and rubric mark data
     exclusions   int[][]     User ids, grouped by assessment.id
-    overall      array       TODO
+    overall      array       Summated student capability/indicator marks across all assessments
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
@@ -92,9 +92,34 @@
                                     {% endif %}
                                 {% endfor %}
                             </tr>
-                        {% endfor %} {# indicator #}
-                    {% endfor %} {# capability #}
-                {% endfor %} {# assessment #}
+                        {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+
+                {% for capabilityId, capabilityData in overall %}
+                    <tr class="capability summated{% if loop.index0 == 0 %} first-summated{% endif %}">
+                        {% if loop.index0 == 0 %}
+                            <th class="overall">Overall</th>
+                        {% else %}
+                            <th class="overall placeholder"></th>
+                        {% endif %}
+                        <th class="capability-name">{{ capabilityData.name }}</th>
+                        {% for studentId, studentData in students %}
+                            {% set gradientClass = urgency.marks(capabilityData.marks[studentId].normalised) %}
+                            <td{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>{{ capabilityData.marks[studentId].humanReadable|default('–') }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% for indicatorId, indicatorData in capabilityData.indicators %}
+                        <tr class="indicator summated">
+                            <th class="overall placeholder"></th>
+                            <th class="indicator-name">{{ indicatorData.name }}</th>
+                            {% for studentId, studentData in students %}
+                                {% set gradientClass = urgency.marks(indicatorData.marks[studentId].normalised) %}
+                                <td{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>{{ indicatorData.marks[studentId].humanReadable|default('–') }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
 

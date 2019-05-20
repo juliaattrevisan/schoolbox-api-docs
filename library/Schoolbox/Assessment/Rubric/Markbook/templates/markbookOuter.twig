@@ -47,7 +47,7 @@
 
 {# TODO move this to external style sheet #}
 <style>
-    /* TODO not working */
+    {# TODO not working #}
     /*#left-columns.drop-shadow {*/
     /*    !* Drop shadow to make it easier to understand what's going on when scrolling the other table *!*/
     /*    -webkit-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);*/
@@ -64,15 +64,18 @@
     }
 
     /**** Style the assessment/capability/indicator headings ****/
+    .rubric-marksheet-container .overall,
     .rubric-marksheet-container .assessment,
     .rubric-marksheet-container .capability-name,
     .rubric-marksheet-container .indicator-name{
         border: 1px solid #ededed;
     }
-    .rubric-marksheet-container .assessment:not(.placeholder){
+    .rubric-marksheet-container .assessment:not(.placeholder),
+    .rubric-marksheet-container .overall:not(.placeholder) {
         border-bottom: none;
     }
-    .rubric-marksheet-container .assessment.placeholder {
+    .rubric-marksheet-container .assessment.placeholder,
+    .rubric-marksheet-container .overall.placeholder {
         border-top: none;
         border-bottom: none;
     }
@@ -89,10 +92,16 @@
         padding-left: 2rem;
         font-weight: normal;
     }
+    .rubric-marksheet-container tbody tr:last-child .assessment{
+        border-bottom: 1px solid #ededed; /* make the last body row bottom-border even */
+    }
 
-    /*!**** Style the marksheet ****!*/
     .rubric-marksheet-container .no-mark {
         padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
+    }
+
+    .rubric-marksheet-container .first-summated{
+        border-top: 2px solid #ededed; /* A gap between the body and overall sections */
     }
 
 
@@ -107,7 +116,6 @@
         /*padding-right: 0 !important;*/
     }
 </style>
-
 
 <div class="row">
     <div class="small-12">

@@ -17,6 +17,7 @@ use function func_get_args;
 use function implode;
 use function in_array;
 use LogicException;
+use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Column\Boolean;
@@ -162,6 +163,7 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws LogicException
      * @throws Router\Exception\RouteNotFound
+     * @throws RangeException
      */
     public function postMarkbook(Folder\Model $folder): void
     {
@@ -186,6 +188,7 @@ class Controller extends Base
                     'students'    => $linkedMarks,
                     'assessments' => $assessments,
                     'exclusions'  => $exclusions,
+                    'overall'     => $overallMarks,
                 ]
             )->getAsString(),
         ]));
@@ -309,6 +312,7 @@ class Controller extends Base
                 vr.assessment_mark_type           AS assessment_mark_type,
                 vr.assessment_grade_group_id      AS assessment_grade_group_id,
                 vr.assessment_mark_per_capability AS assessment_rubric_group_marks,
+                vr.assessment_weight              AS assessment_weight,
                 vr.capability_id                  AS capability_id,
                 vr.capability_name                AS capability_name,
                 vr.indicator_id                   AS indicator_id,
@@ -330,6 +334,7 @@ class Controller extends Base
 
         $lastObservedAssessmentId = null;
         $lastObservedCapabilityId = null;
+        $decimalHydrator          = new Decimal();
 
         foreach ($stmt->getIterator($pb->getParams()) as $row) {
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
@@ -363,6 +368,7 @@ class Controller extends Base
                 'markType'       => $row['assessment_mark_type'],
                 'gradeGroupId'   => $row['assessment_grade_group_id'],
                 'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
+                'weight'         => $decimalHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
 
@@ -529,7 +535,7 @@ class Controller extends Base
         $totalMarkScheme   = new MarkScheme\TotalMarkFractional();
 
         foreach ($students as $studentId => $student) {
-            foreach($student['assessments'] as $assessmentId => $assessmentMarks) {
+            foreach ($student['assessments'] as $assessmentId => $assessmentMarks) {
 
                 $assessmentMaxMark        = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
                 $assessmentMarkType       = $assessments[$assessmentId]['markType'];
@@ -555,7 +561,7 @@ class Controller extends Base
                     $stubAssessment->setGradeGroup($gradeGroup);
                 }
 
-                foreach($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
+                foreach ($assessmentMarks['capabilities'] as $capabilityId => $capabilityMarks) {
                     $capabilityDatabaseMark = $decimalHydrator->hydrate($capabilityMarks['databaseMark']);
 
                     if ($capabilityDatabaseMark !== null) {
@@ -565,16 +571,16 @@ class Controller extends Base
                         $capabilityUsageModel->setMaxValue($capabilityMaxMark);
 
                         $capabilityMarkScheme = $markSchemeFactory->spawnForCapability($stubAssessment, $capabilityMaxMark);
-                        $capabilityMarkModel = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
+                        $capabilityMarkModel  = new CapabilityMark($capabilityUsageModel, $capabilityMarkScheme);
                         $capabilityMarkModel->setValue($capabilityDatabaseMark);
 
-                        $humanReadableCapabilityMark = $capabilityMarkModel->retrieveHumanReadableMark();
-                        $normalisedCapabilityMark = $capabilityMarkModel->retrieveNormalizedMark();
+                        $humanReadableCapabilityMark                                                                            = $capabilityMarkModel->retrieveHumanReadableMark();
+                        $normalisedCapabilityMark                                                                               = $capabilityMarkModel->retrieveNormalizedMark();
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = $humanReadableCapabilityMark;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = $normalisedCapabilityMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = $normalisedCapabilityMark;
                     } else {
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['humanReadableMark'] = null;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] = null;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark']    = null;
                     }
 
                     foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
@@ -591,7 +597,7 @@ class Controller extends Base
                         }
 
                         $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['humanReadableMark'] = $humanReadableIndicatorMark;
-                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] = $normalisedIndicatorMark;
+                        $students[$studentId]['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark']    = $normalisedIndicatorMark;
                     }
                 }
             }
@@ -710,8 +716,145 @@ class Controller extends Base
         return $studentMarks;
     }
 
+
+    /**
+     * Iterates student individual marks to return overall student marks for capabilities and indicators
+     *
+     * @param array $assessments
+     * @param array $linkedMarks
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws RangeException
+     */
     private function buildOverallMarks(array $assessments, array $linkedMarks): array
     {
-        return [];
+        $overallMarks = $this->aggregateMarks($assessments, $linkedMarks);
+
+        return $this->summateAggregatedMarks($overallMarks);
+    }
+
+
+    /**
+     * Resolves the aggregated counts to summate final capability/indicator marks
+     *
+     * @param array $overallMarks
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws RangeException
+     */
+    private function summateAggregatedMarks(array $overallMarks): array
+    {
+
+        $markScheme = new MarkScheme\Percentage();
+
+        foreach ($overallMarks as $capabilityId => $capabilityMarks) {
+            foreach ($capabilityMarks['marks'] as $studentId => $sums) {
+                $sumNormalised = $sums['sumNormalised'];
+                $sumWeight     = $sums['sumWeight'];
+                if (!$sumWeight) {
+                    unset($overallMarks[$capabilityId]['marks'][$studentId]);
+                } else {
+                    $normalised                                       = $sumNormalised / $sumWeight;
+                    $overallMarks[$capabilityId]['marks'][$studentId] = [
+                        'normalised'    => $normalised,
+                        'humanReadable' => $markScheme->getHumanReadableMark($normalised),
+                    ];
+                }
+            }
+            foreach ($capabilityMarks['indicators'] as $indicatorId => $indicatorMarks) {
+                foreach ($indicatorMarks['marks'] as $studentId => $sums) {
+                    $sumNormalised = $sums['sumNormalised'];
+                    $sumWeight     = $sums['sumWeight'];
+                    if (!$sumWeight) {
+                        unset($overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]);
+                    } else {
+                        $normalised                                                                   = $sumNormalised / $sumWeight;
+                        $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
+                            'normalised'    => $normalised,
+                            'humanReadable' => $markScheme->getHumanReadableMark($normalised),
+                        ];
+                    }
+                }
+            }
+        }
+        return $overallMarks;
+    }
+
+
+    /**
+     * Iterates individual student marks to build the weighted sums per capability and indicator
+     *
+     * @param array $assessments
+     * @param array $linkedMarks
+     * @return array
+     */
+    private function aggregateMarks(array $assessments, array $linkedMarks): array
+    {
+        $overallMarks = [];
+
+        foreach ($assessments as $assessmentId => $assessmentData) {
+            $assessmentWeight = $assessmentData['weight'];
+            if (!$assessmentWeight) {
+                continue;
+            }
+            foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
+
+                // First time we've seen this capability?
+                if (!array_key_exists($capabilityId, $overallMarks)) {
+                    $overallMarks[$capabilityId] = [
+                        'name'       => $capabilityData['name'],
+                        'show'       => $capabilityData['show'],
+                        'marks'      => [],
+                        'indicators' => [],
+                    ];
+                }
+
+                // Only calculate capability marks if we are rendering the capability.
+                if ($overallMarks[$capabilityId]['show']) {
+                    foreach ($linkedMarks as $studentId => $studentData) {
+                        // First time we've see this student for this capability?
+                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
+                            $overallMarks[$capabilityId]['marks'][$studentId] = [
+                                'sumNormalised' => null,
+                                'sumWeight'     => null,
+                            ];
+                        }
+                        // Does student have a mark for this capability for this assessment?
+                        $capabilityMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['normalisedMark'] ?? null;
+                        if ($capabilityMark !== null) {
+                            $overallMarks[$capabilityId]['marks'][$studentId]['sumNormalised'] += $capabilityMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                        }
+                    }
+                }
+
+                foreach ($capabilityData['indicators'] as $indicatorId => $indicatorData) {
+                    // First time we've seen this indicator?
+                    if (!array_key_exists($indicatorId, $overallMarks[$capabilityId]['indicators'])) {
+                        $overallMarks[$capabilityId]['indicators'][$indicatorId] = [
+                            'name'  => $indicatorData['name'],
+                            'marks' => [],
+                        ];
+                    }
+
+                    foreach ($linkedMarks as $studentId => $studentData) {
+                        // First time we've see this student for this indicator?
+                        if (!array_key_exists($studentId, $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'])) {
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId] = [
+                                'sumNormalised' => null,
+                                'sumWeight'     => null,
+                            ];
+                        }
+                        // Does student have a mark for this indicator for this assessment?
+                        $indicatorMark = $studentData['assessments'][$assessmentId]['capabilities'][$capabilityId]['indicators'][$indicatorId]['normalisedMark'] ?? null;
+                        if ($indicatorMark !== null) {
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumNormalised'] += $indicatorMark * $assessmentWeight;
+                            $overallMarks[$capabilityId]['indicators'][$indicatorId]['marks'][$studentId]['sumWeight']     += $assessmentWeight;
+                        }
+                    }
+                }
+            }
+        }
+        return $overallMarks;
     }
 }
