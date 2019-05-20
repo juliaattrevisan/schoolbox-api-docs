@@ -137,7 +137,6 @@ class Controller extends Base
                 '@rubricMarkbook/markbookOuter.twig',
                 [
                     'folder'      => $folder,
-                    'viewee'      => $this->getUser(),
                     'filterPanel' => $filterPanel,
                     'page'        => $page,
                 ]
@@ -176,6 +175,7 @@ class Controller extends Base
         $studentMarks  = $this->insertFolderMembers($derivedMarks, $folder);
         $exclusions    = $this->getExclusions($assessmentIds);
         $linkedMarks   = $this->insertSummaryPageLinks($studentMarks, $assessmentIds, $exclusions);
+        $overallMarks  = $this->buildOverallMarks($assessments, $linkedMarks);
 
         $this->getResponse()->content->set($this->buildJsonOutput([
             'status'  => 200,
@@ -708,5 +708,10 @@ class Controller extends Base
         }
 
         return $studentMarks;
+    }
+
+    private function buildOverallMarks(array $assessments, array $linkedMarks): array
+    {
+        return [];
     }
 }
