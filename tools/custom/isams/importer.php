@@ -6,6 +6,12 @@
  * Imports from an xml file and populates the following tables:
  *  user_profile
  *  user_relation
+ *  class
+ *  class_period
+ *  class_user
+ *  timetable_campus
+ *  timetable_cycle
+ *  timetable_period
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
@@ -60,6 +66,7 @@ HELP;
         }
 
         /* Spawn api
+         * TODO: Swap with actual live connection when ready
          */
         $api = new MockApi($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 

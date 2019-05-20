@@ -219,6 +219,7 @@ class TimetableClass
                 }
 
                 /* TODO: Assign class (set) to period
+                 * TODO: Assign room via EstateManager I guess
                  * Currently isams doesn't have this information for some reason
                  */
             }

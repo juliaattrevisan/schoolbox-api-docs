@@ -157,6 +157,8 @@ class Composite implements ImporterInterface
      */
     public function import(): void
     {
+        /* TODO: Reactivate all strategies when ready
+         */
         $this->registry
 //            ->add(new Importer\Profile($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userProfileMapper))
 //            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper))
