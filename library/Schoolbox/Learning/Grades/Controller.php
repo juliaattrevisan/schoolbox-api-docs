@@ -239,6 +239,8 @@ class Controller extends Base
 
         $folders = $this->folderMapper->createCollection();
 
+        $visibility = new Visibility($this->access);
+
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
@@ -253,19 +255,13 @@ class Controller extends Base
                     $assessment instanceof DueWork\Model &&
                     $assessment->getWorkType() &&
                     \in_array($assessment->getWorkType()->getName(), $workTypeNames, true) &&
-                    (
-                        // Hide SIVO assessments from users who are not staff or instructors
-                        !$assessment->isStaffOrInstructorVisibleOnly() ||
-                        $this->getUser()->getRole()->isStaff() ||
-                        $this->access->isInstructor($this->getUser(), $folder)
-                    )
+                    $visibility->isVisibleToUser($assessment, $viewee, true, null, !$this->access->isInstructor($this->getUser(), $folder))
                 ) {
                     if (!isset($assessmentTasks[$folder->getId()])) {
                         $assessmentTasks[$folder->getId()] = new GenericCollection(IAssessable::class);
                     }
-                    if ($assessment->getParticipantIfExtant($viewee)) {
-                        $assessmentTasks[$folder->getId()]->add($assessment);
-                    }
+                    
+                    $assessmentTasks[$folder->getId()]->add($assessment);
                 }
 
                 $markbooksFolders[$folder->getId()]->add($assessment);
@@ -443,6 +439,7 @@ class Controller extends Base
                                                         ->get('display_grade_graph'));
 
         $visibility = new Visibility($this->access);
+
         // Need to load other participants if we can see graph to get assessment mark statistics
         $assessments = $this
             ->findByFiltersWithParticipants($filters, $viewee, $canSeeGraph)
