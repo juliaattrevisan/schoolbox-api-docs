@@ -99,7 +99,7 @@ class TimetableClass
     /**
      * Import data from xml into local schema
      */
-    public function import()
+    public function import(): void
     {
         $this->classEntryMapper->getDatabase()->query("DELETE FROM {$this->classEntryMapper->getTable()}");
         $this->classInvolvementMapper->getDatabase()->query("DELETE FROM {$this->classInvolvementMapper->getTable()}");
