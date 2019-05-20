@@ -126,7 +126,6 @@
         {% endautoescape %}
 
         {% endif %}
-
         {{ scripts.header | raw }}
 
     {% endblock mainHeader %}
@@ -202,8 +201,7 @@
                 {# Never used AFAICT #}
                 {#{MAIN_BANNER_REGION}#}
             </div>
-
-            <div class="hybrid-bar hide-for-print" id="hybrid-bar">
+            <div class="hybrid-bar hide-for-print" id="hybrid-bar" {% if user.no_header %}style="display:none"{% endif %}>
                 <nav class="tab-bar">
                     <section class="left-small">
                         <a class="left-off-canvas-toggle menu-icon" id="left-off-canvas-toggle"><span></span></a>
