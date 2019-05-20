@@ -39,7 +39,7 @@ class Relations implements ImporterInterface
     /**
      * @var Batchxml
      */
-    private $api;
+    private $batchxml;
 
 
     /**
@@ -72,7 +72,7 @@ class Relations implements ImporterInterface
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $batchxml;
+        $this->batchxml = $batchxml;
         $this->userMapper = $userMapper;
         $this->userRelationMapper = $userRelationMapper;
     }
@@ -83,7 +83,7 @@ class Relations implements ImporterInterface
      */
     public function import(): void
     {
-        $parents = $this->api->findAllParents();
+        $parents = $this->batchxml->findAllParents();
 
         /* Delete all the records in user_relation
          * This is to ensure we always have the latest relation data in this table

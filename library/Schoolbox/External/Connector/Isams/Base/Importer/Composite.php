@@ -35,7 +35,7 @@ class Composite implements ImporterInterface
     /**
      * @var Batchxml
      */
-    private $api;
+    private $batchxml;
 
 
     /**
@@ -111,7 +111,7 @@ class Composite implements ImporterInterface
      *
      * @param LoggerInterface        $log
      * @param bool                   $perform
-     * @param Batchxml               $api
+     * @param Batchxml               $batchxml
      * @param UserMapper             $userMapper
      * @param UserProfileMapper      $userProfileMapper
      * @param UserRelationMapper     $userRelationMapper
@@ -125,7 +125,7 @@ class Composite implements ImporterInterface
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        Batchxml $api,
+        Batchxml $batchxml,
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
         UserRelationMapper $userRelationMapper,
@@ -139,7 +139,7 @@ class Composite implements ImporterInterface
         $this->log = $log;
         $this->perform = $perform;
         $this->registry = new Collection();
-        $this->api = $api;
+        $this->batchxml = $batchxml;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
         $this->userRelationMapper = $userRelationMapper;
@@ -158,10 +158,10 @@ class Composite implements ImporterInterface
     public function import(): void
     {
         $this->registry
-//            ->add(new Importer\Profile($this->log, $this->perform, $this->api, $this->userMapper, $this->userProfileMapper))
-//            ->add(new Importer\Relations($this->log, $this->perform, $this->api, $this->userMapper, $this->userRelationMapper))
-            ->add(new Importer\Timetable($this->log, $this->perform, $this->api, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
-            ->add(new Importer\TimetableClass($this->log, $this->perform, $this->api, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
+//            ->add(new Importer\Profile($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userProfileMapper))
+//            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper))
+            ->add(new Importer\Timetable($this->log, $this->perform, $this->batchxml, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
+            ->add(new Importer\TimetableClass($this->log, $this->perform, $this->batchxml, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();

@@ -38,7 +38,7 @@ class Timetable implements ImporterInterface
     /**
      * @var Batchxml
      */
-    private $api;
+    private $batchxml;
 
 
     /**
@@ -79,7 +79,7 @@ class Timetable implements ImporterInterface
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $batchxml;
+        $this->batchxml = $batchxml;
         $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
@@ -96,7 +96,7 @@ class Timetable implements ImporterInterface
             $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
         }
 
-        $cycles = $this->api->fetchXml('/iSAMS/TimetableManager/Structure/Week');
+        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
         foreach ($cycles as $cycle) {
             $dayData = $this->findDays($cycle);

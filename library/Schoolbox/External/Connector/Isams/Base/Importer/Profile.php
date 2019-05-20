@@ -39,7 +39,7 @@ class Profile implements ImporterInterface
     /**
      * @var Batchxml
      */
-    private $api;
+    private $batchxml;
 
 
     /**
@@ -72,7 +72,7 @@ class Profile implements ImporterInterface
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $batchxml;
+        $this->batchxml = $batchxml;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
     }
@@ -83,7 +83,7 @@ class Profile implements ImporterInterface
      */
     public function import(): void
     {
-        $students = $this->api->findAllStudents();
+        $students = $this->batchxml->findAllStudents();
 
         /** @var Student $student */
         foreach ($students as $student) {
@@ -204,7 +204,7 @@ class Profile implements ImporterInterface
          * ($student contains multiple ids, some of which seem internal to usams)
          */
         $path = "/iSAMS/PupilManager/CurrentPupils/Pupil[contains(SchoolCode, '{$student->getId()}')]";
-        $node = $this->api->fetchXml($path)[0];
+        $node = $this->batchxml->fetchXml($path)[0];
 
         /* This isn't the primary identifier that we use in $student
          * This is some sort of internal relation id in the xml
@@ -218,7 +218,7 @@ class Profile implements ImporterInterface
          * If isams changes this structure, this will snap (obviously) so yeah, we should pay attention
          */
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
-        $parents = $this->api->fetchXml($path);
+        $parents = $this->batchxml->fetchXml($path);
 
         $stack = [];
 
