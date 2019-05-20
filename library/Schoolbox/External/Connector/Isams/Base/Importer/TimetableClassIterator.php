@@ -9,9 +9,10 @@
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use Iterator;
 use Schoolbox\External\UPS\Batchxml;
 
-class TimetableClassIterator implements \Iterator
+class TimetableClassIterator implements Iterator
 {
 
     /**
