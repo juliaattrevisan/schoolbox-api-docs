@@ -181,6 +181,7 @@ class TimetableClass
              */
             foreach ($class['students'] as $student) {
                 if (isset($users[$student['id']])) {
+
                     /* Minimum user
                      */
                     $user = $this->userMapper->createModel()
@@ -202,6 +203,10 @@ class TimetableClass
                         $student['preferredName'] . ' ' . $student['surname'],
                         $timetableClassInvolvement->getUser()->getId()
                     ));
+
+                    /* TODO: Assign class (set) to period
+                     * Currently isams doesn't have this information for some reason
+                     */
                 }
             }
         }
