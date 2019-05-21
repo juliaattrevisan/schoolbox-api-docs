@@ -30,7 +30,7 @@ class YearlyBreakdown extends Base
             WHERE ID = '{$externalId}'
             AND studentibflag = 1
             AND fileyear = '{$this->year}'
-            ORDER BY Term, Heading, AssessAreaSeq
+            ORDER BY Heading, Term, AssessAreaSeq
         ";
 
         $results = $this->getDb()->getAll($query) ?: [];
