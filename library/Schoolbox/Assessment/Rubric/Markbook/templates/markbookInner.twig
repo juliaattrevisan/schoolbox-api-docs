@@ -31,6 +31,7 @@
 
             <tbody>
                 {% for assessmentId, assessment in assessments %}
+                    {% set markPerCap = assessment.usesMarkPerCap %}
                     {% for capabilityId, capability in assessment.capabilities %}
                         <tr class="capability">
 
@@ -44,7 +45,7 @@
                             <th class="capability-name" title="{{ capability.name }}">{{ capability.name }}</th>
 
                             {% for studentId, student in students %}
-                                {% if not capability.show %}
+                                {% if not capability.show or not markPerCap %}
                                     <td class="excluded"></td>
                                 {% elseif exclusions[assessmentId] and studentId in exclusions[assessmentId] %}
                                     <td class="excluded" title="Excluded from assessment"></td>

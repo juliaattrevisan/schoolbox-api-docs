@@ -494,7 +494,7 @@ class Controller extends Base
                 'indicators' => $indicatorMarks,
             ];
             if ($assessments[$row['assessment_id']]['capabilities'][$row['capability_id']]['show']) {
-                $capData['databaseMark'] = $row['capability_mark'];
+                $capData['databaseMark'] = $assessments[$row['assessment_id']]['usesMarkPerCap'] ? $row['capability_mark'] : null;
                 $capData['maxMark']      = $row['capability_max_value'];
             }
             $capabilityMarks[$row['capability_id']] = $capData;
