@@ -40,7 +40,7 @@
                                 <a href="{{ assessment.statusLink }}">{{ assessment.name }}</a>
                             </th>
                             {% else %}
-                                <th class="assessment placeholder"></th>
+                                <th class="assessment placeholder" title="{{ assessment.name }}"></th>
                             {% endif %}
                             <th class="capability-name" title="{{ capability.name }}">{{ capability.name }}</th>
 
