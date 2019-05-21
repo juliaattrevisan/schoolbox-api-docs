@@ -28,8 +28,12 @@
       }
 
       // there are unresolved deferreds: do not event yet
-      e.preventDefault();
-      e.stopPropagation();
+
+      if (e && e.preventDefault) {
+        e.stopPropagation();
+      } else {
+        return false;
+      }
 
       $.when.apply(window, staller.getDeferreds()).done(function() {
         // ok *now* you may event
