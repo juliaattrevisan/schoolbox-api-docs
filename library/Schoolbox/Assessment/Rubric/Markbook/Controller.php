@@ -794,9 +794,6 @@ class Controller extends Base
 
         foreach ($assessments as $assessmentId => $assessmentData) {
             $assessmentWeight = $assessmentData['weight'];
-            if (!$assessmentWeight) {
-                continue;
-            }
             foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
 
                 // First time we've seen this capability?
@@ -809,8 +806,8 @@ class Controller extends Base
                     ];
                 }
 
-                // Only calculate capability marks if we are rendering the capability.
-                if ($overallMarks[$capabilityId]['show']) {
+                // Only calculate capability marks if the assessment has weight and we are rendering the capability.
+                if ($assessmentWeight && $overallMarks[$capabilityId]['show']) {
                     foreach ($linkedMarks as $studentId => $studentData) {
                         // First time we've see this student for this capability?
                         if (!array_key_exists($studentId, $overallMarks[$capabilityId]['marks'])) {
@@ -835,6 +832,10 @@ class Controller extends Base
                             'name'  => $indicatorData['name'],
                             'marks' => [],
                         ];
+                    }
+                    if (!$assessmentWeight) {
+                        // Don't aggregate marks if the assessment lacks weighting
+                        continue;
                     }
 
                     foreach ($linkedMarks as $studentId => $studentData) {
