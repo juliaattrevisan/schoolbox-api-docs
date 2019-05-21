@@ -11,7 +11,7 @@
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Web\Controller\Base;
-use Custom\Diocesan\AchievementReport\Comments\Comments;
+use Custom\Diocesan\AchievementReport\Comments;
 use Custom\Diocesan\AchievementReport\Comments\ValidJuniorSchoolStudent;
 use MSSQL;
 use Schoolbox\User;
@@ -211,38 +211,50 @@ class Controller extends Base {
      */
     public function ib(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
+        /* The selected year should contain data. If a selected
+         * year contains no data, probably 404 or something - you
+         * could fiddle with the url to get illegal values
+         */
+        $allYears = (new IB\Navigation($user, $externalUser, $db, $year))->findData();
+
+        /* If $year wasn't provided, go with the most recent year we have
+         */
+        if (null === $year && \count($allYears)) {
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('achievementreport.ib', [
+                    'externalUserId' => $externalUser['StudentID'],
+                    'year' => $allYears[0]
+                ])
+            );
+        }
+
         $selector = new NavigationSelector($db, $user, $externalUser);
-        $footer = new IB\Footer($user, $externalUser, $db, null);
 
-        $progressGradeSummary = new IB\ProgressGradeSummary($user, $externalUser, $db, $year);
-        $yearlyBreakdown = new IB\YearlyBreakdown($user, $externalUser, $db, $year);
-
-        $this->getResponse()->content->set(array(
+        $this->getResponse()->content->set([
             'template' => '@ib/index.twig',
-            'data' => array(
-                'navigation' => array(
+            'data' => [
+                'navigation' => [
                     'all' => $selector->getAvailableNavigation(),
                     'selected' => NavigationSelector::IB_KEY
-                ),
-                'footer' => array(
-                    'data' => $footer->findData(),
-                ),
+                ],
+
                 'preselectedYear' => $year,
                 'externalUser' => $externalUser,
                 'user' => $user,
+                'year' => $year,
 
-                'progressGradeSummary' => array(
-                    'heading' => $progressGradeSummary->getHeading(),
-                    'data' => $progressGradeSummary->findData(),
-                ),
+                'yearlyBreakdown' => [
+                    'navigation' => [
+                        'all' => $allYears,
+                        'selected' => $year
+                    ],
+                    'terms' => IB\YearlyBreakdown::INITIAL_TERMS,
+                    'data' => (new IB\YearlyBreakdown($user, $externalUser, $db, $year))->findData(),
+                ],
 
-                'yearlyBreakdown' => array(
-                    'heading' => $yearlyBreakdown->getHeading(),
-                    'data' => $yearlyBreakdown->findData(),
-                    'currentYear' => $yearlyBreakdown->getCurrentYear()
-                )
-            )
-        ));
+                'footer' => (new IB\Footer($user, $externalUser, $db, $year))->findData()
+            ]
+        ]);
     }
 
     /**
@@ -359,7 +371,7 @@ class Controller extends Base {
                  */
                 $output['data']['entriesAndResults'] = array(
                     'data' => $entriesAndResults->findData(),
-                    'comments' => (new Comments($user, $externalUser, $db, $year))->findNCEAData(),
+                    'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findNCEAData(),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => self::TYPES,
                     'year' => $year,

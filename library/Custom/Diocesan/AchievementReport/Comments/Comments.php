@@ -16,17 +16,6 @@ class Comments extends Base
 {
 
     /**
-     * Initialised array of term indices
-     */
-    public const INITIAL_TERMS = [
-        1 => null,
-        2 => null,
-        3 => null,
-        4 => null
-    ];
-
-
-    /**
      * Consts corresponding to ResultType (that's synonymous with a report type)
      * Each comment belongs to one of these reports
      */

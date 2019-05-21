@@ -3,22 +3,17 @@
  * YearlyBreakdown
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Custom\Diocesan\AchievementReport\IB;
 
-class YearlyBreakdown extends Base {
+use Custom\Diocesan\AchievementReport\NormaliseTeachers;
 
-    /**
-     * Heading
-     *
-     * @var string
-     */
-    protected $heading = 'Progress Grade Summary';
 
+class YearlyBreakdown extends Base
+{
 
     /**
      * Returns data for twig rendering
@@ -27,69 +22,50 @@ class YearlyBreakdown extends Base {
      */
     public function findData()
     {
-        $allProgressGrades = $this->findAllProgressGrades();
+        $externalId = $this->getExternalUserId();
 
-        /**
-         * Rearrange everything into a nice order
-         */
-        $finalStack = array();
+        $query = "
+            SELECT *
+            FROM dbo.uvSchoolBoxIBResultsNEW
+            WHERE ID = '{$externalId}'
+            AND studentibflag = 1
+            AND fileyear = '{$this->year}'
+            ORDER BY Heading, Term, AssessAreaSeq
+        ";
 
-        foreach ($allProgressGrades as $current) {
-            $courseName = trim($current['CourseName']);
-            $classcode = trim($current['classcode']);
-            $year = $current['classyear'];
+        $results = $this->getDb()->getAll($query) ?: [];
+
+        $finalStack = [];
+
+        $teacherNormaliser = new NormaliseTeachers();
+
+        foreach ($results as $current) {
+            $courseName = $current['Heading'];
+            $assessment = $current['AssessAreaHeading'];
+            $result = $current['AssessResultsResult'];
             $term = $current['Term'];
 
-            /* Always display both terms for current year regardless of content
+            /* Assemble assessments if they have a title; otherwise disregard
              */
-            if ($year == $this->getCurrentYear()) {
-                foreach(array(4, 2) as $currentTerm) {
-                    if (!isset($finalStack[$year][$courseName]['allTerms'][$currentTerm])) {
-                        $finalStack[$year][$courseName]['allTerms'][$currentTerm]['level'] = '';
-                        $finalStack[$year][$courseName]['allTerms'][$currentTerm]['progressGrade'] = '0';
-                    }
-                }
+            if ($assessment) {
+                $finalStack[$courseName]['assessments'][$assessment] = $result;
             }
 
-            $finalStack[$year][$courseName]['classcode'] = $classcode;
-            $finalStack[$year][$courseName]['allTerms'][$term]['level'] = $current['Level'];
-            $finalStack[$year][$courseName]['allTerms'][$term]['progressGrade'] = $current['ProgressGrade'];
+            /* Teachers
+             */
+            $finalStack[$courseName]['teachers'] = $teacherNormaliser->normalise($current);
+
+            /* Comments
+             * I can assemble comments here without running it separately since I'm already
+             * rebuilding this entire structure from the ground up
+             */
+            if (!isset($finalStack[$courseName]['comments'])) {
+                $finalStack[$courseName]['comments'] = self::INITIAL_TERMS;
+            }
+
+            $finalStack[$courseName]['comments'][$term] = $current['assesscommentscomment'];
         }
 
         return $finalStack;
-    }
-
-
-    /**
-     * Find all progress grades
-     *
-     * @return array
-     */
-    private function findAllProgressGrades() {
-        $query = "
-            SELECT
-                classyear,
-                CourseName,
-                classcode,
-                Term,
-                Level,
-                ProgressGrade
-            FROM
-                dbo.uvSchoolBoxIBResults
-            WHERE
-                ID = '{$this->getExternalUserId()}'
-            ORDER BY
-                classyear DESC,
-                classcode DESC,
-                Term DESC
-        ";
-
-        $result = $this->getDb()->getAll($query);
-
-        if (is_array($result)) {
-            return $result;
-        }
-
-        return array();
     }
 }
