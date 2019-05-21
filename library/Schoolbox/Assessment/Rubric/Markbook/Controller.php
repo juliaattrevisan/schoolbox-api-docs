@@ -315,6 +315,7 @@ class Controller extends Base
                 vr.assessment_weight              AS assessment_weight,
                 vr.capability_id                  AS capability_id,
                 vr.capability_name                AS capability_name,
+                vr.capability_max_value           AS capability_max_value,
                 vr.indicator_id                   AS indicator_id,
                 vr.indicator_name                 AS indicator_name,
                 vr.indicator_max_value            AS indicator_max_value
@@ -353,12 +354,12 @@ class Controller extends Base
                 ];
             }
 
+            $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
             $capabilities[$row['capability_id']] = [
                 'name'       => $row['capability_name'],
                 'indicators' => $indicators,
-                'show'       => in_array((int)$row['capability_id'], $selectedCapabilities, true),
+                'show'       => $capabilityMaxValue && in_array((int)$row['capability_id'], $selectedCapabilities, true),
             ];
-
 
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
@@ -805,6 +806,9 @@ class Controller extends Base
                         'indicators' => [],
                     ];
                 }
+
+                // Show the capability if we are showing it for any assessment
+                $overallMarks[$capabilityId]['show'] = $overallMarks[$capabilityId]['show'] || $capabilityData['show'];
 
                 // Only calculate capability marks if the assessment has weight and we are rendering the capability.
                 if ($assessmentWeight && $overallMarks[$capabilityId]['show']) {
