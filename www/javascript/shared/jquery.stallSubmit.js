@@ -30,6 +30,7 @@
       // there are unresolved deferreds: do not event yet
 
       if (e && e.preventDefault) {
+        e.preventDefault();
         e.stopPropagation();
       } else {
         return false;
