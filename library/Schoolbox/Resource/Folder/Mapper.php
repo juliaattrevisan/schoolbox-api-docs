@@ -13,7 +13,9 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use function explode;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Psr\Log\NullLogger;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -51,6 +53,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
+use Alaress\Database\Predicate;
 
 /**
  * Class Mapper
@@ -70,6 +73,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     const INHERIT_ON = 1;
     const INHERIT_OFF = 0;
     const FOLDER_ROOT = 0;
+    private const FOLDER_CODE_COLUMN = 'fc.code';
 
     /**
      * Maximum number of recursion iterations to execute before dying
@@ -961,7 +965,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * Finds a single category based on the category code passed in.
+     * Returns the first folder found that uses any of the codes specified in $code
+     *
      * Does not find codes that have been deleted
      *
      * @param  string $code
@@ -971,40 +976,118 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByCode($code, $campusCode = '')
     {
-        // Retrieve all codes for category, not just $code
+        $folders = $this->findAllByCode($code, $campusCode);
+
+        // The set of $code returned exactly one folder (determinate)
+        // return this folder because we're sure
+        if ($folders->count() === 1) {
+            return $folders->first();
+        }
+
+        // no folders match the $code provided
+        if ($folders->count() === 0) {
+            throw new MapperException();
+        }
+
+        // Multiple folders resulted from $code
+        // this is an edge case that cannot happen normally because bidness logic prevents it
+        // you have to mangle the db, or provide bad data on the url to manifest this situation
+        // In either case, pop out an exception because this should never have occurred
+        throw new InvalidArgumentException('Multiple folders returned; indeterminate destination');
+    }
+
+
+    /**
+     * Returns all folders that use any of the individual codes included in $classCodeCsv
+     *
+     * Does not match soft-deleted folder codes
+     * Does not return soft-deleted folders or folder codes
+     *
+     * @param string $classCodeCsv Comma-separated list of class codes
+     * @param string $campusCode   If provided, use this campus code in the query.
+     * @return GenericCollection
+     * @throws Predicate\InvalidColumnException
+     * @throws PDOException
+     */
+    public function findAllByCode(string $classCodeCsv, string $campusCode = ''): GenericCollection
+    {
+        $pb = $this->getPredicateBuilder()->all(
+            $this->buildFindAllByCodePredicateBuilder($classCodeCsv, $campusCode)
+        );
+
+        // Dont bother fetching attributes to hydrate, as this query will be missing codes
+        // that don't match the code query
         $query = "
-            {$this->getSelectString()}
-            {$this->getFromString()}
-            WHERE folder.deleted_at IS NULL
+            SELECT f.id
+            FROM folder f
+            JOIN folder_code fc ON fc.folder_id = f.id
+            WHERE {$pb->getWhere()[0]}
         ";
-        $params = [];
-        if (strlen($campusCode) === 0) {
-            $query .= ' AND (cc.code = :code OR cc.code LIKE :codeLike)';
-            $params['code']     = $code;
-            $params['codeLike'] = '%/' . $this->database->escapeForLike($code);
-        } else {
-            $query .= ' AND (cc.code = :code OR cc.code = :fullCode)';
-            $params['code']     = $code;
-            $params['fullCode'] = $campusCode . '/' . $code;
-        }
+
         $statement = $this->database->prepare($query);
-        $statement->execute($params);
-        $model = $this->hydrateSelect($statement)->first();
+        $statement->execute($pb->getParams());
 
-        if (!$model instanceof Model) {
-            throw new MapperException("Instance of object not found");
+        $folderIds = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+        // Retrieve all codes for folder, not just those specified by $classCodeCsv
+        return $this->findByColumn($this->getIdentifierColumn(), $folderIds);
+    }
+
+    /**
+     * @param string $classCodeCsv
+     * @param string $campusCode
+     *
+     * @return PredicateBuilder
+     */
+    private function buildFindAllByCodePredicateBuilder(string $classCodeCsv, string $campusCode = ''): PredicateBuilder
+    {
+        $classCodes = explode(',', $classCodeCsv);
+
+        if ($campusCode === '') {
+            $innerPb = $this->noCampusCodeInnerPredicateBuilder($classCodes);
+        } else {
+            $innerPb = $this->withCampusCodeInnerPredicateBuilder($campusCode, $classCodes);
         }
 
-        // Re-load codes into the model,
-        // because the above query won't fetch codes for this category that
-        // don't match the above where part.
+        return $this->getPredicateBuilder()
+            ->isNull('f.deleted_at')
+            ->isNull('fc.deleted_at')
+            ->any($innerPb);
+    }
 
-        $codeList = $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId());
-        foreach($codeList as $folderCode) {
-            $model->getCodes()[$folderCode->getCode()] = $folderCode;
+    /**
+     * @param array $classCodes
+     *
+     * @return PredicateBuilder
+     */
+    private function noCampusCodeInnerPredicateBuilder(array $classCodes): PredicateBuilder
+    {
+        $innerPb    = $this->getPredicateBuilder();
+
+        foreach ($classCodes as $classCode) {
+            $innerPb->equals(self::FOLDER_CODE_COLUMN, $classCode);
+            $innerPb->like(self::FOLDER_CODE_COLUMN, "%/{$this->database->escapeForLike($classCode)}");
         }
 
-        return $model;
+        return $innerPb;
+    }
+
+    /**
+     * @param string $campusCode
+     * @param array  $classCodes
+     *
+     * @return PredicateBuilder
+     */
+    private function withCampusCodeInnerPredicateBuilder(string $campusCode, array $classCodes): PredicateBuilder
+    {
+        $innerPb    = $this->getPredicateBuilder();
+
+        foreach ($classCodes as $classCode) {
+            $innerPb->equals(self::FOLDER_CODE_COLUMN, $classCode);
+            $innerPb->equals(self::FOLDER_CODE_COLUMN, "{$campusCode}/{$classCode}");
+        }
+
+        return $innerPb;
     }
 
     /**
@@ -1866,7 +1949,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
             $codeCollection = $folder->getCodes();
-            $code = $row['fc.code'];
+            $code = $row[self::FOLDER_CODE_COLUMN];
             if($code && !$codeCollection->offsetExists($code)){
                 /** @var FolderCode\Model $folderCode */
                 $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
@@ -2005,7 +2088,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
             $codeCollection = $folder->getCodes();
-            $code           = $row['fc.code'];
+            $code           = $row[self::FOLDER_CODE_COLUMN];
             if ($code && !$codeCollection->offsetExists($code)) {
                 /** @var FolderCode\Model $folderCode */
                 $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
