@@ -66,8 +66,6 @@ class YearlyBreakdown extends Base
             $finalStack[$courseName]['comments'][$term] = $current['assesscommentscomment'];
         }
 
-//        new \Alaress_Probe($results, $finalStack);
-
         return $finalStack;
     }
 }
