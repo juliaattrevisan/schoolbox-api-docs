@@ -22,6 +22,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Column\Boolean;
 use Schoolbox\Column\Decimal;
+use Schoolbox\Column\Integer;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
@@ -336,6 +337,7 @@ class Controller extends Base
         $lastObservedAssessmentId = null;
         $lastObservedCapabilityId = null;
         $decimalHydrator          = new Decimal();
+        $integerHydrator          = new Integer();
 
         foreach ($stmt->getIterator($pb->getParams()) as $row) {
             if ($lastObservedAssessmentId !== $row['assessment_id']) {
@@ -369,7 +371,7 @@ class Controller extends Base
                 'markType'       => $row['assessment_mark_type'],
                 'gradeGroupId'   => $row['assessment_grade_group_id'],
                 'usesMarkPerCap' => $row['assessment_rubric_group_marks'],
-                'weight'         => $decimalHydrator->hydrate($row['assessment_weight']),
+                'weight'         => $integerHydrator->hydrate($row['assessment_weight']),
                 'capabilities'   => $capabilities,
             ];
 
