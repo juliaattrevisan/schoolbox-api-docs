@@ -200,7 +200,7 @@ class NavigationSelector
     {
         $query = "
             SELECT 
-                TOP 1 COUNT(*)
+                TOP 1 COUNT(*) AS computed
             FROM 
                 dbo.uvSchoolBoxReportComments
             WHERE 
@@ -219,7 +219,7 @@ class NavigationSelector
     {
         $query = "
             SELECT
-                TOP 1 COUNT(*)
+                TOP 1 COUNT(*) AS computed
             FROM
                 dbo.uvSchoolBoxSchoolGradeResults
             WHERE
@@ -238,7 +238,7 @@ class NavigationSelector
     {
         $query = "
             SELECT
-                TOP 1 COUNT(*)
+                TOP 1 COUNT(*) AS computed
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
@@ -257,7 +257,7 @@ class NavigationSelector
     {
         $query = "
             SELECT
-                TOP 1 COUNT(*)
+                TOP 1 COUNT(*) AS computed
             FROM
                 dbo.uvSchoolBoxIBResults
             WHERE
