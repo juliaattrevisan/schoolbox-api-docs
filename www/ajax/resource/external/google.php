@@ -62,7 +62,7 @@ foreach ($_POST['docs'] as $doc) {
 
         $files[] = $meta;
     }
-    catch (Schoolbox\File\Exception $e) {
+    catch (\InvalidArgumentException|Schoolbox\File\Exception $e) {
         $files[] = array(
             'title' => $meta['title'],
             'size'  => 0,
