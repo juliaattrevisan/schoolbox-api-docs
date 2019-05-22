@@ -13,6 +13,8 @@ namespace Alaress\File\Remote;
 use DomainException;
 use OutOfBoundsException;
 use \Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\File\ExtensionMapper;
+use Schoolbox\Mapper\Exception;
 
 class GDriveFetcher implements FetcherInterface
 {
@@ -86,13 +88,22 @@ class GDriveFetcher implements FetcherInterface
      */
     private $metaCache = [];
 
+
     /**
-     * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
-     * @param resource $curl       - a custom curl handle if a default won't suffice
-     * @param string   $httpAuth   - an authorization header if not using an anonymous connection
+     * @var ExtensionMapper
      */
-    public function __construct(string $storageDir, $curl = null, string $httpAuth = '')
+    private $extensionMapper;
+
+
+    /**
+     * @param ExtensionMapper $extensionMapper
+     * @param string          $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
+     * @param resource        $curl       - a custom curl handle if a default won't suffice
+     * @param string          $httpAuth   - an authorization header if not using an anonymous connection
+     */
+    public function __construct(ExtensionMapper $extensionMapper, string $storageDir, $curl = null, string $httpAuth = '')
     {
+        $this->extensionMapper = $extensionMapper;
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
 
@@ -219,6 +230,14 @@ class GDriveFetcher implements FetcherInterface
 
         $destination = tempnam($this->dir, 'gdrive-');
 
+        /* null or false $destination when tempnam fails for some reason
+        */
+        if (!$destination) {
+            throw new OutOfBoundsException('Could not determine destination for temp file');
+        }
+
+        /* If you can't open the $destination tempnam() made
+         */
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException('Could not open target');
         }
@@ -269,6 +288,8 @@ class GDriveFetcher implements FetcherInterface
      *
      * @param array $metadata
      * @return string
+     * @throws \PDOException
+     * @throws Exception
      */
     public function deriveFileName(array $metadata): string
     {
@@ -281,7 +302,20 @@ class GDriveFetcher implements FetcherInterface
             return "{$metadata['title']}.pdf";
         }
 
-        return $metadata['title'];
+        /* If the metadata field "fileExtension" contains text, assume a concatenation of
+         * "title" and "fileExtension" to form a full filename
+         */
+        if ('' !== $metadata['fileExtension']) {
+            return "{$metadata['title']}.{$metadata['fileExtension']}";
+        }
+
+        /* Otherwise we might have a weird case where there's a title which is the same as originalFilename
+         * but neither have file extension information in it; we have to infer from the "mimeType" metadata
+         * field, look it up in our AllowedFiles to see what kind of extension it is, then concat that
+         */
+        $extension = $this->extensionMapper->findExtensionFromMimeType($metadata['mimeType']);
+
+        return "{$metadata['originalFilename']}.{$extension}";
     }
 
     /**

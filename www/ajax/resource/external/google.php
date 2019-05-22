@@ -1,6 +1,9 @@
 <?php
+
+use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Remote\GDriveFetcher;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage;
 
@@ -31,7 +34,7 @@ if (function_exists('apache_request_headers')) {
     $headers['Authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
 }
 $proxy   = new Proxy\Server($conf);
-$grive   = new GDriveFetcher(sys_get_temp_dir(), $proxy->curlInit(), $headers['Authorization']);
+$grive   = new GDriveFetcher(ExtensionMapper::getInstance(), sys_get_temp_dir(), $proxy->curlInit(), $headers['Authorization']);
 $mapper  = Storage\Mapper::getInstance();
 $files   = array();
 
@@ -47,7 +50,15 @@ foreach ($_POST['docs'] as $doc) {
         continue;
     }
 
-    $filename = $grive->deriveFileName($meta);
+    try {
+        $filename = $grive->deriveFileName($meta);
+    } catch (Mapper\Exception $e) {
+
+        /* noop: unknown file extension: silently disregard for now
+         */
+        continue;
+    }
+
     $dest = $grive->fetchToFile($doc['id']);
 
     try {
@@ -63,12 +74,16 @@ foreach ($_POST['docs'] as $doc) {
         $files[] = $meta;
     }
     catch (Schoolbox\File\Exception $e) {
-        $files[] = array(
-            'title' => $meta['title'],
-            'size'  => 0,
-            'type'  => 'unknown/binary',
-            'err'   => $e->getMessage()
-        );
+
+        /* TODO: Find out how to handle this "successful error"
+         * TODO: UI doesn't understand this payload
+         */
+//        $files[] = array(
+//            'title' => $meta['title'],
+//            'size'  => 0,
+//            'type'  => 'unknown/binary',
+//            'err'   => $e->getMessage()
+//        );
     }
 
 }
