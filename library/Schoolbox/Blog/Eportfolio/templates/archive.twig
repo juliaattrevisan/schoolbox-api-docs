@@ -2,12 +2,12 @@
     $(function() {
         $(this).find("form[data-blog-comment-form]").each(function() {
             $(this).alaressValidate({
-            rules: {
-                'commentBody':  {
-                    requiredNotBlank:true
+                rules: {
+                    'commentBody':  {
+                        requiredNotBlank:true
+                    }
                 }
-            }
-        });
+            });
         })
     });
 </script>
