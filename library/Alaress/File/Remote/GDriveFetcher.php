@@ -221,6 +221,14 @@ class GDriveFetcher implements FetcherInterface
 
         $destination = tempnam($this->dir, 'gdrive-');
 
+        /* null or false $destination when tempnam fails for some reason
+        */
+        if (!$destination) {
+            throw new OutOfBoundsException('Could not determine destination for temp file');
+        }
+
+        /* If you can't open the $destination tempnam() made
+         */
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException('Could not open target');
         }
