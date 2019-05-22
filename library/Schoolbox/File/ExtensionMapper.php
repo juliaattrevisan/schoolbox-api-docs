@@ -10,6 +10,7 @@
 
 namespace Schoolbox\File;
 
+use http\Exception\InvalidArgumentException;
 use Schoolbox\Collection;
 
 /**
@@ -40,6 +41,41 @@ class ExtensionMapper extends \Schoolbox\Mapper {
 			'type'       => self::TYPE_STRING,
 		));
 	}
+
+
+    /**
+     * Find the file extension from a given mimetype
+     * If it can't find something that matches, throw an exception
+     * since we're now dealing with potential security hazard
+     *
+     * @param string $mimeType
+     * @return string
+     * @throws \http\Exception\InvalidArgumentException
+     * @throws \PDOException
+     */
+	public function findExtensionFromMimeType(string $mimeType): string
+    {
+        $query = "
+            SELECT extension 
+            FROM {$this->table} e
+            INNER JOIN allowedFileTypes aft ON e.fileTypeID = aft.fileTypeID
+            WHERE aft.mime = :mimeType
+            LIMIT 1
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute([
+            'mimeType' => $mimeType
+        ]);
+
+        $result = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if (\count($result)) {
+            return $result['extension'];
+        }
+
+        throw new InvalidArgumentException('Unknown file extension.');
+    }
 
 	/**
 	 * All the allowed file extensions
