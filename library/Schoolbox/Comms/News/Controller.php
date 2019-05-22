@@ -713,8 +713,16 @@ class Controller extends Base
      */
     public function getListForUser() :void
     {
-        $articleIds = $this->articleResolver->findArticlesForUser($this->getUser());
-        $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds);
+        $articleIds = [];
+
+        if (!(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($this->getUser())) {
+            $articleIds = array_merge(
+                $this->articleResolver->findArticlesForUser($this->getUser()),
+                $this->newsMapper->findIdsByColumn('author_id', $this->getUser()->getId())
+            );
+        }
+
+        $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
@@ -1134,7 +1142,7 @@ class Controller extends Base
      * @return array
      * @throws MapperException
      */
-    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, bool $isArchive = false, ?int $year, ?int $month): array
+    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, bool $isArchive, ?int $year, ?int $month): array
     {
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;

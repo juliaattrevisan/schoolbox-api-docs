@@ -151,7 +151,7 @@ class Lists
          */
         $folderId = $params->getFolderId();
 
-        if(null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
+        if (null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
             /* Articles that were audienced to $user */
             $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
 

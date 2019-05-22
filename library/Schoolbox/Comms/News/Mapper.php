@@ -19,6 +19,7 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -333,19 +334,23 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Given a list of articles, returns those that are published and not expired
      *
      * @param array $availableArticleIds
+     * @param User  $user
+     *
      * @return array
-     * @throws InvalidColumnException
-     * @throws \UnderflowException
      */
-    public function findArticlesIdsPublished(array $availableArticleIds): array
+    public function findArticlesIdsPublished(array $availableArticleIds, User $user): array
     {
-        if (!\count($availableArticleIds)) {
+        if (!\count($availableArticleIds) && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
             return [];
         }
 
         $articleIds = [];
         $pb = $this->getPredicatePublished();
-        $pb->in('id',$availableArticleIds);
+
+        if(\count($availableArticleIds)) {
+            $pb->in('id', $availableArticleIds);
+        }
+
         $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
