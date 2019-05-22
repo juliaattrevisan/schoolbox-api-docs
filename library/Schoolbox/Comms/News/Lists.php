@@ -20,6 +20,7 @@ use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 
 class Lists
@@ -127,19 +128,14 @@ class Lists
      * @param Querystring        $params
      * @param User               $user
      * @param Collection|Topic[] $topics
+     * @param bool               $isArchive
      * @param int|null           $year
      * @param int|null           $month
+     *
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
      */
-    public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
+    public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, bool $isArchive, ?int $year, ?int $month): array
     {
         /* News Topics were never obtainable by slug
          * We always fetched everything, then manually sorted by slug
@@ -147,24 +143,33 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-
+        $articleIdsForUser = [];
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
          *
          * Component config can set "All" as its limit, filtered to the list of articles that can be seen
          */
         $folderId = $params->getFolderId();
-        if(!$folderId) {
+
+        if(null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
             /* Articles that were audienced to $user */
             $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
-        }
-        else {
-            $articleIdsForUser = [];
+
+            /**
+             * On archive page, if the user is not a super user / news moderator, let's also provide the articles id's
+             * that the user has authored.
+             */
+            if ($isArchive) {
+                $articleIdsForUser = array_merge(
+                    $articleIdsForUser,
+                    $this->newsMapper->findIdsByColumn('author_id', $user->getId())
+                );
+            }
         }
 
-        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $params->getLimit(), $params->getPageNum(), $year, $month, $folderId);
+        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $isArchive, $params->getLimit(), $params->getPageNum(), $year, $month, $folderId);
 
-        $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, 0, 0, $year, $month, $folderId);
+        $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $isArchive, 0, 0, $year, $month, $folderId);
 
         $articles = $this->loadArticleByIds($articleIds, $params, $user);
 

@@ -374,21 +374,20 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @param array    $availableArticleIds
      * @param int      $topicId
+     * @param bool     $isArchive
      * @param int|null $limit
      * @param int|null $pageNum
      * @param int|null $year
      * @param int|null $month
      * @param int|null $folderId
+     *
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \DomainException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, bool $isArchive, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
         /* This user can't see any articles
          */
-        if (!(\count($availableArticleIds) || $folderId)) {
+        if (!$isArchive && !(\count($availableArticleIds) || $folderId)) {
             return [];
         }
 
