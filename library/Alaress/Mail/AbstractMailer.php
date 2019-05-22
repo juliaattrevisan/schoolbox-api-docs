@@ -135,9 +135,9 @@ abstract class AbstractMailer implements IMailer
      * @param string $email
      * @param string $name
      */
-    public function setFrom($email, $name = '')
+    public function setFrom(string $email, string $name = '')
     {
-        $this->email->setFrom($email, $name ?? null);
+        $this->email->setFrom($email, $name);
         $this->email->setReturnPath($email);
     }
 
@@ -148,9 +148,9 @@ abstract class AbstractMailer implements IMailer
      * @param string $email
      * @param string $name
      */
-    public function setReplyTo($email, $name = '')
+    public function setReplyTo(string $email, string $name = '')
     {
-        $this->email->setReplyTo($email, $name ?? null);
+        $this->email->setReplyTo($email, $name);
     }
 
 
@@ -467,7 +467,7 @@ abstract class AbstractMailer implements IMailer
     {
         $email = self::getEmailFromString($string);
 
-        if ($email && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
             return true;
         }
 
@@ -476,15 +476,16 @@ abstract class AbstractMailer implements IMailer
 
     /**
      * @param string $string
-     * @return bool|null
+     *
+     * @return string
      */
-    public static function getEmailFromString(string $string)
+    public static function getEmailFromString(string $string): string
     {
         if (preg_match('~<(.*?)>~', $string, $output) !== 0) {
-            return $output[1];
+            return trim($output[1]);
         }
 
-        return false;
+        return '';
     }
 
     /**
