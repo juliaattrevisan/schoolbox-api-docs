@@ -12,9 +12,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * An instance of MSSQL
      *
-     * @var null
+     * @var MSSQL
      */
-    private $db = null;
+    private $db;
 
     /**
      * Helper
@@ -638,7 +638,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
     private function setDb($db)
     {

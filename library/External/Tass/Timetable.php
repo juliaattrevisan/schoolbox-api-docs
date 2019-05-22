@@ -20,6 +20,12 @@ class External_Tass_Timetable implements External_TimetableInterface
      */
     private $tassDay;
 
+
+    /**
+     * @var Group
+     */
+    private $groupHandler;
+
     /**
      * @var External_UserInterface
      */

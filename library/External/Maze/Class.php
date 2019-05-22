@@ -13,9 +13,9 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * An instance of MSSQL
      *
-     * @var null
+     * @var MSSQL
      */
-    protected $db = null;
+    protected $db;
 
     /**
      * @var External_Maze_Helper
@@ -226,7 +226,7 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
     protected function setDb($db) {
         $this->db = $db;
@@ -235,7 +235,7 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * Get db
      *
-     * @return null
+     * @return MSSQL
      */
     protected function getDb() {
         return $this->db;

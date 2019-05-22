@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of Edumate Class connector
  * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
@@ -6,22 +7,22 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
-*/
+ */
 class External_Edumate_Ping extends External_Edumate_Connection implements External_PingInterface
 {
     /**
      * @inheritdoc
      */
-	public function isResponsive(): bool
+    public function isResponsive(): bool
     {
-		try {
-			$this->connect();
-			return true;
-		} catch (Exception $e) {
+        try {
+            $this->connect();
+            return true;
+        } catch (Exception $e) {
         }
 
-		return false;
-	}
+        return false;
+    }
 
     /**
      * @inheritdoc
