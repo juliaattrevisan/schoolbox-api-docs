@@ -135,9 +135,9 @@ abstract class AbstractMailer implements IMailer
      * @param string $email
      * @param string $name
      */
-    public function setFrom($email, $name = '')
+    public function setFrom(string $email, string $name = '')
     {
-        $this->email->setFrom($email, $name ?? null);
+        $this->email->setFrom($email, $name);
         $this->email->setReturnPath($email);
     }
 
@@ -148,9 +148,9 @@ abstract class AbstractMailer implements IMailer
      * @param string $email
      * @param string $name
      */
-    public function setReplyTo($email, $name = '')
+    public function setReplyTo(string $email, string $name = '')
     {
-        $this->email->setReplyTo($email, $name ?? null);
+        $this->email->setReplyTo($email, $name);
     }
 
 
