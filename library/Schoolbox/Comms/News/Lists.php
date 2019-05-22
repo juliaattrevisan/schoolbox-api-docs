@@ -116,7 +116,7 @@ class Lists
      *
      *   - has a publish_at date
      *   - has been accepted for publication by the moderator
-     *   - has not yet expired
+     *   - has not yet expired (If the request is not news archive page)
      *   - has not been deleted
      *
      * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
