@@ -13,6 +13,8 @@ namespace Alaress\File\Remote;
 use DomainException;
 use OutOfBoundsException;
 use \Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\File\ExtensionMapper;
+
 
 class GDriveFetcher implements FetcherInterface
 {
@@ -269,6 +271,8 @@ class GDriveFetcher implements FetcherInterface
      *
      * @param array $metadata
      * @return string
+     * @throws \PDOException
+     * @throws \http\Exception\InvalidArgumentException
      */
     public function deriveFileName(array $metadata): string
     {
@@ -281,7 +285,20 @@ class GDriveFetcher implements FetcherInterface
             return "{$metadata['title']}.pdf";
         }
 
-        return $metadata['title'];
+        /* If the metadata field "fileExtension" contains text, assume a concatenation of
+         * "title" and "fileExtension" to form a full filename
+         */
+        if ('' !== $metadata['fileExtension']) {
+            return "{$metadata['title']}.{$metadata['fileExtension']}";
+        }
+
+        /* Otherwise we might have a weird case where there's a title which is the same as originalFilename
+         * but neither have file extension information in it; we have to infer from the "mimeType" metadata
+         * field, look it up in our AllowedFiles to see what kind of extension it is, then concat that
+         */
+        $extension = ExtensionMapper::getInstance()->findExtensionFromMimeType($metadata['mimeType']);
+
+        return "{$metadata['originalFilename']}.{$extension}";
     }
 
     /**
