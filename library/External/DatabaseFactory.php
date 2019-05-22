@@ -22,16 +22,12 @@ class External_DatabaseFactory
      *                             whatever the configured external DB is, or
      *                             "offline" if it isn't enabled.
      *
-     * @return External_ClassInterface|External_AttendanceInterface|
-     *         External_PingInterface|External_TimetableInterface|
-     *         External_UserInterface|External_UserDetentionInterface|
-     *         External_MarkbookInterface
-     *         (depends on value of $databaseType)
+     * @return External\IConnector
      * @throws LogicException if even the offline class could be created.
      *                        (This probably means you passed an invalid value
      *                         for $databaseType.)
      */
-    protected function buildConnector($databaseType, $databaseName = '')
+    private function buildConnector(string $databaseType, string $databaseName = ''): External\IConnector
     {
         $offlineClass    = "External_Offline_$databaseType";
         $databaseClasses = array();
@@ -51,8 +47,7 @@ class External_DatabaseFactory
 
             if (file_exists(Autoloader::getClassFile($databaseClass))) {
                 try {
-                    $dbClass =  new $databaseClass();
-                    return $dbClass;
+                    return new $databaseClass();
                 } catch (\Schoolbox\External\Exception $e) {
                 } catch (\Alaress\Database\Exception $e) {
                 }
@@ -67,46 +62,54 @@ class External_DatabaseFactory
         throw new LogicException("Class \"$offlineClass\" does not exist");
     }
 
+
     /**
      * Builds an attendance connector.
      *
-     * @param  string $databaseName
+     * @param string $databaseName
      * @return External_AttendanceInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildAttendanceConnector($databaseName = '')
+    public function buildAttendanceConnector(string $databaseName = ''): External_AttendanceInterface
     {
         return $this->buildConnector('Attendance', $databaseName);
     }
 
+
     /**
      * Builds a class connector.
      *
-     * @param  string $databaseName
+     * @param string $databaseName
      * @return External_ClassInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildClassConnector($databaseName = '')
+    public function buildClassConnector(string $databaseName = ''): External_ClassInterface
     {
         return $this->buildConnector('Class', $databaseName);
     }
 
+
     /**
      * Builds a ping connector.
      *
-     * @param  string $databaseName
+     * @param string $databaseName
      * @return External_PingInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildPingConnector($databaseName = '')
+    public function buildPingConnector(string $databaseName = ''): External_PingInterface
     {
         return $this->buildConnector('Ping', $databaseName);
     }
 
+
     /**
      * Builds a timetable connector.
      *
-     * @param  string $databaseName
+     * @param string $databaseName
      * @return External_TimetableInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildTimetableConnector($databaseName = '')
+    public function buildTimetableConnector(string $databaseName = ''): External_TimetableInterface
     {
         return $this->buildConnector('Timetable', $databaseName);
     }
@@ -116,8 +119,9 @@ class External_DatabaseFactory
      *
      * @param  string $databaseName
      * @return External_UserInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildUserConnector($databaseName = '')
+    public function buildUserConnector(string $databaseName = ''): External_UserInterface
     {
         return $this->buildConnector('User', $databaseName);
     }
@@ -127,8 +131,9 @@ class External_DatabaseFactory
      *
      * @param  string $databaseName
      * @return External_UserDetentionInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildUserDetentionConnector($databaseName = '')
+    public function buildUserDetentionConnector(string $databaseName = ''): External_UserDetentionInterface
     {
         return $this->buildConnector('UserDetention', $databaseName);
     }
@@ -138,15 +143,15 @@ class External_DatabaseFactory
      *
      * @param  string $databaseName
      * @return External_MarkbookInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildMarkbookConnector($databaseName = '')
+    public function buildMarkbookConnector(string $databaseName = ''): External_MarkbookInterface
     {
         if(Config::get('external_markbook')) {
             return $this->buildConnector('Markbook', $databaseName);
         }
-        else {
-            return $this->buildConnector('Markbook', 'Offline');
-        }
+
+        return $this->buildConnector('Markbook', 'Offline');
     }
 
     /**
@@ -154,15 +159,14 @@ class External_DatabaseFactory
      *
      * @param  string $databaseName
      * @return External_PastoralInterface
+     * @throws LogicException If cannot build connector
      */
-    public function buildPastoralConnector($databaseName = '')
+    public function buildPastoralConnector(string $databaseName = ''): External_PastoralInterface
     {
         if(Config::get('external_pastoral')) {
             return $this->buildConnector('Pastoral', $databaseName);
         }
-        else {
-            return $this->buildConnector('Pastoral', 'Offline');
-        }
-    }
 
+        return $this->buildConnector('Pastoral', 'Offline');
+    }
 }

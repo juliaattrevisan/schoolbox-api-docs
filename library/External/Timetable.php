@@ -9,77 +9,57 @@
  */
 
 use Alaress\Redis;
+use External\CachingConnectorAbstract;
+use Schoolbox\Campus;
 
-class External_Timetable implements External_TimetableInterface
+class External_Timetable extends CachingConnectorAbstract implements External_TimetableInterface
 {
-    use External_CacheTrait;
-
-    private $database;
-    
-    /**
-     * @var External_Offline_Timetable
-     */
-    private $offline;
     /**
      * Constructor
      *
-     * @throws Exception
      * @param String $databaseName
+     * @throws InvalidArgumentException
+     * @throws LogicException If unable to build connector
      */
     public function __construct($databaseName = '')
     {
-        $factory = new External_DatabaseFactory();
-        $this->setDatabase($factory->buildTimetableConnector($databaseName));
-        $this->setOffline(new External_Offline_Timetable());
-        $this->setCache(Redis::getInstance());
-        $this->setTimeout(Config::get('external_cache_timeout'));
+        // TODO inject dependencies
+        parent::__construct(
+            (new External_DatabaseFactory())->buildTimetableConnector($databaseName),
+            new External_Offline_Timetable(),
+            Redis::getInstance(),
+            Config::get('external_cache_timeout')
+        );
     }
 
     /**
-     * Returns the period definition for the schools timetable, can be optionally provided a day to fetch a specific
-     * days definition.
-     * @param string $externalUserId
-     * @param \Schoolbox\Campus $campus
-     * @param Integer $day
-     * @return Array
+     * @inheritDoc
      */
-    function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
-     * Calculates the current day number in the cycle
-     *
-     * @param int|\Schoolbox\Campus $campus
-     * @param String|Integer $date
-     * @return Integer
+     * @inheritDoc
      */
-    function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+    public function getDayNumber(Campus $campus, $date = 0)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
-     * Returns the name of the current day
-     *
-     * @param $dayNumber
-     * @return String
-     *
+     * @inheritDoc
      */
-    function getDayName($dayNumber) {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    public function getDayName($dayNumber): string
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
-     * Determines the period number
-     *
-     * @param int|\Schoolbox\Campus $campus
-     * @param Integer $now
-     * @param \Schoolbox\User $user     User we are getting the period for (only required by DF)
-     * @return Integer
+     * @inheritDoc
      */
-    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         // Period number is more subject to change than most information:
         // set max cache time to 1 minute.
@@ -96,7 +76,7 @@ class External_Timetable implements External_TimetableInterface
      *
      * @todo this should be moved to a 5.4 trait, and used by External_*_Timetable
      *
-     * @param \Schoolbox\Campus $campus The campus ID to get the date for.
+     * @param Campus $campus The campus ID to get the date for.
      * @param int $day The day number to get the date for.
      * @param int $date A Unix timestamp representing the date to get, or
      *                       today if not set.
@@ -108,7 +88,7 @@ class External_Timetable implements External_TimetableInterface
      *
      * @return DateTime
      */
-    protected function getDateForDayNumber($campus, $day, $date = null, $previous = false)
+    protected function getDateForDayNumber($campus, $day, $date = null, $previous = false): DateTime
     {
         if (!isset($date)) {
             $date = time();
@@ -163,104 +143,36 @@ class External_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Returns a user's complete timetable
-     *
-     * The structure of this data is as follows
-     * Array[]['periodName']
-     * Array[]['periodStart']
-     * Array[]['periodEnd']
-     * Array[]['periodNumber']
-     * Array[]['periodSequence']
-     * Array[]['day'][][]['description']
-     * Array[]['day'][][]['code']
-     * Array[]['day'][][]['campus']
-     * Array[]['day'][][]['description']
-     *
-     * @param Integer $externalUserId
-     * @param Integer $userId
-     * @param int|\Schoolbox\Campus $campus
-     * @return Array
+     * @inheritDoc
      */
-    function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
 
     /**
      * {@inheritdoc}
-     *
-     * @param int               $externalUserId
-     * @param int               $userId
-     * @param \Schoolbox\Campus $campus
-     * @param int               $dayNumber
-     * @return array
      */
-    function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
     /**
      * @inheritdoc
      */
-    function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
 
 
     /**
-     * Gets the timetable for the given room.
-     *
-     * @param  array|string $roomCodes
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
-
-    public function __call($methodName, $argumentList)
-    {
-        $database = $this->getDatabase();
-
-        $methodReflection = new ReflectionMethod($database, $methodName);
-
-        return $methodReflection->invokeArgs($database, $argumentList);
-    }
-
-    /**
-     * @param External_TimetableInterface $database
-     * @return void
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return External_TimetableInterface
-     */
-    private function getDatabase()
-    {
-        return $this->database;
-    }
-    
-    /**
-     * @return External_Offline_Timetable
-     */
-    public function getOffline()
-    {
-        return $this->offline;
-    }
-
-    /**
-     * @param External_Offline_Timetable $offline
-     */
-    public function setOffline($offline)
-    {
-        $this->offline = $offline;
-    }
-
 }

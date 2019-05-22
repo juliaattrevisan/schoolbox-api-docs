@@ -5,8 +5,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
+*/
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -24,15 +24,11 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the Synergetic of the Contact, not the Student.
-     *
-     * @param $externalId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getParent($externalId)
+    public function getParent(string $externalUserId): array
     {
-        if (empty($externalId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -41,7 +37,7 @@ class External_Schoolpro_User implements External_UserInterface
             [
                 'pUserName' => 'alaress',
                 'pUserPass' => 'alaress',
-                'pSchoolNum' => $externalId,
+                'pSchoolNum' => $externalUserId,
             ]
         ];
 
@@ -65,53 +61,41 @@ class External_Schoolpro_User implements External_UserInterface
             return $parent;
         }
 
-        return false;
+        return [];
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the Synergetic of the Contact, not the Student. Anyone who is
-     * not supposed to be having their details publicised (via the
-     * DirectoryIncludeFlag) are not included in the result set.
-     * Accept array of Synergy IDs, or just an int
-     *
-     * @param $externalId
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getParentSync($externalId)
+    public function getParentSync(array $externalIds): array
     {
         $vars = [
             'sbGetParent',
             [
                 'pUserName' => 'alaress',
                 'pUserPass' => 'alaress',
-                'pSchoolNum' => $externalId,
+                'pSchoolNum' => $externalIds,
             ]
         ];
 
         $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
 
+        trigger_error(__METHOD__ . ' not implemented', E_USER_WARNING);
         if ($result['success']) {
-        } else {
+            return [];
         }
+        return [];
     }
 
     /**
-     * TODO: Not specified in a stored proc
-     *
-     * Get all the parents emails for a class, or group of students
-     *
-     * @param array $synergyIds
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentEmails($synergyIds): array
+    public function getParentEmails(array $externalUserIds): array
     {
         $emails = [];
 
-        if (\count($synergyIds)) {
-            foreach ($synergyIds as $studentId) {
+        if (\count($externalUserIds)) {
+            foreach ($externalUserIds as $studentId) {
 
                 /* Get the contacts for $studentId
                  */
@@ -170,14 +154,11 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
-     * Get a guy's info from Schoolpro
-     *
-     * @param  $synId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStudent($synId)
+    public function getStudent(string $externalUserId): array
     {
-        if (empty($synId)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -188,7 +169,7 @@ class External_Schoolpro_User implements External_UserInterface
             [
                 'pUserName' => 'alaress',
                 'pUserPass' => 'alaress',
-                'pSchoolNum' => $synId,
+                'pSchoolNum' => $externalUserId,
             ]
         ];
 
@@ -203,7 +184,7 @@ class External_Schoolpro_User implements External_UserInterface
                 [
                     'pUserName' => 'alaress',
                     'pUserPass' => 'alaress',
-                    'pSchoolNum' => $synId,
+                    'pSchoolNum' => $externalUserId,
                 ]
             ];
 
@@ -251,28 +232,21 @@ class External_Schoolpro_User implements External_UserInterface
             return $student;
         }
 
-        return false;
+        return [];
     }
 
     /**
-     * TODO: Not specified in a stored proc
-     *
-     * Get a guy's info from Schoolpro
-     *
-     * @param  $synId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStaff($synId)
+    public function getStaff(string $externalUserId): array
     {
+        return [];
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
-     *
-     * @param string $externalUserId
-     * @return array
+     * @inheritDoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -319,49 +293,30 @@ class External_Schoolpro_User implements External_UserInterface
     }
     
     /**
-     * TODO: Not specified in a stored proc
-     *
-     * Gets a list of Contacts for all Students in a particular year level. The
-     * year level is stored in Synergetic.
-     *
-     * Used in reporting.
-     *
-     * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
-     * so I changed it to use CountryCode instead.
-     *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
+        return [];
     }
-    
-    public function getCurrentYear($externalUserId = null)
+
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return date('Y');
     }
 
     /**
-     * TODO: Not specified in a stored proc
-     *
-     * @param null $externalUserId
-     * @return int
+     * @inheritDoc
      */
-    public function getCurrentSemester($externalUserId = null) {
-        return date('m') < 6 ? 1 : 2;
+    public function getCurrentSemester(string $externalUserId = null): ?string
+    {
+        return date('m') < 6 ? '1' : '2';
     }
     
     /**
-     * Get a list of subjects for a particular user
-     *
-     * @param User $user
-     * @return array
+     * @inheritDoc
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -423,19 +378,14 @@ class External_Schoolpro_User implements External_UserInterface
         } else {
             return [];
         }
-
-        return [];
     }
 
     /**
-     * Returns a list of externalIds
-     *
-     * @param $synergyID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getEnrolledStudents($synergyID)
+    public function getEnrolledStudents(string $externalUserId): array
     {
-        if (empty($synergyID)) {
+        if (empty($externalUserId)) {
             return [];
         }
 
@@ -444,7 +394,7 @@ class External_Schoolpro_User implements External_UserInterface
             [
                 'pUserName' => 'alaress',
                 'pUserPass' => 'alaress',
-                'pSchoolNum' => $synergyID,
+                'pSchoolNum' => $externalUserId,
             ]
         ];
 
@@ -461,12 +411,9 @@ class External_Schoolpro_User implements External_UserInterface
     }
 
     /**
-     * Get an email address for a particular person
-     *
-     * @param $externalUserId
-     * @return bool
+     * @inheritDoc
      */
-    public function getEmail($externalUserId)
+    public function getEmail(string $externalUserId): string
     {
         $groupHandler = new Group();
 
@@ -496,12 +443,12 @@ class External_Schoolpro_User implements External_UserInterface
 
                     /* TODO: Not supplied?
                      */
-                    return false;
+                    return '';
                 }
             }
         }
 
-        return false;
+        return '';
     }
 
 
@@ -592,8 +539,10 @@ class External_Schoolpro_User implements External_UserInterface
 
     /**
      * Stub method, probably not used
+     *
+     * @inheritDoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $vars = [
             'sbGetStudentAccounts',
@@ -603,13 +552,13 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        return $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
     }
 
     /**
      * Stub method, probably not used
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         $vars = [
             'sbGetGuardianAccounts',
@@ -619,13 +568,13 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        return $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
     }
 
     /**
      * Stub method, probably not used
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         $vars = [
             'sbGetStaffAccounts',
@@ -635,55 +584,55 @@ class External_Schoolpro_User implements External_UserInterface
             ]
         ];
 
-        $result = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
+        return $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetchAll();
     }
 
     /**
-     * Stub method, probably not used
+     * @inheritDoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
+        return '';
     }
 
     /**
-     * Stub method, probably not used
+     * @inheritDoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
+        return null;
     }
 
     /**
-     * Get contact list for staff directory
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStaffContactListExtended()
+    public function getHousemasterEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getStaffContactListExtended(): array
     {
         // TODO: Implement getStaffContactListExtended() method.
         return array();
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return array();
     }
 
     /**
-     * Not yet implemented for this connector
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         return [];
     }
-
-    /* Getters/Setters
-     */
 }

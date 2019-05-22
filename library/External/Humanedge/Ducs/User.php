@@ -4,6 +4,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 /**
  * HumanEdge implementation of user retrieve methods.

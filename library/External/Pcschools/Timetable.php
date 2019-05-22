@@ -8,7 +8,6 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\Database\Exception as AlaressDatabaseException;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -64,7 +63,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array
     {
         // TODO: Hardcoded until we handle differing times each day of the timetable
 
@@ -157,24 +156,15 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return 'Day ' . $dayNumber;
     }
 
     /**
-     * Calculates the current period based on the current time
-     * The returned data structure is required for Dashboard Timetable Controller
-     * PeriodNumber
-     * PeriodNumberSeq
-     *
-     * @param Campus $campus
-     * @param int    $now
-     *
-     * @internal param $campusId
-     * @return array
+     * @inheritDoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         // Assume that definition doesn't vary per student
         // Should this use getFullTimetable then?
@@ -205,16 +195,8 @@ class External_Pcschools_Timetable implements External_TimetableInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param string $externalUserId
-     * @param string $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
-     *
-     * @throws AlaressDatabaseException
-     * @return array
      */
-    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
         if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
             return [];
@@ -308,33 +290,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific date
-     * This was developed as synergetic has substitutions and attendance data available in a stored proc which
-     * is date dependent
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     * Has the structure for each period
-     * periodName
-     * periodStart
-     * periodEnd
-     * periodNumber
-     * periodSequence
-     * description
-     * code
-     * room
-     * staffID
-     * staffTitle
-     * staffFirstname
-     * staffSurname
-     *
-     * @param                     $externalUserId
-     * @param                     $userId
-     * @param Campus              $campus
-     * @param Alaress_Date_Format $date
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
             return [];
@@ -443,51 +401,9 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return the ENTIRE timetable for a user and campus
-     * Assemble into a 2D array
-     * Each row represents a Period across each Day in the cycle
-     * [Period1 [Day1, Day2, Day3, DayN...]]
-     * [Period2 [Day1, Day2, Day3, DayN...]]
-     * [Period3 [Day1, Day2, Day3, DayN...]]
-     * [PeriodN [Day1, Day2, Day3, DayN...]]
-     * ...
-     * $timetable[$period]['periodName']
-     * $timetable[$period]['periodStart']
-     * $timetable[$period]['periodEnd']
-     * $timetable[$period]['periodNumber']
-     * $timetable[$period]['periodSequence']
-     * $timetable[$period]['day'][$day][] = array()
-     * Similarly with $dayIndex
-     * [Period1 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
-     * [Period2 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
-     * [Period3 [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
-     * [PeriodN [Day1 [Class1, Class2...], Day2, Day3, DayN...]]
-     * ...
-     * $timetable[$periodIndex]['periodName']
-     * $timetable[$periodIndex]['periodStart']
-     * $timetable[$periodIndex]['periodEnd']
-     * $timetable[$periodIndex]['periodNumber']
-     * $timetable[$periodIndex]['periodSequence']
-     * An array of classes for this period on this day
-     * $timetable[$periodIndex]['day'][$dayIndex][] = array(
-     *     description
-     *     code
-     *     campus
-     *     room
-     *     staffID
-     *     staffFirstname
-     *     staffSurname
-     *     staffTitle
-     * )
-     *
-     * @param                  $externalUserId
-     * @param                  $userId
-     * @param Campus           $campus
-     *
-     * @internal param $campusId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
             return [];
@@ -581,29 +497,19 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Gets the timetable for the given room.
-     *
-     * @param  array|string $roomCodes
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         // Split the requested room codes into a CSV string for use in the query
-
-        if (!is_array($roomCodes)) {
-            $roomCodes = [$roomCodes];
-        }
-
         array_walk($roomCodes, function (&$value, &$key) {
             $value = "'" . $this->getDatabase()->quote($value) . "'";
         });
 
-        $roomCodes = implode(",", $roomCodes);
+        $roomCodesCsv = implode(",", $roomCodes);
 
         // We don't have any information at this point in time as to which user, date, or other context we are in- so
         // we sadly just end up blindly picking any campus to get a value to use for TIME_PERIOD in our queries
-
         $timePeriod = '';
 
         $campuses = CampusMapper::getInstance()->findAll();
@@ -651,7 +557,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) = '*' AND TIMEPDHD.INCLUDES LIKE '%|' + TIMEFILE.YEAR + '|%' THEN 1             
                 ELSE 0
               END = 1
-            WHERE TIME_PERIOD = '{$timePeriod}' AND TIMEFILE.ROOM IN ({$roomCodes})
+            WHERE TIME_PERIOD = '{$timePeriod}' AND TIMEFILE.ROOM IN ({$roomCodesCsv})
         ";
 
         $classes = $this->getDatabase()->getAll($sql);

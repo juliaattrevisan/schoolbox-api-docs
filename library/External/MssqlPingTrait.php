@@ -14,7 +14,7 @@ trait External_MssqlPingTrait
      *
      * @return bool
      */
-    public function isResponsive()
+    public function isResponsive(): bool
     {
         try {
             return MSSQL::getInstance()->isResponsive();
@@ -27,7 +27,7 @@ trait External_MssqlPingTrait
     /**
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return '';
     }

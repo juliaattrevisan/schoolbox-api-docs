@@ -4,14 +4,14 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-/**
- * HumanEdge implementation of user retrieve methods.
- */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
+/**
+ * HumanEdge implementation of user retrieve methods.
+ */
 class External_Humanedge_User implements External_UserInterface
 {
     use External_Humanedge_APlusDatabaseTrait;
@@ -46,7 +46,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudent($externalUserId)
+    public function getStudent(string $externalUserId): array
     {
         // Smoosh all of the contacts into one
         $query = "
@@ -116,7 +116,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         $query = "
             SELECT
@@ -163,7 +163,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];
     }
@@ -171,7 +171,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         return [];
     }
@@ -179,13 +179,13 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
-        if (empty($synergyIds)) {
+        if (empty($externalUserIds)) {
             return [];
         }
 
-        $idString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
+        $idString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $externalUserIds));
 
         $query = "
             SELECT
@@ -210,7 +210,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParent($externalUserId)
+    public function getParent(string $externalUserId): array
     {
         $query = "
             SELECT
@@ -241,7 +241,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentSync($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
         return [];
     }
@@ -249,7 +249,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         return [];
     }
@@ -257,7 +257,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStaff($externalUserId)
+    public function getStaff(string $externalUserId): array
     {
         /**
          * Get the following fields for the staff member $externalUserId
@@ -298,7 +298,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         return [];
     }
@@ -306,7 +306,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         $query = "
             SELECT      
@@ -379,7 +379,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         return $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
     }
@@ -387,18 +387,17 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
     }
 
+
     /**
-     * Returns list of subjects the user is enrolled in
-     *
-     * @param User $user
-     * @return array
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -484,7 +483,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         $query = "
             SELECT
@@ -502,7 +501,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getEmail($externalUserId)
+    public function getEmail(string $externalUserId): string
     {
         return '';
     }
@@ -523,7 +522,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         return '';
     }
@@ -531,15 +530,15 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        return '';
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
@@ -547,17 +546,17 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
-        return '';
+        return [];
     }
 
     /**
      * @inheritDoc
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
-        return '';
+        return [];
     }
 
     /**

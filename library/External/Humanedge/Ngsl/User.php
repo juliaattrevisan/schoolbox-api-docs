@@ -4,24 +4,23 @@
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
+use Schoolbox\User;
 
 /**
  * NGSL specific HumanEdge implementation of user retrieve methods.
  */
-
-use Schoolbox\User;
-
-class External_Humanedge_Ngsl_User extends External_Humanedge_User implements External_UserInterface
+class External_Humanedge_Ngsl_User extends External_Humanedge_User
 {
     use External_Humanedge_APlusDatabaseTrait;
 
+
     /**
-     * Returns list of subjects the user is enrolled in
-     *
-     * @param User $user
-     * @return array
+     * @inheritDoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 

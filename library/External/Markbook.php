@@ -11,63 +11,67 @@ use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
 
 class External_Markbook implements External_MarkbookInterface
 {
+
     /** @var External_MarkbookInterface */
     private $database;
 
-    /** @var External_Offline_Markbook */
-    private $offline;
 
     /**
      * Constructor
      *
      * @param String $databaseName
+     * @throws LogicException If unable to build connection
      */
-    public function __construct($databaseName = '')
+    public function __construct(string $databaseName = '')
     {
-        $factory = new External_DatabaseFactory();
-        $this->setDatabase($factory->buildMarkbookConnector($databaseName));
-        $this->setOffline(new External_Offline_Markbook());
+        $this->database = (new External_DatabaseFactory())->buildMarkbookConnector($databaseName);
     }
+
 
     /**
      * @inheritdoc
      */
     public function getAssessment(Activity $assessment): array
     {
-        return $this->getDatabase()->getAssessment($assessment);
+        return $this->database->getAssessment($assessment);
     }
+
 
     /**
      * @inheritdoc
      */
     public function hasAssessment(Activity $assessment): bool
     {
-        return $this->getDatabase()->hasAssessment($assessment);
+        return $this->database->hasAssessment($assessment);
     }
+
 
     /**
      * @inheritdoc
      */
     public function createAssessment(Activity $assessment): bool
     {
-        return $this->getDatabase()->createAssessment($assessment);
+        return $this->database->createAssessment($assessment);
     }
+
 
     /**
      * @inheritdoc
      */
     public function updateAssessment(Activity $assessment): bool
     {
-        return $this->getDatabase()->updateAssessment($assessment);
+        return $this->database->updateAssessment($assessment);
     }
+
 
     /**
      * @inheritDoc
      */
     public function deleteAssessment(Activity $assessment): bool
     {
-        return $this->getDatabase()->deleteAssessment($assessment);
+        return $this->database->deleteAssessment($assessment);
     }
+
 
     /**
      * @param ReturnedWork|QuizAttempt $returnedWork
@@ -77,40 +81,6 @@ class External_Markbook implements External_MarkbookInterface
      */
     public function setMark($returnedWork): bool
     {
-        return $this->getDatabase()->setMark($returnedWork);
-    }
-
-    /**
-     * @param External_MarkbookInterface $database
-     */
-    public function setDatabase(External_MarkbookInterface $database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * @return External_MarkbookInterface
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @return External_Offline_Markbook
-     */
-    public function getOffline()
-    {
-        return $this->offline;
-    }
-
-    /**
-     * @param External_Offline_Markbook $offline
-     * @return $this
-     */
-    public function setOffline($offline)
-    {
-        $this->offline = $offline;
-        return $this;
+        return $this->database->setMark($returnedWork);
     }
 }

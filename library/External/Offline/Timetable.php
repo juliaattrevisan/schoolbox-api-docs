@@ -1,56 +1,65 @@
 <?php
+
+use External\IOfflineConnector;
+use Schoolbox\Campus;
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
+*/
 
-class External_Offline_Timetable implements External_TimetableInterface
+class External_Offline_Timetable implements External_TimetableInterface, IOfflineConnector
 {
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
+    {
+        return [];
+    }
+
+    public function getDayNumber(Campus $campus, $date = 0)
     {
         // Noop
     }
 
-    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0)
+    public function getDayName($dayNumber): string
     {
-        // Noop
-    }
-
-    public function getDayName($dayNumber)
-    {
-        // Noop
+        return '';
     }
 
 
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
-        // Noop
+        return [];
     }
 
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
-        // Noop
-    }
-
-
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
-    {
-        // noop
+        return [];
     }
 
 
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
+    {
+        return [];
+    }
+
+
+    /**
+     * @param        $externalUserId
+     * @param        $userId
+     * @param Campus $campus
+     * @return array
+     * @throws \Schoolbox\External\Exception
+     */
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         // Throw exception to let the user know we cannot fetch it for them
         throw new Schoolbox\External\Exception("Timetable is unavailable.");
     }
 
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        // Noop
+        return [];
     }
-
 }

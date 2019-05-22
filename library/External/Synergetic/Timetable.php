@@ -75,14 +75,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string $externalUserId
-     * @param Campus $campus
-     * @param int    $day
-     * @param string $date
-     * @throws InvalidArgumentException
-     * @return array
+     * @inheritDoc
      */
-    public function getTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         $args = [ $externalUserId, $campus, $day, $date ];
         $key  = sprintf('%d-%s-%d-%s', $externalUserId, $campus->getExtTimetableCode(), $day, $date);
@@ -92,14 +87,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param int    $externalUserId
+     * @param string $externalUserId
      * @param Campus $campus
      * @param int    $day
      * @param string $date
      * @return array
      * @throws InvalidArgumentException
      */
-    private function fetchTimetableDefinition($externalUserId, Campus $campus, $day = 0, $date = null)
+    private function fetchTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         // check if there is a calendar event remapping the day number for this specific date
 
@@ -302,7 +297,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @param $dayNumber
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         $query = "SELECT Description FROM luDays WHERE Code = '{$this->getDatabase()->quote($dayNumber)}'";
         $result = $this->getDatabase()->getRow($query);
@@ -310,9 +305,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         if($result['Description']) {
             return $result['Description'];
         }
-        else {
-            return 'Day ' . $dayNumber;
-        }
+
+        return 'Day ' . $dayNumber;
 
     }
 
@@ -389,18 +383,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Returns the period number for the current time.
-     *
-     * @todo campus object should be passed instead of campus ID
-     *       Either that, or a timetable group code, as all other external DB
-     *       calls use the key in the external DB, instead of the Schoolbox key.
-     *
-     * @param Campus $campus A campus object (internal, not Synergetic)
-     * @param int    $now    Optional override of time
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $now = $now ?: time();
 
@@ -466,14 +451,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param int                 $externalUserId
-     * @param int                 $userId
-     * @param Campus              $campus
-     * @param Alaress_Date_Format $date
-     * @throws InvalidArgumentException
-     * @return array
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         $key = sprintf('%d-%d-%s-%s', $externalUserId, $userId, $campus->getExtTimetableCode(), $date->getDatabaseDate());
 
@@ -482,14 +462,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param int                 $externalUserId
+     * @param string                 $externalUserId
      * @param int                 $userId
      * @param Campus              $campus
      * @param Alaress_Date_Format $date
      * @throws InvalidArgumentException
      * @return array
      */
-    private function fetchTimetableForDate($externalUserId, $userId, Campus $campus, Alaress_Date_Format $date)
+    private function fetchTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
         $dayNumber = $this->getDayNumber($campus, $date->getUnixTimeStamp());
 
@@ -604,15 +584,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param int    $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
-     * @param string $date
-     * @return array
-     * @throws InvalidArgumentException
+     * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
     {
         $key = sprintf('%d-%d-%s-%d-%s', $externalUserId, $userId, $campus->getExtTimetableCode(), $dayNumber, $date);
 
@@ -621,7 +595,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param int    $externalUserId
+     * @param string    $externalUserId
      * @param int    $userId
      * @param Campus $campus
      * @param int    $dayNumber
@@ -630,7 +604,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      * @throws MssqlQueryException
      * @return array
      */
-    private function fetchDayTimetable($externalUserId, $userId, Campus $campus, $dayNumber, $date = null)
+    private function fetchDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
@@ -733,7 +707,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     }
 
-    public function getFullTimetable($externalUserId, $userId, Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
@@ -883,17 +857,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * Gets the timetable for the given room.
-     *
-     * @param string $roomCodes
-     * @throws InvalidArgumentException
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
-        if (!is_array($roomCodes)) {
-            $roomCodes = [$roomCodes];
-        }
         if (empty($roomCodes)) {
             return [];
         }

@@ -1,23 +1,16 @@
 <?php
-
 /**
- * DoubleFirst User Object
- *
- * @author        Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- *
- *         ,--.--._
- * ------" _, \___)
- *       2 / _/____)
- *       x \//(____)
- * ------\     (__)
- *        `-----"
  */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
+/**
+ * DoubleFirst User Connector
+ */
 class External_Doublefirst_User implements External_UserInterface
 {
 
@@ -161,13 +154,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the Doublefirst of the Contact, not the Student.
-     *
-     * @param $externalUserId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getParent($externalUserId)
+    public function getParent(string $externalUserId): array
     {
         $externalUserId = $this->database->quote($externalUserId);
 
@@ -255,24 +244,11 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the external ID of the Contact, not the Student. Anyone who is
-     * not supposed to be having their details publicised (via the
-     * DirectoryIncludeFlag) are not included in the result set.
-     * Accept array of external IDs, or just an int
-     *
-     * @param $externalUserId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getParentSync($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
-        if (is_array($externalUserId)) {
-            $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $externalUserId)) . "')";
-        } else {
-            $assignation = " =  '" . $this->database->quote($externalUserId) . "'";
-        }
-
-        $externalUserId = $this->database->quote($externalUserId);
+        $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $externalUserIds)) . "')";
 
         $query = "
             SELECT
@@ -306,24 +282,16 @@ class External_Doublefirst_User implements External_UserInterface
             ORDER BY    pc.Priority
         ";
 
-        if (is_array($externalUserId)) {
-            return $this->getDatabase()->getAll($query);
-        }
-
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
-     * Get all the parents emails for a class, or group of students
-     *
-     * @param array $synergyIds
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
         $emailList = array();
-        $id_list = implode(',', array_map('intval', $synergyIds));
+        $id_list = implode(',', array_map('intval', $externalUserIds));
 
         if (empty($id_list)) {
             return array();
@@ -353,12 +321,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Get a students info from Doublefirst
-     *
-     * @param  $externalUserId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStudent($externalUserId)
+    public function getStudent(string $externalUserId): array
     {
         // We will retrieve a list of all possible primary emergency contacts- they all seem to contain 'EM Contact 1' in the description
 
@@ -463,12 +428,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Retrieve selected staff members details
-     *
-     * @param $externalUserId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStaff($externalUserId)
+    public function getStaff(string $externalUserId): array
     {
         $query =
             "
@@ -494,19 +456,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Gets a list of Contacts for all Students in a particular year level. The
-     * year level is stored in Doublefirst.
-     *
-     * Used in reporting.
-     *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         $query =
             "
@@ -631,8 +583,8 @@ class External_Doublefirst_User implements External_UserInterface
 
         // Search for a particular year level
 
-        if (strlen($yearlevel)) {
-            $query .= " {$whereAnd} Year.Description = '{$this->getDatabase()->quote($yearlevel)}' ";
+        if (strlen($yearLevel)) {
+            $query .= " {$whereAnd} Year.Description = '{$this->getDatabase()->quote($yearLevel)}' ";
             $whereAnd = " AND ";
         }
 
@@ -720,12 +672,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
-     *
-     * @param string $externalUserId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         $query =
             "
@@ -820,7 +769,6 @@ class External_Doublefirst_User implements External_UserInterface
         $contactList = $this->getDatabase()->getAll($query);
 
         // Hack to get rid of duplicate phone numbers
-
         foreach ($contactList as $k => $c) {
             if ($c["StudentContactSpouseOccupPhone"] == $c["StudentContactOccupPhone"]) {
                 $contactList[$k]["StudentContactSpouseOccupPhone"] = '';
@@ -837,32 +785,25 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * Retrieve the current Doublefirst semester- there is no such concept in their DB so back to the old 6 month trick
      *
-     * @param null $externalUserId
-     * @return int
+     * @inheritDoc
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        return date('m') < 6 ? 1 : 2;
+        return date('m') < 6 ? '1' : '2';
     }
 
     /**
-     * Get current academic year
-     *
-     * @param null $externalUserId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
     }
 
     /**
-     * Get a list of subjects for a given student
-     *
-     * @param User $user
-     * @return array
+     * @inheritDoc
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -961,18 +902,15 @@ class External_Doublefirst_User implements External_UserInterface
 
         if (is_array($subjectList)) {
             return $subjectList;
-        } else {
-            return [];
         }
+
+        return [];
     }
 
     /**
-     * Get the students belonging to specified person
-     *
-     * @param $externalUserId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         $query =
             "
@@ -1003,18 +941,15 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Retrieve email address
-     *
-     * @param $id
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getEmail($id)
+    public function getEmail(string $externalUserId): string
     {
         $query =
             "
           SELECT  TOP 1 EmailID 
           FROM    ContactEmailInformation 
-          WHERE   ContactID = '{$id}' AND 
+          WHERE   ContactID = '{$externalUserId}' AND 
                   PrimaryEmail = 1;
         ";
 
@@ -1022,11 +957,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Gets all Students' account info from Doublefirst
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $query = "
             SELECT      PupilID           AS StudentID,
@@ -1049,11 +982,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Gets all Parents' account info from Doublefirst
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         $query =
             "
@@ -1086,11 +1017,9 @@ class External_Doublefirst_User implements External_UserInterface
     }
 
     /**
-     * Gets all active Staff's account info from Doublefirst
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         $query =
             "
@@ -1128,9 +1057,9 @@ class External_Doublefirst_User implements External_UserInterface
      * Exclude people who are on leave (category description for this is 'Staff on leave')
      * TODO: Make exclusion on category configurable, currently excluding
      *
-     * @return mixed
+     * @return array
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         $query =
             "
@@ -1168,44 +1097,37 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * List of campuses a staff member is involved in based on timetable. No such thing in Doublefirst.
      *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return [];
     }
 
     /**
-     * Determine the boarder type based on a value
-     * Returns a human-readable string
-     *
-     * @param $boarderValue
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
-        if (in_array($this->helper->getBoardingStatuses(), $boarderValue)) {
+        if (in_array($boarderValue, $this->helper->getBoardingStatuses(), true)) {
             return "Boarder";
-        } else {
-            return "Day Student";
         }
+
+        return "Day Student";
     }
 
     /**
-     * @param $houseID
-     * @return bool
+     * @inheritDoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        return false;
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
@@ -1213,7 +1135,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         $query =
             "

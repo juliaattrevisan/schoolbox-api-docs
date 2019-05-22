@@ -1,9 +1,9 @@
 <?php
 /**
- * @author    The Whole Company <support@alaress.com.au>
- * @copyright Copyright 2011-2017 (Hopefully RIP after that), Alaress Pty Ltd
+ * @copyright Copyright 2011, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Resource\Storage;
@@ -111,9 +111,9 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getParent($synID)
+    public function getParent(string $externalUserId): array
     {
-        if (!$this->isExternalIdValid($synID)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
 
@@ -151,7 +151,7 @@ class External_Synergetic_User implements External_UserInterface
             WHERE       Contact.ID = :externalId
         ";
 
-        $parentQuery = $this->getConnector()->executeQuery($query, ['externalId' => $synID]);
+        $parentQuery = $this->getConnector()->executeQuery($query, ['externalId' => $externalUserId]);
 
         // Try and fetch the requested parent
 
@@ -167,7 +167,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getParentSync($synID)
+    public function getParentSync(array $externalUserIds): array
     {
         // This hasn't been tested in an actual sync script. But running in isolation it returns this following results.
         //
@@ -182,18 +182,17 @@ class External_Synergetic_User implements External_UserInterface
         //              'OccupEmail' => string '' (length=0)
         //              'DefaultEmailCode' => string '' (length=0)
         //              'DirectoryIncludeFlag' => string '0' (length=1)
+        foreach ($externalUserIds as $idx => $externalUserId) {
+            if (!$this->isExternalIdValid($externalUserId)) {
+                unset($externalUserIds[$idx]);
+            }
+        }
 
-        if (!$this->isExternalIdValid($synID)) {
+        if (!count($externalUserIds)) {
             return [];
         }
 
-        // Coalesce non array inputs into an array just to make this easier
-
-        if (!is_array($synID)) {
-            $synID = [$synID];
-        }
-
-        $externalIdBindings = Builder::getArrayBindings($synID, 'externalId');
+        $externalIdBindings = Builder::getArrayBindings($externalUserIds, 'externalId');
 
         $query =
         "
@@ -214,7 +213,7 @@ class External_Synergetic_User implements External_UserInterface
         // If multiple parents were requested return the results in an array. This should be replaces with an
         // iterator, but that would require refactoring the old sync scripts which is a glorious waste of energy
 
-        if (count($synID) > 1) {
+        if (count($externalUserIds) > 1) {
             return $this->clearInvalidValues(
                 $queryParents->fetchAll()
             );
@@ -230,17 +229,17 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
         // Coalesce non array inputs into an array just to make this easier
 
-        if (!is_array($synergyIds)) {
-            $synergyIds = [$synergyIds];
+        if (!is_array($externalUserIds)) {
+            $externalUserIds = [$externalUserIds];
         }
 
         // Make sure all of the ID's supplied were valid
 
-        foreach ($synergyIds as &$id) {
+        foreach ($externalUserIds as &$id) {
             if (!$this->isExternalIdValid($id)) {
 
                 // This was not a valid ID, remove it from the array
@@ -251,11 +250,11 @@ class External_Synergetic_User implements External_UserInterface
 
         // Check if we've got any valid IDs left
 
-        if (count($synergyIds) == 0) {
+        if (count($externalUserIds) == 0) {
             return [];
         }
 
-        $externalIdBindings = Builder::getArrayBindings($synergyIds, 'externalId');
+        $externalIdBindings = Builder::getArrayBindings($externalUserIds, 'externalId');
 
         $query =
         "
@@ -300,9 +299,9 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudent($synID)
+    public function getStudent(string $externalUserId): array
     {
-        if (!$this->isExternalIdValid($synID)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
 
@@ -390,7 +389,7 @@ class External_Synergetic_User implements External_UserInterface
 
         $student = [];
 
-        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $synID]);
+        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         foreach ($iteratorStudents as $row) {
 
@@ -430,12 +429,14 @@ class External_Synergetic_User implements External_UserInterface
         return $this->clearInvalidValues($student);
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaff($synID)
+    public function getStaff(string $externalUserId): array
     {
-        if (!$this->isExternalIdValid($synID)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
 
@@ -459,13 +460,13 @@ class External_Synergetic_User implements External_UserInterface
              WHERE      vStaff.StaffID = :externalId
         ";
 
-        return $this->getConnector()->executeQuery($query, ['externalId' => $synID])->fetch();
+        return $this->getConnector()->executeQuery($query, ['externalId' => $externalUserId])->fetch();
     }
 
     /**
      * @inheritdoc
      */
-    public function getStudentContactListExtended($yearLevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         // We have to dynamically bind filter parameters here based on the users input
 
@@ -737,7 +738,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
@@ -797,10 +798,12 @@ class External_Synergetic_User implements External_UserInterface
         return $this->clearInvalidValues($contactList);
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -887,16 +890,17 @@ class External_Synergetic_User implements External_UserInterface
         }
 
         // No subjects found
-
         return [];
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getEnrolledStudents($externalId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
-        if (!$this->isExternalIdValid($externalId)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
 
@@ -926,30 +930,32 @@ class External_Synergetic_User implements External_UserInterface
             $query,
             array_merge(
                 $relationshipBindings['bindings'],
-                ['externalId' => $externalId]
+                ['externalId' => $externalUserId]
             )
         )->fetchAll();
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getEmail($externalId)
+    public function getEmail(string $externalUserId): string
     {
-        if (!$this->isExternalIdValid($externalId)) {
-            return false;
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return '';
         }
 
         return $this->getConnector()->executeQuery(
             "SELECT Email FROM Community WHERE id = :externalId",
-            ['externalId' => $externalId]
-        )->fetch();
+            ['externalId' => $externalUserId]
+        )->fetchColumn();
     }
 
     /**
      * @inheritdoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $query =
             "
@@ -979,10 +985,12 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         // Get student contact types from config, and wrangle into a query
 
@@ -1026,10 +1034,12 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query, $contactTypes['bindings'])->fetchAll();
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         $query =
             "
@@ -1055,10 +1065,12 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         // Restrict staff categories to provided list
 
@@ -1139,10 +1151,12 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getConnector()->executeQuery($query, $bindings)->fetchAll();
     }
 
+
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getCampusFromTimetable($externalId)
+    public function getCampusFromTimetable(string $staffID): array
     {
         // Was unable to hit this in testing, but running in isolation returned
         //
@@ -1152,7 +1166,7 @@ class External_Synergetic_User implements External_UserInterface
         //          array (size=1)
         //              'campus' => string 'S' (length=1)
 
-        if (!$this->isExternalIdValid($externalId)) {
+        if (!$this->isExternalIdValid($staffID)) {
             return [];
         }
 
@@ -1165,7 +1179,7 @@ class External_Synergetic_User implements External_UserInterface
                                     ClassCampus <> ''
             ",
             [
-                'id' => $externalId,
+                'id' => $staffID,
                 'fileYear' => date('Y')
             ]
         )->fetchAll();
@@ -1174,15 +1188,15 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function determineBoarderType($code)
+    public function determineBoarderType(string $boarderValue): string
     {
-        if (empty($code)) {
+        if (empty($boarderValue)) {
             return '';
         }
 
         return $this->getConnector()->executeQuery(
             "SELECT Description FROM luBoarder WHERE Code = :code",
-            ['code' => $code]
+            ['code' => $boarderValue]
         )->fetchColumn();
     }
 
@@ -1190,15 +1204,17 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        return false;
+        return null;
     }
+
 
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         // Make sure an array of valid external ID's was passed
 
@@ -1236,7 +1252,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         $iteratorForms = $this->getConnector()->getQueryIterator(
             "SELECT Code, Description FROM dbo.luForm WHERE ActiveFlag = 1"
@@ -1331,11 +1347,8 @@ class External_Synergetic_User implements External_UserInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param int $externalUserId
-     * @return int
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
 
@@ -1348,11 +1361,8 @@ class External_Synergetic_User implements External_UserInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @param int $externalUserId
-     * @return int
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
 

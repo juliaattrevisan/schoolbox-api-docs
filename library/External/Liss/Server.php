@@ -660,7 +660,7 @@ class External_Liss_Server
                 }
             }
 
-            $this->log()->info(sprintf("publishBellTimes: Saved timetable periods, process completed", $collection->count()));
+            $this->log()->info(sprintf("publishBellTimes: Saved timetable periods, process completed"));
 
             return $this->generateResponse('BellTimes Imported');
         }

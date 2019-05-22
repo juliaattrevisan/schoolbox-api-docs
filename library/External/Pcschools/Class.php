@@ -93,7 +93,7 @@ class External_Pcschools_Class implements External_ClassInterface
     /**
      * Gets a where part for the timefile query in `getTeacherName()` and `getStudents()`.
      *
-     * @param string $classCode
+     * @param string $classCodes
      *
      * @return string
      */

@@ -6,6 +6,7 @@
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -45,18 +46,14 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the ExternalId of the Contact, not the Student.
-     *
      * In Maze, Parents aren't considered atomic units of people, so always
      * refer to them in a joint account.
      *
-     * SynergyId is DFKEY
+     * $externalId is DFKEY
      *
-     * @param $externalId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getParent($externalId)
+    public function getParent(string $externalUserId): array
     {
         $query = "
 			SELECT
@@ -78,7 +75,7 @@ class External_Maze_User implements External_UserInterface
 				FMOBILE AS SpouseMobilePhone,
 				'' AS SpouseDirectoryIncludeFlag
 			FROM DF
-			WHERE DFKEY = '{$externalId}'
+			WHERE DFKEY = '{$externalUserId}'
 		";
 
         return $this->getDb()->getRow($query);
@@ -151,23 +148,11 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the ExternalId of the Contact, not the Student. Anyone who is
-     * not supposed to be having their details publicised (via the
-     * DirectoryIncludeFlag) are not included in the result set.
-     * Accept array of ExternalIDs, or just an int
-     *
-     * @param $externalId
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getParentSync($externalId)
+    public function getParentSync(array $externalIds): array
     {
-        if (is_array($externalId)) {
-            $assignation = ' IN (\'' . implode('\',\'', $externalId) . '\')';
-        } else {
-            $assignation = " = '$externalId'";
-        }
+        $assignation = ' IN (\'' . implode('\',\'', $externalIds) . '\')';
 
         $query = "
 			SELECT
@@ -188,42 +173,30 @@ class External_Maze_User implements External_UserInterface
 			WHERE DFKEY $assignation
 		";
 
-        if (is_array($externalId)) {
-            $families = $this->getDb()->getAll($query);
 
-            $allFamilies = array();
+        $families = $this->getDb()->getAll($query);
 
-            foreach ($families as $currentFamily) {
-                $processed = $this->recombine($currentFamily);
-                $processed['ID'] = $currentFamily['ContactID'];
+        $allFamilies = array();
 
-                $allFamilies[] = $processed;
-            }
-        } else {
-            $currentFamily = $this->getDb()->getRow($query);
-
+        foreach ($families as $currentFamily) {
             $processed = $this->recombine($currentFamily);
             $processed['ID'] = $currentFamily['ContactID'];
 
-            $allFamilies = $this->recombine($processed);
+            $allFamilies[] = $processed;
         }
 
         return $allFamilies;
     }
 
     /**
-     * Get all the parents emails for a class, or group of students
-     *
-     * @param array $synergyIds
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
-        if (!count($synergyIds)) {
+        if (!count($externalUserIds)) {
             return array();
         } else {
-            $allIds = '(\'' . implode('\',\'', $synergyIds) . '\')';
+            $allIds = '(\'' . implode('\',\'', $externalUserIds) . '\')';
 
             $query = "
 				SELECT
@@ -283,14 +256,9 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Get a guy's info from Maze
-     *
-     * $synId is the STKEY value.
-     *
-     * @param  $synId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStudent($synId)
+    public function getStudent(string $externalUserId): array
     {
 
         /* The School Year is never represented as just an int, it's always a
@@ -355,7 +323,7 @@ class External_Maze_User implements External_UserInterface
 			LEFT JOIN KCT ON ST.SCHOOL_YEAR = KCT.KCTKEY
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
-			WHERE STKEY = '{$synId}'
+			WHERE STKEY = '{$externalUserId}'
 		";
 
         $student = $this->getDb()->getRow($query);
@@ -396,14 +364,9 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Get a guy's info from Maze
-     *
-     * None of the users seem to have any value for CAMPUS
-     *
-     * @param  $synId
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStaff($synId)
+    public function getStaff(string $externalUserId): array
     {
         $query = "
 			SELECT
@@ -420,19 +383,16 @@ class External_Maze_User implements External_UserInterface
 				'' AS StaffHouseDescription
 			FROM SF
 			LEFT JOIN KSC ON SF.POS_CODE = KSC.KSCKEY
-			WHERE SFKEY = '{$synId}'
+			WHERE SFKEY = '{$externalUserId}'
 		";
 
         return $this->getDb()->getRow($query);
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
-     *
-     * @param string $externalUserId
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         $query = "
 			SELECT
@@ -467,27 +427,10 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Gets a list of Contacts for all Students in a particular year level. The
-     * year level is stored in Synergetic.
-     *
-     * Used in reporting.
-     *
-     * Note that there is no StudentContactHomeCountryDesc in the Synergetic views
-     * so I changed it to use CountryCode instead.
-     *
-     * Note that if a student has split parents, they will appear more than once.
-     * They will appear once for each split parent.
-     *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
-
         /* Mega select
          */
         $query = "
@@ -548,15 +491,15 @@ class External_Maze_User implements External_UserInterface
 
         /* Search for a particular year level
          */
-        if (strlen($yearlevel)) {
+        if (strlen($yearLevel)) {
 
             /* Translate back to Maze-specific
              */
-            if (is_numeric($yearlevel)) {
-                $mazeYearLevel = $yearlevel;
+            if (is_numeric($yearLevel)) {
+                $mazeYearLevel = $yearLevel;
 
-                if ($yearlevel < 10) {
-                    $mazeYearLevel = '0' . $yearlevel;
+                if ($yearLevel < 10) {
+                    $mazeYearLevel = '0' . $yearLevel;
                 }
 
                 $mazeYearLevel = 'Y' . $mazeYearLevel;
@@ -634,30 +577,25 @@ class External_Maze_User implements External_UserInterface
      * This should take the form below:
      * $row['CURRENT_SEMESTER'] = '1998S4';
      *
-     * @param null $externalUserId
-     * @return string
+     * @inheritDoc
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         return $this->getHelper()->getCurrentSemester();
     }
 
     /**
-     * @param null $externalUserId
-     * @return string
+     * @inheritDoc
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return $this->getHelper()->getCurrentYear();
     }
 
     /**
-     * Get a list of subjects for a particular user
-     *
-     * @param User $user
-     * @return array
+     * @inheritDoc
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -797,33 +735,26 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Returns a list of externalIds
-     *
-     * @param $synergyID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getEnrolledStudents($synergyID)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         $query = "
 			SELECT ST.STKEY AS RelatedID
 			FROM ST
-			WHERE FAMILY = '{$synergyID}'
-			OR FAMB = '{$synergyID}'
+			WHERE FAMILY = '{$externalUserId}'
+			OR FAMB = '{$externalUserId}'
 		";
 
         return $this->getDb()->getAll($query);
     }
 
     /**
-     * Get an email address for a particular person
-     *
-     * @param $externalUserId
-     * @return bool
+     * @inheritDoc
      */
-    public function getEmail($externalUserId)
+    public function getEmail(string $externalUserId): string
     {
-        /* TODO: This doesn't seem to be used in Schoolbox?
-         */
+        return '';
     }
 
 
@@ -927,9 +858,9 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Used in sync scripts
+     * @inheritDoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $query = "
 			SELECT
@@ -951,9 +882,9 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * Used in sync scripts
+     * @inheritDoc
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         $query = "
 			SELECT
@@ -1002,9 +933,7 @@ class External_Maze_User implements External_UserInterface
             $families[$currentFamily['DFKEY']] = $updatedFamily;
         }
 
-        $data = array_values($families);
-
-        return $data;
+        return array_values($families);
     }
 
     /**
@@ -1013,7 +942,7 @@ class External_Maze_User implements External_UserInterface
      * Staff members with a Finish date are ignored
      * Staff members with staff_type L (left/departed) are ignored
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         $query = "
 			SELECT
@@ -1039,22 +968,19 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return array();
     }
 
     /**
-     * Determine what kind of boarder this person is
+     * @inheritDoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
-        if ($boarderValue == 'Y') {
+        if ($boarderValue === 'Y') {
             return 'Boarder';
         }
 
@@ -1066,7 +992,7 @@ class External_Maze_User implements External_UserInterface
      *
      * @return array
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         // TODO: Implement getStaffContactListExtended() method.
         return array();
@@ -1075,15 +1001,15 @@ class External_Maze_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        // Return nothing
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
@@ -1093,7 +1019,7 @@ class External_Maze_User implements External_UserInterface
      *
      * @return array
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         return [];
     }

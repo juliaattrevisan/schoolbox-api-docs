@@ -14,6 +14,9 @@ use Schoolbox\IConfigLoader;
 
 class External_Edumate_Connection
 {
+    /** @var DatabaseFactory */
+    private $databaseFactory;
+
     /** @var Group $groupHandler */
     private $groupHandler;
 
@@ -21,19 +24,27 @@ class External_Edumate_Connection
     private $userHandler;
 
     /** @var Connector $connector */
-    protected $connector;
+    private $connector;
 
     /** @var IConfigLoader $config */
-    protected $config;
+    private $config;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $factory = new DatabaseFactory();
-        $this->connector = $factory->createDb2();
-        $this->config = ConfigMapper::getInstance();
+        $this->databaseFactory = new DatabaseFactory();
+        $this->config          = ConfigMapper::getInstance();
+        $this->connect();
+        $this->groupHandler = new Group();
+        $this->userHandler  = new User();
+    }
+
+
+    protected function connect(): void
+    {
+        $this->connector = $this->databaseFactory->createDb2();
 
         $this->connector->connect(
             $this->config->get('external_db_host'),
@@ -41,9 +52,6 @@ class External_Edumate_Connection
             $this->config->get('external_db_user'),
             $this->config->get('external_db_passwd')
         );
-
-        $this->setGroupHandler(new Group());
-        $this->setUserHandler(new User());
     }
 
     /**
@@ -75,14 +83,6 @@ class External_Edumate_Connection
         return $this->connector;
     }
 
-    /**
-     * Set the group handler
-     * @param Group $group
-     */
-    protected function setGroupHandler($group)
-    {
-        $this->groupHandler = $group;
-    }
 
     /**
      * Retrieve the group handler
@@ -93,14 +93,6 @@ class External_Edumate_Connection
         return $this->groupHandler;
     }
 
-    /**
-     * Set the user handler
-     * @param $user
-     */
-    protected function setUserHandler($user)
-    {
-        $this->userHandler = $user;
-    }
 
     /**
      * Retrieve the user handler

@@ -107,7 +107,7 @@ abstract class Report_Abstract {
 	/**
 	 * Get external user handler
 	 *
-	 * @return External_User
+	 * @return External_UserInterface
 	 */
 	protected function getExternalUserHandler() {
 		return $this->externalUserHandler;

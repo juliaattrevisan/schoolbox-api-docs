@@ -130,7 +130,7 @@ class Redis
             return call_user_func($callback, $params);
         }
 
-        $redis = $this->getClient();
+        $redis = $this->client;
         $key   = $base_key . ':' . $this->instanceId . ':' . hash('sha256', serialize($params));
 
         // Would use Redis hashes, but individual keys don't have expiry.

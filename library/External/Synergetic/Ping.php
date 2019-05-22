@@ -13,51 +13,27 @@ class External_Synergetic_Ping implements External_PingInterface
     /**
      * @var MSSQL
      */
-    protected $database;
+    private $database;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = MSSQL::getInstance();
     }
 
     /**
      * @inheritdoc
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         try {
-            $version = $this->getDatabase()->getOne("SELECT TOP 1 [VALUE] FROM Config WHERE Key1 = 'System' AND Key2 = 'Network' AND Key3 = 'Version' AND Key4 = 'DataStructure'");
-            return intval($version);
+            return $this->database->getOne("SELECT TOP 1 [VALUE] FROM Config WHERE Key1 = 'System' AND Key2 = 'Network' AND Key3 = 'Version' AND Key4 = 'DataStructure'");
         } catch (\Exception $e) {
             // If all else fails we will default to reporting version 67 as this is the
             // baseline functionality level for the Synergetic connector
-
-            return 67;
+            return '67';
         }
-    }
-
-    /**
-     * Set database
-     *
-     * @param $database
-     * @return $this
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-        return $this;
-    }
-
-    /**
-     * Get database
-     *
-     * @return MSSQL
-     */
-    protected function getDatabase()
-    {
-        return $this->database;
     }
 }

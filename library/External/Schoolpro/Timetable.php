@@ -31,15 +31,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     protected $cycleLength = 4;
 
     /**
-     * Get a timetable definition
-     *
-     * @param string $externalUserId
-     * @param \Schoolbox\Campus $campus
-     * @param int $day
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
     {
         $this->setCycleLength($campus->getTimetableDay());
 
@@ -117,19 +111,15 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * @param $dayNumber
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return 'Day ' . $dayNumber;
     }
 
     /**
-     * Get period number for a particular campus
-     *
-     * @param int|\Schoolbox\Campus $campus
-     * @param int $now
-     * @return array
+     * @inheritDoc
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         $statement = $this->getConnector()->prepareStoredProcedure('sbGetPeriodNumber');
         $statement->bindInputs([
@@ -197,16 +187,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Get the day timetable for a given person
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param \Schoolbox\Campus $campus
-     * @param $dayNumber
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -277,34 +260,18 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific date
-     *
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     *
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param Schoolbox\Campus $campus
-     * @param Alaress_Date_Format $date
-     * @return mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
     {
         return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
 
     /**
-     * Get a full timetable
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param \Schoolbox\Campus $campus
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -345,12 +312,9 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     }
 
     /**
-     * TODO: No stored proc
-     *
-     * @param  array|string $roomCodes
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         return array();
     }

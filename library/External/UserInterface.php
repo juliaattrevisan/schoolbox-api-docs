@@ -1,14 +1,18 @@
 <?php
 /**
- * @author    The Whole Company <support@alaress.com.au>
- * @copyright Copyright 2011-2017 (Hopefully RIP after that), Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-interface External_UserInterface {
+/**
+ * Provides consistently-structured information about users in the SIS, regardless of underlying SIS implementation
+ */
+interface External_UserInterface extends External\IConnector
+{
 
     /* Student-specific
      */
@@ -61,10 +65,10 @@ interface External_UserInterface {
      *
      * @importance high - used on student profile page
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
-    public function getStudent($externalUserId);
+    public function getStudent(string $externalUserId): array;
 
     /**
      * Get a list of student contacts (parents) and their contact information
@@ -95,7 +99,7 @@ interface External_UserInterface {
      * @param string $externalUserId
      * @return array
      */
-    public function getStudentContactList($externalUserId);
+    public function getStudentContactList(string $externalUserId): array;
 
     /**
      * Gets a list of Contacts for all Students in a particular year level.
@@ -150,13 +154,13 @@ interface External_UserInterface {
      *
      * @importance low - used only on the parent report.
      *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
+     * @param string $yearLevel
+     * @param string $name
+     * @param string $boardingStatus
+     * @param string $form
      * @return array
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array;
 
     /**
      * Gets some basic information about a student
@@ -180,18 +184,18 @@ interface External_UserInterface {
      *
      * @return array
      */
-    public function getStudentUserAccountInfo();
+    public function getStudentUserAccountInfo(): array;
 
     /**
      * Returns a list of email parent email addresseses for students.
      *
-     * @param array $synergyIds
+     * @param array $externalUserIds
      *
      * @importance medium - used in the class list to create a list of emails, and the report card.
      *
      * @return array
      */
-    public function getParentEmails($synergyIds);
+    public function getParentEmails(array $externalUserIds): array;
 
     /* Parent-specific
      */
@@ -222,10 +226,10 @@ interface External_UserInterface {
      *
      * @importance medium - used on parent profile page.
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
-    public function getParent($externalUserId);
+    public function getParent(string $externalUserId): array;
 
     /**
      * Gets the contact info of the person who is a Student's Contact. The ID
@@ -240,19 +244,7 @@ interface External_UserInterface {
      *
      * @importance low - used in some sync scripts.
      *
-     * @param $externalUserId
-     * @return array (
-     *     ID,
-     *     Title,
-     *     Preferred,
-     *     Surname,
-     *     Email,
-     *     OccupEmail,
-     *     DefaultEmailCode,
-     *     DirectoryIncludeFlag
-     * )
-     *
-     * or
+     * @param string[] $externalUserIds
      *
      * @return array(
      *     array(
@@ -267,7 +259,7 @@ interface External_UserInterface {
      *     )
      * )
      */
-    public function getParentSync($externalUserId);
+    public function getParentSync(array $externalUserIds): array;
 
     /**
      * Get the following fields for all parents
@@ -296,7 +288,7 @@ interface External_UserInterface {
      *
      * @return array
      */
-    public function getParentUserAccountInfo();
+    public function getParentUserAccountInfo(): array;
 
     /* Staff-specific
      */
@@ -318,10 +310,10 @@ interface External_UserInterface {
      *
      * @importance high - used on staff profile page.
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return array
      */
-    public function getStaff($externalUserId);
+    public function getStaff(string $externalUserId): array;
 
     /**
      * Get staff account information
@@ -347,7 +339,7 @@ interface External_UserInterface {
      *     )
      * )
      */
-    public function getStaffUserAccountInfo();
+    public function getStaffUserAccountInfo(): array;
 
     /* Common methods
      */
@@ -377,7 +369,7 @@ interface External_UserInterface {
      *
      * @return array
      */
-    public function getStaffContactListExtended();
+    public function getStaffContactListExtended(): array;
 
     /**
      * Gets the current semester for the user.
@@ -385,10 +377,10 @@ interface External_UserInterface {
      * @importance low - used everywhere, but if you can't get it from the DB,
      *             Jan-Jun: 1, Jul-Dec: 2
      *
-     * @param string $externalUserId
-     * @return string The current semester
+     * @param string|null $externalUserId
+     * @return string|null The current semester
      */
-    public function getCurrentSemester($externalUserId = null);
+    public function getCurrentSemester(string $externalUserId = null): ?string;
 
     /**
      * Gets the current year for the user.
@@ -398,10 +390,10 @@ interface External_UserInterface {
      * @importance low - used everywhere, but if you can't get it from the DB,
      *             return the current year.
      *
-     * @param string $externalUserId
-     * @return string The current file year for the user
+     * @param string|null $externalUserId
+     * @return string|null The current file year for the user
      */
-    public function getCurrentYear($externalUserId = null);
+    public function getCurrentYear(string $externalUserId = null): ?string;
 
     /**
      * Get a list of subjects for $externalUserId
@@ -426,7 +418,7 @@ interface External_UserInterface {
      * @param User $user
      * @return array
      */
-    public function getSubjectList(User $user);
+    public function getSubjectList(User $user): array;
 
     /**
      * Get all the enrolled students belonging to $externalUserId
@@ -436,21 +428,21 @@ interface External_UserInterface {
      *
      * @importance high - used to determine a parent's children, and related permissions.
      *
-     * @param $externalUserId
+     * @param string   $externalUserId
      * @return string[][]
      * @var string|int $return[idx]['RelatedID']
      */
-    public function getEnrolledStudents($externalUserId);
+    public function getEnrolledStudents(string $externalUserId): array;
 
     /**
      * Get the email address as a string for a particular person
      *
      * @importance low - I'm not sure this is used anywhere yet?
      *
-     * @param $externalUserId
+     * @param string $externalUserId
      * @return string
      */
-    public function getEmail($externalUserId);
+    public function getEmail(string $externalUserId): string;
 
 
     /**
@@ -470,30 +462,43 @@ interface External_UserInterface {
      *
      * @importance low - used on profile page, but only to show if student is a boarder
      *
-     * @param $boarderValue
+     * @param string $boarderValue
      * @return string
      */
-    public function determineBoarderType($boarderValue);
+    public function determineBoarderType(string $boarderValue): string;
 
     /**
      * Find the housemasterId for a particular house
      *
      * @importance low - I'm not sure this is used anywhere yet?
      *
-     * @param $houseID
-     * @return string
+     * @param string $houseID
+     * @return string|null
      */
-    public function getHousemasterByHouseId($houseID);
+    public function getHousemasterByHouseId(string $houseID): ?string;
+
+
+    /**
+     * Returns email addresses for any users who are both:
+     * * current housemasters, and
+     * * match $externalUserIds
+     *
+     * @param string[] $externalUserIds
+     * @return string[]
+     */
+    public function getHousemasterEmails(array $externalUserIds): array;
 
     /**
      * List of campuses a staff member is involved in based on timetable
      *
      * @importance low - used in a few sync scripts.
      *
-     * @param int $staffID
-     * @return array|bool
+     * @internal string array[]['campus']
+     *
+     * @param string $staffID
+     * @return string[][]
      */
-    public function getCampusFromTimetable($staffID);
+    public function getCampusFromTimetable(string $staffID): array;
 
     /**
      * Retrieves a list of forms that a student may be in.
@@ -502,5 +507,5 @@ interface External_UserInterface {
      *
      * @return array [['Code' => string, 'Description' => string], ...]
      */
-    public function getStudentForms();
+    public function getStudentForms(): array;
 }

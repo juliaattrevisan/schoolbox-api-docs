@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Pastoral\Model as Pastoral;
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\External;
 
 class Model implements ISoftDeletable
 {
@@ -164,12 +165,14 @@ class Model implements ISoftDeletable
         return $this->message;
     }
 
+
     /**
      * Upload this file to Synergetic DocMan
      *
-     * @returns int
+     * @return bool
+     * @throws External\Exception
      */
-    public function uploadPastoralDocument()
+    public function uploadPastoralDocument(): bool
     {
         $pastoralExternal = new External_Pastoral();
 

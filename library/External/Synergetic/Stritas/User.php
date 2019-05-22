@@ -6,20 +6,17 @@
  *    This file provides access to synergetic user info      *
  *                                                           *
  ************************************************************/
+declare(strict_types=1);
+
 class External_Synergetic_Stritas_User extends External_Synergetic_User
 {
 
-
     /**
-     * Get a guy's info from Synergetic
-     *
-     * @param  $synID
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getStudent($synID)
+    public function getStudent(string $externalUserId): array
     {
-        if (!$this->isExternalIdValid($synID)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
 
@@ -113,7 +110,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
 
         $student = [];
 
-        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $synID]);
+        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         foreach ($iteratorStudents as $row) {
 

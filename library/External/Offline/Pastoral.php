@@ -9,17 +9,18 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
+use External\IOfflineConnector;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
 use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
 use Schoolbox\User;
 
-class External_Offline_Pastoral implements External_PastoralInterface
+class External_Offline_Pastoral implements External_PastoralInterface, IOfflineConnector
 {
     /**
      * {@inheritDoc}
      */
-    public function getPastoral(PastoralModel $pastoral)
+    public function getPastoral(PastoralModel $pastoral): array
     {
         // NOOP
         return array();
@@ -28,16 +29,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * {@inheritDoc}
      */
-    public function syncPastoral(PastoralModel $pastoral)
-    {
-        // NOOP
-        return array();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createComment(PastoralComment $comment)
+    public function syncPastoral(PastoralModel $pastoral): bool
     {
         // NOOP
         return false;
@@ -46,7 +38,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function deleteComment(PastoralComment $comment)
+    public function createComment(PastoralComment $comment): bool
     {
         // NOOP
         return false;
@@ -55,7 +47,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function uploadPastoralDocument(UploadQueue $upload)
+    public function deleteComment(PastoralComment $comment): bool
     {
         // NOOP
         return false;
@@ -64,15 +56,30 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritdoc
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords)
+    public function uploadPastoralDocument(UploadQueue $upload): bool
     {
+        // NOOP
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function importPastoral(
+        User $user,
+        User $defaultOwner,
+        bool $importParentAccess,
+        bool $importRecords,
+        bool $importAttachments,
+        bool $deleteRecords
+    ): void {
         // NOOP
     }
 
     /**
      * @inheritDoc
      */
-    public function deletePastoral(PastoralModel $pastoral)
+    public function deletePastoral(PastoralModel $pastoral): bool
     {
         // NOOP
         return false;

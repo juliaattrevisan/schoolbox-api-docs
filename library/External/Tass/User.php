@@ -6,6 +6,7 @@
 *	This file provides access to TASS user info		        *
 *                                                           *
 ************************************************************/
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -17,7 +18,7 @@ class External_Tass_User implements External_UserInterface
      * This identifies the CONVERT/CAST format for ISO8601 date
      * yyyy-mm-ddThh:mi:ss.mmm
      */
-    protected const FORMAT_ISO8601 = 126;
+    private const FORMAT_ISO8601 = 126;
 
     /**
      * @var MSSQL
@@ -39,30 +40,28 @@ class External_Tass_User implements External_UserInterface
      */
     function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = MSSQL::getInstance();
         $this->companyCode  = Config::get('external_tass_company_code');
         $this->helper = new External_Tass_Helper();
     }
 
+
     /**
-     * @param $synID
+     * @inheritDoc
      */
-    function getParent($synID)
+    public function getParent(string $externalUserId): array
     {
+        return [];
     }
 
     /**
-     * Get all the parents of the students id
-     *
-     * @param array $synergyIds
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
         $emailList = array();
-        $db = $this->getDatabase();
-        $idList    = implode(',', array_map(array($db, 'smartQuote'), $synergyIds));
+        $db = $this->database;
+        $idList    = implode(',', array_map(array($db, 'smartQuote'), $externalUserIds));
 
         if (empty($idList)) {
             return array();
@@ -106,7 +105,7 @@ class External_Tass_User implements External_UserInterface
             ";
         }
 
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->database->query($query);
         while ($row = $statement->fetch()) {
             if(stristr($row['e_mail'],';')) {
                 $i=0;
@@ -121,7 +120,11 @@ class External_Tass_User implements External_UserInterface
         return $emailList;
     }
 
-    function getStudent($tassID)
+
+    /**
+     * @inheritDoc
+     */
+    public function getStudent(string $externalUserId): array
     {
         $query = "
         SELECT
@@ -171,9 +174,9 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN house AS h ON s.house=h.hse_code AND s.cmpy_code=h.cmpy_code
         -- LEFT JOIN parent AS p ON s.par_code=p.par_code AND s.cmpy_code=p.cmpy_code
         LEFT JOIN teacher AS t ON s.pctut_grp=t.pctut_grp AND t.curr_flg = 'Y' AND s.cmpy_code=t.cmpy_code
-        WHERE stud_code = '$tassID'
+        WHERE stud_code = '$externalUserId'
         ";
-        $student = $this->getDatabase()->trimRow($this->getDatabase()->getRow($query));
+        $student = $this->database->trimRow($this->database->getRow($query));
         if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
             $student['StudentBirthDate'] = $birthDate;
         } else {
@@ -182,15 +185,24 @@ class External_Tass_User implements External_UserInterface
         return $student;
     }
 
-    function getStaff($tassID)
+
+    /**
+     * @inheritDoc
+     */
+    public function getStaff(string $externalUserId): array
     {
-        $query = "
-            SELECT *
-            FROM tel_vw_telemf
-        ";
+        return [];
+//        $query = "
+//            SELECT *
+//            FROM tel_vw_telemf
+//        ";
     }
 
-    function getStudentContactList($tassID)
+
+    /**
+     * @inheritDoc
+     */
+    public function getStudentContactList(string $externalUserId): array
     {
         /* students profile should provide all parents, but only show contact info if not in a split family
          */
@@ -218,7 +230,7 @@ class External_Tass_User implements External_UserInterface
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_father,'1')
-            WHERE stud_code = '$tassID'
+            WHERE stud_code = '$externalUserId'
 
             UNION
 
@@ -243,7 +255,7 @@ class External_Tass_User implements External_UserInterface
                 ON parent.par_code = pa.par_code
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_mother,'1')
-            WHERE stud_code = '$tassID'
+            WHERE stud_code = '$externalUserId'
 
             UNION
 
@@ -270,7 +282,7 @@ class External_Tass_User implements External_UserInterface
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_father,'1')
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-            WHERE (CHARINDEX(','+ '$tassID' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
+            WHERE (CHARINDEX(','+ '$externalUserId' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
 
             UNION
 
@@ -297,16 +309,16 @@ class External_Tass_User implements External_UserInterface
                 AND pa.cmpy_code = parent.cmpy_code
                 AND pa.add_num IN ($addnum_mother,'1')
                 AND (CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') > 0)
-            WHERE (CHARINDEX(','+ '$tassID' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
+            WHERE (CHARINDEX(','+ '$externalUserId' +',', ','+RTRIM(sf.stud_codes)+',') > 0)
         ";
-        $parents = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
+        $parents = $this->database->trimAll($this->database->getAll($query));
 
         foreach ($parents as $key => $parent) {
             /* Fallback to add_num 1 when there is no add_num mother or add_num father
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
                 foreach ($parents as $key2 => $parent2) {
-                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->getDatabase()->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother OR $this->getDatabase()->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
+                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother or $this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
                         unset($parents[$key]);
                     }
                 }
@@ -315,31 +327,38 @@ class External_Tass_User implements External_UserInterface
         return $parents;
     }
 
-    public function getCurrentSemester($externalUserId = null)
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
         $query = "
             SELECT curr_sem
             FROM ttparms
-            WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+            WHERE cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
-        return $this->getDatabase()->getOne($query);
+        return $this->database->getOne($query);
     }
 
-    public function getCurrentYear($externalUserId = null)
+
+    /**
+     * @inheritDoc
+     */
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         $query = "
             SELECT curr_year
             FROM ttparms
-            WHERE cmpy_code = {$this->getDatabase()->smartQuote($this->companyCode)}
+            WHERE cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
-        return $this->getDatabase()->getOne($query);
+        return $this->database->getOne($query);
     }
 
     /**
-     * @param User $user
-     * @return array
+     * @inheritDoc
      */
-    function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -369,9 +388,9 @@ class External_Tass_User implements External_UserInterface
             return [];
         }
 
-        $statement = $this->getDatabase()->query($sql);
+        $statement = $this->database->query($sql);
         $subjectList = array();
-        while ($subject = $this->getDatabase()->trimRow($statement->fetch())) {
+        while ($subject = $this->database->trimRow($statement->fetch())) {
             if (Cfg::get('external_tass_year_in_class_code') == '0') {
                 $subject['year_grp'] = '';
             }
@@ -388,22 +407,22 @@ class External_Tass_User implements External_UserInterface
     /**
     * Get enrolled students
     *
-    * @param $tassID
-    * @return mixed
+    * @param $externalUserId
+    * @return array
     */
-    public function getEnrolledStudents($tassID)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         /* If the TassID is 8 characters long then it is assumed to be
          * someone in the split-parent scenario.
          */
 
         // id has to have a [P]arent prefix (or [S]pouse)
-        if (!preg_match('#(?:P|S)[0-9A-Za-z]+#s', $tassID)) {
+        if (!preg_match('#(?:P|S)[0-9A-Za-z]+#s', $externalUserId)) {
             return array();
         }
 
         // remove the P|S prefix
-        $id = substr($tassID, 1);
+        $id = substr($externalUserId, 1);
 
         $companyCode = $this->database->smartQuote($this->companyCode);
         $commrules = Config::get('external_tass_commrules');
@@ -432,8 +451,8 @@ class External_Tass_User implements External_UserInterface
                     ON p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
                     AND (s.dol IS NULL OR s.dol >= getdate())
-                WHERE sf.par_code = {$this->getDatabase()->smartQuote($parentCode)}
-                AND   sf.sfa_num  = {$this->getDatabase()->smartQuote($parentNum)}
+                WHERE sf.par_code = {$this->database->smartQuote($parentCode)}
+                AND   sf.sfa_num  = {$this->database->smartQuote($parentNum)}
             ";
 
             if ($commrules) {
@@ -445,7 +464,7 @@ class External_Tass_User implements External_UserInterface
                         scr.stud_code AS RelatedID
                     FROM studcommrules as scr
                     WHERE cmpy_code = {$companyCode}
-                    AND par_code = {$this->getDatabase()->smartQuote($parentCode)}
+                    AND par_code = {$this->database->smartQuote($parentCode)}
                     AND add_num IN({$addnum})
                 ";
 
@@ -455,7 +474,7 @@ class External_Tass_User implements External_UserInterface
             }
 
             $return = array();
-            $result = $this->getDatabase()->getAll($query);
+            $result = $this->database->getAll($query);
 
             // parse the array, because this data is stored in a funky way
             if (count($result) && is_array($result)) {
@@ -475,7 +494,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-                WHERE s.par_code = {$this->getDatabase()->smartQuote($id)}
+                WHERE s.par_code = {$this->database->smartQuote($id)}
                 AND (s.dol IS NULL OR s.dol >= getdate())
             ";
             if ($commrules) {
@@ -486,7 +505,7 @@ class External_Tass_User implements External_UserInterface
                         scr.stud_code AS RelatedID
                     FROM studcommrules as scr
                     WHERE cmpy_code = {$companyCode}
-                    AND par_code = {$this->getDatabase()->smartQuote($id)}
+                    AND par_code = {$this->database->smartQuote($id)}
                     AND add_num IN ({$addnum})
                 ";
 
@@ -495,7 +514,7 @@ class External_Tass_User implements External_UserInterface
                 }
             }
 
-            $return = $this->getDatabase()->getAll($query);
+            $return = $this->database->getAll($query);
         }
 
         return $return;
@@ -503,19 +522,17 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
-    * Determine the boarder type based on a value
-    * Returns a human-readable string
-    *
-    * @param $boarderValue
-    * @return string
+    * @inheritDoc
     */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         $boarders = array('Y');
 
-        if (!strlen($boarderValue)) {
+        if ($boarderValue === '') {
             return '';
-        } elseif (in_array($boarderValue, $boarders)) {
+        }
+
+        if (in_array($boarderValue, $boarders, true)) {
             return 'Boarder';
         }
 
@@ -533,16 +550,15 @@ class External_Tass_User implements External_UserInterface
         return $user->getPortrait();
     }
 
-    public function getEmail($id)
+    public function getEmail(string $externalUserId): string
     {
+        return '';
     }
 
     /**
-     * Retrieves staff user account info for sync script.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         // For Meriden:
         // * filter on t.curr_flg = Y
@@ -571,11 +587,10 @@ class External_Tass_User implements External_UserInterface
             LEFT JOIN teacher AS te ON t.emp_code = te.emp_code
             LEFT JOIN tchdept AS td ON te.tch_code = td.tch_code
         ";
-        $staffList = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
-        return $staffList;
+        return $this->database->trimAll($this->database->getAll($query));
     }
 
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         // Get all students who have a campus, and don't have a leaving date?
         // (Maybe students who do have a leaving date should be deactivated instead)
@@ -598,35 +613,31 @@ class External_Tass_User implements External_UserInterface
             WHERE (s.dol IS NULL OR s.dol >= getdate())
         ";
 
-        $result = $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
-        return $result;
+        return $this->database->trimAll($this->database->getAll($query));
     }
 
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
+        return [];
     }
 
-    public function getParentSync($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
+        return [];
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @param int $staffID
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return array();
     }
 
     /**
-     * Retrieves parent user account info for sync script.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         // For Meriden: ignore split families,
         // because they weren't retrieved with their original query.
@@ -640,7 +651,7 @@ class External_Tass_User implements External_UserInterface
         // pia_sfaccess: only join the relevant paraddress
         // no pia_sfaccess: get all paraddress
 
-        $database = $this->getDatabase();
+        $database = $this->database;
         $query = "
             SELECT
                 p.par_code AS StudentContactID,
@@ -716,11 +727,9 @@ class External_Tass_User implements External_UserInterface
     }
 
     /**
-     * Get contact list for staff directory
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         // Exclude selected position text
 
@@ -731,7 +740,7 @@ class External_Tass_User implements External_UserInterface
         if (is_array($staffCategory) && $staffCategory[0] != '')
         {
             $wherePositionText = 'AND (';
-            $db = $this->getDatabase();
+            $db = $this->database;
 
             $count = 0;
 
@@ -756,7 +765,7 @@ class External_Tass_User implements External_UserInterface
         {
             $wherePositionTitle = " AND (";
 
-            $db = $this->getDatabase();
+            $db = $this->database;
 
             $count = 0;
 
@@ -780,7 +789,7 @@ class External_Tass_User implements External_UserInterface
         if (is_array($staffAward) && $staffAward[0] != '')
         {
             $whereAward = " AND (";
-            $db = $this->getDatabase();
+            $db = $this->database;
 
             $count = 0;
 
@@ -802,9 +811,10 @@ class External_Tass_User implements External_UserInterface
         if (is_array($awardMappings) && $awardMappings[0] != '' && count($awardMappings) % 2 == 0)
         {
             $caseAwardMappings = 'CASE (dbo.tel_vw_telemf.awd_code) ';
-            $db = $this->getDatabase();
+            $db = $this->database;
 
-            for ($i = 0; $i < count($awardMappings); $i += 2)
+            $countAwardMappers = count($awardMappings);
+            for ($i = 0; $i < $countAwardMappers; $i += 2)
                 $caseAwardMappings .= " WHEN '" . $db->quote($awardMappings[$i]) . "' THEN '" . $db->quote($awardMappings[$i+1]) . "'";
 
             $caseAwardMappings .= " ELSE '' END AS StaffCategoryType";
@@ -816,7 +826,7 @@ class External_Tass_User implements External_UserInterface
             $caseAwardMappings = "dbo.tel_vw_telemf.awd_code AS StaffCategoryType";
         }
 
-        $database = $this->getDatabase();
+        $database = $this->database;
 
         $query = "
             SELECT TOP (100) PERCENT
@@ -847,44 +857,27 @@ class External_Tass_User implements External_UserInterface
         return $database->trimAll($database->getAll($query));
     }
 
+
     /**
      * @inheritdoc
      */
-    private function setDatabase($database)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        $this->database = $database;
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    protected function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId($houseID)
-    {
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
 
     /**
-     * Not yet implemented for this connector
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         return [];
     }

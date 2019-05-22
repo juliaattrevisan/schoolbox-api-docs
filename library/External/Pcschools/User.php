@@ -6,6 +6,7 @@
  * @copyright Copyright 2015, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
@@ -60,50 +61,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get student info for $externalUserId
-     * StudentID,
-     * StudentGiven1,
-     * StudentSurname,
-     * StudentBirthDate, (a unix timestamp)
-     * StudentHouseDescription,
-     * StudentHouse,
-     * HeadOfHouseID,
-     * StudentHeadOfHouse,
-     * StudentBoarder
-     * StudentForm,
-     * FormDescription,
-     * StudentFormStaffName,
-     * StudentTutor,
-     * StudentTutorName,
-     * StudentTutorDescription,
-     * TeacherFormID,
-     * TeacherTutorID,
-     * StudentYearLevel,
-     * YearLevelCoordID,
-     * StudentYearLevelCoordinator,
-     * StudentLockerBook,
-     * StudentEmergencyName,
-     * StudentEmergencyPhone,
-     * StudentEmergencyPhoneAlt,
-     * StudentEmergency2Name,
-     * StudentEmergency2Phone,
-     * StudentEmergency2PhoneAlt,
-     * StudentEmergency3Name,
-     * StudentEmergency3Phone,
-     * StudentEmergency3PhoneAlt,
-     * StudentMedicalAlert,
-     * StudentSpecialNeedsFlag,
-     * StudentStudiesCode,
-     * AlertMessage,
-     * StudentIBFlag
-     *
-     * @importance high - used on student profile page
-     *
-     * @param $externalUserId
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStudent($externalUserId)
+    public function getStudent(string $externalUserId): array
     {
         [ $sql, $params ] = $this->queryHelper->getGetStudentQuery($externalUserId);
 
@@ -125,42 +85,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get a list of student contacts (parents) and their contact information
-     * for the student $externalUserId
-     * StudentContactID,
-     * StudentContactTitle,
-     * StudentContactPreferred,
-     * StudentContactSurname,
-     * StudentContactDefaultEmail,
-     * ValidAddressFlag,
-     * StudentContactAddress1,
-     * StudentContactAddress2,
-     * StudentContactAddress3,
-     * StudentContactSuburb,
-     * StudentContactPostCode,
-     * StudentContactState,
-     * StudentContactPhoneActual,
-     * StudentContactSilentPhoneFlag,
-     * StudentContactMobilePhone,
-     * StudentContactOccupPhone,
-     * StudentContactRelation,
-     * StudentContactSpouseID,
-     * StudentContactSpouseTitle,
-     * StudentContactSpousePreferred,
-     * StudentContactSpouseSurname,
-     * StudentContactSpouseMobilePhone,
-     * StudentContactSpouseOccupPhone,
-     * StudentContactSpouseDefaultEmail,
-     * StudentContactType,
-     * StudentContactSpouseRelation
-     *
-     * @importance high - used on student profile page, and the report card.
-     *
-     * @param string $externalUserId
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery($externalUserId);
 
@@ -207,64 +134,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Gets a list of Contacts for all Students in a particular year level.
-     * The year level is stored in the external db.
-     * Used in reporting.
-     * StudentID,
-     * StudentGiven1,
-     * StudentSurname,
-     * StudentYearLevel,
-     * StudentHouse,
-     * StudentBoarder,
-     * StudentForm,
-     * StudentContactID,
-     * StudentContactTitle,
-     * StudentContactPreferred,
-     * StudentContactLegalFullName,
-     * StudentContactSurname,
-     * StudentContactDefaultEmail,
-     * ValidAddressFlag,
-     * StudentContactAddress1,
-     * StudentContactAddress2,
-     * StudentContactAddress3,
-     * StudentContactSuburb,
-     * StudentContactPostCode,
-     * StudentContactState,
-     * StudentContactCountryCode,
-     * StudentContactHomeAddress1,
-     * StudentContactHomeAddress2,
-     * StudentContactHomeAddress3,
-     * StudentContactHomeSuburb,
-     * StudentContactHomePostCode,
-     * StudentContactHomeState,
-     * StudentContactHomeCountryCode,
-     * StudentContactPhoneActual,
-     * StudentContactMobilePhone,
-     * StudentContactOccupPhone,
-     * StudentContactSpouseID,
-     * StudentContactSpouseTitle,
-     * StudentContactSpousePreferred,
-     * StudentContactSpouseLegalFullName,
-     * StudentContactSpouseSurname,
-     * StudentContactSpouseMobilePhone,
-     * StudentContactSpouseOccupPhone,
-     * StudentContactSpouseDefaultEmail,
-     * StudentContactType,
-     * StudentContactSilentPhoneFlag,
-     * PrimaryDirectoryIncludeFlag,
-     * SpouseDirectoryIncludeFlag,
-     * StudentParentsSeparatedFlag
-     *
-     * @importance low - used only on the parent report.
-     *
-     * @param $yearlevel
-     * @param $name
-     * @param $boardingStatus
-     * @param $form
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         // Not required for MVP
         return [];
@@ -338,26 +210,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Gets some basic information about a student
-     * StudentID,
-     * NetworkLogin,
-     * StudentTitle,
-     * StudentPreferred,
-     * StudentSurname,
-     * StudentGender,
-     * StudentEmail,
-     * StudentOccupEmail,
-     * StudentYearLevel,
-     * StudentHouse,
-     * StudentBoarder,
-     * StudentBoardingHouse,
-     * StudentCampus
-     *
-     * @importance high - used in sync scripts.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         // "Null" date: 1/1/1753
         // To reformat boarder status or not?
@@ -390,24 +245,18 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Returns a list of email parent email addresseses for students.
-     *
-     * @importance medium - used in the class list to create a list of emails, and the report card.
-     *
-     * @param array $synergyIds
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
-        if (empty($synergyIds)) {
+        if (empty($externalUserIds)) {
             return [];
         }
 
-        [ $query, $params ] = $this->queryHelper->getGetParentEmailsQuery($synergyIds);
+        [ $query, $params ] = $this->queryHelper->getGetParentEmailsQuery($externalUserIds);
 
         $whereParts = [];
-        foreach ($synergyIds as $id) {
+        foreach ($externalUserIds as $id) {
             $whereParts[] = "S.STUDKEY = {$this->getDatabase()->smartQuote($id)}";
         }
         $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
@@ -446,108 +295,27 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact.
-     * $externalId is that of the Contact, not the Student
-     * Title,
-     * Preferred,
-     * Surname,
-     * Email,
-     * OccupEmail,
-     * DefaultEmailCode,
-     * HomePhone,
-     * SilentPhoneFlag,
-     * MobilePhone,
-     * DirectoryIncludeFlag,
-     * SpouseID,
-     * SpouseTitle,
-     * SpousePreferred,
-     * SpouseSurname,
-     * SpouseEmail,
-     * SpouseOccupEmail,
-     * SpouseDefaultEmailCode,
-     * SpouseMobilePhone,
-     * SpouseDirectoryIncludeFlag
-     *
-     * @importance medium - used on parent profile page.
-     *
-     * @param $externalUserId
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParent($externalUserId)
+    public function getParent(string $externalUserId): array
     {
         // Non-core promise
         return [];
     }
 
     /**
-     * Gets the contact info of the person who is a Student's Contact. The ID
-     * passed is the $externalUserId of the Contact, not the Student. Anyone who
-     * is not supposed to be having their details publicised (via the
-     * DirectoryIncludeFlag) are not included in the result set.
-     * I think this was used to only update parents of current Schoolbox
-     * students, rather than updating everyone blindly
-     * Accept array of Synergy IDs, or just an int
-     *
-     * @importance low - used in some sync scripts.
-     *
-     * @param $externalUserId
-     *
-     * @return array (
-     *     ID,
-     *     Title,
-     *     Preferred,
-     *     Surname,
-     *     Email,
-     *     OccupEmail,
-     *     DefaultEmailCode,
-     *     DirectoryIncludeFlag
-     * )
-     * or
-     * @return array(
-     *     array(
-     *         ID,
-     *         Title,
-     *         Preferred,
-     *         Surname,
-     *         Email,
-     *         OccupEmail,
-     *         DefaultEmailCode,
-     *         DirectoryIncludeFlag
-     *     )
-     * )
+     * @inheritDoc
      */
-    public function getParentSync($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
         // Non-core promise
         return [];
     }
 
     /**
-     * Get the following fields for all parents
-     * (yes they're prefixed as Student-)
-     * Used in Synchronise
-     * StudentContactNetworkLogin,
-     * StudentContactID,
-     * StudentContactTitle,
-     * StudentContactPreferred,
-     * StudentContactSurname,
-     * StudentContactDefaultEmail,
-     * StudentContactSpouseNetworkLogin,
-     * StudentContactSpouseID,
-     * StudentContactSpouseTitle,
-     * StudentContactSpousePreferred,
-     * StudentContactSpouseSurname,
-     * StudentContactSpouseDefaultEmail,
-     * StudentYearLevel,
-     * StudentCampus,
-     * StudentGender
-     *
-     * @importance high - used in sync script.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getParentUserAccountInfo()
+    public function getParentUserAccountInfo(): array
     {
         $result = [];
         $rowset = $this->getDatabase()->trimAll(
@@ -610,25 +378,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get the following fields for the staff member $externalUserId
-     * SchoolStaffCode,
-     * StaffBuilding,
-     * StaffRoom,
-     * StaffExtension,
-     * StaffMobilePhone,
-     * StaffCampusDescription,
-     * StaffCategoryDescription,
-     * StaffDepartment,
-     * StaffVoiceMail,
-     * StaffHouseDescription
-     *
-     * @importance high - used on staff profile page.
-     *
-     * @param $externalUserId
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStaff($externalUserId)
+    public function getStaff(string $externalUserId): array
     {
         return $this->getDatabase()->trimRow(
             $this->getDatabase()->getRow("
@@ -652,29 +404,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get staff account information
-     *
-     * @importance high - used in sync scripts.
-     *
-     * @return array(
-     *     array(
-     *         StaffID,
-     *         NetworkLogin,
-     *         ActiveFlag,
-     *         StaffTitle,
-     *         StaffPreferredName,
-     *         StaffSurname,
-     *         DefaultEmailCode,
-     *         OccupEmail,
-     *         Email,
-     *         StaffCampus,
-     *         StaffCategoryType,
-     *         StaffCategory,
-     *         StaffDepartment
-     *     )
-     * )
+     * @inheritDoc
      */
-    public function getStaffUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         return $this->getDatabase()->trimAll(
             $this->getDatabase()->getAll("
@@ -707,63 +439,26 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get contact list for staff directory
-     * return array(
-     *     array(
-     *         StaffID,
-     *         NetworkLogin,
-     *         ActiveFlag,
-     *         StaffTitle,
-     *         StaffPreferredName,
-     *         StaffSurname,
-     *         DefaultEmailCode,
-     *         OccupEmail,
-     *         Email,
-     *         StaffCampus,
-     *         StaffCategoryType,
-     *         StaffCategory,
-     *         StaffDepartment
-     *     )
-     * )
-     *
-     * @importance low - used on staff directory only.
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         // Non-core promise
         return [];
     }
 
     /**
-     * Gets the current semester for the user.
-     *
-     * @importance low - used everywhere, but if you can't get it from the DB,
-     *             Jan-Jun: 1, Jul-Dec: 2
-     *
-     * @param string $externalUserId
-     *
-     * @return string The current semester
+     * @inheritDoc
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        return date('m') < 6 ? 1 : 2;
+        return date('m') < 6 ? '1' : '2';
     }
 
     /**
-     * Gets the current year for the user.
-     * Needs a method because a user could be set on file as being on a
-     * previous year.
-     *
-     * @importance low - used everywhere, but if you can't get it from the DB,
-     *             return the current year.
-     *
-     * @param string $externalUserId
-     *
-     * @return string The current file year for the user
+     * @inheritDoc
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return date('Y');
     }
@@ -788,28 +483,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get a list of subjects for $externalUserId
-     * $externalUserId and $userId are properties of the same person
-     * This method internally distinguishes between students and
-     * staff by using the Schoolbox $userId
-     * returns array(
-     *     array(
-     *         'code' => class category code
-     *         'name' => class name
-     *         'classType' => a string e.g. academic, music, maths
-     *         'campusCode' => the campus this class is in
-     *     )
-     *     ...
-     * )
-     *
-     * @importance high - used on student profile page, and for determining a
-     *             student's memberships.
-     *
-     * @param User $user
-     *
-     * @return array
-     */    
-    public function getSubjectList(User $user)
+     * @inheritDoc
+     */
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -884,17 +560,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get all the enrolled students belonging to $externalUserId
-     * (usually a parent)
-     * Returns an array of $externalId
-     *
-     * @importance high - used to determine a parent's children, and related permissions.
-     *
-     * @param string $externalUserId
-     *
-     * @return array
+     * @inheritDoc
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         [ $query, $params ] = $this->queryHelper->getGetEnrolledStudentsQuery($externalUserId);
 
@@ -902,15 +570,9 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Get the email address as a string for a particular person
-     *
-     * @importance low - I'm not sure this is used anywhere yet?
-     *
-     * @param $externalUserId
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function getEmail($externalUserId)
+    public function getEmail(string $externalUserId): string
     {
         // non-core promise
         return '';
@@ -930,15 +592,9 @@ class External_Pcschools_User implements External_UserInterface
 
 
     /**
-     * Determine whether someone is a day boarder or not
-     *
-     * @importance low - used on profile page, but only to show if student is a boarder
-     *
-     * @param $boarderValue
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         // Non-core promise
         return '';
@@ -954,50 +610,35 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * Find the housemasterId for a particular house
-     *
-     * @importance low - I'm not sure this is used anywhere yet?
-     *
-     * @param $houseID
-     *
-     * @return string
+     * @inheritDoc
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
         // Non-core promise
-        return '';
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getHousemasterEmails($externalUserIds)
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
 
     /**
-     * List of campuses a staff member is involved in based on timetable
-     *
-     * @importance low - used in a few sync scripts.
-     *
-     * @param int $staffID
-     *
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         // Non-core promise
         return [];
     }
 
     /**
-     * Retrieves a list of forms that a student may be in.
-     *
-     * @importance low - used on student report only.
-     * @return array [['Code' => string, 'Description' => string], ...]
+     * @inheritDoc
      */
-    public function getStudentForms()
+    public function getStudentForms(): array
     {
         // Non-core promise
         return [];

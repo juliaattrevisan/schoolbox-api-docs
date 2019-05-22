@@ -1,26 +1,25 @@
 <?php
 /**
- * This interface defines how to store pastoral data in a remote SIS
- *
  * @author      Damian Sloane <dsloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
 
-use Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
-use Schoolbox\Pastoral\Model as PastoralModel;
-use Schoolbox\Pastoral\UploadQueue\Model as UploadQueue;
+use Schoolbox\Pastoral;
 use Schoolbox\User;
 
-interface External_PastoralInterface
+/**
+ * This interface defines how to store pastoral data in a remote SIS
+ */
+interface External_PastoralInterface extends External\IConnector
 {
     /**
      * Returns the pastoral record if found in remote system
      *
-     * @param PastoralModel $pastoral
+     * @param Pastoral\Model $pastoral
      * @return array
      */
-    public function getPastoral(PastoralModel $pastoral);
+    public function getPastoral(Pastoral\Model $pastoral): array;
 
     /**
      * Import pastoral care records from external SIS
@@ -31,49 +30,66 @@ interface External_PastoralInterface
      * @param bool $importRecords Flag indicating pastoral records should be imported from the SIS
      * @param bool $importAttachments Flag indicating pastoral record attachments should be imported from the SIS
      * @param bool $deleteRecords Flag to indicate if records should be deleted and recreated, or skipped if already existing
-     * @return bool
      */
-    public function importPastoral(User $user, User $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
+    public function importPastoral(
+        User $user,
+        User $defaultOwner,
+        bool $importParentAccess,
+        bool $importRecords,
+        bool $importAttachments,
+        bool $deleteRecords
+    ): void;
 
     /**
      * Sync a schoolbox pastoral record with the remote system
      *
-     * @param PastoralModel $pastoral
+     * Returns whether we *created* a record in the SIS (ie, an update will return false)
+     *
+     * @param Pastoral\Model $pastoral
      * @return bool
      */
-    public function syncPastoral(PastoralModel $pastoral);
+    public function syncPastoral(Pastoral\Model $pastoral): bool;
 
     /**
      * Deletes an existing pastoral record
      *
-     * @param PastoralModel $pastoral
+     * Returns whether all corresponding records in the SIS were successfully deleted
+     *
+     * @param Pastoral\Model $pastoral
      * @return bool
      */
-    public function deletePastoral(PastoralModel $pastoral);
+    public function deletePastoral(Pastoral\Model $pastoral): bool;
 
     /**
      * Creates a new pastoral comment in the remote system
      *
-     * @param PastoralCommentModel $comment
-     * @return bool|int ID of newly created comment
+     * Returns whether a comment was created in the remote system
+     *
+     * @param Pastoral\Comment\Model $comment
+     * @return bool
      */
-    public function createComment(PastoralCommentModel $comment);
+    public function createComment(Pastoral\Comment\Model $comment): bool;
 
     /**
      * Deletes an existing comment record
      *
-     * @param PastoralCommentModel $comment
+     * Returns whether any items were deleted
+     *
+     * @param Pastoral\Comment\Model $comment
      * @return bool
      */
-    public function deleteComment(PastoralCommentModel $comment);
+    public function deleteComment(Pastoral\Comment\Model $comment): bool;
 
     /**
      * Upload pastoral care document that are currently queued
-     * @param UploadQueue $upload
-     * @return int|bool
+     *
+     * Returns whether the document was uploaded to remove system
+     *
+     * @param Pastoral\UploadQueue\Model $upload
+     * @return bool
      * @throws \Schoolbox\External\Exception
      */
-    public function uploadPastoralDocument(UploadQueue $upload);
+    public function uploadPastoralDocument(Pastoral\UploadQueue\Model $upload): bool;
 }
 
 

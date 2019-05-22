@@ -1,18 +1,16 @@
 <?php
 /**
- * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory as DatabaseFactory;
 use Schoolbox\External\UserRelation;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
-
 
 class External_Schoolbox_User implements External_UserInterface
 {
@@ -20,30 +18,23 @@ class External_Schoolbox_User implements External_UserInterface
     /** @var IConnector $internalDatabase */
     private $internalDatabase;
 
-    /** @var ConfigMapper $configMapper */
-    private $configMapper;
 
     /**
      * External_Schoolbox_User constructor.
      */
     public function __construct()
     {
-        $this->configMapper = ConfigMapper::getInstance();
-
         /** @noinspection PhpDeprecationInspection */
         $this->internalDatabase = DatabaseFactory::getInstanceInternal();
     }
 
     /**
      * {@inheritDoc}
-     * @param array $synergyIds
-     *
-     * @return array
      */
-    public function getParentEmails($synergyIds)
+    public function getParentEmails(array $externalUserIds): array
     {
         $emailList = [];
-        $id_list   = array_filter((array)$synergyIds);
+        $id_list   = array_filter($externalUserIds);
 
         if (empty($id_list)) {
             return [];
@@ -75,13 +66,12 @@ class External_Schoolbox_User implements External_UserInterface
         return $emailList;
     }
 
+
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getStudent($externalUserId)
+    public function getStudent(string $externalUserId): array
     {
         return $this->internalDatabase->executeQuery(
             "
@@ -128,13 +118,12 @@ class External_Schoolbox_User implements External_UserInterface
         )->fetch();
     }
 
+
     /**
      * {@inheritDoc}
-     * @param string $externalUserId
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getStudentContactList($externalUserId)
+    public function getStudentContactList(string $externalUserId): array
     {
         return $this->internalDatabase->executeQuery(
             "
@@ -224,13 +213,12 @@ class External_Schoolbox_User implements External_UserInterface
         return $contactAdaptionList;
     }
 
+
     /**
      * {@inheritDoc}
-     * @param User $user
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getSubjectList(User $user)
+    public function getSubjectList(User $user): array
     {
         $externalId = $user->getExternalId();
 
@@ -282,13 +270,12 @@ class External_Schoolbox_User implements External_UserInterface
         );
     }
 
+
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return array
+     * @throws \Alaress\Database\Exception
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getEnrolledStudents(string $externalUserId): array
     {
         return $this->internalDatabase->executeQuery(
             "
@@ -308,17 +295,16 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param string $boarderValue
-     *
-     * @return string
      */
-    public function determineBoarderType($boarderValue)
+    public function determineBoarderType(string $boarderValue): string
     {
         $boarders = ['B', 'W'];
 
-        if (!strlen($boarderValue)) {
+        if ($boarderValue === '') {
             return '';
-        } elseif (in_array($boarderValue, $boarders)) {
+        }
+
+        if (in_array($boarderValue, $boarders, true)) {
             return 'Boarder';
         }
 
@@ -338,22 +324,16 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return int
      */
-    public function getCurrentSemester($externalUserId = null)
+    public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        return date('m') < 6 ? 1 : 2;
+        return date('m') < 6 ? '1' : '2';
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return string
      */
-    public function getCurrentYear($externalUserId = null)
+    public function getCurrentYear(string $externalUserId = null): ?string
     {
         return date('Y');
     }
@@ -362,79 +342,64 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
-     * @return array
      */
-    public function getStaffContactListExtended()
+    public function getStaffContactListExtended(): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $staffID
-     *
-     * @return array
      */
-    public function getCampusFromTimetable($staffID)
+    public function getCampusFromTimetable(string $staffID): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $houseId
      */
-    public function getHousemasterByHouseId($houseID)
+    public function getHousemasterByHouseId(string $houseID): ?string
     {
-        return '';
+        return null;
     }
 
     /**
      * {@inheritDoc}
-     * @param array $externalUserIds
      */
-    public function getHousemasterEmails($externalUserIds)
-    {
-        /** @noinspection PhpUnusedParameterInspection */
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     * @return array
-     */
-    public function getStudentForms()
+    public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return array
      */
-    public function getParent($externalUserId)
+    public function getStudentForms(): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return array
      */
-    public function getParentSync($externalUserId)
+    public function getParent(string $externalUserId): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @return string
      */
-    public function getEmail($externalUserId)
+    public function getParentSync(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getEmail(string $externalUserId): string
     {
         return '';
     }
@@ -443,50 +408,39 @@ class External_Schoolbox_User implements External_UserInterface
      * {@inheritDoc}
      * @return array
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getParentUserAccountInfo(): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @return array
      */
-    public function getParentUserAccountInfo()
+    public function getStaffUserAccountInfo(): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @return array
      */
-    public function getStaffUserAccountInfo()
+    public function getStaff(string $externalUserId): array
     {
         return [];
     }
 
     /**
      * {@inheritDoc}
-     * @param int $externalUserId
-     *
-     * @return array
      */
-    public function getStaff($externalUserId)
-    {
-        return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param string $yearlevel
-     * @param string $name
-     * @param string $boardingStatus
-     * @param string $form
-     *
-     * @return array
-     */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];
     }

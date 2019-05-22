@@ -8,7 +8,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
+declare(strict_types=1);
 
 class External_Pcschools_Cornerstone_User extends External_Pcschools_User
 {

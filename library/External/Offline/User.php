@@ -4,88 +4,18 @@
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
+use External\IOfflineConnector;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
-class External_Offline_User implements External_UserInterface
+class External_Offline_User implements External_UserInterface, IOfflineConnector
 {
     /**
      * @inheritdoc
      */
-    public function getParent($externalUserId)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParentSync($externalUserId)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParentEmails($synergyIds)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStudent($externalUserId)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStaff($externalUserId)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStudentContactList($externalUserId)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrentSemester($externalUserId = null)
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getCurrentYear($externalUserId = null)
-    {
-        return null;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSubjectList(User $user)
+    public function getParent(string $externalUserId): array
     {
         return [];
     }
@@ -93,17 +23,89 @@ class External_Offline_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getEnrolledStudents($externalUserId)
+    public function getParentSync(array $externalUserIds): array
     {
-        // Return nothing
+        return [];
     }
 
     /**
      * @inheritdoc
      */
-    public function getEmail($externalUserId)
+    public function getParentEmails(array $externalUserIds): array
     {
-        // Return nothing
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudent(string $externalUserId): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaff(string $externalUserId): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudentContactList(string $externalUserId): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentSemester(string $externalUserId = null): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentYear(string $externalUserId = null): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSubjectList(User $user): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEnrolledStudents(string $externalUserId): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEmail(string $externalUserId): string
+    {
+        return '';
     }
 
     /**
@@ -117,78 +119,71 @@ class External_Offline_User implements External_UserInterface
     /**
      * @inheritdoc
      */
-    public function getStudentUserAccountInfo()
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getParentUserAccountInfo()
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getStaffUserAccountInfo()
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function determineBoarderType($boarderValue)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterByHouseId($houseID)
-    {
-        // Return nothing
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getHousemasterEmails($externalUserIds)
+    public function getStudentUserAccountInfo(): array
     {
         return [];
     }
 
     /**
      * @inheritdoc
-     *
-     * @return array
      */
-    public function getStaffContactListExtended()
+    public function getParentUserAccountInfo(): array
     {
         return [];
     }
 
     /**
      * @inheritdoc
-     *
-     * @return array
      */
-    public function getStudentForms()
+    public function getStaffUserAccountInfo(): array
     {
         return [];
     }
 
     /**
      * @inheritdoc
-     *
-     * @param int $staffID
-     * @return array|bool
      */
-    public function getCampusFromTimetable($staffID)
+    public function determineBoarderType(string $boarderValue): string
+    {
+        return '';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterByHouseId(string $houseID): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHousemasterEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStaffContactListExtended(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStudentForms(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCampusFromTimetable(string $staffID): array
     {
         return [];
     }

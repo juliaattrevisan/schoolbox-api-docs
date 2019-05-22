@@ -6,16 +6,15 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class External_Maze_Timetable implements External_TimetableInterface
 {
     /**
      * An instance of MSSQL
      *
-     * @var null
+     * @var MSSQL
      */
-    private $db = null;
+    private $db;
 
     /**
      * Helper
@@ -104,16 +103,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * The headings of the timetable, going horizontally
-     * from left to right containing all the times and day numbers
-     *
-     * @param string $externalUserId
-     * @param \Schoolbox\Campus $campus
-     * @param int $day
-     * @param string $date
-     * @return array
+     * @inheritDoc
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
+    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
     {
         $periodQuery = "
             SELECT TOP 1 *
@@ -199,21 +191,15 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param $dayNumber
      * @return String
      */
-    public function getDayName($dayNumber)
+    public function getDayName($dayNumber): string
     {
         return 'Day ' . $dayNumber;
     }
 
     /**
-     * Calculates the current period based on the current time
-     *
-     * The returned data structure is required for Dashboard Timetable Controller
-     *
-     * @param int|\Schoolbox\Campus $campus
-     * @param int $now
-     * @return array
+     * @inheritDoc
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
     {
         if ($now) {
             $now = new \Alaress_Date_Format($now, 'U');
@@ -252,15 +238,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific day
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param \Schoolbox\Campus $campus
-     * @param $dayNumber
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber)
+    public function getDayTimetable(string $externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -278,19 +258,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a user's timetable for a specific date
-     *
-     * Depending on the role for $userId (staff or student) this summons the respective
-     * method to spawn associated timetable
-     *
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param Schoolbox\Campus $campus
-     * @param Alaress_Date_Format $date
-     * @return mixed
+     * @inheritDoc
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
+    public function getTimetableForDate(string $externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date): array
     {
         if (empty($externalUserId)) {
             return [];
@@ -323,7 +293,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      * Find next Monday
      *
      * @param $date
-     * @return Alaress_Date_Format
+     * @return string
      */
     private function nextMonday($date)
     {
@@ -351,7 +321,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param \Alaress_Date_Format $date
      * @return array
      */
-    public function getStaffTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null)
+    public function getStaffTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null): array
     {
         if ($date instanceof \Alaress_Date_Format) {
             $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
@@ -445,15 +415,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return a student's timetable for a specific day
-     *
-     * @param $externalUserId
-     * @param \Schoolbox\Campus $campus
-     * @param $dayNumber
-     * @param \Alaress_Date_Format $date
-     * @return mixed
+     * @inheritDoc
      */
-    public function getStudentTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null)
+    public function getStudentTimetable($externalUserId, \Schoolbox\Campus $campus, $dayNumber, \Alaress_Date_Format $date = null): array
     {
         if ($date instanceof \Alaress_Date_Format) {
             $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
@@ -583,14 +547,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * Return the ENTIRE timetable for a user
-     *
-     * @param $externalUserId
-     * @param $userId
-     * @param \Schoolbox\Campus $campus
-     * @return array|bool
+     * @inheritDoc
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus): array
     {
         if (empty($externalUserId)) {
             return array();
@@ -645,12 +604,9 @@ class External_Maze_Timetable implements External_TimetableInterface
     }
 
     /**
-     * @todo Implement for MAZE connector
-     *
-     * @param  array|string $roomCodes
-     * @return array
+     * @inheritDoc
      */
-    public function getRoomTimetable($roomCodes)
+    public function getRoomTimetable(array $roomCodes): array
     {
         // I'm not even going to try navigating this MAZE
         return array();
@@ -682,7 +638,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
     private function setDb($db)
     {

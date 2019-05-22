@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Campus;
+
 /**
  * Created by JetBrains PhpStorm.
  * User: aetworowsky
@@ -7,7 +9,7 @@
  * Time: 4:45 PM
  * To change this template use File | Settings | File Templates.
  */
-interface External_TimetableInterface
+interface External_TimetableInterface extends External\IConnector
 {
     /**
      * The headings of the timetable, going horizontally
@@ -22,11 +24,11 @@ interface External_TimetableInterface
      * $timetableDef['sequence'][]
      *
      * @param string $externalUserId If set, the external user ID to get definition for.
-     * @param \Schoolbox\Campus $campus
+     * @param Campus $campus
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0);
+    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array;
 
     /**
      * Get the current day number for a given campus
@@ -35,31 +37,30 @@ interface External_TimetableInterface
      * @param int $date
      * @return int
      */
-    public function getDayNumber(\Schoolbox\Campus $campus, $date = 0);
+    public function getDayNumber(Campus $campus, $date = 0);
 
     /**
      * Returns the name of the current day
      *
      * @param $dayNumber
-     * @return String
-     *
+     * @return string
      */
-    function getDayName($dayNumber);
+    public function getDayName($dayNumber): string;
 
     /**
      * Calculates the current period based on the current time
      *
      * The returned data structure is required for Dashboard Timetable Controller
      *
-     * PeriodNumber
-     * PeriodNumberSeq
+     * array[]['PeriodNumber']
+     * array[]['PeriodNumberSeq']
      *
      * @param Schoolbox\Campus $campus
      * @param int $now
      * @param \Schoolbox\User $user
      * @return array
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null);
+    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array;
 
 
     /**
@@ -83,11 +84,11 @@ interface External_TimetableInterface
      *
      * @param                   $externalUserId
      * @param                   $userId
-     * @param \Schoolbox\Campus $campus
+     * @param Campus $campus
      * @param                   $dayNumber
-     * @return mixed
+     * @return array
      */
-    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber);
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array;
 
     /**
      * Return a user's timetable for a specific date
@@ -125,7 +126,7 @@ interface External_TimetableInterface
      * @param Alaress_Date_Format $date
      * @return array
      */
-    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date);
+    public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array;
 
 
     /**
@@ -174,15 +175,15 @@ interface External_TimetableInterface
      * @param $externalUserId
      * @param $userId
      * @param Schoolbox\Campus $campus
-     * @return mixed
+     * @return array
      */
-    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus);
+    public function getFullTimetable($externalUserId, $userId, Campus $campus): array;
 
     /**
      * Gets the timetable for the given room.
      *
-     * @param  array|string $roomCodes
+     * @param  string[] $roomCodes
      * @return array
      */
-    public function getRoomTimetable($roomCodes);
+    public function getRoomTimetable(array $roomCodes): array;
 }

@@ -5,6 +5,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -14,9 +15,9 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
     /**
      * @inheritdoc
      */
-    public function getStudent($synID)
+    public function getStudent(string $externalUserId): array
     {
-        if (!$this->isExternalIdValid($synID)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
 
@@ -104,7 +105,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
 
         $student = [];
 
-        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $synID]);
+        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         foreach ($iteratorStudents as $row) {
 
@@ -147,7 +148,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
     /**
      * @inheritdoc
      */
-    public function getStudentUserAccountInfo()
+    public function getStudentUserAccountInfo(): array
     {
         $query =
             "
