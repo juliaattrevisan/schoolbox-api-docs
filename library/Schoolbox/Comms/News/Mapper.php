@@ -291,12 +291,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function findYearsAndMonthsWithArticles(): array
     {
-        /* Dates - must be expired, accepted, published and not deleted
+        /* Dates - must be accepted, published and not deleted
          */
         $now = \Alaress_Date_Format::now()->getDatabase();
 
         $pb = $this->getPredicateBuilder()
-            ->lessThan('expires_at', $now)
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
             ->isNull('deleted_at');
