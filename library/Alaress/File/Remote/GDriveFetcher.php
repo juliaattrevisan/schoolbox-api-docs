@@ -88,13 +88,22 @@ class GDriveFetcher implements FetcherInterface
      */
     private $metaCache = [];
 
+
     /**
-     * @param string   $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
-     * @param resource $curl       - a custom curl handle if a default won't suffice
-     * @param string   $httpAuth   - an authorization header if not using an anonymous connection
+     * @var ExtensionMapper
      */
-    public function __construct(string $storageDir, $curl = null, string $httpAuth = '')
+    private $extensionMapper;
+
+
+    /**
+     * @param ExtensionMapper $extensionMapper
+     * @param string          $storageDir - the target storage directory: typically the result of `sys_get_temp_dir()`
+     * @param resource        $curl       - a custom curl handle if a default won't suffice
+     * @param string          $httpAuth   - an authorization header if not using an anonymous connection
+     */
+    public function __construct(ExtensionMapper $extensionMapper, string $storageDir, $curl = null, string $httpAuth = '')
     {
+        $this->extensionMapper = $extensionMapper;
         $this->dir = $storageDir;
         $this->ch  = $curl ?: curl_init();
 
@@ -304,7 +313,7 @@ class GDriveFetcher implements FetcherInterface
          * but neither have file extension information in it; we have to infer from the "mimeType" metadata
          * field, look it up in our AllowedFiles to see what kind of extension it is, then concat that
          */
-        $extension = ExtensionMapper::getInstance()->findExtensionFromMimeType($metadata['mimeType']);
+        $extension = $this->extensionMapper->findExtensionFromMimeType($metadata['mimeType']);
 
         return "{$metadata['originalFilename']}.{$extension}";
     }
