@@ -481,7 +481,7 @@ abstract class AbstractMailer implements IMailer
     public static function getEmailFromString(string $string)
     {
         if (preg_match('~<(.*?)>~', $string, $output) !== 0) {
-            return $output[1];
+            return trim($output[1]);
         }
 
         return false;
