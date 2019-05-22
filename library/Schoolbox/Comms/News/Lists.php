@@ -152,19 +152,13 @@ class Lists
         $folderId = $params->getFolderId();
 
         if (null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
-            /* Articles that were audienced to $user */
-            $articleIdsForUser = $this->articleResolver->findArticlesForUser($user);
-
             /**
-             * On archive page, if the user is not a super user / news moderator, let's also provide the articles id's
-             * that the user has authored.
+             * Articles that were audienced to $user and the articles that they created
              */
-            if ($isArchive) {
-                $articleIdsForUser = array_merge(
-                    $articleIdsForUser,
-                    $this->newsMapper->findIdsByColumn('author_id', $user->getId())
-                );
-            }
+            $articleIdsForUser = array_merge(
+                $this->articleResolver->findArticlesForUser($user),
+                $this->newsMapper->findIdsByColumn('author_id', $user->getId())
+            );
         }
 
         $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $isArchive, $params->getLimit(), $params->getPageNum(), $year, $month, $folderId);
