@@ -11,115 +11,24 @@
 <script>
     $(function() {
         $('#{{ reportContentId }}').on('filterContentLoaded', function() {
-            // // Hide/show a drop shadow when scrolling the markbook horizontally
-            // // The shadow only appears when you have scrolled past a certain threshold
-            // $("#rubric-marksheet-container").scroll(function(e) {
-            //     const scrollAmount = e.target.scrollLeft;
-            //     const scrollPixelThreshold = 10;
-            //     const $leftColumns = $("#left-columns");
-            //     if (scrollAmount > scrollPixelThreshold && !$leftColumns.hasClass(".drop-shadow")) {
-            //         $leftColumns.addClass("drop-shadow");
-            //     } else {
-            //         $leftColumns.removeClass("drop-shadow");
-            //     }
-            // });
-
-            // Use datatables to do fixed headers and left column
-            // Only do this on small up
-            var $windowWidthRems = $(window).width() / parseFloat($('html').css('font-size'));
-            if ($windowWidthRems >= 40 ) {
-                $('[data-mark-sheet]').DataTable({
-                    scrollY: '34em', // Fairly arbitrary height, catered to a 1080p screen
-                    scrollX: true,
-                    scrollCollapse: true,
-                    paging: false,
-                    bFilter: false,
-                    bInfo: false,
-                    ordering: false,
-                    fixedColumns: {
-                        leftColumns: 2
-                    }
-                });
-            }
+            // Hide/show a drop shadow when scrolling the markbook horizontally
+            // The shadow only appears when you have scrolled past a certain threshold
+            $(".scrollable-table-wrap").scroll(function(e) {
+                console.log(e.target.scrollLeft);
+                const scrollAmount = e.target.scrollLeft;
+                const scrollPixelThreshold = 10;
+                const $leftColumns = $(".left-columns-wrap");
+                if (scrollAmount > scrollPixelThreshold && !$leftColumns.hasClass(".drop-shadow")) {
+                    $leftColumns.addClass("drop-shadow");
+                } else {
+                    $leftColumns.removeClass("drop-shadow");
+                }
+            });
         });
     });
 </script>
 
-{# TODO move this to external style sheet #}
-<style>
-    {# TODO not working #}
-    /*#left-columns.drop-shadow {*/
-    /*    !* Drop shadow to make it easier to understand what's going on when scrolling the other table *!*/
-    /*    -webkit-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);*/
-    /*    -moz-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);*/
-    /*    box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);*/
 
-    /*    !* Make sure we can see the drop shadow.*/
-    /*    For some reason, this only works if applied to #left-columns.drop-shadow;*/
-    /*    otherwise something overrides it *!*/
-    /*    z-index: 1;*/
-    /*}*/
-    .rubric-marksheet-container #rubric-marksheet {
-        width: auto;
-    }
-
-    /**** Style the assessment/capability/indicator headings ****/
-    .rubric-marksheet-container .overall,
-    .rubric-marksheet-container .assessment,
-    .rubric-marksheet-container .capability-name,
-    .rubric-marksheet-container .indicator-name{
-        border: 1px solid #ededed;
-    }
-    .rubric-marksheet-container .assessment:not(.placeholder),
-    .rubric-marksheet-container .overall:not(.placeholder) {
-        border-bottom: none;
-    }
-    .rubric-marksheet-container .assessment.placeholder,
-    .rubric-marksheet-container .overall.placeholder {
-        border-top: none;
-        border-bottom: none;
-    }
-    .rubric-marksheet-container .assessment {
-        width: 150px;                                              {# TODO not working #}
-        font-weight: normal;
-    }
-    .rubric-marksheet-container .capability-name,
-    .rubric-marksheet-container .indicator-name{
-        width: 200px;                                             {# TODO not working #}
-        border-right-width: 2px;
-    }
-    .rubric-marksheet-container .indicator-name {
-        padding-left: 2rem;
-        font-weight: normal;
-    }
-    .rubric-marksheet-container tbody tr:last-child .assessment{
-        border-bottom: 1px solid #ededed; /* make the last body row bottom-border even */
-    }
-
-    .rubric-marksheet-container .mark{
-        white-space: nowrap; /* Prevent wrapping between percentage value and percentage sign */
-    }
-
-    .rubric-marksheet-container .no-mark {
-        padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
-    }
-
-    .rubric-marksheet-container .first-summated{
-        border-top: 2px solid #ededed; /* A gap between the body and overall sections */
-    }
-
-
-    {# TODO breaks plugin #}
-    .rubric-marksheet-container #rubric-marksheet.marksheet thead tr:first-child th:last-child {
-        /* For some reason we have a style in our marksheet SASS that causes the last student to be cut off.
-        This undoes that.
-        Previously this was being undone somehow by initialising the DataTables plugin, but it's better
-        to fix the CSS (especially since DataTables crashes catastrophically in IE and Firefox on large datasets;
-        fixing the CSS allows us to remove the DataTables completely)
-         */
-        /*padding-right: 0 !important;*/
-    }
-</style>
 
 <div class="row">
     <div class="small-12">
@@ -135,10 +44,23 @@
     page:      page
 } only %}
 
-<div id="{{ reportContentId }}" class="rubric-marksheet-container">
-    <div class="small-12 island" data-placeholder>
-        <section class="content">
-            <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-        </section>
+{# TODO move to filter SASS #}
+<style>
+    @media only print, screen and (max-width: 64em) and (min-width: 40.0625em) {
+        .filtered-report .row > .small-12  {
+            padding: 0 1.5rem;
+        }
+    }
+</style>
+
+
+
+<div id="{{ reportContentId }}" class="filtered-report">
+    <div class="row">
+        <div class="small-12 island" data-placeholder>
+            <section class="content">
+                <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+            </section>
+        </div>
     </div>
 </div>
