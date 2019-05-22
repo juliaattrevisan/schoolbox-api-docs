@@ -14,7 +14,7 @@ use DomainException;
 use OutOfBoundsException;
 use \Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\File\ExtensionMapper;
-
+use Schoolbox\Mapper\Exception;
 
 class GDriveFetcher implements FetcherInterface
 {
@@ -289,7 +289,7 @@ class GDriveFetcher implements FetcherInterface
      * @param array $metadata
      * @return string
      * @throws \PDOException
-     * @throws \http\Exception\InvalidArgumentException
+     * @throws Exception
      */
     public function deriveFileName(array $metadata): string
     {

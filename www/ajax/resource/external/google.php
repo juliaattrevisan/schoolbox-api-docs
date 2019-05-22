@@ -3,6 +3,7 @@
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Remote\GDriveFetcher;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage;
 
@@ -49,7 +50,15 @@ foreach ($_POST['docs'] as $doc) {
         continue;
     }
 
-    $filename = $grive->deriveFileName($meta);
+    try {
+        $filename = $grive->deriveFileName($meta);
+    } catch (Mapper\Exception $e) {
+
+        /* noop: unknown file extension: silently disregard for now
+         */
+        continue;
+    }
+
     $dest = $grive->fetchToFile($doc['id']);
 
     try {
@@ -64,7 +73,7 @@ foreach ($_POST['docs'] as $doc) {
 
         $files[] = $meta;
     }
-    catch (\InvalidArgumentException|Schoolbox\File\Exception $e) {
+    catch (Schoolbox\File\Exception $e) {
 
         /* TODO: Find out how to handle this "successful error"
          * TODO: UI doesn't understand this payload

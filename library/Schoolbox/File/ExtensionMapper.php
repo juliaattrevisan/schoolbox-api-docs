@@ -10,8 +10,8 @@
 
 namespace Schoolbox\File;
 
-use http\Exception\InvalidArgumentException;
 use Schoolbox\Collection;
+use Schoolbox\Mapper;
 
 /**
  * Class ExtensionMapper
@@ -19,28 +19,28 @@ use Schoolbox\Collection;
  * @package Schoolbox\File
  * @method Collection|Extension[] findByColumn($columnName, $columnValue, $options = [])
  */
-class ExtensionMapper extends \Schoolbox\Mapper {
+class ExtensionMapper extends Mapper {
 
-	/**
-	 * Mapping
-	 *
-	 * @return Bool|void
-	 */
-	protected function mapping() {
-		$this->hasTable('allowedFileExtension');
-		$this->hasModel(Extension::class);
+    /**
+     * Mapping
+     *
+     * @return Bool|void
+     */
+    protected function mapping() {
+        $this->hasTable('allowedFileExtension');
+        $this->hasModel(Extension::class);
 
-		$this->hasMap(array(
-			'column'     => 'fileTypeId',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasMap(array(
-			'column'     => 'extension',
-			'property'   => 'extension',
-			'type'       => self::TYPE_STRING,
-		));
-	}
+        $this->hasMap(array(
+            'column'     => 'fileTypeId',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+        ));
+        $this->hasMap(array(
+            'column'     => 'extension',
+            'property'   => 'extension',
+            'type'       => self::TYPE_STRING,
+        ));
+    }
 
 
     /**
@@ -50,10 +50,10 @@ class ExtensionMapper extends \Schoolbox\Mapper {
      *
      * @param string $mimeType
      * @return string
-     * @throws \http\Exception\InvalidArgumentException
+     * @throws \Schoolbox\Mapper\Exception
      * @throws \PDOException
      */
-	public function findExtensionFromMimeType(string $mimeType): string
+    public function findExtensionFromMimeType(string $mimeType): string
     {
         $query = "
             SELECT extension 
@@ -74,31 +74,35 @@ class ExtensionMapper extends \Schoolbox\Mapper {
             return $result['extension'];
         }
 
-        throw new InvalidArgumentException('Unknown file extension.');
+        throw new Mapper\Exception('Unknown file extension.');
     }
 
-	/**
-	 * All the allowed file extensions
-	 *
-	 * @return \Schoolbox\Collection
-	 */
-	public function findAllowedExtensions() {
-		$query = "
-			SELECT {$this->getColumnString()}
-			FROM allowedFileExtension
-		";
 
-		$statement = $this->getDatabase()->prepare($query);
-		$statement->execute();
+    /**
+     * All the allowed file extensions
+     *
+     * @return Collection
+     * @throws Mapper\Exception
+     * @throws \PDOException
+     */
+    public function findAllowedExtensions(): Collection
+    {
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM allowedFileExtension
+        ";
 
-		$collection = new \Schoolbox\Collection();
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute();
 
-		foreach ($statement as $row) {
-			$extension = $this->hydrate($row);
+        $collection = new Collection();
 
-			$collection->add($extension);
-		}
+        foreach ($statement as $row) {
+            $extension = $this->hydrate($row);
 
-		return $collection;
-	}
+            $collection->add($extension);
+        }
+
+        return $collection;
+    }
 }
