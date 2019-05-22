@@ -857,7 +857,7 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), false, $year, $month);
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), true, $year, $month);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version

@@ -472,51 +472,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             }
         }
 
-        $statement = $this->database->prepare($query);
-
-        /* Bind the pb params
-         */
-        foreach ($pb->getParams() as $key => $value) {
-            $statement->bindValue($key, $value);
-        }
-
-        if($folderId) {
-            $statement->bindValue('folderId', $folderId);
-            $statement->bindValue('entityType', Folder::getEntityType());
-        }
-
-        /* Because pdo does some mickey mouse shenanigans
-         */
-        if ($pageNum) {
-            if ($limit || $limit === null) {
-
-                /* Apply either the $limit provided, or use the system default
-                 */
-                $derivedLimit = $limit;
-
-                if (!$limit) {
-                    $derivedLimit = (int)$this->getConfigLoader()->get('search_type_limit');
-                }
-
-                $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
-
-                /* Paginate
-                 */
-                $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
-            }
-        }
-
-        /* finally
-         */
-        $statement->execute();
-
-        $articlesInTopic = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $articlesInTopic[] = $row['id'];
-        }
-
-        return $articlesInTopic;
+        return $this->getArticleIdsByQuery($query, $pb, $pageNum, $limit, $folderId);
     }
 
 
@@ -580,5 +536,58 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement->execute($pb->getParams());
 
         return (boolean) $statement->fetch(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param string   $query
+     * @param Builder  $builder
+     * @param int|null $pageNum
+     * @param int|null $limit
+     * @param int|null $folderId
+     *
+     * @return array
+     */
+    private function getArticleIdsByQuery(string $query, Builder $builder, ?int $pageNum, ?int $limit, ?int $folderId): array
+    {
+        $statement = $this->database->prepare($query);
+
+        /* Bind the pb params
+        */
+        foreach ($builder->getParams() as $key => $value) {
+            $statement->bindValue($key, $value);
+        }
+
+        if ($folderId) {
+            $statement->bindValue('folderId', $folderId);
+            $statement->bindValue('entityType', Folder::getEntityType());
+        }
+
+        /* Because pdo does some mickey mouse shenanigans
+         */
+        if ($pageNum && ($limit || $limit === null)) {
+            /* Apply either the $limit provided, or use the system default */
+            $derivedLimit = $this->getDerivedLimit($limit);
+
+            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
+
+            /* Paginate */
+            $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
+        }
+
+        /* finally */
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Apply either the $limit provided, or use the system default
+     * @param int|null $limit
+     *
+     * @return int|null
+     */
+    private function getDerivedLimit(?int $limit)
+    {
+        return (!$limit) ? (int) $this->getConfigLoader()->get('search_type_limit') : $limit;
     }
 }

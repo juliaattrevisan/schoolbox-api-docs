@@ -152,18 +152,30 @@ class Lists
         $folderId = $params->getFolderId();
 
         if (null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
-            /**
-             * Articles that were audienced to $user and the articles that they created
-             */
-            $articleIdsForUser = array_merge(
-                $this->articleResolver->findArticlesForUser($user),
-                $this->newsMapper->findIdsByColumn('author_id', $user->getId())
-            );
+            $articleIdsForUser = $this->fetchArticleIdsForUser($user);
         }
 
-        $articleIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $isArchive, $params->getLimit(), $params->getPageNum(), $year, $month, $folderId);
+        $articleIds = $this->newsMapper->findArticleIdsForTopic(
+            $articleIdsForUser,
+            $topicId,
+            $isArchive,
+            $params->getLimit(),
+            $params->getPageNum(),
+            $year,
+            $month,
+            $folderId
+        );
 
-        $availableIds = $this->newsMapper->findArticleIdsForTopic($articleIdsForUser, $topicId, $isArchive, 0, 0, $year, $month, $folderId);
+        $availableIds = $this->newsMapper->findArticleIdsForTopic(
+            $articleIdsForUser,
+            $topicId,
+            $isArchive,
+            0,
+            0,
+            $year,
+            $month,
+            $folderId
+        );
 
         $articles = $this->loadArticleByIds($articleIds, $params, $user);
 
@@ -372,5 +384,20 @@ class Lists
         }
 
         return $articles;
+    }
+
+    /**
+     * Return the article ids that the user is an audienced and the ones that they authored
+     *
+     * @param User $user
+     *
+     * @return array
+     */
+    private function fetchArticleIdsForUser(User $user): array
+    {
+        return array_merge(
+            $this->articleResolver->findArticlesForUser($user),
+            $this->newsMapper->findIdsByColumn('author_id', $user->getId())
+        );
     }
 }
