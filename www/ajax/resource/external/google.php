@@ -63,12 +63,16 @@ foreach ($_POST['docs'] as $doc) {
         $files[] = $meta;
     }
     catch (\InvalidArgumentException|Schoolbox\File\Exception $e) {
-        $files[] = array(
-            'title' => $meta['title'],
-            'size'  => 0,
-            'type'  => 'unknown/binary',
-            'err'   => $e->getMessage()
-        );
+
+        /* TODO: Find out how to handle this "successful error"
+         * TODO: UI doesn't understand this payload
+         */
+//        $files[] = array(
+//            'title' => $meta['title'],
+//            'size'  => 0,
+//            'type'  => 'unknown/binary',
+//            'err'   => $e->getMessage()
+//        );
     }
 
 }
