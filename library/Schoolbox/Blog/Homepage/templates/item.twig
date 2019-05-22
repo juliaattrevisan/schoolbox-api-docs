@@ -6,14 +6,12 @@
             type: 'image'
         });
 
-        comp.find("form[data-blog-comment-form]").each(function() {
-            $(this).alaressValidate({
-                rules: {
-                    'commentBody':  {
-                        requiredNotBlank:true
-                    }
+        $("#commentForm").alaressValidate({
+            rules: {
+                'commentBody':  {
+                    requiredNotBlank:true
                 }
-            });
+            }
         })
 
         $('[data-interaction="delete"]').click(function(event) {
@@ -109,7 +107,7 @@
                     {% endfor %}
                     {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
                     <li>
-                        <form method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad" data-blog-comment-form>
+                        <form id="commentForm" method="post" action="{{ routeLookup('blog.postCommentInsert', { id: record.getId }) }}" class="no-pad">
                             <label class="content">
                                 <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
                             </label>

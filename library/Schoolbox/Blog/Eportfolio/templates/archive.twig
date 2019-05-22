@@ -1,14 +1,12 @@
 <script type="text/javascript">
     $(function() {
-        comp.find("form[data-blog-comment-form]").each(function() {
-            $(this).alaressValidate({
-                rules: {
-                    'commentBody':  {
-                        requiredNotBlank:true
-                    }
+        $("#commentForm").alaressValidate({
+            rules: {
+                'commentBody':  {
+                    requiredNotBlank:true
                 }
-            });
-        })
+            }
+        });
     });
 </script>
 
@@ -120,7 +118,7 @@
                         </ul>
                         {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
                         <div class="editPanel socialstream-new-post">
-                            <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post" data-blog-comment-form>
+                            <form id="commentForm" action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                                 <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                                 <textarea name="commentBody" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                 <input type="submit" class="expand" name="comment" value="Add comment"/>
