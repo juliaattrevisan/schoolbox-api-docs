@@ -14,7 +14,7 @@ class External_Maze_Helper
     /**
      * An instance of MSSQL
      *
-     * @var null
+     * @var MSSQL
      */
     private $db = null;
 
@@ -198,7 +198,7 @@ class External_Maze_Helper
     /**
      * Set db
      *
-     * @param null $db
+     * @param MSSQL $db
      */
     private function setDb($db)
     {
@@ -208,7 +208,7 @@ class External_Maze_Helper
     /**
      * Get db
      *
-     * @return null
+     * @return MSSQL
      */
     private function getDb()
     {

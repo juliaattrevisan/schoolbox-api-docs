@@ -14,6 +14,7 @@ use Schoolbox\IConfigLoader;
 
 class External_Edumate_Connection
 {
+    /** @var DatabaseFactory */
     private $databaseFactory;
 
     /** @var Group $groupHandler */

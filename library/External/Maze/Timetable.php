@@ -293,7 +293,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      * Find next Monday
      *
      * @param $date
-     * @return Alaress_Date_Format
+     * @return string
      */
     private function nextMonday($date)
     {
