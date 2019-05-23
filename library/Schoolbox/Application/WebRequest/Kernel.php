@@ -266,6 +266,7 @@ class Kernel extends WebKernelAbstract
         } catch (Deleted $e) {
             $response = $this->di->get('webFactory')->newResponse();
             if ($controller->getRequest()->isXhr()) {
+                //TODO replace this with standard outputError (ApiProblem style payload)
                 // Fabricate an AJAX response. Don't redirect
                 $response->status->setCode(410);
                 $response->content->set([
@@ -273,30 +274,32 @@ class Kernel extends WebKernelAbstract
                     'data'   => ['error' => 'Object was deleted'],
                 ]);
             } else {
-                error($e->getCode(), $e->getMessage(), 410);
+                $this->outputError($e, $e->getMessage(), '', [], 410);
             }
         } catch (Forbidden $e) {
-            // TODO replace the call to Sitepage::error() method
-            error($e->getCode(), $e->getMessage(), 403);
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 403);
         } catch (NotFound $e) {
             // "That which you are looking for cannot be found"
-            error($e->getCode(), $e->getMessage(), 404);
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 404);
         } catch (Unauthorized $e) {
             // This seems to be the most appropriate error code for unauthorized calls.
             // TODO set headers on $response instead of calling header()
             header('WWW-Authenticate: FormBased');
-            error($e->getCode(), $e->getMessage(), 401);
+            $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
+            $this->outputError($e, $errorMessage, '', [], 401);
         } /* Generic Schoolbox Exception spawned by ErrorMapper,
              * thrown by Controllers. ErrorMapper already did the
              * db call to retrieve the content, so error() doesn't
              * need to do it itself. It just renders the content.
              */
         catch (SchoolboxException $e) {
-            error(null, $e->getMessage(), 500);
+            $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
         } /* SPL Runtime exceptions
              */
         catch (Base $e) {
-            error($e->getCode(), $e->getMessage(), 500);
+            $this->outputError($e, $e->getMessage(), '', [], 500);
         }
         /** @var OutputInterface $output */
         $output = $response->content->get();
