@@ -1282,7 +1282,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * Return the FileYear and FileSemester for a user, if given; otherwise, the global value.
      *
-     * @param int $externalUserId
+     * @param string $externalUserId
      * @return array [ year, semester ]
      */
     protected function findFileYearAndSemester($externalUserId = null)
@@ -1350,13 +1350,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+        $fileSemester = $this->findFileYearAndSemester($externalUserId)['semester'] ?? null;
 
-        if (!empty($fileYearSemester)) {
-            return $fileYearSemester['semester'];
-        }
-
-        return null;
+        return $fileSemester === null ? null : (string)$fileSemester;
     }
 
     /**
@@ -1364,12 +1360,8 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCurrentYear(string $externalUserId = null): ?string
     {
-        $fileYearSemester = $this->findFileYearAndSemester($externalUserId);
+        $fileYear = $this->findFileYearAndSemester($externalUserId)['year'] ?? null;
 
-        if (!empty($fileYearSemester)) {
-            return $fileYearSemester['year'];
-        }
-
-        return null;
+        return $fileYear === null ? null : (string)$fileYear;
     }
 }
