@@ -1282,7 +1282,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * Return the FileYear and FileSemester for a user, if given; otherwise, the global value.
      *
-     * @param int $externalUserId
+     * @param string $externalUserId
      * @return array [ year, semester ]
      */
     protected function findFileYearAndSemester($externalUserId = null)
