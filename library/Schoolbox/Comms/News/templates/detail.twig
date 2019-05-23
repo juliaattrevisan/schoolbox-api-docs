@@ -25,7 +25,7 @@ Data:
 
 <script type="text/javascript">
     $(function() {
-        history.replaceState({}, '', '{{ article.id }}');
+        history.replaceState({}, '', '{{ article.id }}' + window.location.hash);
     });
 </script>
 
