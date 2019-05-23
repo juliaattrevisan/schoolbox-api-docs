@@ -57,17 +57,20 @@ class FolderFetcher
      */
     public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride): GenericCollection
     {
-        if (null === $nowOverride) {
-            $folders = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
-        } else {
-            $term          = (new Term\Model())
-                ->setStart($attributes->getCurriculumSemesterStart())
-                ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
-                ->setActualFinish($attributes->getCurriculumSemesterFinish());
+        // Always fetch folders with interactions
+        $term = (new Term\Model())
+            ->setStart($attributes->getCurriculumSemesterStart())
+            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+            ->setActualFinish($attributes->getCurriculumSemesterFinish());
 
-            $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
-            $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
-            $folders       = $withResponses->mergeUnique($withFeedback, $this->folderMapper->getIdentifierProperty());
+        $idProperty    = $this->folderMapper->getIdentifierProperty();
+        $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
+        $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
+        $folders       = $withResponses->mergeUnique($withFeedback, $idProperty);
+
+        // If current report, also fetch enrolled folders
+        if (null === $nowOverride) {
+            $folders = $folders->mergeUnique($this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)), $idProperty);
         }
 
         $folders->indexBy($this->folderMapper->getIdentifierProperty())
