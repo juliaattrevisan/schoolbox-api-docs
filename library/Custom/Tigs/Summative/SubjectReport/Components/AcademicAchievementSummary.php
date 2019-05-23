@@ -99,7 +99,6 @@ class AcademicAchievementSummary extends BaseComponent
      * @return array
      * @throws Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
-     * @throws UnexpectedValueException
      */
     public function toContext(): array
     {
@@ -126,7 +125,6 @@ class AcademicAchievementSummary extends BaseComponent
      * @return array|null
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
-     * @throws UnexpectedValueException
      */
     private function buildUnitData(UnitSpec\Model $unitSpec): ?array
     {
@@ -177,6 +175,17 @@ class AcademicAchievementSummary extends BaseComponent
             return ['error' => "{$assessment::getDefaultTypeName()} {$title} has a AAS work-type but does not have a rubric grid"];
         }
 
+        // If assessment not visible, or student is not a participant, returns NULL.
+        // Did we find an assessment, but it shouldn't be visible to the current viewer?
+        if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
+            return null;
+        }
+
+        // Is grade visibility off for the current viewer?
+        if (!$this->isFeedbackVisibleToUser($assessment)) {
+            return null;
+        }
+
         return $this->buildAssessmentData($assessment);
     }
 
@@ -184,32 +193,39 @@ class AcademicAchievementSummary extends BaseComponent
     /**
      * Build AAS data from the specified due work
      *
-     * If assessment not visible, or student is not a participant, returns NULL.
      * If no feedback, or viewer not permitted to view feedback, empty marks returned
      *
      * @param DueWork\Model $dueWork
      * @return null|array
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
-     * @throws UnexpectedValueException
      */
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
-        // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->getViewer(), true, null, false)) {
-            return null;
-        }
+        $data = [];
+        // Fetch the grid
+        $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
+        $data['grid'] = $dueWork->getRubricGrid();
 
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($dueWork)) {
-            return null;
-        }
+        // Load rubric marks if they exist and current user is permitted to view grades
+        $participant = $dueWork->getParticipantIfExtant($this->student);
+        if ($participant && !$participant->isExcluded()) {
+            /** @var DueWork\Feedback\Model $feedback */
+            $feedback = $participant->getAuthoritativeFeedback(true);
+            if ($feedback) {
+                $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
+                $data['markedGrid'] = $feedback->getRubricMarkedGrid();
 
-        return [
-            'dueDate' => $dueWork->getDueAt(),
-            'link'    => $this->getAasLink($dueWork),
-            'marks'   => $this->getMarks($dueWork, $dueWork->getParticipant($this->student)),
-        ];
+                // MYP students' comments will come from this assessment
+                if ($this->getAttributes()->isMyp()) {
+                    $data['comment']   = $feedback->getComment();
+                    $data['commentBy'] = $feedback->getReviewer();
+                }
+            }
+        }
+        $data['dueDate'] = $dueWork->getDueAt();
+        $data['link']    = $this->getAasLink($dueWork);
+        return $data;
     }
 
 
@@ -233,40 +249,5 @@ class AcademicAchievementSummary extends BaseComponent
             return $this->router->generate($path, $routeParams);
         }
         return null;
-    }
-
-
-    /**
-     * @param DueWork\Model $dueWork
-     * @param Participant   $participant
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function getMarks(DueWork\Model $dueWork, Participant $participant): array
-    {
-        // Fetch the grid
-        $grid = $this->rubricMapper->retrieveGrid($dueWork, false);
-        $dueWork->setRubricGrid($grid);
-
-        $marks = [];
-
-        /** @var DueWork\Feedback\Model $feedback */
-        $feedback = $participant->getAuthoritativeFeedback(true);
-
-        // No feedback?
-        if (!$feedback) {
-            foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
-                $capabilityName         = $capabilityUsage->getCapability()->getName();
-                $marks['rubric'][$capabilityName] = '';
-            }
-        } else {
-            foreach ($this->rubricMapper->retrieveMarkedGrid($feedback)->getCapabilityMarks() as $capabilityMark) {
-                $capabilityName         = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
-                $marks['rubric'][$capabilityName] = $capabilityMark->getValue();
-            }
-            $marks['comment'] = $feedback->getComment();
-            $marks['commentBy'] = $feedback->getReviewer();
-        }
-        return $marks;
     }
 }

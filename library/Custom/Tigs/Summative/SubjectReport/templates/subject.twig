@@ -171,14 +171,14 @@ Data:
                 {% endif %}
             </div>
 
-            {# Comments always come from the 'MYP AAS' or 'HSC Task Marks' assessments #}
+            {# Comments come from different assessments, depending on student type #}
 
             {% if attributes.isDp %}
                 {% set commentData = aamData.data[unitSpecId] %}
             {% elseif attributes.isHsc %}
                 {% set commentData = hscTaskMarks.data[unitSpecId] %}
             {% elseif attributes.isMyp %}
-                {% set commentData = aasData.data[unitSpecId].marks %}
+                {% set commentData = aasData.data[unitSpecId] %}
             {% endif %}
             {% if commentData.comment %}
                 <div class="column island small-12 comments">

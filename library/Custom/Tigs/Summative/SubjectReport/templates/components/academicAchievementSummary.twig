@@ -7,13 +7,9 @@ Data:
     error:               string           - Optional. If present, the reason why we can't render the component
     marks                array            -
     marks['rubric']      int[]            - Keyed by criterion name
+    grid:                Rubric\Grid      - The rubric grid
+    markedGrid:          MarkedGrid       - Optional. The student's marks for the rubric
 #}
-
-<style>
-    table.aas td.narrow {
-        width: 100px;
-    }
-</style>
 
 <p class="meta">Academic Achievement Summary</p>
 {% if error|default(null) %}
@@ -23,16 +19,26 @@ Data:
         <table class="aas">
             <thead>
             <tr>
-                <td class="narrow">Criterion</td>
-                <td>Mark</td>
+                <td></td>
+                {% for level in grid.levels %}
+                    <td>{{ level.name }}</td>
+                {% endfor %}
             </tr>
             </thead>
             <tbody>
-            {% for criterion, mark in marks.rubric %}
-                <tr>
-                    <td class="narrow">{{ criterion | nl2br }}</td>
-                    <td>{{ mark }}</td>
-                </tr>
+            {% for capabilityUsage in grid.capabilityUsages %}
+                {% for indicatorUsage in capabilityUsage.indicatorUsages %}
+                    <tr>
+                        <th>{{ indicatorUsage.indicator.name | nl2br }}</th>
+
+                        {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
+                        {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
+
+                        {% for descriptor in indicatorUsage.descriptors %}
+                            <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description | nl2br }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
             {% endfor %}
             </tbody>
         </table>
