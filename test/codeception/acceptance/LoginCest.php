@@ -57,14 +57,14 @@ class LoginCest
      * @param LoginPage        $loginPage
      * @throws Exception
      */
-    #public function loginSAMLFailure(AcceptanceTester $i, LoginPage $loginPage)
-    #{
-        #$loginPage->loginSAML('AD\drhodes', 'wrong');
-        #$loginPage->verifyLoginFailure();
+    public function loginSAMLFailure(AcceptanceTester $i, LoginPage $loginPage)
+    {
+        $loginPage->loginSAML('AD\drhodes', 'wrong');
+        $loginPage->verifyLoginFailure();
 
         // Test DB contents
-        #$i->dontSeeInDatabase('user', ['username' => 'wrong']);
-    #}
+        $i->dontSeeInDatabase('user', ['username' => 'wrong']);
+    }
 
     /**
      * Test for login success
