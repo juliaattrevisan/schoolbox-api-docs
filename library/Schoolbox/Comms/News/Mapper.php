@@ -19,6 +19,7 @@ use Schoolbox\Discussion\Thread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\News\TopicMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -290,12 +291,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function findYearsAndMonthsWithArticles(): array
     {
-        /* Dates - must be expired, accepted, published and not deleted
+        /* Dates - must be accepted, published and not deleted
          */
         $now = \Alaress_Date_Format::now()->getDatabase();
 
         $pb = $this->getPredicateBuilder()
-            ->lessThan('expires_at', $now)
             ->lessThan('publish_at', $now)
             ->notNull('accepted_at')
             ->isNull('deleted_at');
@@ -333,19 +333,23 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Given a list of articles, returns those that are published and not expired
      *
      * @param array $availableArticleIds
+     * @param User  $user
+     *
      * @return array
-     * @throws InvalidColumnException
-     * @throws \UnderflowException
      */
-    public function findArticlesIdsPublished(array $availableArticleIds): array
+    public function findArticlesIdsPublished(array $availableArticleIds, User $user): array
     {
-        if (!\count($availableArticleIds)) {
+        if (!\count($availableArticleIds) && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
             return [];
         }
 
         $articleIds = [];
         $pb = $this->getPredicatePublished();
-        $pb->in('id',$availableArticleIds);
+
+        if(\count($availableArticleIds)) {
+            $pb->in('id', $availableArticleIds);
+        }
+
         $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
@@ -374,21 +378,20 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @param array    $availableArticleIds
      * @param int      $topicId
+     * @param bool     $isArchive
      * @param int|null $limit
      * @param int|null $pageNum
      * @param int|null $year
      * @param int|null $month
      * @param int|null $folderId
+     *
      * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \UnderflowException
-     * @throws \DomainException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, bool $isArchive, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
         /* This user can't see any articles
          */
-        if (!(\count($availableArticleIds) || $folderId)) {
+        if (!$isArchive && !(\count($availableArticleIds) || $folderId)) {
             return [];
         }
 
@@ -469,51 +472,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             }
         }
 
-        $statement = $this->database->prepare($query);
-
-        /* Bind the pb params
-         */
-        foreach ($pb->getParams() as $key => $value) {
-            $statement->bindValue($key, $value);
-        }
-
-        if($folderId) {
-            $statement->bindValue('folderId', $folderId);
-            $statement->bindValue('entityType', Folder::getEntityType());
-        }
-
-        /* Because pdo does some mickey mouse shenanigans
-         */
-        if ($pageNum) {
-            if ($limit || $limit === null) {
-
-                /* Apply either the $limit provided, or use the system default
-                 */
-                $derivedLimit = $limit;
-
-                if (!$limit) {
-                    $derivedLimit = (int)$this->getConfigLoader()->get('search_type_limit');
-                }
-
-                $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
-
-                /* Paginate
-                 */
-                $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
-            }
-        }
-
-        /* finally
-         */
-        $statement->execute();
-
-        $articlesInTopic = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $articlesInTopic[] = $row['id'];
-        }
-
-        return $articlesInTopic;
+        return $this->getArticleIdsByQuery($query, $pb, $pageNum, $limit, $folderId);
     }
 
 
@@ -577,5 +536,58 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement->execute($pb->getParams());
 
         return (boolean) $statement->fetch(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param string   $query
+     * @param Builder  $builder
+     * @param int|null $pageNum
+     * @param int|null $limit
+     * @param int|null $folderId
+     *
+     * @return array
+     */
+    private function getArticleIdsByQuery(string $query, Builder $builder, ?int $pageNum, ?int $limit, ?int $folderId): array
+    {
+        $statement = $this->database->prepare($query);
+
+        /* Bind the pb params
+        */
+        foreach ($builder->getParams() as $key => $value) {
+            $statement->bindValue($key, $value);
+        }
+
+        if ($folderId) {
+            $statement->bindValue('folderId', $folderId);
+            $statement->bindValue('entityType', Folder::getEntityType());
+        }
+
+        /* Because pdo does some mickey mouse shenanigans
+         */
+        if ($pageNum && ($limit || $limit === null)) {
+            /* Apply either the $limit provided, or use the system default */
+            $derivedLimit = $this->getDerivedLimit($limit);
+
+            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
+
+            /* Paginate */
+            $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
+        }
+
+        /* finally */
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Apply either the $limit provided, or use the system default
+     * @param int|null $limit
+     *
+     * @return int|null
+     */
+    private function getDerivedLimit(?int $limit)
+    {
+        return (!$limit) ? (int) $this->getConfigLoader()->get('search_type_limit') : $limit;
     }
 }
