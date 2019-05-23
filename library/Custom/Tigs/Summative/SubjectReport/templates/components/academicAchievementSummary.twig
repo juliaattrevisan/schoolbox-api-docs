@@ -20,6 +20,7 @@ Data:
             <thead>
             <tr>
                 <td></td>
+                <td></td>
                 {% for level in grid.levels %}
                     <td>{{ level.name }}</td>
                 {% endfor %}
@@ -29,7 +30,10 @@ Data:
             {% for capabilityUsage in grid.capabilityUsages %}
                 {% for indicatorUsage in capabilityUsage.indicatorUsages %}
                     <tr>
-                        <th>{{ indicatorUsage.indicator.name | nl2br }}</th>
+                        {% if loop.index0 == 0 %}
+                        <th class="rb-group-name" rowspan="{{ capabilityUsage.indicatorUsages | length }}">{{ capabilityUsage.capability.name | nl2br }}</th>
+                        {% endif %}
+                        <th class="rb-criterion-name">{{ indicatorUsage.indicator.name | nl2br }}</th>
 
                         {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
                         {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
