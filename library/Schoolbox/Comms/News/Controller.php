@@ -16,9 +16,7 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
-use phpDocumentor\Reflection\Types\Object_;
 use Schoolbox\Application\Exception\Exception;
-use Schoolbox\Assessment\StudentReportCard\CommentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
@@ -30,8 +28,6 @@ use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\External\Normalise\User\Staff\Meta;
-use Schoolbox\Forum\ThreadMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
@@ -757,7 +753,8 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map,
+            new PropertyDecorator(
+                $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator($this->getConfigLoader()->get('read_more')),
                 new MetaDataDecorator($commentCounts)

@@ -6,10 +6,7 @@
 
 namespace Schoolbox\Comms\News;
 
-
-
 use Alaress\Json\Decorator\IDecorator;
-
 
 class MetaDataDecorator implements IDecorator
 {
