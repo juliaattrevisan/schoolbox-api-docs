@@ -1177,6 +1177,20 @@ class Controller extends Base
             $month
         );
 
+        foreach ($topicData['articles'] as $key => $data) {
+            $discussionThread = $data->getDiscussionThread();
+
+            $topicData['articles'][$key]->commentCount = 0;
+
+            if ($discussionThread) {
+                $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
+                    [$discussionThread->getId()]
+                );
+
+                $topicData['articles'][$key]->commentCount = reset(array_values($commentCounts));
+            }
+        }
+
         /* Always provide paginator from this context
          */
         $partialData = array_merge($topicData, [
