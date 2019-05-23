@@ -52,7 +52,7 @@ class Login
             FROM login_log
             JOIN `user` ON login_log.username = `user`.username
             JOIN groups ON user.group_id = groups.id
-            WHERE login=1 AND date >= :start AND date <= :end AND `user`.deleted_at IS NULL
+            WHERE login=1 AND date >= :start AND date <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at <= :end)
             GROUP BY group_id';
 
         $statement = $this->database->prepareQuery($query);
@@ -77,7 +77,7 @@ class Login
             (
                 SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
                 INNER JOIN login_log ON `user`.username = login_log.username
-                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.deleted_at IS NULL
+                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at <= :end) 
             ) AS total
           FROM groups';
 
@@ -92,21 +92,24 @@ class Login
 
     /**
      * Returns a summary of total users in system, and number of active sessions
-     *
+     * @param Alaress_Date_Format $end
      * @return array
      * @throws \Alaress\Database\Exception
      */
-    public function userSummary(): array
+    public function userSummary(Alaress_Date_Format $end): array
     {
         $query = '
                 SELECT groups.id, groups.`name`, COUNT(*) total
                 FROM groups
-                JOIN `user` ON groups.id=`user`.group_id AND `user`.deleted_at IS NULL
+                JOIN `user` ON groups.id=`user`.group_id 
+                WHERE `user`.created_at <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at <= :end) 
                 GROUP BY groups.id
                 ORDER BY groups.`name`';
 
         $statement = $this->database->prepareQuery($query);
-        $statement->execute();
+        $statement->execute([
+            'end'   => $end->getDatabaseDate()
+        ]);
         $summary = new Collection();
 
         /** @noinspection PhpAssignmentInConditionInspection */

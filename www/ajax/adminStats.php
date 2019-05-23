@@ -28,7 +28,7 @@ switch($_POST['module']) {
     case 'users':
         $configMapper = ConfigMapper::getInstance();
         $login         = new Login(Database\Factory::getInstanceInternal(), $configMapper->get('session_length'));
-        $summary       = $login->userSummary();
+        $summary       = $login->userSummary($now);
         $totalUser     = 0;
         $totalLogin    = 0;
 
