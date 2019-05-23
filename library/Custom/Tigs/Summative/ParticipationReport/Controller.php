@@ -390,10 +390,9 @@ class Controller extends Web\Controller\Base
         if ($getCurrent) {
             // If viewing current, just use SIS values
             $folder->loadTeachers();
-            return;
         }
 
-        // If viewing historical, load teachers who gave feedback
+        // Load teachers who gave feedback
         $assessments = $this->findAssessmentsForFolderAndReport($folder, $attributes);
         if (!$assessments->count()) {
             return;
