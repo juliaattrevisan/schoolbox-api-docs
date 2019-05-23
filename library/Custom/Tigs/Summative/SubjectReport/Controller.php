@@ -383,7 +383,6 @@ class Controller extends Web\Controller\Base
      * @param string|null                        $roleTypeOverride
      * @return array
      * @throws InvalidArgumentException
-     * @throws UnexpectedValueException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */

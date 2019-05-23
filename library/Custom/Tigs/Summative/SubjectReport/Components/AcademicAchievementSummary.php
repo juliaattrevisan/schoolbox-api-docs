@@ -99,7 +99,6 @@ class AcademicAchievementSummary extends BaseComponent
      * @return array
      * @throws Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
-     * @throws UnexpectedValueException
      */
     public function toContext(): array
     {
@@ -126,7 +125,6 @@ class AcademicAchievementSummary extends BaseComponent
      * @return array|null
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
-     * @throws UnexpectedValueException
      */
     private function buildUnitData(UnitSpec\Model $unitSpec): ?array
     {
@@ -201,7 +199,6 @@ class AcademicAchievementSummary extends BaseComponent
      * @return null|array
      * @throws \Schoolbox\Mapper\Exception
      * @throws Router\Exception\RouteNotFound
-     * @throws UnexpectedValueException
      */
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
@@ -219,8 +216,8 @@ class AcademicAchievementSummary extends BaseComponent
                 $feedback->setRubricMarkedGrid($this->rubricMapper->retrieveMarkedGrid($feedback));
                 $data['markedGrid'] = $feedback->getRubricMarkedGrid();
 
-                // DP students' comments will come from this assessment
-                if ($this->getAttributes()->isDp()) {
+                // MYP students' comments will come from this assessment
+                if ($this->getAttributes()->isMyp()) {
                     $data['comment']   = $feedback->getComment();
                     $data['commentBy'] = $feedback->getReviewer();
                 }
@@ -228,7 +225,6 @@ class AcademicAchievementSummary extends BaseComponent
         }
         $data['dueDate'] = $dueWork->getDueAt();
         $data['link']    = $this->getAasLink($dueWork);
-        $data['marks']   = $this->getMarks($dueWork, $dueWork->getParticipant($this->student));
         return $data;
     }
 
@@ -253,40 +249,5 @@ class AcademicAchievementSummary extends BaseComponent
             return $this->router->generate($path, $routeParams);
         }
         return null;
-    }
-
-
-    /**
-     * @param DueWork\Model $dueWork
-     * @param Participant   $participant
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function getMarks(DueWork\Model $dueWork, Participant $participant): array
-    {
-        // Fetch the grid
-        $grid = $this->rubricMapper->retrieveGrid($dueWork, false);
-        $dueWork->setRubricGrid($grid);
-
-        $marks = [];
-
-        /** @var DueWork\Feedback\Model $feedback */
-        $feedback = $participant->getAuthoritativeFeedback(true);
-
-        // No feedback?
-        if (!$feedback) {
-            foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
-                $capabilityName         = $capabilityUsage->getCapability()->getName();
-                $marks['rubric'][$capabilityName] = '';
-            }
-        } else {
-            foreach ($this->rubricMapper->retrieveMarkedGrid($feedback)->getCapabilityMarks() as $capabilityMark) {
-                $capabilityName         = $capabilityMark->getCapabilityUsage()->getCapability()->getName();
-                $marks['rubric'][$capabilityName] = $capabilityMark->getValue();
-            }
-            $marks['comment'] = $feedback->getComment();
-            $marks['commentBy'] = $feedback->getReviewer();
-        }
-        return $marks;
     }
 }
