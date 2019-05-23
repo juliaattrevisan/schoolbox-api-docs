@@ -143,12 +143,14 @@ class Lists
          */
         $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-        $articleIdsForUser = [];
         /* $articleIds:   Articles in $topicId that were audienced to $user
          * $availableIds: The total available articles that were audienced to user
+         * $articleIdsForUser: Article id's that were audienced to user and the ones that the user has created (if any)
          *
          * Component config can set "All" as its limit, filtered to the list of articles that can be seen
          */
+        $articleIdsForUser = [];
+
         $folderId = $params->getFolderId();
 
         if (null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
