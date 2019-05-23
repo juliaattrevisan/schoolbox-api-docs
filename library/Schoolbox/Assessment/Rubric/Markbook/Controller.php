@@ -16,6 +16,7 @@ use function count;
 use function func_get_args;
 use function implode;
 use function in_array;
+use function is_array;
 use LogicException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -211,7 +212,17 @@ class Controller extends Base
         /** @var Filter\Model[] $filters */
         $filters               = $this->filterMapper->findByClass(RubricUsage\Definition::class)->indexBy('class');
         $rubricUsageFilter     = $filters[RubricUsage\Definition::class];
-        $rubricUsageSelections = $request[$rubricUsageFilter->getId()] ?? [];
+        $rubricUsageSelections = $request[$rubricUsageFilter->getId()] ?? null;
+
+        // Is filter not present on page at all?
+        if ($rubricUsageSelections === null) {
+            return [null, null];
+        }
+
+        // Is filter present, but no options are available?
+        if ($rubricUsageSelections === "") {
+            return [[], []];
+        }
 
         $selectedCapabilities = $selectedIndicators = [];
         $rubricUsageCodec     = new RubricUsage\Codec();
@@ -276,32 +287,45 @@ class Controller extends Base
     /**
      * Fetch assessment data, and return it indexed by assessment ID
      *
-     * @param int[] $assessmentIds
-     * @param array $selectedCapabilities
-     * @param array $selectedIndicators
+     * @param int[]      $assessmentIds
+     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedIndicators   Null if rubricUsage filter not enabled for page
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws Router\Exception\RouteNotFound
      * @throws UnderflowException
      */
-    private function buildAssessmentData(array $assessmentIds, array $selectedCapabilities, array $selectedIndicators): array
+    private function buildAssessmentData(array $assessmentIds, ?array $selectedCapabilities, ?array $selectedIndicators): array
     {
         $assessments = [];
-        if (!count($assessmentIds) || (!count($selectedCapabilities) && !count($selectedIndicators))) {
+
+        // If no assessments match filters, short-circuit out.
+        if (!count($assessmentIds)) {
+            return $assessments;
+        }
+
+        // Is the rubric usage filter enabled for the page?
+        $filteringByRubricUsage = is_array($selectedCapabilities) || is_array($selectedIndicators);
+
+        // If enabled, but nothing selected? (probably because no options available)
+        if ($filteringByRubricUsage && !count($selectedCapabilities) && !count($selectedIndicators)) {
             return $assessments;
         }
 
         $pb = (new Database\Predicate\Builder($this->internalDb, ''))->in('vr.assessment_id', $assessmentIds);
 
-        $usagePb = new Database\Predicate\Builder($this->internalDb, '');
-        if (count($selectedCapabilities)) {
-            $usagePb->in('vr.capability_id', $selectedCapabilities);
+        if ($filteringByRubricUsage) {
+            $usagePb = new Database\Predicate\Builder($this->internalDb, '');
+            if (is_array($selectedCapabilities) && count($selectedCapabilities)) {
+                $usagePb->in('vr.capability_id', $selectedCapabilities);
+            }
+            if (is_array($selectedIndicators) && count($selectedIndicators)) {
+                $usagePb->in('vr.indicator_id', $selectedIndicators);
+            }
+            $pb->any($usagePb);
         }
-        if (count($selectedIndicators)) {
-            $usagePb->in('vr.indicator_id', $selectedIndicators);
-        }
-        $pb->any($usagePb);
+
         $whereClause = implode(' AND ', $pb->getWhere());
 
         $sql  = "
@@ -350,17 +374,17 @@ class Controller extends Base
                 $indicators = [];
             }
 
-            if (in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
                 $indicators[$row['indicator_id']] = [
                     'name' => $row['indicator_name'],
                 ];
             }
 
-            $capabilityMaxValue = $decimalHydrator->hydrate($row['capability_max_value']);
+            $capabilityMaxValue                  = $decimalHydrator->hydrate($row['capability_max_value']);
             $capabilities[$row['capability_id']] = [
                 'name'       => $row['capability_name'],
                 'indicators' => $indicators,
-                'show'       => $capabilityMaxValue && in_array((int)$row['capability_id'], $selectedCapabilities, true),
+                'show'       => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
             ];
 
             // Stuff everything about the assessment into an array
@@ -392,19 +416,29 @@ class Controller extends Base
     /**
      * Find each student in a folder and their marks (if extant), and return an array indexed by student ID
      *
-     * @param int[] $assessments
-     * @param array $selectedCapabilities
-     * @param array $selectedIndicators
+     * @param int[]      $assessments
+     * @param null|array $selectedCapabilities Null if rubricUsage filter not enabled for page
+     * @param null|array $selectedIndicators   Null if rubricUsage filter not enabled for page
      * @return array
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
      * @throws UnderflowException
      */
-    private function retrieveDatabaseMarks(array $assessments, array $selectedCapabilities, array $selectedIndicators): array
+    private function retrieveDatabaseMarks(array $assessments, ?array $selectedCapabilities, ?array $selectedIndicators): array
     {
         $students = [];
-        if (!count($assessments) || (!count($selectedCapabilities) && !count($selectedIndicators))) {
+
+        // Don't load marks if no assessments.
+        if (!count($assessments)) {
             return $students;
+        }
+
+        // Is the rubric usage filter enabled for the page?
+        $filteringByRubricUsage = is_array($selectedCapabilities) || is_array($selectedIndicators);
+
+        // If enabled, but nothing selected? (probably because no options available)
+        if ($filteringByRubricUsage && !count($selectedCapabilities) && !count($selectedIndicators)) {
+            return $assessments;
         }
 
         $innerPb    = (new Database\Predicate\Builder($this->internalDb, ''))
@@ -417,14 +451,17 @@ class Controller extends Base
             ->equals('vrm.feedback_type', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
             ->in('vrm.assessment_id', array_keys($assessments));
 
-        $usagePb = new Database\Predicate\Builder($this->internalDb, '');
-        if (count($selectedCapabilities)) {
-            $usagePb->in('vrm.capability_id', $selectedCapabilities);
+        if ($filteringByRubricUsage) {
+            $usagePb = new Database\Predicate\Builder($this->internalDb, '');
+            if (is_array($selectedCapabilities) && count($selectedCapabilities)) {
+                $usagePb->in('vrm.capability_id', $selectedCapabilities);
+            }
+            if (is_array($selectedCapabilities) && count($selectedIndicators)) {
+                $usagePb->in('vrm.indicator_id', $selectedIndicators);
+            }
+            $outerPb->any($usagePb);
         }
-        if (count($selectedIndicators)) {
-            $usagePb->in('vrm.indicator_id', $selectedIndicators);
-        }
-        $outerPb->any($usagePb);
+
         $outerWhere = implode(' AND ', $outerPb->getWhere());
 
         $getAuthoritativeMarksQuery = $this->internalDb->prepareQuery("
@@ -485,7 +522,7 @@ class Controller extends Base
                 $indicatorMarks = [];
             }
 
-            if (in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
+            if ($selectedIndicators === null || in_array((int)$row['indicator_id'], $selectedIndicators, true)) {
                 $indicatorMarks[$row['indicator_id']] = [
                     'databaseMark'           => $row['indicator_mark'],
                     'maxMark'                => $row['indicator_max_value'],
