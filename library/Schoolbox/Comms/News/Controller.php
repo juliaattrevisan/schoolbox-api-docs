@@ -1224,6 +1224,20 @@ class Controller extends Base
             $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
         }
 
+        foreach ($topicData['articles'] as $key => $data) {
+            $discussionThread = $data->getDiscussionThread();
+
+            $topicData['articles'][$key]->commentCount = 0;
+
+            if ($discussionThread) {
+                $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
+                    [$discussionThread->getId()]
+                );
+
+                $topicData['articles'][$key]->commentCount = reset(array_values($commentCounts));
+            }
+        }
+
         return array_merge($topicData, [
             'hidePaginator' => true,
             'compactMode' => $params->getCompactMode(),
