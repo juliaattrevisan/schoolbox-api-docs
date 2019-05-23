@@ -296,10 +296,6 @@ class Kernel extends WebKernelAbstract
              */
         catch (SchoolboxException $e) {
             $this->outputError($e, $e->getMessage(), '', [], $e->getHttpStatusCode());
-        } /* SPL Runtime exceptions
-             */
-        catch (Base $e) {
-            $this->outputError($e, $e->getMessage(), '', [], 500);
         }
         /** @var OutputInterface $output */
         $output = $response->content->get();
