@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use function array_filter;
+use function array_map;
 use function array_merge;
 use function count;
 use Custom\Tigs\Summative\StudentAttributes;
@@ -55,12 +57,12 @@ class FolderFetcher
      * @param User              $student
      * @param StudentAttributes $attributes
      * @param string|null       $nowOverride
-     * @param string[]          $excludedClassCodes
+     * @param null|string       $excludedClassCodes
      * @return GenericCollection|Folder\Model[]
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride, array $excludedClassCodes): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride, ?string $excludedClassCodes): GenericCollection
     {
         // Always fetch folders with interactions
         $term = (new Term\Model())
@@ -78,8 +80,9 @@ class FolderFetcher
             $folders = $folders->mergeUnique($this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)), $idProperty);
         }
 
+        $exclusions = array_filter(array_map('\trim', explode(',', $excludedClassCodes ?? '')));
         foreach ($folders as $idx => $folder) {
-            if ($this->isFolderExcluded($folder, $excludedClassCodes)) {
+            if ($this->isFolderExcluded($folder, $exclusions)) {
                 $folders->offsetUnset($idx);
             }
         }
@@ -101,7 +104,7 @@ class FolderFetcher
      * applies to all reports (but current and historical).
      *
      * @param Folder\Model $folder
-     * @param array        $exclusions
+     * @param string[]     $exclusions
      * @return bool
      */
     private function isFolderExcluded(Folder\Model $folder, array $exclusions): bool

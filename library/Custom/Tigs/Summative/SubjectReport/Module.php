@@ -201,11 +201,10 @@ class Module extends Alaress\Module\Module
                         throw new InvalidPath("Folder does not exist in SB");
                     }
 
-                    // User must be enrolled in the specified folder
-                    $excluded = array_map('trim', explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES) ?? ''));
+                    // User must be enrolled in the specified folder and not excluded
                     /** @var User $user */
                     $user = $params['user'];
-                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null, $excluded)) {
+                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null)) {
                         throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
                     }
                 }),
@@ -232,14 +231,13 @@ class Module extends Alaress\Module\Module
      * @param User         $user
      * @param Folder\Model $folder
      * @param string|null  $nowOverride
-     * @param array        $excludedClassCodes
      * @return bool
      * @throws InvalidArgumentException
      * @throws InvalidPath
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
-    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride, array $excludedClassCodes): bool
+    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride): bool
     {
         try {
             $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
@@ -248,7 +246,7 @@ class Module extends Alaress\Module\Module
         }
 
         $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-        $folders = $fetcher->findForStudent($user, $attributes, $nowOverride, $excludedClassCodes);
+        $folders = $fetcher->findForStudent($user, $attributes, $nowOverride, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
 
         /** @var Folder\Model $involvedFolder */
         foreach ($folders as $involvedFolder) {

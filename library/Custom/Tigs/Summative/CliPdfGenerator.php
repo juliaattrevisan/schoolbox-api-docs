@@ -386,18 +386,15 @@ class CliPdfGenerator extends CliTool\App
 
 
     /**
-     * Returns a set of class codes to exclude from reporting
+     * Returns configured class codes to exclude from reporting
      *
-     * @return string[]
+     * @return null|string
      */
-    private function getExcludedClassCodes(): array
+    private function getExcludedClassCodes(): ?string
     {
         // Trim and remove empty items
-        $excluded        = \array_filter(\array_map('\trim', \explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES) ?? '')));
-        $singleQuoteWrap = function (string $code): string {
-            return \sprintf("'%s'", $code);
-        };
-        $this->getLogger()->debug("Class code exclusions: " . implode(', ', \array_map($singleQuoteWrap, $excluded)));
+        $excluded = $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES);
+        $this->getLogger()->debug("Class code exclusions: " . $excluded);
         return $excluded;
     }
 
@@ -529,7 +526,7 @@ class CliPdfGenerator extends CliTool\App
      * @param User     $student
      * @param array    $externalStudent
      * @param string   $sessionHash
-     * @param string[] $excludedClassCodes
+     * @param null|string $excludedClassCodes
      * @param string   $tempDir
      * @return string The filename of the PDF
      * @throws RuntimeException If unable to generate a PDF Report for this student
@@ -538,7 +535,7 @@ class CliPdfGenerator extends CliTool\App
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function generatePdf(User $student, array $externalStudent, string $sessionHash, array $excludedClassCodes, string $tempDir): string
+    private function generatePdf(User $student, array $externalStudent, string $sessionHash, ?string $excludedClassCodes, string $tempDir): string
     {
         $filename = "{$tempDir}/{$student->getExternalId()}.pdf";
         $this->getLogger()->debug("Attempting to create temp PDF file: $filename");
@@ -580,14 +577,14 @@ class CliPdfGenerator extends CliTool\App
      *
      * @param User  $student
      * @param array $externalStudent
-     * @param array $excludedClassCodes
+     * @param null|string $excludedClassCodes
      * @return string[]
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function generateUrlsForStudent(User $student, array $externalStudent, array $excludedClassCodes): array
+    private function generateUrlsForStudent(User $student, array $externalStudent, ?string $excludedClassCodes): array
     {
         $data                   = ['userId' => $student->getId(), 'now' => $this->nowOverride,];
         $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data);
@@ -616,13 +613,13 @@ class CliPdfGenerator extends CliTool\App
      *
      * @param User  $student
      * @param array $externalStudent
-     * @param array $excludedClassCodes
+     * @param null|string $excludedClassCodes
      * @return Collection|Folder\Model[]
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function getClassFolders(User $student, array $externalStudent, array $excludedClassCodes): Collection
+    private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes): Collection
     {
         $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->nowOverride);
         return $this->folderFetcher->findForStudent($student, $attributes, $this->nowOverride, $excludedClassCodes);

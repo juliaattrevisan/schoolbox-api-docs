@@ -356,8 +356,7 @@ class Controller extends Web\Controller\Base
     {
         $getCurrent = null === $nowOverride;
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $excluded   = array_map('trim', \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES) ?? ''));
-        $folders    = $fetcher->findForStudent($user, $attributes, $nowOverride, $excluded);
+        $folders    = $fetcher->findForStudent($user, $attributes, $nowOverride, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
 
         $subjects = [];
         foreach ($folders as $folder) {
