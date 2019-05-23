@@ -202,10 +202,16 @@ class AcademicAchievementSummary extends BaseComponent
      */
     private function buildAssessmentData(DueWork\Model $dueWork): ?array
     {
-        $data = [];
         // Fetch the grid
         $dueWork->setRubricGrid($this->rubricMapper->retrieveGrid($dueWork, false));
-        $data['grid'] = $dueWork->getRubricGrid();
+
+        $data = [
+            'grid'                => $dueWork->getRubricGrid(),
+            'useMarkRange'        => $dueWork->getUseMarkRange(),
+            'showDescriptorValue' => true,
+            'showGroupTotal'      => $dueWork->getMarkPerCapability(),
+            'showRubricTotal'     => true,
+        ];
 
         // Load rubric marks if they exist and current user is permitted to view grades
         $participant = $dueWork->getParticipantIfExtant($this->student);
