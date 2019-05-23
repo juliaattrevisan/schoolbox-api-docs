@@ -212,7 +212,7 @@ class GDriveFetcher implements FetcherInterface
 
         if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
             // if this file has been flagged by Drive as "restricted", disallow any download
-            return null;
+            throw new DomainException('This file is restricted and cannot be downloaded.');
         } elseif ($this->isPdfExportEnabled($metadata)) {
             // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
             $url = $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
