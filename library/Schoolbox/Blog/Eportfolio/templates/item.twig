@@ -22,15 +22,13 @@
             });
         });
 
-        comp.find("form[data-blog-comment-form]").each(function() {
-            $(this).alaressValidate({
-                rules: {
-                    'commentBody':  {
-                        requiredNotBlank:true
-                    }
+        $("#commentForm").alaressValidate({
+            rules: {
+                'commentBody': {
+                    requiredNotBlank: true
                 }
-            });
-        })
+            }
+        });
     });
 </script>
 
@@ -76,48 +74,46 @@
             </article>
         </section>
 
-            <h2 class="subheader">Comments</h2>
+        <h2 class="subheader">Comments</h2>
+        {% if comments | length > 0 %}
+        <section>
+            <ul class="information-list">
 
-            <section>
-                <ul class="information-list">
+                {% for comment in comments %}
 
-                    {% for comment in comments %}
+                    <li class="actions-small-1">
 
-                        <li class="actions-small-1">
-
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                    <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
-                                </div>
+                        <div class="list-item">
+                            <div class="card small-12">
+                                {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
+                                <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
                             </div>
+                        </div>
 
-                            {# Only the owner of a comment can delete it #}
+                        {# Only the owner of a comment can delete it #}
 
-                            {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
-                                <nav>
-                                    <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
-                                </nav>
-                            {% endif %}
+                        {% if isRouteAuthorized('eportfolioBlog.postCommentDelete', {comment: comment, page: page }) %}
+                            <nav>
+                                <a class="icon icon-delete" data-interaction="delete" data-comment-id="{{ comment.getId }}"></a>
+                            </nav>
+                        {% endif %}
 
-                            <article><p>{{ comment.getBody | nl2br }}</p></article>
-                        </li>
-
-                    {% endfor %}
-
-                    {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: record, page: page}) %}
-                    <li>
-                        <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post" data-blog-comment-form>
-                            <input type="hidden" name="pageId" value="{{ page.getPageId }}">
-                            <label class="content">
-                                <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                            </label>
-
-                            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
-                        </form>
+                        <article><p>{{ comment.getBody | nl2br }}</p></article>
                     </li>
-                    {% endif %}
-                </ul>
-            </section>
+
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+    {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: record, page: page}) %}
+        <form id="commentForm" action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
+            <input type="hidden" name="pageId" value="{{ page.getPageId }}">
+            <label class="content">
+                <textarea name="commentBody" class="no-margin" rows="2" cols="100" placeholder="Add your comment"></textarea>
+            </label>
+
+            <input type="submit" class="no-margin" name="comment" value="Add comment"/>
+        </form>
+    {% endif %}
     </div>
 </div>

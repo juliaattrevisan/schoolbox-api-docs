@@ -1,6 +1,7 @@
+{% if blogs | length > 0 %}
 <script type="text/javascript">
     $(function() {
-        comp.find("form[data-blog-comment-form]").each(function() {
+        $('#blog-posts').find("form[data-blog-comment-form]").each(function() {
             $(this).alaressValidate({
                 rules: {
                     'commentBody':  {
@@ -11,6 +12,7 @@
         })
     });
 </script>
+{% endif %}
 
 <ul class="breadcrumb">
     <li><a href="/homepage/{{ folder.getId }}" title="Homepage">{{ folder.getName }}</a></li>
@@ -69,7 +71,7 @@
 
     {% if blogs | length > 0 %}
 
-        <div class="small-12 large-9 island">
+        <div class="small-12 large-9 island" id="blog-posts">
             <h2 class="subheader">{{ blogs[0].getCreatedAt | date('F Y') }} Blog Posts</h2>
             <section>
                 <ul class="information-list social-stream">
