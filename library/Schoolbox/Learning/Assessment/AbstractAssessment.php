@@ -178,9 +178,10 @@ abstract class AbstractAssessment implements IAssessable
         $this->setDueAt($this->getDueAt() instanceof Alaress_Date_Format ? clone $this->getDueAt() : new Alaress_Date_NullDate());
         $this->setCloseAt($this->getCloseAt() instanceof Alaress_Date_Format ? clone $this->getCloseAt() : new Alaress_Date_NullDate());
 
-        // Deep clone participants: in places where participants are required to be empty in the clone, use cloneForCopy() instead
+        /* Explicitly dump away all the Participants
+         */
         foreach ($this->plans as $plan) {
-            $plan->setParticipants(clone $plan->getParticipants());
+            $plan->setParticipants($plan->getParticipants()->emptyClone());
         }
 
         /* TODO: Dump away all the attached files?
