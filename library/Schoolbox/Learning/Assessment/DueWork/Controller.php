@@ -740,6 +740,14 @@ class Controller extends Assessment\Controller
         if ($rq->post['responseId']) {
             // Load an existing response to update
             $response = $this->dueWorkResponseMapper->findById($rq->post['responseId']);
+
+            /* @var Response\Model $response */
+            //check if $response has already been finalised, if so error
+            if (!$response->isDraft()) {
+                //cannot update
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_WORK_SUBMITTED);
+            }
+
         } else {
             // Create a new response
             $response = $this->dueWorkResponseMapper->createModel()
