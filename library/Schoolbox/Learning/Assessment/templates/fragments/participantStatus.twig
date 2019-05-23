@@ -11,7 +11,7 @@
     </a>
     {% if not participant.user.deleted %}
         <h3>
-            <a href="{{ actionUrl }}" title="View Profile">{{ participant.user.fullName }}</a>
+            <a href="/search/user/{{ user.id }}" title="View Profile">{{ participant.user.fullName }}</a>
             {% if not participant.plan.isDynamic %}
                 <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name}} ({{ participant.plan.duedate.short}})">i</span>
             {% endif %}
