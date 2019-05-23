@@ -17,6 +17,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage;
 $output = array();
+$now = new Alaress_Date_Format();
 
 if(!isset($_POST['module'])) {
     // don't bother returning anything
