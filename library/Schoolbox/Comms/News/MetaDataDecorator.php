@@ -25,15 +25,27 @@ class MetaDataDecorator implements IDecorator
      */
     public function decorate(array $json, $model): array
     {
+        $commentCount = 0;
+
         if (!$model instanceof Model) {
             // only attempt to decorate if the model is the right type
             return $json;
         }
 
-        $discussionThread =  $model->getDiscussionThread();
+        $discussionThread = $model->getDiscussionThread();
+
+        if ($discussionThread) {
+            // Match values with threadId from commentCounts array to get the total number of comments
+            $commentCount = (int) $this->commentCounts[
+                array_search(
+                    $discussionThread->getId(),
+                    array_column($this->commentCounts, 'threadId'),
+                    false)
+            ]['totalCount'];
+        }
 
         $json['metaData'] = [
-            'commentCount' => $discussionThread ? $this->commentCounts[$discussionThread->getId()] : 0
+            'commentCount' => $commentCount
         ];
 
         return $json;

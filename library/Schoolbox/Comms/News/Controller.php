@@ -1177,19 +1177,7 @@ class Controller extends Base
             $month
         );
 
-        foreach ($topicData['articles'] as $key => $data) {
-            $discussionThread = $data->getDiscussionThread();
-
-            $topicData['articles'][$key]->commentCount = 0;
-
-            if ($discussionThread) {
-                $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
-                    [$discussionThread->getId()]
-                );
-
-                $topicData['articles'][$key]->commentCount = reset(array_values($commentCounts));
-            }
-        }
+        $topicData = $this->mergeCommentCountIntoPartialData($topicData);
 
         /* Always provide paginator from this context
          */
@@ -1238,19 +1226,7 @@ class Controller extends Base
             $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
         }
 
-        foreach ($topicData['articles'] as $key => $data) {
-            $discussionThread = $data->getDiscussionThread();
-
-            $topicData['articles'][$key]->commentCount = 0;
-
-            if ($discussionThread) {
-                $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
-                    [$discussionThread->getId()]
-                );
-
-                $topicData['articles'][$key]->commentCount = reset(array_values($commentCounts));
-            }
-        }
+        $topicData = $this->mergeCommentCountIntoPartialData($topicData);
 
         return array_merge($topicData, [
             'hidePaginator' => true,
@@ -1576,5 +1552,37 @@ class Controller extends Base
         }
 
         return $threadIds;
+    }
+
+    /**
+     * @param array $topicData
+     *
+     * @return array
+     */
+    private function mergeCommentCountIntoPartialData(array $topicData): array
+    {
+        $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
+            $this->getThreadIdsFromCollection($topicData['articles'])
+        );
+
+        foreach ($topicData['articles'] as $key => $data) {
+            $discussionThread = $data->getDiscussionThread();
+
+            $topicData['articles'][$key]->commentCount = 0;
+
+            if ($discussionThread) {
+                // Match parentId with article id in commentCounts array to get the total number of comments
+                $commentCount = (int) $commentCounts[
+                array_search(
+                    $data->getId(),
+                    array_column($commentCounts, 'parentId'),
+                    false)
+                ]['totalCount'];
+
+                $topicData['articles'][$key]->commentCount = $commentCount;
+            }
+        }
+
+        return $topicData;
     }
 }

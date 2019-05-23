@@ -110,37 +110,35 @@ class Mapper extends BaseMapper
      */
     public function getCommentCountByThreadIds(array $threadIds): array
     {
+        $newsTable = \Schoolbox\Comms\News\Mapper::getInstance()->getTable();
+
         $result = [];
 
+        if (count($threadIds) === 0) {
+            return $result;
+        }
+
         $pb = $this->getPredicateBuilder()
-            ->in('discussion_thread_id', $threadIds)
-            ->isNull('deleted_at');
+            ->in($this->table.'.discussion_thread_id', $threadIds)
+            ->isNull($this->table.'.deleted_at');
 
         $where = implode("\nAND ", $pb->getWhere());
 
         $query = "
-            SELECT 
-            {$this->table}.discussion_thread_id,
-            COUNT({$this->table}.id) AS commentCount
-            FROM {$this->getTable()}
+            SELECT
+            {$newsTable}.id AS parentId,
+            {$this->table}.discussion_thread_id AS threadId,
+            COUNT({$this->table}.id) AS totalCount
+            FROM {$this->getTable()} 
+            INNER JOIN {$newsTable} ON {$newsTable}.discussion_thread_id = {$this->table}.discussion_thread_id
             WHERE {$where} 
-            GROUP BY  {$this->table}.discussion_thread_id
+            GROUP BY {$this->table}.discussion_thread_id
         ";
 
         $statement = $this->database->prepare($query);
 
         $statement->execute($pb->getParams());
 
-        $queryResults = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        if (count($queryResults) === 0) {
-            return $result;
-        }
-
-        foreach ($queryResults as $queryResult) {
-            $result[$queryResult['discussion_thread_id']] = $queryResult['commentCount'];
-        }
-
-        return $result;
+        return $statement->fetchAll(PDO::FETCH_ASSOC);;
     }
 }
