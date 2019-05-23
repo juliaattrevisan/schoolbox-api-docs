@@ -594,11 +594,10 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [$participationReportUrl];
 
-        $classFolders     = $this->getClassFolders($student, $externalStudent);
-        $filteredClasses  = $this->filterClasses($classFolders, $excludedClassCodes);
+        $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes);
         $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
 
-        foreach ($filteredClasses as $folder) {
+        foreach ($classFolders as $folder) {
             $data = [
                 'userId'   => $student->getId(),
                 'folderId' => $folder->getId(),
@@ -613,19 +612,20 @@ class CliPdfGenerator extends CliTool\App
 
 
     /**
-     * Returns the set of folders a user is/was enrolled in
+     * Returns the set of folders a user is/was enrolled in, that are not excluded
      *
      * @param User  $student
      * @param array $externalStudent
+     * @param array $excludedClassCodes
      * @return Collection|Folder\Model[]
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
-    private function getClassFolders(User $student, array $externalStudent): Collection
+    private function getClassFolders(User $student, array $externalStudent, array $excludedClassCodes): Collection
     {
         $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->nowOverride);
-        return $this->folderFetcher->findForStudent($student, $attributes, $this->nowOverride);
+        return $this->folderFetcher->findForStudent($student, $attributes, $this->nowOverride, $excludedClassCodes);
     }
 
 
@@ -657,34 +657,6 @@ class CliPdfGenerator extends CliTool\App
         }
 
         \fwrite($fp, $snappy->getOutput($urls));
-    }
-
-
-    /**
-     * Returns a new collection with any excluded classes removed
-     *
-     * @param Collection|Folder\Model[] $classFolders
-     * @param string[]                  $excludedClassCodes
-     * @return Collection|Folder\Model[]
-     */
-    private function filterClasses(Collection $classFolders, array $excludedClassCodes): Collection
-    {
-        $filtered = $classFolders->emptyClone();
-        foreach ($classFolders as $idx => $folder) {
-            $exclude = false;
-            foreach ($folder->getCodes() as $code) {
-                if (in_array($code->getCode(), $excludedClassCodes, true)) {
-                    $this->getLogger()->debug("'{$code->getCode()}' is in class exclusion list, skipping folder {$folder->getId()}...");
-                    $exclude = true;
-                    break;
-                }
-            }
-            if (!$exclude) {
-                $this->getLogger()->debug("Folder {$folder->getId()} not excluded, added to filtered set.");
-                $filtered[$idx] = $folder;
-            }
-        }
-        return $filtered;
     }
 
 

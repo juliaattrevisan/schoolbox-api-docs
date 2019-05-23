@@ -10,12 +10,14 @@ namespace Custom\Tigs\Summative\SubjectReport;
 use Alaress;
 use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Twig\Loader\IChainLoader;
+use function array_map;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
+use function explode;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -199,19 +201,11 @@ class Module extends Alaress\Module\Module
                         throw new InvalidPath("Folder does not exist in SB");
                     }
 
-                    // Check excluded folder codes from reporting
-                    if ($folder->getCodes() && $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)) {
-                        $excluded = \array_map('trim', \explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
-                        if (!empty(\array_intersect($folder->getCodes()->getPropertyValues('code'), $excluded))) {
-                            // Folder is in exclusion list
-                            throw new InvalidPath("Folder is excluded");
-                        }
-                    }
-
                     // User must be enrolled in the specified folder
+                    $excluded = array_map('trim', explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES) ?? ''));
                     /** @var User $user */
                     $user = $params['user'];
-                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null)) {
+                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null, $excluded)) {
                         throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
                     }
                 }),
@@ -238,39 +232,28 @@ class Module extends Alaress\Module\Module
      * @param User         $user
      * @param Folder\Model $folder
      * @param string|null  $nowOverride
+     * @param array        $excludedClassCodes
      * @return bool
      * @throws InvalidArgumentException
+     * @throws InvalidPath
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
-     * @throws InvalidPath
      */
-    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride): bool
+    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride, array $excludedClassCodes): bool
     {
-        if ($nowOverride !== null) {
-            // This is pretty heavy, but exists primarily for testing. It is (hopefully) unlikely the client
-            // will ever attempt to reconstruct historical views
-            try {
-                $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
-            }
-            $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-            $folders = $fetcher->findForStudent($user, $attributes, $nowOverride);
-
-            /** @var Folder\Model $involvedFolder */
-            foreach ($folders as $involvedFolder) {
-                if ($involvedFolder->getId() === $folder->getId()) {
-                    return true;
-                }
-            }
-            return false;
+        try {
+            $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
         }
 
-        foreach ($this->getExternalUser()->getSubjectList($user) as $subject) {
-            foreach ($folder->getCodes() as $code) {
-                if ($code->getCode() === $subject['code']) {
-                    return true;
-                }
+        $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
+        $folders = $fetcher->findForStudent($user, $attributes, $nowOverride, $excludedClassCodes);
+
+        /** @var Folder\Model $involvedFolder */
+        foreach ($folders as $involvedFolder) {
+            if ($involvedFolder->getId() === $folder->getId()) {
+                return true;
             }
         }
         return false;

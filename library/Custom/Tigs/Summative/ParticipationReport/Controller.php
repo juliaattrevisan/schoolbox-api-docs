@@ -9,6 +9,7 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
+use function array_map;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
@@ -355,17 +356,11 @@ class Controller extends Web\Controller\Base
     {
         $getCurrent = null === $nowOverride;
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $folders    = $fetcher->findForStudent($user, $attributes, $nowOverride);
+        $excluded   = array_map('trim', \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES) ?? ''));
+        $folders    = $fetcher->findForStudent($user, $attributes, $nowOverride, $excluded);
 
-        $excluded = \array_map('trim', \explode(',', $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
         $subjects = [];
         foreach ($folders as $folder) {
-            $codes = $this->getFolderCodes($folder, $getCurrent);
-            if (!empty(\array_intersect($codes, $excluded))) {
-                // Folder is in exclusion list
-                continue;
-            }
-
             $this->loadTeachers($folder, $attributes, $getCurrent);
             $subjects[] = [
                 'name'     => $folder->getName(),
@@ -376,32 +371,6 @@ class Controller extends Web\Controller\Base
         }
 
         return $subjects;
-    }
-
-
-    /**
-     * Returns all folder codes for a folder, including archived codes in the folder name
-     *
-     * @param Folder\Model $folder
-     * @param bool $getCurrent
-     * @return array
-     */
-    private function getFolderCodes(Folder\Model $folder, bool $getCurrent): array
-    {
-        $codes = $folder->getCodes()->getPropertyValues('code');
-
-        // If looking at historical, also fetch archived codes from folder name
-        if ($getCurrent) {
-            return $codes;
-        }
-
-        // Extract, eg 'CODE' from 'Folder name with archived [CODE]'
-        if (\preg_match('/\[([^\]]+)\]/', $folder->getName(), $matches)) {
-            \array_shift($matches);
-            $codes = \array_merge($codes, $matches);
-        }
-
-        return $codes;
     }
 
 
