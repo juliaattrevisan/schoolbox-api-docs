@@ -242,7 +242,7 @@ $thumb-box-shadow-hover: none;
 // $has-tip-font-weight: $font-weight-bold;
 $has-tip-font-color: $black;
 $has-tip-border-bottom-hover: dotted 1px $has-tip-font-color;
-// $has-tip-font-color-hover: $primary-color;
+$has-tip-font-color-hover: $has-tip-font-color;
 // $has-tip-cursor-type: help;
 
 $tooltip-padding: rem-calc(($base-font-size - 2));
@@ -745,6 +745,40 @@ $rotate-span-width: 11rem;
         );
         color: darken($neutral-color, 50%);
     }
+}
+
+.individualisation {
+    background-color: #9a9a9a;
+    display: inline-block;
+    width: rem-calc($base-font-size - 2);
+    height: rem-calc($base-font-size - 2);
+    line-height: 1;
+    font-family: serif;
+    font-style: italic;
+    text-align: center;
+
+    &.has-tip {
+        border-bottom: 0;
+        color: $white;
+        font-weight: 400;
+
+        &:hover {
+            color: $white;
+        }
+    }
+}
+
+.marksheet .individualisation {
+    border-bottom-left-radius: 50%;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.card .individualisation {
+    margin-left: .5rem;
+    width: 1rem;
+    height: 1rem;
 }
 
 // Hints

@@ -38,7 +38,7 @@
         <div>
             <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}" data-collapser="user-completions-{{ participant.user.id }}"></div>
             {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                user:        participant.user,
+                participant: participant,
                 statusClass: pStatusClass,
                 statusText:  pStatusText,
                 statusTip:   pTooltip,
