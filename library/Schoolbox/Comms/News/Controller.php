@@ -16,7 +16,9 @@ use Alaress\Web\Controller\Base;
 use Alaress\Web\Output\ThemedHtml;
 use Aura\Router\Exception\RouteNotFound;
 use InvalidArgumentException;
+use phpDocumentor\Reflection\Types\Object_;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Assessment\StudentReportCard\CommentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Discussion\ThreadLocator;
@@ -28,6 +30,9 @@ use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\External\Normalise\User\Staff\Meta;
+use Schoolbox\Forum\ThreadMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -726,6 +731,10 @@ class Controller extends Base
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
+        $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
+            $this->getThreadIdsFromCollection($articles)
+        );
+
         $map = [
             'id',
             'title',
@@ -748,7 +757,11 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get('read_more')))
+            new PropertyDecorator($map,
+                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                new BlurbDecorator($this->getConfigLoader()->get('read_more')),
+                new MetaDataDecorator($commentCounts)
+            )
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
@@ -1513,5 +1526,30 @@ class Controller extends Base
     private function generateValidSubmittedArticleSpec() :\Alaress\Specification\ISpecification
     {
         return (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
+    }
+
+    /**
+     * Extract thread ids from the collection
+     *
+     * @param GenericCollection $articles
+     *
+     * @return array
+     */
+    private function getThreadIdsFromCollection(GenericCollection $articles): array
+    {
+        $threadIds = [];
+
+        if (count($articles) === 0) {
+            return $threadIds;
+        }
+
+        foreach ($articles as $key => $article) {
+            $discussionThread = $article->getDiscussionThread();
+            if (null !== $discussionThread) {
+                $threadIds[] = $discussionThread->getId();
+            }
+        }
+
+        return $threadIds;
     }
 }

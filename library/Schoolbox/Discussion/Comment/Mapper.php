@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Comment;
 
+use PDO;
 use PDOStatement;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Mapper as BaseMapper;
@@ -100,5 +101,46 @@ class Mapper extends BaseMapper
             $collection[$model->getId()] = $model;
         }
         return $collection;
+    }
+
+    /**
+     * @param array $threadIds
+     *
+     * @return array
+     */
+    public function getCommentCountByThreadIds(array $threadIds): array
+    {
+        $result = [];
+
+        $pb = $this->getPredicateBuilder()
+            ->in('discussion_thread_id', $threadIds)
+            ->isNull('deleted_at');
+
+        $where = implode("\nAND ", $pb->getWhere());
+
+        $query = "
+            SELECT 
+            {$this->table}.discussion_thread_id,
+            COUNT({$this->table}.id) AS commentCount
+            FROM {$this->getTable()}
+            WHERE {$where} 
+            GROUP BY  {$this->table}.discussion_thread_id
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute($pb->getParams());
+
+        $queryResults = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($queryResults) === 0) {
+            return $result;
+        }
+
+        foreach ($queryResults as $queryResult) {
+            $result[$queryResult['discussion_thread_id']] = $queryResult['commentCount'];
+        }
+
+        return $result;
     }
 }
