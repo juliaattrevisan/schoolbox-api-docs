@@ -1,15 +1,23 @@
+{#
+    folder       Folder\Model
+    filterPanel  Filter\Panel
+    page         string         An identifier for this filterable page
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(['Learning', '/learning/classes'], ['Rubric Markbook']) }}
+{{ bread.crumbs(['Learning', '/learning/classes'], [folder.name, '/homepage/' ~ folder.id], ['Rubric Markbook']) }}
+
+{% set reportContentId = 'rubric-markbook-content' %}
 
 <script>
     $(function() {
         $('#{{ reportContentId }}').on('filterContentLoaded', function() {
             // Hide/show a drop shadow when scrolling the markbook horizontally
             // The shadow only appears when you have scrolled past a certain threshold
-            $("#rubric-marksheet-container").scroll(function(e) {
+            $(".scrollable-table-wrap").scroll(function(e) {
+                console.log(e.target.scrollLeft);
                 const scrollAmount = e.target.scrollLeft;
                 const scrollPixelThreshold = 10;
-                const $leftColumns = $("#left-columns");
+                const $leftColumns = $(".left-columns-wrap");
                 if (scrollAmount > scrollPixelThreshold && !$leftColumns.hasClass(".drop-shadow")) {
                     $leftColumns.addClass("drop-shadow");
                 } else {
@@ -20,97 +28,7 @@
     });
 </script>
 
-<style>
-    #table-container {
-        display: flex;
-    }
-    #left-columns, #rubric-marksheet {
-        /* Ensures rows in each table stay in line with each other */
-        white-space: nowrap;
-    }
-    #left-columns tr, #rubric-marksheet tr {
-        /* Enforce a fixed height to ensure rows always match up */
-        height: 39px;
-    }
-    /* Renamed from "wrapper" to "container" to avoid confusion with an ID DataTables generates -_- */
-    #rubric-marksheet-container {
-        /* Allow the user to scroll the mark table horizontally (has to be applied to container div, not table) */
-        overflow-x: auto;
-        /* Make room for diagonal student */
-        padding-right: 11rem;
-    }
 
-    /**** Styles to force the width of the 2 left columns ****/
-    #left-columns {
-        margin-top: 10.04rem; /* This is the height of the student headings on the marksheet, plus a tiny tweak (ugh) */
-        table-layout: fixed; /* Required in order for a fixed width to be set */
-        width: 350px;
-        flex: 0 0; /* Fixes an IE bug */
-        border-collapse: separate; /* Fixes an IE bug, see https://stackoverflow.com/questions/9949396/css-box-shadow-not-working-in-ie */
-    }
-    #left-columns.drop-shadow {
-        /* Drop shadow to make it easier to understand what's going on when scrolling the other table */
-        -webkit-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
-        -moz-box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
-        box-shadow: 15px 0px 32px -18px rgba(0,0,0,0.1);
-
-        /* Make sure we can see the drop shadow.
-        For some reason, this only works if applied to #left-columns.drop-shadow;
-        otherwise something overrides it */
-        z-index: 1;
-    }
-    .column-1, .column-2 {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .column-1 {
-        width: 150px;
-    }
-    .column-2 {
-        width: 200px;
-    }
-
-
-    /**** Style the assessment/cap/indicator headings ****/
-    #left-columns .placeholder,
-    #left-columns .assessment,
-    #left-columns .capability,
-    #left-columns .indicator {
-        border-right: 1px solid #ededed;
-    }
-    #left-columns .placeholder, #left-columns .assessment {
-        border-bottom: none;
-    }
-    #left-columns .assessment {
-        font-weight: normal;
-        border-top: 1px solid #ededed;
-    }
-    #left-columns tr:first-child .assessment {
-        /* Removes top border on first assessment that makes table look wonky */
-        border-top: none;
-    }
-    #left-columns .indicator {
-        padding-left: 2rem;
-        font-weight: normal;
-    }
-
-    /**** Style the marksheet ****/
-    #rubric-marksheet a.no-mark {
-        padding: 0.5rem 1.25rem 0.5rem 0; /* Makes it easier to click on the dashes */
-        color: black; /* Without this, the dashes would be blue by default since they're links */
-    }
-
-
-    .marksheet thead tr:first-child th:last-child {
-        /* For some reason we have a style in our marksheet SASS that causes the last student to be cut off.
-        This undoes that.
-        Previously this was being undone somehow by initialising the DataTables plugin, but it's better
-        to fix the CSS (especially since DataTables crashes catastrophically in IE and Firefox on large datasets;
-        fixing the CSS allows us to remove the DataTables completely)
-         */
-        padding-right: 0rem !important;
-    }
-</style>
 
 <div class="row">
     <div class="small-12">
@@ -119,8 +37,6 @@
 </div>
 
 
-{% set reportContentId = 'rubric-markbook-content' %}
-
 {% include '@filters/panel.twig' with {
     contentId: reportContentId,
     panel:     filterPanel,
@@ -128,10 +44,23 @@
     page:      page
 } only %}
 
-<div id="{{ reportContentId }}">
-    <div class="small-12 island" data-placeholder>
-        <section class="content">
-            <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
-        </section>
+{# TODO move to filter SASS #}
+<style>
+    @media only print, screen and (max-width: 64em) and (min-width: 40.0625em) {
+        .filtered-report .row > .small-12  {
+            padding: 0 1.5rem;
+        }
+    }
+</style>
+
+
+
+<div id="{{ reportContentId }}" class="filtered-report">
+    <div class="row">
+        <div class="small-12 island" data-placeholder>
+            <section class="content">
+                <img src="/images/foundation/preloader.gif" alt="preloader.gif" style="text-align:center; margin:auto; display:block;">
+            </section>
+        </div>
     </div>
 </div>
