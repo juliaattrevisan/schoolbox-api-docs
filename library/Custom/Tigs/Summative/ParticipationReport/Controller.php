@@ -9,7 +9,6 @@ namespace Custom\Tigs\Summative\ParticipationReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web;
-use function array_map;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
