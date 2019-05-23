@@ -420,8 +420,7 @@ class RubricMapper
                 continue;
             }
 
-            $capabilityUsage = (new \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage($capability))
-                ->setMaxValue($capabilityUsageModel->getMaxValue());
+            $capabilityUsage = new \Schoolbox\Assessment\Rubric\Grid\CapabilityUsage($capability);
 
             $capabilityIndicatorUsageModels = $groupedIndicatorUsageModels[$capabilityId] ?? [];
             foreach ($capabilityIndicatorUsageModels as $indicatorUsageModel) {
@@ -448,6 +447,13 @@ class RubricMapper
 
                 $capabilityUsage->getIndicatorUsages()[$indicatorId] = $indicatorUsage;
             }
+
+            // Max value is derived from indicators, if mark-per-cap is off
+            $capabilityUsage->setMaxValue(
+                $assessment->getMarkPerCapability()
+                    ? $capabilityUsageModel->getMaxValue()
+                    : $capabilityUsage->calculateMaxValueFromIndicators()
+            );
 
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }
