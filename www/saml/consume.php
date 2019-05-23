@@ -28,8 +28,8 @@ if (isset($_GET['sls'])) {
     }
 
     $errors = $auth->getErrors();
-    $errorReason = $auth->getLastErrorReason();
     if (!empty($errors)) {
+        $errorReason = $auth->getLastErrorReason() ?? end($errors);
         SAMLDebugLog("SLS Error(s): ".json_encode($errors));
         SAMLDebugLog("SLS Error: ".$errorReason);
         error(ErrorMapper::ERROR_PROCESSING, $errorReason);
