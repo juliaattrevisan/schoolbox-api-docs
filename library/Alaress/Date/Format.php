@@ -79,8 +79,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         if ($clock) {
             // always give precendence to a clock if passed in
             return new static($clock->time(), 'U');
+        }
 
-        } elseif (php_sapi_name() === 'cli') {
+        if (in_array(PHP_SAPI, ['cli', 'phpdbg'], true)) {
             // if we're CLI, do not freeze time
             return new static(time(), 'U');
         }
