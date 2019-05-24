@@ -7,13 +7,18 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
+use function array_filter;
+use function array_map;
+use function array_merge;
+use function count;
 use Custom\Tigs\Summative\StudentAttributes;
+use function explode;
+use function preg_match;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use External_UserInterface;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term;
-use InvalidArgumentException;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
 
@@ -51,23 +56,34 @@ class FolderFetcher
      * @param User              $student
      * @param StudentAttributes $attributes
      * @param string|null       $nowOverride
+     * @param null|string       $excludedClassCodes
      * @return GenericCollection|Folder\Model[]
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride, ?string $excludedClassCodes): GenericCollection
     {
-        if (null === $nowOverride) {
-            $folders = $this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student));
-        } else {
-            $term          = (new Term\Model())
-                ->setStart($attributes->getCurriculumSemesterStart())
-                ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
-                ->setActualFinish($attributes->getCurriculumSemesterFinish());
+        // Always fetch folders with interactions
+        $term = (new Term\Model())
+            ->setStart($attributes->getCurriculumSemesterStart())
+            ->setDisplayFinish($attributes->getCurriculumSemesterFinish())
+            ->setActualFinish($attributes->getCurriculumSemesterFinish());
 
-            $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
-            $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
-            $folders       = $withResponses->mergeUnique($withFeedback, $this->folderMapper->getIdentifierProperty());
+        $idProperty    = $this->folderMapper->getIdentifierProperty();
+        $withResponses = $this->folderMapper->findFoldersWithResponses($student, $term);
+        $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
+        $folders       = $withResponses->mergeUnique($withFeedback, $idProperty);
+
+        // If current report, also fetch enrolled folders
+        if (null === $nowOverride) {
+            $folders = $folders->mergeUnique($this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)), $idProperty);
+        }
+
+        $exclusions = array_filter(array_map('\trim', explode(',', $excludedClassCodes ?? '')));
+        foreach ($folders as $idx => $folder) {
+            if ($this->isFolderExcluded($folder, $exclusions)) {
+                $folders->offsetUnset($idx);
+            }
         }
 
         $folders->indexBy($this->folderMapper->getIdentifierProperty())
@@ -76,5 +92,42 @@ class FolderFetcher
                 }, true);
 
         return $folders;
+    }
+
+
+    /**
+     * Returns whether a folder should be excluded from reports due to configured class code exclusions
+     *
+     * Excludes a folder if either a current or archived class code matches one of the exclusions.
+     * We need to check against both current and archived codes because their is only one exclusion list, and it
+     * applies to all reports (but current and historical).
+     *
+     * @param Folder\Model $folder
+     * @param string[]     $exclusions
+     * @return bool
+     */
+    private function isFolderExcluded(Folder\Model $folder, array $exclusions): bool
+    {
+        if (!count($exclusions)) {
+            return false;
+        }
+
+        // Current folder codes
+        $codes = $folder->getCodes()->getPropertyValues('code');
+
+        // Rolled-over folder codes
+        if (preg_match('/\[([^\]]+)\]/', $folder->getName(), $matches)) {
+            $codes = array_merge($codes, explode(',', $matches[1]));
+        }
+
+        foreach ($codes as $code) {
+            foreach ($exclusions as $exclusion) {
+                if ($exclusion === $code) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

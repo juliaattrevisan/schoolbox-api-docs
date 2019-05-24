@@ -199,16 +199,7 @@ class Module extends Alaress\Module\Module
                         throw new InvalidPath("Folder does not exist in SB");
                     }
 
-                    // Check excluded folder codes from reporting
-                    if ($folder->getCodes() && $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)) {
-                        $excluded = \array_map('trim', \explode(',', $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES)));
-                        if (!empty(\array_intersect($folder->getCodes()->getPropertyValues('code'), $excluded))) {
-                            // Folder is in exclusion list
-                            throw new InvalidPath("Folder is excluded");
-                        }
-                    }
-
-                    // User must be enrolled in the specified folder
+                    // User must be enrolled in the specified folder and not excluded
                     /** @var User $user */
                     $user = $params['user'];
                     if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null)) {
@@ -240,37 +231,25 @@ class Module extends Alaress\Module\Module
      * @param string|null  $nowOverride
      * @return bool
      * @throws InvalidArgumentException
+     * @throws InvalidPath
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
-     * @throws InvalidPath
      */
     private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride): bool
     {
-        if ($nowOverride !== null) {
-            // This is pretty heavy, but exists primarily for testing. It is (hopefully) unlikely the client
-            // will ever attempt to reconstruct historical views
-            try {
-                $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
-            } catch (InvalidArgumentException $e) {
-                throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
-            }
-            $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-            $folders = $fetcher->findForStudent($user, $attributes, $nowOverride);
-
-            /** @var Folder\Model $involvedFolder */
-            foreach ($folders as $involvedFolder) {
-                if ($involvedFolder->getId() === $folder->getId()) {
-                    return true;
-                }
-            }
-            return false;
+        try {
+            $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
+        } catch (InvalidArgumentException $e) {
+            throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
         }
 
-        foreach ($this->getExternalUser()->getSubjectList($user) as $subject) {
-            foreach ($folder->getCodes() as $code) {
-                if ($code->getCode() === $subject['code']) {
-                    return true;
-                }
+        $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
+        $folders = $fetcher->findForStudent($user, $attributes, $nowOverride, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+
+        /** @var Folder\Model $involvedFolder */
+        foreach ($folders as $involvedFolder) {
+            if ($involvedFolder->getId() === $folder->getId()) {
+                return true;
             }
         }
         return false;

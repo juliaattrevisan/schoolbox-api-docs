@@ -7,6 +7,7 @@ Data:
     teachers:            User[]         - teachers of this class folder
     courseSpec:          CourseSpec\Model|null - if present, the single courseSpec imported to this class
     isEnabled:           bool           - is this report enabled for the student and their parents?
+    showNoLongerEnrolledAlert bool      - should we show an alert indicating the student has left this class?
     attributes:          StudentAttributes
     errors               string[]       - Any errors that affect the whole page
     unitSpecs            unitSpec\Model - Unit specs which contains visible data imported to this folder.
@@ -48,6 +49,11 @@ Data:
             {% if not isEnabled %}
                 <div data-alert class="alert-box highlight">
                     This report is currently not visible to the student or their parents.
+                </div>
+            {% endif %}
+            {% if showNoLongerEnrolledAlert %}
+                <div data-alert class="alert-box highlight">
+                    Student is not currently enrolled in this class, but has submitted work and/or received marks.
                 </div>
             {% endif %}
             {% for error in errors %}

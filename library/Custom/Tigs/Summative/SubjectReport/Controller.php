@@ -214,6 +214,7 @@ class Controller extends Web\Controller\Base
             'teachers'      => $folder->loadTeachers()->getTeachers(),
             'courseSpec'    => $courseSpec,
             'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
+            'showNoLongerEnrolledAlert' => $now === null && !$this->isCurrentEnrollment($user, $folder),
             'attributes'    => $attributes,
             'errors'        => $errors,
             'unitSpecs'     => $unitSpecsWithData,
@@ -229,6 +230,26 @@ class Controller extends Web\Controller\Base
         $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 
         $this->getResponse()->content->set($output);
+    }
+
+
+    /**
+     * Returns whether this folder is a current enrollment
+     *
+     * @param User         $user
+     * @param Folder\Model $folder
+     * @return bool
+     */
+    private function isCurrentEnrollment(User $user, Folder\Model $folder): bool
+    {
+        foreach ($this->externalUser->getSubjectList($user) as $currentSubject) {
+            foreach ($folder->getCodes() as $code) {
+                if ($code->getCode() === $currentSubject['code']) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
