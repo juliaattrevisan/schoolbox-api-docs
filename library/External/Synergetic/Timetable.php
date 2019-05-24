@@ -80,7 +80,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         $args = [ $externalUserId, $campus, $day, $date ];
-        $key  = sprintf('%d-%s-%d-%s', $externalUserId, $campus->getExtTimetableCode(), $day, $date);
+        $key  = sprintf('%d-%s-%d-%s', $externalUserId === null ? '' : $externalUserId, $campus->getExtTimetableCode(), $day, $date);
 
         return self::$timetableDefinitionCache->get($key, $args);
     }
