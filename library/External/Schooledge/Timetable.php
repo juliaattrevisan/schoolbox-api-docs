@@ -115,7 +115,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     /**
      * @inheritdoc
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0): array
     {
         if (!$day) {
             $day = $this->getDayNumber($campus);

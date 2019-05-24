@@ -18,7 +18,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
     {
 
         $definition = array();

@@ -35,7 +35,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

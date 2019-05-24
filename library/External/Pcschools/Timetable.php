@@ -63,7 +63,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      *
      * @return array
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0): array
     {
         // TODO: Hardcoded until we handle differing times each day of the timetable
 

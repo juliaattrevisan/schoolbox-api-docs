@@ -77,7 +77,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         $args = [ $externalUserId, $campus, $day, $date ];
         $key  = sprintf('%d-%s-%d-%s', $externalUserId, $campus->getExtTimetableCode(), $day, $date);
@@ -87,14 +87,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string $externalUserId
+     * @param string|null $externalUserId
      * @param Campus $campus
      * @param int    $day
      * @param string $date
      * @return array
      * @throws InvalidArgumentException
      */
-    private function fetchTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
+    private function fetchTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         // check if there is a calendar event remapping the day number for this specific date
 

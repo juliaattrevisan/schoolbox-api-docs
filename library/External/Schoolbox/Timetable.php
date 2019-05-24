@@ -30,7 +30,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     /**
      * {@inheritDoc}
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         $timetableDef = [];
 

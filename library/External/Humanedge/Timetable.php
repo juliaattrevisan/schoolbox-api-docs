@@ -36,7 +36,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0): array
+    public function getTimetableDefinition(?string $externalUserId, \Schoolbox\Campus $campus, $day = 0): array
     {
         if (!$day) {
             $day = $this->getDayNumber($campus);

@@ -49,7 +49,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, CampusModel $campus, $day = 1, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, CampusModel $campus, $day = 1, $date = null): array
     {
         $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
 
