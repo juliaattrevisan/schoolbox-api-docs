@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class SubmissionBoxMapper
@@ -315,6 +316,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      *
      * @param SubmissionBox $object
      * @return bool
+     * @throws UnexpectedValueException If unable to build an Activity from the Submission Box
      */
     public function syncToExternalMarkbook(SubmissionBox $object): bool
     {
@@ -360,13 +362,13 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
     }
 
 
-
     /**
      * Removes this box from the markbook.
      *
      * This is used as a post-delete hook.
      *
      * @param SubmissionBox $object
+     * @throws \UnexpectedValueException If unable to build an Activity from the SubmissionBox
      */
     public function deleteFromMarkbook(SubmissionBox $object)
     {
@@ -404,14 +406,15 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
 
     /**
-    * Gets all submission boxes that are due within the given date span.
-    *
-    * @param array $category_list  A list of category IDs to filter on.
-    * @param int   $from_timestamp A Unix timestamp to search from
-    * @param int   $to_timestamp   A Unix timestamp to search until
-    *
-    * @return ActivityCollection
-    */
+     * Gets all submission boxes that are due within the given date span.
+     *
+     * @param array $category_list  A list of category IDs to filter on.
+     * @param int   $from_timestamp A Unix timestamp to search from
+     * @param int   $to_timestamp   A Unix timestamp to search until
+     *
+     * @return ActivityCollection
+     * @throws \UnexpectedValueException If unable to build an Activity from a SB Assessment
+     */
     public function getDueActivities($category_list, $from_timestamp, $to_timestamp)
     {
         $factory    = new ActivityFactory();
