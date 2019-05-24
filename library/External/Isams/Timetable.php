@@ -36,7 +36,7 @@ class External_Isams_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, CampusModel $campus, $day = null, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, CampusModel $campus, $day = null, $date = null): array
     {
         $dayId = $this->getDayId($campus, $date);
 

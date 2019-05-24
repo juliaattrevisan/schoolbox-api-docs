@@ -57,13 +57,13 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      * the Day 1 timetable only and clobbering the rest of the week with the same timetable. I am however selecting the
      * period number in the format DD.PP (day number.period number- e.g "01.05")
      *
-     * @param string $externalUserId If set, the external user ID to get definition for.
+     * @param string|null $externalUserId If set, the external user ID to get definition for.
      * @param Campus $campus
      * @param int    $day
      *
      * @return array
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0): array
     {
         // TODO: Hardcoded until we handle differing times each day of the timetable
 

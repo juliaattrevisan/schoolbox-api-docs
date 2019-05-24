@@ -23,12 +23,12 @@ interface External_TimetableInterface extends External\IConnector
      * $timetableDef['number'][]
      * $timetableDef['sequence'][]
      *
-     * @param string $externalUserId If set, the external user ID to get definition for.
+     * @param string|null $externalUserId If set, the external user ID to get definition for.
      * @param Campus $campus
      * @param int $day
      * @return array
      */
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0): array;
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0): array;
 
     /**
      * Get the current day number for a given campus

@@ -105,7 +105,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getTimetableDefinition(string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null): array
     {
         $periodQuery = "
             SELECT TOP 1 *

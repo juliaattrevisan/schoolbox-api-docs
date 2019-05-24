@@ -12,7 +12,7 @@ use Schoolbox\Campus;
 
 class External_Offline_Timetable implements External_TimetableInterface, IOfflineConnector
 {
-    public function getTimetableDefinition(string $externalUserId, Campus $campus, $day = 0, $date = null): array
+    public function getTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         return [];
     }
