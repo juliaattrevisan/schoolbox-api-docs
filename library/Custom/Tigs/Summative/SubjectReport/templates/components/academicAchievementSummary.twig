@@ -1,50 +1,29 @@
 {#
 Renders an Academic Achievement Summary component.
 
-This is a table derived from a rubric. It does not render the capability column.
-
 Data:
     error:               string           - Optional. If present, the reason why we can't render the component
-    marks                array            -
-    marks['rubric']      int[]            - Keyed by criterion name
     grid:                Rubric\Grid      - The rubric grid
     markedGrid:          MarkedGrid       - Optional. The student's marks for the rubric
+    useMarkRange:        bool
+    showDescriptorValue: bool
+    showGroupTotal:      bool
+    showRubricTotal:     bool
 #}
 
 <p class="meta">Academic Achievement Summary</p>
 {% if error|default(null) %}
     <div data-alert class="alert-box alert">{{ error|raw }}</div>
 {% else %}
-    <div class="scrollable">
-        <table class="aas">
-            <thead>
-            <tr>
-                <td></td>
-                <td></td>
-                {% for level in grid.levels %}
-                    <td>{{ level.name }}</td>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            {% for capabilityUsage in grid.capabilityUsages %}
-                {% for indicatorUsage in capabilityUsage.indicatorUsages %}
-                    <tr>
-                        {% if loop.index0 == 0 %}
-                        <th class="rb-group-name" rowspan="{{ capabilityUsage.indicatorUsages | length }}">{{ capabilityUsage.capability.name | nl2br }}</th>
-                        {% endif %}
-                        <th class="rb-criterion-name">{{ indicatorUsage.indicator.name | nl2br }}</th>
-
-                        {% set indicatorMark = markedGrid is defined ? markedGrid.retrieveIndicatorMark(indicatorUsage) : null %}
-                        {% set indicatorMarkDescriptor = indicatorMark ? indicatorMark.descriptor : null %}
-
-                        {% for descriptor in indicatorUsage.descriptors %}
-                            <td{% if indicatorMarkDescriptor and indicatorMarkDescriptor.id == descriptor.id %} class="rb-selected"{% endif %}>{{ descriptor.description | nl2br }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            {% endfor %}
-            </tbody>
-        </table>
+    <div class="aas">
+        {% include '@rubric/grid.twig' with {
+            rubricGrid: grid,
+            rubricMarkedGrid: markedGrid,
+            markVisibility: true,
+            useMarkRange: useMarkRange,
+            showDescriptorValue: showDescriptorValue,
+            showGroupTotal: showGroupTotal,
+            showRubricTotal: showRubricTotal
+        } only %}
     </div>
 {% endif %}
