@@ -68,13 +68,13 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     const SATURDAY = 6;
 
     /**
-     * Returns an instance of self at the current time.
+     * Returns an instance of static at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
      *
      * @param IClock $clock
      * @return static
      */
-    public static function now(IClock $clock = null)
+    public static function now(IClock $clock = null): self
     {
         if ($clock) {
             // always give precendence to a clock if passed in
@@ -86,7 +86,7 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         }
 
         // down here, cache the clock at time of request
-        if (!static::$now instanceof static) {
+        if (!self::$now instanceof static) {
 
             if (isset($_SERVER['REQUEST_TIME'])) {
                 $time = $_SERVER['REQUEST_TIME'];
