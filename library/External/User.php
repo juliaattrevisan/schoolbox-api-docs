@@ -179,7 +179,7 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     /**
      * @inheritdoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

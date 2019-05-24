@@ -524,13 +524,9 @@ class External_Tass_User implements External_UserInterface
     /**
     * @inheritDoc
     */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         $boarders = array('Y');
-
-        if ($boarderValue === '') {
-            return '';
-        }
 
         if (in_array($boarderValue, $boarders, true)) {
             return 'Boarder';

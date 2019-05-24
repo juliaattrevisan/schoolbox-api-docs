@@ -462,10 +462,10 @@ interface External_UserInterface extends External\IConnector
      *
      * @importance low - used on profile page, but only to show if student is a boarder
      *
-     * @param string $boarderValue
+     * @param null|string $boarderValue
      * @return string
      */
-    public function determineBoarderType(string $boarderValue): string;
+    public function determineBoarderType(?string $boarderValue): string;
 
     /**
      * Find the housemasterId for a particular house

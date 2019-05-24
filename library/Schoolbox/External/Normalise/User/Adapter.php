@@ -1418,10 +1418,10 @@ class Adapter {
      * Translate a $boarderValue into a human-readable variant
      * e.g. translates D, W into "Day" and B into "Boarder"
      *
-     * @param $boarderValue
+     * @param null|string $boarderValue
      * @return string
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return $this->handler->determineBoarderType($boarderValue);
     }

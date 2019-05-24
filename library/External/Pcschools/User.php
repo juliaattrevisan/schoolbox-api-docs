@@ -594,7 +594,7 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         // Non-core promise
         return '';

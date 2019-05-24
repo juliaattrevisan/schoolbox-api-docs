@@ -1107,7 +1107,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         if (in_array($boarderValue, $this->helper->getBoardingStatuses(), true)) {
             return "Boarder";

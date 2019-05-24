@@ -557,7 +557,7 @@ class External_Denbigh_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         $boarders = [
             'Boarder'        => 'Boarder',

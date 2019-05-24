@@ -978,7 +978,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         if ($boarderValue === 'Y') {
             return 'Boarder';

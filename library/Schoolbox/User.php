@@ -216,9 +216,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /**
      * Student's boarding status (only used if boarder leave module is enabled)
      *
-     * @var string
+     * @var null|string
      */
-    protected $boardingStatus;
+    private $boardingStatus;
 
     /**
      * @var IConfigLoader
@@ -940,11 +940,11 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /**
      * Set boarding status (only if boarder leave is enabled)
      *
-     * @param  string $boardingStatus
+     * @param null|string $boardingStatus
      *
      * @return $this
      */
-    public function setBoardingStatus($boardingStatus)
+    public function setBoardingStatus(?string $boardingStatus): self
     {
         $this->boardingStatus = $boardingStatus;
         return $this;
@@ -953,9 +953,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /**
      * Get boarding status
      *
-     * @return string
+     * @return null|string
      */
-    public function getBoardingStatus()
+    public function getBoardingStatus(): ?string
     {
         return $this->boardingStatus;
     }

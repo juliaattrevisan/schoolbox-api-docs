@@ -522,7 +522,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return '';
     }
