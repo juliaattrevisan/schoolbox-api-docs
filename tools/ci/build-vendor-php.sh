@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ulimit -f 32768
+
 initialdir=`pwd`;
 
 filepath=`readlink -f $0`;
