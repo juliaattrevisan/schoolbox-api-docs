@@ -27,6 +27,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Role;
 use Schoolbox\User;
 use External_UserInterface;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -226,6 +227,7 @@ class Controller extends Web\Controller\Base
             'nesaGraphData' => $nesaGraphData,
             'hscTaskMarks'  => $hscTaskMarks,
             'hscRankData'   => $hscRankData,
+            'showErrors'    => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
         ];
         $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 

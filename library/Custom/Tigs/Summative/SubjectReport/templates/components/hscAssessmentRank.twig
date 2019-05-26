@@ -6,10 +6,11 @@ Data:
     assessmentMark:      string|null      - Optional. eg '65 %'
     assessmentAverage:   string|null      - Optional. eg '76.33 %'    The average mark given to students across the cohort
     assessmentRank:      string|null      -           eg '7 / 9'      Where the student ranked compared to the cohort
+    showErrors           bool             - Should we render errors?
 #}
 <h2 class="subheader">HSC Assessment Rank</h2>
 {% if error|default(null) %}
-    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+    {% if showErrors %}<div data-alert class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
     <div class="scrollable">
         <table class="hsc-rank">

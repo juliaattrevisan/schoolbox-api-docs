@@ -21,6 +21,7 @@ Data:
     falData              array|null     - Data to render the Final Achievement Level component
     ibGraphData          array          - Data to render the MYP/DP Graph component
     nesaGraphData        array          - Data to render the NESA Grade Graph component
+    showErrors           bool           - Should we render errors?
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
 <style>
@@ -57,21 +58,23 @@ Data:
                 </div>
             {% endif %}
             {% for error in errors %}
+                {% if showErrors %}
                 <div data-alert class="alert-box alert">
                     {{ error|raw }}
                 </div>
+                {% endif %}
             {% endfor %}
-            {% if aasData.error is defined %}
+            {% if aasData.error is defined and showErrors %}
                 <div data-alert class="alert-box alert">
                     {{ aasData.error|raw }}
                 </div>
             {% endif %}
-            {% if aamData.error is defined %}
+            {% if aamData.error is defined and showErrors %}
                 <div data-alert class="alert-box alert">
                     {{ aamData.error|raw }}
                 </div>
             {% endif %}
-            {% if hscTaskMarks.error is defined %}
+            {% if hscTaskMarks.error is defined and showErrors %}
                 <div data-alert class="alert-box alert">
                     {{ hscTaskMarks.error|raw }}
                 </div>
@@ -115,10 +118,10 @@ Data:
         <div class="column small-12 medium-6">
             {% if ibGraphData %}
                 {% for ibData in ibGraphData %}
-                    {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData only %}
+                    {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData|merge({showErrors: showErrors}) only %}
                 {% endfor %}
             {% elseif hscRankData %}
-                {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData only %}
+                {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData|merge({showErrors: showErrors}) only %}
             {% else %}
                 <p></p>
             {% endif %}
@@ -127,7 +130,7 @@ Data:
         <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.0.semester }}">
             {% if nesaGraphData.0 %}
                 <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.0.semester }})</h2>
-                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0 only %}
+                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0|merge({showErrors: showErrors}) only %}
             {% else %}
                 <p></p>
             {% endif %}
@@ -140,7 +143,7 @@ Data:
         <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.1.semester }}">
             {% if nesaGraphData.1 %}
                 <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.1.semester }})</h2>
-                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1 only %}
+                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1|merge({showErrors: showErrors}) only %}
             {% else %}
                 <p></p>
             {% endif %}
@@ -148,7 +151,7 @@ Data:
 
         {% if falData %}
         <div class="column small-12 final-achievement-levels">
-            {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData only %}
+            {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData|merge({showErrors: showErrors}) only %}
         </div>
         {% endif %}
         {% for unitSpec in unitSpecs %}
@@ -164,16 +167,16 @@ Data:
 
                 {# Were we given AAS data for this unit? #}
                 {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
-                    {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId] only %}
+                    {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge({showErrors: showErrors}) only %}
                 {% endif %}
                 {# Were we given AAM data for this unit? #}
                 {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
-                    {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId] only %}
+                    {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId]|merge({showErrors: showErrors}) only %}
                 {% endif %}
 
                 {# Were we given HSC Task Marks data for this unit? #}
                 {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
-                    {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId] only %}
+                    {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge({showErrors: showErrors}) only %}
                 {% endif %}
             </div>
 

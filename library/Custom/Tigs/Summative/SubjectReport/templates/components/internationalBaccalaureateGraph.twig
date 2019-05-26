@@ -8,6 +8,7 @@ Data:
     data:           array              - The results to render. key: column, value: height
     useComment:     bool               - Whether to render the student's comment, instead of the graph
     showComponent:  bool               - Whether the component should be shown at all (used by including template)
+    showErrors:     bool               - Should we render errors?
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(studentMark / 7 * 100) ~ '-bg' %}
@@ -15,7 +16,7 @@ Data:
 <h2 class="subheader">{{ header }}</h2>
 
 {% if error|default(null) %}
-    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+    {% if showErrors %}<div data-alert class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
 
     <div {% if gradientClass %}class="{{ gradientClass }}"{% endif %}>
