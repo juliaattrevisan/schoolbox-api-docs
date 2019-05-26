@@ -36,4 +36,5 @@ class Config
     public const _TIGS_START_TERM_2 = self::PREFIX_TIGS_CRP . 'start_term_2';
     public const _TIGS_START_TERM_3 = self::PREFIX_TIGS_CRP . 'start_term_3';
     public const _TIGS_START_TERM_4 = self::PREFIX_TIGS_CRP . 'start_term_4';
+    public const _TIGS_TEXTBOX_HEADING_EXPLANATION_OF_GRADES = self::PREFIX_TIGS_CRP . 'textbox_heading_explanation_of_grades';
 }
