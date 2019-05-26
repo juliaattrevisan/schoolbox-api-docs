@@ -2,28 +2,35 @@
 Displays a report for the selected user and folder for the current term.
 
 Data:
-    user:                User           - a student in years 7-12
-    folder:              Folder\Model   - a class folder
-    teachers:            User[]         - teachers of this class folder
-    courseSpec:          CourseSpec\Model|null - if present, the single courseSpec imported to this class
-    isEnabled:           bool           - is this report enabled for the student and their parents?
-    showNoLongerEnrolledAlert bool      - should we show an alert indicating the student has left this class?
-    attributes:          StudentAttributes
-    errors               string[]       - Any errors that affect the whole page
-    unitSpecs            unitSpec\Model - Unit specs which contains visible data imported to this folder.
-    courseDescription    null|string    - If present, the text from a specific textbox on the imported CourseSpec's homepage
-    aasData              array          - Data to render the Academic Achievement Summary components
-    aamData              array          - Data to render the Approaches to Learning components
-    hscTaskMarks         array          - Data to render the HSC Task Marks components
-    hscTaskMarks['error'] string        - Optional. If present, the reason we can't render these components
-    hscTaskMarks['data'] array          - Optional. If present, the per-unit data. Indexed by unitSpec.id
-    hscRankData          array          - Data to render the 'HSC Assessment Rank' component
-    falData              array|null     - Data to render the Final Achievement Level component
-    ibGraphData          array          - Data to render the MYP/DP Graph component
-    nesaGraphData        array          - Data to render the NESA Grade Graph component
-    showErrors           bool           - Should we render errors?
+    user:                     User                  - a student in years 7-12
+    folder:                   Folder\Model          - a class folder
+    teachers:                 User[]                - teachers of this class folder
+    courseSpec:               CourseSpec\Model|null - if present, the single courseSpec imported to this class
+    isEnabled:                bool                  - is this report enabled for the student and their parents?
+    showNoLongerEnrolledAlert bool                  - should we show an alert indicating the student has left this class?
+    attributes:               StudentAttributes
+    errors                    string[]              - Any errors that affect the whole page
+    unitSpecs                 unitSpec\Model        - Unit specs which contains visible data imported to this folder.
+    courseDescription         null|string           - If present, the text from a specific textbox on the imported CourseSpec's homepage
+    aasData                   array                 - Data to render the Academic Achievement Summary components
+    aamData                   array                 - Data to render the Approaches to Learning components
+    hscTaskMarks              array                 - Data to render the HSC Task Marks components
+    hscTaskMarks['error']     string                - Optional. If present, the reason we can't render these components
+    hscTaskMarks['data']      array                 - Optional. If present, the per-unit data. Indexed by unitSpec.id
+    hscRankData               array                 - Data to render the 'HSC Assessment Rank' component
+    falData                   array|null            - Data to render the Final Achievement Level component
+    ibGraphData               array                 - Data to render the MYP/DP Graph component
+    nesaGraphData             array                 - Data to render the NESA Grade Graph component
+    showErrors                bool                  - Should we render errors?
+    dataAttributeError      string                - A string to apply as a data attribute to error alerts
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
+
+{# Extra data to pass to each component #}
+{% set extraComponentData = {
+    showErrors: showErrors,
+    dataAttributeError: dataAttributeError
+} %}
 <style>
     .linked-unit-heading {
         color: inherit;
@@ -59,23 +66,23 @@ Data:
             {% endif %}
             {% for error in errors %}
                 {% if showErrors %}
-                <div data-alert class="alert-box alert">
+                <div data-alert {{ dataAttributeError }} class="alert-box alert">
                     {{ error|raw }}
                 </div>
                 {% endif %}
             {% endfor %}
             {% if aasData.error is defined and showErrors %}
-                <div data-alert class="alert-box alert">
+                <div data-alert {{ dataAttributeError }} class="alert-box alert">
                     {{ aasData.error|raw }}
                 </div>
             {% endif %}
             {% if aamData.error is defined and showErrors %}
-                <div data-alert class="alert-box alert">
+                <div data-alert {{ dataAttributeError }} class="alert-box alert">
                     {{ aamData.error|raw }}
                 </div>
             {% endif %}
             {% if hscTaskMarks.error is defined and showErrors %}
-                <div data-alert class="alert-box alert">
+                <div data-alert {{ dataAttributeError }} class="alert-box alert">
                     {{ hscTaskMarks.error|raw }}
                 </div>
             {% endif %}
@@ -118,10 +125,10 @@ Data:
         <div class="column small-12 medium-6">
             {% if ibGraphData %}
                 {% for ibData in ibGraphData %}
-                    {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData|merge({showErrors: showErrors}) only %}
+                    {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData|merge(extraComponentData) only %}
                 {% endfor %}
             {% elseif hscRankData %}
-                {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData|merge({showErrors: showErrors}) only %}
+                {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData|merge(extraComponentData) only %}
             {% else %}
                 <p></p>
             {% endif %}
@@ -130,7 +137,7 @@ Data:
         <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.0.semester }}">
             {% if nesaGraphData.0 %}
                 <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.0.semester }})</h2>
-                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0|merge({showErrors: showErrors}) only %}
+                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.0|merge(extraComponentData) only %}
             {% else %}
                 <p></p>
             {% endif %}
@@ -143,7 +150,7 @@ Data:
         <div class="column small-12 medium-6 nesa semester-{{ nesaGraphData.1.semester }}">
             {% if nesaGraphData.1 %}
                 <h2 class="subheader">NESA Grade (Semester {{ nesaGraphData.1.semester }})</h2>
-                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1|merge({showErrors: showErrors}) only %}
+                {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphData.1|merge(extraComponentData) only %}
             {% else %}
                 <p></p>
             {% endif %}
@@ -151,7 +158,7 @@ Data:
 
         {% if falData %}
         <div class="column small-12 final-achievement-levels">
-            {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData|merge({showErrors: showErrors}) only %}
+            {% include '@tigsSubjectReport/components/finalAchievementLevels.twig' with falData|merge(extraComponentData) only %}
         </div>
         {% endif %}
         {% for unitSpec in unitSpecs %}
@@ -167,16 +174,16 @@ Data:
 
                 {# Were we given AAS data for this unit? #}
                 {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}
-                    {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge({showErrors: showErrors}) only %}
+                    {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge(extraComponentData) only %}
                 {% endif %}
                 {# Were we given AAM data for this unit? #}
                 {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
-                    {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId]|merge({showErrors: showErrors}) only %}
+                    {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId]|merge(extraComponentData) only %}
                 {% endif %}
 
                 {# Were we given HSC Task Marks data for this unit? #}
                 {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
-                    {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge({showErrors: showErrors}) only %}
+                    {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                 {% endif %}
             </div>
 

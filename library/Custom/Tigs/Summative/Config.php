@@ -13,6 +13,9 @@ namespace Custom\Tigs\Summative;
 class Config
 {
 
+    // A data attribute to identify errors on the reports
+    public const ERROR_DATA_ATTRIBUTE = 'data-tigs-crp-error-state';
+
     // All config for this module will share this common prefix
     public const PREFIX_TIGS_CRP = 'tigs_crp_';
     public const _TIGS_PARTICIPATION_REPORT_ENABLED = self::PREFIX_TIGS_CRP . 'participation_report_enabled';

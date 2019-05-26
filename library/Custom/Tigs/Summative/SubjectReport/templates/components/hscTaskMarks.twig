@@ -9,6 +9,7 @@ Data:
     cohortRank           string|null      - eg '3 / 8'
     cohortAverage        string|null      - eg '25 %'
     showErrors           bool             - Should we render errors?
+    dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 
 <style>
@@ -19,7 +20,7 @@ Data:
 
 <p class="meta">HSC Task Marks (%)</p>
 {% if error|default(null) %}
-    {% if showErrors %}<div data-alert class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
     <div class="scrollable">
         <table class="hsc-task-marks">

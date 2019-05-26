@@ -10,11 +10,12 @@ Data:
     showGroupTotal:      bool
     showRubricTotal:     bool
     showErrors           bool             - Should we render errors?
+    dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 
 <p class="meta">Academic Achievement Summary</p>
 {% if error|default(null) %}
-    {% if showErrors %}<div data-alert class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
     <div class="aas">
         {% include '@rubric/grid.twig' with {

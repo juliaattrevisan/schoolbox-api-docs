@@ -8,11 +8,12 @@ Data:
     grid:                Rubric\Grid      - The rubric grid
     markedGrid:          MarkedGrid       - Optional. The student's marks for the rubric
     showErrors           bool             - Should we render errors?
+    dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 
 <p class="meta">Approaches to Learning</p>
 {% if error|default(null) %}
-    {% if showErrors %}<div data-alert class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
     <p>Typical indicators of a student's performance at each level are outlined below.</p>
 

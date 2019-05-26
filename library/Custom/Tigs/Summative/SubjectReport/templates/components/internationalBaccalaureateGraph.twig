@@ -2,13 +2,14 @@
 Renders a MYP/DP graph.
 
 Data:
-    error:          string             - Optional. If present, the reason why we can't render the component
-    studentMark:    int|null           - Optional. The student's mark for the IB graph assessment
-    studentComment: string|null        - Optional. The student's comment for the IB graph assessment
-    data:           array              - The results to render. key: column, value: height
-    useComment:     bool               - Whether to render the student's comment, instead of the graph
-    showComponent:  bool               - Whether the component should be shown at all (used by including template)
-    showErrors:     bool               - Should we render errors?
+    error:               string        - Optional. If present, the reason why we can't render the component
+    studentMark:         int|null      - Optional. The student's mark for the IB graph assessment
+    studentComment:      string|null   - Optional. The student's comment for the IB graph assessment
+    data:                array         - The results to render. key: column, value: height
+    useComment:          bool          - Whether to render the student's comment, instead of the graph
+    showComponent:       bool          - Whether the component should be shown at all (used by including template)
+    showErrors:          bool          - Should we render errors?
+    dataAttributeError   string        - A string to apply as a data attribute to error alerts
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(studentMark / 7 * 100) ~ '-bg' %}
@@ -16,7 +17,7 @@ Data:
 <h2 class="subheader">{{ header }}</h2>
 
 {% if error|default(null) %}
-    {% if showErrors %}<div data-alert class="alert-box alert">{{ error|raw }}</div>{% endif %}
+    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
 
     <div {% if gradientClass %}class="{{ gradientClass }}"{% endif %}>
