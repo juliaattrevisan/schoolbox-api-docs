@@ -147,16 +147,11 @@ class Controller extends Base\Base
         if (self::IMPORT_STAGE_UNITS === $initialStage) {
             // If jumping straight to step2, generate a list of units for the specified course
             $data = array_merge($data, [
-                'courseSpecId' => $courseSpec->getId(),
-                'folderIds'    => [(int)$targetClass->getId()],
-                'unitsImpls'   => $this->findUnitImplementationsForCourseSpecId($courseSpec->getId()),
+                'courseSpecId'     => $courseSpec->getId(),
+                'folderIds'        => [(int)$targetClass->getId()],
+                'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpec->getId()),
+                'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
             ]);
-
-            $canReadUnitSpecs = [];
-            foreach ($courseSpec->getUnits() as $unit) {
-                $canReadUnitSpecs[$unit->getId()] = $this->canReadUnitSpec($unit);
-            }
-            $data['canReadUnitSpecs'] = $canReadUnitSpecs;
         }
         $this->tpl('course', 'import', $data);
     }
@@ -182,7 +177,7 @@ class Controller extends Base\Base
         $componentId     = trim($this->getRequest()->post['component_id']);
 
         try {
-            $this->courseSpecificationMapper->findById($courseSpecId);
+            $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
             $this->sendError('The selected source is not a course');
@@ -209,11 +204,12 @@ class Controller extends Base\Base
 
         // respond with stage 2: units
         $this->tpl('course', 'unitImportForm', [
-            'action'       => 'import',
-            'courseSpecId' => $courseSpecId,
-            'folderIds'    => $targetFolderIds,
-            'componentId'  => $componentId,
-            'unitsImpls'   => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
+            'action'           => 'import',
+            'courseSpecId'     => $courseSpecId,
+            'folderIds'        => $targetFolderIds,
+            'componentId'      => $componentId,
+            'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
+            'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
         ]);
     }
 
@@ -917,6 +913,7 @@ class Controller extends Base\Base
             'unitsImpls'       => $courseImpl->getUnits(),
             'returnUrlName'    => Redirect::RETURN_URL,
             'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
         ]);
     }
 
@@ -1183,11 +1180,27 @@ class Controller extends Base\Base
     /**
      * Does the current user have read access to this unit spec?
      *
-     * @param CourseSpecification\Model $spec
+     * @param UnitSpecification\Model $spec
      * @return bool
      */
     private function canReadUnitSpec(UnitSpecification\Model $spec): bool
     {
         return $this->access->getFolderAccess($this->getUser(), $spec->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * What permissions does the current user have on the units in this spec?
+     *
+     * @param CourseSpecification\Model $spec
+     * @return array
+     */
+    private function canReadUnitSpecs(CourseSpecification\Model $spec): array
+    {
+        $canReadUnitSpecs = [];
+        foreach ($spec->getUnits() as $unit) {
+            $canReadUnitSpecs[$unit->getId()] = $this->canReadUnitSpec($unit);
+        }
+        return $canReadUnitSpecs;
     }
 }
