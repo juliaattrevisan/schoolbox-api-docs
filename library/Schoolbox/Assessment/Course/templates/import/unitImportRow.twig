@@ -26,6 +26,14 @@
                         <div class="card small-12">
                             <h3><span class="icon-unit"></span>{{ unitSpec.folder.name }}</h3>
                             {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
+
+                            {##
+                             # No read perm on unit spec? don't show the full assessment count, just what was selected.
+                             # This is so that users don't see a count that's greater than what they can actually affect.
+                             #}
+                            {% if not canReadUnitSpec %}
+                                {% set unitAssessmentCount = countSelected %}
+                            {% endif %}
                             <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
                         </div>
 
