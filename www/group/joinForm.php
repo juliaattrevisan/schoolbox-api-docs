@@ -69,7 +69,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
             $response = 'pending';
         }
 
-    } else if (!$group->isPrivate() && ($ua->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+    } elseif (!$group->isPrivate() && ($ua->getAccessLevel() < UserAccess::ACCESS_FULL)) {
         // non admin in moderated/free group can leave
         // delete the record that matches the given params
         $count = $uaMapper->deleteByColumnList(
