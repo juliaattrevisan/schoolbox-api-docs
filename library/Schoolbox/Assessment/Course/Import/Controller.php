@@ -316,16 +316,13 @@ class Controller extends Base\Base
             $courseSpec = $e->getDeletedObject();
         }
 
-        $canReadCourseSpec = true;
-        if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-            // If modifying an already imported course,
-            // and I can't read the original copy:
-            // I can still modify the import, but can't add anything new to it.
-            $canReadCourseSpec = false;
-            if (!$courseImplId) {
-                $this->sendError('You do not have permission to import this course');
-                return;
-            }
+        $canReadCourseSpec = $this->canReadCourseSpec($courseSpec);
+        // If modifying an already imported course,
+        // and I can't read the original copy:
+        // I can still modify the import, but can't add anything new to it.
+        if (!($canReadCourseSpec || $courseImplId)) {
+            $this->sendError('You do not have permission to import this course');
+            return;
         }
 
         // Test each homepage for write access
@@ -360,17 +357,14 @@ class Controller extends Base\Base
                     } catch (MapperException\Deleted $e) {
                         $unitSpec = $e->getDeletedObject();
                     }
-                    $canReadUnitSpecs[$unitSpecId] = true;
-                    if ($this->access->getFolderAccess($this->getUser(), $unitSpec->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-                        // If modifying an already imported unit,
-                        // and I can't read the original copy:
-                        // I can still modify the dates of the assessments in
-                        // this unit, but can't add anything new to it.
-                        $canReadUnitSpecs[$unitSpecId] = false;
-                        if (!$courseImplId) {
-                            $this->sendError('You do not have permission to import this unit');
-                            return;
-                        }
+                    $canReadUnitSpecs[$unitSpecId] = $this->canReadUnitSpec($unitSpec);
+                    // If modifying an already imported unit,
+                    // and I can't read the original copy:
+                    // I can still modify the dates of the assessments in
+                    // this unit, but can't add anything new to it.
+                    if (!($canReadUnitSpecs[$unitSpecId] || $courseImplId)) {
+                        $this->sendError('You do not have permission to import this unit');
+                        return;
                     }
                 }
             }
@@ -1165,5 +1159,29 @@ class Controller extends Base\Base
         return array_map(function ($folderId) {
             return (int)$folderId;
         }, array_filter(explode(',', trim($folderIdCsv))));
+    }
+
+
+    /**
+     * Does the current user have read access to this course spec?
+     *
+     * @param CourseSpecification\Model $spec
+     * @return bool
+     */
+    private function canReadCourseSpec(CourseSpecification\Model $spec): bool
+    {
+        return $this->access->getFolderAccess($this->getUser(), $spec->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * Does the current user have read access to this unit spec?
+     *
+     * @param CourseSpecification\Model $spec
+     * @return bool
+     */
+    private function canReadUnitSpec(UnitSpecification\Model $spec): bool
+    {
+        return $this->access->getFolderAccess($this->getUser(), $spec->getFolder()->getId()) >= UserAccess::ACCESS_READ;
     }
 }
