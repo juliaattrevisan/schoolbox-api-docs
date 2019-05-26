@@ -8,10 +8,14 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Aura\Router\Router;
+use function count;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use External_UserInterface;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Psr7\Uri;
 use function implode;
 use function in_array;
+use InvalidArgumentException;
 use Knp\Snappy\Pdf;
 use RuntimeException;
 use Schoolbox\Collection;
@@ -119,6 +123,20 @@ class CliPdfGenerator extends CliTool\App
      */
     private $roleTypeOverride;
 
+    /**
+     * A guzzle client to request each Subject Report
+     *
+     * @var Client
+     */
+    private $guzzleClient;
+
+    /**
+     * For now, just a flat array of all URLs that contain errors. May group by student/folder in the future.
+     *
+     * @var string[]
+     */
+    private $pageErrors = [];
+
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -153,7 +171,7 @@ class CliPdfGenerator extends CliTool\App
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
@@ -310,7 +328,7 @@ class CliPdfGenerator extends CliTool\App
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
@@ -318,6 +336,7 @@ class CliPdfGenerator extends CliTool\App
      */
     private function execute(): void
     {
+        $this->guzzleClient  = new Client();
         $excludedClassCodes  = $this->getExcludedClassCodes();
         $sessionHash         = $this->getSessionHash();
         $studentsIds         = $this->getStudentIds();
@@ -326,7 +345,7 @@ class CliPdfGenerator extends CliTool\App
         $pdfFilenames        = [];
         $consecutiveFailures = 0;
         $index               = 1;
-        $count               = \count($studentsIds);
+        $count               = count($studentsIds);
 
         foreach ($studentsIds as $studentId) {
             $this->getLogger()->notice(\sprintf("Processing student %s of %s", $index++, $count));
@@ -350,6 +369,7 @@ class CliPdfGenerator extends CliTool\App
 
         $this->createZipArchive($pdfFilenames, $tempDir);
         $this->cleanUpTempFiles($pdfFilenames, $tempDir);
+        $this->printPageErrorSummary();
     }
 
 
@@ -404,7 +424,7 @@ class CliPdfGenerator extends CliTool\App
      *
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function getSessionHash(): string
     {
@@ -492,7 +512,7 @@ class CliPdfGenerator extends CliTool\App
             }
         }
 
-        $this->getLogger()->info(\sprintf("%d students found", \count($studentIds)));
+        $this->getLogger()->info(\sprintf("%d students found", count($studentIds)));
         return $studentIds;
     }
 
@@ -530,7 +550,7 @@ class CliPdfGenerator extends CliTool\App
      * @param string   $tempDir
      * @return string The filename of the PDF
      * @throws RuntimeException If unable to generate a PDF Report for this student
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
@@ -545,6 +565,7 @@ class CliPdfGenerator extends CliTool\App
         }
 
         $urls = $this->generateUrlsForStudent($student, $externalStudent, $excludedClassCodes);
+        $this->detectRenderedErrors($student, $urls, $sessionHash);
         $this->getLogger()->info("Generating PDF...");
         $javascriptDelayMs = $this->jsDelay;
         $userStyleSheet    = $this->userStyleSheet;
@@ -573,14 +594,54 @@ class CliPdfGenerator extends CliTool\App
 
 
     /**
+     * Download each URL as it would be rendered for staff and checks for rendered page errors
+     *
+     * @param User   $student
+     * @param Uri[]  $urls
+     * @param string $sessionHash
+     */
+    private function detectRenderedErrors(User $student, array $urls, string $sessionHash): void
+    {
+        $this->getLogger()->info("Checking report for student {$student->getId()} for errors...");
+
+        $cookieJar = CookieJar::fromArray([PipeManager::PHP_SESSION_PREFIX => $sessionHash,], $this->fqdn);
+        $options   = ['cookies' => $cookieJar,];
+        foreach ($urls as $url) {
+            try {
+                $staffUrl = $url->withQuery('role-type=' . Role::STAFF);
+            } catch (InvalidArgumentException $e) {
+                $this->getLogger()->error("Unable to generate staff version of '$url'");
+                $this->getLogger()->error($e->getMessage());
+                $this->getLogger()->error($e->getTraceAsString());
+                break;
+            }
+
+            $response = $this->guzzleClient->get($staffUrl, $options);
+            try {
+                $contents = $response->getBody()->getContents();
+                if (strpos($contents, Config::ERROR_DATA_ATTRIBUTE) !== false) {
+                    $this->getLogger()->error("'$staffUrl' contains an error.");
+                    $this->pageErrors[] = $staffUrl;
+                }
+            } catch (RuntimeException $e) {
+                $this->getLogger()->error("Unable to check '$staffUrl' for errors");
+                $this->getLogger()->error($e->getMessage());
+                $this->getLogger()->error($e->getTraceAsString());
+                break;
+            }
+        }
+    }
+
+
+    /**
      * Generates the set of URLs to include in a student's PDF report
      *
      * @param User  $student
      * @param array $externalStudent
      * @param null|string $excludedClassCodes
-     * @return string[]
+     * @return Uri[]
      * @throws \Aura\Router\Exception\RouteNotFound
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
@@ -589,7 +650,7 @@ class CliPdfGenerator extends CliTool\App
         $data                   = ['userId' => $student->getId(), 'now' => $this->nowOverride,];
         $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data) . '?inline=1';
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
-        $urls = [$participationReportUrl];
+        $urls = [new Uri($participationReportUrl)];
 
         $classFolders     = $this->getClassFolders($student, $externalStudent, $excludedClassCodes);
         $queryArgs        = $this->roleTypeOverride ? "?role-type={$this->roleTypeOverride}" : '';
@@ -602,7 +663,7 @@ class CliPdfGenerator extends CliTool\App
             ];
             $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data) . $queryArgs;
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
-            $urls[] = $subjectReportUrl;
+            $urls[] = new Uri($subjectReportUrl);
         }
         return $urls;
     }
@@ -615,7 +676,7 @@ class CliPdfGenerator extends CliTool\App
      * @param array $externalStudent
      * @param null|string $excludedClassCodes
      * @return Collection|Folder\Model[]
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnexpectedValueException
      */
@@ -630,13 +691,13 @@ class CliPdfGenerator extends CliTool\App
     /**
      * Attempts to snapshot a set of URLs as a PDF, and return the PDF contents
      *
-     * @param array    $urls
+     * @param Uri[]    $urls
      * @param string   $sessionHash
      * @param resource $fp The temp file to write the PDF to
      * @param int      $javascriptDelayMs
      * @param string   $userStyleSheet
      * @throws RuntimeException If unable to generate the PDF contents
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function snapshotUrlsToPdf(array $urls, string $sessionHash, $fp, int $javascriptDelayMs, string $userStyleSheet): void
     {
@@ -675,7 +736,7 @@ class CliPdfGenerator extends CliTool\App
         $batchSize     = \round($openFileLimit - 20, -2); // buffer of 20, round to nearest 100
         $this->getLogger()->debug(sprintf('Open file limit: %d, setting batch size to %d', $openFileLimit, $batchSize));
         $batchIndex = 1;
-        $batches    = \ceil(\count($pdfFilenames) / $batchSize);
+        $batches    = \ceil(count($pdfFilenames) / $batchSize);
         foreach ($pdfFilenames as $pdfFilename) {
             if ($batchIndex++ % $batchSize === 0) {
                 $batchCount = (int)($batchIndex / $batchSize);
@@ -751,7 +812,7 @@ class CliPdfGenerator extends CliTool\App
      * @param string $username
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function generateSessionHashViaLoginForm(string $username): string
     {
@@ -788,7 +849,7 @@ class CliPdfGenerator extends CliTool\App
      * @param string $password
      * @return string
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     private function attemptLogin(string $username, string $password): string
     {
@@ -934,5 +995,23 @@ EXAMPLES:
       $file -l export.log -o archive.zip
 ";
         \fwrite(STDOUT, $help);
+    }
+
+
+    /**
+     * Prints a summary of errors that were detected while generating reports
+     */
+    private function printPageErrorSummary(): void
+    {
+        $countErrors = count($this->pageErrors);
+        if (!$countErrors) {
+            $this->getLogger()->info("No errors were detected while generating reports");
+        } else {
+            $errorFragment = $countErrors === 1 ? 'error was' : 'errors were';
+            $this->getLogger()->error(sprintf("%d $errorFragment detected while generating reports", count($this->pageErrors)));
+        }
+        foreach ($this->pageErrors as $staffUrlWithError) {
+            $this->getLogger()->error($staffUrlWithError);
+        }
     }
 }
