@@ -151,6 +151,12 @@ class Controller extends Base\Base
                 'folderIds'    => [(int)$targetClass->getId()],
                 'unitsImpls'   => $this->findUnitImplementationsForCourseSpecId($courseSpec->getId()),
             ]);
+
+            $canReadUnitSpecs = [];
+            foreach ($courseSpec->getUnits() as $unit) {
+                $canReadUnitSpecs[$unit->getId()] = $this->canReadUnitSpec($unit);
+            }
+            $data['canReadUnitSpecs'] = $canReadUnitSpecs;
         }
         $this->tpl('course', 'import', $data);
     }

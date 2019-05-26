@@ -285,12 +285,13 @@ Usages:
                         <div id="import_units">
                             {% if 2 == initialStage %}
                                 {% include '@course/unitImportForm.twig' with {
-                                    action:       action,
-                                    courseSpecId: courseSpecId,
-                                    folderIds:    folderIds,
-                                    courseImplId: courseImpl.id,
-                                    componentId:  componentId,
-                                    unitsImpls:   unitsImpls
+                                    action:           action,
+                                    courseSpecId:     courseSpecId,
+                                    folderIds:        folderIds,
+                                    courseImplId:     courseImpl.id,
+                                    componentId:      componentId,
+                                    unitsImpls:       unitsImpls,
+                                    canReadUnitSpecs: canReadUnitSpecs,
                                 } only %}
                             {% endif %}
                         </div>
