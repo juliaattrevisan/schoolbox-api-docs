@@ -15,6 +15,8 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Custom\Diocesan\AchievementReport\Controller as AchievementReportController;
+use Group;
+use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -129,7 +131,7 @@ class Module extends BaseModule
          */
         try {
             $user = $this->getUserMapper()->findByExternalId($params['externalUserId']);
-        } catch (\Exception $e) {
+        } catch (Mapper\Exception $e) {
             error(31);
             exit();
         }
@@ -137,7 +139,7 @@ class Module extends BaseModule
         /* Teachers and parents of children have access to a report
          * Everyone else does not
          */
-        $groupHandler = new \Group();
+        $groupHandler = new Group();
 
         /** @var User $sessionUser */
         $sessionUser = $_SESSION['user'];
