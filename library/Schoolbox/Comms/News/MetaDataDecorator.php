@@ -35,13 +35,11 @@ class MetaDataDecorator implements IDecorator
         $discussionThread = $model->getDiscussionThread();
 
         if ($discussionThread) {
-            // Match values with threadId from commentCounts array to get the total number of comments
-            $commentCount = (int) $this->commentCounts[
-                array_search(
-                    $discussionThread->getId(),
-                    array_column($this->commentCounts, 'threadId'),
-                    false)
-            ]['totalCount'];
+            $threadId = $discussionThread->getId();
+
+            if ($this->commentCounts[$threadId]) {
+                $commentCount = $this->commentCounts[$threadId];
+            }
         }
 
         $json['metaData'] = [

@@ -728,7 +728,8 @@ class Controller extends Base
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
         $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
-            $this->getThreadIdsFromCollection($articles)
+            $this->getThreadIdsFromCollection($articles),
+            'threadId'
         );
 
         $map = [
@@ -1562,7 +1563,8 @@ class Controller extends Base
     private function mergeCommentCountIntoPartialData(array $topicData): array
     {
         $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
-            $this->getThreadIdsFromCollection($topicData['articles'])
+            $this->getThreadIdsFromCollection($topicData['articles']),
+            'parentId'
         );
 
         foreach ($topicData['articles'] as $key => $data) {
@@ -1571,15 +1573,7 @@ class Controller extends Base
             $topicData['articles'][$key]->commentCount = 0;
 
             if ($discussionThread) {
-                // Match parentId with article id in commentCounts array to get the total number of comments
-                $commentCount = (int) $commentCounts[
-                array_search(
-                    $data->getId(),
-                    array_column($commentCounts, 'parentId'),
-                    false)
-                ]['totalCount'];
-
-                $topicData['articles'][$key]->commentCount = $commentCount;
+                $topicData['articles'][$key]->commentCount = (int) $commentCounts[$data->getId()];
             }
         }
 

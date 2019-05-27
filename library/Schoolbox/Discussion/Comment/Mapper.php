@@ -104,12 +104,29 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param array $threadIds
+     * @param array  $threadIds
+     * @param string $indexBy
+     *
+     * Available options for indexBy:
+     * - threadId = Refers to threadId. If this is the option that was selected, the index of the array will be
+     *              based on the threadId.
+     * - parentId = Currently it is referring to news id, and if this option is selected, the index of the array
+     *              will be based on the newsId.
+     *
+     * This needs to be done for now as news in the archive and other listing pages have a different structure.
+     * For more info, please see: News/Controller::getListForUser and News/Controller::generatePartial
      *
      * @return array
      */
-    public function getCommentCountByThreadIds(array $threadIds): array
+    public function getCommentCountByThreadIds(array $threadIds, string $indexBy): array
     {
+        $parentId = 'parentId';
+        $threadId = 'threadId';
+
+        if (!in_array($indexBy, [$parentId, $threadId], true)) {
+            throw new \InvalidArgumentException('Invalid index: ' . $indexBy);
+        }
+
         $newsTable = \Schoolbox\Comms\News\Mapper::getInstance()->getTable();
 
         $result = [];
@@ -117,6 +134,22 @@ class Mapper extends BaseMapper
         if (count($threadIds) === 0) {
             return $result;
         }
+
+        // Prepare column and join string
+        $join = '';
+        $indexByColumn = $this->table . '.discussion_thread_id AS ' . $threadId;
+
+        if ($indexBy === $parentId) {
+            $indexByColumn = $newsTable . '.id AS ' . $parentId;
+            $join = 'INNER JOIN ' . $newsTable . ' ON ' . $newsTable . '.discussion_thread_id = ' . $this->table . '.discussion_thread_id';
+        }
+
+        $columns = [
+            $indexByColumn,
+            'COUNT(' . $this->table . '.id) AS totalCount'
+        ];
+
+        $selectColumns = implode(',', $columns);
 
         $pb = $this->getPredicateBuilder()
             ->in($this->table.'.discussion_thread_id', $threadIds)
@@ -126,11 +159,9 @@ class Mapper extends BaseMapper
 
         $query = "
             SELECT
-            {$newsTable}.id AS parentId,
-            {$this->table}.discussion_thread_id AS threadId,
-            COUNT({$this->table}.id) AS totalCount
+            {$selectColumns}
             FROM {$this->getTable()} 
-            INNER JOIN {$newsTable} ON {$newsTable}.discussion_thread_id = {$this->table}.discussion_thread_id
+            {$join}
             WHERE {$where} 
             GROUP BY {$this->table}.discussion_thread_id
         ";
@@ -139,6 +170,6 @@ class Mapper extends BaseMapper
 
         $statement->execute($pb->getParams());
 
-        return $statement->fetchAll(PDO::FETCH_ASSOC);;
+        return $statement->fetchAll(PDO::FETCH_KEY_PAIR);
     }
 }
