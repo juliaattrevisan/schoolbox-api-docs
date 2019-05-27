@@ -263,35 +263,35 @@ class External_Schoolpro_User implements External_UserInterface
 
         $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
-        if ($currentStudentContact) {
-
-            $studentContact = array(
-
-                /* This should be separated into constituent parts
-                 */
-                'StudentContactPreferred'          => $currentStudentContact['FullName'],
-                'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
-                'StudentContactID'                 => $currentStudentContact['ID'],
-                'StudentContactDefaultEmail'       => $currentStudentContact['email'],
-                'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
-                'StudentContactSilentPhoneFlag'    => 0,
-                'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
-                'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
-                'StudentContactRelation'           => '',
-                'StudentContactSpouseID'           => $currentStudentContact['SpouseID'],
-                'StudentContactSpouseMobilePhone'  => $currentStudentContact['SpouseMobile'],
-                'StudentContactSpouseOccupPhone'   => $currentStudentContact['SpouseBusinessPhone'],
-                'StudentContactSpouseDefaultEmail' => '',
-                'StudentContactType'               => '',
-                'StudentContactSpouseRelation'     => '',
-            );
-
-            return array($studentContact);
+        if (!$currentStudentContact) {
+            return [];
         }
 
-        return [];
+        $studentContact = [
+
+            /* This should be separated into constituent parts
+             */
+            'StudentContactPreferred'          => $currentStudentContact['FullName'],
+            'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
+            'StudentContactID'                 => $currentStudentContact['ID'],
+            'StudentContactDefaultEmail'       => $currentStudentContact['email'],
+            'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
+            'StudentContactSilentPhoneFlag'    => 0,
+            'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
+            'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
+            'StudentContactRelation'           => '',
+            'StudentContactSpouseID'           => $currentStudentContact['SpouseID'],
+            'StudentContactSpouseMobilePhone'  => $currentStudentContact['SpouseMobile'],
+            'StudentContactSpouseOccupPhone'   => $currentStudentContact['SpouseBusinessPhone'],
+            'StudentContactSpouseDefaultEmail' => '',
+            'StudentContactType'               => '',
+            'StudentContactSpouseRelation'     => '',
+        ];
+
+        return [$studentContact];
     }
-    
+
+
     /**
      * @inheritDoc
      */
