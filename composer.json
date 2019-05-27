@@ -77,7 +77,8 @@
         "ext-redis": "*",
         "ext-readline": "*",
         "ext-zip": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "firebase/php-jwt": "^5.0"
 
     },
     "require-dev": {
