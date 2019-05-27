@@ -149,6 +149,7 @@ class Module extends BaseModule
         if (!(
             $sessionUser->isSuperuser() ||
             $sessionUser->getRole()->isStaff() ||
+            $sessionUser->getId() === $user->getId() ||
             $groupHandler->isParentOfChild($user->getId())
         )) {
             error(19);
