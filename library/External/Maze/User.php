@@ -84,10 +84,10 @@ class External_Maze_User implements External_UserInterface
     /**
      * 1 + 1 = 1
      *
-     * @param $family
+     * @param array $family
      * @return array
      */
-    protected function recombine($family)
+    private function recombine(array $family): array
     {
 
         /* Combine everything into a joint account
@@ -98,7 +98,15 @@ class External_Maze_User implements External_UserInterface
         $newFamily = array();
         $newFamily['ContactID'] = $family['ContactID'];
 
-        if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
+        // We need to know if these contain any real data. ie not NULL, nor empty, nor just whitespace
+        $preferred         = trim($family['Preferred'] ?? '');
+        $spousePreferred   = trim($family['SpousePreferred'] ?? '');
+        $email             = trim($family['Email'] ?? '');
+        $spouseEmail       = trim($family['SpouseEmail'] ?? '');
+        $mobilePhone       = trim($family['MobilePhone'] ?? '');
+        $spouseMobilePhone = trim($family['SpouseMobilePhone'] ?? '');
+
+        if ($preferred !== '' && $spousePreferred !== '') {
             $newFamily['Title'] = "{$family['Title']} & {$family['SpouseTitle']}";
             $newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
 
@@ -108,18 +116,18 @@ class External_Maze_User implements External_UserInterface
 
             /* Decide whose email to use
              */
-            if (strlen($family['Email'])) {
+            if ($email !== '') {
                 $newFamily['Email'] = $family['Email'];
-            } elseif (strlen($family['SpouseEmail'])) {
+            } elseif ($spouseEmail !== '') {
                 $newFamily['Email'] = $family['SpouseEmail'];
             }
 
             /* Decide whose mobile to use
              */
-            if (strlen($family['MobilePhone'])) {
+            if ($mobilePhone !== '') {
                 $newFamily['MobilePhone'] = $family['MobilePhone'];
             }
-            elseif (strlen($family['SpouseMobilePhone'])) {
+            elseif ($spouseMobilePhone !== '') {
                 $newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
             }
 
@@ -127,7 +135,7 @@ class External_Maze_User implements External_UserInterface
              */
             $newFamily['HomePhone'] = $family['HomePhone'];
         }
-        elseif (strlen($family['Preferred'])) {
+        elseif ($preferred !== '') {
             $newFamily['Title']       = $family['Title'];
             $newFamily['Preferred']   = $family['Preferred'];
             $newFamily['Surname']     = $family['Surname'];
@@ -135,7 +143,7 @@ class External_Maze_User implements External_UserInterface
             $newFamily['HomePhone']   = $family['HomePhone'];
             $newFamily['MobilePhone'] = $family['MobilePhone'];
         }
-        elseif (strlen($family['SpousePreferred'])) {
+        elseif ($spousePreferred !== '') {
             $newFamily['Title'] = $family['SpouseTitle'];
             $newFamily['Preferred'] = $family['SpousePreferred'];
             $newFamily['Surname'] = $family['SpouseSurname'];
