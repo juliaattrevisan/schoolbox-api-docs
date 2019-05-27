@@ -18,6 +18,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -181,4 +182,30 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * Authenticates a user given the username/password combination.
+     *
+     * @param string $username
+     * @param string $password
+     * @return User|null
+     */
+    private function authenticateViaCredentials(string $username, string $password): ?User
+    {
+        $this->auth->authenticate($username, $password, true);
+        return $this->getUser();
+    }
+
+
+    /**
+     * Authenticates a user given the value of the "Authorization" HTTP header.
+     *
+     * @param string $header
+     * @return User|null
+     */
+    private function authenticateViaHeader(string $header): ?User
+    {
+        // TODO implement JWT authentication
+        return null;
+    }
 }
