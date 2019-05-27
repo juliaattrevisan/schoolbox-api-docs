@@ -106,6 +106,7 @@ class External_Tass_User implements External_UserInterface
         }
 
         $statement = $this->database->query($query);
+        /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
             if(stristr($row['e_mail'],';')) {
                 $i=0;
