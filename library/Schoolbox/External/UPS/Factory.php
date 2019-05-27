@@ -75,7 +75,7 @@ class Factory
             /* ISAMS batch xml reader
              * TODO: This can probably evolve into a switch-case statement when other providers exist
              */
-            if (($providerName === self::PROVIDER_ISAMS_BATCH_XML) && class_exists("\\Schoolbox\\External\\UPS\\Batchxml")) {
+            if ($providerName === self::PROVIDER_ISAMS_BATCH_XML) {
                 $config = new Loader();
                 $api = new Api($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
 
