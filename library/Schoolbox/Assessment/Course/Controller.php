@@ -949,7 +949,7 @@ class Controller extends Base\Base
             // Get units for a course
             $units = $this->unitSpecificationMapper->findAllByCourseId($currentCourse->getId());
             // Remove units whose folders aren't accessible by this user
-            $currentCourse->setUnits($units->filter(function($unit) {
+            $currentCourse->setUnits($units->filter(function ($unit) {
                 /** @var UnitSpecification $unit */
                 return $this->confirmAccess($unit->getFolder()->getId());
             }));
