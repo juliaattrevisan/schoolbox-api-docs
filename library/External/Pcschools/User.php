@@ -498,11 +498,9 @@ class External_Pcschools_User implements External_UserInterface
         }
 
         // Create return array
-
         $classes = [];
 
         // Retrieve timetabled classes
-
         $period = $this->findPeriod();
 
         if ($user->getRole()->isStudent()) {
