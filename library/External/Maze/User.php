@@ -227,15 +227,23 @@ class External_Maze_User implements External_UserInterface
         if (is_array($allEmails) && count($allEmails)) {
             foreach ($allEmails as $currentEmail) {
 
+                // Testing that column is not NULL, empty, or just whitespace
+                $relatedID1      = trim($currentEmail['RelatedID1'] ?? '');
+                $relatedID2      = trim($currentEmail['RelatedID2'] ?? '');
+                $familyEmail1    = trim($currentEmail['FamilyEmail1'] ?? '');
+                $familyEmail2    = trim($currentEmail['FamilyEmail2'] ?? '');
+                $altFamilyEmail1 = trim($currentEmail['AltFamilyEmail1'] ?? '');
+                $altFamilyEmail2 = trim($currentEmail['AltFamilyEmail2'] ?? '');
+
                 /*
                  * Need to get both FamilyEmail1 and FamilyEmail2, as one is for father
                  * and the other is for mother in some schools.
                  */
-                if (strlen($currentEmail['RelatedID1'])) {
-                    if (strlen($currentEmail['FamilyEmail1'])) {
+                if ($relatedID1 !== '') {
+                    if ($familyEmail1) {
                         $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
                     }
-                    if (strlen($currentEmail['FamilyEmail2'])) {
+                    if ($familyEmail2 !== '') {
                         // As the second email shares the same DFKEY as the first email, appending extra to the key.
                         $processed["{$currentEmail['RelatedID1']}-2"] = $currentEmail['FamilyEmail2'];
                     }
@@ -247,11 +255,11 @@ class External_Maze_User implements External_UserInterface
                  * Assume they will be emailed, split out the split parents
                  * into their own record in the processed stack
                  */
-                if (strlen($currentEmail['RelatedID2'])) {
-                    if (strlen($currentEmail['AltFamilyEmail1'])) {
+                if ($relatedID2 !== '') {
+                    if ($altFamilyEmail1 !== '') {
                         $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
                     }
-                    if (strlen($currentEmail['AltFamilyEmail2'])) {
+                    if ($altFamilyEmail2 !== '') {
                         // As the second email shares the same DFKEY as the first email, appending extra to the key.
                         $processed["{$currentEmail['RelatedID2']}-2"] = $currentEmail['AltFamilyEmail2'];
                     }
