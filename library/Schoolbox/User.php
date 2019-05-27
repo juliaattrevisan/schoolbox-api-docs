@@ -1130,9 +1130,12 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * Load parents into object from external db
      * @return self
      */
-    public function loadParents()
+    public function loadParents(): self
     {
         if($this->parentsLoaded) {
+            return $this;
+        }
+        if (null === $this->externalId) {
             return $this;
         }
         $DEPRECATED_EXTERNAL_USER = new \External_User();
