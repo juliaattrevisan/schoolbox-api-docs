@@ -71,52 +71,20 @@ class Controller extends Base
             return;
         }
 
-
-        try {
-            // require these to be present in POSTDATA
-            $this->assertArrayKeys($data, ['username', 'password']);
-
-        } catch (\UnderflowException $e) {
-            $this->getResponse()->status->setCode(400);
-            $response->set([
-                'format' => 'json',
-                'data'   => [
-                    'required' => $e->getMessage(),
-                ],
-            ]);
-            return;
+        // Maybe someone's already authenticated?
+        // (This might have happened as a result of token authentication)
+        $sessionUser = $this->getUser();
+        if (!($sessionUser && $sessionUser->getId())) {
+            $sessionUser = $this->authenticateViaPostData($data);
+            if (!$sessionUser) {
+                // Authentication failed: return early
+                return;
+            }
         }
 
-        // verify username|password combination
-        try {
-            $this->auth->authenticate($data['username'], $data['password'], true);
-
-            // only obtain these *after* you've run authentication
-            $sessionUser    = $this->getUser();
-            $sessionUserId  = $sessionUser->getId();
-            $sessionUserKey = $sessionUser->getKey();
-        } catch (SchoolboxAccessDeniedException $e) {
-            $this->getResponse()->status->setCode(401);
-            $response->set([
-                'format' => 'json',
-                'data'   => 'Invalid username or password',
-            ]);
-            return;
-        } catch (SchoolboxAccountDisabledException $e) {
-            $this->getResponse()->status->setCode(400);
-            $response->set([
-                'format' => 'json',
-                'data'   => 'Account disabled',
-            ]);
-            return;
-        } catch (SchoolboxNotFoundException $e) {
-            $this->getResponse()->status->setCode(400);
-            $response->set([
-                'format' => 'json',
-                'data'   => 'User not found',
-            ]);
-            return;
-        }
+        // only obtain these *after* you've run authentication
+        $sessionUserId  = $sessionUser->getId();
+        $sessionUserKey = $sessionUser->getKey();
 
         // token may be absent or blank, in which case we don't store anything in the registry
         if (!empty($data['token'])) {
@@ -184,28 +152,61 @@ class Controller extends Base
 
 
     /**
-     * Authenticates a user given the username/password combination.
+     * Authenticates a user given the username/password in POST data.
      *
-     * @param string $username
-     * @param string $password
+     * @noinspection PhpDocMissingThrowsInspection as \Aura\Web\Response\Status::setCode should never throw
+     * @param array $postData Must contain "username" and "password" keys
      * @return User|null
      */
-    private function authenticateViaCredentials(string $username, string $password): ?User
+    private function authenticateViaPostData(array $postData): ?User
     {
-        $this->auth->authenticate($username, $password, true);
-        return $this->getUser();
-    }
+        $response = $this->response;
+        try {
+            // require these to be present in POSTDATA
+            $this->assertArrayKeys($postData, ['username', 'password']);
 
+        } catch (\UnderflowException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $response->status->setCode(400);
+            $response->content->set([
+                'format' => 'json',
+                'data'   => [
+                    'required' => $e->getMessage(),
+                ],
+            ]);
+            return null;
+        }
 
-    /**
-     * Authenticates a user given the value of the "Authorization" HTTP header.
-     *
-     * @param string $header
-     * @return User|null
-     */
-    private function authenticateViaHeader(string $header): ?User
-    {
-        // TODO implement JWT authentication
-        return null;
+        // verify username|password combination
+        try {
+            $this->auth->authenticate($postData['username'], $postData['password'], true);
+
+            // only obtain these *after* you've run authentication
+            return $this->getUser();
+        } catch (SchoolboxAccessDeniedException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $response->status->setCode(401);
+            $response->content->set([
+                'format' => 'json',
+                'data'   => 'Invalid username or password',
+            ]);
+            return null;
+        } catch (SchoolboxAccountDisabledException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $response->status->setCode(400);
+            $response->content->set([
+                'format' => 'json',
+                'data'   => 'Account disabled',
+            ]);
+            return null;
+        } catch (SchoolboxNotFoundException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $response->status->setCode(400);
+            $response->content->set([
+                'format' => 'json',
+                'data'   => 'User not found',
+            ]);
+            return null;
+        }
     }
 }
