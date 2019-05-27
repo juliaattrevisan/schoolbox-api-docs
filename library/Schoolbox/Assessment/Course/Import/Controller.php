@@ -336,7 +336,7 @@ class Controller extends Base\Base
         }
 
         // Hydrate + Validate dates
-        $canReadUnitSpecs = [];
+        $canReadUnitSpecs = $this->canReadUnitSpecs($courseSpec);
         try {
 
             $countImportedUnits = 0;
@@ -354,17 +354,12 @@ class Controller extends Base\Base
                     $units[$idx]['close_date'] = $closeDate;
 
                     $unitSpecId = $unit['unit_spec_id'];
-                    try {
-                        $unitSpec = $this->unitSpecificationMapper->findById($unitSpecId);
-                    } catch (MapperException\Deleted $e) {
-                        $unitSpec = $e->getDeletedObject();
-                    }
-                    $canReadUnitSpecs[$unitSpecId] = $this->canReadUnitSpec($unitSpec);
+
                     // If modifying an already imported unit,
                     // and I can't read the original copy:
                     // I can still modify the dates of the assessments in
                     // this unit, but can't add anything new to it.
-                    if (!($canReadUnitSpecs[$unitSpecId] || $courseImplId)) {
+                    if (!($courseImplId || $canReadUnitSpecs[$unitSpecId])) {
                         $this->sendError('You do not have permission to import this unit');
                         return;
                     }
@@ -1178,18 +1173,6 @@ class Controller extends Base\Base
 
 
     /**
-     * Does the current user have read access to this unit spec?
-     *
-     * @param UnitSpecification\Model $spec
-     * @return bool
-     */
-    private function canReadUnitSpec(UnitSpecification\Model $spec): bool
-    {
-        return $this->access->getFolderAccess($this->getUser(), $spec->getFolder()->getId()) >= UserAccess::ACCESS_READ;
-    }
-
-
-    /**
      * What permissions does the current user have on the units in this spec?
      *
      * @param CourseSpecification\Model $spec
@@ -1199,7 +1182,7 @@ class Controller extends Base\Base
     {
         $canReadUnitSpecs = [];
         foreach ($spec->getUnits() as $unit) {
-            $canReadUnitSpecs[$unit->getId()] = $this->canReadUnitSpec($unit);
+            $canReadUnitSpecs[$unit->getId()] = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ;
         }
         return $canReadUnitSpecs;
     }
