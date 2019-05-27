@@ -203,64 +203,63 @@ class External_Maze_User implements External_UserInterface
     {
         if (!count($externalUserIds)) {
             return array();
-        } else {
-            $allIds = '(\'' . implode('\',\'', $externalUserIds) . '\')';
+        }
+        $allIds = '(\'' . implode('\',\'', $externalUserIds) . '\')';
 
-            $query = "
-				SELECT
-					DF1.DFKEY AS RelatedID1,
-					DF2.DFKEY AS RelatedID2,
-					DF1.M_EMAIL AS FamilyEmail1,
-					DF1.F_EMAIL AS FamilyEmail2,
-					DF2.M_EMAIL AS AltFamilyEmail1,
-					DF2.F_EMAIL AS AltFamilyEmail2
-				FROM ST
-				LEFT JOIN DF DF1 ON ST.FAMILY = DF1.DFKEY
-				LEFT JOIN DF DF2 ON (ST.FAMB = DF2.DFKEY AND ST.LIVING_B != 'N')
-				WHERE ST.STKEY IN $allIds
-			";
+        $query = "
+            SELECT
+                DF1.DFKEY AS RelatedID1,
+                DF2.DFKEY AS RelatedID2,
+                DF1.M_EMAIL AS FamilyEmail1,
+                DF1.F_EMAIL AS FamilyEmail2,
+                DF2.M_EMAIL AS AltFamilyEmail1,
+                DF2.F_EMAIL AS AltFamilyEmail2
+            FROM ST
+            LEFT JOIN DF DF1 ON ST.FAMILY = DF1.DFKEY
+            LEFT JOIN DF DF2 ON (ST.FAMB = DF2.DFKEY AND ST.LIVING_B != 'N')
+            WHERE ST.STKEY IN $allIds
+        ";
 
-            $allEmails = $this->getDb()->getAll($query);
+        $allEmails = $this->getDb()->getAll($query);
 
-            $processed = array();
+        $processed = array();
 
-            if (is_array($allEmails) && count($allEmails)) {
-                foreach ($allEmails as $currentEmail) {
+        if (is_array($allEmails) && count($allEmails)) {
+            foreach ($allEmails as $currentEmail) {
 
-                    /*
-                     * Need to get both FamilyEmail1 and FamilyEmail2, as one is for father
-                     * and the other is for mother in some schools.
-                     */
-                    if (strlen($currentEmail['RelatedID1'])) {
-                        if (strlen($currentEmail['FamilyEmail1'])) {
-                            $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
-                        }
-                        if (strlen($currentEmail['FamilyEmail2'])) {
-                            // As the second email shares the same DFKEY as the first email, appending extra to the key.
-                            $processed["{$currentEmail['RelatedID1']}-2"] = $currentEmail['FamilyEmail2'];
-                        }
+                /*
+                 * Need to get both FamilyEmail1 and FamilyEmail2, as one is for father
+                 * and the other is for mother in some schools.
+                 */
+                if (strlen($currentEmail['RelatedID1'])) {
+                    if (strlen($currentEmail['FamilyEmail1'])) {
+                        $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
                     }
+                    if (strlen($currentEmail['FamilyEmail2'])) {
+                        // As the second email shares the same DFKEY as the first email, appending extra to the key.
+                        $processed["{$currentEmail['RelatedID1']}-2"] = $currentEmail['FamilyEmail2'];
+                    }
+                }
 
-                    /* Can't tell whether a parent should be emailed at all,
-                     * or ignored, in a split-family scenario
-                     *
-                     * Assume they will be emailed, split out the split parents
-                     * into their own record in the processed stack
-                     */
-                    if (strlen($currentEmail['RelatedID2'])) {
-                        if (strlen($currentEmail['AltFamilyEmail1'])) {
-                            $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
-                        }
-                        if (strlen($currentEmail['AltFamilyEmail2'])) {
-                            // As the second email shares the same DFKEY as the first email, appending extra to the key.
-                            $processed["{$currentEmail['RelatedID2']}-2"] = $currentEmail['AltFamilyEmail2'];
-                        }
+                /* Can't tell whether a parent should be emailed at all,
+                 * or ignored, in a split-family scenario
+                 *
+                 * Assume they will be emailed, split out the split parents
+                 * into their own record in the processed stack
+                 */
+                if (strlen($currentEmail['RelatedID2'])) {
+                    if (strlen($currentEmail['AltFamilyEmail1'])) {
+                        $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
+                    }
+                    if (strlen($currentEmail['AltFamilyEmail2'])) {
+                        // As the second email shares the same DFKEY as the first email, appending extra to the key.
+                        $processed["{$currentEmail['RelatedID2']}-2"] = $currentEmail['AltFamilyEmail2'];
                     }
                 }
             }
-
-            return $processed;
         }
+
+        return $processed;
     }
 
     /**
