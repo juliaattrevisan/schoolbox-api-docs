@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class External_Schoolpro_User implements External_UserInterface
 {
@@ -415,42 +416,27 @@ class External_Schoolpro_User implements External_UserInterface
 
     }
 
+
     /**
      * @inheritDoc
+     * @throws \Schoolbox\Mapper\Exception We need to fetch the user's role to know which internal method to call
      */
     public function getEmail(string $externalUserId): string
     {
-        $groupHandler = new Group();
-
-        /* 13.5 context
-        $userMapper = new Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumnList(array('externalId' => $externalUserId));
-        */
-
-        /* 13.0.x context
-         */
-        $userMapper = new User();
-        $user       = $userMapper->getBySynergy($externalUserId);
+        $role = UserMapper::getInstance()->findByExternalId($externalUserId)->getRole();
 
         /* Use a different query depending on the type of person
          */
-        if ($groupHandler->isStudent($user['uid'])) {
-            $result = $this->getStudent($externalUserId);
-
-            return $result['email'];
-        } else {
-            if ($groupHandler->isParent($user['uid'])) {
-                $result = $this->getParent($externalUserId);
-
-                return $result['email'];
-            } else {
-                if ($groupHandler->isStaff($user['uid'])) {
-
-                    /* TODO: Not supplied?
-                     */
-                    return '';
-                }
-            }
+        if ($role->isStudent()) {
+            return $this->getStudent($externalUserId)['email'] ?? '';
+        }
+        if ($role->isParent()) {
+            return $this->getParent($externalUserId)['email'] ?? '';
+        }
+        if ($role->isStaff()) {
+            /* TODO: Not supplied?
+             */
+            return '';
         }
 
         return '';
