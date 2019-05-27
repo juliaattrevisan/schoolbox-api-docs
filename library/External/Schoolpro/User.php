@@ -116,7 +116,7 @@ class External_Schoolpro_User implements External_UserInterface
                     /* Get this contact's email
                      * De-dupe it just in case
                      */
-                    $email = trim($currentStudentContact['email']);
+                    $email = trim($currentStudentContact['email'] ?? '');
 
                     if ('' !== $email) {
                         $emails[$email] = $email;
@@ -139,7 +139,7 @@ class External_Schoolpro_User implements External_UserInterface
                      * but the Contact doesn't have the Spouse's email ><
                      */
                     if ($currentStudentSpouse) {
-                        $email = trim($currentStudentSpouse['email']);
+                        $email = trim($currentStudentSpouse['email'] ?? '');
 
                         if ('' !== $email) {
                             $emails[$email] = $email;
