@@ -15,8 +15,11 @@ use Page\Homepage;
  */
 class HomepageInitialCest
 {
-    public function createHomepage(): void
+    public function createHomepage(AcceptanceTester $i): void
     {
+        $i->login("alaress", "alaress");
+        $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/create/51");
+        $i->click(['xpath' => '//select[@class="valid"]']);
         echo "Not done yet";
     }
 
