@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use DateTime;
 use External_Ping;
 use External_Synergetic_ValidateExternalIdTrait;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -63,10 +64,10 @@ class Document extends Base implements IDocument
      * @inheritdoc
      *
      * @param User $student
-     *
+     * @param string|null $request
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student)
+    public function getAcademicReportsForStudent(User $student, ?string $request = null): array
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -106,7 +107,7 @@ class Document extends Base implements IDocument
         }
 
         // If there's any DocMan classifications entered into the config - union docman docs on
-        $bindings = $this->buildBindingsForClassifications();
+        $bindings = $this->buildBindingsForClassifications('', $request);
 
         if (!empty($bindings)) {
             $query .= "
@@ -153,7 +154,7 @@ class Document extends Base implements IDocument
 
                 // If that query worked we can assume they have updated their DB permissions and use this extra source
 
-                $bindings = $this->buildBindingsForClassifications('pvd');
+                $bindings = $this->buildBindingsForClassifications('pvd', $request);
 
                 $query .= "
                     UNION
@@ -371,16 +372,29 @@ class Document extends Base implements IDocument
      *
      * @param string $suffix Suffix for bindings
      *
+     * @param string|null $classifications
+     *
      * @return array Empty if there's no document classifications.
      *               Otherwise:
      *               bindings:     the parameters to bind to a query
      *               placeholders: the IN part of a query
      */
-    private function buildBindingsForClassifications($suffix = '')
+    private function buildBindingsForClassifications(string $suffix = '', ?string $classifications = null)
     {
         $classificationCodes = array_filter(
-            explode(",", trim($this->config->get('external_document_docman_categories')))
+            explode(',', trim($this->config->get('external_document_docman_categories')))
         );
+
+         // If `classification` get request is present, let's try to match those codes that was set from the config.
+        if (null !== $classifications) {
+            $classificationCodes = array_intersect(
+                $classificationCodes, array_filter(explode(',', trim($classifications)))
+            );
+
+            if (!$classificationCodes) {
+                throw new NotFound();
+            }
+        }
 
         if (count($classificationCodes) > 0) {
             return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);

@@ -21,7 +21,7 @@ class Document extends Base implements IDocument
      * @param User $student
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student)
+    public function getAcademicReportsForStudent(User $student, ?string $request = null): array
     {
         return [];
     }

@@ -29,13 +29,16 @@ class Controller extends Base
 
     /**
      * Display all documents for selected student
-     *
      * @param User $student
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getIndex(User $student)
+    public function getIndex(User $student): void
     {
+        $request = $this->getRequest()->query->get('classification');
+
         // And render this thing out
-        $reports = $this->externalDocument->getAcademicReportsForStudent($student);
+        $reports = $this->externalDocument->getAcademicReportsForStudent($student, $request);
         $wysiwyg_value = $this->getConfigLoader()->get('academic_reports_wysiwyg');
         /* @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
