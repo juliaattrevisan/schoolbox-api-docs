@@ -347,7 +347,8 @@ class External_Tass_User implements External_UserInterface
             FROM ttparms
             WHERE cmpy_code = {$this->database->smartQuote($this->companyCode)}
         ";
-        return $this->database->getOne($query);
+        $currentSemester = $this->database->getOne($query);
+        return $currentSemester === null ? null : (string)$currentSemester;
     }
 
 
