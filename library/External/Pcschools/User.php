@@ -400,7 +400,7 @@ class External_Pcschools_User implements External_UserInterface
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
                 WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}
             ")
-        );
+        ) ?: [];
     }
 
     /**
