@@ -131,7 +131,11 @@ class External_Maze_Helper
 			ORDER BY TH.CALENDAR_END01,TH.CALENDAR_END02,TH.CALENDAR_END03,TH.CALENDAR_END04 ASC
 		";
 
-        return $this->getDb()->getOne($query);
+        $value = $this->getDb()->getOne($query);
+        if ($value === false) {
+            return '';
+        }
+        return $value;
     }
 
     /**
@@ -228,9 +232,9 @@ class External_Maze_Helper
     /**
      * Get current semester
      *
-     * @return string
+     * @return null|string
      */
-    public function getCurrentSemester()
+    public function getCurrentSemester(): ?string
     {
         return $this->currentSemester;
     }
