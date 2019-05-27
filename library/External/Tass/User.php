@@ -75,7 +75,11 @@ class External_Tass_User implements External_UserInterface
             FROM paraddress pa
             INNER JOIN parent p ON pa.par_code=p.par_code AND pa.cmpy_code=p.cmpy_code
             INNER JOIN student s ON p.par_code=s.par_code AND p.cmpy_code=s.cmpy_code
-            WHERE s.stud_code IN ($idList) AND pa.cmpy_code = {$companyCode} AND pa.add_num IN ($addnum)
+            WHERE
+                  pa.e_mail IS NOT NULL AND
+                  s.stud_code IN ($idList) AND
+                  pa.cmpy_code = {$companyCode} AND
+                  pa.add_num IN ($addnum)
         ";
 
         /* If Tass Comm rules are enabled then locate the guardian relationship
@@ -101,14 +105,18 @@ class External_Tass_User implements External_UserInterface
 
             $query .= "
                 INNER JOIN student s ON scr.stud_code=s.stud_code AND scr.cmpy_code=s.cmpy_code
-                WHERE s.stud_code IN ($idList) AND pa.cmpy_code = {$companyCode} AND pa.add_num IN ($addnum)
+                WHERE
+                    pa.e_mail IS NOT NULL AND
+                    s.stud_code IN ($idList) AND
+                    pa.cmpy_code = {$companyCode} AND
+                    pa.add_num IN ($addnum)
             ";
         }
 
         $statement = $this->database->query($query);
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch()) {
-            if(stristr($row['e_mail'],';')) {
+            if(false !== strpos($row['e_mail'], ';')) {
                 $i=0;
                 foreach(explode(';',$row['e_mail']) as $email) {
                     $emailList[trim($row['par_code']).'-'.trim($row['add_num'].'-'.$i++)] = $email;
