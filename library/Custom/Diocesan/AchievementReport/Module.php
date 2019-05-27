@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Custom\Diocesan\AchievementReport;
@@ -17,7 +16,7 @@ use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Twig_Loader_Filesystem;
 use Custom\Diocesan\AchievementReport\Controller as AchievementReportController;
-
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -27,7 +26,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Router $router, $basePath): void
     {
         $router->addGet('achievementreport.selector', $basePath . '/{externalUserId}');
 
@@ -61,7 +60,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher)
+    public function initRoutePreloads(PathMatcher $matcher): void
     {
         $matcher->add(
             '/^achievementreport\.selector/',
@@ -141,7 +140,7 @@ class Module extends BaseModule
          */
         $groupHandler = new \Group();
 
-        /** @var \Schoolbox\User $sessionUser */
+        /** @var User $sessionUser */
         $sessionUser = $_SESSION['user'];
 
         /* If you're not a superuser, staff, or parent of specified user, get out
@@ -155,19 +154,19 @@ class Module extends BaseModule
             error(19);
         }
 
-        return array(
+        return [
             'db' => \MSSQL::getInstance(),
             'externalUser' => $externalUser,
             'user' => $user
-        );
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-        $loader = new Twig_Loader_Filesystem(array());
+        $loader = new Twig_Loader_Filesystem([]);
         $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolGrades');
         $loader->addPath(__DIR__ . '/IB', 'ib');
         $loader->addPath(__DIR__ . '/NCEA', 'ncea');
@@ -180,7 +179,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
             'controller:achievementreport',
@@ -193,8 +192,9 @@ class Module extends BaseModule
 
     /**
      * @return UserMapper
+     * @throws \InvalidArgumentException
      */
-    protected function getUserMapper()
+    protected function getUserMapper(): UserMapper
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
