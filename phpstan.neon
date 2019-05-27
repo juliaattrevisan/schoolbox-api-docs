@@ -10,7 +10,6 @@ parameters:
         - conf
         - dav
         - library
-        - test
         - tools
         - updates
         - www
