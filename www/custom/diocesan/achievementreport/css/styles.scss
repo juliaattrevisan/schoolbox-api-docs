@@ -62,6 +62,21 @@
             content: '';
             font-size: 0;
         }
+
+        /* Specify the color to override icon- global style
+         * until Profile Buttons supports enabling/disabling of icons in some manner
+         */
+        &.enrolmy {
+            background-image: url('/custom/diocesan/achievementreport/img/enrolmy.png');
+            color: #0066b0
+        }
+
+        /* Remove icon
+         */
+        &.enrolmy:before {
+            content: '';
+            font-size: 0;
+        }
     }
 }
 
