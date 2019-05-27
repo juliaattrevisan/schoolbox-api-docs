@@ -12,6 +12,7 @@ namespace Schoolbox\Application\WebRequest;
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Csrf;
 use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
@@ -23,7 +24,6 @@ use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Alaress\Csrf\HeaderCheck;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Database;
 use Psr\Log\NullLogger;
@@ -458,7 +458,13 @@ class Kernel extends WebKernelAbstract
         // AFAIK this isn't fakeable, and this gets called by some CLI scripts
         // despite it being the WebRequest bootstrap. (Go figure.)
 
-        $this->csrfProtection(
+        /** @var IConfigLoader $config */
+        $di             = $this->getDependencyInjector();
+        $config         = $di->get('config');
+        $fqdn           = trim($config->get('site_hostname') . '.' . $config->get('site_domain'), ';.');
+        $csrfCheck      = new Csrf\HeaderCheck($_SERVER, $fqdn);
+        $csrfMiddleware = new Csrf\Middleware($csrfCheck);
+        if (!$csrfMiddleware->verify(
             $_SERVER,
             ['*/dav/index.php'],
             [
@@ -468,48 +474,12 @@ class Kernel extends WebKernelAbstract
                 '/liss/liss.php',
                 '/lti-consumer/*',
             ]
-        );
-    }
-
-
-    /**
-     * Runs CSRF protection.
-     *
-     * @param array $serverVars
-     * @param array $scriptWhitelist
-     * @param array $whitelist
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     */
-    protected function csrfProtection(array $serverVars, array $scriptWhitelist = [], array $whitelist = []): void
-    {
-        foreach ($scriptWhitelist as $path) {
-            if (fnmatch($path, $serverVars['SCRIPT_FILENAME'])) {
-                return;
-            }
-        }
-
-        if (isset($serverVars['REQUEST_METHOD']) && !\in_array($serverVars['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
-
-            // Check against whitelist first
-            foreach ($whitelist as $path) {
-                if (fnmatch($path, $serverVars['REQUEST_URI'])) {
-                    return;
-                }
-            }
-
-            // Then verify request origin
-            /** @var IConfigLoader $config */
-            $di        = $this->getDependencyInjector();
-            $config    = $di->get('config');
-            $fqdn      = trim($config->get('site_hostname') . '.' . $config->get('site_domain'), ';.');
-            $csrfCheck = new HeaderCheck($serverVars, $fqdn);
-            if (!$csrfCheck->verifyRequestOrigin()) {
-                // Let's just say 403 Forbidden for now
-                // TODO replace the call to Sitepage::error() method
-                /** @var \SitePage $page */
-                $page = $di->get('layoutEngine');
-                $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
-            }
+        )) {
+            // Let's just say 403 Forbidden for now
+            // TODO replace the call to Sitepage::error() method
+            /** @var \SitePage $page */
+            $page = $di->get('layoutEngine');
+            $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
         }
     }
 }
