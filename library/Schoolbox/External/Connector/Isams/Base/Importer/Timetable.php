@@ -91,8 +91,10 @@ class Timetable implements ImporterInterface
      */
     public function import(): void
     {
-        $this->timetableCycleMapper->getDatabase()->query("DELETE FROM {$this->timetableCycleMapper->getTable()}");
-        $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
+        if ($this->perform) {
+            $this->timetableCycleMapper->getDatabase()->query("DELETE FROM {$this->timetableCycleMapper->getTable()}");
+            $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
+        }
 
         $cycles = $this->api->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 

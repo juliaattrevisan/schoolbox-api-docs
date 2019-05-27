@@ -95,7 +95,9 @@ class Relations implements ImporterInterface
          * I also thought of putting this in the mapper but I kinda don't want people to
          * have access to such a powerful query - it's only used for a specific purpose
          */
-        $this->userRelationMapper->getDatabase()->query("DELETE FROM {$this->userRelationMapper->getTable()}");
+        if ($this->perform) {
+            $this->userRelationMapper->getDatabase()->query("DELETE FROM {$this->userRelationMapper->getTable()}");
+        }
 
         /** @var Guardian $parent */
         foreach ($parents as $parent) {
