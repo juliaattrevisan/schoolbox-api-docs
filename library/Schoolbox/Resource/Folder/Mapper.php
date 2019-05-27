@@ -1699,6 +1699,12 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Check cache first
 
         if (isset($this->cacheNnian[$folder->getId()])) {
+            // If found parent in cache, set the parent for interim nodes as well.
+            foreach ($this->interimNodes as $id) {
+                $this->cacheNnian[$id] = $this->cacheNnian[$folder->getId()];
+            }
+            // Clear out the array
+            $this->interimNodes = [];
             return $this->cacheNnian[$folder->getId()];
         }
 
@@ -1744,8 +1750,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
 
             // Clear out the array
-
-            $this->interimNodes = array();
+            $this->interimNodes = [];
 
             return $folder;
         }

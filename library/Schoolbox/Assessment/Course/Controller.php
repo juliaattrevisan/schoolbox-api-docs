@@ -947,13 +947,12 @@ class Controller extends Base\Base
             }
 
             // Get units for a course
-            $currentCourse->setUnits($this->unitSpecificationMapper->findAllByCourseId($currentCourse->getId()));
-
+            $units = $this->unitSpecificationMapper->findAllByCourseId($currentCourse->getId());
             // Remove units whose folders aren't accessible by this user
-            $currentCourse->getUnits()->filter(function($unit) {
+            $currentCourse->setUnits($units->filter(function($unit) {
                 /** @var UnitSpecification $unit */
                 return $this->confirmAccess($unit->getFolder()->getId());
-            });
+            }));
 
             // Add course directly into $data
             $data['courses'][] = $currentCourse;
