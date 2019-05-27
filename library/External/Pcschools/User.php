@@ -509,10 +509,10 @@ class External_Pcschools_User implements External_UserInterface
             FROM TIMEFILE tf
                         INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS
                         INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
-            WHERE su.STUDKEY = :externalID
-              AND tf.TIME_PERIOD = :timePeriod
+            WHERE su.STUDKEY = :externalID_1
+              AND tf.TIME_PERIOD = :timePeriod_1
               AND su.PERIOD_ID =  :subPeriod
-              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = :externalID))
+              AND (tf.[STATUS] = '' OR tf.[STATUS] = 'S' OR (tf.[STATUS] = 'C' AND tf.TEACHER_REP = :externalID_2))
 
             UNION
 
@@ -522,10 +522,16 @@ class External_Pcschools_User implements External_UserInterface
                             INNER JOIN SUBJECT s ON tf.SUBJECT = s.NO
                             INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE st.CURRENT_YEAR <> '99'
-                  AND (st.STUDKEY = :externalID AND tf.TIME_PERIOD = :timePeriod)
-
-        ";
-
+                  AND (st.STUDKEY = :externalID_3 AND tf.TIME_PERIOD = :timePeriod_2)
+            ";
+            $params = [
+                'externalID_1' => $externalId,
+                'timePeriod_1' => $period['TIME_PERIOD'],
+                'subPeriod'    => $period['SUB_PERIOD'],
+                'externalID_2' => $externalId,
+                'externalID_3' => $externalId,
+                'timePeriod_2' => $period['TIME_PERIOD'],
+            ];
         } else if ($user->getRole()->isStaff()) {
             $query = "SELECT  DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
                           FROM dbo.TIMEFILE tf
@@ -536,12 +542,16 @@ class External_Pcschools_User implements External_UserInterface
                                 AND          sub.PERIOD_ID = :subPeriod
                                 AND          (tf.[STATUS] != 'S' OR tf.SUPERDATE = CONVERT(date, GETDATE()))
                         ";
-
+            $params = [
+                'externalID' => $externalId,
+                'timePeriod' => $period['TIME_PERIOD'],
+                'subPeriod'  => $period['SUB_PERIOD'],
+            ];
         } else {
             return [];
         }
 
-        $classArray =$this->getDatabase()->getAll($query, ['externalID'=>$externalId, 'timePeriod'=>$period['TIME_PERIOD'], 'subPeriod'=>$period['SUB_PERIOD']]);
+        $classArray =$this->getDatabase()->getAll($query, $params);
 
         foreach ($classArray as $class)
         {   
