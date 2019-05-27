@@ -14,7 +14,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
 use Custom\Diocesan\AchievementReport\Controller as AchievementReportController;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -166,14 +165,12 @@ class Module extends BaseModule
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-        $loader = new Twig_Loader_Filesystem([]);
-        $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolGrades');
-        $loader->addPath(__DIR__ . '/IB', 'ib');
-        $loader->addPath(__DIR__ . '/NCEA', 'ncea');
-        $loader->addPath(__DIR__ . '/Comments', 'comments');
-        $loader->addPath(__DIR__ . '/StandardisedTest', 'standardisedTest');
-        $loader->addPath(__DIR__ . '/Templates', 'templates');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/SchoolGrades', 'schoolGrades');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/IB', 'ib');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/NCEA', 'ncea');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Comments', 'comments');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/StandardisedTest', 'standardisedTest');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates', 'templates');
     }
 
     /**
