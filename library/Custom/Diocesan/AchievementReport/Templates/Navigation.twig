@@ -5,6 +5,7 @@
  #
  # @param array navigation
  # @param array externalUser
+ # @param User  user
  #}
 <div class="row">
     <div class="small-12 columns">
@@ -14,6 +15,10 @@
                     <a href="/modules/custom/diocesan/achievementreport/{{ url }}/{{ externalUser.StudentID }}">{{ label }}</a>
                 </li>
             {% endfor %}
+
+            <li>
+                <a href="/user/profile/documents/reports/{{ user.id }}">PDF Reports</a>
+            </li>
         </ul>
     </div>
 </div>
