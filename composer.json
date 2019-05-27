@@ -77,7 +77,6 @@
         "ext-redis": "*",
         "ext-readline": "*",
         "ext-zip": "*",
-        "ext-mysqli": "*",
         "ext-pdo": "*"
 
     },
