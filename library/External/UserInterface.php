@@ -74,25 +74,25 @@ interface External_UserInterface extends External\IConnector
      * Get a list of student contacts (parents) and their contact information
      * for the student $externalUserId
      *
-     * StudentContactID,
-     * StudentContactTitle,
-     * StudentContactPreferred,
-     * StudentContactSurname,
-     * StudentContactDefaultEmail,
-     * StudentContactPhoneActual,
-     * StudentContactSilentPhoneFlag,
-     * StudentContactMobilePhone,
-     * StudentContactOccupPhone,
-     * StudentContactRelation,
-     * StudentContactSpouseID,
-     * StudentContactSpouseTitle,
-     * StudentContactSpousePreferred,
-     * StudentContactSpouseSurname,
-     * StudentContactSpouseMobilePhone,
-     * StudentContactSpouseOccupPhone,
-     * StudentContactSpouseDefaultEmail,
-     * StudentContactType,
-     * StudentContactSpouseRelation
+     * string return[]['StudentContactID']
+     * string return[]['StudentContactTitle']
+     * string return[]['StudentContactPreferred']
+     * string return[]['StudentContactSurname']
+     * string return[]['StudentContactDefaultEmail']
+     * string return[]['StudentContactPhoneActual']
+     * string return[]['StudentContactSilentPhoneFlag']
+     * string return[]['StudentContactMobilePhone']
+     * string return[]['StudentContactOccupPhone']
+     * string return[]['StudentContactRelation']
+     * string return[]['StudentContactSpouseID']
+     * string return[]['StudentContactSpouseTitle']
+     * string return[]['StudentContactSpousePreferred']
+     * string return[]['StudentContactSpouseSurname']
+     * string return[]['StudentContactSpouseMobilePhone']
+     * string return[]['StudentContactSpouseOccupPhone']
+     * string return[]['StudentContactSpouseDefaultEmail']
+     * string return[]['StudentContactType']
+     * string return[]['StudentContactSpouseRelation']
      *
      * @importance high - used on student profile page, and the report card.
      *
