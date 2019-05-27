@@ -288,6 +288,11 @@ class External_Schoolpro_User implements External_UserInterface
             'StudentContactSpouseRelation'     => '',
         ];
 
+        // Ensure all values are strings to respect interface
+        $studentContact = array_map(static function ($value) {
+            return (string)$value;
+        }, $studentContact);
+
         return [$studentContact];
     }
 
