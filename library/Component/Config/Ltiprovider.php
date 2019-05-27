@@ -10,7 +10,7 @@
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Schoolbox\LTI\Provider\Model as ProviderModel;
 
-class Component_Config_LTIProvider extends Component_Config_Abstract
+class Component_Config_Ltiprovider extends Component_Config_Abstract
 {
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {

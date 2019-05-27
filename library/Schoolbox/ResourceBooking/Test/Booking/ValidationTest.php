@@ -6,7 +6,7 @@
  * Time: 11:05 AM
  */
 
-namespace Schoolbox\ResourceBooking\Test;
+namespace Schoolbox\ResourceBooking\Test\Booking;
 
 use DateTime;
 use DateInterval;

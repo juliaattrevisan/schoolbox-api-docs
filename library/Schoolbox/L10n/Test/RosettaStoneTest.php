@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\L10n\RosettaStone\Test;
+namespace Schoolbox\L10n\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\L10n\Model;
