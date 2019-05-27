@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,17 +9,18 @@
 
 namespace Schoolbox\API;
 
-use \Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
-use \Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
-use \Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Alaress\Web\Controller\Base;
 use Authenticator;
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
+use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\ServiceMapper;
 
-class Controller extends Base {
+class Controller extends Base
+{
 
     /** @var Authenticator */
     protected $auth;
@@ -57,31 +58,31 @@ class Controller extends Base {
     {
         $data      = (array)$this->getRequest()->post;
         $response  = $this->getResponse()->content;
-        $providers = array(Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE);
+        $providers = [Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE];
 
         // check the provider is valid
         if (!in_array($provider, $providers)) {
             $this->getResponse()->status->setCode(400);
-            $response->set(array(
+            $response->set([
                 'format' => 'json',
-                'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
-            ));
+                'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers),
+            ]);
             return;
         }
 
 
         try {
             // require these to be present in POSTDATA
-            $this->assertArrayKeys($data, array('username', 'password'));
+            $this->assertArrayKeys($data, ['username', 'password']);
 
         } catch (\UnderflowException $e) {
             $this->getResponse()->status->setCode(400);
-            $response->set(array(
+            $response->set([
                 'format' => 'json',
-                'data'   => array(
-                    'required' => $e->getMessage()
-                )
-            ));
+                'data'   => [
+                    'required' => $e->getMessage(),
+                ],
+            ]);
             return;
         }
 
@@ -90,32 +91,29 @@ class Controller extends Base {
             $this->auth->authenticate($data['username'], $data['password'], true);
 
             // only obtain these *after* you've run authentication
-            $sessionUser     = $this->getUser();
-            $sessionUserId   = $sessionUser->getId();
-            $sessionUserKey  = $sessionUser->getKey();
-        }
-        catch (SchoolboxAccessDeniedException $e) {
+            $sessionUser    = $this->getUser();
+            $sessionUserId  = $sessionUser->getId();
+            $sessionUserKey = $sessionUser->getKey();
+        } catch (SchoolboxAccessDeniedException $e) {
             $this->getResponse()->status->setCode(401);
-            $response->set(array(
+            $response->set([
                 'format' => 'json',
-                'data'   => 'Invalid username or password'
-            ));
+                'data'   => 'Invalid username or password',
+            ]);
             return;
-        }
-        catch (SchoolboxAccountDisabledException $e) {
+        } catch (SchoolboxAccountDisabledException $e) {
             $this->getResponse()->status->setCode(400);
-            $response->set(array(
+            $response->set([
                 'format' => 'json',
-                'data'   => 'Account disabled'
-            ));
+                'data'   => 'Account disabled',
+            ]);
             return;
-        }
-        catch (SchoolboxNotFoundException $e) {
+        } catch (SchoolboxNotFoundException $e) {
             $this->getResponse()->status->setCode(400);
-            $response->set(array(
+            $response->set([
                 'format' => 'json',
-                'data'   => 'User not found'
-            ));
+                'data'   => 'User not found',
+            ]);
             return;
         }
 
@@ -134,7 +132,10 @@ class Controller extends Base {
                     $registry
                         ->setUser($sessionUser)
                         ->setToken($data['token'])
-                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([ 'app_identifier' => $data['appId'], 'provider' => $provider ]))
+                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([
+                            'app_identifier' => $data['appId'],
+                            'provider'       => $provider,
+                        ]))
                         ->setCreatedAt($now)
                         ->setTouchedAt($now);
 
@@ -145,10 +146,10 @@ class Controller extends Base {
 
                 } catch (MapperException $e) {
                     $this->getResponse()->status->setCode(400);
-                    $response->set(array(
+                    $response->set([
                         'format' => 'json',
-                        'data'   => 'Invalid app ID given'
-                    ));
+                        'data'   => 'Invalid app ID given',
+                    ]);
                     return;
                 }
             }
@@ -156,14 +157,14 @@ class Controller extends Base {
             $this->registryMapper->save($registry);
         }
 
-        $response->set(array(
+        $response->set([
             'format' => 'json',
-            'data'   => array(
-                'id'  => $sessionUserId,
-                'key' => $sessionUserKey,
-                'role'=> $sessionUser->getRole()->getType(),
-            )
-        ));
+            'data'   => [
+                'id'   => $sessionUserId,
+                'key'  => $sessionUserKey,
+                'role' => $sessionUser->getRole()->getType(),
+            ],
+        ]);
     }
 
 
@@ -171,7 +172,8 @@ class Controller extends Base {
      * @param array $array
      * @param array $keys
      */
-    protected function assertArrayKeys(array $array, array $keys) {
+    protected function assertArrayKeys(array $array, array $keys)
+    {
         foreach ($keys as $key) {
             if (!array_key_exists($key, $array)) {
                 throw new \UnderflowException($key);
@@ -179,4 +181,4 @@ class Controller extends Base {
         }
     }
 
-} 
+}
