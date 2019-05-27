@@ -112,18 +112,17 @@ class Module extends BaseModule
      *
      * public because of php version
      *
-     * @param $params
+     * @param array $params
      * @return array
      * @throws \Exception
      */
-    public function getPreloads($params): array
+    public function getPreloads(array $params): array
     {
-        $externalUserHandler = $this->getExternalUser();
-        $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
+        $externalUser = $this->getExternalUser()->getStudent($params['externalUserId']);
 
         /* When selected user doesn't exist in external db
          */
-        if (!$externalUser) {
+        if (empty($externalUser)) {
             error(31);
         }
 
