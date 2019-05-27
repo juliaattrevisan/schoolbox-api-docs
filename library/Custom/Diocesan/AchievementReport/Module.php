@@ -136,7 +136,7 @@ class Module extends BaseModule
             exit();
         }
 
-        /* Teachers and parents of children have access to a report
+        /* Teachers, students and parents of those students have access to a student's report
          * Everyone else does not
          */
         $groupHandler = new Group();
@@ -144,7 +144,7 @@ class Module extends BaseModule
         /** @var User $sessionUser */
         $sessionUser = $_SESSION['user'];
 
-        /* If you're not a superuser, staff, or parent of specified user, get out
+        /* If you're not a superuser, staff, student, or parent of specified student, get out
          */
         if (!(
             $sessionUser->isSuperuser() ||
