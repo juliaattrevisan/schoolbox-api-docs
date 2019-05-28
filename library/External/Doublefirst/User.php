@@ -455,7 +455,7 @@ class External_Doublefirst_User implements External_UserInterface
             WHERE           s.StaffId = '{$this->database->quote($externalUserId)}'
         ";
 
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getRow($query) ?: [];
     }
 
     /**
