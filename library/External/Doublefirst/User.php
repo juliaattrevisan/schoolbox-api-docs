@@ -800,7 +800,8 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getCurrentYear(string $externalUserId = null): ?string
     {
-        return $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
+        $year = $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
+        return ($year === null || $year === false) ? null : (string)$year;
     }
 
     /**
