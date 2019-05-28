@@ -43,7 +43,7 @@ class External_Tass_Class implements External_ClassInterface {
         if(stristr($classCode, ',')) {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
-                list($year, $code, $class) = $this->parseClassCode($code);
+                list($year, $code, $class) = self::parseClassCode($code);
                 $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
                 $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
@@ -51,7 +51,7 @@ class External_Tass_Class implements External_ClassInterface {
             $classQuery .= '1=0';
         }
         else {
-            list($year, $code, $class) = $this->parseClassCode($classCode);
+            list($year, $code, $class) = self::parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
@@ -97,7 +97,7 @@ class External_Tass_Class implements External_ClassInterface {
         if(stristr($classCode, ',')) {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
-                list($year, $code, $class) = $this->parseClassCode($code);
+                list($year, $code, $class) = self::parseClassCode($code);
                 $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 
@@ -106,7 +106,7 @@ class External_Tass_Class implements External_ClassInterface {
             $classQuery .= '1=0';
         }
         else {
-            list($year,$code,$class) = $this->parseClassCode($classCode);
+            list($year, $code, $class) = self::parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
@@ -159,15 +159,19 @@ class External_Tass_Class implements External_ClassInterface {
      * @param string $classCode
      * @return array
      */
-    private function parseClassCode(string $classCode): array
+    public static function parseClassCode(string $classCode): array
     {
-        // if the first character is the delimiter, assume it as a part of year, e.g. -2
-        if (strpos($classCode, self::CLASS_CODE_DELIMITER) === 0) {
-            list($year, $code, $class) = explode(self::CLASS_CODE_DELIMITER, substr($classCode, 1));
-            $year = self::CLASS_CODE_DELIMITER . $year;
-        } else {
-            list($year, $code, $class) = explode(self::CLASS_CODE_DELIMITER, $classCode);
+        $parts = explode(self::CLASS_CODE_DELIMITER, $classCode);
+
+        if (\count($parts) === 3) {
+            return $parts;
         }
-        return [$year, $code, $class];
+
+        if (\count($parts) === 4 && $parts[0] === '' && preg_match('/[0-9]+/', $parts[1])) {
+            return [self::CLASS_CODE_DELIMITER . $parts[1], $parts[2], $parts[3]];
+        }
+
+        // shouldn't get here, but just in case.
+        return $parts;
     }
 }
