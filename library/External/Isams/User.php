@@ -43,7 +43,8 @@ class External_Isams_User implements External_UserInterface
     public function getParent(string $externalUserId): array
     {
         $query = "
-            SELECT      V_Parent.ParentID             AS ID,
+            SELECT TOP 1
+                        V_Parent.ParentID             AS ID,
                         V_Parent.Title                AS Title,
                         V_Parent.ParentFirstname      AS Preferred,
                         V_Parent.ParentSurname        AS Surname,
@@ -69,14 +70,7 @@ class External_Isams_User implements External_UserInterface
             WHERE       V_Student.StudentID = :external_user_id
         ";
 
-        $parents = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
-
-        if (count($parents)) {
-            // If multiple found, just return the first
-            return reset($parents);
-        }
-
-        return [];
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
     }
 
     /**
@@ -131,7 +125,8 @@ class External_Isams_User implements External_UserInterface
     public function getStudent(string $externalUserId): array
     {
         $query = "
-            SELECT      StudentID               AS StudentID,
+            SELECT TOP 1
+                        StudentID               AS StudentID,
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
                         CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,                
@@ -167,11 +162,7 @@ class External_Isams_User implements External_UserInterface
             WHERE       StudentID = :external_user_id
         ";
 
-        $students = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
-        if (!count($students)) {
-            return [];
-        }
-        return reset($students);
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
     }
 
 
