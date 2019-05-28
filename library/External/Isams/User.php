@@ -418,7 +418,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      
-                        Username                      AS StudentContactNetworkLogin,
+                        V_Parent.Username             AS StudentContactNetworkLogin,
                         V_Parent.ParentID             AS StudentContactID,
                         V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
@@ -431,8 +431,8 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseSurname,
                         ''                            AS StudentContactSpouseDefaultEmail,
                         V_Student.Grade               AS StudentYearLevel,
-                        campus                        AS StudentCampus,
-                        Gender                        AS StudentGender
+                        V_Student.campus              AS StudentCampus,
+                        V_Student.Gender              AS StudentGender
             FROM        V_Student
             LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
