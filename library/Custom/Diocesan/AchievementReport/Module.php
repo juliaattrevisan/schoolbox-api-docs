@@ -5,7 +5,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Custom\Diocesan\AchievementReport;
@@ -15,9 +14,10 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
-use Twig_Loader_Filesystem;
 use Custom\Diocesan\AchievementReport\Controller as AchievementReportController;
-
+use Group;
+use Schoolbox\Mapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -27,7 +27,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
+    public function initRoutes(Router $router, $basePath): void
     {
         $router->addGet('achievementreport.selector', $basePath . '/{externalUserId}');
 
@@ -61,7 +61,7 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher)
+    public function initRoutePreloads(PathMatcher $matcher): void
     {
         $matcher->add(
             '/^achievementreport\.selector/',
@@ -112,18 +112,17 @@ class Module extends BaseModule
      *
      * public because of php version
      *
-     * @param $params
+     * @param array $params
      * @return array
      * @throws \Exception
      */
-    public function getPreloads($params): array
+    public function getPreloads(array $params): array
     {
-        $externalUserHandler = $this->getExternalUser();
-        $externalUser = $externalUserHandler->getStudent($params['externalUserId']);
+        $externalUser = $this->getExternalUser()->getStudent($params['externalUserId']);
 
         /* When selected user doesn't exist in external db
          */
-        if (!$externalUser) {
+        if (empty($externalUser)) {
             error(31);
         }
 
@@ -131,55 +130,54 @@ class Module extends BaseModule
          */
         try {
             $user = $this->getUserMapper()->findByExternalId($params['externalUserId']);
-        } catch (\Exception $e) {
+        } catch (Mapper\Exception $e) {
             error(31);
             exit();
         }
 
-        /* Teachers and parents of children have access to a report
+        /* Teachers, students and parents of those students have access to a student's report
          * Everyone else does not
          */
-        $groupHandler = new \Group();
+        $groupHandler = new Group();
 
-        /** @var \Schoolbox\User $sessionUser */
+        /** @var User $sessionUser */
         $sessionUser = $_SESSION['user'];
 
-        /* If you're not a superuser, staff, or parent of specified user, get out
+        /* If you're not a superuser, staff, student, or parent of specified student, get out
          */
         if (!(
             $sessionUser->isSuperuser() ||
             $sessionUser->getRole()->isStaff() ||
+            $sessionUser->getId() === $user->getId() ||
             $groupHandler->isParentOfChild($user->getId())
         )) {
             error(19);
         }
 
-        return array(
+        return [
             'db' => \MSSQL::getInstance(),
             'externalUser' => $externalUser,
             'user' => $user
-        );
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader)
+    public function initTemplatePaths(IChainLoader $templateLoader): void
     {
-        $loader = new Twig_Loader_Filesystem(array());
-        $loader->addPath(__DIR__ . '/SchoolGrades', 'schoolGrades');
-        $loader->addPath(__DIR__ . '/IB', 'ib');
-        $loader->addPath(__DIR__ . '/NCEA', 'ncea');
-        $loader->addPath(__DIR__ . '/Comments', 'comments');
-        $loader->addPath(__DIR__ . '/StandardisedTest', 'standardisedTest');
-        $loader->addPath(__DIR__ . '/Templates', 'templates');
-        $templateLoader->addLoader($loader);
+        $this->addTemplatePath($templateLoader, __DIR__ . '/SchoolGrades', 'schoolGrades');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/IB', 'ib');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/NCEA', 'ncea');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Comments', 'comments');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/StandardisedTest', 'standardisedTest');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/Templates', 'templates');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
             'controller:achievementreport',
@@ -192,8 +190,9 @@ class Module extends BaseModule
 
     /**
      * @return UserMapper
+     * @throws \InvalidArgumentException
      */
-    protected function getUserMapper()
+    protected function getUserMapper(): UserMapper
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
