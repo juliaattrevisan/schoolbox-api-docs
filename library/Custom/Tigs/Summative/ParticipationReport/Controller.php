@@ -531,23 +531,27 @@ class Controller extends Web\Controller\Base
             return null;
         }
 
-        if (!$renderExplanationOfGradesInline) {
-            return "Explanation of grades for {$attributes->getExplanationOfGradesType()} can be found <a href=\"/homepage/$homepageId\">here.</a>";
-        }
-
         $pb = $this->textBoxMapper->getPredicateBuilder()
                                   ->equals('categoryId', $homepageId)
                                   ->equals('heading', $textboxHeading);
 
         $textBoxes = $this->textBoxMapper->findByPredicates($pb);
 
-        if (1 !== $textBoxes->count()) {
+        if (0 === $textBoxes->count()) {
+            // Render no link or inline content
             return null;
         }
-        /** @var Textbox\Model $textbox */
-        $textbox = $textBoxes->first();
 
-        return $textbox->getBody();
+        if (!$renderExplanationOfGradesInline) {
+            // Render link to homepage
+            return "Explanation of grades for {$attributes->getExplanationOfGradesType()} can be found <a href=\"/homepage/$homepageId\">here.</a>";
+        }
+
+        // Render content of first-textbox on homepage
+        /** @var Textbox\Model $firstTextbox */
+        $firstTextbox = $textBoxes->first();
+
+        return $firstTextbox->getBody();
     }
 
 
