@@ -223,7 +223,7 @@ class External_Doublefirst_User implements External_UserInterface
 
         // Start by checking for "&"
 
-        $spouseNameArray = explode("&", trim($parent["Surname"]), 1);
+        $spouseNameArray = explode("&", trim($parent["Surname"] ?? ''), 1);
 
         if (count($spouseNameArray) > 1) {
             $spouseNameArray["Surname"] = $spouseNameArray[0];
@@ -231,7 +231,7 @@ class External_Doublefirst_User implements External_UserInterface
         } else {
             // That didn't work, try looking for spaces in spouse name
 
-            $spouseNameArray = explode(" ", trim($parent["SpousePreferred"]), 1);
+            $spouseNameArray = explode(" ", trim($parent["SpousePreferred"] ?? ''), 1);
 
             if (count($spouseNameArray) > 1) {
                 $spouseNameArray["SpouseSurname"] = $spouseNameArray[1];
