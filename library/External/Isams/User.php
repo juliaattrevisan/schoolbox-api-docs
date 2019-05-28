@@ -1,22 +1,7 @@
 <?php
 /**
- * Isams User Object
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- *
- * Uncle iSam?
- *    _..._
- *   |||||||
- *   |||||||
- *  _|*****|_
- * ( '-...-' )
- * {`;-----;`}
- * {(| a  a|)}
- *  \|  _\ |/
- *   \  -  /
- *    '{_}`
  */
 declare(strict_types=1);
 
@@ -25,8 +10,6 @@ use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
 {
-
-
     use External_MssqlConnector;
 
     /**
