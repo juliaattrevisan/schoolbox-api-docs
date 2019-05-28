@@ -148,17 +148,17 @@ class Pool extends EventEmitter implements PoolInterface
 
 
     /**
-     * @param array $args
+     * @param array|string $args
      * @return string
      */
-    protected function parseArgs($args)
+    protected function parseArgs($args): string
     {
         $values = array();
 
         if (is_string($args)) {
-            try {
-                $args = unserialize($args);
-            } catch(RuntimeException $e) {
+            // suppressing unserialize error to keep log readable.
+            $args = @unserialize($args);
+            if (!$args) {
                 $values[] = substr($args, 0, 128);
             }
         }
