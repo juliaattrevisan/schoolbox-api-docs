@@ -957,7 +957,7 @@ class External_Doublefirst_User implements External_UserInterface
                   PrimaryEmail = 1;
         ";
 
-        return $this->getDatabase()->getOne($query);
+        return $this->getDatabase()->getOne($query) ?: '';
     }
 
     /**
