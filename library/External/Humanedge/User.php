@@ -381,7 +381,8 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        return $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        $semester = $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        return ($semester === null || $semester === false) ? null : (string)$semester;
     }
 
     /**
@@ -389,7 +390,8 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentYear(string $externalUserId = null): ?string
     {
-        return $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        $year = $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        return ($year === null || $year === false) ? null : (string)$year;
     }
 
 
