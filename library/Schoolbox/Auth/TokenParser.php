@@ -14,9 +14,11 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * Class for extracting a Schoolbox user from a JWT token.
+ * Class for parsing a Schoolbox user out of a JWT token.
+ *
+ * @todo convert to a PSR-15 compatible middleware
  */
-class Token
+class TokenParser
 {
     /**
      * @var UserMapper
@@ -47,6 +49,8 @@ class Token
 
     /**
      * Finds the user who matches the token, or null if no user found.
+     * This doesn't actually authenticate the user: it merely retrieves a user
+     * who is then passed to the authentication function.
      *
      * @param array  $serverVars The contents of the `$_SERVER` super-global.
      *                           The token should be in the "Authorization" HTTP
@@ -66,11 +70,11 @@ class Token
             return null;
         }
 
-        if (preg_match('/^Bearer:\\s+(.*)$/i', $authHeader, $matches)) {
+        if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
             // Parse the token and extract a user from it
             // TODO determine which algorithms our source supports
-            $decodedToken = $this->jwtCodec::decode($token, $key);
+            $decodedToken = $this->jwtCodec::decode($token, $key, ['HS256']);
 
             // A username _should_ be in the "sub" (subject) key
             // Alternately: it might contain a token, or something?

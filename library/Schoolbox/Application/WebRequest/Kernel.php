@@ -17,11 +17,15 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
+use Firebase\JWT\JWT;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebKernelAbstract;
+use Schoolbox\Auth\TokenParser;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\MapperFactory;
+use Schoolbox\UserMapper;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
@@ -480,6 +484,18 @@ class Kernel extends WebKernelAbstract
             /** @var \SitePage $page */
             $page = $di->get('layoutEngine');
             $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Invalid Request Origin', 403);
+        }
+
+
+        // Ghetto token-based authentication.
+        // If it finds a user: add them
+        /** @var MapperFactory $mapperFactory */
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $mapperFactory = $di->get('mapperFactory');
+        $tokenParser   = new TokenParser($mapperFactory->get(UserMapper::class), new JWT());
+        $user          = $tokenParser->findUser($_SERVER, 'b');
+        if ($user) {
+            // do something with that user
         }
     }
 }
