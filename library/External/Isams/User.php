@@ -391,7 +391,8 @@ class External_Isams_User implements External_UserInterface
           WHERE   V_Parent.ParentID = :id
         ";
 
-        return $this->getConnector()->executeQuery($query, ['id' => $externalUserId])->fetchColumn();
+        $email = $this->getConnector()->executeQuery($query, ['id' => $externalUserId])->fetchColumn();
+        return ($email === null || $email === false) ? '' : $email;
     }
 
 
