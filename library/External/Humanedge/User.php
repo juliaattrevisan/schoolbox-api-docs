@@ -292,7 +292,7 @@ class External_Humanedge_User implements External_UserInterface
             FROM Staff t
             WHERE t.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getRow($query) ?: [];
     }
 
     /**
