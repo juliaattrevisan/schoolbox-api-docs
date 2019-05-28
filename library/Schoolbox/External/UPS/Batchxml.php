@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\UPS;
 
 use Schoolbox\Collection;
-use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\External\Normalise\User;
@@ -49,15 +48,12 @@ class Batchxml implements ISync
 
     /**
      * Batchxml constructor.
+     *
+     * @param Api $api
      */
-    public function __construct()
+    public function __construct(Api $api)
     {
-        $config = new Loader();
-
-        $host = $config->get('external_ups_provider_batchxml_host');
-        $key = $config->get('external_ups_provider_batchxml_key');
-
-        $this->api = new Api($host, $key);
+        $this->api = $api;
     }
 
 
@@ -77,12 +73,6 @@ class Batchxml implements ISync
         if (!$this->nodes) {
             $this->nodes = new \SimpleXMLElement($this->api->retrieveDocument());
         }
-
-        /* Faster, for now
-         */
-//        $source = __DIR__ .'/../../../../www/temp.xml';
-//        $xml = file_get_contents($source);
-//        $this->nodes = new \SimpleXMLElement($xml);
 
         /* Prefetch (Campus, NCYear) relations as a lookup
          */
