@@ -156,7 +156,7 @@ class ResolverTest extends TestCase
      *
      * @throws InvalidArgumentException
      * @throws OutOfBoundsException
-     */
+
     public function testLockSavesMemory()
     {
         gc_collect_cycles();
@@ -179,7 +179,7 @@ class ResolverTest extends TestCase
 //        printf("-delta   : %s\n", \Alaress_Byte_Format::bytesToString($delta * -1));
 
         $this->assertLessThan(0, $delta);
-    }
+    }*/
 
 
     /**
