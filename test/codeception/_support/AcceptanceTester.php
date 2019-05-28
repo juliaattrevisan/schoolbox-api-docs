@@ -1,6 +1,7 @@
 <?php
 
 use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Codeception\Module;
 
 /**
  * Inherited Methods
@@ -191,5 +192,15 @@ class AcceptanceTester extends \Codeception\Actor
 
                 $webDriver->switchTo()->defaultContent();
             });
+    }
+
+    /**
+     * Get current url from WebDriver
+     * @return mixed
+     * @throws \Codeception\Exception\ModuleException
+     */
+    public function getCurrentUrl()
+    {
+        return $this->executeJS("return location.href");
     }
 }
