@@ -360,24 +360,6 @@ class External_Isams_User implements External_UserInterface
      * @inheritDoc
      * @throws \Alaress\Database\Exception
      */
-    public function getEmail(string $externalUserId): string
-    {
-        $query =
-            "
-          SELECT  V_Parent.PersonalEmail 
-          FROM    V_Parent 
-          WHERE   V_Parent.ParentID = :id
-        ";
-
-        $email = $this->getConnector()->executeQuery($query, ['id' => $externalUserId])->fetchColumn();
-        return ($email === null || $email === false) ? '' : $email;
-    }
-
-
-    /**
-     * @inheritDoc
-     * @throws \Alaress\Database\Exception
-     */
     public function getStudentUserAccountInfo(): array
     {
         $query = "

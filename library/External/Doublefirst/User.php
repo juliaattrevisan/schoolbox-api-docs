@@ -944,21 +944,6 @@ class External_Doublefirst_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        $query =
-            "
-          SELECT  TOP 1 EmailID 
-          FROM    ContactEmailInformation 
-          WHERE   ContactID = '{$externalUserId}' AND 
-                  PrimaryEmail = 1;
-        ";
-
-        return $this->getDatabase()->getOne($query) ?: '';
-    }
 
     /**
      * @inheritDoc

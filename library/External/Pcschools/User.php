@@ -577,15 +577,6 @@ class External_Pcschools_User implements External_UserInterface
         return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query, $params));
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        // non-core promise
-        return '';
-    }
-
 
     /**
      * {@inheritDoc}

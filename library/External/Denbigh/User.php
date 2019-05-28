@@ -606,14 +606,6 @@ class External_Denbigh_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function getParentSync(array $externalUserIds): array
     {
         return [];

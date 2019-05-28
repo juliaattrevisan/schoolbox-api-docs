@@ -500,14 +500,6 @@ class External_Humanedge_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
-
 
     /**
      * {@inheritDoc}

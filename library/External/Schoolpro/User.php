@@ -418,32 +418,6 @@ class External_Schoolpro_User implements External_UserInterface
 
 
     /**
-     * @inheritDoc
-     * @throws \Schoolbox\Mapper\Exception We need to fetch the user's role to know which internal method to call
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        $role = UserMapper::getInstance()->findByExternalId($externalUserId)->getRole();
-
-        /* Use a different query depending on the type of person
-         */
-        if ($role->isStudent()) {
-            return $this->getStudent($externalUserId)['email'] ?? '';
-        }
-        if ($role->isParent()) {
-            return $this->getParent($externalUserId)['email'] ?? '';
-        }
-        if ($role->isStaff()) {
-            /* TODO: Not supplied?
-             */
-            return '';
-        }
-
-        return '';
-    }
-
-
-    /**
      * Returns a local path to the user's portrait
      *
      * This indicates that Cedar needs to upload the pics manually to portrait_dir

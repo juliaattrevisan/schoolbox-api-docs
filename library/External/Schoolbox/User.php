@@ -392,13 +392,6 @@ class External_Schoolbox_User implements External_UserInterface
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
 
     /**
      * {@inheritDoc}

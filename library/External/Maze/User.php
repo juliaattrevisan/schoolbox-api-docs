@@ -764,14 +764,6 @@ class External_Maze_User implements External_UserInterface
         return $this->getDb()->getAll($query);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
-
 
     /**
      * Returns a local path to the user's portrait

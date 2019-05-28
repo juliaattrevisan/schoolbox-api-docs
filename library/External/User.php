@@ -143,15 +143,6 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     /**
      * @inheritdoc
      */
-    public function getEmail(string $externalUserId): string
-    {
-        return $this->getCachedResult(__FUNCTION__, func_get_args());
-    }
-
-
-    /**
-     * @inheritdoc
-     */
     public function getStudentUserAccountInfo(): array
     {
         return $this->bypassCache(__FUNCTION__, func_get_args()); // TODO why bypass cache?

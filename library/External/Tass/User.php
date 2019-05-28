@@ -557,10 +557,6 @@ class External_Tass_User implements External_UserInterface
         return $user->getPortrait();
     }
 
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
 
     /**
      * @inheritDoc

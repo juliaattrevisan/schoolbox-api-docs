@@ -552,12 +552,4 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     {
         return [];
     }
-
-    /**
-     * @inheritdoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
 }

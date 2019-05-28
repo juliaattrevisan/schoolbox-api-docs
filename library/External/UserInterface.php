@@ -434,16 +434,6 @@ interface External_UserInterface extends External\IConnector
      */
     public function getEnrolledStudents(string $externalUserId): array;
 
-    /**
-     * Get the email address as a string for a particular person
-     *
-     * @importance low - I'm not sure this is used anywhere yet?
-     *
-     * @param string $externalUserId
-     * @return string
-     */
-    public function getEmail(string $externalUserId): string;
-
 
     /**
      * Get the portrait for a particular user

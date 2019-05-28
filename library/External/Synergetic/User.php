@@ -938,22 +938,6 @@ class External_Synergetic_User implements External_UserInterface
 
     /**
      * @inheritdoc
-     * @throws \Alaress\Database\Exception
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        if (!$this->isExternalIdValid($externalUserId)) {
-            return '';
-        }
-
-        return $this->getConnector()->executeQuery(
-            "SELECT Email FROM Community WHERE id = :externalId",
-            ['externalId' => $externalUserId]
-        )->fetchColumn();
-    }
-
-    /**
-     * @inheritdoc
      */
     public function getStudentUserAccountInfo(): array
     {
