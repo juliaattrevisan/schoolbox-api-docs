@@ -22,17 +22,17 @@ use Schoolbox\User;
 use Schoolbox\Filter\Filters;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use External_UserInterface;
 use Schoolbox\UserMapper;
 use InvalidArgumentException;
 use External_User;
 use UnexpectedValueException;
+use Alaress\Database;
 
 class Controller extends Web\Controller\Base
 {
-
     /** @var External_UserInterface|External_User */
     private $externalUser;
 
@@ -48,8 +48,8 @@ class Controller extends Web\Controller\Base
     /** @var FolderMapper $folderMapper */
     private $folderMapper;
 
-    /** @var TermMapper $termMapper */
-    private $termMapper;
+    /** @var Textbox\Mapper */
+    private $textBoxMapper;
 
     /** @var AssessmentMapper $assessmentMapper */
     private $assessmentMapper;
@@ -60,7 +60,7 @@ class Controller extends Web\Controller\Base
      * @param IConnector             $externalDatabase
      * @param PastoralMapper         $pastoralMapper
      * @param FolderMapper           $folderMapper
-     * @param TermMapper             $termMapper
+     * @param Textbox\Mapper         $textBoxMapper
      * @param AssessmentMapper       $assessmentMapper
      */
     public function __construct(
@@ -69,7 +69,7 @@ class Controller extends Web\Controller\Base
         IConnector $externalDatabase,
         PastoralMapper $pastoralMapper,
         FolderMapper $folderMapper,
-        TermMapper $termMapper,
+        Textbox\Mapper $textBoxMapper,
         AssessmentMapper $assessmentMapper
     ) {
         $this->externalUser     = $externalUser;
@@ -77,7 +77,7 @@ class Controller extends Web\Controller\Base
         $this->externalDatabase = $externalDatabase;
         $this->pastoralMapper   = $pastoralMapper;
         $this->folderMapper     = $folderMapper;
-        $this->termMapper       = $termMapper;
+        $this->textBoxMapper    = $textBoxMapper;
         $this->assessmentMapper = $assessmentMapper;
     }
 
@@ -109,7 +109,7 @@ class Controller extends Web\Controller\Base
         $absences      = $this->getAbsenceData($user, $attributes);
         $subjectList   = $this->getSubjectList($user, $attributes, $now);
         $deansComments = $this->getDeansComment($user, $attributes);
-        $explanation   = $this->getExplanation($attributes);
+        $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
 
         $data   = [
             'user'          => $user,
@@ -511,11 +511,57 @@ class Controller extends Web\Controller\Base
 
 
     /**
-     * Returns explanation of grade which matches the given attribute
+     * Returns explanation of grade which matches the given attribute.
+     *
+     * Will either be link to homepage, or inline content, depending of flag
+     *
      * @param StudentAttributes $attributes
-     * @return string
+     * @param bool              $renderExplanationOfGradesInline
+     * @return null|string
+     * @throws Database\Predicate\InvalidColumnException
      */
-    private function getExplanation(StudentAttributes $attributes): string
+    private function getExplanation(StudentAttributes $attributes, bool $renderExplanationOfGradesInline): ?string
+    {
+        $textboxHeading = $this->getConfigLoader()->get(Config::_TIGS_TEXTBOX_HEADING_EXPLANATION_OF_GRADES);
+        if (null === $textboxHeading) {
+            return null;
+        }
+        $homepageId = $this->getExplanationOfGradesHomepageId($attributes);
+        if (null === $homepageId) {
+            return null;
+        }
+
+        $pb = $this->textBoxMapper->getPredicateBuilder()
+                                  ->equals('categoryId', $homepageId)
+                                  ->equals('heading', $textboxHeading);
+
+        $textBoxes = $this->textBoxMapper->findByPredicates($pb, ['order' => ['textBoxID' => 'ASC'],]);
+
+        if (0 === $textBoxes->count()) {
+            // Render no link or inline content
+            return null;
+        }
+
+        if (!$renderExplanationOfGradesInline) {
+            // Render link to homepage
+            return "Explanation of grades for {$attributes->getExplanationOfGradesType()} can be found <a href=\"/homepage/$homepageId\">here.</a>";
+        }
+
+        // Render content of first-textbox on homepage
+        /** @var Textbox\Model $firstTextbox */
+        $firstTextbox = $textBoxes->first();
+
+        return $firstTextbox->getBody();
+    }
+
+
+    /**
+     * Returns the configured 'explanation of grades' homepage id for the specified student
+     *
+     * @param StudentAttributes $attributes
+     * @return string|null
+     */
+    private function getExplanationOfGradesHomepageId(StudentAttributes $attributes): ?string
     {
         switch ($attributes->getYearLevel()) {
             case 12:

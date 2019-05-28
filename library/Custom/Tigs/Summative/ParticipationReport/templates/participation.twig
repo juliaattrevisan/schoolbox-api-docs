@@ -18,6 +18,7 @@ Data:
     subjects[idx].codes     string[]
     subjects[idx].folderId  int
     subjects[idx].teachers  User[]
+    explanation             null|string         - Explanation of the student's grades
     nowOverride             null|string
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
@@ -174,6 +175,7 @@ Data:
         {% endif %}
     {% endfor %}
 
+    {% if explanation is not null %}
     <div class="row explanation-grades">
         <div class="small-12 island">
             <h2 class="subheader">Explanation of Grades</h2>
@@ -182,4 +184,5 @@ Data:
             </section>
         </div>
     </div>
+    {% endif %}
 </div>

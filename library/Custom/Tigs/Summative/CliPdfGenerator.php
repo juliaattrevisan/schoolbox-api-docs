@@ -587,7 +587,7 @@ class CliPdfGenerator extends CliTool\App
     private function generateUrlsForStudent(User $student, array $externalStudent, ?string $excludedClassCodes): array
     {
         $data                   = ['userId' => $student->getId(), 'now' => $this->nowOverride,];
-        $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data);
+        $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data) . '?inline=1';
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [$participationReportUrl];
 

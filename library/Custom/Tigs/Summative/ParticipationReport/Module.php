@@ -22,7 +22,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 
 
@@ -86,7 +86,7 @@ class Module extends Alaress\Module\Module
             'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
             'pastoralMapper'   => $this->getMapperFactory()->getLazy(PastoralMapper::class),
             'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
-            'termMapper'       => $this->getMapperFactory()->getLazy(TermMapper::class),
+            'textBoxMapper'    => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
             'assessmentMapper' => $this->getMapperFactory()->getLazy(AssessmentMapper::class),
             'externalDatabase' => $injector->lazyGet('databaseExternal'),
         ];

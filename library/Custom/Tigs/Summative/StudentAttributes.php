@@ -166,6 +166,20 @@ class StudentAttributes
 
 
     /**
+     * Returns the student's explanation of grades fragment
+     *
+     * @return string
+     */
+    public function getExplanationOfGradesType(): string
+    {
+        if ($this->isMyp()) {
+            return 'MYP Year 7-10';
+        }
+        return "Year {$this->getYearLevel()} " . ($this->isDp() ? 'DP' : 'HSC');
+    }
+
+
+    /**
      * Returns whether the student is MYP (IB Middle Years Programme)
      *
      * @return bool
