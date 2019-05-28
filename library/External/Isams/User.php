@@ -35,14 +35,10 @@ class External_Isams_User implements External_UserInterface
      */
     protected const FORMAT_ISO8601 = 126;
 
-    /** @var Group $groupHandler */
-    private $groupHandler;
-
     /** Constructor */
     public function __construct()
     {
         $this->setupDatabase();
-        $this->setGroup(new Group());
     }
 
 
@@ -567,24 +563,5 @@ class External_Isams_User implements External_UserInterface
     public function getStudentForms(): array
     {
         return [];
-    }
-
-    /* Getters/Setters
-      */
-
-    /**
-     * @param Group $groupHandler
-     */
-    public function setGroup($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * @return Group
-     */
-    public function getGroup()
-    {
-        return $this->groupHandler;
     }
 }
