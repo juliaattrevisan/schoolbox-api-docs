@@ -517,7 +517,7 @@ class Controller extends Web\Controller\Base
      *
      * @param StudentAttributes $attributes
      * @param bool              $renderExplanationOfGradesInline
-     * @return string
+     * @return null|string
      * @throws Database\Predicate\InvalidColumnException
      */
     private function getExplanation(StudentAttributes $attributes, bool $renderExplanationOfGradesInline): ?string
