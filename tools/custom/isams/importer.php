@@ -14,8 +14,11 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
+use Schoolbox\External\Connector\Isams\Base\MockApi;
+use Schoolbox\External\TimetableCampusMapper;
+use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelationMapper;
@@ -55,7 +58,7 @@ HELP;
 
         /* Spawn api
          */
-        $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+        $api = new MockApi($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 
         $composite = new Composite(
             $this->getLogger(),
@@ -63,7 +66,10 @@ HELP;
             new Batchxml($api),
             UserMapper::getInstance(),
             UserProfileMapper::getInstance(),
-            UserRelationMapper::getInstance()
+            UserRelationMapper::getInstance(),
+            TimetableCampusMapper::getInstance(),
+            TimetableCycleMapper::getInstance(),
+            TimetablePeriodMapper::getInstance()
         );
 
         $composite->import();
