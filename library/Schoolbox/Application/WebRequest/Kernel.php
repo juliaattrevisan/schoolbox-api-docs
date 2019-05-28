@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Application\WebRequest;
 
-use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;

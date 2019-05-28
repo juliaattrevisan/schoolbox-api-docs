@@ -172,7 +172,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * @param string           $message A human-friendly message to output.
      * @param string           $info    More descriptive description of what
      *                                  happened.
-     * @param string           $url     The URL from which this error occurred
      * @param array            $error   An array-format stack trace
      * @param int              $code    A HTTP status code
      */
