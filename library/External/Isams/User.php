@@ -90,9 +90,14 @@ class External_Isams_User implements External_UserInterface
             WHERE       V_Student.StudentID = :external_user_id
         ";
 
-        $parent = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
+        $parents = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
 
-        return $parent;
+        if (count($parents)) {
+            // If multiple found, just return the first
+            return reset($parents);
+        }
+
+        return [];
     }
 
     /**
