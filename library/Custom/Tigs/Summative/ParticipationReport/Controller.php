@@ -535,7 +535,7 @@ class Controller extends Web\Controller\Base
                                   ->equals('categoryId', $homepageId)
                                   ->equals('heading', $textboxHeading);
 
-        $textBoxes = $this->textBoxMapper->findByPredicates($pb);
+        $textBoxes = $this->textBoxMapper->findByPredicates($pb, ['order' => ['textBoxID' => 'ASC'],]);
 
         if (0 === $textBoxes->count()) {
             // Render no link or inline content
