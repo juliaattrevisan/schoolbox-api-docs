@@ -159,7 +159,7 @@ class External_Tass_Class implements External_ClassInterface {
      * @param string $classCode
      * @return array
      */
-    public static function parseClassCode(string $classCode): array
+    private static function parseClassCode(string $classCode): array
     {
         $parts = explode(self::CLASS_CODE_DELIMITER, $classCode);
 

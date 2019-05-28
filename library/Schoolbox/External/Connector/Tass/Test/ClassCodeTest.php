@@ -9,6 +9,7 @@ namespace Schoolbox\External\Connector\Tass\Test;
 
 use External_Tass_Class;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class ClassCodeTest extends TestCase
 {
@@ -18,11 +19,15 @@ class ClassCodeTest extends TestCase
      * @param string $year
      * @param string $code
      * @param string $class
+     * @throws \ReflectionException
      */
     public function testClassCode(string $year, string $code, string $class)
     {
+        $parseClassCode = (new ReflectionClass(External_Tass_Class::class))->getMethod('parseClassCode');
+        $parseClassCode->setAccessible(true);
 
-        list($actualYear, $actualCode, $actualClass) = External_Tass_Class::parseClassCode(implode('-', [$year, $code, $class]));
+        list($actualYear, $actualCode, $actualClass) = $parseClassCode->invoke(null, implode('-', [$year, $code, $class]));
+
         $this->assertEquals($actualYear, $year);
         $this->assertEquals($actualCode, $code);
         $this->assertEquals($actualClass, $class);
