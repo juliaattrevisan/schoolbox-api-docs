@@ -215,6 +215,9 @@ class External_Doublefirst_User implements External_UserInterface
         ";
 
         $parent = $this->getDatabase()->getRow($query);
+        if ($parent === false) {
+            return [];
+        }
 
         // HACK: Apparently the DoubleFirst database schema is setup to believe that all couples share the same surname, so
         // the partners surname is either mashed into their first name (in which case we assume anything after the
