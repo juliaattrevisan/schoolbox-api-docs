@@ -23,6 +23,7 @@ use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Auth\TokenParser;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
@@ -488,12 +489,12 @@ class Kernel extends WebKernelAbstract
 
 
         // Ghetto token-based authentication.
-        // If it finds a user: add them
+        // If it finds a user: create a session for them
         /** @var MapperFactory $mapperFactory */
         /** @noinspection PhpUnhandledExceptionInspection */
         $mapperFactory = $di->get('mapperFactory');
         $tokenParser   = new TokenParser($mapperFactory->get(UserMapper::class), new JWT());
-        $user          = $tokenParser->findUser($_SERVER, 'b');
+        $user          = $tokenParser->findUser($_SERVER, ConfigMapper::_OAUTH_JWT_SECRET);
         if ($user) {
             // do something with that user
         }

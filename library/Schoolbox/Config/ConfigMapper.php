@@ -94,6 +94,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _BOARDER_LEAVE_ENABLED = 'boarder_leave_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
     public const _EXTERNAL_MS_SQL_SERVER_DRIVER = 'external_ms_sql_server_driver';
+    public const _OAUTH_JWT_SECRET = 'oauth_jwt_secret';
 
     /** @var array */
     protected $cache = array();
