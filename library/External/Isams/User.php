@@ -167,7 +167,11 @@ class External_Isams_User implements External_UserInterface
             WHERE       StudentID = :external_user_id
         ";
 
-        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
+        $students = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetchAll();
+        if (!count($students)) {
+            return [];
+        }
+        return reset($students);
     }
 
 
