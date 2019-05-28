@@ -14,6 +14,11 @@ class External_Tass_Class implements External_ClassInterface {
     private $database;
 
     /**
+     * Class code delimiter
+     */
+    private const CLASS_CODE_DELIMITER = '-';
+
+    /**
      * @var External_UserInterface
      */
     private $externalUser;
@@ -38,7 +43,7 @@ class External_Tass_Class implements External_ClassInterface {
         if(stristr($classCode, ',')) {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
-                list($year,$code,$class) = explode('-',$code);
+                list($year, $code, $class) = $this->parseClassCode($code);
                 $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
                 $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
@@ -46,7 +51,7 @@ class External_Tass_Class implements External_ClassInterface {
             $classQuery .= '1=0';
         }
         else {
-            list($year,$code,$class) = explode('-',$classCode);
+            list($year, $code, $class) = $this->parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
@@ -92,7 +97,7 @@ class External_Tass_Class implements External_ClassInterface {
         if(stristr($classCode, ',')) {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
-                list($year,$code,$class) = explode('-',$code);
+                list($year, $code, $class) = $this->parseClassCode($code);
                 $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
 
@@ -101,7 +106,7 @@ class External_Tass_Class implements External_ClassInterface {
             $classQuery .= '1=0';
         }
         else {
-            list($year,$code,$class) = explode('-',$classCode);
+            list($year,$code,$class) = $this->parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery sub_code = '$code' AND class = '$class' ";
@@ -147,5 +152,22 @@ class External_Tass_Class implements External_ClassInterface {
     public function findClassesByType(string $filetype, array $timetableCode): array
     {
         return [];
+    }
+
+    /**
+     * Parse year, code, class from the given class code.
+     * @param string $classCode
+     * @return array
+     */
+    private function parseClassCode(string $classCode): array
+    {
+        // if the first character is the delimiter, assume it as a part of year, e.g. -2
+        if (strpos($classCode, self::CLASS_CODE_DELIMITER) === 0) {
+            list($year, $code, $class) = explode(self::CLASS_CODE_DELIMITER, substr($classCode, 1));
+            $year = self::CLASS_CODE_DELIMITER . $year;
+        } else {
+            list($year, $code, $class) = explode(self::CLASS_CODE_DELIMITER, $classCode);
+        }
+        return [$year, $code, $class];
     }
 }
