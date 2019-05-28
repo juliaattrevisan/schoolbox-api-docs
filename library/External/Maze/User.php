@@ -841,11 +841,15 @@ class External_Maze_User implements External_UserInterface
                 }
 
                 if ($queryPhoto) {
-                    $photo = $this->getDb()->getRow($queryPhoto);
+                    $photo = $this->getDb()->getRow($queryPhoto)['Photo'] ?? null;
+
+                    if(!$photo){
+                        return null;
+                    }
 
                     /* Save it into brownhole
                      */
-                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
+                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo);
 
                     /* Update user with latest version
                      */
