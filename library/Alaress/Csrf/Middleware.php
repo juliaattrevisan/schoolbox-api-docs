@@ -44,8 +44,7 @@ class Middleware
         array $serverVars,
         array $filenameWhitelist = [],
         array $uriWhitelist = []
-    ): bool
-    {
+    ): bool {
         foreach ($filenameWhitelist as $path) {
             if (fnmatch($path, $serverVars['SCRIPT_FILENAME'])) {
                 return true;
