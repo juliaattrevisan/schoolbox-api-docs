@@ -584,7 +584,7 @@ class External_Doublefirst_User implements External_UserInterface
         // Search for a particular year level
 
         if (strlen($yearLevel)) {
-            $query .= " {$whereAnd} Year.Description = '{$this->getDatabase()->quote($yearLevel)}' ";
+            $query .= " {$whereAnd} p.YearGroup = '{$this->getDatabase()->quote($yearLevel)}' ";
             $whereAnd = " AND ";
         }
 
