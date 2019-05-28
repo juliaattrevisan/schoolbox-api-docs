@@ -46,7 +46,7 @@ interface IStatement
      * Make sure you really want to use this- it has the potential to be a memory hog. If you're iterating results, use an iterator!
      *
      * @param int $fetchStyle PDO fetch style
-     * @return mixed
+     * @return array
      */
     public function fetchAll($fetchStyle = PDO::FETCH_ASSOC);
 
