@@ -160,7 +160,9 @@ class ResolverTest extends TestCase
     public function testLockSavesMemory()
     {
         if (PHP_SAPI === 'phpdbg')
+        {
             $this->markTestSkipped();
+        }
         gc_collect_cycles();
         $before = memory_get_usage();
 
