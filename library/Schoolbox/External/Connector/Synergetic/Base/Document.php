@@ -14,7 +14,6 @@ use Alaress_Date_Format;
 use DateTime;
 use External_Ping;
 use External_Synergetic_ValidateExternalIdTrait;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -64,10 +63,11 @@ class Document extends Base implements IDocument
      * @inheritdoc
      *
      * @param User $student
-     * @param string|null $request
+     * @param array $classificationCode
+     *
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student, ?string $request = null): array
+    public function getAcademicReportsForStudent(User $student, array $classificationCode): array
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -107,9 +107,9 @@ class Document extends Base implements IDocument
         }
 
         // If there's any DocMan classifications entered into the config - union docman docs on
-        $bindings = $this->buildBindingsForClassifications('', $request);
+        $bindings = $this->buildBindingsForClassifications($classificationCode);
 
-        if (!empty($bindings)) {
+        if (count($bindings) > 0) {
             $query .= "
                 UNION
 
@@ -154,7 +154,7 @@ class Document extends Base implements IDocument
 
                 // If that query worked we can assume they have updated their DB permissions and use this extra source
 
-                $bindings = $this->buildBindingsForClassifications('pvd', $request);
+                $bindings = $this->buildBindingsForClassifications($classificationCode, 'pvd');
 
                 $query .= "
                     UNION
@@ -223,8 +223,9 @@ class Document extends Base implements IDocument
      * @param string $source
      *
      * @return array
+     * @throws \Exception
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId, $source)
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes)
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -240,7 +241,7 @@ class Document extends Base implements IDocument
         // Create query to get the document from the database
 
         if ($source == 'tDocuments') {
-            $bindings = $this->buildBindingsForClassifications();
+            $bindings = $this->buildBindingsForClassifications($classificationCodes);
 
             // If there's no classifications in config - error out because they shouldn't be getting anything
             // from DocMan
@@ -272,7 +273,7 @@ class Document extends Base implements IDocument
 
                 // If that query worked we can assume they have updated their DB permissions and use this extra source
 
-                $bindings = $this->buildBindingsForClassifications('pvd');
+                $bindings = $this->buildBindingsForClassifications($classificationCodes, 'pvd');
 
                 $query = "
                     
@@ -370,32 +371,16 @@ class Document extends Base implements IDocument
     /**
      * Builds placeholders and bindings for document classifications.
      *
+     * @param array $classificationCodes
      * @param string $suffix Suffix for bindings
-     *
-     * @param string|null $classifications
      *
      * @return array Empty if there's no document classifications.
      *               Otherwise:
      *               bindings:     the parameters to bind to a query
      *               placeholders: the IN part of a query
      */
-    private function buildBindingsForClassifications(string $suffix = '', ?string $classifications = null)
+    private function buildBindingsForClassifications(array $classificationCodes, string $suffix = ''): array
     {
-        $classificationCodes = array_filter(
-            explode(',', trim($this->config->get('external_document_docman_categories')))
-        );
-
-         // If `classification` get request is present, let's try to match those codes that was set from the config.
-        if (null !== $classifications) {
-            $classificationCodes = array_intersect(
-                $classificationCodes, array_filter(explode(',', trim($classifications)))
-            );
-
-            if (!$classificationCodes) {
-                throw new NotFound();
-            }
-        }
-
         if (count($classificationCodes) > 0) {
             return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);
         }
