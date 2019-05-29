@@ -3,10 +3,10 @@
         <link rel="shortcut icon" type="image/png" href="/images/core/icons/fail-whale-16x16.png"/>
         <title>Schoolbox scheduled maintenance</title>
         <script>
-            const MAX_TIMEOUT_PERIOD = 10;      // Don't back-off to less frequent checks than this
+            const MAX_TIMEOUT_PERIOD = 60;      // Don't back-off to less frequent checks than this
 
             // Variables
-            let timeoutPeriod  = 2,            // How much time to delay before rechecking service status
+            let timeoutPeriod  = 10,            // How much time to delay before rechecking service status
                 timeoutCounter = timeoutPeriod; // How much time left until next check
 
 
@@ -19,9 +19,9 @@
              * Initial setup on page load
              */
             function init() {
-                counterLabel       = document.getElementById('count_seconds');
+                counterLabel = document.getElementById('count_seconds');
                 maintenanceMessage = document.getElementById('message');
-                refreshMessage     = document.getElementById('refresh');
+                refreshMessage = document.getElementById('refresh');
                 timedRefresh();
             }
 
@@ -42,32 +42,43 @@
              * Returns whether the server is back up
              * @return boolean
              */
-            function checkServiceRestored(){
+            function checkServiceRestored() {
                 let xHttp = new XMLHttpRequest();
                 xHttp.addEventListener("load", onXHttpResponse);
                 xHttp.open("GET", "/ping");
                 xHttp.send();
             }
 
-            function onXHttpResponse () {
-                if(200 === this.status) {
-                    // If this was a get request, this next line should reload the requested resource
-                    location.reload(true);
-
+            /**
+             * Handle a xHttp response
+             */
+            function onXHttpResponse() {
+                if (200 === this.status) {
                     // Otherwise prompt the user to refresh to re-post so they don't lose their work
-                    // maintenanceMessage.className = 'hide';
-                    // refreshMessage.className = '';
-                    // TODO how do this automatically?
-
-                } else if(503 === this.status){
+                    maintenanceMessage.className = 'hide';
+                    refreshMessage.className = '';
+                    window.location.reload(true);
+                } else if (503 === this.status) {
                     // Still down. Apply exponential back-off, reset timeout counter, but not more than the max
-                    timeoutPeriod *= 2;
-                    timeoutPeriod = Math.min(timeoutPeriod, MAX_TIMEOUT_PERIOD);
-                    timeoutCounter = timeoutPeriod;
-                    timedRefresh();
+                    resetRetry(false);
                 } else {
-                    // Something went wrong.
+                    // Something went wrong. Don't limit the exponential back-off
+                    resetRetry(true);
                 }
+            }
+
+            /**
+             * Reset the retry counter
+             *
+             * @param {boolean} limitBackOff
+             */
+            function resetRetry(limitBackOff) {
+                timeoutPeriod *= 2;
+                if (limitBackOff) {
+                    timeoutPeriod = Math.min(timeoutPeriod, MAX_TIMEOUT_PERIOD);
+                }
+                timeoutCounter = timeoutPeriod;
+                timedRefresh();
             }
 
             window.onload = init;
@@ -77,25 +88,29 @@
                 color: #0066B0;
                 font-family: Arial, Helvetica, sans-serif;
             }
-            .row{
+
+            .row {
                 text-align: center;
             }
-            .image-wrap{
+
+            .image-wrap {
                 display: inline-block;
             }
-            h1{
-                /*font-size: larger;*/
-            }
-            #message{
+
+            p {
+                font-size: 20px;
                 line-height: 30px;
             }
-            .retry{
+
+            .retry {
                 font-style: italic;
                 opacity: 0.5;
             }
+
             #refresh {
                 color: forestgreen;
             }
+
             .hide {
                 display: none;
             }
@@ -103,7 +118,6 @@
         </style>
     </head>
     <body>
-<!--        <h1>503 - Service Temporarily Unavailable</h1>-->
         <div class="content">
             <div class="row">
                 <div class="image-wrap">
@@ -116,8 +130,9 @@
                     <p>Schoolbox is temporarily lost in cyberspace due to maintenance.<br>Sit back an relax, we'll refresh your page automatically when ready.</p>
                     <p class="retry">Retrying in <span id="count_seconds"></span>...</p>
                 </div>
-                <div id="refresh" class="hide" >
-                    <p>Schoolbox appears to be back up. Please refresh your browser to re-submit your request</p>
+                <div id="refresh" class="hide">
+                    <h2>Aaaaand we're back!</h2>
+                    <p>Schoolbox appears to be back up.<br>Resubmitting your request... hang tight...</p>
                 </div>
             </div>
         </div>
