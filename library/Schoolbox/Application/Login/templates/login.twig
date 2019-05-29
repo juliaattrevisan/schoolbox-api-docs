@@ -84,8 +84,6 @@ $(function() {
                 </div>
                 <div class="small-12 column">
                     <input type="text" name="username" id="username" placeholder="Username" />
-                </div>
-                <div class="small-12 column">
                     <input type="password" name="password" id="password" placeholder="Password" />
                 </div>
             </div>
@@ -104,30 +102,35 @@ $(function() {
                     </label>
                 </div>
                 {% endif %}
+
+                {% if config.forgotten_password_text and config.forgotten_password_url %}
+                <div class="small-12 column">
+                    <p><a href="{{ config.forgotten_password_url }}">{{ config.forgotten_password_text }}</a></p>
+                </div>
+                {% endif %}
+
                 {% if config.session_remember %}
                 <div class="small-12 column">
                     <input id="rememberme" type="checkbox" name="rememberme" value="1" />
                     <label for="rememberme">Remember me</label>
                 </div>
                 {% endif %}
-                <div class="small-12 column">
-                    <input type="submit" name="Submit" value="Sign in" alt="Sign in" />
-                    {% if config.login_anonymous != '' %}
-                    <a href="/account/anonymous.php?{{ requestParams|escape }}" class="button guest">Sign in as Guest</a>
-                    {% endif %}
-                    {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
-                    <a href="/saml/index.php?{{ requestParams|escape }}" class="button samlbutton">Login using Single Sign-On</a>
-                    {% endif %}
-                </div>
-            </div>
-            {% if config.forgotten_password_text and config.forgotten_password_url %}
-            <div class="row collapse">
-                <div class="small-12 column">
-                    <a href="{{ config.forgotten_password_url }}">{{ config.forgotten_password_text }}</a>
-                </div>
-            </div>
-            {% endif %}
+                <div class="small-12 column login-links">
+                    <input type="submit" name="Submit" value="Login" alt="Login" />
 
+                    {% if config.login_anonymous != '' or config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
+                    <p> - OR - </p>
+                    {% endif %}
+
+                    {% if config.login_anonymous != '' %}
+                    <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
+                    {% endif %}
+
+                    {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
+                    <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
+                    {% endif %}
+                </div>
+            </div>
         </form>
     </div>
     <div id="footer">
