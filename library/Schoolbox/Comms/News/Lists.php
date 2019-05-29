@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Engagement\News;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -421,15 +422,13 @@ class Lists
         $commentCounts = $this->loadCommentCountsFromCollections($articles);
 
         foreach ($articles as $article) {
-            $commentCount = 0;
+            $newsMetaData = new NewsMetaData();
 
             if ($article->getDiscussionThread()) {
-                $commentCount = (int) $commentCounts[$article->getId()];
+                $newsMetaData->setCommentCount((int) $commentCounts[$article->getId()]);
             }
 
-            $article->setMetaData([
-                'commentCount' => $commentCount
-            ]);
+            $article->setMetaData($newsMetaData);
         }
 
         return $articles;

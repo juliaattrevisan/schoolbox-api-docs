@@ -172,11 +172,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private $audience;
 
     /**
-     * An array of article meta data, e.g: comment count, interactions etc.
-     *
-     * @var array
+     * @var NewsMetaData
      */
-    private $metaData = [];
+    private $metaData;
 
     public function __construct()
     {
@@ -1048,11 +1046,11 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     }
 
     /**
-     * @param array $metaData
+     * @param NewsMetaData $metaData
      *
      * @return $this
      */
-    public function setMetaData(array $metaData): self
+    public function setMetaData(NewsMetaData $metaData): self
     {
         $this->metaData = $metaData;
 
@@ -1060,9 +1058,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     }
 
     /**
-     * @return array
+     * @return NewsMetaData
      */
-    public function getMetaData()
+    public function getMetaData(): NewsMetaData
     {
         return $this->metaData;
     }
