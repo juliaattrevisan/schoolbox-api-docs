@@ -613,7 +613,7 @@ class CliPdfGenerator extends CliTool\App
                 $this->getLogger()->error("Unable to generate staff version of '$url'");
                 $this->getLogger()->error($e->getMessage());
                 $this->getLogger()->error($e->getTraceAsString());
-                break;
+                continue;
             }
 
             $response = $this->guzzleClient->get($staffUrl, $options);
@@ -627,7 +627,7 @@ class CliPdfGenerator extends CliTool\App
                 $this->getLogger()->error("Unable to check '$staffUrl' for errors");
                 $this->getLogger()->error($e->getMessage());
                 $this->getLogger()->error($e->getTraceAsString());
-                break;
+                continue;
             }
         }
     }
