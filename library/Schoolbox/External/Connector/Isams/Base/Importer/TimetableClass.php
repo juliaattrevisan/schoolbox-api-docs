@@ -189,7 +189,7 @@ class TimetableClass
                  */
                 if (isset($users[$student['id']])) {
                     $this->log->warning(sprintf(
-                        'Tried to assign nonexistent schoobox account %s to class %s %s; skipping',
+                        'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
                         $student['id'],
                         $timetableClass->getName(),
                         $timetableClass->getCode()
