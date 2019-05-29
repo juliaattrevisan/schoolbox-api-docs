@@ -10,7 +10,11 @@
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Iterator;
+use RuntimeException;
 use Schoolbox\External\UPS\Batchxml;
+use SimpleXMLElement;
+use Zend\Uri\Exception\InvalidArgumentException;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 class TimetableClassIterator implements Iterator
 {
@@ -22,7 +26,7 @@ class TimetableClassIterator implements Iterator
 
 
     /**
-     * @var array|\SimpleXMLElement[]
+     * @var array|SimpleXMLElement[]
      */
     private $sets;
 
@@ -37,9 +41,9 @@ class TimetableClassIterator implements Iterator
      * TimetableClassIterator constructor.
      *
      * @param Batchxml $batchxml
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
     public function __construct(Batchxml $batchxml)
     {
@@ -53,13 +57,13 @@ class TimetableClassIterator implements Iterator
      * A list of teachers for the class $set
      * Requires UPS to have loaded all Staff members
      *
-     * @param \SimpleXMLElement $set
+     * @param SimpleXMLElement $set
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
-    private function findTeachers(\SimpleXMLElement $set): array
+    private function findTeachers(SimpleXMLElement $set): array
     {
         $teachers = [];
 
@@ -85,13 +89,13 @@ class TimetableClassIterator implements Iterator
      * A list of students for this class
      * Requires UPS to have loaded all Student members
      *
-     * @param \SimpleXMLElement $set
+     * @param SimpleXMLElement $set
      * @return array
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      */
-    private function findStudents(\SimpleXMLElement $set): array
+    private function findStudents(SimpleXMLElement $set): array
     {
         $students = [];
 
@@ -127,9 +131,9 @@ class TimetableClassIterator implements Iterator
      *
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
-     * @throws \RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     * @throws RuntimeException
+     * @throws InvalidArgumentException
+     * @throws InvalidUriPartException
      * @since 5.0.0
      */
     public function current()

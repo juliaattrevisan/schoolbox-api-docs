@@ -9,6 +9,7 @@
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Collection;
 use Schoolbox\External\ClassEntryMapper;
@@ -21,7 +22,9 @@ use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelationMapper;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 class Composite implements ImporterInterface
 {
@@ -154,6 +157,11 @@ class Composite implements ImporterInterface
 
     /**
      * Execute each of the strategies
+     *
+     * @throws \RuntimeException
+     * @throws InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function import(): void
     {

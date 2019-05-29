@@ -16,6 +16,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidArgumentException;
@@ -126,6 +127,11 @@ class TimetableClass
 
     /**
      * Import data from xml into local schema
+     *
+     * @throws \RuntimeException
+     * @throws InvalidUriPartException
+     * @throws InvalidArgumentException
+     * @throws Exception
      */
     public function import(): void
     {
@@ -146,18 +152,7 @@ class TimetableClass
          * such as period ids, user ids, etc. so we try to get those and assemble them into
          * a convenient struct which we can then just ram home
          */
-        try {
-            $classes = new TimetableClassIterator($this->batchxml);
-        } catch (\RuntimeException $e) {
-            $this->log->critical('Cannot access api endpoint.');
-            exit(1);
-        } catch (InvalidUriPartException $e) {
-            $this->log->critical('Cannot access api endpoint: bad url');
-            exit(1);
-        } catch (InvalidArgumentException $e) {
-            $this->log->critical('Cannot access api endpoint: bad url');
-            exit(1);
-        }
+        $classes = new TimetableClassIterator($this->batchxml);
 
         foreach ($classes as $class) {
 

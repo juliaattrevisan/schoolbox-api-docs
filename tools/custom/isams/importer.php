@@ -32,6 +32,7 @@ use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\External\UserProfileMapper;
 use Schoolbox\External\UserRelationMapper;
 use Schoolbox\UserMapper;
+use Zend\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -85,7 +86,15 @@ HELP;
             ClassPeriodMapper::getInstance()
         );
 
-        $composite->import();
+        try {
+            $composite->import();
+        } catch (\RuntimeException $e) {
+            $this->getLogger()->critical('Cannot access api endpoint.');
+        } catch (InvalidUriPartException $e) {
+            $this->getLogger()->critical('Cannot access api endpoint: bad url');
+        } catch (InvalidArgumentException $e) {
+            $this->getLogger()->critical('Cannot access api endpoint: bad url');
+        }
     }
 };
 
