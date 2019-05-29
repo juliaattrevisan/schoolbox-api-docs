@@ -216,9 +216,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /**
      * Student's boarding status (only used if boarder leave module is enabled)
      *
-     * @var string
+     * @var null|string
      */
-    protected $boardingStatus;
+    private $boardingStatus;
 
     /**
      * @var IConfigLoader
@@ -940,11 +940,11 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /**
      * Set boarding status (only if boarder leave is enabled)
      *
-     * @param  string $boardingStatus
+     * @param null|string $boardingStatus
      *
      * @return $this
      */
-    public function setBoardingStatus($boardingStatus)
+    public function setBoardingStatus(?string $boardingStatus): self
     {
         $this->boardingStatus = $boardingStatus;
         return $this;
@@ -953,9 +953,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /**
      * Get boarding status
      *
-     * @return string
+     * @return null|string
      */
-    public function getBoardingStatus()
+    public function getBoardingStatus(): ?string
     {
         return $this->boardingStatus;
     }
@@ -1130,39 +1130,42 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      * Load parents into object from external db
      * @return self
      */
-    public function loadParents()
+    public function loadParents(): self
     {
-        if(!$this->parentsLoaded) {
-            $DEPRECATED_EXTERNAL_USER = new \External_User();
-            $allParents = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
+        if ($this->parentsLoaded) {
+            return $this;
+        }
+        if (null === $this->externalId) {
+            return $this;
+        }
+        $DEPRECATED_EXTERNAL_USER = new \External_User();
+        $allParents               = $DEPRECATED_EXTERNAL_USER->getStudentContactList($this->externalId);
 
-            if (is_array($allParents)) {
-                foreach ($allParents as $currentParent) {
-                    /* Add parent
-                     */
-                    if (!empty($currentParent['StudentContactID'])) {
-                        try {
-                            $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
-                            $this->parents->add($parent);
-                        } catch (Mapper\Exception $e) {
-                            //noop
-                        }
-                    }
-                    /* Add speece
-                     */
-                    if (!empty($currentParent['StudentContactSpouseID'])) {
-
-                        try {
-                            $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
-                            $this->parents->add($spouse);
-                        } catch (Mapper\Exception $e) {
-                            //noop
-                        }
-                    }
+        foreach ($allParents as $currentParent) {
+            /* Add parent
+             */
+            if (!empty($currentParent['StudentContactID'])) {
+                try {
+                    $parent = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactID'], Role::PARENT);
+                    $this->parents->add($parent);
+                } catch (Mapper\Exception $e) {
+                    //noop
                 }
             }
-            $this->parentsLoaded = true;
+            /* Add speece
+             */
+            if (!empty($currentParent['StudentContactSpouseID'])) {
+
+                try {
+                    $spouse = UserMapper::getInstance()->findByExternalId($currentParent['StudentContactSpouseID'], Role::PARENT);
+                    $this->parents->add($spouse);
+                } catch (Mapper\Exception $e) {
+                    //noop
+                }
+            }
         }
+
+        $this->parentsLoaded = true;
 
         return $this;
     }

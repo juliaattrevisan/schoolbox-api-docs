@@ -235,7 +235,7 @@ class External_Humanedge_User implements External_UserInterface
             FROM Contact c
             WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getRow($query) ?: [];
     }
 
     /**
@@ -292,7 +292,7 @@ class External_Humanedge_User implements External_UserInterface
             FROM Staff t
             WHERE t.Code = {$this->getDatabase()->smartQuote($externalUserId)}
         ";
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getRow($query) ?: [];
     }
 
     /**
@@ -381,7 +381,8 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentSemester(string $externalUserId = null): ?string
     {
-        return $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        $semester = $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        return ($semester === null || $semester === false) ? null : (string)$semester;
     }
 
     /**
@@ -389,7 +390,8 @@ class External_Humanedge_User implements External_UserInterface
      */
     public function getCurrentYear(string $externalUserId = null): ?string
     {
-        return $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        $year = $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
+        return ($year === null || $year === false) ? null : (string)$year;
     }
 
 
@@ -498,14 +500,6 @@ class External_Humanedge_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
-
 
     /**
      * {@inheritDoc}
@@ -522,7 +516,7 @@ class External_Humanedge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return '';
     }

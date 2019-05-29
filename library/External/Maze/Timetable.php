@@ -122,7 +122,13 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         $result = $this->getDb()->getAll($query);
 
-        $timetableDef = array();
+        $timetableDef = [
+            'desc'     => [],
+            'start'    => [],
+            'end'      => [],
+            'number'   => [],
+            'sequence' => [],
+        ];
 
         if (count($result) && is_array($result)) {
             foreach ($result as $current) {

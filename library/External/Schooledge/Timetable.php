@@ -201,8 +201,8 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             FROM       fc.Timetable       t
             INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
             WHERE t.Enabled = 1
-            AND   td.SortOrder = {$this->database->quote($dayNumber)}
-        ");
+            AND   td.SortOrder = :day_number
+        ", ['day_number' => $dayNumber]);
     }
 
     /**

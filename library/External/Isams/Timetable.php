@@ -178,6 +178,9 @@ class External_Isams_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber): string
     {
+        if (!is_numeric($dayNumber)) {
+            return '';
+        }
         $names = [
             'Monday',
             'Tuesday',

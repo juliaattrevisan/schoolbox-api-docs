@@ -346,7 +346,8 @@ class External_Denbigh_User implements External_UserInterface
                               pa_p.type != 'Non Resident'
                 LEFT JOIN     People pe_p ON pe_p.denbighID = pa_p.peopleDenbighID
                 LEFT JOIN     Addresses a ON a.familyDenbighID = s.familyDenbighID
-                WHERE         pe_s.denbighID = :externalId
+                WHERE         pe_s.denbighID = :externalId AND
+                              pe_p.id IS NOT NULL -- check the row actually exists in `People` table
                 GROUP BY      pe_p.denbighID
             ",
             ['externalId' => $externalUserId]
@@ -362,7 +363,7 @@ class External_Denbigh_User implements External_UserInterface
                 'StudentContactSurname'          => $contact['surname'],
                 'StudentContactDefaultEmail'     => $contact['email'],
                 'StudentContactPhoneActual'      => $contact['telephoneHome'],
-                'StudentContactSilentPhoneFlag'  => 0,
+                'StudentContactSilentPhoneFlag'  => '0',
                 'StudentContactMobilePhone'      => '',
                 'StudentContactOccupPhone'       => '',
                 'StudentContactSpouseID'         => '',
@@ -557,8 +558,11 @@ class External_Denbigh_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
+        if ($boarderValue === null) {
+            return '';
+        }
         $boarders = [
             'Boarder'        => 'Boarder',
             'Weekly Boarder' => 'Weekly Boarder',
@@ -600,14 +604,6 @@ class External_Denbigh_User implements External_UserInterface
     public function getHousemasterEmails(array $externalUserIds): array
     {
         return [];
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
     }
 
     /**

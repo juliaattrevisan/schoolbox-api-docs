@@ -100,13 +100,6 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
         return [];
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
 
     /**
      * @inheritdoc
@@ -143,7 +136,7 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return '';
     }

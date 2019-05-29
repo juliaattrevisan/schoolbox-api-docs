@@ -115,7 +115,7 @@ class External_Schoolpro_User implements External_UserInterface
                     /* Get this contact's email
                      * De-dupe it just in case
                      */
-                    $email = trim($currentStudentContact['email']);
+                    $email = trim($currentStudentContact['email'] ?? '');
 
                     if ('' !== $email) {
                         $emails[$email] = $email;
@@ -138,7 +138,7 @@ class External_Schoolpro_User implements External_UserInterface
                      * but the Contact doesn't have the Spouse's email ><
                      */
                     if ($currentStudentSpouse) {
-                        $email = trim($currentStudentSpouse['email']);
+                        $email = trim($currentStudentSpouse['email'] ?? '');
 
                         if ('' !== $email) {
                             $emails[$email] = $email;
@@ -263,35 +263,40 @@ class External_Schoolpro_User implements External_UserInterface
 
         $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
-        if ($currentStudentContact) {
-
-            $studentContact = array(
-
-                /* This should be separated into constituent parts
-                 */
-                'StudentContactPreferred'          => $currentStudentContact['FullName'],
-                'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
-                'StudentContactID'                 => $currentStudentContact['ID'],
-                'StudentContactDefaultEmail'       => $currentStudentContact['email'],
-                'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
-                'StudentContactSilentPhoneFlag'    => 0,
-                'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
-                'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
-                'StudentContactRelation'           => '',
-                'StudentContactSpouseID'           => $currentStudentContact['SpouseID'],
-                'StudentContactSpouseMobilePhone'  => $currentStudentContact['SpouseMobile'],
-                'StudentContactSpouseOccupPhone'   => $currentStudentContact['SpouseBusinessPhone'],
-                'StudentContactSpouseDefaultEmail' => '',
-                'StudentContactType'               => '',
-                'StudentContactSpouseRelation'     => '',
-            );
-
-            return array($studentContact);
+        if (!$currentStudentContact) {
+            return [];
         }
 
-        return [];
+        $studentContact = [
+
+            /* This should be separated into constituent parts
+             */
+            'StudentContactPreferred'          => $currentStudentContact['FullName'],
+            'StudentContactSpousePreferred'    => $currentStudentContact['SpouseName'],
+            'StudentContactID'                 => $currentStudentContact['ID'],
+            'StudentContactDefaultEmail'       => $currentStudentContact['email'],
+            'StudentContactPhoneActual'        => $currentStudentContact['HomePhone'],
+            'StudentContactSilentPhoneFlag'    => 0,
+            'StudentContactMobilePhone'        => $currentStudentContact['Mobile'],
+            'StudentContactOccupPhone'         => $currentStudentContact['BusinessPhone'],
+            'StudentContactRelation'           => '',
+            'StudentContactSpouseID'           => $currentStudentContact['SpouseID'],
+            'StudentContactSpouseMobilePhone'  => $currentStudentContact['SpouseMobile'],
+            'StudentContactSpouseOccupPhone'   => $currentStudentContact['SpouseBusinessPhone'],
+            'StudentContactSpouseDefaultEmail' => '',
+            'StudentContactType'               => '',
+            'StudentContactSpouseRelation'     => '',
+        ];
+
+        // Ensure all values are strings to respect interface
+        $studentContact = array_map(static function ($value) {
+            return (string)$value;
+        }, $studentContact);
+
+        return [$studentContact];
     }
-    
+
+
     /**
      * @inheritDoc
      */
@@ -408,47 +413,6 @@ class External_Schoolpro_User implements External_UserInterface
 
         return $allStudents;
 
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        $groupHandler = new Group();
-
-        /* 13.5 context
-        $userMapper = new Schoolbox\UserMapper();
-        $user = $userMapper->findOneByColumnList(array('externalId' => $externalUserId));
-        */
-
-        /* 13.0.x context
-         */
-        $userMapper = new User();
-        $user       = $userMapper->getBySynergy($externalUserId);
-
-        /* Use a different query depending on the type of person
-         */
-        if ($groupHandler->isStudent($user['uid'])) {
-            $result = $this->getStudent($externalUserId);
-
-            return $result['email'];
-        } else {
-            if ($groupHandler->isParent($user['uid'])) {
-                $result = $this->getParent($externalUserId);
-
-                return $result['email'];
-            } else {
-                if ($groupHandler->isStaff($user['uid'])) {
-
-                    /* TODO: Not supplied?
-                     */
-                    return '';
-                }
-            }
-        }
-
-        return '';
     }
 
 
@@ -590,7 +554,7 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return '';
     }

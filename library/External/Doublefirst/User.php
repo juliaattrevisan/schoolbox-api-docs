@@ -215,6 +215,9 @@ class External_Doublefirst_User implements External_UserInterface
         ";
 
         $parent = $this->getDatabase()->getRow($query);
+        if ($parent === false) {
+            return [];
+        }
 
         // HACK: Apparently the DoubleFirst database schema is setup to believe that all couples share the same surname, so
         // the partners surname is either mashed into their first name (in which case we assume anything after the
@@ -223,7 +226,7 @@ class External_Doublefirst_User implements External_UserInterface
 
         // Start by checking for "&"
 
-        $spouseNameArray = explode("&", trim($parent["Surname"]), 1);
+        $spouseNameArray = explode("&", trim($parent["Surname"] ?? ''), 1);
 
         if (count($spouseNameArray) > 1) {
             $spouseNameArray["Surname"] = $spouseNameArray[0];
@@ -231,7 +234,7 @@ class External_Doublefirst_User implements External_UserInterface
         } else {
             // That didn't work, try looking for spaces in spouse name
 
-            $spouseNameArray = explode(" ", trim($parent["SpousePreferred"]), 1);
+            $spouseNameArray = explode(" ", trim($parent["SpousePreferred"] ?? ''), 1);
 
             if (count($spouseNameArray) > 1) {
                 $spouseNameArray["SpouseSurname"] = $spouseNameArray[1];
@@ -452,7 +455,7 @@ class External_Doublefirst_User implements External_UserInterface
             WHERE           s.StaffId = '{$this->database->quote($externalUserId)}'
         ";
 
-        return $this->getDatabase()->getRow($query);
+        return $this->getDatabase()->getRow($query) ?: [];
     }
 
     /**
@@ -584,7 +587,7 @@ class External_Doublefirst_User implements External_UserInterface
         // Search for a particular year level
 
         if (strlen($yearLevel)) {
-            $query .= " {$whereAnd} Year.Description = '{$this->getDatabase()->quote($yearLevel)}' ";
+            $query .= " {$whereAnd} p.YearGroup = '{$this->getDatabase()->quote($yearLevel)}' ";
             $whereAnd = " AND ";
         }
 
@@ -797,7 +800,8 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getCurrentYear(string $externalUserId = null): ?string
     {
-        return $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
+        $year = $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
+        return ($year === null || $year === false) ? null : (string)$year;
     }
 
     /**
@@ -940,21 +944,6 @@ class External_Doublefirst_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        $query =
-            "
-          SELECT  TOP 1 EmailID 
-          FROM    ContactEmailInformation 
-          WHERE   ContactID = '{$externalUserId}' AND 
-                  PrimaryEmail = 1;
-        ";
-
-        return $this->getDatabase()->getOne($query);
-    }
 
     /**
      * @inheritDoc
@@ -1107,7 +1096,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         if (in_array($boarderValue, $this->helper->getBoardingStatuses(), true)) {
             return "Boarder";

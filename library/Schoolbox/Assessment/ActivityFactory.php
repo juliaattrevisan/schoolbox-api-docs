@@ -13,6 +13,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use UnexpectedValueException;
 
 class ActivityFactory {
 
@@ -20,9 +21,11 @@ class ActivityFactory {
 	 * @param SubmissionBox $box
 	 * @param string        $event The event type
      * @see Activity::EVENT_* constants
-	 * @return null|Activity
+	 * @return Activity
+     * @throws UnexpectedValueException If unable to find a suitable date for the submission box and event
 	 */
-    public function buildFromSubmissionBox(SubmissionBox $box, string $event) {
+    public function buildFromSubmissionBox(SubmissionBox $box, string $event): Activity
+    {
 		$date = null;
         if ($event === Activity::EVENT_NEW) {
 			$date = $box->getOpenDate();
@@ -34,7 +37,7 @@ class ActivityFactory {
 			$date = $box->getLateDate();
 		}
 		if (!isset($date)) {
-			return null;
+            throw new UnexpectedValueException("Unable to find suitable '$event' date for submission box ({$box->getId()})");
 		}
 		$activity = new Activity();
 		$activity
@@ -49,9 +52,11 @@ class ActivityFactory {
 	/**
 	 * @param Quiz $assess
 	 * @param string        $event The event type: "new", "closed" or "upcoming"
-	 * @return null|Activity
+	 * @return Activity
+     * @throws UnexpectedValueException If unable to find a suitable date for the quiz and event
 	 */
-	public function buildFromOnlineAssessment(Quiz $assess, string $event) {
+    public function buildFromOnlineAssessment(Quiz $assess, string $event): Activity
+    {
 		$date = null;
 		if ($event === Activity::EVENT_NEW) {
 			$date = $assess->getStart();
@@ -60,7 +65,7 @@ class ActivityFactory {
 			$date = $assess->getFinish();
 		}
 		if (!isset($date)) {
-			return null;
+            throw new UnexpectedValueException("Unable to find suitable '$event' date for quiz ({$assess->getId()})");
 		}
 		$activity = new Activity();
 		$activity

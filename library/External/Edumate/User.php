@@ -499,7 +499,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      * @inheritdoc
      * @deprecated
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return '';
     }
@@ -551,13 +551,5 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     public function getStaff(string $externalUserId): array
     {
         return [];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
     }
 }

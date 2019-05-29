@@ -446,7 +446,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 $secondsAfterMidnight,
                 $secondsAfterMidnight
             )
-        );
+        ) ?: [];
     }
 
 

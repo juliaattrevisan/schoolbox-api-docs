@@ -29,6 +29,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * @method Model createModel($id = null)
@@ -240,6 +241,7 @@ class Mapper extends BaseMapper
         return $assessment->getAssessmentContext()->isSpecificationContext();
     }
 
+
     /**
      * Post-delete callback.
      *
@@ -247,6 +249,7 @@ class Mapper extends BaseMapper
      *
      * @param Model $object
      * @return true
+     * @throws UnexpectedValueException If unable to build Acitivity from Quiz
      */
     public function deleteFromMarkbook(Model $object)
     {
@@ -258,14 +261,16 @@ class Mapper extends BaseMapper
         return true;
     }
 
+
     /**
      * Gets all assessments that are due within the given date span.
      *
-     * @param array $category_list A list of category IDs to filter on.
-     * @param int $from_timestamp A Unix timestamp to search from
-     * @param int $to_timestamp A Unix timestamp to search until
+     * @param array $category_list  A list of category IDs to filter on.
+     * @param int   $from_timestamp A Unix timestamp to search from
+     * @param int   $to_timestamp   A Unix timestamp to search until
      *
      * @return ActivityCollection
+     * @throws UnexpectedValueException If unable to build Activity from assessment
      */
     public function getDueActivities($category_list, $from_timestamp, $to_timestamp)
     {

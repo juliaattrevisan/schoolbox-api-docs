@@ -52,8 +52,8 @@ interface External_TimetableInterface extends External\IConnector
      *
      * The returned data structure is required for Dashboard Timetable Controller
      *
-     * array[]['PeriodNumber']
-     * array[]['PeriodNumberSeq']
+     * array['PeriodNumber']
+     * array['PeriodNumberSeq']
      *
      * @param Schoolbox\Campus $campus
      * @param int $now

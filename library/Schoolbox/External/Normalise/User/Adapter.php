@@ -1324,22 +1324,6 @@ class Adapter {
      */
 
     /**
-     * Get an email address belonging to $externalUserId
-     *
-     * @param $externalUserId
-     * @return Common\Email
-     */
-    public function getEmail($externalUserId): Common\Email
-    {
-        $currentResult = $this->handler->getEmail($externalUserId);
-
-        $email = new Common\Email();
-        $email->setAddress($currentResult);
-
-        return $email;
-    }
-
-    /**
      * Set session vars for current semester (fileyear, filesemester)
      *
      * @param string $externalUserId
@@ -1418,10 +1402,10 @@ class Adapter {
      * Translate a $boarderValue into a human-readable variant
      * e.g. translates D, W into "Day" and B into "Boarder"
      *
-     * @param $boarderValue
+     * @param null|string $boarderValue
      * @return string
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return $this->handler->determineBoarderType($boarderValue);
     }

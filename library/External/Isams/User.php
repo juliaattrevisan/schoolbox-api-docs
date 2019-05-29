@@ -1,22 +1,7 @@
 <?php
 /**
- * Isams User Object
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- *
- * Uncle iSam?
- *    _..._
- *   |||||||
- *   |||||||
- *  _|*****|_
- * ( '-...-' )
- * {`;-----;`}
- * {(| a  a|)}
- *  \|  _\ |/
- *   \  -  /
- *    '{_}`
  */
 declare(strict_types=1);
 
@@ -25,8 +10,6 @@ use Schoolbox\User;
 
 class External_Isams_User implements External_UserInterface
 {
-
-
     use External_MssqlConnector;
 
     /**
@@ -35,14 +18,10 @@ class External_Isams_User implements External_UserInterface
      */
     protected const FORMAT_ISO8601 = 126;
 
-    /** @var Group $groupHandler */
-    private $groupHandler;
-
     /** Constructor */
     public function __construct()
     {
         $this->setupDatabase();
-        $this->setGroup(new Group());
     }
 
 
@@ -64,7 +43,8 @@ class External_Isams_User implements External_UserInterface
     public function getParent(string $externalUserId): array
     {
         $query = "
-            SELECT      V_Parent.ParentID             AS ID,
+            SELECT TOP 1
+                        V_Parent.ParentID             AS ID,
                         V_Parent.Title                AS Title,
                         V_Parent.ParentFirstname      AS Preferred,
                         V_Parent.ParentSurname        AS Surname,
@@ -90,9 +70,7 @@ class External_Isams_User implements External_UserInterface
             WHERE       V_Student.StudentID = :external_user_id
         ";
 
-        $parent = $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
-
-        return $parent;
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
     }
 
     /**
@@ -147,7 +125,8 @@ class External_Isams_User implements External_UserInterface
     public function getStudent(string $externalUserId): array
     {
         $query = "
-            SELECT      StudentID               AS StudentID,
+            SELECT TOP 1
+                        StudentID               AS StudentID,
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
                         CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,                
@@ -183,7 +162,7 @@ class External_Isams_User implements External_UserInterface
             WHERE       StudentID = :external_user_id
         ";
 
-        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch();
+        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
     }
 
 
@@ -381,23 +360,6 @@ class External_Isams_User implements External_UserInterface
      * @inheritDoc
      * @throws \Alaress\Database\Exception
      */
-    public function getEmail(string $externalUserId): string
-    {
-        $query =
-            "
-          SELECT  V_Parent.PersonalEmail 
-          FROM    V_Parent 
-          WHERE   V_Parent.ParentID = :id
-        ";
-
-        return $this->getConnector()->executeQuery($query, ['id' => $externalUserId])->fetchColumn();
-    }
-
-
-    /**
-     * @inheritDoc
-     * @throws \Alaress\Database\Exception
-     */
     public function getStudentUserAccountInfo(): array
     {
         $query = "
@@ -429,7 +391,7 @@ class External_Isams_User implements External_UserInterface
     {
         $query = "
             SELECT      
-                        Username                      AS StudentContactNetworkLogin,
+                        V_Parent.Username             AS StudentContactNetworkLogin,
                         V_Parent.ParentID             AS StudentContactID,
                         V_Parent.Title                AS StudentContactTitle,
                         V_Parent.ParentFirstname      AS StudentContactPreferred,
@@ -442,8 +404,8 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS StudentContactSpouseSurname,
                         ''                            AS StudentContactSpouseDefaultEmail,
                         V_Student.Grade               AS StudentYearLevel,
-                        campus                        AS StudentCampus,
-                        Gender                        AS StudentGender
+                        V_Student.campus              AS StudentCampus,
+                        V_Student.Gender              AS StudentGender
             FROM        V_Student
             LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = V_Student.StudentID
         ";
@@ -535,7 +497,7 @@ class External_Isams_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         return "Day Student";
     }
@@ -562,24 +524,5 @@ class External_Isams_User implements External_UserInterface
     public function getStudentForms(): array
     {
         return [];
-    }
-
-    /* Getters/Setters
-      */
-
-    /**
-     * @param Group $groupHandler
-     */
-    public function setGroup($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * @return Group
-     */
-    public function getGroup()
-    {
-        return $this->groupHandler;
     }
 }

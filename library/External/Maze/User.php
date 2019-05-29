@@ -84,10 +84,10 @@ class External_Maze_User implements External_UserInterface
     /**
      * 1 + 1 = 1
      *
-     * @param $family
+     * @param array $family
      * @return array
      */
-    protected function recombine($family)
+    private function recombine(array $family): array
     {
 
         /* Combine everything into a joint account
@@ -98,7 +98,15 @@ class External_Maze_User implements External_UserInterface
         $newFamily = array();
         $newFamily['ContactID'] = $family['ContactID'];
 
-        if (strlen($family['Preferred']) && strlen($family['SpousePreferred'])) {
+        // We need to know if these contain any real data. ie not NULL, nor empty, nor just whitespace
+        $preferred         = trim($family['Preferred'] ?? '');
+        $spousePreferred   = trim($family['SpousePreferred'] ?? '');
+        $email             = trim($family['Email'] ?? '');
+        $spouseEmail       = trim($family['SpouseEmail'] ?? '');
+        $mobilePhone       = trim($family['MobilePhone'] ?? '');
+        $spouseMobilePhone = trim($family['SpouseMobilePhone'] ?? '');
+
+        if ($preferred !== '' && $spousePreferred !== '') {
             $newFamily['Title'] = "{$family['Title']} & {$family['SpouseTitle']}";
             $newFamily['Preferred'] = "{$family['Preferred']} & {$family['SpousePreferred']}";
 
@@ -108,18 +116,18 @@ class External_Maze_User implements External_UserInterface
 
             /* Decide whose email to use
              */
-            if (strlen($family['Email'])) {
+            if ($email !== '') {
                 $newFamily['Email'] = $family['Email'];
-            } elseif (strlen($family['SpouseEmail'])) {
+            } elseif ($spouseEmail !== '') {
                 $newFamily['Email'] = $family['SpouseEmail'];
             }
 
             /* Decide whose mobile to use
              */
-            if (strlen($family['MobilePhone'])) {
+            if ($mobilePhone !== '') {
                 $newFamily['MobilePhone'] = $family['MobilePhone'];
             }
-            elseif (strlen($family['SpouseMobilePhone'])) {
+            elseif ($spouseMobilePhone !== '') {
                 $newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
             }
 
@@ -127,7 +135,7 @@ class External_Maze_User implements External_UserInterface
              */
             $newFamily['HomePhone'] = $family['HomePhone'];
         }
-        elseif (strlen($family['Preferred'])) {
+        elseif ($preferred !== '') {
             $newFamily['Title']       = $family['Title'];
             $newFamily['Preferred']   = $family['Preferred'];
             $newFamily['Surname']     = $family['Surname'];
@@ -135,7 +143,7 @@ class External_Maze_User implements External_UserInterface
             $newFamily['HomePhone']   = $family['HomePhone'];
             $newFamily['MobilePhone'] = $family['MobilePhone'];
         }
-        elseif (strlen($family['SpousePreferred'])) {
+        elseif ($spousePreferred !== '') {
             $newFamily['Title'] = $family['SpouseTitle'];
             $newFamily['Preferred'] = $family['SpousePreferred'];
             $newFamily['Surname'] = $family['SpouseSurname'];
@@ -195,64 +203,71 @@ class External_Maze_User implements External_UserInterface
     {
         if (!count($externalUserIds)) {
             return array();
-        } else {
-            $allIds = '(\'' . implode('\',\'', $externalUserIds) . '\')';
+        }
+        $allIds = '(\'' . implode('\',\'', $externalUserIds) . '\')';
 
-            $query = "
-				SELECT
-					DF1.DFKEY AS RelatedID1,
-					DF2.DFKEY AS RelatedID2,
-					DF1.M_EMAIL AS FamilyEmail1,
-					DF1.F_EMAIL AS FamilyEmail2,
-					DF2.M_EMAIL AS AltFamilyEmail1,
-					DF2.F_EMAIL AS AltFamilyEmail2
-				FROM ST
-				LEFT JOIN DF DF1 ON ST.FAMILY = DF1.DFKEY
-				LEFT JOIN DF DF2 ON (ST.FAMB = DF2.DFKEY AND ST.LIVING_B != 'N')
-				WHERE ST.STKEY IN $allIds
-			";
+        $query = "
+            SELECT
+                DF1.DFKEY AS RelatedID1,
+                DF2.DFKEY AS RelatedID2,
+                DF1.M_EMAIL AS FamilyEmail1,
+                DF1.F_EMAIL AS FamilyEmail2,
+                DF2.M_EMAIL AS AltFamilyEmail1,
+                DF2.F_EMAIL AS AltFamilyEmail2
+            FROM ST
+            LEFT JOIN DF DF1 ON ST.FAMILY = DF1.DFKEY
+            LEFT JOIN DF DF2 ON (ST.FAMB = DF2.DFKEY AND ST.LIVING_B != 'N')
+            WHERE ST.STKEY IN $allIds
+        ";
 
-            $allEmails = $this->getDb()->getAll($query);
+        $allEmails = $this->getDb()->getAll($query);
 
-            $processed = array();
+        $processed = array();
 
-            if (is_array($allEmails) && count($allEmails)) {
-                foreach ($allEmails as $currentEmail) {
+        if (is_array($allEmails) && count($allEmails)) {
+            foreach ($allEmails as $currentEmail) {
 
-                    /*
-                     * Need to get both FamilyEmail1 and FamilyEmail2, as one is for father
-                     * and the other is for mother in some schools.
-                     */
-                    if (strlen($currentEmail['RelatedID1'])) {
-                        if (strlen($currentEmail['FamilyEmail1'])) {
-                            $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
-                        }
-                        if (strlen($currentEmail['FamilyEmail2'])) {
-                            // As the second email shares the same DFKEY as the first email, appending extra to the key.
-                            $processed["{$currentEmail['RelatedID1']}-2"] = $currentEmail['FamilyEmail2'];
-                        }
+                // Testing that column is not NULL, empty, or just whitespace
+                $relatedID1      = trim($currentEmail['RelatedID1'] ?? '');
+                $relatedID2      = trim($currentEmail['RelatedID2'] ?? '');
+                $familyEmail1    = trim($currentEmail['FamilyEmail1'] ?? '');
+                $familyEmail2    = trim($currentEmail['FamilyEmail2'] ?? '');
+                $altFamilyEmail1 = trim($currentEmail['AltFamilyEmail1'] ?? '');
+                $altFamilyEmail2 = trim($currentEmail['AltFamilyEmail2'] ?? '');
+
+                /*
+                 * Need to get both FamilyEmail1 and FamilyEmail2, as one is for father
+                 * and the other is for mother in some schools.
+                 */
+                if ($relatedID1 !== '') {
+                    if ($familyEmail1) {
+                        $processed[$currentEmail['RelatedID1']] = $currentEmail['FamilyEmail1'];
                     }
+                    if ($familyEmail2 !== '') {
+                        // As the second email shares the same DFKEY as the first email, appending extra to the key.
+                        $processed["{$currentEmail['RelatedID1']}-2"] = $currentEmail['FamilyEmail2'];
+                    }
+                }
 
-                    /* Can't tell whether a parent should be emailed at all,
-                     * or ignored, in a split-family scenario
-                     *
-                     * Assume they will be emailed, split out the split parents
-                     * into their own record in the processed stack
-                     */
-                    if (strlen($currentEmail['RelatedID2'])) {
-                        if (strlen($currentEmail['AltFamilyEmail1'])) {
-                            $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
-                        }
-                        if (strlen($currentEmail['AltFamilyEmail2'])) {
-                            // As the second email shares the same DFKEY as the first email, appending extra to the key.
-                            $processed["{$currentEmail['RelatedID2']}-2"] = $currentEmail['AltFamilyEmail2'];
-                        }
+                /* Can't tell whether a parent should be emailed at all,
+                 * or ignored, in a split-family scenario
+                 *
+                 * Assume they will be emailed, split out the split parents
+                 * into their own record in the processed stack
+                 */
+                if ($relatedID2 !== '') {
+                    if ($altFamilyEmail1 !== '') {
+                        $processed[$currentEmail['RelatedID2']] = $currentEmail['AltFamilyEmail1'];
+                    }
+                    if ($altFamilyEmail2 !== '') {
+                        // As the second email shares the same DFKEY as the first email, appending extra to the key.
+                        $processed["{$currentEmail['RelatedID2']}-2"] = $currentEmail['AltFamilyEmail2'];
                     }
                 }
             }
-
-            return $processed;
         }
+
+        return $processed;
     }
 
     /**
@@ -749,14 +764,6 @@ class External_Maze_User implements External_UserInterface
         return $this->getDb()->getAll($query);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getEmail(string $externalUserId): string
-    {
-        return '';
-    }
-
 
     /**
      * Returns a local path to the user's portrait
@@ -826,11 +833,15 @@ class External_Maze_User implements External_UserInterface
                 }
 
                 if ($queryPhoto) {
-                    $photo = $this->getDb()->getRow($queryPhoto);
+                    $photo = $this->getDb()->getRow($queryPhoto)['Photo'] ?? null;
+
+                    if (!$photo) {
+                        return null;
+                    }
 
                     /* Save it into brownhole
                      */
-                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['Photo']);
+                    $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo);
 
                     /* Update user with latest version
                      */
@@ -978,7 +989,7 @@ class External_Maze_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function determineBoarderType(string $boarderValue): string
+    public function determineBoarderType(?string $boarderValue): string
     {
         if ($boarderValue === 'Y') {
             return 'Boarder';

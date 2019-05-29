@@ -3854,7 +3854,7 @@ abstract class Mapper implements IMapper, Serializable
         $distinct = $stmt->fetchAll(PDO::FETCH_COLUMN);
         if (count($distinct)) {
             $hydrator = $this->getColumnScalarHydrator($column);
-            $distinct = array_map([$hydrator, 'hydrator'], $distinct);
+            $distinct = array_map([$hydrator, 'hydrate'], $distinct);
         }
         return $distinct;
     }

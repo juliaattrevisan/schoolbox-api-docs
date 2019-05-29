@@ -162,8 +162,8 @@ class MSSQL
      *
      * @deprecated
      * @param string $sql_q
-     * @param null   $params
-     * @return string
+     * @param null|array $params
+     * @return mixed
      */
     function getOne($sql_q, $params = null)
     {
