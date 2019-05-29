@@ -394,6 +394,7 @@ class Controller extends Web\Controller\Base
         if ($getCurrent) {
             // If viewing current, just use SIS values
             $folder->loadTeachers();
+            return;
         }
 
         // Load teachers who gave feedback
