@@ -12,6 +12,7 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
@@ -438,6 +439,7 @@ class Controller extends Web\Controller\Base
             ->in('a.id', $assessments->getPropertyValues($this->assessmentMapper->getIdentifierProperty()));
 
         $whereClause = implode(' AND ', $pb->getWhere());
+        $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
 
         $sql = "
             SELECT tc.marking_user_id AS user_id
@@ -456,9 +458,14 @@ class Controller extends Web\Controller\Base
             FROM assessment a
             JOIN submission_box sb on a.id = sb.assessment_id
             JOIN submission_return sr on sb.id = sr.box_id
-            WHERE {$whereClause}
+            WHERE sr.review_route = '{$reviewRoute}' AND {$whereClause}
         ";
-        return $this->folderMapper->getDatabase()->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
+
+        $userIds = $this->folderMapper->getDatabase()->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
+        // Get staff only
+        $pb = $this->userMapper->getPredicateBuilder();
+        $pb->in('id', $userIds)->equals('g.group_type', Role::STAFF);
+        return $this->userMapper->findByPredicates($pb)->getAll();
     }
 
 
