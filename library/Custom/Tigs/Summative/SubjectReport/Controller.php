@@ -27,6 +27,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Role;
 use Schoolbox\User;
 use External_UserInterface;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -209,23 +210,25 @@ class Controller extends Web\Controller\Base
         }
 
         $data   = [
-            'user'          => $user,
-            'folder'        => $folder,
-            'teachers'      => $folder->loadTeachers()->getTeachers(),
-            'courseSpec'    => $courseSpec,
-            'isEnabled'     => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
+            'user'                      => $user,
+            'folder'                    => $folder,
+            'teachers'                  => $folder->loadTeachers()->getTeachers(),
+            'courseSpec'                => $courseSpec,
+            'isEnabled'                 => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
             'showNoLongerEnrolledAlert' => $now === null && !$this->isCurrentEnrollment($user, $folder),
-            'attributes'    => $attributes,
-            'errors'        => $errors,
-            'unitSpecs'     => $unitSpecsWithData,
-            'courseDescription' => $courseDescription,
-            'falData'       => $falData,
-            'aamData'       => $aamData,
-            'aasData'       => $aasData,
-            'ibGraphData'   => $ibGraphData,
-            'nesaGraphData' => $nesaGraphData,
-            'hscTaskMarks'  => $hscTaskMarks,
-            'hscRankData'   => $hscRankData,
+            'attributes'                => $attributes,
+            'errors'                    => $errors,
+            'unitSpecs'                 => $unitSpecsWithData,
+            'courseDescription'         => $courseDescription,
+            'falData'                   => $falData,
+            'aamData'                   => $aamData,
+            'aasData'                   => $aasData,
+            'ibGraphData'               => $ibGraphData,
+            'nesaGraphData'             => $nesaGraphData,
+            'hscTaskMarks'              => $hscTaskMarks,
+            'hscRankData'               => $hscRankData,
+            'showErrors'                => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
+            'dataAttributeError'        => Config::ERROR_DATA_ATTRIBUTE,
         ];
         $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 

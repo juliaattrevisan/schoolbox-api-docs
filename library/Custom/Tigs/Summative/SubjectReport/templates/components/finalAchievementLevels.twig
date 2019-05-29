@@ -6,11 +6,13 @@ This is a table derived from a rubric.
 Data:
     error:               string           - Optional. If present, the reason why we can't render the component
     data:                int[]:           - Optional. The student's marks for the rubric
+    showErrors           bool             - Should we render errors?
+    dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 
 <h2 class="subheader">MYP Final Achievement Levels</h2>
 {% if error|default(null) %}
-    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
     <div class="scrollable">
         <table class="fal">

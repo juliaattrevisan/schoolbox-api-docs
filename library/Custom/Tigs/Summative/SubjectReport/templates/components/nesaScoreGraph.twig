@@ -2,9 +2,11 @@
 Renders a NESA Grade graph.
 
 Data:
-    error:        string   - Optional. If present, the reason why we can't render the component
-    studentMark:  int|null - Optional. The student's mark for the NESA graph assessment
-    data:         array    - The results to render. key: column, value: height
+    error:               string   - Optional. If present, the reason why we can't render the component
+    studentMark:         int|null - Optional. The student's mark for the NESA graph assessment
+    data:                array    - The results to render. key: column, value: height
+    showErrors           bool     - Should we render errors?
+    dataAttributeError   string   - A string to apply as a data attribute to error alerts
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 
@@ -14,7 +16,7 @@ Data:
 {% set gradientClass = studentMark is null ? '' : urgency.marks(normalisedMark) ~ '-bg' %}
 {% set graphId = 'nesa-graph' ~ semester %}
 {% if error|default(null) %}
-    <div data-alert class="alert-box alert">{{ error|raw }}</div>
+    {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
 
     <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>

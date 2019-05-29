@@ -57,20 +57,20 @@ class BaseComponent
                 $escalation = false;
                 break;
             case Role::STAFF:
-                // Only staff can simulate staff
-                if ($role->isStaff()) {
+                // Only SU or staff can simulate staff
+                if ($viewer->isSuperuser() || $role->isStaff()) {
                     $escalation = false;
                 }
                 break;
             case Role::STUDENT:
-                // Only staff/student can simulate student
-                if ($role->isStaff() || $role->isStudent()) {
+                // Only SU/staff/student can simulate student
+                if ($viewer->isSuperuser() || $role->isStaff() || $role->isStudent()) {
                     $escalation = false;
                 }
                 break;
             case Role::PARENT:
-                // Only staff/student/parent can simulate parent
-                if ($role->isStaff() || $role->isStudent() || $role->isParent()) {
+                // Only SU/staff/student/parent can simulate parent
+                if ($viewer->isSuperuser() || $role->isStaff() || $role->isStudent() || $role->isParent()) {
                     $escalation = false;
                 }
                 break;
