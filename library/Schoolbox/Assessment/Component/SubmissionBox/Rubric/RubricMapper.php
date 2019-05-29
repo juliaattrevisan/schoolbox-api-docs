@@ -1522,14 +1522,17 @@ class RubricMapper
                 // If there's no course spec, or there's no match in the spec:
                 // * create a new criterion in the folder
                 if (!$model) {
-                    // Is the group already on the course?
-                    // Create the criterion in the course
-                    $groupMapper = GroupMapper::getInstance();
-                    try {
-                        $groupMapper->findOneForFolderByName($courseSpecFolderId, $groupName);
-                        $createInCourse = true;
-                    } catch (MapperException $e) {
-                        $createInCourse = false;
+                    $createInCourse = false;
+                    if ($courseSpecFolderId) {
+                        // Is the group already on the course?
+                        // Create the criterion in the course, as group names
+                        // can't conflict between the course and unit.
+                        try {
+                            GroupMapper::getInstance()->findOneForFolderByName($courseSpecFolderId, $groupName);
+                            $createInCourse = true;
+                        } catch (MapperException $e) {
+                            $createInCourse = false;
+                        }
                     }
                     if ($createInCourse) {
                         $model = $criterionMapper->findOrCreateOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
