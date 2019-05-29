@@ -28,7 +28,6 @@ use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -1533,55 +1532,5 @@ class Controller extends Base
     private function generateValidSubmittedArticleSpec() :\Alaress\Specification\ISpecification
     {
         return (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
-    }
-
-    /**
-     * Extract thread ids from the collection
-     *
-     * @param GenericCollection $articles
-     *
-     * @return array
-     */
-    private function getThreadIdsFromCollection(GenericCollection $articles): array
-    {
-        $threadIds = [];
-
-        if (count($articles) === 0) {
-            return $threadIds;
-        }
-
-        foreach ($articles as $key => $article) {
-            $discussionThread = $article->getDiscussionThread();
-            if (null !== $discussionThread) {
-                $threadIds[] = $discussionThread->getId();
-            }
-        }
-
-        return $threadIds;
-    }
-
-    /**
-     * @param array $topicData
-     *
-     * @return array
-     */
-    private function mergeCommentCountIntoPartialData(array $topicData): array
-    {
-        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
-            $this->getThreadIdsFromCollection($topicData['articles']),
-            'parentId'
-        );
-
-        foreach ($topicData['articles'] as $key => $data) {
-            $discussionThread = $data->getDiscussionThread();
-
-            $topicData['articles'][$key]->commentCount = 0;
-
-            if ($discussionThread) {
-                $topicData['articles'][$key]->commentCount = (int) $commentCounts[$data->getId()];
-            }
-        }
-
-        return $topicData;
     }
 }

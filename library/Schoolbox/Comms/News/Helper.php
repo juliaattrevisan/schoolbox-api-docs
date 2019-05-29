@@ -6,7 +6,6 @@
 
 namespace Schoolbox\Comms\News;
 
-
 use Schoolbox\GenericCollection;
 
 class Helper
