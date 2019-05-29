@@ -293,19 +293,49 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata): string
     {
-        /* if there is a PDF-export option for this file (and the config is set to do pdf export),
-         * always give that preference
-         *
-         * There seems to be different behaviour for pdf-able files and other ones
+
+        /* If this is one of the google docs filetypes we know about
          */
-        if ($this->isPdfExportEnabled($metadata) && isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
-            return "{$metadata['title']}.pdf";
+        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
+
+            /* If there is a PDF-export option for this file (and the config is set to do pdf export),
+             * always give that preference
+             *
+             * There seems to be different behaviour for pdf-able files and other ones
+             */
+            if ($this->isPdfExportEnabled($metadata)) {
+                return "{$metadata['title']}.pdf";
+            }
+
+            /* But if pdf export is disabled, infer a meaningful filename instead
+             * so you can load it into Office etc.
+             */
+            $extension = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXTENSION];
+
+            return "{$metadata['title']}.{$extension}";
         }
 
-        /* If the metadata field "fileExtension" contains text, assume a concatenation of
-         * "title" and "fileExtension" to form a full filename
+        /* If you got here, it's some other kind of file
+         *
+         * If the metadata field "fileExtension" contains text, investigate the contents of
+         * "originalFilename" and "fileExtension"
          */
         if ('' !== $metadata['fileExtension']) {
+
+            /* "originalFilename" might already contain the extension if you uploaded a file
+             * If the last characters of "originalFilename" are the same as "fileExtension"
+             * then just return "originalFilename" with no alterations required
+             */
+            $extIndex = strrpos($metadata['originalFilename'], '.');
+
+            if (false !== strpos($metadata['originalFilename'], $metadata['fileExtension'], $extIndex)) {
+                return $metadata['originalFilename'];
+            }
+
+            /* Otherwise it might not have the extension in "originalFilename" at all, such as
+             * that "Getting Started" pdf; assume a concatenation of "title" and "fileExtension"
+             * to make a full filename
+             */
             return "{$metadata['title']}.{$metadata['fileExtension']}";
         }
 

@@ -55,18 +55,13 @@ foreach ($_POST['docs'] as $doc) {
         trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
 
         continue;
-    }
-
-    try {
-        $filename = $grive->deriveFileName($meta);
     } catch (Mapper\Exception $e) {
 
         /* noop: unknown file extension: silently disregard for now
+         * because deriveFileName() couldn't figure out the extension
          */
         continue;
     }
-
-    $dest = $grive->fetchToFile($doc['id']);
 
     try {
         // this will return an existing record if the file previously existed
