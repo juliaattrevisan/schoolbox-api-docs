@@ -145,10 +145,10 @@ abstract class AbstractMailer implements IMailer
     /**
      * Set the reply-to header
      *
-     * @param string $email
+     * @param string|array $email
      * @param string $name
      */
-    public function setReplyTo(string $email, string $name = '')
+    public function setReplyTo($email, string $name = '')
     {
         $this->email->setReplyTo($email, $name);
     }
