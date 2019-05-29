@@ -413,7 +413,7 @@ class Controller extends Web\Controller\Base
             'g.group_type'                           => Role::STAFF, // are staff
         ];
         $staffWhoGaveFeedback = $this->userMapper->findByColumnList($columnList);
-        $folder->setTeachers($folder->getTeachers()->mergeUnique($staffWhoGaveFeedback, $this->userMapper->getIdentifierProperty()));
+        $folder->setTeachers($staffWhoGaveFeedback);
     }
 
 
