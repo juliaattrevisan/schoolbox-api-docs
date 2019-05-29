@@ -187,7 +187,7 @@ class TimetableClass
                  * we can't assign them to any classes - they don't have a
                  * schoolbox user account
                  */
-                if (isset($users[$student['id']])) {
+                if (!isset($users[$student['id']])) {
                     $this->log->warning(sprintf(
                         'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
                         $student['id'],
