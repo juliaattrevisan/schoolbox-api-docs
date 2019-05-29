@@ -45,13 +45,16 @@ try {
     $idpMetadataUrl = $url->toString();
 
     $cache = new Alaress_Saml_Cache();
-    $idpMetadata_raw = $cache->init($idpMetadataUrl)->getStreamContents();
+    $idpMetadata = $cache->init($idpMetadataUrl);
 
-    try {
-        $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata_raw));
-    } catch (Exception $e) {
-        $cache->invalidateCache();
-        SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
+    // if cache exists, update $setting info from cache
+    if (!empty($idpMetadata) && file_exists($idpMetadata->getCachedFile())) {
+        try {
+            $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
+        } catch (Exception $e) {
+            $cache->invalidateCache();
+            SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
+        }
     }
 
 } catch (Exception $e) {
