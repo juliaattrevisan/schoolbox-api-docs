@@ -60,10 +60,10 @@
                     window.location.reload(true);
                 } else if (503 === this.status) {
                     // Still down. Apply exponential back-off, reset timeout counter, but not more than the max
-                    resetRetry(false);
+                    resetRetry(true);
                 } else {
                     // Something went wrong. Don't limit the exponential back-off
-                    resetRetry(true);
+                    resetRetry(false);
                 }
             }
 
