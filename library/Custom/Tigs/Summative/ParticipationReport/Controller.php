@@ -12,6 +12,10 @@ use Alaress\Web;
 use Aura\Di\Exception\ServiceNotFound;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
+use function implode;
+use PDO;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception;
@@ -315,8 +319,8 @@ class Controller extends Web\Controller\Base
             ->greaterThanOrEqualTo('t2.date', $start2->getDatabaseDate())
             ->lessThanOrEqualTo('t2.date', $finish2->getDatabaseDate());
 
-        $whereClause1 = \implode(' AND ', $pb1->getWhere());
-        $whereClause2 = \implode(' AND ', $pb2->getWhere());
+        $whereClause1 = implode(' AND ', $pb1->getWhere());
+        $whereClause2 = implode(' AND ', $pb2->getWhere());
         $sql          = "
             SELECT 1 AS s, COUNT(*) AS c
             FROM uvContinuousReportingAbsences AS t1
@@ -350,6 +354,7 @@ class Controller extends Web\Controller\Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
      * @throws \DomainException
+     * @throws Exception
      */
     private function getSubjectList(User $user, StudentAttributes $attributes, ?string $nowOverride): array
     {
@@ -377,17 +382,19 @@ class Controller extends Web\Controller\Base
      *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
-     * @param bool $getCurrent
+     * @param bool              $getCurrent
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \UnderflowException
+     * @throws Exception
      */
     private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes, bool $getCurrent): void
     {
         if ($getCurrent) {
             // If viewing current, just use SIS values
             $folder->loadTeachers();
+            return;
         }
 
         // Load teachers who gave feedback
@@ -396,12 +403,17 @@ class Controller extends Web\Controller\Base
             return;
         }
 
-        $userIds = $this->findTeachersWhoGaveFeedback($assessments);
+        $userIds = $this->findUsersWhoGaveFeedback($assessments);
         if (!\count($userIds)) {
             return;
         }
 
-        $folder->setTeachers($this->userMapper->findByColumn($this->userMapper->getIdentifierColumn(), $userIds));
+        $columnList           = [
+            $this->userMapper->getIdentifierColumn() => $userIds,    // Users who gave feedback, and
+            'g.group_type'                           => Role::STAFF, // are staff
+        ];
+        $staffWhoGaveFeedback = $this->userMapper->findByColumnList($columnList);
+        $folder->setTeachers($folder->getTeachers()->mergeUnique($staffWhoGaveFeedback, $this->userMapper->getIdentifierProperty()));
     }
 
 
@@ -432,33 +444,47 @@ class Controller extends Web\Controller\Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
-    private function findTeachersWhoGaveFeedback(Collection $assessments): array
+    private function findUsersWhoGaveFeedback(Collection $assessments): array
     {
-        $pb = $this->assessmentMapper->getPredicateBuilder()
-            ->in('a.id', $assessments->getPropertyValues($this->assessmentMapper->getIdentifierProperty()));
+        $assessmentIdProperty = $this->assessmentMapper->getIdentifierProperty();
 
-        $whereClause = implode(' AND ', $pb->getWhere());
+        $taskPb = $this->assessmentMapper->getPredicateBuilder()
+                                         ->in('t_a.id', $assessments->getPropertyValues($assessmentIdProperty))
+                                         ->equals('tc.completion_status', Completion::STATUS_TEACHER_ASSESSED_COMPLETE);
+
+        $quizPb = $this->assessmentMapper->getPredicateBuilder()
+                                         ->in('q_a.id', $assessments->getPropertyValues($assessmentIdProperty));
+
+        $subBoxPb = $this->assessmentMapper->getPredicateBuilder()
+                                           ->in('sb_a.id', $assessments->getPropertyValues($assessmentIdProperty))
+                                           ->equals('sr.review_route', ReturnedWork::REVIEW_ROUTE_INSTRUCTOR);
+
+        $taskWhere   = implode(' AND ', $taskPb->getWhere());
+        $quizWhere   = implode(' AND ', $quizPb->getWhere());
+        $subBoxWhere = implode(' AND ', $subBoxPb->getWhere());
 
         $sql = "
             SELECT tc.marking_user_id AS user_id
-            FROM assessment a
-            JOIN task t on a.id = t.assessment_id
+            FROM assessment t_a
+            JOIN task t on t_a.id = t.assessment_id
             JOIN task_completion tc on t.id = tc.task_id
-            WHERE {$whereClause}
+            WHERE {$taskWhere}
               UNION
             SELECT aa.reviewer_id AS user_id
-            FROM assessment a
-            JOIN assess q ON q.assessment_id = a.id
+            FROM assessment q_a
+            JOIN assess q ON q.assessment_id = q_a.id
             JOIN assess_attempt aa
-            WHERE {$whereClause}
+            WHERE {$quizWhere}
               UNION
             SELECT sr.marker AS user_id
-            FROM assessment a
-            JOIN submission_box sb on a.id = sb.assessment_id
+            FROM assessment sb_a
+            JOIN submission_box sb on sb_a.id = sb.assessment_id
             JOIN submission_return sr on sb.id = sr.box_id
-            WHERE {$whereClause}
+            WHERE {$subBoxWhere}
         ";
-        return $this->folderMapper->getDatabase()->query($sql, $pb->getParams())->fetchAll(\PDO::FETCH_COLUMN);
+
+        $params = array_merge($taskPb->getParams(), $quizPb->getParams(), $subBoxPb->getParams());
+        return $this->folderMapper->getDatabase()->query($sql, $params)->fetchAll(PDO::FETCH_COLUMN);
     }
 
 
