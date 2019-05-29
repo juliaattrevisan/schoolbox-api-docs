@@ -32,28 +32,29 @@ if (!empty($_POST['group'])) {
 /** @var Schoolbox\User $user */
 $user = $_SESSION['user'];
 foreach ($groupsSelected as $groupId => $isJoining) {
+
+    /**
+     * @var Group $group
+     */
+    $group = $groupMapper->findById($groupId);
+
+    try {
+        $ua = $uaMapper->findOneByColumnList(
+            [
+                'uid' => $user->getId(),
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'sid' => $groupId,
+            ]
+        );
+    } catch (Mapper\Exception $e) {
+        $ua = new UserAccess();
+        $ua->setUser($user)
+            ->setAccessLevel(UserAccess::ACCESS_DENY)
+            ->setService(UserAccess::SERVICE_HOMEPAGE)
+            ->setServiceIdentifier($groupId);
+    }
+
     if ($isJoining) {
-        /**
-         * @var Group $group
-         */
-        $group = $groupMapper->findById($groupId);
-
-        try {
-            $ua = $uaMapper->findOneByColumnList(
-                [
-                    'uid'     => $user->getId(),
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'sid'     => $groupId,
-                ]
-            );
-        } catch (Mapper\Exception $e) {
-            $ua = new UserAccess();
-            $ua->setUser($user)
-                ->setAccessLevel(UserAccess::ACCESS_DENY)
-                ->setService(UserAccess::SERVICE_HOMEPAGE)
-                ->setServiceIdentifier($groupId);
-        }
-
         if ($group->isFree()) {
             // allow read access immediately for a free group
             if ($ua->getAccessLevel() < UserAccess::ACCESS_READ) {
@@ -68,7 +69,8 @@ foreach ($groupsSelected as $groupId => $isJoining) {
             $response = 'pending';
         }
 
-    } else {
+    } elseif (!$group->isPrivate() && ($ua->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+        // non admin in moderated/free group can leave
         // delete the record that matches the given params
         $count = $uaMapper->deleteByColumnList(
             array(
