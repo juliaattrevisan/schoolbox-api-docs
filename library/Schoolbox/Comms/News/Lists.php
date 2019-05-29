@@ -18,7 +18,6 @@ use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
-use Schoolbox\Engagement\News;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;

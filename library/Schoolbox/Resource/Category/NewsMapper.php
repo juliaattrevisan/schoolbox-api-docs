@@ -9,11 +9,9 @@
 
 namespace Schoolbox\Resource\Category;
 
-use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
-use Schoolbox\Comms\News\NewsMetaData;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
