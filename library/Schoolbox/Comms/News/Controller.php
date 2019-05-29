@@ -735,8 +735,8 @@ class Controller extends Base
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
         $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
-            $this->getThreadIdsFromCollection($articles),
-            'threadId'
+            Helper::getThreadIdsFromCollection($articles),
+            $this->commentMapper::THREAD_ID
         );
 
         $map = [
@@ -1174,7 +1174,8 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver
+            $this->articleResolver,
+            $this->commentMapper
         ))->findForTopic(
             $urlPrefix,
             $params,
@@ -1184,8 +1185,6 @@ class Controller extends Base
             $year,
             $month
         );
-
-        $topicData = $this->mergeCommentCountIntoPartialData($topicData);
 
         /* Always provide paginator from this context
          */
@@ -1224,7 +1223,8 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver
+            $this->articleResolver,
+            $this->commentMapper
         ))->findArticlesForHomepage(
             $params,
             $this->getUser()
@@ -1233,8 +1233,6 @@ class Controller extends Base
         if (\count($topicData['articles']) < 1) {
             $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
         }
-
-        $topicData = $this->mergeCommentCountIntoPartialData($topicData);
 
         return array_merge($topicData, [
             'hidePaginator' => true,

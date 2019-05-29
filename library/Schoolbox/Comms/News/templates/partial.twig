@@ -12,7 +12,7 @@
  #}
 {% if articles|length %}
     {% import '@commsNews/macro/newsBlurb.twig' as macro %}
-    
+
     <ul class="information-list">
         {% for article in articles %}
             <li class="actions-small-1">
@@ -43,7 +43,7 @@
                                 </span>
                             {% endif %}
 
-                            <span> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.commentCount }} comment(s)</a></span>
+                            <span> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.metaData.commentCount }} comment(s)</a></span>
                         </p>
                     </div>
                 </div>

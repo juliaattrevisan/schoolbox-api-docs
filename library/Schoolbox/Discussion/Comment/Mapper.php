@@ -22,6 +22,11 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+
+    public const THREAD_ID = 'threadId';
+
+    public const PARENT_ID = 'parentId';
+
     /**
      * @inheritdoc
      */
@@ -120,27 +125,24 @@ class Mapper extends BaseMapper
      */
     public function getCommentCountByThreadIds(array $threadIds, string $indexBy): array
     {
-        $parentId = 'parentId';
-        $threadId = 'threadId';
-
-        if (!in_array($indexBy, [$parentId, $threadId], true)) {
-            throw new \InvalidArgumentException('Invalid index: ' . $indexBy);
-        }
-
-        $newsTable = \Schoolbox\Comms\News\Mapper::getInstance()->getTable();
-
         $result = [];
 
         if (count($threadIds) === 0) {
             return $result;
         }
 
+        if (!in_array($indexBy, [self::PARENT_ID , self::THREAD_ID], true)) {
+            throw new \InvalidArgumentException('Invalid index: ' . $indexBy);
+        }
+
+        $newsTable = \Schoolbox\Comms\News\Mapper::getInstance()->getTable();
+
         // Prepare column and join string
         $join = '';
-        $indexByColumn = $this->table . '.discussion_thread_id AS ' . $threadId;
+        $indexByColumn = $this->table . '.discussion_thread_id AS ' . self::THREAD_ID;
 
-        if ($indexBy === $parentId) {
-            $indexByColumn = $newsTable . '.id AS ' . $parentId;
+        if ($indexBy === self::PARENT_ID) {
+            $indexByColumn = $newsTable . '.id AS ' . self::PARENT_ID;
             $join = 'INNER JOIN ' . $newsTable . ' ON ' . $newsTable . '.discussion_thread_id = ' . $this->table . '.discussion_thread_id';
         }
 

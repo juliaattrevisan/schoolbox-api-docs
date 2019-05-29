@@ -11,9 +11,17 @@ use Alaress\Json\Decorator\IDecorator;
 class MetaDataDecorator implements IDecorator
 {
 
+    /**
+     * @var array
+     */
     private $commentCounts;
 
-    public function __construct($commentCounts)
+    /**
+     * MetaDataDecorator constructor.
+     *
+     * @param $commentCounts
+     */
+    public function __construct(array $commentCounts)
     {
         $this->commentCounts = $commentCounts;
     }

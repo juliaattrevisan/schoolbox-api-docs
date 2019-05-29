@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
 class Lists
 {
@@ -70,6 +71,11 @@ class Lists
      */
     private $articleResolver;
 
+    /**
+     * @var CommentMapper
+     */
+    private $commentMapper;
+
 
     /**
      * Lists constructor.
@@ -93,7 +99,8 @@ class Lists
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        IArticleResolver $articleResolver
+        IArticleResolver $articleResolver,
+        CommentMapper $commentMapper
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->newsMapper                 = $newsMapper;
@@ -104,6 +111,7 @@ class Lists
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
+        $this->commentMapper              = $commentMapper;
     }
 
 
@@ -215,7 +223,7 @@ class Lists
         /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
-            'articles' => $articles,
+            'articles' => $this->attachMetadataIntoLoadedArticles($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,
@@ -339,7 +347,7 @@ class Lists
         }
 
         return [
-            'articles' => $articles,
+            'articles' => $this->attachMetadataIntoLoadedArticles($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
@@ -400,6 +408,43 @@ class Lists
         return array_merge(
             $this->articleResolver->findArticlesForUser($user),
             $this->newsMapper->findIdsByColumn('author_id', $user->getId())
+        );
+    }
+
+    /**
+     * @param GenericCollection $articles
+     *
+     * @return GenericCollection
+     */
+    private function attachMetadataIntoLoadedArticles(GenericCollection $articles): GenericCollection
+    {
+        $commentCounts = $this->loadCommentCountsFromCollections($articles);
+
+        foreach ($articles as $article) {
+            $commentCount = 0;
+
+            if ($article->getDiscussionThread()) {
+                $commentCount = (int) $commentCounts[$article->getId()];
+            }
+
+            $article->setMetaData([
+                'commentCount' => $commentCount
+            ]);
+        }
+
+        return $articles;
+    }
+
+    /**
+     * @param GenericCollection $articles
+     *
+     * @return array
+     */
+    private function loadCommentCountsFromCollections(GenericCollection $articles): array
+    {
+        return $this->commentMapper->getCommentCountByThreadIds(
+            Helper::getThreadIdsFromCollection($articles),
+            $this->commentMapper::PARENT_ID
         );
     }
 }
