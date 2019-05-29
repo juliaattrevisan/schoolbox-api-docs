@@ -78,7 +78,8 @@
         "ext-readline": "*",
         "ext-zip": "*",
         "ext-pdo": "*",
-        "firebase/php-jwt": "^5.0"
+        "firebase/php-jwt": "^5.0",
+        "okta/jwt-verifier": "^0.2.1"
 
     },
     "require-dev": {
