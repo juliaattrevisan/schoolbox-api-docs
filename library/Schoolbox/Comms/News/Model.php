@@ -171,6 +171,12 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /** @var GenericCollection|Audience\Model[] */
     private $audience;
 
+    /**
+     * An array of article meta data, e.g: comment count, interactions etc.
+     *
+     * @var array
+     */
+    private $metaData = [];
 
     public function __construct()
     {
@@ -1039,5 +1045,25 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function getCommentNotifier(): string
     {
         return Discussion\Comment\Notifier::class;
+    }
+
+    /**
+     * @param array $metaData
+     *
+     * @return $this
+     */
+    public function setMetaData(array $metaData): self
+    {
+        $this->metaData = $metaData;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetaData()
+    {
+        return $this->metaData;
     }
 }
