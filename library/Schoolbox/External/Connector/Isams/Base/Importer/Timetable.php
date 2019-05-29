@@ -38,7 +38,7 @@ class Timetable implements ImporterInterface
     /**
      * @var Batchxml
      */
-    private $api;
+    private $batchxml;
 
 
     /**
@@ -79,7 +79,7 @@ class Timetable implements ImporterInterface
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $batchxml;
+        $this->batchxml = $batchxml;
         $this->timetableCampusMapper = $timetableCampusMapper;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
@@ -96,7 +96,7 @@ class Timetable implements ImporterInterface
             $this->timetablePeriodMapper->getDatabase()->query("DELETE FROM {$this->timetablePeriodMapper->getTable()}");
         }
 
-        $cycles = $this->api->fetchXml('/iSAMS/TimetableManager/Structure/Week');
+        $cycles = $this->batchxml->fetchXml('/iSAMS/TimetableManager/Structure/Week');
 
         foreach ($cycles as $cycle) {
             $dayData = $this->findDays($cycle);
@@ -128,11 +128,6 @@ class Timetable implements ImporterInterface
                 ->setFinish(\Alaress_Date_Format::newDatabaseDate('2120-01-01 00:00:00'))
                 ->setStartDay(1);
 
-            if ($this->perform) {
-                $this->timetableCycleMapper->save($timetableCycle);
-                $this->timetableCampusMapper->save($timetableCampus);
-            }
-
             $this->log->info(sprintf(
                 'Creating timetable cycle %s (%s) with day length %s',
                 $timetableCycle->getId(),
@@ -140,12 +135,20 @@ class Timetable implements ImporterInterface
                 $timetableCycle->getDayLength()
             ));
 
+            if ($this->perform) {
+                $this->timetableCycleMapper->save($timetableCycle);
+            }
+
             $this->log->info(sprintf(
                 'Associating timetable cycle %s (%s) with campus %s',
                 $timetableCycle->getId(),
                 $timetableCycle->getTitle(),
                 $campus->getName()
             ));
+
+            if ($this->perform) {
+                $this->timetableCampusMapper->save($timetableCampus);
+            }
 
             /* Save all the periods and associate them with a cycle
              */
