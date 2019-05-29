@@ -115,7 +115,7 @@ class HomepageInitialCest
         $i->fillField("textBoxHeading","Test Text Box Title");
         $i->fillCkEditorById('textBoxBody', 'wow what interesting Text box text');
         $i->scrollTo(['css'=>'div[class=component-container\ Component_Homepage_TextBoxController]']);
-        sleep(1);
+        $i->waitForElementVisible(['css'=>'input[type=submit][value=Save\ Content]'], 5);
         $i->click(['css'=>'input[type=submit][value=Save\ Content]']);
     }
 
