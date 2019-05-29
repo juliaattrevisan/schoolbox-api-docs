@@ -55,7 +55,7 @@ class ActivityFactory {
 	 * @return Activity
      * @throws UnexpectedValueException If unable to find a suitable date for the quiz and event
 	 */
-	public function buildFromOnlineAssessment(Quiz $assess, string $event): Activity
+    public function buildFromOnlineAssessment(Quiz $assess, string $event): Activity
     {
 		$date = null;
 		if ($event === Activity::EVENT_NEW) {

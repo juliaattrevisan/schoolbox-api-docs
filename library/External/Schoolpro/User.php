@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class External_Schoolpro_User implements External_UserInterface
 {

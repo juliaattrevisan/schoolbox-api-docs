@@ -560,6 +560,9 @@ class External_Denbigh_User implements External_UserInterface
      */
     public function determineBoarderType(?string $boarderValue): string
     {
+        if ($boarderValue === null) {
+            return '';
+        }
         $boarders = [
             'Boarder'        => 'Boarder',
             'Weekly Boarder' => 'Weekly Boarder',
