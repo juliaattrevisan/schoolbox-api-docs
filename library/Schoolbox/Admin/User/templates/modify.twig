@@ -612,20 +612,20 @@
                 <p class="no-margin">{{ user.firstName }} must be signed in to receive a popup alert.</p>
             </div>
 
-            <form action="{{ routeLookup('adminUser.postAlert', {userId: user.id}) }}" method="POST">
+            <form action="{{ routeLookup('adminUser.postAlert', {userId: user.id}) }}" method="POST" id="sendAlertForm">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
                                 Message from {{ USER.fullName }}
-                                <input type="text" value="" name="body"/>
+                                <input id="alertMsg" type="text" value="" name="body"/>
                             </label>
                         </div>
                     </fieldset>
                 </section>
                 <div class="row">
                     <div class="small-12 columns">
-                        <input type="submit" value="Send"/>
+                        <input id="sendAlert" type="submit" value="Send"/>
                     </div>
                 </div>
             </form>
@@ -895,6 +895,18 @@
             );
 
         {% endif %}
+
+        $('#sendAlertForm').alaressValidate({
+            rules: {
+                'body': {
+                    required: true,
+                    requiredNotBlank:true
+                }
+            },
+            messages: {
+                body: "Please enter a message"
+            }
+        });
     });
 </script>
 
