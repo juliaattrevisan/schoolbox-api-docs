@@ -44,6 +44,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 use Schoolbox\User;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
 class Controller extends Base
 {
@@ -112,6 +113,9 @@ class Controller extends Base
     /** @var ErrorMapper */
     private $errorMapper;
 
+    /** @var CommentMapper */
+    private $commentMapper;
+
     private const DEFAULT_SEARCH_LIMIT = 10;
 
 
@@ -129,6 +133,7 @@ class Controller extends Base
      * @param Audience\Segment\StrategyFactory $strategyFactory
      * @param Thread\Mapper                    $threadMapper
      * @param ErrorMapper                      $errorMapper
+     * @param CommentMapper                    $commentMapper
      */
     public function __construct(
         Mapper $newsMapper,
@@ -143,7 +148,8 @@ class Controller extends Base
         Audience\UserResolver $userResolver,
         Audience\Segment\StrategyFactory $strategyFactory,
         Thread\Mapper $threadMapper,
-        ErrorMapper $errorMapper
+        ErrorMapper $errorMapper,
+        CommentMapper $commentMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -158,6 +164,7 @@ class Controller extends Base
         $this->strategyFactory            = $strategyFactory;
         $this->threadMapper               = $threadMapper;
         $this->errorMapper                = $errorMapper;
+        $this->commentMapper              = $commentMapper;
     }
 
 
@@ -727,7 +734,7 @@ class Controller extends Base
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
-        $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
+        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
             $this->getThreadIdsFromCollection($articles),
             'threadId'
         );
@@ -1562,7 +1569,7 @@ class Controller extends Base
      */
     private function mergeCommentCountIntoPartialData(array $topicData): array
     {
-        $commentCounts = \Schoolbox\Discussion\Comment\Mapper::getInstance()->getCommentCountByThreadIds(
+        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
             $this->getThreadIdsFromCollection($topicData['articles']),
             'parentId'
         );
