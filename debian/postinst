@@ -71,6 +71,9 @@ case "$1" in
                 service schoolbox-belld restart 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
             fi
         fi
+
+        # Bring site up from maintenance
+        /usr/share/schoolbox/tools/maintenance/site_down.sh
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
