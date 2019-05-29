@@ -122,9 +122,9 @@ $(function() {
                     <p> - OR - </p>
                     {% endif %}
 
-{#                    {% if config.login_anonymous != '' %}#}
+                    {% if config.login_anonymous != '' %}
                     <p><a href="/account/anonymous.php?{{ requestParams|escape }}" class="guest">Login as guest</a></p>
-{#                    {% endif %}#}
+                    {% endif %}
 
                     {% if config.saml_sso_url != '' or config.saml_idp_metadata_url != '' %}
                     <p><a href="/saml/index.php?{{ requestParams|escape }}" class="samlbutton">Login using Single Sign-On</a></p>
