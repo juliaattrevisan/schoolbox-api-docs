@@ -178,8 +178,6 @@ class GroupMapper extends BaseMapper
 
     /**
      * Find a group, given its parent ID, type and name.
-     * Find a single criterion for a parent type, given its unique identifier
-     * (parentId+parentType+name+groupName).
      *
      * @param int    $parentId   The parent ID to find for
      * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
