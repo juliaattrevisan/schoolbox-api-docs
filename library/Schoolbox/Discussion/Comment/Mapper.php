@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Comment;
 
+use function count;
 use PDO;
 use PDOStatement;
 use Schoolbox\Discussion\Thread;
@@ -22,10 +23,15 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
-
+    /**
+     * Used as column alias when fetching a comment count by thread id
+     */
     public const THREAD_ID = 'threadId';
 
-    public const PARENT_ID = 'parentId';
+    /**
+     * Used as column alias when fetching a comment count by article id
+     */
+    public const ARTICLE_ID = 'parentId';
 
     /**
      * @inheritdoc
@@ -125,13 +131,11 @@ class Mapper extends BaseMapper
      */
     public function getCommentCountByThreadIds(array $threadIds, string $indexBy): array
     {
-        $result = [];
-
         if (count($threadIds) === 0) {
-            return $result;
+            return [];
         }
 
-        if (!in_array($indexBy, [self::PARENT_ID , self::THREAD_ID], true)) {
+        if (!in_array($indexBy, [self::ARTICLE_ID , self::THREAD_ID], true)) {
             throw new \InvalidArgumentException('Invalid index: ' . $indexBy);
         }
 
@@ -141,8 +145,8 @@ class Mapper extends BaseMapper
         $join = '';
         $indexByColumn = $this->table . '.discussion_thread_id AS ' . self::THREAD_ID;
 
-        if ($indexBy === self::PARENT_ID) {
-            $indexByColumn = $newsTable . '.id AS ' . self::PARENT_ID;
+        if ($indexBy === self::ARTICLE_ID) {
+            $indexByColumn = $newsTable . '.id AS ' . self::ARTICLE_ID;
             $join = 'INNER JOIN ' . $newsTable . ' ON ' . $newsTable . '.discussion_thread_id = ' . $this->table . '.discussion_thread_id';
         }
 

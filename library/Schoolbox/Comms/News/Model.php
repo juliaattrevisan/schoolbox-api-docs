@@ -172,7 +172,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private $audience;
 
     /**
-     * @var NewsMetaData
+     * @var MetaData
      */
     private $metaData;
 
@@ -180,6 +180,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     {
         /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->audience = new GenericCollection(Audience\Model::class);
+        $this->metaData = new MetaData();
     }
 
 
@@ -1046,11 +1047,11 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     }
 
     /**
-     * @param NewsMetaData $metaData
+     * @param MetaData $metaData
      *
      * @return $this
      */
-    public function setMetaData(NewsMetaData $metaData): self
+    public function setMetaData(MetaData $metaData): self
     {
         $this->metaData = $metaData;
 
@@ -1058,9 +1059,9 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     }
 
     /**
-     * @return NewsMetaData
+     * @return MetaData
      */
-    public function getMetaData(): NewsMetaData
+    public function getMetaData(): MetaData
     {
         return $this->metaData;
     }

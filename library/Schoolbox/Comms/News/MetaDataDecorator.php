@@ -10,9 +10,11 @@ use Alaress\Json\Decorator\IDecorator;
 
 class MetaDataDecorator implements IDecorator
 {
-
     /**
      * @var array
+     *
+     * Expected structure:
+     * [[$threadId => $count]]
      */
     private $commentCounts;
 

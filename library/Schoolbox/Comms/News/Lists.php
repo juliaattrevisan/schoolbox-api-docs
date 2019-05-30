@@ -223,7 +223,7 @@ class Lists
         /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
-            'articles' => $this->attachMetadataIntoLoadedArticles($articles),
+            'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,
@@ -412,37 +412,48 @@ class Lists
     }
 
     /**
+     * Populate each article's metadata instance
+     *
      * @param GenericCollection $articles
      *
      * @return GenericCollection
+     * @throws \InvalidArgumentException
      */
-    private function attachMetadataIntoLoadedArticles(GenericCollection $articles): GenericCollection
+    private function populateMetadata(GenericCollection $articles): GenericCollection
     {
-        $commentCounts = $this->loadCommentCountsFromCollections($articles);
+        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+            Helper::getThreadIdsFromCollection($articles),
+            $this->commentMapper::ARTICLE_ID
+        );
 
-        foreach ($articles as $article) {
-            $newsMetaData = new NewsMetaData();
+        $this->loadCommentCounts($commentCounts, $articles);
 
-            if ($article->getDiscussionThread()) {
-                $newsMetaData->setCommentCount((int) $commentCounts[$article->getId()]);
-            }
-
-            $article->setMetaData($newsMetaData);
-        }
+        /* Other metadata stuff can be listed here
+         *
+         * $this->addMoreMetadata($articles);
+         * $this->addEvenMoreMetadata($articles);
+         */
 
         return $articles;
     }
 
     /**
+     * Load the count of comments for each article in $articles
+     * using pass-by-reference
+     *
+     * @param array             $commentCounts
      * @param GenericCollection $articles
      *
-     * @return array
+     * @return void
      */
-    private function loadCommentCountsFromCollections(GenericCollection $articles): array
+    private function loadCommentCounts(array $commentCounts, GenericCollection $articles): void
     {
-        return $this->commentMapper->getCommentCountByThreadIds(
-            Helper::getThreadIdsFromCollection($articles),
-            $this->commentMapper::PARENT_ID
-        );
+        /** @var Model $article */
+
+        foreach ($articles as $article) {
+            if ($article->getDiscussionThread()) {
+                $article->getMetaData()->setCommentCount((int) $commentCounts[$article->getId()]);
+            }
+        }
     }
 }
