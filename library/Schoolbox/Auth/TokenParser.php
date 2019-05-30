@@ -74,18 +74,17 @@ class TokenParser
             [, $token] = $matches;
             // Parse the token and extract a user from it
             // TODO determine which algorithms our source supports
+            // TODO replace with okta/jwt-verifier, get key from JWK provider
             $decodedToken = $this->jwtCodec::decode($token, $key, ['HS256']);
 
-            // A username _should_ be in the "sub" (subject) key
-            // Alternately: it might contain a token, or something?
-            // Whatever it is, it must uniquely identify a user.
-            if (property_exists($decodedToken, 'sub')) {
+            // A username seems to be in the "username" key?
+            if (property_exists($decodedToken, 'username')) {
                 // Verify the user:
                 // * exists
                 // * is enabled
-                $user = $this->userMapper->findByUsername($decodedToken->sub);
+                $user = $this->userMapper->findByUsername($decodedToken->username);
                 if (!$user) {
-                    throw new SchoolboxException\NotFound('The token\'s "sub" property must match a user\'s username');
+                    throw new SchoolboxException\NotFound('The token\'s "username" property must match a user\'s username');
                 }
                 if (!$user->getEnabled()) {
                     throw new SchoolboxException\AccountDisabled('The user\'s account is disabled');
@@ -94,7 +93,7 @@ class TokenParser
             }
 
             // No "sub" found in token: can't use it
-            throw new SchoolboxException\NotFound('The token must contain a "sub" property');
+            throw new SchoolboxException\NotFound('The token must contain a "username" property');
         }
 
         // Header was malformed: can't use?
