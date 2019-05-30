@@ -97,7 +97,11 @@ class CachingConnectorAbstract
     protected function getCachedResult(string $method, array $params, int $timeoutOverride = null)
     {
         if ($this->isOffline()) {
-            return $this->bypassCache($method, $params);
+            if (PHP_SAPI === 'cli') {
+                throw new External\Exception('SIS connector is offline.');
+            } else {
+                return $this->bypassCache($method, $params);
+            }
         }
 
         $key      = get_class($this->database) . '.' . $method;
@@ -113,7 +117,11 @@ class CachingConnectorAbstract
             trigger_error($e->getMessage(), E_USER_WARNING);
 
             // If there was ANY problem with the connection, fall back to offline implementation for remainder of request
-            $this->database = $this->offline;
+            if (PHP_SAPI === 'cli') {
+                throw new \Schoolbox\External\Exception('SIS connector failed to execute function: ' . $e->getMessage());
+            } else {
+                $this->database = $this->offline;
+            }
 
             return $this->bypassCache($method, $params);
         }

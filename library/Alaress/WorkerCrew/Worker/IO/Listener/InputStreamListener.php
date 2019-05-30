@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Alaress\WorkerCrew\Worker\IO\Listener;
@@ -118,7 +117,10 @@ class InputStreamListener extends AbstractIOStreamListener
             if ($buffer = ob_get_contents()) {
                 $this->log->debug("Captured output: $buffer");
             }
-
+        } catch (\Schoolbox\External\Exception $e) {
+            $msg = sprintf("Failed to connect to SIS connector '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
+            $this->log->warning($msg);
+            $this->loop->stop();
         } catch(IOException $e) {
             // this means the pipe or connection to an external service has been broken
             // no point logging, no point carrying on. everything is meaningless.
