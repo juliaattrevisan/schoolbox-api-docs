@@ -197,13 +197,13 @@
             createThreadEndpoint: "{{ routeLookup('commsDiscussionThreads.createThread', {contextId: article.id}) }}",
             associateThreadEndpoint: "{{ routeLookup('commsNews.postAssociateWithDiscussionThread', {articleId: article.id}) }}",
             showCommentsSection: false,
+            initialLoad: true,
         },
         // define methods under the `methods` object
         methods: {
             changeThreadStatus: function (event) {
                 var self = this;
                 self.threadEnabled = event.target.checked;
-
 
                 var changeThreadStatusAction;
                 if (self.threadId) {
@@ -247,9 +247,7 @@
                 $toast.toastActivate({text: self.savingText});
                 changeThreadStatusAction
                     .then(function () {
-                        if (self.threadEnabled) {
-                            self.loadCkEditor();
-                        }
+                        self.loadCkEditor();
                         $toast.toastTimeout({text: self.savedText, duration: 2000});
                     })
                     .catch(function (error) {
@@ -326,6 +324,20 @@
                      * schoolboxResource_ProxyReplacement do what it's supposed to do.
                      */
                     self.reInitialiseMediaPlayer();
+
+                    if (self.initialLoad) {
+                        self.loadCkEditor();
+
+                        // Anchored? go to the element once the component has been loaded
+                        // We will need to do this for now to make the anchor behaviour more consistent
+                        if (window.location.hash == '#discussion')
+                        {
+                            var offset = $('.banner.content').outerHeight() + $('.article.content').outerHeight() + $('.news-article').offset().top;
+                            $("html, body").animate({ scrollTop: offset }, 500);
+                        }
+
+                        self.initialLoad = false;
+                    }
                 });
             },
             deleteComment: function(id, index, confirmed) {
@@ -416,29 +428,31 @@
             loadCkEditor: function () {
                 var self = this;
 
-                $.fn.alaressEditor({
-                    targetElements: $('#comment'),
-                    removePlugins: 'uploadimage,link,schoolboxanchor',
-                    removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                    toolbarGroups: [
-                        {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                        {name: 'paragraph',  groups: [ 'list', 'blocks', 'bidi']},
-                        {name: 'links', groups: ['links']},
-                        {name: 'insert', groups: ['insert']},
-                        /* Custom schoolbox-specific plugin stuff can go here
-                         * This is a hole into which you may put once-off abilities
-                         * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
-                         * This is typically not used for anything else for now
-                         */
-                        {name: 'schoolbox', groups: ['schoolboxlink']},
-                    ],
-                    on: {
-                        change: function( evt ) {
-                            // Bind the content of ckeditor into the comment model on change
-                            self.comment = CKEDITOR.instances['comment'].getData();
+                if (this.threadEnabled) {
+                    $.fn.alaressEditor({
+                        targetElements: $('#comment'),
+                        removePlugins: 'uploadimage,link,schoolboxanchor',
+                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                        toolbarGroups: [
+                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+                            {name: 'links', groups: ['links']},
+                            {name: 'insert', groups: ['insert']},
+                            /* Custom schoolbox-specific plugin stuff can go here
+                             * This is a hole into which you may put once-off abilities
+                             * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
+                             * This is typically not used for anything else for now
+                             */
+                            {name: 'schoolbox', groups: ['schoolboxlink']},
+                        ],
+                        on: {
+                            change: function (evt) {
+                                // Bind the content of ckeditor into the comment model on change
+                                self.comment = CKEDITOR.instances['comment'].getData();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             },
             reInitialiseMediaPlayer: function () {
                 var self = this;
@@ -468,15 +482,6 @@
         },
         mounted: function() {
             this.getThread();
-            this.loadCkEditor();
-
-            // Anchored? go to the element once the component has been loaded
-            // We will need to do this for now to make the anchor behaviour more consistent
-            if (window.location.hash == '#discussion')
-            {
-                var offset = $('.banner.content').outerHeight() + $('.article.content').outerHeight();
-                $("html, body").animate({ scrollTop: offset }, 500);
-            }
         },
         filters: {
             fromNow: function (date) {
