@@ -17,7 +17,9 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
-use Firebase\JWT\JWT;
+use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
+use Okta\JwtVerifier\Discovery\Oidc;
+use Okta\JwtVerifier\JwtVerifierBuilder;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
@@ -493,7 +495,16 @@ class Kernel extends WebKernelAbstract
         /** @var MapperFactory $mapperFactory */
         /** @noinspection PhpUnhandledExceptionInspection */
         $mapperFactory = $di->get('mapperFactory');
-        $tokenParser   = new TokenParser($mapperFactory->get(UserMapper::class), new JWT());
+        $tokenParser   = new TokenParser(
+            $mapperFactory->get(UserMapper::class),
+            (new JwtVerifierBuilder())
+                // I guess this is configurable.
+                // We'll probably have multiple oAuth providers we accept too
+                ->setIssuer('https://s2-id.cloudworkengine.net')
+                ->setAdaptor(new FirebasePhpJwt())
+                ->setDiscovery(new Oidc())
+                ->build()
+        );
         $user          = $tokenParser->findUser($_SERVER, ConfigMapper::_OAUTH_JWT_SECRET);
         if ($user) {
             // do something with that user

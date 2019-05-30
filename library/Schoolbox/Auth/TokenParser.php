@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Auth;
 
-use Firebase\JWT\JWT;
+use Okta\JwtVerifier\JwtVerifier;
 use Schoolbox\Application\Exception as SchoolboxException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -27,23 +27,23 @@ class TokenParser
 
 
     /**
-     * Codec for JWT tokens.
+     * Verifier for JWT tokens.
      *
-     * @var JWT
+     * @var JwtVerifier
      */
-    private $jwtCodec;
+    private $jwtVerifier;
 
 
     /**
      * Constructor
      *
-     * @param UserMapper $userMapper
-     * @param JWT        $jwtCodec
+     * @param UserMapper  $userMapper
+     * @param JwtVerifier $jwtVerifier
      */
-    public function __construct(UserMapper $userMapper, JWT $jwtCodec)
+    public function __construct(UserMapper $userMapper, JwtVerifier $jwtVerifier)
     {
-        $this->userMapper = $userMapper;
-        $this->jwtCodec   = $jwtCodec;
+        $this->userMapper  = $userMapper;
+        $this->jwtVerifier = $jwtVerifier;
     }
 
 
@@ -73,16 +73,15 @@ class TokenParser
         if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
             // Parse the token and extract a user from it
-            // TODO determine which algorithms our source supports
-            // TODO replace with okta/jwt-verifier, get key from JWK provider
-            $decodedToken = $this->jwtCodec::decode($token, $key, ['HS256']);
+            $decodedToken = $this->jwtVerifier->verify($token);
+            $claims       = $decodedToken->getClaims();
 
             // A username seems to be in the "username" key?
-            if (property_exists($decodedToken, 'username')) {
+            if (isset($claims['username'])) {
                 // Verify the user:
                 // * exists
                 // * is enabled
-                $user = $this->userMapper->findByUsername($decodedToken->username);
+                $user = $this->userMapper->findByUsername($claims['username']);
                 if (!$user) {
                     throw new SchoolboxException\NotFound('The token\'s "username" property must match a user\'s username');
                 }
@@ -92,7 +91,7 @@ class TokenParser
                 return $user;
             }
 
-            // No "sub" found in token: can't use it
+            // No username found in token: can't use it
             throw new SchoolboxException\NotFound('The token must contain a "username" property');
         }
 
