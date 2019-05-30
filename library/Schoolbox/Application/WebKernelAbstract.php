@@ -61,17 +61,10 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $code = 400;
                 $info = 'If the problem persists, please contact your System Administrator including the following information:';
 
-                if (isset($_SERVER['HTTP_HOST'])) {
-                    $url = 'http' . (getenv("SERVER_PORT") === '443' ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-                } else {
-                    $url = '';
-                }
-
                 if ($e instanceof SchoolboxException) {
                     $code    = $e->getHttpStatusCode();
                     $message = $e->getMessage();
                     $info    = '';
-                    $url     = '';
                 } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
@@ -106,7 +99,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                         $e['trace'] = $stack;
                     }
                 }
-                $this->outputError($e, $message, $info, $url, $error, $code);
+                $this->outputError($e, $message, $info, $error, $code);
             }
         }
     }
@@ -179,18 +172,23 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
      * @param string           $message A human-friendly message to output.
      * @param string           $info    More descriptive description of what
      *                                  happened.
-     * @param string           $url     The URL from which this error occurred
      * @param array            $error   An array-format stack trace
      * @param int              $code    A HTTP status code
      */
-    private function outputError(
+    protected function outputError(
         $e,
         string $message,
         string $info,
-        string $url,
         $error,
         int $code
     ): void {
+
+        if (isset($_SERVER['HTTP_HOST'])) {
+            $url = 'http' . (getenv("SERVER_PORT") === '443' ? 's://' : '://') . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        } else {
+            $url = '';
+        }
+
         /* Use structured information for rendering
          */
         $args = [
