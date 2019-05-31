@@ -186,7 +186,7 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         return [];
     }
