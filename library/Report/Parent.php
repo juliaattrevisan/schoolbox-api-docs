@@ -283,9 +283,7 @@ class Report_Parent extends Report_Abstract
         }
 
         $this->getPage()->parse('all_year_selector_block', 'all_year_selector');
-
     }
-
 
     /**
      * Is this user restricted to accessing certain year levels?
@@ -725,7 +723,6 @@ class Report_Parent extends Report_Abstract
      * Set allowed searchable years for parent
      *
      * @param $allowedSearchableYears
-     * @return array
      */
     protected function setAllowedSearchableYears(array $allowedSearchableYears)
     {
@@ -746,7 +743,6 @@ class Report_Parent extends Report_Abstract
      * Set all year levels of Synergetic
      *
      * @param $SISallYearLevels
-     * @return array
      */
     protected function setSISallYearLevels(array $SISallYearLevels)
     {
