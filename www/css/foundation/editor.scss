@@ -15,8 +15,11 @@
 
 @import "utils/custom";
 
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: $white;
     margin: 1rem;
-    height: auto;
 }
