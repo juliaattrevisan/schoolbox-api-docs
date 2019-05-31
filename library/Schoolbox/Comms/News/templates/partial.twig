@@ -15,9 +15,9 @@
 
     <ul class="information-list">
         {% for article in articles %}
-            <li class="actions-small-1">
+            <li class="actions-small-2">
                 <div class="list-item">
-                    <div class="small-12 card">
+                    <div class="small-12 card wrap-down">
                         {%  set articleURL = routeLookup('commsNews.getDetail', {article: article, articleId: article.id}) ~ '?ref=' ~ referrer %}
                         {% if article.featureImage.hash %}
                             <a href="{{ articleURL }}">
