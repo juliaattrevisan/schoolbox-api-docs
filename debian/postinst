@@ -22,6 +22,11 @@ case "$1" in
         # start logging
         date >> /var/log/schoolbox/upgrade.log;
         echo "Schoolbox Upgrade" >> /var/log/schoolbox/upgrade.log;
+
+        # Take site down for maintenance
+        # Ideally this would execute prior to package installation, but debian packages do not support this.
+        /usr/share/schoolbox/tools/maintenance/site_down.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+
         # Test whether a2enmod is available (and thus also apache2ctl).
         if [ -x /usr/sbin/a2enmod ]; then
             # Enable the Apache2 rewrite module if not already enabled
@@ -72,8 +77,12 @@ case "$1" in
             fi
         fi
 
-        # Bring site up from maintenance
-        /usr/share/schoolbox/tools/maintenance/site_down.sh
+        # Blindly run a repair in case it fixes something (TODO - we should instead identify the source of corruption and fix that)
+        mysqlcheck --all-databases --repair 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+
+        # Bring site back up
+        # Ideally this would execute prior to package installation, but debian packages do not support this.
+        /usr/share/schoolbox/tools/maintenance/site_up.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
