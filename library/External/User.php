@@ -219,4 +219,14 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
+
+    /**
+     * @inheritdoc
+     *
+     * @return array [['Code' => string, 'Description' => string], ...]
+     */
+    public function getAllYearLevels()
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+    }
 }

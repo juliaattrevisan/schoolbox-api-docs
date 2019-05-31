@@ -180,4 +180,14 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     {
         return [];
     }
+
+    /**
+     * @inheritdoc
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
+    }
 }
