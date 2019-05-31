@@ -12,12 +12,12 @@
  #}
 {% if articles|length %}
     {% import '@commsNews/macro/newsBlurb.twig' as macro %}
-    
+
     <ul class="information-list">
         {% for article in articles %}
-            <li class="actions-small-1">
+            <li class="actions-small-2">
                 <div class="list-item">
-                    <div class="small-12 card">
+                    <div class="small-12 card wrap-down">
                         {%  set articleURL = routeLookup('commsNews.getDetail', {article: article, articleId: article.id}) ~ '?ref=' ~ referrer %}
                         {% if article.featureImage.hash %}
                             <a href="{{ articleURL }}">
@@ -27,22 +27,24 @@
 
                         <h3><a href="{{ articleURL }}">{{ article.title }}</a></h3>
 
-                        <p class="meta">Published by
+                        <p class="meta">By
                             {% if article.author.deletedAt.isNull %}
                                 <a href="/search/user/{{ article.author.id }}" title="View Profile">{{ article.author.fullname }}</a>
                             {% else %}
                                 {{ article.author.fullname }}
                             {% endif %}
-                            <time title="{{ article.publishAt.long }}">{{ article.publishAt.relativeTime }}</time>
-                        </p>
+                            <time title="{{ article.publishAt.long }}"> &mdash; {{ article.publishAt.relativeTime }}</time>
 
-                        {% if article.topics|length %}
-                            <p class="meta">Related topics:
+                            {% if article.topics|length %}
+                                <span class="meta">in
                                 {% for topic in article.topics %}
                                     <a href="{{ routeLookup('commsNews.getIndex') }}?topic={{ topic.slug }}" title="More {{ locale.news }} in {{ topic.name }}">{{ topic.name }}</a>{% if not loop.last %}, {% endif %}
                                 {% endfor %}
-                            </p>
-                        {% endif %}
+                                </span>
+                            {% endif %}
+
+                            <span> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.metadata.commentCount }} comment(s)</a></span>
+                        </p>
                     </div>
                 </div>
                 <nav>

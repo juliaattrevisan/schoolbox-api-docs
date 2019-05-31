@@ -171,11 +171,16 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /** @var GenericCollection|Audience\Model[] */
     private $audience;
 
+    /**
+     * @var Metadata
+     */
+    private $metadata;
 
     public function __construct()
     {
         /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->audience = new GenericCollection(Audience\Model::class);
+        $this->metadata = new Metadata();
     }
 
 
@@ -1039,5 +1044,25 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function getCommentNotifier(): string
     {
         return Discussion\Comment\Notifier::class;
+    }
+
+    /**
+     * @param Metadata $metadata
+     *
+     * @return $this
+     */
+    public function setMetadata(Metadata $metadata): self
+    {
+        $this->metadata = $metadata;
+
+        return $this;
+    }
+
+    /**
+     * @return Metadata
+     */
+    public function getMetadata(): Metadata
+    {
+        return $this->metadata;
     }
 }

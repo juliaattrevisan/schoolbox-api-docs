@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Resource\Category;
 
-use Alaress\Database\Predicate\Builder;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;

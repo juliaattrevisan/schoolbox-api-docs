@@ -22,6 +22,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
 class Lists
 {
@@ -70,6 +71,11 @@ class Lists
      */
     private $articleResolver;
 
+    /**
+     * @var CommentMapper
+     */
+    private $commentMapper;
+
 
     /**
      * Lists constructor.
@@ -93,7 +99,8 @@ class Lists
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        IArticleResolver $articleResolver
+        IArticleResolver $articleResolver,
+        CommentMapper $commentMapper
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->newsMapper                 = $newsMapper;
@@ -104,6 +111,7 @@ class Lists
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
+        $this->commentMapper              = $commentMapper;
     }
 
 
@@ -215,7 +223,7 @@ class Lists
         /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
-            'articles' => $articles,
+            'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,
@@ -339,7 +347,7 @@ class Lists
         }
 
         return [
-            'articles' => $articles,
+            'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
@@ -401,5 +409,51 @@ class Lists
             $this->articleResolver->findArticlesForUser($user),
             $this->newsMapper->findIdsByColumn('author_id', $user->getId())
         );
+    }
+
+    /**
+     * Populate each article's metadata instance
+     *
+     * @param GenericCollection $articles
+     *
+     * @return GenericCollection
+     * @throws \InvalidArgumentException
+     */
+    private function populateMetadata(GenericCollection $articles): GenericCollection
+    {
+        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+            Helper::getThreadIdsFromCollection($articles),
+            $this->commentMapper::ARTICLE_ID
+        );
+
+        $this->loadCommentCounts($commentCounts, $articles);
+
+        /* Other metadata stuff can be listed here
+         *
+         * $this->addMoreMetadata($articles);
+         * $this->addEvenMoreMetadata($articles);
+         */
+
+        return $articles;
+    }
+
+    /**
+     * Load the count of comments for each article in $articles
+     * using pass-by-reference
+     *
+     * @param array             $commentCounts
+     * @param GenericCollection $articles
+     *
+     * @return void
+     */
+    private function loadCommentCounts(array $commentCounts, GenericCollection $articles): void
+    {
+        /** @var Model $article */
+
+        foreach ($articles as $article) {
+            if ($article->getDiscussionThread()) {
+                $article->getMetadata()->setCommentCount((int) $commentCounts[$article->getId()]);
+            }
+        }
     }
 }

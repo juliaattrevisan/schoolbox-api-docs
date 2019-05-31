@@ -17,7 +17,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
-
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
 class Controller extends Base
 {
@@ -59,6 +59,8 @@ class Controller extends Base
     /** @var ArticleResolver */
     private $articleResolver;
 
+    /** @var CommentMapper */
+    private $commentMapper;
 
     /**
      * Controller constructor.
@@ -80,7 +82,8 @@ class Controller extends Base
         News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
         ArticleResolver $articleResolver,
-        Access $access
+        Access $access,
+        CommentMapper $commentMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -90,6 +93,7 @@ class Controller extends Base
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
         $this->access                     = $access;
+        $this->commentMapper              = $commentMapper;
     }
 
 
@@ -120,7 +124,7 @@ class Controller extends Base
          */
         $args = [];
 
-        $newsList = (new News\Lists(
+        $newsList = new News\Lists(
             (int)$this->getConfigLoader()->get('search_type_limit'),
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -129,8 +133,9 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver
-        ));
+            $this->articleResolver,
+            $this->commentMapper
+        );
 
         /* If a folder was specified, get the feed for that folder
          */
