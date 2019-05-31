@@ -172,15 +172,15 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private $audience;
 
     /**
-     * @var MetaData
+     * @var Metadata
      */
-    private $metaData;
+    private $metadata;
 
     public function __construct()
     {
         /** @noinspection PhpUnhandledExceptionInspection (impossible as we're not adding items) */
         $this->audience = new GenericCollection(Audience\Model::class);
-        $this->metaData = new MetaData();
+        $this->metadata = new Metadata();
     }
 
 
@@ -1047,22 +1047,22 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     }
 
     /**
-     * @param MetaData $metaData
+     * @param Metadata $metadata
      *
      * @return $this
      */
-    public function setMetaData(MetaData $metaData): self
+    public function setMetadata(Metadata $metadata): self
     {
-        $this->metaData = $metaData;
+        $this->metadata = $metadata;
 
         return $this;
     }
 
     /**
-     * @return MetaData
+     * @return Metadata
      */
-    public function getMetaData(): MetaData
+    public function getMetadata(): Metadata
     {
-        return $this->metaData;
+        return $this->metadata;
     }
 }

@@ -452,7 +452,7 @@ class Lists
 
         foreach ($articles as $article) {
             if ($article->getDiscussionThread()) {
-                $article->getMetaData()->setCommentCount((int) $commentCounts[$article->getId()]);
+                $article->getMetadata()->setCommentCount((int) $commentCounts[$article->getId()]);
             }
         }
     }

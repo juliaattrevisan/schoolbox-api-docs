@@ -6,7 +6,7 @@
 
 namespace Schoolbox\Comms\News;
 
-class MetaData
+class Metadata
 {
     /**
      * @var int
@@ -14,7 +14,7 @@ class MetaData
     public $commentCount = 0;
 
     /**
-     * NewsMetaData constructor.
+     * Metadata constructor.
      */
     public function __construct()
     {
@@ -24,7 +24,7 @@ class MetaData
     /**
      * @param int $commentCount
      *
-     * @return MetaData
+     * @return Metadata
      */
     public function setCommentCount(int $commentCount): self
     {

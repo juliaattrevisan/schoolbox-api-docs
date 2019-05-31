@@ -8,7 +8,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Decorator\IDecorator;
 
-class MetaDataDecorator implements IDecorator
+class MetadataDecorator implements IDecorator
 {
     /**
      * @var array
@@ -19,9 +19,9 @@ class MetaDataDecorator implements IDecorator
     private $commentCounts;
 
     /**
-     * MetaDataDecorator constructor.
+     * MetadataDecorator constructor.
      *
-     * @param $commentCounts
+     * @param array $commentCounts
      */
     public function __construct(array $commentCounts)
     {
@@ -52,7 +52,7 @@ class MetaDataDecorator implements IDecorator
             }
         }
 
-        $json['metaData'] = [
+        $json['metadata'] = [
             'commentCount' => $commentCount
         ];
 
