@@ -120,7 +120,8 @@ class InputStreamListener extends AbstractIOStreamListener
         } catch (\Schoolbox\External\Exception $e) {
             $msg = sprintf("Failed to connect to SIS connector '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
             $this->log->warning($msg);
-            $this->loop->stop();
+            // throwing to let scheduler re-schedule
+            throw $e;
         } catch(IOException $e) {
             // this means the pipe or connection to an external service has been broken
             // no point logging, no point carrying on. everything is meaningless.

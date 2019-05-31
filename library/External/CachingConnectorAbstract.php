@@ -77,9 +77,13 @@ class CachingConnectorAbstract
      * @param string $method
      * @param array  $params
      * @return mixed
+     * @throws External\Exception
      */
     protected function bypassCache(string $method, array $params)
     {
+        if (PHP_SAPI === 'cli' && $this->isOffline()) {
+            throw new External\Exception('SIS connector is offline.');
+        }
         return call_user_func_array([$this->database, $method], $params);
     }
 
@@ -93,15 +97,12 @@ class CachingConnectorAbstract
      * @param array    $params
      * @param int|null $timeoutOverride Optionally override configured timeout
      * @return mixed
+     * @throws External\Exception
      */
     protected function getCachedResult(string $method, array $params, int $timeoutOverride = null)
     {
         if ($this->isOffline()) {
-            if (PHP_SAPI === 'cli') {
-                throw new External\Exception('SIS connector is offline.');
-            } else {
-                return $this->bypassCache($method, $params);
-            }
+            return $this->bypassCache($method, $params);
         }
 
         $key      = get_class($this->database) . '.' . $method;
