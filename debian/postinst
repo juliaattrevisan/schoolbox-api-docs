@@ -22,11 +22,6 @@ case "$1" in
         # start logging
         date >> /var/log/schoolbox/upgrade.log;
         echo "Schoolbox Upgrade" >> /var/log/schoolbox/upgrade.log;
-
-        # Take site down for maintenance
-        # Ideally this would execute prior to package installation, but debian packages do not support this.
-        /usr/share/schoolbox/tools/maintenance/site_down.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-
         # Test whether a2enmod is available (and thus also apache2ctl).
         if [ -x /usr/sbin/a2enmod ]; then
             # Enable the Apache2 rewrite module if not already enabled

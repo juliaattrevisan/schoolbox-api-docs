@@ -2,6 +2,7 @@
 # Simple script to place schoolbox into maintenance mode.
 # 1. Ensures maintenance file is present
 # 2. Reloads nginx config to detect the presence of the file
+# IMPORTANT - IF YOU CHANGE THIS FILE, YOU MUST PORT THE SAME LOGICAL CHANGE TO debian/preinst
 
 # Check we're running as root
 if [[ "$EUID" -ne 0 ]]
