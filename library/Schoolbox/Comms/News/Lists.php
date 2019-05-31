@@ -347,7 +347,7 @@ class Lists
         }
 
         return [
-            'articles' => $this->attachMetadataIntoLoadedArticles($articles),
+            'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
