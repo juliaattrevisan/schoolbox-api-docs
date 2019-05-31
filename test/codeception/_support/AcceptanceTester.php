@@ -98,10 +98,13 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $i = $this;
         $i->amOnPage('/user/recoverSession');
-        $i->click('a#profile-drop');
-        $i->click($fullname, '#account-content');
+        $i->click(['css'=>'a[title=Schoolbox\ Admin]']);
+        $fullname_format_spaces=str_replace(' ', '\ ', $fullname);
+        $i->executeJS("var scrollableDiv = document.getElementById('account-content');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+        $i->waitForText($fullname, 5);
+        $i->click($fullname, '#switch-user');
     }
-
 
     /**
      * Fill in CKEditor
