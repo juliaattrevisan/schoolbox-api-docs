@@ -129,7 +129,15 @@ class HomepageInitialCest
         $i->click("Test Homepage");
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
-        echo "Not done yet";
+        $home_page_url=$i->getCurrentUrl();
+        $i->impersonate("Rachel Rhodes");
+        $i->amOnUrl($home_page_url);
+        $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
+        $i->canSee("Test Blog Title");
+        $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        $i->canSee("Test News Title");
+        $i->canSeeElement(['css'=>'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        $i->canSee("Test Text Box Title");
     }
 
     #@depends createHomepage
@@ -142,6 +150,18 @@ class HomepageInitialCest
         $i->click("Test Homepage");
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
+        $home_page_url=$i->getCurrentUrl();
+        $i->click(['css'=>'label[for=component-lock-toggle]']);
+        $i->canSeeElement(['css'=>'span[class=icon-unlocked]']);
+        $i->click(['css'=>'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a.icon-close[data-state=closed][title=Close]']);
+        $i->canSeeElement(['css'=>'a[class=button\ submit]']);
+        $i->click(['css'=>'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a[class=button\ submit]']);
+        $i->click(['css'=>'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a.icon-close[data-state=closed][title=Close]']);
+        $i->canSeeElement(['css'=>'a[class=button\ submit]']);
+        $i->click(['css'=>'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a[class=button\ submit]']);
+        $i->click(['css'=>'div.component-container.Component_Homepage_TextBoxController a.icon-close[data-state=closed][title=Close]']);
+        $i->canSeeElement(['css'=>'a[class=button\ submit]']);
+        $i->click(['css'=>'div.component-container.Component_Homepage_TextBoxController a[class=button\ submit]']);
         echo "Not done yet";
     }
 
