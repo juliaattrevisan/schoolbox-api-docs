@@ -14,6 +14,7 @@ namespace Schoolbox\Resource\Folder;
 
 use Alaress;
 use function explode;
+use InvalidArgumentException;
 use PDO;
 use PDOException;
 use PDOStatement;
