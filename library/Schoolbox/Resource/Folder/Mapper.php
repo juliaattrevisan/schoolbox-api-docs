@@ -990,7 +990,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // Multiple folders resulted from $code
-        // this is an edge case that cannot happen normally because bidness logic prevents it
+        // this is an edge case that cannot happen normally because business logic prevents it
         // you have to mangle the db, or provide bad data on the url to manifest this situation
         // In either case, pop out an exception because this should never have occurred
         throw new InvalidArgumentException('Multiple folders returned; indeterminate destination');
