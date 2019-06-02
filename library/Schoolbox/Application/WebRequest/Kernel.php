@@ -490,24 +490,25 @@ class Kernel extends WebKernelAbstract
         }
 
 
-        // Ghetto token-based authentication.
-        // If it finds a user: create a session for them
-        /** @var MapperFactory $mapperFactory */
-        /** @noinspection PhpUnhandledExceptionInspection */
-        $mapperFactory = $di->get('mapperFactory');
-        $tokenParser   = new TokenParser(
-            $mapperFactory->get(UserMapper::class),
-            (new JwtVerifierBuilder())
-                // I guess this is configurable.
-                // We'll probably have multiple oAuth providers we accept too
-                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
-                ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
-                ->setDiscovery(new Oidc())
-                ->build()
-        );
-        $user          = $tokenParser->findUser($_SERVER, ConfigMapper::_OAUTH_JWT_SECRET);
-        if ($user) {
-            // do something with that user
-        }
+        // Commented out for now: this was largely an experiment
+//        // Ghetto token-based authentication.
+//        // If it finds a user: create a session for them
+//        /** @var MapperFactory $mapperFactory */
+//        /** @noinspection PhpUnhandledExceptionInspection */
+//        $mapperFactory = $di->get('mapperFactory');
+//        $tokenParser   = new TokenParser(
+//            $mapperFactory->get(UserMapper::class),
+//            (new JwtVerifierBuilder())
+//                // I guess this is configurable.
+//                // We'll probably have multiple oAuth providers we accept too
+//                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
+//                ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
+//                ->setDiscovery(new Oidc())
+//                ->build()
+//        );
+//        $user          = $tokenParser->findUser($_SERVER, ConfigMapper::_OAUTH_JWT_SECRET);
+//        if ($user) {
+//            // do something with that user
+//        }
     }
 }
