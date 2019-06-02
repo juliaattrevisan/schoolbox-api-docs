@@ -41,7 +41,7 @@ $oauthProvider->setOptionProvider(new HttpBasicAuthOptionProvider());
 
 // Nonce: not required, but can be used and is respected by the JWT decoder
 // TODO generate and store in the session, if it turns out it is required?
-$nonce = 'bbbbb';
+$nonce = null;
 
 
 // Step 1: redirect to auth URL if there was no code
@@ -49,9 +49,8 @@ if (!isset($_GET['code'])) {
     // Fetch the authorization URL from the provider; this returns the
     // urlAuthorize option and generates and applies any necessary parameters
     // (e.g. state).
-    $authorizationUrl = $oauthProvider->getAuthorizationUrl([
+    $oauthOptions     = [
         'scope'         => 'openid profile email https://scopes.cloudwork.id/profile',
-        'nonce'         => $nonce,
         'response_type' => 'code',
         'response_mode' => 'query',
         'claims'        => json_encode([
@@ -62,10 +61,13 @@ if (!isset($_GET['code'])) {
                 'https://cloudwork.id/claims/sis_id' => null,
                 'email'                              => null,
                 'preferred_username'                 => null,
-                'kid'                                => null,
             ],
-        ]),
-    ]);
+        ])
+    ];
+    if (isset($nonce)) {
+        $oauthOptions['nonce'] = $nonce;
+    }
+    $authorizationUrl = $oauthProvider->getAuthorizationUrl($oauthOptions);
 
     // Get the state generated for you and store it to the session.
     $_SESSION['oauth2state'] = $oauthProvider->getState();
@@ -106,16 +108,18 @@ try {
 
 
     // Step 2b: parse the JWT
-    $jwtVerifier = (new JwtVerifierBuilder())
+    $jwtVerifierBuilder = (new JwtVerifierBuilder())
         // I guess this is configurable.
         // We'll probably have multiple oAuth providers we accept too
         ->setIssuer($oauthIssuer)
         // For now, I must hardcode the key ID, as it's not in the JWT header
         ->setAdaptor(new FirebasePhpJwt('0'))
         ->setDiscovery(new Oidc())
-        ->setNonce($nonce)
-        ->setAudience([$clientId])
-        ->build();
+        ->setAudience([$clientId]);
+    if (isset($nonce)) {
+        $jwtVerifierBuilder = $jwtVerifierBuilder->setNonce($nonce);
+    }
+    $jwtVerifier = $jwtVerifierBuilder->build();
 
     echo '<h2>Parsed JWT</h2>';
     echo '<pre>'.json_encode($jwtVerifier->verify($accessToken->getValues()['id_token']), JSON_PRETTY_PRINT).'</pre>';
