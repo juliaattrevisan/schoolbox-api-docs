@@ -8,24 +8,46 @@ declare(strict_types=1);
 
 namespace Schoolbox\Auth\Adapter;
 
-use Firebase\JWT\JWT as JwtCodec;
 use Okta\JwtVerifier;
 
 /**
  * Override for Okta's Firebase JWT adapter.
  *
- * Supports all known algorithms, not just RS256.
+ * Overridden to support a hardcoded kid (key ID) field, as not all providers
+ * provide this field as part of their JWT header.
  */
 class FirebasePhpJwt extends JwtVerifier\Adaptors\FirebasePhpJwt
 {
     /**
-     * @param string $jwt
-     * @param array $keys
-     * @return JwtVerifier\Jwt
+     * The ID of the key to use to decode the JWT.
+     *
+     * @var string|null
      */
-    public function decode($jwt, $keys): JwtVerifier\Jwt
+    private $keyId;
+
+
+    /**
+     * Constructor
+     *
+     * @param string|null              $keyId
+     * @param JwtVerifier\Request|null $request
+     */
+    public function __construct(?string $keyId = null, JwtVerifier\Request $request = null)
     {
-        $decoded = (array)JwtCodec::decode($jwt, $keys, ['HS256']);
-        return new JwtVerifier\Jwt($jwt, $decoded);
+        parent::__construct($request);
+        $this->keyId = $keyId;
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function getKeys($jku)
+    {
+        $keys = parent::getKeys($jku);
+        if (isset($this->keyId, $keys[$this->keyId])) {
+            return $keys[$this->keyId];
+        }
+        return $keys;
     }
 }
