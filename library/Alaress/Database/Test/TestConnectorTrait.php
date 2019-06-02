@@ -13,6 +13,7 @@ namespace Alaress\Database\Test;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Factory;
 use Database;
+use InvalidArgumentException;
 
 trait TestConnectorTrait
 {
@@ -110,6 +111,7 @@ trait TestConnectorTrait
      * Connect to Synergetic V68 database
      *
      * @return bool Was connection successful?
+     * @throws InvalidArgumentException
      */
     private function connectSynergetic68()
     {
@@ -123,7 +125,7 @@ trait TestConnectorTrait
 
         $factory = new Factory();
 
-        $this->synergetic68 = $factory->createMssql();
+        $this->synergetic68 = $factory->createMssql(Factory::PDO_DRIVER_DBLIB);
         return $this->synergetic68->connect(
             '172.31.15.10',
             'Synergetic_AUVIC_ALARESS_PRD',

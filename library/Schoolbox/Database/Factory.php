@@ -5,6 +5,8 @@ namespace Schoolbox\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
+use InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 
@@ -129,6 +131,7 @@ class Factory
      *
      * @return null|IConnector Return the external connector appropriate for the SIS
      * @throws DatabaseException
+     * @throws InvalidArgumentException
      */
     public function getExternalDatabase(IConfigLoader $config): ?IConnector
     {
@@ -152,7 +155,7 @@ class Factory
             case 'doublefirst':
             case 'humanedge':
             case 'schooledge':
-                $connectorExternal = $this->factory->createMssql();
+                $connectorExternal = $this->factory->createMssql($config->get(ConfigMapper::_EXTERNAL_MS_SQL_SERVER_DRIVER));
                 break;
 
             // MySQL
