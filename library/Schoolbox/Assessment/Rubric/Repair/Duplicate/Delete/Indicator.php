@@ -125,7 +125,7 @@ class Indicator extends Base
     {
         $this->findFoldersQuery->execute();
         if ($this->findFoldersQuery->rowCount() === 0) {
-            $this->log->critical('No folders found - nothing to merge');
+            $this->log->warning('No folders found - nothing to merge');
         }
         foreach ($this->findFoldersQuery->fetchAll() as $folder) {
             $folderId = (int)$folder['id'];
