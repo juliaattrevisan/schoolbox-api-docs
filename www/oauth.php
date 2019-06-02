@@ -113,7 +113,7 @@ try {
         // We'll probably have multiple oAuth providers we accept too
         ->setIssuer($oauthIssuer)
         // For now, I must hardcode the key ID, as it's not in the JWT header
-        ->setAdaptor(new FirebasePhpJwt('0'))
+        ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
         ->setDiscovery(new Oidc())
         ->setAudience([$clientId]);
     if (isset($nonce)) {

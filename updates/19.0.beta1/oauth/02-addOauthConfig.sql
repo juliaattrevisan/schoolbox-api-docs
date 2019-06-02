@@ -43,4 +43,15 @@ VALUES (
     'true',
     'false',
     'false'
+),  (
+    'cloudwork_oauth_jwt_key_id',
+    '',
+    'Cloudwork oAuth JWT Key ID',
+    'The ID of the key that is used to decode a JWT from Cloudwork. It is planned that this will auto-detect in the future.',
+    1, -- input
+    '',
+    21, -- SAML? will probably change this
+    'true',
+    'false',
+    'false'
 );
