@@ -65,116 +65,134 @@ class Controller extends Base
     /**
      * @param string $provider
      */
-    public function register($provider)
+    public function register($provider): void
     {
-        $data      = (array)$this->getRequest()->post;
-        $response  = $this->getResponse()->content;
         $providers = [Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE];
 
         // check the provider is valid
-        if (!in_array($provider, $providers)) {
+        if (!in_array($provider, $providers, true)) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
-            $response->set([
+            $this->response->content->set([
                 'format' => 'json',
                 'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers),
             ]);
             return;
         }
 
+        // Authenticate, and if so register app
+        if ($this->authenticate()) {
+            $sessionUser    = $this->getUser();
+            $sessionUserId  = $sessionUser->getId();
+            $sessionUserKey = $sessionUser->getKey();
+
+            // token may be absent or blank, in which case we don't store anything in the registry
+            $token = $this->request->post->get('token');
+            if (!empty($token)) {
+                $now = \Alaress_Date_Format::now();
+
+                try {
+                    $registry = $this->registryMapper->findById($sessionUserId, $token, $provider);
+                    $registry->setTouchedAt($now);
+
+                } catch (MapperException $e) {
+                    try {
+                        /** @var Registry $registry */
+                        $registry = $this->registryMapper->createModel();
+                        $registry
+                            ->setUser($sessionUser)
+                            ->setToken($token)
+                            ->setService(ServiceMapper::getInstance()->findOneByColumnList([
+                                'app_identifier' => $this->request->post->get('appId'),
+                                'provider'       => $provider,
+                            ]))
+                            ->setCreatedAt($now)
+                            ->setTouchedAt($now);
+
+                        // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
+                        $deviceId = $this->request->post->get('deviceId');
+                        if (isset($deviceId)) {
+                            $registry->setDeviceId($deviceId);
+                        }
+
+                    } catch (MapperException $e) {
+                        /** @noinspection PhpUnhandledExceptionInspection */
+                        $this->response->status->setCode(400);
+                        $this->response->content->set([
+                            'format' => 'json',
+                            'data'   => 'Invalid app ID given',
+                        ]);
+                        return;
+                    }
+                }
+
+                $this->registryMapper->save($registry);
+            }
+
+            $this->response->content->set([
+                'format' => 'json',
+                'data'   => [
+                    'id'   => $sessionUserId,
+                    'key'  => $sessionUserKey,
+                    'role' => $sessionUser->getRole()->getType(),
+                ],
+            ]);
+        }
+    }
+
+
+    /**
+     * Authenticates the user based on data within the request.
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     * @return bool Was a user auth session created?
+     *              If it wasn't, JSON should have been put into the response.
+     */
+    private function authenticate(): bool
+    {
+        $data = $this->request->post->getArrayCopy();
         try {
             if (isset($data['username'], $data['password'])) {
-                $sessionUser = $this->authenticateViaPostData($data['username'], $data['password']);
+                $this->authenticateViaPostData($data['username'], $data['password']);
             } elseif (isset($data['jwt'])) {
-                $sessionUser = $this->authenticateViaJwt($data['jwt']);
+                $this->authenticateViaJwt($data['jwt']);
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $this->response->status->setCode(400);
-                $response->set([
+                $this->response->content->set([
                     'format' => 'json',
                     'data'   => [
                         'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
                     ],
                 ]);
-                return;
+                return false;
             }
-            $sessionUserId  = $sessionUser->getId();
-            $sessionUserKey = $sessionUser->getKey();
         } catch (SchoolboxAccessDeniedException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            $this->getResponse()->status->setCode(401);
-            $response->set([
+            $this->response->status->setCode(401);
+            $this->response->content->set([
                 'format' => 'json',
                 'data'   => 'Invalid username or password',
             ]);
-            return;
+            return false;
         } catch (SchoolboxAccountDisabledException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            $this->getResponse()->status->setCode(400);
-            $response->set([
+            $this->response->status->setCode(400);
+            $this->response->content->set([
                 'format' => 'json',
                 'data'   => 'Account disabled',
             ]);
-            return;
+            return false;
         } catch (SchoolboxNotFoundException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
-            $this->getResponse()->status->setCode(400);
-            $response->set([
+            $this->response->status->setCode(400);
+            $this->response->content->set([
                 'format' => 'json',
                 'data'   => 'User not found',
             ]);
-            return;
+            return false;
         }
-
-        // token may be absent or blank, in which case we don't store anything in the registry
-        if (!empty($data['token'])) {
-            $now = \Alaress_Date_Format::now();
-
-            try {
-                $registry = $this->registryMapper->findById($sessionUserId, $data['token'], $provider);
-                $registry->setTouchedAt($now);
-
-            } catch (MapperException $e) {
-                try {
-                    /** @var Registry $registry */
-                    $registry = $this->registryMapper->createModel();
-                    $registry
-                        ->setUser($sessionUser)
-                        ->setToken($data['token'])
-                        ->setService(ServiceMapper::getInstance()->findOneByColumnList([
-                            'app_identifier' => $data['appId'],
-                            'provider'       => $provider,
-                        ]))
-                        ->setCreatedAt($now)
-                        ->setTouchedAt($now);
-
-                    // if a device ID is given, store that too. The mapper will auto-dedupe because of unique constraints
-                    if (isset($data['deviceId'])) {
-                        $registry->setDeviceId($data['deviceId']);
-                    }
-
-                } catch (MapperException $e) {
-                    /** @noinspection PhpUnhandledExceptionInspection */
-                    $this->getResponse()->status->setCode(400);
-                    $response->set([
-                        'format' => 'json',
-                        'data'   => 'Invalid app ID given',
-                    ]);
-                    return;
-                }
-            }
-
-            $this->registryMapper->save($registry);
-        }
-
-        $response->set([
-            'format' => 'json',
-            'data'   => [
-                'id'   => $sessionUserId,
-                'key'  => $sessionUserKey,
-                'role' => $sessionUser->getRole()->getType(),
-            ],
-        ]);
+        return true;
     }
 
 
