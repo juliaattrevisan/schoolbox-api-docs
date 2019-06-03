@@ -62,20 +62,22 @@ class TokenParser
         $decodedToken = $this->jwtVerifier->verify($token);
         $claims       = $decodedToken->getClaims();
 
-        // A username seems to be in the "username" key?
-        if (isset($claims['username'])) {
-            // Verify the user:
-            // * exists
-            // * is enabled
-            $user = $this->userMapper->findByUsername($claims['username']);
+        // The identification in the token seems to be in one of two claims:
+        // * "preferred_username" matches a Schoolbox username
+        // * "https://cloudwork.id/claims/sis_id" matches an external ID
+        // We'll just use the preferred username until I hear otherwise.
+        if (isset($claims['preferred_username'])) {
+            $user = $this->userMapper->findByUsername($claims['preferred_username']);
             if (!$user) {
-                throw new SchoolboxException\NotFound('The token\'s "username" property must match a user\'s username');
+                throw new SchoolboxException\NotFound(
+                    'The token\'s "preferred_username" claim must match a user\'s username'
+                );
             }
             return $user;
         }
 
         // No username found in token: can't use it
-        throw new SchoolboxException\NotFound('The token must contain a "username" property');
+        throw new SchoolboxException\NotFound('The token must contain a "preferred_username" claim');
     }
 
 
