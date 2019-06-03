@@ -27,12 +27,22 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-    /** @var Authenticator */
+    /**
+     * @var Authenticator
+     */
     private $auth;
 
 
-    /** @var RegistryMapper */
+    /**
+     * @var RegistryMapper
+     */
     private $registryMapper;
+
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
 
 
     /**
@@ -43,9 +53,11 @@ class Controller extends Base
      */
     public function __construct(
         Authenticator $auth,
+        UserMapper $userMapper,
         RegistryMapper $registryMapper
     ) {
         $this->auth           = $auth;
+        $this->userMapper     = $userMapper;
         $this->registryMapper = $registryMapper;
     }
 
@@ -198,7 +210,7 @@ class Controller extends Base
 
         // TODO DI this once it starts being used in multiple places
         $tokenParser = new TokenParser(
-            UserMapper::getInstance(),
+            $this->userMapper,
             (new JwtVerifierBuilder())
                 ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
                 ->setAdaptor(new FirebasePhpJwt())
