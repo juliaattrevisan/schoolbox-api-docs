@@ -702,6 +702,10 @@ class Controller extends Base
 
         $userId = $user->getId();
 
+        if (trim($post['body']) === '') {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
+
         $bob = new NotificationInstanceBuilder();
         $bob->setTitle(Scrub::text($post['body']))
             ->setSeverity(Logger::INFO)
