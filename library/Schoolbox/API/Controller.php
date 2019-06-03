@@ -49,6 +49,7 @@ class Controller extends Base
      * Constructor
      *
      * @param Authenticator  $auth
+     * @param UserMapper     $userMapper
      * @param RegistryMapper $registryMapper
      */
     public function __construct(
