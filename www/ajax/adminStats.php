@@ -17,6 +17,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $page = new SitePage;
 $output = array();
+$now = new Alaress_Date_Format();
 
 if(!isset($_POST['module'])) {
     // don't bother returning anything
@@ -28,7 +29,7 @@ switch($_POST['module']) {
     case 'users':
         $configMapper = ConfigMapper::getInstance();
         $login         = new Login(Database\Factory::getInstanceInternal(), $configMapper->get('session_length'));
-        $summary       = $login->userSummary();
+        $summary       = $login->userSummary($now);
         $totalUser     = 0;
         $totalLogin    = 0;
 

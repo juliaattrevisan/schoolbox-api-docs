@@ -32,7 +32,7 @@ $configMapper  = $mapperFactory->get(ConfigMapper::class);
 $loginReport   = new Login(Database\Factory::getInstanceInternal(), $configMapper->get('session_length'));
 $roleMapper    = $mapperFactory->get(RoleMapper::class);
 $roleList      = $roleMapper->findAll();
-$roleSummary   = $loginReport->userSummary();
+
 
 foreach($roleList as $role) {
     $totalTable[$role->getName()] = array_fill(0,$months, 0);
@@ -48,6 +48,8 @@ for($i=0; $i < $months; $i++) {
 
     $endMonth = clone $currentMonth;
     $endMonth->endOfMonth();
+
+    $roleSummary   = $loginReport->userSummary($endMonth);
 
     $total = $loginReport->loginByGroup($currentMonth, $endMonth);
     foreach($total as $row) {
