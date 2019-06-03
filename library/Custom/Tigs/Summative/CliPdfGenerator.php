@@ -40,7 +40,7 @@ class CliPdfGenerator extends CliTool\App
     private const OPT_LONG_HELP             = 'help';              // print help
     private const OPT_LONG_HASH             = 'hash:';             // session hash
     private const OPT_LONG_USERNAME         = 'username:';         // username
-    private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student-id
+    private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student external id
     private const OPT_LONG_YEAR_LEVEL       = 'year-level:';       // year-level
     private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
     private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
@@ -959,7 +959,7 @@ DESCRIPTION
         A username to run the tool as
         
     $yellow--student-id=ID$white
-        Just generate the report for this student
+        Just generate the report for this student. (Value is SIS id, not Schoolbox id)
         
     $yellow--year-level=YEAR$white
         Just generate reports for students in this year level
