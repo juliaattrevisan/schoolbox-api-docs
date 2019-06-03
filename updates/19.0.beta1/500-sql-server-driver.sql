@@ -7,8 +7,8 @@ VALUES (
     (SELECT id FROM lu_config_field WHERE field = 'select'),
     'dblib:sqlsrv',
     (SELECT id FROM lu_config_type WHERE type = 'External DB'),
-    'true',
     'false',
+    'true',
     'true',
     'settings'
 );
