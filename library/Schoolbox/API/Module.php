@@ -9,50 +9,29 @@
 namespace Schoolbox\API;
 
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
-use Alaress\Web\Router\RouteCollection;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 use Authenticator;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
-
     protected $basename = 'api';
 
-    /**
-     * @param Router|RouteCollection $router
-     * @param string                 $basePath
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $this->addPostRoute($router, 'register', $basePath, '/register/{provider}');
-    }
-
 
     /**
-     * @param PathMatcher $matcher
+     * @inheritDoc
      */
-    public function initRoutePreloads(PathMatcher $matcher)
+    protected function registerRoutes(): void
     {
-        $this->addRoutePreload(
-            $matcher,
-            'register',
-            function ($params) {
-                return [
-                    'provider' => $params['provider'],
-                ];
-            }
-        );
+        $this->register('GET', '/register/{provider}', 'register');
     }
 
 
     /**
      * @param ContainerInterface $injector
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
             'controller:' . $this->basename,
