@@ -72,9 +72,16 @@ class Controller extends Base
 
 
     /**
+     * Authenticates a user via either a username+password or JWT, and then
+     * registers their app token.
+     *
+     * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
+     * @api          /api/register/{provider}
+     * @level        145
+     *
      * @param string $provider
      */
-    public function register($provider): void
+    public function register(string $provider): void
     {
         $providers = [Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE];
 
@@ -92,9 +99,7 @@ class Controller extends Base
 
         // Authenticate, and if so register app
         if ($this->authenticate()) {
-            $sessionUser    = $this->getUser();
-            $sessionUserId  = $sessionUser->getId();
-            $sessionUserKey = $sessionUser->getKey();
+            $sessionUser = $this->getUser();
 
             // token may be absent or blank, in which case we don't store anything in the registry
             $token = $this->request->post->get('token');
@@ -102,7 +107,7 @@ class Controller extends Base
                 $now = \Alaress_Date_Format::now();
 
                 try {
-                    $registry = $this->registryMapper->findById($sessionUserId, $token, $provider);
+                    $registry = $this->registryMapper->findById($sessionUser->getId(), $token, $provider);
                     $registry->setTouchedAt($now);
 
                 } catch (MapperException $e) {
@@ -136,13 +141,28 @@ class Controller extends Base
                 $this->registryMapper->save($registry);
             }
 
-            $this->response->content->set(
-                $this->buildJsonOutput([
-                    'id'   => $sessionUserId,
-                    'key'  => $sessionUserKey,
-                    'role' => $sessionUser->getRole()->getType(),
-                ])
-            );
+            $this->response->content->set($this->buildAuthenticatedJsonOutput());
+        }
+    }
+
+
+    /**
+     * API endpoint for initializing a session based on a username/password or
+     * a JWT, without registering an app.
+     *
+     * @api   /api/session
+     * @level 190
+     */
+    public function initSession(): void
+    {
+        if ($this->authenticate()) {
+            if ($this->isJsonRequest()) {
+                $this->response->content->set($this->buildAuthenticatedJsonOutput());
+            } else {
+                // Redirect somewhere (locally only?)
+                // TODO accept redirect URL in a GET/POST param
+                $this->response->redirect->to('/');
+            }
         }
     }
 
@@ -235,5 +255,20 @@ class Controller extends Base
         $user        = $tokenParser->findUserFromToken($jwt);
         $this->auth->createSession($user->getUsername(), true);
         return $this->getUser();
+    }
+
+
+    /**
+     * Build JSON output for an authenticated user.
+     *
+     * @return \Alaress\Web\Output\Json
+     */
+    private function buildAuthenticatedJsonOutput(): \Alaress\Web\Output\Json
+    {
+        return $this->buildJsonOutput([
+            'id'   => $this->getUser()->getId(),
+            'key'  => $this->getUser()->getKey(),
+            'role' => $this->getUser()->getRole()->getType(),
+        ]);
     }
 }

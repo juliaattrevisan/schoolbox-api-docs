@@ -26,6 +26,7 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         $this->register('GET', '/register/{provider}', 'register');
+        $this->register('GET', '/session', 'initSession');
     }
 
 
