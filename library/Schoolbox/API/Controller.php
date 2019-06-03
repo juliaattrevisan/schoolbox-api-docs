@@ -11,14 +11,20 @@ namespace Schoolbox\API;
 
 use Alaress\Web\Controller\Base;
 use Authenticator;
+use Okta\JwtVerifier\Discovery\Oidc;
+use Okta\JwtVerifier\JwtVerifierBuilder;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
+use Schoolbox\Auth\Adapter\FirebasePhpJwt;
+use Schoolbox\Auth\TokenParser;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -208,5 +214,33 @@ class Controller extends Base
             ]);
             return null;
         }
+    }
+
+
+    /**
+     * Authenticates a user via a JWK passed in POST data.
+     *
+     * @param array $postData
+     * @return User|null
+     */
+    private function authenticateViaJwk(array $postData): ?User
+    {
+        if (!isset($postData['token'])) {
+            return null;
+        }
+
+        $config = $this->getConfigLoader();
+
+        // TODO DI this once it starts being used in multiple places
+        $tokenParser = new TokenParser(
+            UserMapper::getInstance(),
+            (new JwtVerifierBuilder())
+                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
+                ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
+                ->setDiscovery(new Oidc())
+                ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
+                ->build()
+        );
+        return $tokenParser->findUserFromToken($postData['token']);
     }
 }

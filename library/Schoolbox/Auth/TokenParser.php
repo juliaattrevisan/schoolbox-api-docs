@@ -52,17 +52,50 @@ class TokenParser
      * This doesn't actually authenticate the user: it merely retrieves a user
      * who is then passed to the authentication function.
      *
+     * @param string $token
+     * @return User|null
+     */
+    public function findUserFromToken(string $token): ?User
+    {
+        // Parse the token and extract a user from it
+        $decodedToken = $this->jwtVerifier->verify($token);
+        $claims       = $decodedToken->getClaims();
+
+        // A username seems to be in the "username" key?
+        if (isset($claims['username'])) {
+            // Verify the user:
+            // * exists
+            // * is enabled
+            $user = $this->userMapper->findByUsername($claims['username']);
+            if (!$user) {
+                throw new SchoolboxException\NotFound('The token\'s "username" property must match a user\'s username');
+            }
+            if (!$user->getEnabled()) {
+                throw new SchoolboxException\AccountDisabled('The user\'s account is disabled');
+            }
+            return $user;
+        }
+
+        // No username found in token: can't use it
+        throw new SchoolboxException\NotFound('The token must contain a "username" property');
+    }
+
+
+    /**
+     * Finds the user from a token in PHP's server vars.
+     *
+     * The token must be in the "Authorization" HTTP header, and be in the form
+     * "Bearer: $token".
+     *
      * @param array  $serverVars The contents of the `$_SERVER` super-global.
-     *                           The token should be in the "Authorization" HTTP
-     *                           header, and be in the form "Bearer: $token"
-     * @param string $key        The key used to decode the token.
+     *
      * @return User|null
      * @throws SchoolboxException\Exception       if the "Authorization" header isn't type "Bearer"
      * @throws SchoolboxException\NotFound        if the decoded token doesn't contain a "sub" (subject) key
      * @throws SchoolboxException\NotFound        if the decoded token's "sub" key doesn't match a username
      * @throws SchoolboxException\AccountDisabled if the user matched by the "sub" key isn't enabled
      */
-    public function findUser(array $serverVars, string $key): ?User
+    public function findUserFromServerVars(array $serverVars): ?User
     {
         // Find the auth header in server vars. If it's not there: do nothing
         $authHeader = $serverVars['HTTP_AUTHORIZATION'] ?? null;
@@ -72,27 +105,7 @@ class TokenParser
 
         if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
             [, $token] = $matches;
-            // Parse the token and extract a user from it
-            $decodedToken = $this->jwtVerifier->verify($token);
-            $claims       = $decodedToken->getClaims();
-
-            // A username seems to be in the "username" key?
-            if (isset($claims['username'])) {
-                // Verify the user:
-                // * exists
-                // * is enabled
-                $user = $this->userMapper->findByUsername($claims['username']);
-                if (!$user) {
-                    throw new SchoolboxException\NotFound('The token\'s "username" property must match a user\'s username');
-                }
-                if (!$user->getEnabled()) {
-                    throw new SchoolboxException\AccountDisabled('The user\'s account is disabled');
-                }
-                return $user;
-            }
-
-            // No username found in token: can't use it
-            throw new SchoolboxException\NotFound('The token must contain a "username" property');
+            return $this->findUserFromToken($token);
         }
 
         // Header was malformed: can't use?

@@ -504,9 +504,10 @@ class Kernel extends WebKernelAbstract
 //                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
 //                ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
 //                ->setDiscovery(new Oidc())
+//                ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)]);
 //                ->build()
 //        );
-//        $user          = $tokenParser->findUser($_SERVER, ConfigMapper::_OAUTH_JWT_SECRET);
+//        $user          = $tokenParser->findUserFromServerVars($_SERVER);
 //        if ($user) {
 //            // do something with that user
 //        }
