@@ -175,20 +175,6 @@ class Controller extends Base
 
 
     /**
-     * @param array $array
-     * @param array $keys
-     */
-    protected function assertArrayKeys(array $array, array $keys)
-    {
-        foreach ($keys as $key) {
-            if (!array_key_exists($key, $array)) {
-                throw new \UnderflowException($key);
-            }
-        }
-    }
-
-
-    /**
      * Authenticates a user given the username/password in POST data.
      *
      * @param string $username
