@@ -40,7 +40,7 @@ class CliPdfGenerator extends CliTool\App
     private const OPT_LONG_HELP             = 'help';              // print help
     private const OPT_LONG_HASH             = 'hash:';             // session hash
     private const OPT_LONG_USERNAME         = 'username:';         // username
-    private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student-id
+    private const OPT_LONG_STUDENT_ID       = 'student-id:';       // student external id
     private const OPT_LONG_YEAR_LEVEL       = 'year-level:';       // year-level
     private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
     private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
@@ -65,7 +65,7 @@ class CliPdfGenerator extends CliTool\App
     private $username;
 
     /** @var string|null */
-    private $studentId;
+    private $studentExternalId;
 
     /** @var string|null */
     private $yearLevel;
@@ -212,17 +212,17 @@ class CliPdfGenerator extends CliTool\App
      */
     private function parseAppOptions(): bool
     {
-        $valid             = true;
-        $this->sessionHash = $this->getOpt(self::OPT_LONG_HASH);
-        $this->username    = $this->getOpt(self::OPT_LONG_USERNAME);
-        $this->studentId   = $this->getOpt(self::OPT_LONG_STUDENT_ID);
-        $this->yearLevel   = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
-        $this->curriculum  = $this->getOpt(self::OPT_LONG_CURRICULUM);
-        $this->nowOverride = $this->getOpt(self::OPT_LONG_NOW);
-        $maxFailures       = $this->getOpt(self::OPT_LONG_MAX_FAILS);
-        $jsDelay           = $this->getOpt(self::OPT_LONG_JS_DELAY);
-        $userStyleSheet    = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
-        $roleTypeOverride  = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
+        $valid                      = true;
+        $this->sessionHash          = $this->getOpt(self::OPT_LONG_HASH);
+        $this->username             = $this->getOpt(self::OPT_LONG_USERNAME);
+        $this->studentExternalId    = $this->getOpt(self::OPT_LONG_STUDENT_ID);
+        $this->yearLevel            = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
+        $this->curriculum           = $this->getOpt(self::OPT_LONG_CURRICULUM);
+        $this->nowOverride          = $this->getOpt(self::OPT_LONG_NOW);
+        $maxFailures                = $this->getOpt(self::OPT_LONG_MAX_FAILS);
+        $jsDelay                    = $this->getOpt(self::OPT_LONG_JS_DELAY);
+        $userStyleSheet             = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
+        $roleTypeOverride           = $this->getOpt(self::OPT_LONG_ROLE_TYPE);
 
         if ($this->sessionHash) {
             $this->getLogger()->info('Command-line session hash supplied, validating...');
@@ -308,7 +308,7 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("Command Line Options:");
         $this->getLogger()->debug("    sessionHash: {$this->sessionHash}");
         $this->getLogger()->debug("    username: {$this->username}");
-        $this->getLogger()->debug("    studentId: {$this->studentId}");
+        $this->getLogger()->debug("    studentExternalId: {$this->studentExternalId}");
         $this->getLogger()->debug("    yearLevel: {$this->yearLevel}");
         $this->getLogger()->debug("    curriculum: {$this->curriculum}");
         $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
@@ -474,10 +474,10 @@ class CliPdfGenerator extends CliTool\App
         $pb->isNull('u.deleted_at');
         $messageParts[] = "not soft-deleted";
 
-        // optional user.id filter
-        if ($this->studentId) {
-            $pb->equals('u.id', $this->studentId);
-            $messageParts[] = \sprintf("user.id of '%d'", $this->studentId);
+        // optional user.synergy_id filter
+        if ($this->studentExternalId) {
+            $pb->equals('u.synergy_id', $this->studentExternalId);
+            $messageParts[] = \sprintf("user.synergy_id of '%s'", $this->studentExternalId);
         }
 
         // optional year level filter
@@ -959,7 +959,7 @@ DESCRIPTION
         A username to run the tool as
         
     $yellow--student-id=ID$white
-        Just generate the report for this student
+        Just generate the report for this student. (Value is SIS id, not Schoolbox id)
         
     $yellow--year-level=YEAR$white
         Just generate reports for students in this year level
