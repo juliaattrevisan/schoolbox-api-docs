@@ -618,14 +618,14 @@
                         <div class="small-12 columns">
                             <label>
                                 Message from {{ USER.fullName }}
-                                <input id="alertMsg" type="text" value="" name="body"/>
+                                <input type="text" value="" name="body"/>
                             </label>
                         </div>
                     </fieldset>
                 </section>
                 <div class="row">
                     <div class="small-12 columns">
-                        <input id="sendAlert" type="submit" value="Send"/>
+                        <input type="submit" value="Send"/>
                     </div>
                 </div>
             </form>
@@ -899,7 +899,6 @@
         $('#sendAlertForm').alaressValidate({
             rules: {
                 'body': {
-                    required: true,
                     requiredNotBlank:true
                 }
             },
