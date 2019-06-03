@@ -466,19 +466,18 @@ class CliPdfGenerator extends CliTool\App
         $pb->in('u.year', ['7', '8', '9', '10', '11', '12']);
         $messageParts[] = "user.year between 7 and 12";
 
-        // Who have an external id
-        $pb->notNull('u.synergy_id');
-        $messageParts[] = "a non-null external id";
+        // optional user.synergy_id filter
+        if ($this->studentExternalId !== null) {
+            $pb->equals('u.synergy_id', $this->studentExternalId);
+            $messageParts[] = \sprintf("user.synergy_id of '%s'", $this->studentExternalId);
+        } else {
+            $pb->notNull('u.synergy_id');
+            $messageParts[] = "a non-null external id";
+        }
 
         // And are not deleted
         $pb->isNull('u.deleted_at');
         $messageParts[] = "not soft-deleted";
-
-        // optional user.synergy_id filter
-        if ($this->studentExternalId) {
-            $pb->equals('u.synergy_id', $this->studentExternalId);
-            $messageParts[] = \sprintf("user.synergy_id of '%s'", $this->studentExternalId);
-        }
 
         // optional year level filter
         if ($this->yearLevel) {
