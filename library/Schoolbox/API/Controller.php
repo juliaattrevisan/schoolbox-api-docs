@@ -80,9 +80,9 @@ class Controller extends Base
 
         try {
             if (isset($data['username'], $data['password'])) {
-                $sessionUser = $this->authenticateViaPostData($data);
+                $sessionUser = $this->authenticateViaPostData($data['username'], $data['password']);
             } elseif (isset($data['jwt'])) {
-                $sessionUser = $this->authenticateViaJwt($data);
+                $sessionUser = $this->authenticateViaJwt($data['jwt']);
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $this->response->status->setCode(400);
@@ -150,6 +150,7 @@ class Controller extends Base
                     }
 
                 } catch (MapperException $e) {
+                    /** @noinspection PhpUnhandledExceptionInspection */
                     $this->getResponse()->status->setCode(400);
                     $response->set([
                         'format' => 'json',
@@ -190,49 +191,31 @@ class Controller extends Base
     /**
      * Authenticates a user given the username/password in POST data.
      *
-     * @noinspection PhpDocMissingThrowsInspection as \Aura\Web\Response\Status::setCode should never throw
-     * @param array $postData Must contain "username" and "password" keys
-     * @return User|null
+     * @param string $username
+     * @param string $password
+     * @return User The authenticated user (only if auth was successful)
+     * @throws SchoolboxNotFoundException        if the user doesn't exist
+     * @throws SchoolboxAccessDeniedException    if the password is incorrect
+     * @throws SchoolboxAccountDisabledException if the account is disabled
      */
-    private function authenticateViaPostData(array $postData): ?User
+    private function authenticateViaPostData(string $username, string $password): User
     {
-        $response = $this->response;
-        try {
-            // require these to be present in POSTDATA
-            $this->assertArrayKeys($postData, ['username', 'password']);
-
-        } catch (\UnderflowException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $response->status->setCode(400);
-            $response->content->set([
-                'format' => 'json',
-                'data'   => [
-                    'required' => $e->getMessage(),
-                ],
-            ]);
-            return null;
-        }
-
-        // verify username|password combination
-        $this->auth->authenticate($postData['username'], $postData['password'], true);
-
-        // only obtain these *after* you've run authentication
+        $this->auth->authenticate($username, $password, true);
         return $this->getUser();
     }
 
 
     /**
-     * Authenticates a user via a JWT passed in POST data, in the "jwt" field.
+     * Authenticates a user via a JWT passed in POST data.
      *
-     * @param array $postData
-     * @return User|null
+     * @param string $jwt
+     * @return User The authenticated user (only if auth was successful)
+     * @throws SchoolboxNotFoundException        if the user doesn't exist, or
+     *                                           can't be found in the JWT
+     * @throws SchoolboxAccountDisabledException if the account is disabled
      */
-    private function authenticateViaJwt(array $postData): ?User
+    private function authenticateViaJwt(string $jwt): User
     {
-        if (!isset($postData['jwt'])) {
-            return null;
-        }
-
         $config = $this->getConfigLoader();
 
         // TODO DI this once it starts being used in multiple places
