@@ -477,7 +477,7 @@ class CliPdfGenerator extends CliTool\App
         // optional user.synergy_id filter
         if ($this->studentExternalId) {
             $pb->equals('u.synergy_id', $this->studentExternalId);
-            $messageParts[] = \sprintf("user.synergy_id of '%d'", $this->studentExternalId);
+            $messageParts[] = \sprintf("user.synergy_id of '%s'", $this->studentExternalId);
         }
 
         // optional year level filter
