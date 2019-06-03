@@ -994,11 +994,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             throw new MapperException();
         }
 
+        $folderIds = implode(',', $folders->getPropertyValues($this->getIdentifierProperty()));
+
         // Multiple folders resulted from $code
         // this is an edge case that cannot happen normally because business logic prevents it
         // you have to mangle the db, or provide bad data on the url to manifest this situation
         // In either case, pop out an exception because this should never have occurred
-        throw new UnexpectedValueException('Multiple folders returned; indeterminate destination');
+        throw new UnexpectedValueException("Multiple folders (ids: $folderIds) found for code: '$code', campusCode: '$campusCode'");
     }
 
 
