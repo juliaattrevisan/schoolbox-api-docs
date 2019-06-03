@@ -71,9 +71,6 @@ class TokenParser
             if (!$user) {
                 throw new SchoolboxException\NotFound('The token\'s "username" property must match a user\'s username');
             }
-            if (!$user->getEnabled()) {
-                throw new SchoolboxException\AccountDisabled('The user\'s account is disabled');
-            }
             return $user;
         }
 
