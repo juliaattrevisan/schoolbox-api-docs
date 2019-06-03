@@ -9,9 +9,9 @@ declare(strict_types=1);
 use League\OAuth2\Client\OptionProvider\HttpBasicAuthOptionProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
+use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
 use Okta\JwtVerifier\JwtVerifierBuilder;
-use Schoolbox\Auth\Adapter\FirebasePhpJwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Zend\Uri\Uri;
@@ -112,8 +112,7 @@ try {
         // I guess this is configurable.
         // We'll probably have multiple oAuth providers we accept too
         ->setIssuer($oauthIssuer)
-        // For now, I must hardcode the key ID, as it's not in the JWT header
-        ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
+        ->setAdaptor(new FirebasePhpJwt())
         ->setDiscovery(new Oidc())
         ->setAudience([$clientId]);
     if (isset($nonce)) {

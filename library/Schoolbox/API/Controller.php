@@ -11,12 +11,12 @@ namespace Schoolbox\API;
 
 use Alaress\Web\Controller\Base;
 use Authenticator;
+use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
 use Okta\JwtVerifier\JwtVerifierBuilder;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-use Schoolbox\Auth\Adapter\FirebasePhpJwt;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -209,7 +209,7 @@ class Controller extends Base
             UserMapper::getInstance(),
             (new JwtVerifierBuilder())
                 ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
-                ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
+                ->setAdaptor(new FirebasePhpJwt())
                 ->setDiscovery(new Oidc())
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
                 ->build()

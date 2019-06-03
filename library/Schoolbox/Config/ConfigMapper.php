@@ -98,7 +98,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = 'cloudwork_oauth_identity_provider';
     public const _CLOUDWORK_OAUTH_CLIENT_ID         = 'cloudwork_oauth_client_id';
     public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = 'cloudwork_oauth_client_secret';
-    public const _CLOUDWORK_OAUTH_JWT_KEY_ID        = 'cloudwork_oauth_jwt_key_id';
 
     /** @var array */
     protected $cache = array();

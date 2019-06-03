@@ -17,13 +17,13 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
+use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
 use Okta\JwtVerifier\JwtVerifierBuilder;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebKernelAbstract;
-use Schoolbox\Auth\Adapter\FirebasePhpJwt;
 use Schoolbox\Auth\TokenParser;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception\Deleted;
@@ -502,7 +502,7 @@ class Kernel extends WebKernelAbstract
 //                // I guess this is configurable.
 //                // We'll probably have multiple oAuth providers we accept too
 //                ->setIssuer($config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER))
-//                ->setAdaptor(new FirebasePhpJwt($config->get(ConfigMapper::_CLOUDWORK_OAUTH_JWT_KEY_ID)))
+//                ->setAdaptor(new FirebasePhpJwt())
 //                ->setDiscovery(new Oidc())
 //                ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)]);
 //                ->build()
