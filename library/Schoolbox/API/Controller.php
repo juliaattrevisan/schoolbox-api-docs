@@ -34,15 +34,21 @@ class Controller extends Base
 
 
     /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
+
+    /**
      * @var RegistryMapper
      */
     private $registryMapper;
 
 
     /**
-     * @var UserMapper
+     * @var ServiceMapper
      */
-    private $userMapper;
+    private $serviceMapper;
 
 
     /**
@@ -55,11 +61,13 @@ class Controller extends Base
     public function __construct(
         Authenticator $auth,
         UserMapper $userMapper,
-        RegistryMapper $registryMapper
+        RegistryMapper $registryMapper,
+        ServiceMapper $serviceMapper
     ) {
         $this->auth           = $auth;
         $this->userMapper     = $userMapper;
         $this->registryMapper = $registryMapper;
+        $this->serviceMapper  = $serviceMapper;
     }
 
 
@@ -104,7 +112,7 @@ class Controller extends Base
                         $registry
                             ->setUser($sessionUser)
                             ->setToken($token)
-                            ->setService(ServiceMapper::getInstance()->findOneByColumnList([
+                            ->setService($this->serviceMapper->findOneByColumnList([
                                 'app_identifier' => $this->request->post->get('appId'),
                                 'provider'       => $provider,
                             ]))
