@@ -67,7 +67,7 @@ class Document extends Base implements IDocument
      *
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student, array $classificationCode): array
+    public function getAcademicReportsForStudent(User $student, array $classificationCodes): array
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -107,7 +107,7 @@ class Document extends Base implements IDocument
         }
 
         // If there's any DocMan classifications entered into the config - union docman docs on
-        $bindings = $this->buildBindingsForClassifications($classificationCode);
+        $bindings = $this->buildBindingsForClassifications($classificationCodes);
 
         if (count($bindings) > 0) {
             $query .= "
@@ -154,7 +154,7 @@ class Document extends Base implements IDocument
 
                 // If that query worked we can assume they have updated their DB permissions and use this extra source
 
-                $bindings = $this->buildBindingsForClassifications($classificationCode, 'pvd');
+                $bindings = $this->buildBindingsForClassifications($classificationCodes, 'pvd');
 
                 $query .= "
                     UNION
