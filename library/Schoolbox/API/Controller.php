@@ -74,10 +74,11 @@ class Controller extends Base
         if (!in_array($provider, $providers, true)) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
-            $this->response->content->set([
-                'format' => 'json',
-                'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers),
-            ]);
+            $this->response->content->set(
+                $this->buildJsonOutput(
+                    "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers)
+                )
+            );
             return;
         }
 
@@ -119,10 +120,7 @@ class Controller extends Base
                     } catch (MapperException $e) {
                         /** @noinspection PhpUnhandledExceptionInspection */
                         $this->response->status->setCode(400);
-                        $this->response->content->set([
-                            'format' => 'json',
-                            'data'   => 'Invalid app ID given',
-                        ]);
+                        $this->response->content->set($this->buildJsonOutput('Invalid app ID given'));
                         return;
                     }
                 }
@@ -130,14 +128,13 @@ class Controller extends Base
                 $this->registryMapper->save($registry);
             }
 
-            $this->response->content->set([
-                'format' => 'json',
-                'data'   => [
+            $this->response->content->set(
+                $this->buildJsonOutput([
                     'id'   => $sessionUserId,
                     'key'  => $sessionUserKey,
                     'role' => $sessionUser->getRole()->getType(),
-                ],
-            ]);
+                ])
+            );
         }
     }
 
@@ -160,37 +157,27 @@ class Controller extends Base
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $this->response->status->setCode(400);
-                $this->response->content->set([
-                    'format' => 'json',
-                    'data'   => [
+                $this->response->content->set(
+                    $this->buildJsonOutput([
                         'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
-                    ],
-                ]);
+                    ])
+                );
                 return false;
             }
         } catch (SchoolboxAccessDeniedException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(401);
-            $this->response->content->set([
-                'format' => 'json',
-                'data'   => 'Invalid username or password',
-            ]);
+            $this->response->content->set($this->buildJsonOutput('Invalid username or password'));
             return false;
         } catch (SchoolboxAccountDisabledException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
-            $this->response->content->set([
-                'format' => 'json',
-                'data'   => 'Account disabled',
-            ]);
+            $this->response->content->set($this->buildJsonOutput('Account disabled'));
             return false;
         } catch (SchoolboxNotFoundException $e) {
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(400);
-            $this->response->content->set([
-                'format' => 'json',
-                'data'   => 'User not found',
-            ]);
+            $this->response->content->set($this->buildJsonOutput('User not found'));
             return false;
         }
         return true;
