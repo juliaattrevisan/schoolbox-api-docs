@@ -301,12 +301,12 @@ abstract class Base extends CliTool\App
             if ($transaction) {
                 $this->db->commit();
             }
-            $this->log->alert('Changes written to database');
+            $this->log->warning('Changes written to database');
         } else {
             if ($transaction) {
                 $this->db->rollBack();
             }
-            $this->log->alert('Dry-run complete - no changes written to database');
+            $this->log->warning('Dry-run complete - no changes written to database');
         }
 
     }
