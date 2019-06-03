@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use DateTime;
 use External_Ping;
 use External_Synergetic_ValidateExternalIdTrait;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -216,14 +217,14 @@ class Document extends Base implements IDocument
     }
 
     /**
-     * @inheritdoc
      *
      * @param User   $student
      * @param string $documentId
      * @param string $source
+     * @param array $classificationCodes
      *
      * @return array
-     * @throws \Exception
+     * @throws SchoolboxException
      */
     public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes)
     {
