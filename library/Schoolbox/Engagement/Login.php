@@ -57,8 +57,8 @@ class Login
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
-            'start' => $start->getDatabaseDate(),
-            'end'   => $end->getDatabaseDate(),
+            'start' => $start->getDatabase(),
+            'end'   => $end->getDatabase(),
         ]);
         return $statement->fetchAll();
     }
@@ -84,8 +84,8 @@ class Login
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
-            'start' => $start->getDatabaseDate(),
-            'end'   => $end->getDatabaseDate(),
+            'start' => $start->getDatabase(),
+            'end'   => $end->getDatabase(),
         ]);
         return $statement->fetchAll();
     }
@@ -111,8 +111,8 @@ class Login
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
-            'start' => $start->getDatabaseDate(),
-            'end'   => $end->getDatabaseDate()
+            'start' => $start->getDatabase(),
+            'end'   => $end->getDatabase()
         ]);
         $summary = new Collection();
 
