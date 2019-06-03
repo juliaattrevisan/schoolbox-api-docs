@@ -225,7 +225,7 @@ class Controller extends Base
      */
     private function authenticateViaJwk(array $postData): ?User
     {
-        if (!isset($postData['token'])) {
+        if (!isset($postData['jwt'])) {
             return null;
         }
 
@@ -241,6 +241,6 @@ class Controller extends Base
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
                 ->build()
         );
-        return $tokenParser->findUserFromToken($postData['token']);
+        return $tokenParser->findUserFromToken($postData['jwt']);
     }
 }
