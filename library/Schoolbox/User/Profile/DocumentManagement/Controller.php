@@ -36,10 +36,20 @@ class Controller extends Base
      */
     public function getIndex(User $student): void
     {
-        $classificationCodes = $this->getValidDocmanDocumentTypes(
-            $this->getRegisteredDocmanCategories(),
-            $this->getRequest()->query->get('classification')
-        );
+        /**
+         * Get the valid classification codes. Respect `classification` from query param if it exists.
+         * and try to get all the value that matches the value from `external_document_docman_categories`
+         *
+         * Otherwise, just use the values that's defined in `external_document_docman_categories` config.
+         */
+        $classificationCodes = $this->splitCategoriesToArray($this->getRegisteredDocmanCategories());
+
+        if ($this->getRequest()->query->get('classification') !== null) {
+            $classificationCodes = array_intersect(
+                $classificationCodes,
+                $this->splitCategoriesToArray($this->getRequest()->query->get('classification'))
+            );
+        }
 
         if (count($classificationCodes) < 1) {
             throw new NotFound();
@@ -74,11 +84,12 @@ class Controller extends Base
      */
     public function getDownload(User $student, $documentId, $source): void
     {
-        $classificationCodes = array_filter(
-            explode(',', $this->getRegisteredDocmanCategories())
+        $report = $this->externalDocument->downloadAcademicReportForStudent(
+            $student,
+            $documentId,
+            $source,
+            $this->splitCategoriesToArray($this->getRegisteredDocmanCategories())
         );
-
-        $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId, $source, $classificationCodes);
 
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');
@@ -93,38 +104,25 @@ class Controller extends Base
     }
 
     /**
-     * Generate valid classification codes. Respect `classification` query param if it exists.
-     * and try to get all the value that matches the value from `external_document_docman_categories`
-     *
-     * Otherwise, just use the value from `external_document_docman_categories` config.
-     *
-     * @param string $registeredDocmanCategories
-     * @param string|null $classifications
-     *
-     * @return array
-     */
-    private function getValidDocmanDocumentTypes(string $registeredDocmanCategories, ?string $classifications): array
-    {
-        $classificationCodes = array_filter(
-            explode(',', $registeredDocmanCategories)
-        );
-
-        // If `classification` get request is present, let's try to match those codes that was set from the config.
-        if (null !== $classifications) {
-            $classificationCodes = array_intersect(
-                $classificationCodes,
-                array_filter(explode(',', trim($classifications)))
-            );
-        }
-
-        return $classificationCodes;
-    }
-
-    /**
      * @return string
      */
     private function getRegisteredDocmanCategories(): string
     {
-        return trim($this->getConfigLoader()->get('external_document_docman_categories'));
+        return $this->getConfigLoader()->get('external_document_docman_categories');
+    }
+
+    /**
+     * @param string $categories
+     *
+     * @return array
+     */
+    private function splitCategoriesToArray(string $categories): array
+    {
+        return array_filter(
+            array_map(
+                'trim',
+                explode(',', $categories)
+            )
+        );
     }
 }
