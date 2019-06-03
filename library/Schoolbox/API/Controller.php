@@ -1,6 +1,5 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -28,33 +27,26 @@ use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
-
     /** @var Authenticator */
-    protected $auth;
+    private $auth;
+
 
     /** @var RegistryMapper */
-    protected $registryMapper;
+    private $registryMapper;
 
 
     /**
-     * @param Authenticator $auth
-     * @return self
-     */
-    public function setAuth(Authenticator $auth)
-    {
-        $this->auth = $auth;
-        return $this;
-    }
-
-
-    /**
+     * Constructor
+     *
+     * @param Authenticator  $auth
      * @param RegistryMapper $registryMapper
-     * @return self
      */
-    public function setRegistryMapper($registryMapper)
-    {
+    public function __construct(
+        Authenticator $auth,
+        RegistryMapper $registryMapper
+    ) {
+        $this->auth           = $auth;
         $this->registryMapper = $registryMapper;
-        return $this;
     }
 
 
@@ -214,7 +206,7 @@ class Controller extends Base
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
                 ->build()
         );
-        $user = $tokenParser->findUserFromToken($jwt);
+        $user        = $tokenParser->findUserFromToken($jwt);
         $this->auth->createSession($user->getUsername(), true);
         return $this->getUser();
     }

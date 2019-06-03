@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -16,13 +15,14 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\MobileApp\RegistryMapper;
 
-class Module extends BaseModule {
+class Module extends BaseModule
+{
 
     protected $basename = 'api';
 
     /**
      * @param Router|RouteCollection $router
-     * @param string $basePath
+     * @param string                 $basePath
      */
     public function initRoutes(Router $router, $basePath)
     {
@@ -39,9 +39,9 @@ class Module extends BaseModule {
             $matcher,
             'register',
             function ($params) {
-                return array(
+                return [
                     'provider' => $params['provider'],
-                );
+                ];
             }
         );
     }
@@ -53,16 +53,14 @@ class Module extends BaseModule {
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'auth'           => $injector->lazyNew('Authenticator'),
+                    'registryMapper' => $this->getMapperFactory()->getLazy(RegistryMapper::class),
+                ]
+            )
         );
-
-        $injector->setters[Controller::class]['setAuth']
-            = $injector->lazyNew('Authenticator');
-
-        $injector->setters[Controller::class]['setRegistryMapper']
-            = $this->getMapperFactory()->getLazy(RegistryMapper::class);
-
     }
-
 }
