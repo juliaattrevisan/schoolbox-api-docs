@@ -69,7 +69,8 @@ class Controller extends Base
 
         // check the provider is valid
         if (!in_array($provider, $providers)) {
-            $this->getResponse()->status->setCode(400);
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->response->status->setCode(400);
             $response->set([
                 'format' => 'json',
                 'data'   => "Invalid provider: '$provider'. Accepted providers are: " . implode(', ', $providers),
@@ -77,20 +78,49 @@ class Controller extends Base
             return;
         }
 
-        // Maybe someone's already authenticated?
-        // (This might have happened as a result of token authentication)
-        $sessionUser = $this->getUser();
-        if (!($sessionUser && $sessionUser->getId())) {
-            $sessionUser = $this->authenticateViaPostData($data);
-            if (!$sessionUser) {
-                // Authentication failed: return early
+        try {
+            if (isset($data['username'], $data['password'])) {
+                $sessionUser = $this->authenticateViaPostData($data);
+            } elseif (isset($data['jwt'])) {
+                $sessionUser = $this->authenticateViaJwt($data);
+            } else {
+                /** @noinspection PhpUnhandledExceptionInspection */
+                $this->response->status->setCode(400);
+                $response->set([
+                    'format' => 'json',
+                    'data'   => [
+                        'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set',
+                    ],
+                ]);
                 return;
             }
+            $sessionUserId  = $sessionUser->getId();
+            $sessionUserKey = $sessionUser->getKey();
+        } catch (SchoolboxAccessDeniedException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->getResponse()->status->setCode(401);
+            $response->set([
+                'format' => 'json',
+                'data'   => 'Invalid username or password',
+            ]);
+            return;
+        } catch (SchoolboxAccountDisabledException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->getResponse()->status->setCode(400);
+            $response->set([
+                'format' => 'json',
+                'data'   => 'Account disabled',
+            ]);
+            return;
+        } catch (SchoolboxNotFoundException $e) {
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $this->getResponse()->status->setCode(400);
+            $response->set([
+                'format' => 'json',
+                'data'   => 'User not found',
+            ]);
+            return;
         }
-
-        // only obtain these *after* you've run authentication
-        $sessionUserId  = $sessionUser->getId();
-        $sessionUserKey = $sessionUser->getKey();
 
         // token may be absent or blank, in which case we don't store anything in the registry
         if (!empty($data['token'])) {
@@ -184,46 +214,20 @@ class Controller extends Base
         }
 
         // verify username|password combination
-        try {
-            $this->auth->authenticate($postData['username'], $postData['password'], true);
+        $this->auth->authenticate($postData['username'], $postData['password'], true);
 
-            // only obtain these *after* you've run authentication
-            return $this->getUser();
-        } catch (SchoolboxAccessDeniedException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $response->status->setCode(401);
-            $response->content->set([
-                'format' => 'json',
-                'data'   => 'Invalid username or password',
-            ]);
-            return null;
-        } catch (SchoolboxAccountDisabledException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $response->status->setCode(400);
-            $response->content->set([
-                'format' => 'json',
-                'data'   => 'Account disabled',
-            ]);
-            return null;
-        } catch (SchoolboxNotFoundException $e) {
-            /** @noinspection PhpUnhandledExceptionInspection */
-            $response->status->setCode(400);
-            $response->content->set([
-                'format' => 'json',
-                'data'   => 'User not found',
-            ]);
-            return null;
-        }
+        // only obtain these *after* you've run authentication
+        return $this->getUser();
     }
 
 
     /**
-     * Authenticates a user via a JWK passed in POST data.
+     * Authenticates a user via a JWT passed in POST data, in the "jwt" field.
      *
      * @param array $postData
      * @return User|null
      */
-    private function authenticateViaJwk(array $postData): ?User
+    private function authenticateViaJwt(array $postData): ?User
     {
         if (!isset($postData['jwt'])) {
             return null;
