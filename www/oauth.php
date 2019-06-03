@@ -6,6 +6,8 @@
 
 declare(strict_types=1);
 
+// TODO delete this if it turns out oAuth login isn't actually required
+
 use League\OAuth2\Client\OptionProvider\HttpBasicAuthOptionProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\GenericProvider;
@@ -89,7 +91,7 @@ if (empty($_GET['state']) || (isset($_SESSION['oauth2state']) && $_GET['state'] 
 
 // Step 2: if there is a code, swap it for an auth token
 try {
-    echo '<a href="https://vagrant.dev.schoolbox.cloud/oauth.php">Try again</a>';
+    echo '<a href="/oauth.php">Try again</a>';
 
 
     // client id / secret gets passed via Basic auth
