@@ -52,7 +52,7 @@ class Login
             FROM login_log
             JOIN `user` ON login_log.username = `user`.username
             JOIN groups ON user.group_id = groups.id
-            WHERE login=1 AND date >= :start AND date <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at <= :end)
+            WHERE login=1 AND date >= :start AND date <= :end AND `user`.created_at <=  :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start)
             GROUP BY group_id';
 
         $statement = $this->database->prepareQuery($query);
@@ -77,7 +77,8 @@ class Login
             (
                 SELECT COUNT(DISTINCT(`user`.username)) FROM `user`
                 INNER JOIN login_log ON `user`.username = login_log.username
-                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at <= :end) 
+                WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.created_at <=  :end AND
+                      (`user`.deleted_at IS NULL OR `user`.deleted_at > :start) 
             ) AS total
           FROM groups';
 
@@ -98,16 +99,19 @@ class Login
      */
     public function userSummary(Alaress_Date_Format $end): array
     {
+        $start = clone $end;
+        $start->startOfMonth();
         $query = '
                 SELECT groups.id, groups.`name`, COUNT(*) total
                 FROM groups
                 JOIN `user` ON groups.id=`user`.group_id 
-                WHERE `user`.created_at <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at <= :end) 
+                WHERE `user`.created_at <= :end AND (`user`.deleted_at IS NULL OR `user`.deleted_at >= :start) 
                 GROUP BY groups.id
                 ORDER BY groups.`name`';
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
+            'start' => $start->getDatabaseDate(),
             'end'   => $end->getDatabaseDate()
         ]);
         $summary = new Collection();
