@@ -54,6 +54,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
 use Alaress\Database\Predicate;
+use UnexpectedValueException;
 
 /**
  * Class Mapper
@@ -964,17 +965,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $folders;
     }
 
+
     /**
      * Returns the first folder found that uses any of the codes specified in $code
      *
      * Does not find codes that have been deleted
      *
-     * @param  string $code
-     * @param  string $campusCode If provided, use this campus code in the query.
-     * @throws MapperException if statement returned no category
+     * @param string $code
+     * @param string $campusCode If provided, use this campus code in the query.
      * @return Model
+     * @throws UnexpectedValueException If multiple folders found for this code
+     * @throws MapperException If statement returned no category
+     * @throws PDOException
+     * @throws Predicate\InvalidColumnException
      */
-    public function findByCode($code, $campusCode = '')
+    public function findByCode(string $code, string $campusCode = ''): Model
     {
         $folders = $this->findAllByCode($code, $campusCode);
 
@@ -990,10 +995,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // Multiple folders resulted from $code
-        // this is an edge case that cannot happen normally because bidness logic prevents it
+        // this is an edge case that cannot happen normally because business logic prevents it
         // you have to mangle the db, or provide bad data on the url to manifest this situation
         // In either case, pop out an exception because this should never have occurred
-        throw new InvalidArgumentException('Multiple folders returned; indeterminate destination');
+        throw new UnexpectedValueException("Multiple folders found for code");
     }
 
 
