@@ -228,6 +228,8 @@ class Controller extends Base
                 ->setAudience([$config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID)])
                 ->build()
         );
-        return $tokenParser->findUserFromToken($postData['jwt']);
+        $user = $tokenParser->findUserFromToken($jwt);
+        $this->auth->createSession($user->getUsername(), true);
+        return $this->getUser();
     }
 }
