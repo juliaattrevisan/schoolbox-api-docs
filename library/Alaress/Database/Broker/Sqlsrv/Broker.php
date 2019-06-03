@@ -11,11 +11,13 @@
 namespace Alaress\Database\Broker\Sqlsrv;
 
 use Alaress\Database\Broker\Base;
+use Alaress\Database\Factory;
 use Alaress\Database\Iterator\Sqlsrv\Iterator;
 use Alaress\Database\Quoter\Sqlsrv\Quoter as SqlsrvQuoter;
 use Alaress\Database\Statement\Query\Sqlsrv\Query;
 use Alaress\Database\Statement\FunctionCall\Sqlsrv\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Sqlsrv\StoredProcedure;
+use function in_array;
 use PDO;
 
 class Broker extends Base
@@ -26,9 +28,9 @@ class Broker extends Base
     /**
      * @inheritdoc
      */
-    public static function isAvailable()
+    public static function isAvailable(): bool
     {
-        return in_array('sqlsrv', PDO::getAvailableDrivers(), true);
+        return in_array(Factory::PDO_DRIVER_SQLSRV, PDO::getAvailableDrivers(), true);
     }
 
     /**

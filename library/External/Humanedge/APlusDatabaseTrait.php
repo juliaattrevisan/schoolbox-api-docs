@@ -6,7 +6,8 @@
  */
 
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Factory as DatabaseFactory;
+use Alaress\Database\Factory;
+use Schoolbox\Config\ConfigMapper;
 
 /**
  * Trait for A+ database usage implementation of user retrieve methods.
@@ -20,17 +21,19 @@ trait External_Humanedge_APlusDatabaseTrait
      */
     private $aPlusDatabase;
 
+
     /**
      * Lazy-load A+ database connection
      *
      * @return IConnector
+     * @throws InvalidArgumentException
      */
     private function loadAPlusDatabase()
     {
         if (!($this->aPlusDatabase instanceof IConnector)) {
             // Finagle a config out of special snowflake A+ config
-            $dbf  = new DatabaseFactory();
-            $conn = $dbf->createMssql();
+            $dbf  = new Factory();
+            $conn = $dbf->createMssql(Config::get(ConfigMapper::_EXTERNAL_MS_SQL_SERVER_DRIVER));
             $conn->connect(
                 Config::get('external_humanedge_aplus_db_host'),
                 Config::get('external_humanedge_aplus_db_db'),
