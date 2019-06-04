@@ -311,6 +311,59 @@ class Lists
         return $urlPaginator;
     }
 
+    public function findForIndex(Querystring $params, User $user): array  {
+
+        /* If the user is a superuser or a news moderator
+         *
+         * Article must be published
+         * and article must not be expired
+         * and one of the following conditions must be met:
+         *    - you're the author
+         *    - you approved the article
+         *    - you're in the audience
+         */
+
+        /* Everyone else
+         *
+         * Article must be published
+         * and article must not be expired
+         * and one of the following conditions must be met:
+         *    - you're the author
+         *    - you're in the audience
+         */
+    }
+
+    public function findForArchive(Querystring $params, User $user): array  {
+
+        /* If the user is a superuser or a news moderator
+         *
+         * Article must be published
+         * and one of the following conditions must be met:
+         *    - you're the author
+         *    - you approved the article
+         *    - you're in the audience
+         */
+
+        /* Everyone else
+         *
+         * Article must be published
+         * and one of the following conditions must be met:
+         *    - you're the author
+         *    - you're in the audience
+         */
+    }
+
+    public function findForHomepage(Querystring $params, User $user): array {
+
+        /* For everyone:
+         *
+         * Article must be published
+         * and article must not be expired
+         * and article must have been audienced to this folder
+         * and $user must have READ access to the folder specified in the article's audience
+         */
+    }
+
 
     /**
      * @param Querystring $params
