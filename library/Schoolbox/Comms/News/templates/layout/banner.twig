@@ -174,7 +174,6 @@
             totalCommentsCount: 0,
             cursorNext: '',
             loadMoreIsEnabled: false,
-            loadingCommentsText: 'Loading comments...',
             errorLoadingCommentsText: 'Unable to load comments',
             savingText: 'Saving...',
             savedText: 'Saved',
@@ -311,6 +310,7 @@
                     self.showSkeletonLoader = false;
                     self.showCommentsCount = true;
                     self.loadMoreIsEnabled = true;
+                    $toast.toastActivate({text: self.errorLoadingCommentsText});
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 }).finally(function () {
                     /**
