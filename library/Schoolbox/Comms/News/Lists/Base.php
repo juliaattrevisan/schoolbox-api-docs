@@ -1,0 +1,171 @@
+<?php
+/**
+ * Lists
+ *
+ * Generates a set of articles for a particular topic
+ * Also figures out whether the viewing user has saved any of those articles for later
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Comms\News\Lists;
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Comms\News\Audience\IArticleResolver;
+use Schoolbox\Comms\News\Mapper;
+use Schoolbox\Comms\News\Querystring;
+use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\Statistics;
+use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\GenericCollection;
+use Schoolbox\User;
+
+abstract class Base
+{
+
+    /**
+     * System default for the number of items per page
+     * Typically connects to search_type_limit
+     *
+     * @var int
+     */
+    protected $defaultLimit;
+
+    /**
+     * @var Mapper
+     */
+    protected $newsMapper;
+
+    /** @var string */
+    protected $readMoreText;
+
+    /** @var bool */
+    protected $saveForLaterEnabled;
+
+    /**
+     * @var SaveForLater\Mapper
+     */
+    protected $saveForLaterMapper;
+
+    /**
+     * @var Statistics\Mapper
+     */
+    protected $statisticsMapper;
+
+    /**
+     * @var Statistics\Cumulative\Mapper
+     */
+    protected $statisticsCumulativeMapper;
+
+    /**
+     * @var IConnector
+     */
+    protected $databaseInternal;
+
+    /**
+     * @var IArticleResolver
+     */
+    protected $articleResolver;
+
+
+    /**
+     * Lists constructor.
+     *
+     * @param int                          $defaultLimit
+     * @param Mapper                       $newsMapper
+     * @param string                       $readMoreText
+     * @param bool                         $saveForLaterEnabled
+     * @param SaveForLater\Mapper          $saveForLaterMapper
+     * @param Statistics\Mapper            $statisticsMapper
+     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
+     * @param IConnector                   $databaseInternal
+     * @param IArticleResolver             $articleResolver
+     */
+    public function __construct(
+        int $defaultLimit,
+        Mapper $newsMapper,
+        string $readMoreText,
+        bool $saveForLaterEnabled,
+        SaveForLater\Mapper $saveForLaterMapper,
+        Statistics\Mapper $statisticsMapper,
+        Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
+        IConnector $databaseInternal,
+        IArticleResolver $articleResolver
+    ) {
+        $this->defaultLimit               = $defaultLimit;
+        $this->newsMapper                 = $newsMapper;
+        $this->readMoreText               = $readMoreText;
+        $this->saveForLaterEnabled        = $saveForLaterEnabled;
+        $this->saveForLaterMapper         = $saveForLaterMapper;
+        $this->statisticsMapper           = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
+        $this->databaseInternal           = $databaseInternal;
+        $this->articleResolver            = $articleResolver;
+    }
+
+
+    /**
+     * Find the article ids that were saved by $user in accordance with policy setting
+     *
+     * @param User    $user
+     * @param bool    $saveForLaterEnabled
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    protected function findSavedArticles(User $user, bool $saveForLaterEnabled): array
+    {
+        if ($saveForLaterEnabled) {
+            $savedArticleIds = (new SaveForLater\Lists($this->saveForLaterMapper, $this->newsMapper))->findSavedIdsForUser($user->getId());
+
+            return array_fill_keys($savedArticleIds, SaveForLater\Mapper::SAVED);
+        }
+
+        return [];
+    }
+
+
+    /**
+     * @param array       $articleIds
+     * @param Querystring $params
+     * @param User        $user
+     * @return GenericCollection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function loadArticleByIds(array $articleIds, Querystring $params, User $user) : GenericCollection
+    {
+        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
+
+        $articles = $this->newsMapper->createCollection();
+
+        foreach ($articleIds as $articleId) {
+            $record = $records->getOffset($articleId);
+
+            if (null !== $record) {
+                $articles->add($records->getOffset($articleId));
+
+                /* Statistics: save an impression record
+                 * Load the referrer value from $params
+                 * Also increment a tally elsewhere
+                 */
+
+                (new ImpressionsConversionsOpens(
+                    $this->databaseInternal,
+                    $this->statisticsMapper,
+                    $this->statisticsCumulativeMapper
+                ))->saveImpression(
+                    $record,
+                    $user->getId(),
+                    $user->getRole()->getType(),
+                    $user->getRole()->getId(),
+                    $params->getReferrer()
+                );
+            }
+        }
+
+        return $articles;
+    }
+}

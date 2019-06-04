@@ -721,7 +721,7 @@ class Controller extends Base
      */
     public function getListForIndex() :void
     {
-        $articleIds = (new Lists(
+        $articleIds = (new Lists\Index(
             0,
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -731,7 +731,7 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver
-        ))->findIdsForIndex($this->getUser());
+        ))->find($this->getUser());
 
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
 
@@ -1160,13 +1160,18 @@ class Controller extends Base
      *
      * @return array
      * @throws MapperException
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
      */
     private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
 
-        $topicData = (new Lists(
+        $topicData = (new Lists\Archive(
             $searchLimit,
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -1175,15 +1180,15 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver,
-            $this->commentMapper
-        ))->findForTopic(
+            $this->articleResolver
+        ))->find(
             $urlPrefix,
             $params,
             $this->getUser(),
             $topics,
             $year,
-            $month
+            $month,
+            $this->commentMapper
         );
 
         /* Always provide paginator from this context
@@ -1214,7 +1219,7 @@ class Controller extends Base
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
 
-        $topicData = (new Lists(
+        $topicData = (new Lists\Homepage(
             $searchLimit,
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -1225,7 +1230,7 @@ class Controller extends Base
             $this->databaseInternal,
             $this->articleResolver,
             $this->commentMapper
-        ))->findArticlesForHomepage(
+        ))->find(
             $params,
             $this->getUser()
         );
