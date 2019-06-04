@@ -48,7 +48,7 @@ class Report_Parent extends Report_Abstract
      *
      * @var array
      */
-    private $SISallYearLevels = array();
+    private $sisAllYearLevels = array();
 
     /**
      * Allowed searchable years for parents
@@ -73,9 +73,9 @@ class Report_Parent extends Report_Abstract
         $this->setExternalUserHandler(new External_User());
 
         $yearLevel = trim($yearLevel);
-        $this->setSISallYearLevels($this->getExternalUserHandler()->getAllYearLevels());
-        $this->setAllowedSearchableYears($this->getTheIntersection($this->getChildrensYears(), $this->getSISallYearLevels()));
-        $yearColumn = array_column($this->getAllowedSearchableYears(), 'Code');
+        $this->sisAllYearLevels = $this->getExternalUserHandler()->getAllYearLevels();
+        $this->allowedSearchableYears = $this->getTheIntersection($this->getChildrensYears(), $this->sisAllYearLevels);
+        $yearColumn = array_column($this->allowedSearchableYears, 'Code');
 
         // Parents may only search in their student's year level
         if ($this->isYearsRestricted() && !(in_array($yearLevel, $yearColumn) || $yearLevel == '')) {
@@ -165,7 +165,7 @@ class Report_Parent extends Report_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_boarder', 'has_boarder_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'all_year_selector', 'all_year_selector_block');
-        $this->getPage()->setBlock(all_year_selector, 'all_year_option', 'all_year_option_block');
+        $this->getPage()->setBlock('all_year_selector', 'all_year_option', 'all_year_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'show_filter_options', 'show_filter_options_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'email_all_parents', 'email_all_parents_block');
@@ -263,13 +263,13 @@ class Report_Parent extends Report_Abstract
         }
 
 
-        if (!$this->isYearsRestricted()) {
+        if ($this->isYearsRestricted()) {
 
-            $allYears = $this->getSISallYearLevels();
+            $allYears = $this->sisAllYearLevels;
 
         } else {
 
-            $allYears = $this->getAllowedSearchableYears();
+            $allYears = $this->allowedSearchableYears;
 
         }
 
@@ -277,13 +277,16 @@ class Report_Parent extends Report_Abstract
             $this->getPage()->setVar([
                 'YEAR_CODE' => $year['Code'],
                 'YEAR_DESCRIPTION' => $year['Description'],
+                'YEAR_SELECTED' =>  $year['Code'] == $this->getYearLevel() ? 'selected="selected"' : '',
             ]);
 
             $this->getPage()->parse('all_year_option_block', 'all_year_option', true);
         }
 
         $this->getPage()->parse('all_year_selector_block', 'all_year_selector');
+
     }
+
 
     /**
      * Is this user restricted to accessing certain year levels?
@@ -717,46 +720,6 @@ class Report_Parent extends Report_Abstract
     protected function getBoardingStatusOptions()
     {
         return $this->boardingStatusOptions;
-    }
-
-    /**
-     * Set allowed searchable years for parent
-     *
-     * @param $allowedSearchableYears
-     */
-    protected function setAllowedSearchableYears(array $allowedSearchableYears)
-    {
-        $this->allowedSearchableYears = $allowedSearchableYears;
-    }
-
-    /**
-     * Get allowed searchable years for parent
-     *
-     * @return array
-     */
-    protected function getAllowedSearchableYears(): array
-    {
-        return $this->allowedSearchableYears;
-    }
-
-    /**
-     * Set all year levels of Synergetic
-     *
-     * @param $SISallYearLevels
-     */
-    protected function setSISallYearLevels(array $SISallYearLevels)
-    {
-        $this->SISallYearLevels = $SISallYearLevels;
-    }
-
-    /**
-     * Get all year levels of Synergetic
-     *
-     * @return array
-     */
-    protected function getSISallYearLevels(): array
-    {
-        return $this->SISallYearLevels;
     }
 }
 

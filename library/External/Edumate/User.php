@@ -546,6 +546,16 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
+    }
+
+    /**
      * @inheritdoc
      */
     public function getStaff(string $externalUserId): array

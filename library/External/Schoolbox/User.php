@@ -378,6 +378,16 @@ class External_Schoolbox_User implements External_UserInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function getParent(string $externalUserId): array
     {

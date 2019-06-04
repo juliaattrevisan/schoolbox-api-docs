@@ -1035,6 +1035,16 @@ class External_Maze_User implements External_UserInterface
         return [];
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
+    }
+
     /* Getters/Setters
      */
 

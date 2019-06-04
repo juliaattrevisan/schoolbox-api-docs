@@ -643,6 +643,16 @@ class External_Pcschools_User implements External_UserInterface
         return [];
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
+    }
+
     // Local methods
 
     /**

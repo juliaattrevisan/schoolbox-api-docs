@@ -884,4 +884,14 @@ class External_Tass_User implements External_UserInterface
     {
         return [];
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
+    }
 }
