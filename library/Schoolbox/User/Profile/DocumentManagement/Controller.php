@@ -42,12 +42,12 @@ class Controller extends Base
          *
          * Otherwise, just use the values that's defined in `external_document_docman_categories` config.
          */
-        $classificationCodes = $this->splitCategoriesToArray($this->getRegisteredDocmanCategories());
+        $classificationCodes = $this->getRegisteredDocmanCategories();
 
         if ($this->getRequest()->query->get('classification') !== null) {
             $classificationCodes = array_intersect(
                 $classificationCodes,
-                $this->splitCategoriesToArray($this->getRequest()->query->get('classification'))
+                array_map('trim', explode(',', $this->getRequest()->query->get('classification')))
             );
         }
 
@@ -88,7 +88,7 @@ class Controller extends Base
             $student,
             $documentId,
             $source,
-            $this->splitCategoriesToArray($this->getRegisteredDocmanCategories())
+            $this->getRegisteredDocmanCategories()
         );
 
         $headers = $this->getResponse()->headers;
@@ -104,25 +104,10 @@ class Controller extends Base
     }
 
     /**
-     * @return string
-     */
-    private function getRegisteredDocmanCategories(): string
-    {
-        return $this->getConfigLoader()->get('external_document_docman_categories');
-    }
-
-    /**
-     * @param string $categories
-     *
      * @return array
      */
-    private function splitCategoriesToArray(string $categories): array
+    private function getRegisteredDocmanCategories(): array
     {
-        return array_filter(
-            array_map(
-                'trim',
-                explode(',', $categories)
-            )
-        );
+        return array_map('trim', explode(',', $this->getConfigLoader()->get('external_document_docman_categories')));
     }
 }
