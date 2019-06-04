@@ -18,6 +18,8 @@ class Controller extends Base
     /** @var IDocument $externalDocument */
     private $externalDocument;
 
+    private const CLASSIFICATION = 'classification';
+
     /**
      * Constructor
      *
@@ -44,10 +46,10 @@ class Controller extends Base
          */
         $classificationCodes = $this->getRegisteredDocmanCategories();
 
-        if ($this->getRequest()->query->get('classification') !== null) {
+        if ($this->getRequest()->query->get(self::CLASSIFICATION) !== null) {
             $classificationCodes = array_intersect(
                 $classificationCodes,
-                array_map('trim', explode(',', $this->getRequest()->query->get('classification')))
+                array_map('trim', explode(',', $this->getRequest()->query->get(self::CLASSIFICATION)))
             );
         }
 
@@ -108,6 +110,6 @@ class Controller extends Base
      */
     private function getRegisteredDocmanCategories(): array
     {
-        return array_map('trim', explode(',', $this->getConfigLoader()->get('external_document_docman_categories')));
+        return array_filter(array_map('trim', explode(',', $this->getConfigLoader()->get('external_document_docman_categories'))));
     }
 }
