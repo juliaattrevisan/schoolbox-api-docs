@@ -42,8 +42,9 @@
                                 {% endfor %}
                                 </span>
                             {% endif %}
-
-                            <span> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.metadata.commentCount }} comment(s)</a></span>
+                            {% if  article.metadata.commentCount > 0 %}
+                            <span v-if="article.metadata.commentCount > 0"> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.metadata.commentCount }} comment{{ article.metadata.commentCount > 1 ? 's':'' }}</a></span>
+                            {% endif %}
                         </p>
                     </div>
                 </div>

@@ -174,8 +174,6 @@
             totalCommentsCount: 0,
             cursorNext: '',
             loadMoreIsEnabled: false,
-            loadingCommentsText: 'Loading comments...',
-            commentsLoadedText: 'Comments loaded',
             errorLoadingCommentsText: 'Unable to load comments',
             savingText: 'Saving...',
             savedText: 'Saved',
@@ -269,8 +267,6 @@
                 self.loadMoreIsEnabled = false;
                 self.showSkeletonLoader = true;
 
-                $toast.toastActivate({text: self.loadingCommentsText});
-
                 // TODO don't construct this endpoint manually
                 axios.get('/discussion/comms/' + String(self.articleId) + '/threads/' + String(self.threadId) + '/comments/', {
                     params: {
@@ -310,11 +306,11 @@
                      */
                     self.showCommentsSection = (self.threadCheckboxVisible || self.totalCommentsCount > 0 || self.threadEnabled);
 
-                    $toast.toastTimeout({text: self.commentsLoadedText, duration: 2000});
                 }).catch(function (error) {
                     self.showSkeletonLoader = false;
                     self.showCommentsCount = true;
                     self.loadMoreIsEnabled = true;
+                    $toast.toastActivate({text: self.errorLoadingCommentsText});
                     $toast.toastTimeout({text: self.errorLoadingCommentsText, duration: 2000, css: 'alert'});
                 }).finally(function () {
                     /**
