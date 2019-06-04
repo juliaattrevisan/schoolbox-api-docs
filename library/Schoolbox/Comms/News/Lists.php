@@ -21,6 +21,7 @@ use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Category\NewsMapper;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
@@ -390,12 +391,14 @@ class Lists
      * @param Querystring $params
      * @param User        $user
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
+     * @throws \Schoolbox\Mapper\Exception
      */
-    public function findIdsForHomepage(Querystring $params, User $user): array {
+    public function findArticlesForHomepage(Querystring $params, User $user): array {
         $articleIds = $this->newsMapper->findArticleIdsForTopic(
             $this->articleResolver->findArticlesForUser($user),
-            $params->getSlug(),
+            Mapper::TOPIC_ALL_ID,
             $params->getLimit(),
             $params->getPageNum(),
             null,
@@ -403,30 +406,7 @@ class Lists
             $params->getFolderId()
         );
 
-        return array_unique($articleIds);
-    }
-
-
-    /**
-     * @param Querystring $params
-     * @param User        $user
-     * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \InvalidArgumentException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     */
-    public function findArticlesForHomepage(Querystring $params, User $user) :array
-    {
-        $articleTable = Mapper::getInstance()->getTable();
-
-        $articleIds = $this->articleResolver->findArticlesForAudience(
-            Folder::getEntityType(),
-            $params->getFolderId(),
-            Audience\Model::RELATIONSHIP_SELF,
-            true,
-            [ "$articleTable.publish_at" => 'DESC', "$articleTable.created_at" => 'DESC'],
-            $params->getLimit()
-        );
+        $articleIds = array_unique($articleIds);
 
         $idProperty = $this->newsMapper->getIdentifierProperty();
 
@@ -447,6 +427,7 @@ class Lists
             'unsaved' => SaveForLater\Mapper::UNSAVED,
         ];
     }
+
 
     /**
      * @param array $articleIds
