@@ -114,7 +114,7 @@ class Pool extends EventEmitter implements PoolInterface
                 $hardLim = $this->strat->getWorkerExecutionTimeout(self::RELEASE_HARD) ?: 0;
                 $softLim = $this->strat->getWorkerExecutionTimeout(self::RELEASE_SOFT) ?: 0;
 
-                $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
+                $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s %0.2fms ago', $pid, $status, $process, $cmd, $elapsed));
 
                 if ($finish && $status != Worker::READY) {
                     // check for an unexpected finish state
@@ -144,46 +144,6 @@ class Pool extends EventEmitter implements PoolInterface
         if ($this->canAccept()) {
             $this->emit('ready');
         }
-    }
-
-
-    /**
-     * @param array $args
-     * @return string
-     */
-    protected function parseArgs($args)
-    {
-        $values = array();
-
-        if (is_string($args)) {
-            try {
-                $args = unserialize($args);
-            } catch(RuntimeException $e) {
-                $values[] = substr($args, 0, 128);
-            }
-        }
-
-        if (is_array($args)) {
-            foreach ($args as $arg) {
-                $values[] = $this->parseArgs($arg);
-            }
-        }
-
-        elseif (is_object($args)) {
-            $value = get_class($args);
-            if (method_exists($args, 'getId')) {
-                $value .= "({$args->getId()})";
-            }
-        }
-        else {
-            $value = "$args";
-        }
-
-        if(isset($value)) {
-            $values[] = substr($value, 0, 128);
-        }
-
-        return implode(', ', $values);
     }
 
 
