@@ -15,19 +15,18 @@ interface IDocument
 {
     /**
      * Retrieve all archived school reports from external SIS for a selected user
-     *
      * @param User $student
+     * @param array $classificationCodes
+     *
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student);
+    public function getAcademicReportsForStudent(User $student, array $classificationCodes): array;
 
     /**
-     * Returns an array containing the academic reports binary contents, length, and filename
-     *
-     * @param User $student
-     * @param string $documentId
-     * @param string $source
-     * @return array
+     * @param User  $student
+     * @param       $documentId
+     * @param       $source
+     * @param array $classificationCodes
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId, $source);
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes);
 }

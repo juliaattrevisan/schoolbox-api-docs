@@ -8,6 +8,7 @@
 namespace Schoolbox\User\Profile\DocumentManagement;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\External\Connector\IDocument;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
@@ -16,6 +17,8 @@ class Controller extends Base
 {
     /** @var IDocument $externalDocument */
     private $externalDocument;
+
+    private const CLASSIFICATION = 'classification';
 
     /**
      * Constructor
@@ -29,13 +32,33 @@ class Controller extends Base
 
     /**
      * Display all documents for selected student
-     *
      * @param User $student
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getIndex(User $student)
+    public function getIndex(User $student): void
     {
+        /**
+         * Get the valid classification codes. Respect `classification` from query param if it exists.
+         * and try to get all the value that matches the value from `external_document_docman_categories`
+         *
+         * Otherwise, just use the values that's defined in `external_document_docman_categories` config.
+         */
+        $classificationCodes = $this->getRegisteredDocmanCategories();
+
+        if ($this->getRequest()->query->get(self::CLASSIFICATION) !== null) {
+            $classificationCodes = array_intersect(
+                $classificationCodes,
+                array_map('trim', explode(',', $this->getRequest()->query->get(self::CLASSIFICATION)))
+            );
+        }
+
+        if (count($classificationCodes) < 1) {
+            throw new NotFound();
+        }
+
         // And render this thing out
-        $reports = $this->externalDocument->getAcademicReportsForStudent($student);
+        $reports = $this->externalDocument->getAcademicReportsForStudent($student, $classificationCodes);
         $wysiwyg_value = $this->getConfigLoader()->get('academic_reports_wysiwyg');
         /* @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
@@ -61,19 +84,32 @@ class Controller extends Base
      * @param string $documentId
      * @param string $source
      */
-    public function getDownload(User $student, $documentId, $source)
+    public function getDownload(User $student, $documentId, $source): void
     {
-        $report = $this->externalDocument->downloadAcademicReportForStudent($student, $documentId, $source);
+        $report = $this->externalDocument->downloadAcademicReportForStudent(
+            $student,
+            $documentId,
+            $source,
+            $this->getRegisteredDocmanCategories()
+        );
 
         $headers = $this->getResponse()->headers;
-        $headers->set("Pragma", " ");
-        $headers->set("Cache-Control", " ");
-        $headers->set("Content-Type", "application/pdf");
-        $headers->set("Content-Length", $report["filesize"]);
-        $headers->set("Content-Disposition", "attachment; filename=\"{$report["filename"]}\"");
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'application/pdf');
+        $headers->set('Content-Length', $report['filesize']);
+        $headers->set('Content-Disposition', 'attachment; filename=' . $report['filename']);
 
         $this->getResponse()->content->set(
             $this->buildFileOutputFromString($report['blob'])
         );
+    }
+
+    /**
+     * @return array
+     */
+    private function getRegisteredDocmanCategories(): array
+    {
+        return array_filter(array_map('trim', explode(',', $this->getConfigLoader()->get('external_document_docman_categories'))));
     }
 }

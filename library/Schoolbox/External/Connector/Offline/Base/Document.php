@@ -7,7 +7,6 @@
 
 namespace Schoolbox\External\Connector\Offline\Base;
 
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -21,7 +20,7 @@ class Document extends Base implements IDocument
      * @param User $student
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student)
+    public function getAcademicReportsForStudent(User $student, array $classificationCodes): array
     {
         return [];
     }
@@ -29,13 +28,15 @@ class Document extends Base implements IDocument
     /**
      * @inheritdoc
      *
-     * @param User $student
+     * @param User   $student
      * @param string $documentId
      * @param string $source
-     * @return array
-     * @throws SchoolboxException
+     * @param array  $classificationCodes
+     *
+     * @return void
+     * @throws \Exception
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId, $source)
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes)
     {
         throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
     }

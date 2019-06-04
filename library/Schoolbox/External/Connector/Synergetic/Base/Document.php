@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use DateTime;
 use External_Ping;
 use External_Synergetic_ValidateExternalIdTrait;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\IDocument;
@@ -63,10 +64,11 @@ class Document extends Base implements IDocument
      * @inheritdoc
      *
      * @param User $student
+     * @param array $classificationCode
      *
      * @return array
      */
-    public function getAcademicReportsForStudent(User $student)
+    public function getAcademicReportsForStudent(User $student, array $classificationCodes): array
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -106,9 +108,9 @@ class Document extends Base implements IDocument
         }
 
         // If there's any DocMan classifications entered into the config - union docman docs on
-        $bindings = $this->buildBindingsForClassifications();
+        $bindings = $this->buildBindingsForClassifications($classificationCodes);
 
-        if (!empty($bindings)) {
+        if (count($bindings) > 0) {
             $query .= "
                 UNION
 
@@ -153,7 +155,7 @@ class Document extends Base implements IDocument
 
                 // If that query worked we can assume they have updated their DB permissions and use this extra source
 
-                $bindings = $this->buildBindingsForClassifications('pvd');
+                $bindings = $this->buildBindingsForClassifications($classificationCodes, 'pvd');
 
                 $query .= "
                     UNION
@@ -215,15 +217,16 @@ class Document extends Base implements IDocument
     }
 
     /**
-     * @inheritdoc
      *
      * @param User   $student
      * @param string $documentId
      * @param string $source
+     * @param array $classificationCodes
      *
      * @return array
+     * @throws SchoolboxException
      */
-    public function downloadAcademicReportForStudent(User $student, $documentId, $source)
+    public function downloadAcademicReportForStudent(User $student, $documentId, $source, array $classificationCodes)
     {
         // If the user does not have a valid external ID, or is not a student- return an empty collection
 
@@ -239,7 +242,7 @@ class Document extends Base implements IDocument
         // Create query to get the document from the database
 
         if ($source == 'tDocuments') {
-            $bindings = $this->buildBindingsForClassifications();
+            $bindings = $this->buildBindingsForClassifications($classificationCodes);
 
             // If there's no classifications in config - error out because they shouldn't be getting anything
             // from DocMan
@@ -271,7 +274,7 @@ class Document extends Base implements IDocument
 
                 // If that query worked we can assume they have updated their DB permissions and use this extra source
 
-                $bindings = $this->buildBindingsForClassifications('pvd');
+                $bindings = $this->buildBindingsForClassifications($classificationCodes, 'pvd');
 
                 $query = "
                     
@@ -369,6 +372,7 @@ class Document extends Base implements IDocument
     /**
      * Builds placeholders and bindings for document classifications.
      *
+     * @param array $classificationCodes
      * @param string $suffix Suffix for bindings
      *
      * @return array Empty if there's no document classifications.
@@ -376,12 +380,8 @@ class Document extends Base implements IDocument
      *               bindings:     the parameters to bind to a query
      *               placeholders: the IN part of a query
      */
-    private function buildBindingsForClassifications($suffix = '')
+    private function buildBindingsForClassifications(array $classificationCodes, string $suffix = ''): array
     {
-        $classificationCodes = array_filter(
-            explode(",", trim($this->config->get('external_document_docman_categories')))
-        );
-
         if (count($classificationCodes) > 0) {
             return PredicateBuilder::getArrayBindings($classificationCodes, 'classificationCode' . $suffix);
         }
