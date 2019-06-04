@@ -938,17 +938,17 @@ class Controller extends Base
         ];
 
         if ($params->getFolderId()) {
-            $folderBasicDetails = $this->getBasicFolderDetailsById((int) $params->getFolderId());
+            $details = $this->folderMapper->findCheaplyById((int)$params->getFolderId())->findValueLabelPair();
 
             $metaDetails = [
-                'folderId'      => $folderBasicDetails['id'],
-                'folderName'    => $folderBasicDetails['name'],
+                'folderId'      => $details['value'],
+                'folderName'    => $details['label'],
                 'componentId'   => $params->getComponentId(),
             ];
 
             $data = array_merge($data, $metaDetails);
 
-            $pageTitle = $folderBasicDetails['name'];
+            $pageTitle = $details['label'];
         }
 
         $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
@@ -1239,27 +1239,6 @@ class Controller extends Base
             }
         }
         return true;
-    }
-
-    /**
-     * @param int $folderId
-     *
-     * @return array
-     * @throws Exception
-     */
-    private function getBasicFolderDetailsById(int $folderId) :?array
-    {
-        try {
-            $folder = $this->folderMapper->findCheaplyById($folderId);
-
-            return [
-                'id'      => $folderId,
-                'name'    => $folder->getName(),
-            ];
-
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
-        }
     }
 
 
