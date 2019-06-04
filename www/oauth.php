@@ -56,12 +56,7 @@ if (!isset($_GET['code'])) {
         'response_type' => 'code',
         'response_mode' => 'query',
         'claims'        => json_encode([
-            'userinfo' => [
-                'https://cloudwork.id/claims/sis_id' => null,
-            ],
             'id_token' => [
-                'https://cloudwork.id/claims/sis_id' => null,
-                'email'                              => null,
                 'preferred_username'                 => null,
             ],
         ])
