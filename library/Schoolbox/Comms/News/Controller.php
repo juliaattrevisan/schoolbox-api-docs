@@ -730,7 +730,7 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver
-        ))->fetchActiveArticleIdsForUser($this->getUser());
+        ))->fetchArticleIdsForUser($this->getUser());
 
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
 
@@ -877,7 +877,7 @@ class Controller extends Base
             $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
         }
 
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), true, $year, $month);
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
@@ -954,7 +954,7 @@ class Controller extends Base
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, true, $year, $month);
+        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
@@ -1155,14 +1155,13 @@ class Controller extends Base
      * @param Querystring        $params
      * @param Collection|Topic[] $topics
      * @param bool               $hidePaginator
-     * @param bool               $isArchive
      * @param int|null           $year
      * @param int|null           $month
      *
      * @return array
      * @throws MapperException
      */
-    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, bool $isArchive, ?int $year, ?int $month): array
+    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
         $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
         $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
@@ -1183,7 +1182,6 @@ class Controller extends Base
             $params,
             $this->getUser(),
             $topics,
-            $isArchive,
             $year,
             $month
         );

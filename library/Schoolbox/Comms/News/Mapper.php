@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use function count;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
@@ -339,14 +340,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function findArticlesIdsPublished(array $availableArticleIds, User $user): array
     {
-        if (!\count($availableArticleIds) && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
+        if (!count($availableArticleIds)) {
             return [];
         }
 
         $articleIds = [];
         $pb = $this->getPredicatePublished();
 
-        if(\count($availableArticleIds)) {
+        if(count($availableArticleIds)) {
             $pb->in('id', $availableArticleIds);
         }
 
@@ -370,7 +371,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Return a list of article id's that is published and is authored or approved by the user
+     * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
      * @param User $user
      *
@@ -378,21 +379,19 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function findAuthoredOrAcceptedArticleIds(User $user): array
     {
-        $pb = $this->getPredicatePublished();
+        $pb = $this->getPredicateBuilder()
+            ->equals('author_id', $user->getId());
 
-        $pb2 = $this->getPredicateBuilder()
-            ->equals('author_id', $user->getId())
-            ->equals('accepted_by', $user->getId());
+        if ((new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
+            $pb->equals('accepted_by', $user->getId());
+        }
 
-        $where = implode("\n AND", [
-            implode("\nAND ", $pb->getWhere()),
-            implode("\n OR", $pb2->getWhere())
-        ]);
+        $where = implode("\nOR ", $pb->getWhere());
 
         $query = "SELECT id FROM {$this->table} WHERE {$where}";
 
         $statement = $this->database->prepare($query);
-        $statement->execute(array_merge($pb->getParams(), $pb2->getParams()));
+        $statement->execute($pb->getParams());
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
@@ -407,7 +406,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @param array    $availableArticleIds
      * @param int      $topicId
-     * @param bool     $isArchive
      * @param int|null $limit
      * @param int|null $pageNum
      * @param int|null $year
@@ -416,11 +414,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @return array
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, bool $isArchive, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
         /* This user can't see any articles
          */
-        if (!$isArchive && !(\count($availableArticleIds) || $folderId)) {
+        if (null !== $folderId && count($availableArticleIds) < 1) {
             return [];
         }
 
@@ -442,15 +440,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             ->notNull('accepted_at')
             ->isNull('deleted_at');
 
-        if(\count($availableArticleIds)) {
+        if (count($availableArticleIds)) {
             $pb->in('id', $availableArticleIds);
         }
-        if ($year || $month) {
-            $paddedMonth = '';
 
-            if ($month) {
-                $paddedMonth = str_pad((string)$month, 2, '0', STR_PAD_LEFT);
-            }
+        if ($year || $month) {
+            $paddedMonth = $month ? str_pad((string)$month, 2, '0', STR_PAD_LEFT) : '';
 
             $yearMonth = "{$year}-{$paddedMonth}%";
 
@@ -602,7 +597,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             /* Paginate */
             $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
         }
-
         /* finally */
         $statement->execute();
 

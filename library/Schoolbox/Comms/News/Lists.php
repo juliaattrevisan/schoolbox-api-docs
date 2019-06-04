@@ -116,6 +116,8 @@ class Lists
 
 
     /**
+     * Note: This is now used only in News Archive and RSS
+     *
      * Find a list of articles that are somehow related to $topicId
      * This wraps around the hyperdrive to abstract away some pagination details
      *
@@ -136,14 +138,13 @@ class Lists
      * @param Querystring        $params
      * @param User               $user
      * @param Collection|Topic[] $topics
-     * @param bool               $isArchive
      * @param int|null           $year
      * @param int|null           $month
      *
      * @return array
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, bool $isArchive, ?int $year, ?int $month): array
+    public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
     {
         /* News Topics were never obtainable by slug
          * We always fetched everything, then manually sorted by slug
@@ -161,14 +162,13 @@ class Lists
 
         $folderId = $params->getFolderId();
 
-        if (null === $folderId && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
+        if (null === $folderId) {
             $articleIdsForUser = $this->fetchArticleIdsForUser($user);
         }
 
         $articleIds = $this->newsMapper->findArticleIdsForTopic(
             $articleIdsForUser,
             $topicId,
-            $isArchive,
             $params->getLimit(),
             $params->getPageNum(),
             $year,
@@ -179,7 +179,6 @@ class Lists
         $availableIds = $this->newsMapper->findArticleIdsForTopic(
             $articleIdsForUser,
             $topicId,
-            $isArchive,
             0,
             0,
             $year,
@@ -397,7 +396,9 @@ class Lists
     }
 
     /**
-     * Return the article ids that the user is an audienced and the ones that they authored
+     * Fetch a list of articles id's that's audienced to the user or is authored by them.
+     *
+     * Users that has a superuser or moderator permissions will be able to see articles that they authored or approved.
      *
      * @param User $user
      *
