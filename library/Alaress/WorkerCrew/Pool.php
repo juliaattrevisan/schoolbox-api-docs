@@ -148,46 +148,6 @@ class Pool extends EventEmitter implements PoolInterface
 
 
     /**
-     * @param array|string $args
-     * @return string
-     */
-    protected function parseArgs($args): string
-    {
-        $values = array();
-
-        if (is_string($args)) {
-            try {
-                $args = unserialize($args);
-            } catch (RuntimeException $e) {
-                $values[] = substr($args, 0, 128);
-            }
-        }
-
-        if (is_array($args)) {
-            foreach ($args as $arg) {
-                $values[] = $this->parseArgs($arg);
-            }
-        }
-
-        elseif (is_object($args)) {
-            $value = get_class($args);
-            if (method_exists($args, 'getId')) {
-                $value .= "({$args->getId()})";
-            }
-        }
-        else {
-            $value = "$args";
-        }
-
-        if(isset($value)) {
-            $values[] = substr($value, 0, 128);
-        }
-
-        return implode(', ', $values);
-    }
-
-
-    /**
      * Request to the pool to accept the given command. Returns the PID of the process to which the task was assigned.
      *
      * @param object $identifier
