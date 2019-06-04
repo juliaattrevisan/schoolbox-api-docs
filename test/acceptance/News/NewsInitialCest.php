@@ -56,20 +56,22 @@ class NewsInitialCest
         $i->click(['css' => 'input#article-submit[value=Publish\ news]']);
     }
 
-    public function audienceViewshNewsFeed(AcceptanceTester $i)
+    public function audienceViewsNewsFeed(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
+        $i->impersonate("Rachel Rhodes");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->seeElement($element);
     }
 
-    public function audienceViewshNews(AcceptanceTester $i)
+    public function audienceViewsNewsItem(AcceptanceTester $i)
     {
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
+        $i->impersonate("Rachel Rhodes");
         $i->amOnPage('/news');
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
@@ -85,7 +87,9 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->click(['css'=> 'lable[for=allow-comments]']);
+        sleep(1);
+        $i->dontSeeElement(['css'=>'div#cke_comment']);
+        $i->click(['css'=> 'label[for=allow-comments]']);
     }
 
     public function addTwoNewsComments(AcceptanceTester $i)
@@ -93,14 +97,16 @@ class NewsInitialCest
         $i->amOnPage('/login/');
         $i->login("alaress", "alaress");
         $i->amOnPage('/news');
-        $element = Locator::contains('div.small-12.card h3 a', 'Test News Title4');
+        $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         $i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
-        $i->fillCkEditorById('comment', 'indeed its intresting');
+        $i->executeJS('CKEDITOR.instances[\'comment\'].setData("indeed this is intresting news");');
+        sleep(2);
         $i->click(['css' => 'a[class=button\ submit]']);
         sleep(3);
-        $i->fillCkEditorById('comment', 'its poop, like your face');
+        $i->executeJS('CKEDITOR.instances[\'comment\'].setData("its poop, like your face");');
+        sleep(2);
         $i->click(['css' => 'a[class=button\ submit]']);
         sleep(3);
     }
@@ -113,6 +119,9 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
+        $i->click(['css'=>'a.icon-delete.no-text']);
+        $i->waitForElementVisible('a.button.icon-approve.submit', 5);
+        $i->click(['css'=>'a.button.icon-approve.submit']);
     }
 
     public function disableNewsComments(AcceptanceTester $i)
@@ -123,7 +132,8 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->click(['css'=> 'lable[for=allow-comments]']);
+        $i->waitForElementVisible(['css'=>'div#cke_comment'], 1);
+        $i->click(['css'=> 'label[for=allow-comments]']);
     }
 
     public function deleteNews(AcceptanceTester $i)
