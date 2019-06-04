@@ -720,14 +720,17 @@ class Controller extends Base
      */
     public function getListForUser() :void
     {
-        $articleIds = [];
-
-        if (!(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($this->getUser())) {
-            $articleIds = array_merge(
-                $this->articleResolver->findArticlesForUser($this->getUser()),
-                $this->newsMapper->findIdsByColumn('author_id', $this->getUser()->getId())
-            );
-        }
+        $articleIds = (new Lists(
+            0,
+            $this->newsMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+            $this->saveForLaterMapper,
+            $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
+            $this->databaseInternal,
+            $this->articleResolver
+        ))->fetchActiveArticleIdsForUser($this->getUser());
 
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
 

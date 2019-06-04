@@ -368,6 +368,35 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $articleIds;
     }
 
+
+    /**
+     * Return a list of article id's that is published and is authored or approved by the user
+     *
+     * @param User $user
+     *
+     * @return array
+     */
+    public function findAuthoredOrAcceptedArticleIds(User $user): array
+    {
+        $pb = $this->getPredicatePublished();
+
+        $pb2 = $this->getPredicateBuilder()
+            ->equals('author_id', $user->getId())
+            ->equals('accepted_by', $user->getId());
+
+        $where = implode("\n AND", [
+            implode("\nAND ", $pb->getWhere()),
+            implode("\n OR", $pb2->getWhere())
+        ]);
+
+        $query = "SELECT id FROM {$this->table} WHERE {$where}";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(array_merge($pb->getParams(), $pb2->getParams()));
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
     /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things
