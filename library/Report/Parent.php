@@ -48,14 +48,14 @@ class Report_Parent extends Report_Abstract
      *
      * @var array
      */
-    private $sisAllYearLevels = array();
+    private $sisAllYearLevels;
 
     /**
      * Allowed searchable years for parents
      *
      * @var array
      */
-    private $allowedSearchableYears = array();
+    private $allowedSearchableYears;
 
     /**
      * Report_Parent constructor.
@@ -202,7 +202,7 @@ class Report_Parent extends Report_Abstract
         }
 
         if (strlen($this->getYearLevel())) {
-            $heading = 'Year ' . $this->getYearLevel();
+            $heading = 'Year ' . $this->getYearLevelDescription($this->getYearLevel());
         } else if (strlen($this->getSearchForm())) {
             $heading = 'Form ' . $this->getSearchForm();
         } else {
@@ -720,6 +720,19 @@ class Report_Parent extends Report_Abstract
     protected function getBoardingStatusOptions()
     {
         return $this->boardingStatusOptions;
+    }
+
+    /**
+     * @param string $yearLevelCode
+     * @return string
+     */
+    protected function getYearLevelDescription(string $yearLevelCode): string
+    {
+        foreach ($this->sisAllYearLevels as $sisYear) {
+            if ($yearLevelCode === $sisYear['Code']) {
+                return $sisYear['Description'];
+            }
+        }
     }
 }
 
