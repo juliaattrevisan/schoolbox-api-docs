@@ -390,13 +390,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         }
 
         $where = implode("\nOR ", $pb->getWhere());
+        $params = $pb->getParams();
 
         /* Only include published articles
          */
         if ($publishedOnly) {
             $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
+            $publishedWhere = implode(',', $publishedPb->getWhere());
 
-            $query = "SELECT id FROM {$this->table} WHERE {$publishedPb->getWhere()} AND ({$where})";
+            $query = "SELECT id FROM {$this->table} WHERE {$publishedWhere} AND ({$where})";
+            $params = array_merge($params, $publishedPb->getParams());
         } else {
             $query = "SELECT id FROM {$this->table} WHERE ({$where})";
         }
@@ -406,12 +409,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         if (!$active) {
             $now = \Alaress_Date_Format::now()->getDatabase();
             $expiredPb = $this->getPredicateBuilder()->all($this->getPredicateBuilder()->lessThan('expires_at', $now));
+            $expiredWhere = implode(',', $expiredPb->getWhere());
 
-            $query .= " AND {$expiredPb->getWhere()}";
+            $query .= " AND {$expiredWhere}";
+            $params = array_merge($params, $expiredPb->getParams());
         }
 
         $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
+        $statement->execute($params);
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }

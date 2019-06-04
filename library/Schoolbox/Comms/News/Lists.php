@@ -332,13 +332,12 @@ class Lists
      *    - you're the author
      *    - you're in the audience
      *
-     * @param Querystring $params
      * @param User        $user
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \PDOException
      */
-    public function findIdsForIndex(Querystring $params, User $user): array  {
+    public function findIdsForIndex(User $user): array  {
         return array_unique(
             array_merge(
                 $this->articleResolver->findArticlesForUser($user),
@@ -470,22 +469,22 @@ class Lists
         return $articles;
     }
 
-    /**
-     * Fetch a list of articles id's that's audienced to the user or is authored by them.
-     *
-     * Users that has a superuser or moderator permissions will be able to see articles that they authored or approved.
-     *
-     * @param User $user
-     *
-     * @return array
-     */
-    private function fetchArticleIdsForUser(User $user): array
-    {
-        return array_merge(
-            $this->articleResolver->findArticlesForUser($user),
-            $this->newsMapper->findIdsByColumn('author_id', $user->getId())
-        );
-    }
+//    /**
+//     * Fetch a list of articles id's that's audienced to the user or is authored by them.
+//     *
+//     * Users that has a superuser or moderator permissions will be able to see articles that they authored or approved.
+//     *
+//     * @param User $user
+//     *
+//     * @return array
+//     */
+//    private function fetchArticleIdsForUser(User $user): array
+//    {
+//        return array_merge(
+//            $this->articleResolver->findArticlesForUser($user),
+//            $this->newsMapper->findIdsByColumn('author_id', $user->getId())
+//        );
+//    }
 
     /**
      * Populate each article's metadata instance

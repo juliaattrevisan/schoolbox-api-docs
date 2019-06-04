@@ -708,17 +708,18 @@ class Controller extends Base
         ]));
     }
 
+
     /**
      * Get a list of articles that are audienced to me from anywhere and are published and not expired
      * This is only returns data as JSON
      *
-     * @api GET /news/lists/feed
-     *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
-     * @throws \UnexpectedValueException
+     * @throws \UnexpectedValueException*@throws \PDOException
+     * @throws \PDOException
+     * @api GET /news/lists/feed
      */
-    public function getListForUser() :void
+    public function getListForIndex() :void
     {
         $articleIds = (new Lists(
             0,
@@ -730,7 +731,7 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver
-        ))->fetchArticleIdsForUser($this->getUser());
+        ))->findIdsForIndex($this->getUser());
 
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
 
@@ -772,9 +773,8 @@ class Controller extends Base
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
-
-
     }
+
 
     /**
      * Delete an article
@@ -1486,7 +1486,7 @@ class Controller extends Base
         try {
             // if the previous url is for ajax call, get one before.
             $ajaxRoutes = [
-                'commsNews.getListForUser',
+                'commsNews.getListForIndex',
                 'commsNews.getAuthoredArticles'
             ];
             foreach ($ajaxRoutes as $ajaxRoute) {

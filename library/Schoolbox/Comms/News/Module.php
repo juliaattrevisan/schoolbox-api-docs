@@ -208,7 +208,7 @@ class Module extends BaseModule
         $this->register('GET', '/me/articles', 'getAuthoredArticles', $loggedIn);
 
         // (async) Get a list of articles published to the user
-        $this->register('GET', '/lists/feed', 'getListForUser', $loggedIn);
+        $this->register('GET', '/lists/feed', 'getListForIndex', $loggedIn);
 
     }
 
