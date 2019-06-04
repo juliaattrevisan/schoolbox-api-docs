@@ -374,10 +374,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
      * @param User $user
-     *
+     * @param bool $publishedOnly Published articles (publish date is reached)
+     * @param bool $active        non-expired articles (expiry date not yet reached)
      * @return array
+     * @throws InvalidColumnException
+     * @throws \PDOException
      */
-    public function findAuthoredOrAcceptedArticleIds(User $user): array
+    public function findAuthoredOrAcceptedArticleIds(User $user, bool $publishedOnly = true, bool $active = true): array
     {
         $pb = $this->getPredicateBuilder()
             ->equals('author_id', $user->getId());
@@ -388,7 +391,24 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $where = implode("\nOR ", $pb->getWhere());
 
-        $query = "SELECT id FROM {$this->table} WHERE {$where}";
+        /* Only include published articles
+         */
+        if ($publishedOnly) {
+            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
+
+            $query = "SELECT id FROM {$this->table} WHERE {$publishedPb->getWhere()} AND ({$where})";
+        } else {
+            $query = "SELECT id FROM {$this->table} WHERE ({$where})";
+        }
+
+        /* Only include expired articles
+         */
+        if (!$active) {
+            $now = \Alaress_Date_Format::now()->getDatabase();
+            $expiredPb = $this->getPredicateBuilder()->all($this->getPredicateBuilder()->lessThan('expires_at', $now));
+
+            $query .= " AND {$expiredPb->getWhere()}";
+        }
 
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
