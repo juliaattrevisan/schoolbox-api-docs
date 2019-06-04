@@ -100,6 +100,10 @@ $kernel = new CliTool\Kernel(
                 exit;
             }
 
+            if ($dryRun) {
+                $this->getLogger()->warning('Performing a dry run. Provide --perform to update DB.');
+            }
+
 
             foreach ($classes as $folderId => $codes) {
                 try {
