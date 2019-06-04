@@ -347,7 +347,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $articleIds = [];
         $pb = $this->getPredicatePublished();
 
-        if(count($availableArticleIds)) {
+        if (count($availableArticleIds)) {
             $pb->in('id', $availableArticleIds);
         }
 
@@ -489,11 +489,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          *     $limit === null: use system default for number of items per page
          *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
-        if ($pageNum) {
-            if ($limit || $limit === null) {
-                $query .= ' LIMIT :limit';
-                $query .= ' OFFSET :offset';
-            }
+        if ($pageNum && ($limit || $limit === null)) {
+            $query .= ' LIMIT :limit';
+            $query .= ' OFFSET :offset';
         }
 
         return $this->getArticleIdsByQuery($query, $pb, $pageNum, $limit, $folderId);

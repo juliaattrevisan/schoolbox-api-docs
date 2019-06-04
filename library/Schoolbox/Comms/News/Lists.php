@@ -20,7 +20,6 @@ use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
