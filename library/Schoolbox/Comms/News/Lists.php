@@ -143,6 +143,10 @@ class Lists
      * @param int|null           $month
      *
      * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function findForTopic(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array
@@ -163,8 +167,31 @@ class Lists
 
         $folderId = $params->getFolderId();
 
+        /* No folder specified: you're getting all the archived news
+         * for the News Archive list
+         */
         if (null === $folderId) {
-            $articleIdsForUser = $this->fetchArticleIdsForUser($user);
+
+            /* If the user is a superuser or a news moderator
+             *
+             * Article must be published
+             * and one of the following conditions must be met:
+             *    - you're the author
+             *    - you approved the article
+             *    - you're in the audience
+             *
+             * Everyone else
+             *
+             * Article must be published
+             * and one of the following conditions must be met:
+             *    - you're the author
+             *    - you're in the audience
+             *
+             */
+            $articleIdsForUser = array_unique(array_merge(
+                $this->articleResolver->findArticlesForUser($user),
+                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, true, false)
+            ));
         }
 
         $articleIds = $this->newsMapper->findArticleIdsForTopic(
@@ -342,38 +369,6 @@ class Lists
             array_merge(
                 $this->articleResolver->findArticlesForUser($user),
                 $this->newsMapper->findAuthoredOrAcceptedArticleIds($user)
-            )
-        );
-    }
-
-
-    /**
-     * If the user is a superuser or a news moderator
-     *
-     * Article must be published
-     * and one of the following conditions must be met:
-     *    - you're the author
-     *    - you approved the article
-     *    - you're in the audience
-     *
-     * Everyone else
-     *
-     * Article must be published
-     * and one of the following conditions must be met:
-     *    - you're the author
-     *    - you're in the audience
-     *
-     * @param Querystring $params
-     * @param User        $user
-     * @return array
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
-     */
-    public function findIdsForArchive(Querystring $params, User $user): array  {
-        return array_unique(
-            array_merge(
-                $this->articleResolver->findArticlesForUser($user),
-                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, true, false)
             )
         );
     }
