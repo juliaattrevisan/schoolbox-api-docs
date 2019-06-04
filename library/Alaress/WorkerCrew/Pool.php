@@ -114,7 +114,7 @@ class Pool extends EventEmitter implements PoolInterface
                 $hardLim = $this->strat->getWorkerExecutionTimeout(self::RELEASE_HARD) ?: 0;
                 $softLim = $this->strat->getWorkerExecutionTimeout(self::RELEASE_SOFT) ?: 0;
 
-                $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s(%s) %0.2fms ago', $pid, $status, $process, $cmd, $this->parseArgs($args), $elapsed));
+                $this->log->debug(sprintf('Worker {%d} (%d) `%s` started %s %0.2fms ago', $pid, $status, $process, $cmd, $elapsed));
 
                 if ($finish && $status != Worker::READY) {
                     // check for an unexpected finish state
@@ -156,9 +156,9 @@ class Pool extends EventEmitter implements PoolInterface
         $values = array();
 
         if (is_string($args)) {
-            // suppressing unserialize error to keep log readable.
-            $args = @unserialize($args);
-            if (!$args) {
+            try {
+                $args = unserialize($args);
+            } catch (RuntimeException $e) {
                 $values[] = substr($args, 0, 128);
             }
         }
