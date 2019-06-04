@@ -72,7 +72,7 @@
                                         <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">${ topic.name }</a>
                                     </template>
                                 </span>
-                                <span> | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount } comment(s)</a></span>
+                                <span v-if="article.metadata.commentCount > 0"> | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount } comment(s)</a></span>
                             </p>
                         </div>
                     </div>
