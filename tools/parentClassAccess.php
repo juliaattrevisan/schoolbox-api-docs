@@ -71,7 +71,7 @@ $kernel = new CliTool\Kernel(
             }
 
             $loadStudents = $this->getOpt(self::OPT_LONG_STUDENTS);
-            $dryRun = $this->getOpt(self::OPT_LONG_DRY_RUN);
+            $dryRun = $this->getOpt(self::OPT_LONG_DRY_RUN) || !$this->perform();
 
             $folders = [];
             $classes = [];
@@ -101,80 +101,67 @@ $kernel = new CliTool\Kernel(
             }
 
 
-            // Remove all students from specified classes
-            if ($loadStudents) {
-                foreach ($classes as $folderId => $codes) {
-                    try {
-                        $folders[$folderId] = $folderMapper->findById($folderId);
-
-                        $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT);
-
-                        $log->info("Removing student access from '{$folders[$folderId]->getTitle()}'");
-
-                        if (!$dryRun) {
-                            foreach ($students as $student) {
-                                $userAccessMapper->deleteByColumnList([
-                                    'uid' => $student->getId(),
-                                    'sid' => $folderId
-                                ]);
-                            }
-                        }
-                    } catch (MapperException $e) {
-                        $log->warning($e->getTraceAsString());
-                    }
-                }
-            }
-
-            // Remove all parents from specified classes
             foreach ($classes as $folderId => $codes) {
                 try {
-                    $folders[$folderId] = $folderMapper->findById($folderId);
+                    $currentFolder = $folderMapper->findById($folderId);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $codeString = implode(',', $codes);
+                    $log->warning("Failed to find folder with id: {$folderId}. Skipping adding users from '{$codeString}' to folder id {$folderId}");
+                    continue;
+                }
+                $folders[$folderId] = $currentFolder;
 
-                    $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT);
-
-                    $log->info("Removing parent access from '{$folders[$folderId]->getTitle()}'");
+                if ($loadStudents) {
+                    // Remove all students from specified classes
+                    $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT);
+                    $log->info("Removing student access from '{$folders[$folderId]->getTitle()}'");
 
                     if (!$dryRun) {
-                        foreach ($parents as $parent) {
+                        foreach ($students as $student) {
                             $userAccessMapper->deleteByColumnList([
-                                'uid' => $parent->getId(),
+                                'uid' => $student->getId(),
                                 'sid' => $folderId
                             ]);
                         }
                     }
-                } catch (MapperException $e) {
-                    $log->warning($e->getTraceAsString());
-                }
-            }
-
-            // Add parents from class codes to the specified classes
-            foreach ($classes as $folderId => $codes) {
-                if (!\array_key_exists($folderId, $folders)) {
-                    $log->warning("Skipping adding parents of '{$code}' students to folder id {$folderId}");
-                    continue;
                 }
 
+                // Remove all parents from specified classes
+                $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT);
+                $log->info("Removing parent access from '{$folders[$folderId]->getTitle()}'");
+
+                if (!$dryRun) {
+                    foreach ($parents as $parent) {
+                        $userAccessMapper->deleteByColumnList([
+                            'uid' => $parent->getId(),
+                            'sid' => $folderId
+                        ]);
+                    }
+                }
+
+                // Add parents from class codes to the specified classes
                 foreach ($codes as $code) {
-                    if (!empty($code)) {
-                        $log->info("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
+                    if (empty($code)) {
+                        continue;
+                    }
+                    $log->info("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
-                        $parents = $this->getParents($code);
+                    $parents = $this->getParents($code);
 
-                        if ($loadStudents) {
-                            $students = $classHandler->getStudents($code);
+                    if ($loadStudents) {
+                        $students = $classHandler->getStudents($code);
 
-                            if (is_array($students)) {
-                                foreach ($students as $student) {
-                                    $this->loadUserAccess($userMapper, $userAccessMapper, $student['synergy_id'], Role::STUDENT, $folderId, $dryRun);
-                                }
+                        if (is_array($students)) {
+                            foreach ($students as $student) {
+                                $this->loadUserAccess($userMapper, $userAccessMapper, $student['synergy_id'], Role::STUDENT, $folderId, $dryRun);
                             }
                         }
+                    }
 
-                        if (is_array($parents)) {
-                            foreach ($parents as $parent) {
-                                $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactID'], Role::PARENT, $folderId, $dryRun);
-                                $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactSpouseID'], Role::PARENT, $folderId, $dryRun);
-                            }
+                    if (is_array($parents)) {
+                        foreach ($parents as $parent) {
+                            $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactID'], Role::PARENT, $folderId, $dryRun);
+                            $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactSpouseID'], Role::PARENT, $folderId, $dryRun);
                         }
                     }
                 }
@@ -256,15 +243,15 @@ $kernel = new CliTool\Kernel(
                         $userAccessMapper->save($userAccess);
                     }
 
-                    $log->info("\tAdded:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
+                    $log->info(" Added:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
                     $usersAdded[$user->getId()] = true;
                 } else {
-                    $log->info("\tSkipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
+                    $log->info(" Skipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
                 }
             } catch (MapperException $e) {
-                $log->error("\tError:    External {$role} user ID not found {$externalId}");
+                $log->error(" Error:    External {$role} user ID not found {$externalId}");
             } catch (UnexpectedValueException $e) {
-                $log->error("\tError:    {$e->getMessage()}");
+                $log->error(" Error:    {$e->getMessage()}");
             }
         }
 
