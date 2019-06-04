@@ -675,6 +675,7 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException
+     * @throws InvalidArgumentException
      * @api GET /news/lists/homepage
      */
     public function getListForHomepage() :void
@@ -711,6 +712,7 @@ class Controller extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException
+     * @throws InvalidArgumentException
      */
     private function generatePartialForHomepage(Querystring $params): array
     {
@@ -727,7 +729,8 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver
+            $this->articleResolver,
+            $this->commentMapper
         ))->find(
             $params,
             $this->getUser()
@@ -803,6 +806,7 @@ class Controller extends Base
      * @throws \UnderflowException
      * @throws \UnexpectedValueException*@throws \PDOException
      * @throws \PDOException
+     * @throws InvalidArgumentException
      * @api GET /news/lists/feed
      */
     public function getListForIndex() :void
@@ -816,7 +820,8 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver
+            $this->articleResolver,
+            $this->commentMapper
         ))->find($this->getUser());
 
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
@@ -999,7 +1004,8 @@ class Controller extends Base
             $this->statisticsMapper,
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
-            $this->articleResolver
+            $this->articleResolver,
+            $this->commentMapper
         ))->find(
             $urlPrefix,
             $params,

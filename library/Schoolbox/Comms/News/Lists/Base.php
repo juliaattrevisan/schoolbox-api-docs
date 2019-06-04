@@ -14,11 +14,14 @@ namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
+use Schoolbox\Comms\News\Helper;
 use Schoolbox\Comms\News\Mapper;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -71,6 +74,12 @@ abstract class Base
 
 
     /**
+     * @var Comment\Mapper
+     */
+    protected $commentMapper;
+
+
+    /**
      * Lists constructor.
      *
      * @param int                          $defaultLimit
@@ -82,6 +91,7 @@ abstract class Base
      * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                   $databaseInternal
      * @param IArticleResolver             $articleResolver
+     * @param Comment\Mapper               $commentMapper
      */
     public function __construct(
         int $defaultLimit,
@@ -92,7 +102,8 @@ abstract class Base
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
-        IArticleResolver $articleResolver
+        IArticleResolver $articleResolver,
+        Comment\Mapper $commentMapper
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->newsMapper                 = $newsMapper;
@@ -103,6 +114,7 @@ abstract class Base
         $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
+        $this->commentMapper              = $commentMapper;
     }
 
 
@@ -123,6 +135,53 @@ abstract class Base
         }
 
         return [];
+    }
+
+
+    /**
+     * Populate each article's metadata instance
+     *
+     * @param GenericCollection $articles
+     *
+     * @return GenericCollection
+     * @throws \InvalidArgumentException
+     */
+    protected function populateMetadata(GenericCollection $articles): GenericCollection
+    {
+        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+            Helper::getThreadIdsFromCollection($articles),
+            $this->commentMapper::ARTICLE_ID
+        );
+
+        $this->loadCommentCounts($commentCounts, $articles);
+
+        /* Other metadata stuff can be listed here
+        *
+        * $this->addMoreMetadata($articles);
+        * $this->addEvenMoreMetadata($articles);
+        */
+
+        return $articles;
+    }
+
+
+    /**
+     * Load the count of comments for each article in $articles
+     * using pass-by-reference
+     *
+     * @param array             $commentCounts
+     * @param GenericCollection $articles
+     *
+     * @return void
+     */
+    private function loadCommentCounts(array $commentCounts, GenericCollection $articles): void
+    {
+        /** @var Model $article */
+        foreach ($articles as $article) {
+            if ($article->getDiscussionThread()) {
+                $article->getMetadata()->setCommentCount((int) $commentCounts[$article->getId()]);
+            }
+        }
     }
 
 

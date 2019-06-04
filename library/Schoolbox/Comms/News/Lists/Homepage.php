@@ -35,6 +35,7 @@ class Homepage extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function find(Querystring $params, User $user): array {
         $articleIds = $this->newsMapper->findArticleIdsForTopic(
@@ -61,7 +62,7 @@ class Homepage extends Base
         }
 
         return [
-            'articles' => $articles,
+            'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),

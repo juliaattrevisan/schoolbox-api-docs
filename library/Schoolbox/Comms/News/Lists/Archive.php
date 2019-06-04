@@ -155,7 +155,7 @@ class Archive extends Base
         /* These pieces are needed to represent an article, due to Save For Later
          */
         return [
-            'articles' => $articles,
+            'articles' => $this->populateMetadata($articles),
             'readMore' => $this->readMoreText,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,
@@ -171,7 +171,6 @@ class Archive extends Base
             'paginator' => $paginator,
         ];
     }
-
 
 
     /**
