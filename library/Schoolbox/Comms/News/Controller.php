@@ -166,6 +166,7 @@ class Controller extends Base
         $this->commentMapper              = $commentMapper;
     }
 
+    /* CRUD actions */
 
     /**
      * Provide form to create a news article
@@ -254,87 +255,6 @@ class Controller extends Base
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
-
-    /**
-     * Generate article's audience segments with audience filtering based on the account access permission.
-     * If the logged in user is a member of a staff, filtering will be skipped.
-     *
-     * @param Model $article
-     * @param boolean $hideIndividualUsers
-     * @return array
-     * @throws MapperException\InsufficientHydrationException
-     * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
-     */
-    private function getAudienceSegments(Model $article, $hideIndividualUsers = false) :array
-    {
-        $audienceSegments = [];
-
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
-
-        $translator = new Audience\Segment\Translator(
-            $this->databaseInternal,
-            $this->strategyFactory
-        );
-        $translator->buildCache($article);
-
-        foreach ($article->getAudience() as $segment) {
-
-            if (($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
-                || !$this->isAudienceVisibleToUser($segment, $this->getUser())) {
-
-                continue;
-            }
-
-            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
-            // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
-
-            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if ($segment->isSimple()) {
-                $encodedValue = $codec->encodeValue($segment->getEntityValue());
-
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
-            } else {
-                foreach ($segment->getChildren() as $child) {
-                    $encodedValue = $codec->encodeValue($child->getEntityValue());
-                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-                }
-            }
-
-            $audienceSegments[] = $option;
-        }
-
-        return $audienceSegments;
-    }
-
-
-    /**
-     * @param Audience\Model $segment
-     * @param User           $user
-     * @return bool
-     * @throws MapperException\InsufficientHydrationException
-     */
-    private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
-    {
-        // Base Case:
-        if ($segment->isSimple()) {
-            $userAccessMapper = new UserAccessMapper();
-            return
-                $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
-                $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
-        }
-
-        // Recursive Case:
-        foreach ($segment->getChildren() as $childSegment) {
-            // If any child is not visible, this composite is not visible
-            if (!$this->isAudienceVisibleToUser($childSegment, $user)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * Redirects to `getCreate`, with a predefined audience brick for the given
@@ -540,6 +460,72 @@ class Controller extends Base
 
 
     /**
+     * Delete an article
+     *
+     * @api POST /news/{articleId}/delete
+     * @level 18.1
+     *
+     * @param Model $article
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \UnexpectedValueException
+     * @throws \Schoolbox\Application\Exception\Exception
+     */
+    public function postDelete(Model $article): void
+    {
+        try {
+            /* Try to delete this article
+             *
+             * Moderators can delete any article, but authors can only delete articles
+             * that haven't been witnessed by the world. Such articles have to be unaccepted
+             * and unpublished
+             */
+
+            $this->newsMapper->delete($article);
+
+            $context = new ThreadLocator($this->threadMapper, $this->newsMapper);
+            if ($article->getDiscussionThread()) {
+                $context->deleteThread($article->getDiscussionThread(), $article);
+            }
+
+            /* Redirect to returnUrl if provided, otherwise to news feed.
+             */
+
+            if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
+                $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
+            } else {
+                $nextStep = $this->getRouter()->generate('commsNews.getIndex');
+            }
+
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => true,
+                    'redirect' => $nextStep
+                ]));
+            } else {
+                $this->getResponse()->redirect->to($nextStep);
+            }
+
+        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
+            if ($this->getRequest()->isXhr()) {
+                $this->getResponse()->status->set(400);
+                $this->getResponse()->content->set($this->buildJsonOutput([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ]));
+
+                return;
+            }
+
+            throw $e;
+        }
+    }
+
+
+    /**
      * Associate this article with a discussion thread (passed in $post['discussionThreadId']).
      *
      * @api POST /news/{articleId}/associateWithThread/{discussionThreadId}
@@ -676,14 +662,17 @@ class Controller extends Base
     }
 
 
+    /* Homepage */
+
     /**
      * Get a list of articles that are audienced to me for homepage component
      *
-     * @api GET /news/lists/homepage
-     *
-     * @throws InvalidArgumentException
      * @throws MapperException
+     * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \PDOException
+     * @api GET /news/lists/homepage
      */
     public function getListForHomepage() :void
     {
@@ -706,6 +695,100 @@ class Controller extends Base
             'success' => true,
             'fragment' => $content
         ]));
+    }
+
+
+    /**
+     * Generate a partial fragment containing articles for homepage
+     *
+     * @param Querystring $params
+     * @return array
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \PDOException
+     */
+    private function generatePartialForHomepage(Querystring $params): array
+    {
+        $showArchiveNewsLink = false;
+        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
+        $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
+
+        $topicData = (new Lists\Homepage(
+            $searchLimit,
+            $this->newsMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+            $this->saveForLaterMapper,
+            $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
+            $this->databaseInternal,
+            $this->articleResolver
+        ))->find(
+            $params,
+            $this->getUser()
+        );
+
+        if (\count($topicData['articles']) < 1) {
+            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
+        }
+
+        return array_merge($topicData, [
+            'hidePaginator' => true,
+            'compactMode' => $params->getCompactMode(),
+            'referrer' => $params->getReferrer(),
+            'folderId' => $params->getFolderId(),
+            'showArchiveNewsLink' => $showArchiveNewsLink,
+            'componentId' => $params->getComponentId(),
+        ]);
+    }
+
+
+    /* Index */
+
+    /**
+     * Get a list of articles audienced to you
+     *
+     * @api GET /news
+     * @level 18.1
+     *
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function getIndex(): void
+    {
+        /* These referrers should be used, even when they're not explicitly provided in the url
+         */
+        $params = new Querystring($this->getRequest()->query);
+        $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
+
+        /* Merge a whole bunch of other settings too
+         * Specifically applies to the index page which loads slightly differently than component variant
+         */
+        $data = [
+            'topicAll' => Mapper::TOPIC_ALL_SLUG,
+            'topic' => $params->getSlug() ?: 'all',
+            'referrer' => $params->getReferrer(),
+            'initialPage' => $params->getPageNum(),
+            'queryStringPage' => Querystring::PAGE_NUMBER,
+            'queryStringReferrer' => Querystring::REFERRER,
+            'queryStringTopic' => Querystring::TOPIC_SLUG,
+
+            /* For configuring the rss button which changes per topic chosen
+             */
+            'key' => $this->getUser()->getKey(),
+        ];
+
+        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+
+        $data = array_merge($data, $sidebar->generate());
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput('@commsNews/index.twig', $data)
+                ->setTitle('News Feed')
+                ->setTab('news')
+        );
     }
 
 
@@ -776,138 +859,11 @@ class Controller extends Base
     }
 
 
-    /**
-     * Delete an article
-     *
-     * @api POST /news/{articleId}/delete
-     * @level 18.1
-     *
-     * @param Model $article
-     * @throws MapperException
-     * @throws RouteNotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
-     * @throws \Schoolbox\Application\Exception\Exception
-     */
-    public function postDelete(Model $article): void
-    {
-        try {
-            /* Try to delete this article
-             *
-             * Moderators can delete any article, but authors can only delete articles
-             * that haven't been witnessed by the world. Such articles have to be unaccepted
-             * and unpublished
-             */
-
-            $this->newsMapper->delete($article);
-
-            $context = new ThreadLocator($this->threadMapper, $this->newsMapper);
-            if ($article->getDiscussionThread()) {
-                $context->deleteThread($article->getDiscussionThread(), $article);
-            }
-
-            /* Redirect to returnUrl if provided, otherwise to news feed.
-             */
-
-            if ($this->getRequest()->query->get(Querystring::RETURN_URL)) {
-                $nextStep = Querystring::decode($this->getRequest()->query->get(Querystring::RETURN_URL));
-            } else {
-                $nextStep = $this->getRouter()->generate('commsNews.getIndex');
-            }
-
-            if ($this->getRequest()->isXhr()) {
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => true,
-                    'redirect' => $nextStep
-                ]));
-            } else {
-                $this->getResponse()->redirect->to($nextStep);
-            }
-
-        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|\PDOException|DefinitionException|\UnexpectedValueException|Exception $e) {
-            if ($this->getRequest()->isXhr()) {
-                $this->getResponse()->status->set(400);
-                $this->getResponse()->content->set($this->buildJsonOutput([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ]));
-
-                return;
-            }
-
-            throw $e;
-        }
-    }
-
-
-    /**
-     * This is now used only in News Archive with a topic
-     * This is the central piece of the puzzle
-     *
-     * @api GET /news/list
-     * @level 18.1
-     *
-     * @deprecated Article lists should now be done on the front-end, with an XHR calls
-     *
-     * @param int|null $year
-     * @param int|null $month
-     * @throws InvalidArgumentException
-     * @throws MapperException
-     * @throws RouteNotFound
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
-     * @throws \UnderflowException
-     * @throws \UnexpectedValueException
-     */
-    public function getListByTopic(?int $year, ?int $month): void
-    {
-        $params = new Querystring($this->getRequest()->query);
-        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
-
-        /* The requested data set to load, given the params provided
-         */
-        if ($year) {
-            $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
-        } else {
-            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
-        }
-
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
-
-        if (!$this->isXhrRequest()) {
-            // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput([
-                'articles' => $partialData['articles']
-            ]));
-
-            return;
-        }
-
-        $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
-        $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'success' => true,
-            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
-            'url' => $partialData['currentUrl'],
-            'fragment' => $content,
-            'slug' => $params->getSlug(),
-            'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
-        ]));
-    }
-
+    /* Archive  */
 
     /**
      * News Archive
      *
-     * @api   GET /news/archive{/year,month}
-     * @level 18.1
-     *
      * @param int|null $year
      * @param int|null $month
      * @throws InvalidArgumentException
@@ -920,7 +876,10 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws Exception
+     * @throws Exception*@throws Unauthorized
+     * @throws Unauthorized
+     * @api   GET /news/archive{/year,month}
+     * @level 18.1
      */
     public function getArchive(int $year = null, int $month = null): void
     {
@@ -954,7 +913,7 @@ class Controller extends Base
             $year = array_keys($availableYearsAndMonths)[0];
         }
 
-        $partialData = $this->generatePartial($urlPrefix, $params, $topics, false, $year, $month);
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $topics, false, $year, $month);
 
         $content = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
 
@@ -1005,70 +964,122 @@ class Controller extends Base
 
 
     /**
-     * @param int $folderId
+     * Generate a partial fragment containing articles
+     * Used in both synchronous and asynchronous requests
+     *
+     * @param string             $urlPrefix
+     * @param Querystring        $params
+     * @param Collection|Topic[] $topics
+     * @param bool               $hidePaginator
+     * @param int|null           $year
+     * @param int|null           $month
      *
      * @return array
-     * @throws Exception
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
      */
-    private function getBasicFolderDetailsById(int $folderId) :?array
+    private function generatePartialForArchive(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
-        try {
-            $folder = $this->folderMapper->findCheaplyById($folderId);
+        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
+        $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
 
-            return [
-                'id'      => $folderId,
-                'name'    => $folder->getName(),
-            ];
+        $topicData = (new Lists\Archive(
+            $searchLimit,
+            $this->newsMapper,
+            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+            $this->saveForLaterMapper,
+            $this->statisticsMapper,
+            $this->statisticsCumulativeMapper,
+            $this->databaseInternal,
+            $this->articleResolver
+        ))->find(
+            $urlPrefix,
+            $params,
+            $this->getUser(),
+            $topics,
+            $year,
+            $month
+        );
 
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
-        }
+        /* Always provide paginator from this context
+         */
+        $partialData = array_merge($topicData, [
+            'hidePaginator' => $hidePaginator,
+            'compactMode' => $params->getCompactMode(),
+            'pageNum' => $params->getPageNum(),
+            'referrer' => $params->getReferrer()
+        ]);
+
+        return $partialData;
     }
+
 
     /**
-     * Get a list of articles audienced to you
+     * This is now used only in News Archive with a topic
+     * This is the central piece of the puzzle
      *
-     * @api GET /news
+     * @api GET /news/list
      * @level 18.1
      *
+     * @deprecated Article lists should now be done on the front-end, with an XHR calls
+     *
+     * @param int|null $year
+     * @param int|null $month
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws RouteNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \OutOfRangeException
+     * @throws \PDOException
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
-    public function getIndex(): void
+    public function getListByTopic(?int $year, ?int $month): void
     {
-        /* These referrers should be used, even when they're not explicitly provided in the url
-         */
         $params = new Querystring($this->getRequest()->query);
-        $params->setReferrer(Statistics\Mapper::REFERRER_INDEX);
+        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
-        /* Merge a whole bunch of other settings too
-         * Specifically applies to the index page which loads slightly differently than component variant
+        /* The requested data set to load, given the params provided
          */
-        $data = [
-            'topicAll' => Mapper::TOPIC_ALL_SLUG,
-            'topic' => $params->getSlug() ?: 'all',
-            'referrer' => $params->getReferrer(),
-            'initialPage' => $params->getPageNum(),
-            'queryStringPage' => Querystring::PAGE_NUMBER,
-            'queryStringReferrer' => Querystring::REFERRER,
-            'queryStringTopic' => Querystring::TOPIC_SLUG,
+        if ($year) {
+            $urlPrefix = $this->getRouter()->generate('commsNews.getArchive', [ 'year' => $year, 'month' => $month ]);
+        } else {
+            $urlPrefix = $this->getRouter()->generate('commsNews.getIndex');
+        }
 
-            /* For configuring the rss button which changes per topic chosen
-             */
-            'key' => $this->getUser()->getKey(),
-        ];
+        $partialData = $this->generatePartialForArchive($urlPrefix, $params, $topics, $params->getHidePaginator(), $year, $month);
 
-        $sidebar = new Sidebar($this->newsMapper, $this->getUser(), $this->getRequest()->query['page']);
+        if (!$this->isXhrRequest()) {
+            // if it's NOT XHR, go for API version
+            $this->response->content->set($this->buildJsonOutput([
+                'articles' => $partialData['articles']
+            ]));
 
-        $data = array_merge($data, $sidebar->generate());
+            return;
+        }
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@commsNews/index.twig', $data)
-                ->setTitle('News Feed')
-                ->setTab('news')
-        );
+        $content     = $this->buildUnthemedHtmlOutput('@commsNews/partial.twig', $partialData)->getAsString();
+        $viewAllLink = "{$this->getRouteIfAuthorized('commsNews.getIndex')}?topic={$params->getSlug()}";
+
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'success' => true,
+            'title' => $this->getDi()->get('l10n')->translate('news', false, true),
+            'url' => $partialData['currentUrl'],
+            'fragment' => $content,
+            'slug' => $params->getSlug(),
+            'viewAllLink' => $partialData['articles']->count() ? $viewAllLink : null
+        ]));
     }
 
+
+    /* Created By Me */
 
     /**
      * Index of articles you've authored
@@ -1147,106 +1158,108 @@ class Controller extends Base
     }
 
 
+    /* Utility methods */
+
     /**
-     * Generate a partial fragment containing articles
-     * Used in both synchronous and asynchronous requests
+     * Generate article's audience segments with audience filtering based on the account access permission.
+     * If the logged in user is a member of a staff, filtering will be skipped.
      *
-     * @param string             $urlPrefix
-     * @param Querystring        $params
-     * @param Collection|Topic[] $topics
-     * @param bool               $hidePaginator
-     * @param int|null           $year
-     * @param int|null           $month
-     *
+     * @param Model $article
+     * @param boolean $hideIndividualUsers
      * @return array
-     * @throws MapperException
+     * @throws MapperException\InsufficientHydrationException
      * @throws UnexpectedValueException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
-     * @throws \DomainException
-     * @throws \OutOfRangeException
-     * @throws \PDOException
+     * @throws UnknownEntityTypeException
      */
-    private function generatePartial(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
+    private function getAudienceSegments(Model $article, $hideIndividualUsers = false) :array
     {
-        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
-        $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
+        $audienceSegments = [];
 
-        $topicData = (new Lists\Archive(
-            $searchLimit,
-            $this->newsMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-            $this->saveForLaterMapper,
-            $this->statisticsMapper,
-            $this->statisticsCumulativeMapper,
+        $codec = new Audience\Segment\Codec($this->audienceMapper);
+
+        $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
-            $this->articleResolver
-        ))->find(
-            $urlPrefix,
-            $params,
-            $this->getUser(),
-            $topics,
-            $year,
-            $month,
-            $this->commentMapper
+            $this->strategyFactory
         );
+        $translator->buildCache($article);
 
-        /* Always provide paginator from this context
-         */
-        $partialData = array_merge($topicData, [
-            'hidePaginator' => $hidePaginator,
-            'compactMode' => $params->getCompactMode(),
-            'pageNum' => $params->getPageNum(),
-            'referrer' => $params->getReferrer()
-        ]);
+        foreach ($article->getAudience() as $segment) {
 
-        return $partialData;
+            if (($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
+                || !$this->isAudienceVisibleToUser($segment, $this->getUser())) {
+
+                continue;
+            }
+
+            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
+            // Labels are used in brick rendering
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+
+            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
+            if ($segment->isSimple()) {
+                $encodedValue = $codec->encodeValue($segment->getEntityValue());
+
+                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+            } else {
+                foreach ($segment->getChildren() as $child) {
+                    $encodedValue = $codec->encodeValue($child->getEntityValue());
+                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
+                }
+            }
+
+            $audienceSegments[] = $option;
+        }
+
+        return $audienceSegments;
     }
 
 
     /**
-     * Generate a partial fragment containing articles for homepage
-     *
-     * @param Querystring $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws MapperException
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @param Audience\Model $segment
+     * @param User           $user
+     * @return bool
+     * @throws MapperException\InsufficientHydrationException
      */
-    private function generatePartialForHomepage(Querystring $params): array
+    private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
     {
-        $showArchiveNewsLink = false;
-        $configuredSearchLimit = $this->getConfigLoader()->get('search_type_limit');
-        $searchLimit           = null === $configuredSearchLimit ? self::DEFAULT_SEARCH_LIMIT : (int)$configuredSearchLimit;
-
-        $topicData = (new Lists\Homepage(
-            $searchLimit,
-            $this->newsMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-            $this->saveForLaterMapper,
-            $this->statisticsMapper,
-            $this->statisticsCumulativeMapper,
-            $this->databaseInternal,
-            $this->articleResolver,
-            $this->commentMapper
-        ))->find(
-            $params,
-            $this->getUser()
-        );
-
-        if (\count($topicData['articles']) < 1) {
-            $showArchiveNewsLink = $this->newsMapper->checkArchiveForHomepage((int) $params->getFolderId());
+        // Base Case:
+        if ($segment->isSimple()) {
+            $userAccessMapper = new UserAccessMapper();
+            return
+                $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
+                $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
         }
 
-        return array_merge($topicData, [
-            'hidePaginator' => true,
-            'compactMode' => $params->getCompactMode(),
-            'referrer' => $params->getReferrer(),
-            'folderId' => $params->getFolderId(),
-            'showArchiveNewsLink' => $showArchiveNewsLink,
-            'componentId' => $params->getComponentId(),
-        ]);
+        // Recursive Case:
+        foreach ($segment->getChildren() as $childSegment) {
+            // If any child is not visible, this composite is not visible
+            if (!$this->isAudienceVisibleToUser($childSegment, $user)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param int $folderId
+     *
+     * @return array
+     * @throws Exception
+     */
+    private function getBasicFolderDetailsById(int $folderId) :?array
+    {
+        try {
+            $folder = $this->folderMapper->findCheaplyById($folderId);
+
+            return [
+                'id'      => $folderId,
+                'name'    => $folder->getName(),
+            ];
+
+        } catch (MapperException $e) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_PAGE_NOT_FOUND);
+        }
     }
 
 
