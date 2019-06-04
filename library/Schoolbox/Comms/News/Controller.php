@@ -115,6 +115,9 @@ class Controller extends Base
     /** @var CommentMapper */
     private $commentMapper;
 
+    /**
+     * Default number of items to display in case config is broken
+     */
     private const DEFAULT_SEARCH_LIMIT = 10;
 
 
