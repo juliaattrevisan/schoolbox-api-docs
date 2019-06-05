@@ -43,6 +43,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const MODULE_COMMS    = 'comms';
     public const MODULE_CUSTOM   = 'custom';
     public const MODULE_OAUTH    = 'oauth';
+    public const MODULE_COMMENTS = 'comments_module';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;

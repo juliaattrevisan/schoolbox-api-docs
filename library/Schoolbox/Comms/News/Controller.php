@@ -861,6 +861,18 @@ class Controller extends Base
         ];
 
         $articles->reindex();
+
+        /**
+         * If comment module is enabled, load comment counts by thread ids
+         * otherwise, provide the default metadata payload
+         */
+        if ($this->getConfigLoader()->get(ConfigMapper::MODULE_COMMENTS)) {
+            $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+                Helper::getThreadIdsFromCollection($articles),
+                $this->commentMapper::THREAD_ID
+            );
+        }
+
         $articles = $articles->jsonSerialize(
             new PropertyDecorator(
                 $map,
