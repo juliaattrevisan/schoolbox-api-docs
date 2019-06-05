@@ -1,0 +1,10 @@
+{#
+    configContext:  array     - Data required to render a config settings form
+#}
+<div class="row">
+    <div class="island small-12">
+        <h1>oAuth Provider Configuration</h1>
+    </div>
+</div>
+
+{% include '@settings/moduleConfig.twig' with configContext only %}
