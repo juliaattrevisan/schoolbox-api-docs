@@ -18,7 +18,7 @@ use Schoolbox\UserMapper;
 class Authenticator
 {
     /**
-     * Are you authentiated?
+     * Are you authenticated?
      *
      * @var bool
      */
@@ -153,9 +153,9 @@ class Authenticator
     /**
      * Set session vars with a key/value array
      *
-     * @param $vars
+     * @param iterable $vars
      */
-    public function setSessionVars($vars)
+    public function setSessionVars(iterable $vars): void
     {
         foreach ($vars as $k => $v) {
             $_SESSION[$k] = $v;
@@ -213,28 +213,24 @@ class Authenticator
     public function isAuthenticated(): bool
     {
         // explicitly define boolean
-        return (isset($_SESSION['user']) || $this->authenticated) ? true : false;
+        return isset($_SESSION['user']) || $this->authenticated;
     }
 
     /**
      * Attempt to retrieve the IP of the client in a proxy-sensitive manner
      *
-     * @return string
+     * @return string|null
      */
-    public function getIP(): string
+    public function getIP(): ?string
     {
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif (isset($_SERVER['REMOTE_ADDR'])) {
+            $ip = $_SERVER['REMOTE_ADDR'];
         } else {
-            if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-            } else {
-                if (isset($_SERVER['REMOTE_ADDR'])) {
-                    $ip = $_SERVER['REMOTE_ADDR'];
-                } else {
-                    $ip = null;
-                }
-            }
+            $ip = null;
         }
 
         return $ip;
