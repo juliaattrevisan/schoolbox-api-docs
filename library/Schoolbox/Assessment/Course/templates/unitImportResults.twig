@@ -11,6 +11,8 @@
         units[unitSpecId]['assessments'][]['spec']: IAssessable | null,
         units[unitSpecId]['assessments'][]['impl']: IAssessable | null,
         componentId:  int|null,
+        canReadCourseSpec: bool
+        canReadUnitSpec[unitSpecId]: bool
     } only %}
 #}
 
@@ -136,8 +138,9 @@
 {% for unitImpl in dto.unitImplementations %}
 
     {% include '@course/import/unitImportRow.twig' with {
-        unitImpl: unitImpl,
-        dto:      dto,
+        unitImpl:        unitImpl,
+        dto:             dto,
+        canReadUnitSpec: canReadUnitSpecs[unitImpl.specification.id] ?? false,
     } only %}
 
 {% endfor %}

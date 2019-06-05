@@ -147,9 +147,10 @@ class Controller extends Base\Base
         if (self::IMPORT_STAGE_UNITS === $initialStage) {
             // If jumping straight to step2, generate a list of units for the specified course
             $data = array_merge($data, [
-                'courseSpecId' => $courseSpec->getId(),
-                'folderIds'    => [(int)$targetClass->getId()],
-                'unitsImpls'   => $this->findUnitImplementationsForCourseSpecId($courseSpec->getId()),
+                'courseSpecId'     => $courseSpec->getId(),
+                'folderIds'        => [(int)$targetClass->getId()],
+                'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpec->getId()),
+                'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
             ]);
         }
         $this->tpl('course', 'import', $data);
@@ -176,7 +177,7 @@ class Controller extends Base\Base
         $componentId     = trim($this->getRequest()->post['component_id']);
 
         try {
-            $this->courseSpecificationMapper->findById($courseSpecId);
+            $courseSpec = $this->courseSpecificationMapper->findById($courseSpecId);
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
             $this->sendError('The selected source is not a course');
@@ -203,11 +204,12 @@ class Controller extends Base\Base
 
         // respond with stage 2: units
         $this->tpl('course', 'unitImportForm', [
-            'action'       => 'import',
-            'courseSpecId' => $courseSpecId,
-            'folderIds'    => $targetFolderIds,
-            'componentId'  => $componentId,
-            'unitsImpls'   => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
+            'action'           => 'import',
+            'courseSpecId'     => $courseSpecId,
+            'folderIds'        => $targetFolderIds,
+            'componentId'      => $componentId,
+            'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
+            'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
         ]);
     }
 
@@ -316,19 +318,27 @@ class Controller extends Base\Base
             $courseSpec = $e->getDeletedObject();
         }
 
-        if ($this->access->getFolderAccess($this->getUser(), $courseSpec->getFolder()->getId()) < READ_ACCESS) {
+        $canReadCourseSpec = $this->canReadCourseSpec($courseSpec);
+        // If modifying an already imported course,
+        // and I can't read the original copy:
+        // I can still modify the import, but can't add anything new to it.
+        if (!($canReadCourseSpec || $courseImplId)) {
             $this->sendError('You do not have permission to import this course');
+            return;
         }
 
         // Test each homepage for write access
         foreach ($targetFolderIds as $folderId) {
-            if ($this->access->getFolderAccess($this->getUser(), $folderId) < WRITE_ACCESS) {
-                $this->sendError('You do not have permission to import this unit');
+            if ($this->access->getFolderAccess($this->getUser(), $folderId) < UserAccess::ACCESS_WRITE) {
+                $this->sendError('You do not have permission to import into this class');
+                return;
             }
         }
 
         // Hydrate + Validate dates
+        $canReadUnitSpecs = $this->canReadUnitSpecs($courseSpec);
         try {
+
             $countImportedUnits = 0;
             /** @var array $units */
             foreach ($units as $idx => $unit) {
@@ -342,6 +352,17 @@ class Controller extends Base\Base
                     }
                     $units[$idx]['open_date']  = $openDate;
                     $units[$idx]['close_date'] = $closeDate;
+
+                    $unitSpecId = $unit['unit_spec_id'];
+
+                    // If modifying an already imported unit,
+                    // and I can't read the original copy:
+                    // I can still modify the dates of the assessments in
+                    // this unit, but can't add anything new to it.
+                    if (!($courseImplId || $canReadUnitSpecs[$unitSpecId])) {
+                        $this->sendError('You do not have permission to import this unit');
+                        return;
+                    }
                 }
             }
 
@@ -396,14 +417,17 @@ class Controller extends Base\Base
 
         // respond with stage 4: coursework list
         $this->tpl('course', 'unitImportResults', [
-            'action'           => $action,
-            'returnUrlName'    => Redirect::RETURN_URL,
-            'encodedReturnUrl' => $encodedReturnUrl,
-            'courseSpecId'     => $courseSpecId,
-            'courseImplId'     => $courseImplId,
-            'componentId'      => $componentId,
-            'folderIds'        => $targetFolderIds,
-            'dto'              => $dto,
+            'action'            => $action,
+            'returnUrlName'     => Redirect::RETURN_URL,
+            'encodedReturnUrl'  => $encodedReturnUrl,
+            'courseSpecId'      => $courseSpecId,
+            'courseImplId'      => $courseImplId,
+            'componentId'       => $componentId,
+            'folderIds'         => $targetFolderIds,
+            'dto'               => $dto,
+            'canReadCourseSpec' => $canReadCourseSpec,
+            'canReadUnitSpecs'  => $canReadUnitSpecs,
+
         ]);
     }
 
@@ -884,6 +908,7 @@ class Controller extends Base\Base
             'unitsImpls'       => $courseImpl->getUnits(),
             'returnUrlName'    => Redirect::RETURN_URL,
             'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+            'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
         ]);
     }
 
@@ -1132,5 +1157,33 @@ class Controller extends Base\Base
         return array_map(function ($folderId) {
             return (int)$folderId;
         }, array_filter(explode(',', trim($folderIdCsv))));
+    }
+
+
+    /**
+     * Does the current user have read access to this course spec?
+     *
+     * @param CourseSpecification\Model $spec
+     * @return bool
+     */
+    private function canReadCourseSpec(CourseSpecification\Model $spec): bool
+    {
+        return $this->access->getFolderAccess($this->getUser(), $spec->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+    }
+
+
+    /**
+     * What permissions does the current user have on the units in this spec?
+     *
+     * @param CourseSpecification\Model $spec
+     * @return array
+     */
+    private function canReadUnitSpecs(CourseSpecification\Model $spec): array
+    {
+        $canReadUnitSpecs = [];
+        foreach ($spec->getUnits() as $unit) {
+            $canReadUnitSpecs[$unit->getId()] = $this->access->getFolderAccess($this->getUser(), $unit->getFolder()->getId()) >= UserAccess::ACCESS_READ;
+        }
+        return $canReadUnitSpecs;
     }
 }
