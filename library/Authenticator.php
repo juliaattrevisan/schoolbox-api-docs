@@ -68,19 +68,19 @@ class Authenticator {
     /* Session Functions */
 
     /**
-     * Start session
+     * Destroys current session, and starts one for the user with this username.
      *
-     * @param $username
-     * @param bool $remember
+     * This method no longer checks if `$this->isAuthenticated` is true: it
+     * assumes that the user has already been authenticated as a valid user
+     * somehow.
+     *
+     * @param string $username
+     * @param bool   $remember
      * @return bool
      * @throws SchoolboxNotAuthenticatedException
      */
-    public function createSession($username, $remember = false) {
-        // do nothing if I don't know you
-        if (!$this->isAuthenticated()) {
-            throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
-        }
-
+    public function createSession($username, $remember = false): bool
+    {
         $this->destroySession();
 
         // start by creating a desktop session, then we will add the mobile elements into it
@@ -91,9 +91,8 @@ class Authenticator {
             }
 
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
