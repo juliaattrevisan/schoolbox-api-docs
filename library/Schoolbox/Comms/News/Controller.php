@@ -872,16 +872,24 @@ class Controller extends Base
                 Helper::getThreadIdsFromCollection($articles),
                 $this->commentMapper::THREAD_ID
             );
-        }
 
-        $articles = $articles->jsonSerialize(
-            new PropertyDecorator(
-                $map,
-                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                new BlurbDecorator($this->getConfigLoader()->get('read_more')),
-                new MetadataDecorator($commentCounts)
-            )
-        );
+            $articles = $articles->jsonSerialize(
+                new PropertyDecorator(
+                    $map,
+                    new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                    new BlurbDecorator($this->getConfigLoader()->get('read_more')),
+                    new MetadataDecorator($commentCounts)
+                )
+            );
+        } else {
+            $articles = $articles->jsonSerialize(
+                new PropertyDecorator(
+                    $map,
+                    new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                    new BlurbDecorator($this->getConfigLoader()->get('read_more'))
+                )
+            );
+        }
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }

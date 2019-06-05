@@ -72,7 +72,9 @@
                                         <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">${ topic.name }</a>
                                     </template>
                                 </span>
-                                <span v-if="article.metadata.commentCount > 0"> | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount } comment<span v-if="article.metadata.commentCount > 1">s</span></a></span>
+                                <span v-if="article.metadata && article.metadata.commentCount && article.metadata.commentCount > 0">
+                                | <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer + '#discussion'">${ article.metadata.commentCount | formatCommentCountMeta }</a></span>
+                                </span>
                             </p>
                         </div>
                     </div>
@@ -462,6 +464,17 @@
             showMoreLink: function() {
                 return !this.articlesLoading && this.showMore && this.currentArticles.length;
             }
+        },
+        filters: {
+            formatCommentCountMeta: function (value) {
+                var suffix = ' comment';
+
+                if (value > 1) {
+                    suffix = ' comments';
+                }
+
+                return value + suffix;
+            },
         }
     });
 </script>
