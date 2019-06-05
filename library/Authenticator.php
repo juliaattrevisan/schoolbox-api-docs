@@ -7,6 +7,8 @@
  * @version     SVN: $Id$
  */
 
+declare(strict_types=1);
+
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 use Schoolbox\External\SubjectMapper;
