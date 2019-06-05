@@ -6,15 +6,15 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
+use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
-use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 
-class Authenticator {
-
+class Authenticator
+{
     /**
      * Are you authentiated?
      *
@@ -22,27 +22,21 @@ class Authenticator {
      */
     private $authenticated = false;
 
-    /**
-     * Authenticator constructor.
-     */
-    public function __construct() {
-
-    }
-
     /* Authentication Functions */
 
     /**
      * Encapsulating authentication method. Takes password by reference because it will unset it at the end of its use
      *
-     * @param $username
-     * @param $password
-     * @param bool $remember
+     * @param string $username
+     * @param string $password
+     * @param bool   $remember
      * @throws SchoolboxAccessDeniedException
      */
-    public function authenticate($username, $password, $remember = false) {
-        $s = new Session();
+    public function authenticate(string $username, string $password, bool $remember = false): void
+    {
+        $s    = new Session();
         $user = $s->authenticate($username, $password);
-        if($user instanceof User) {
+        if ($user instanceof User) {
             $this->authenticated = true;
         }
 
@@ -56,11 +50,13 @@ class Authenticator {
 
     /**
      * Explicitly deauthenticates any existing authentication and retests
-     * @param $username
-     * @param $password
-     * @param bool $remember
+     *
+     * @param string $username
+     * @param string $password
+     * @param bool   $remember
      */
-    public function reauthenticate($username, $password, $remember = false) {
+    public function reauthenticate(string $username, string $password, bool $remember = false): void
+    {
         $this->authenticated = false;
         $this->authenticate($username, $password, $remember);
     }
@@ -79,14 +75,14 @@ class Authenticator {
      * @return bool
      * @throws SchoolboxNotAuthenticatedException
      */
-    public function createSession($username, $remember = false): bool
+    public function createSession(string $username, bool $remember = false): bool
     {
         $this->destroySession();
 
         // start by creating a desktop session, then we will add the mobile elements into it
         if (session_start()) {
             $session = new Session();
-            if(!$session->create($username, $remember)) {
+            if (!$session->create($username, $remember)) {
                 throw new SchoolboxNotAuthenticatedException('Cannot create session, not authenticated');
             }
 
@@ -98,11 +94,11 @@ class Authenticator {
     /**
      * Append session
      *
-     * @param $userID
+     * @param int $userID
      * @return bool
      */
-    public function appendSession($userID) {
-
+    public function appendSession(int $userID): bool
+    {
         /**
          * @var UserMapper $userMapper
          */
@@ -114,6 +110,7 @@ class Authenticator {
 
             /**
              * Map subjects onto the user object retrieved, and dump into session
+             *
              * @var SubjectMapper $subjectMapper
              */
             $subjectMapper = SubjectMapper::getInstance();
@@ -122,8 +119,9 @@ class Authenticator {
 
             // indicate that session creation was successful
             return true;
+        } catch (Schoolbox\Mapper\Exception $e) {
+            // noop
         }
-        catch (Schoolbox\Mapper\Exception $e) {}
 
         return false;
     }
@@ -131,20 +129,22 @@ class Authenticator {
     /**
      * Set a session var
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed  $value
      */
-    public function setSessionVar($key, $value) {
+    public function setSessionVar(string $key, $value): void
+    {
         $_SESSION[$key] = $value;
     }
 
     /**
      * Get a session var
      *
-     * @param $key
+     * @param string $key
      * @return mixed
      */
-    public function getSessionVar($key) {
+    public function getSessionVar(string $key)
+    {
         return $_SESSION[$key];
     }
 
@@ -153,9 +153,11 @@ class Authenticator {
      *
      * @param $vars
      */
-    public function setSessionVars($vars) {
-        foreach($vars as $k => $v)
+    public function setSessionVars($vars)
+    {
+        foreach ($vars as $k => $v) {
             $_SESSION[$k] = $v;
+        }
     }
 
     /* SESSION USER */
@@ -173,60 +175,64 @@ class Authenticator {
     /**
      * @param User $user
      */
-    public function setSessionUser($user) {
-        // $_SESSION['user'] = $user->get('uid');
-        // -- or --
+    public function setSessionUser(User $user): void
+    {
         $_SESSION['user'] = $user;
         $this->touch();
     }
 
     /**
-     * @return User
+     * @return User|null
      */
-    public function getSessionUser() {
-        // $uMap = new GizaUser_DataMapper();
-        // return $uMap->read($_SESSION['user']);
+    public function getSessionUser(): ?User
+    {
         $this->touch();
-        // -- or --
         return $_SESSION['user'];
     }
 
     /**
      * Update the latest touch of the site by the user to being now
      */
-    private function touch() {
+    private function touch(): void
+    {
         $_SESSION['lasttime'] = time();
     }
 
-    public function destroySession() {
+    public function destroySession(): void
+    {
         @session_destroy();
     }
 
     /**
      * Returns whether or not the current request is authenticated
+     *
      * @return bool
      */
-    public function isAuthenticated() {
+    public function isAuthenticated(): bool
+    {
         // explicitly define boolean
         return (isset($_SESSION['user']) || $this->authenticated) ? true : false;
     }
 
     /**
      * Attempt to retrieve the IP of the client in a proxy-sensitive manner
+     *
      * @return string
      */
-    public function getIP() {
+    public function getIP(): string
+    {
         if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];
-        }
-        else if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        }
-        else if(isset($_SERVER['REMOTE_ADDR'])) {
-            $ip = $_SERVER['REMOTE_ADDR'];
-        }
-        else {
-            $ip = null;
+        } else {
+            if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+            } else {
+                if (isset($_SERVER['REMOTE_ADDR'])) {
+                    $ip = $_SERVER['REMOTE_ADDR'];
+                } else {
+                    $ip = null;
+                }
+            }
         }
 
         return $ip;
