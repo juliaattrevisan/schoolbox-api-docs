@@ -99,7 +99,7 @@ class Controller extends Base
         }
 
         // Authenticate, and if so register app
-        if ($this->authenticate()) {
+        if ($this->authenticate($this->request->post->getArrayCopy())) {
             $sessionUser = $this->getUser();
 
             // token may be absent or blank, in which case we don't store anything in the registry
@@ -156,7 +156,7 @@ class Controller extends Base
      */
     public function initSession(): void
     {
-        if ($this->authenticate()) {
+        if ($this->authenticate($this->request->post->getArrayCopy())) {
             if ($this->isJsonRequest()) {
                 $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
             } else {
@@ -171,18 +171,19 @@ class Controller extends Base
     /**
      * Authenticates the user based on data within the request.
      *
-     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
+     *
+     * @param array $postData A copy of the POST data passed to the form
      * @return bool Was a user auth session created?
      *              If it wasn't, JSON should have been put into the response.
      */
-    private function authenticate(): bool
+    private function authenticate(array $postData): bool
     {
-        $data = $this->request->post->getArrayCopy();
         try {
-            if (isset($data['username'], $data['password'])) {
-                $this->authenticateViaPostData($data['username'], $data['password']);
-            } elseif (isset($data['jwt'])) {
-                $this->authenticateViaJwt($data['jwt']);
+            if (isset($postData['username'], $postData['password'])) {
+                $this->authenticateViaPostData($postData['username'], $postData['password']);
+            } elseif (isset($postData['jwt'])) {
+                $this->authenticateViaJwt($postData['jwt']);
             } else {
                 /** @noinspection PhpUnhandledExceptionInspection */
                 $this->response->status->setCode(400);
