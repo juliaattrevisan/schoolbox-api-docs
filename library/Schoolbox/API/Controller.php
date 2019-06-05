@@ -9,6 +9,7 @@
 namespace Schoolbox\API;
 
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Output;
 use Authenticator;
 use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
 use Okta\JwtVerifier\Discovery\Oidc;
@@ -141,7 +142,7 @@ class Controller extends Base
                 $this->registryMapper->save($registry);
             }
 
-            $this->response->content->set($this->buildAuthenticatedJsonOutput());
+            $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
         }
     }
 
@@ -157,7 +158,7 @@ class Controller extends Base
     {
         if ($this->authenticate()) {
             if ($this->isJsonRequest()) {
-                $this->response->content->set($this->buildAuthenticatedJsonOutput());
+                $this->response->content->set($this->buildAuthenticatedJsonOutput($this->getUser()));
             } else {
                 // Redirect somewhere (locally only?)
                 // TODO accept redirect URL in a GET/POST param
@@ -261,14 +262,16 @@ class Controller extends Base
     /**
      * Build JSON output for an authenticated user.
      *
-     * @return \Alaress\Web\Output\Json
+     * @param User $user The user to build output for.
+     *                   In practise this will always be the logged-in user.
+     * @return Output\Json
      */
-    private function buildAuthenticatedJsonOutput(): \Alaress\Web\Output\Json
+    private function buildAuthenticatedJsonOutput(User $user): Output\Json
     {
         return $this->buildJsonOutput([
-            'id'   => $this->getUser()->getId(),
-            'key'  => $this->getUser()->getKey(),
-            'role' => $this->getUser()->getRole()->getType(),
+            'id'   => $user->getId(),
+            'key'  => $user->getKey(),
+            'role' => $user->getRole()->getType(),
         ]);
     }
 }
