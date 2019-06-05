@@ -164,7 +164,8 @@ Data:
                 {% include '@commsNews/layout/banner.twig' with {
                     article:     article,
                     modifyRoute: modifyRoute,
-                    isAuthor:    isAuthor
+                    isAuthor:    isAuthor,
+                    commentsModuleIsEnabled: commentsModule
                 } only %}
             </div>
         </section>

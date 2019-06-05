@@ -651,6 +651,7 @@ class Controller extends Base
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
                 'isPublishable'         => $this->generateValidSubmittedArticleSpec()->isSatisfiedBy($article),
+                'commentsModule'        => $this->getConfigLoader()->get(ConfigMapper::MODULE_COMMENTS),
             ];
         }
 
