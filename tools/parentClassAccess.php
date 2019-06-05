@@ -71,7 +71,7 @@ $kernel = new CliTool\Kernel(
             }
 
             $loadStudents = $this->getOpt(self::OPT_LONG_STUDENTS);
-            $dryRun = $this->getOpt(self::OPT_LONG_DRY_RUN) || !$this->perform();
+            $dryRun = $this->getOpt(self::OPT_LONG_DRY_RUN);
 
             $folders = [];
             $classes = [];
@@ -102,8 +102,10 @@ $kernel = new CliTool\Kernel(
 
             if ($dryRun) {
                 $this->getLogger()->warning('Performing a dry run. Provide --perform to update DB.');
+            } else if (!$this->perform()) {
+                // If not explicitly specifying --perform option
+                $this->getLogger()->warning('Updating DB. The default behaviour without --perform is subject to change.');
             }
-
 
             foreach ($classes as $folderId => $codes) {
                 try {
