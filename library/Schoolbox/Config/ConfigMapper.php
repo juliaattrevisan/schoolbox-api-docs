@@ -159,7 +159,13 @@ class ConfigMapper extends Mapper implements IConfigLoader
         $this->uses(self::COL_EDITABLE, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_HIDDEN, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_REQUIRED, self::TYPE_BOOL_ENUM);
-        $this->uses(self::COL_MODULE, self::TYPE_STRING, self::COLUMN_ENUM, null, [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM]);
+        $this->uses(
+            self::COL_MODULE,
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH,]
+        );
     }
 
 
