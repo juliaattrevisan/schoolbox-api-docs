@@ -877,7 +877,7 @@ class Controller extends Base
                 new PropertyDecorator(
                     $map,
                     new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                    new BlurbDecorator($this->getConfigLoader()->get('read_more')),
+                    new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
                     new MetadataDecorator($commentCounts)
                 )
             );
@@ -886,7 +886,7 @@ class Controller extends Base
                 new PropertyDecorator(
                     $map,
                     new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                    new BlurbDecorator($this->getConfigLoader()->get('read_more'))
+                    new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE))
                 )
             );
         }
@@ -1190,7 +1190,7 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get('read_more')))
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
