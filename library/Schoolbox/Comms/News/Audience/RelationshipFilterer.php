@@ -206,7 +206,7 @@ class RelationshipFilterer
         }
 
         // Then find the teachers of these classes from synergetic.
-        $teacherExternalIds = $this->externalClass->getTeacherName(\implode(',', \array_unique($classCodes)));
+        $teacherExternalIds = $this->externalClass->getTeachers(\implode(',', \array_unique($classCodes)));
 
         $instructorIds = $this->userAccessMapper->findScalarByPredicates(
             'uid',

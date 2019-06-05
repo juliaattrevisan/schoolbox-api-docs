@@ -151,7 +151,7 @@ class Teacher
     /**
      * @return string
      */
-    public function getTeacherName(): string
+    public function getTeachers(): string
     {
         return $this->teacherName;
     }

@@ -14,7 +14,7 @@ class External_Maze_Loreto_Class extends External_Maze_Class {
 	/**
 	 * @inheritdoc
 	 */
-	public function getTeacherName(string $classCode): array
+	public function getTeachers(string $classCode): array
     {
 		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 

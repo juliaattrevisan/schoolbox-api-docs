@@ -98,7 +98,7 @@ class External_Isams_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCode): array
+    public function getTeachers(string $classCode): array
     {
         if (empty($classCode)) {
             return [];

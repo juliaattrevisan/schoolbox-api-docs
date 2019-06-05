@@ -296,7 +296,7 @@ class UserResolver implements IUserResolver
                     foreach ($this->externalClass->getStudents(implode(',', $codes)) as $student) {
                         $externalIds[] = $student['synergy_id'];
                     }
-                    foreach ($this->externalClass->getTeacherName(implode(',', $codes)) as $teacherExternalId) {
+                    foreach ($this->externalClass->getTeachers(implode(',', $codes)) as $teacherExternalId) {
                         $externalIds[] = $teacherExternalId;
                     }
                     if (\count($externalIds)) {

@@ -23,7 +23,7 @@ class External_Offline_Class implements External_ClassInterface, IOfflineConnect
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCode): array
+    public function getTeachers(string $classCode): array
     {
         // Noop
         return [];

@@ -1097,7 +1097,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
             {
                 foreach ($subjects as $subject)
                 {
-                    $teachers = $externalClass->getTeacherName($subject['code']);
+                    $teachers = $externalClass->getTeachers($subject['code']);
 
                     foreach ($teachers as $teacher)
                     {

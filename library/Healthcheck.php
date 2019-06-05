@@ -685,7 +685,7 @@ class Healthcheck
             'sbGetStaffDayTimetable',
             'sbGetStudentDayTimetable',
             'sbGetStudents',
-            'sbGetTeacherName',
+            'sbGetTeachers',
             'sbGetTimetableDefinition',
             'sbGetStudentContact',
             'sbGetPortraitLastUpdated',

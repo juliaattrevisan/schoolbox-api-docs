@@ -36,7 +36,7 @@ interface External_ClassInterface extends External\IConnector
      * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
      * @return string[]
      */
-    public function getTeacherName(string $classCode): array;
+    public function getTeachers(string $classCode): array;
 
     /**
      * @return array

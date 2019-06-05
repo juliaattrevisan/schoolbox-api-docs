@@ -71,7 +71,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCode): array
+    public function getTeachers(string $classCode): array
     {
 
         // Setup handling multiple codes

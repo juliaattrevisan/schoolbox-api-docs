@@ -137,7 +137,7 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
             $teachers = [];
             if (\count($folder->getCodes()) > 0) {
                 // Actual teachers only
-                $teacherCodes = $this->externalClass->getTeacherName($folder->getCodeString());
+                $teacherCodes = $this->externalClass->getTeachers($folder->getCodeString());
                 if(\is_array($teacherCodes) && \count($teacherCodes) > 1) {
                     $teachers = $this->userMapper->findByColumn('synergy_id', $teacherCodes)
                                                  ->filter(

@@ -207,7 +207,7 @@ class Controller extends Base
             $teachers = [];
             if (\count($folder->getCodes())) {
                 // Actual teachers only
-                $teacherCodes = $this->externalClass->getTeacherName($folder->getCodeString());
+                $teacherCodes = $this->externalClass->getTeachers($folder->getCodeString());
                 if (\count($teacherCodes)) {
                     $pb       = $this->userMapper->getPredicateBuilder()
                                                  ->in('synergy_id', $teacherCodes)

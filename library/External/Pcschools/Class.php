@@ -67,7 +67,7 @@ class External_Pcschools_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCode): array
+    public function getTeachers(string $classCode): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
@@ -91,7 +91,7 @@ class External_Pcschools_Class implements External_ClassInterface
     }
 
     /**
-     * Gets a where part for the timefile query in `getTeacherName()` and `getStudents()`.
+     * Gets a where part for the timefile query in `getTeachers()` and `getStudents()`.
      *
      * @param string $classCodes
      *
