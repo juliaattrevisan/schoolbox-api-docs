@@ -5,10 +5,10 @@ insert into config (
     description,
     field_id,
     options,
-    type_id,
     editable,
     hidden,
-    required
+    required,
+    module
 )
 VALUES (
     'cloudwork_oauth_identity_provider',
@@ -17,10 +17,10 @@ VALUES (
     'The URL of your Cloudwork identity provider. Will likely be in the form "https://yourschool-id.cloudworkengine.net/".',
     1, -- input
     '',
-    21, -- SAML? will probably change this
     'true',
     'false',
-    'false'
+    'false',
+    'oauth'
 ), (
     'cloudwork_oauth_client_id',
     '',
@@ -28,10 +28,10 @@ VALUES (
     'The client ID for your Schoolbox oAuth App within Cloudwork',
     1, -- input
     '',
-    21, -- SAML? will probably change this
     'true',
     'false',
-    'false'
+    'false',
+    'oauth'
 ), (
     'cloudwork_oauth_client_secret',
     '',
@@ -39,8 +39,8 @@ VALUES (
     'The client secret for your Schoolbox oAuth App within Cloudwork',
     1, -- input
     '',
-    21, -- SAML? will probably change this
     'true',
     'false',
-    'false'
+    'false',
+    'oauth'
 );

@@ -93,6 +93,6 @@ class Controller extends ConfigController
                         ConfigMapper::COL_NAME,
                         $this->quoter->escapeForLike(ConfigMapper::PREFIX_CLOUDWORK_OAUTH) . "%"
                     )
-                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_CUSTOM);
+                    ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OAUTH);
     }
 }
