@@ -357,14 +357,14 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         /* Only include published articles
          */
+        $query = "SELECT id FROM {$this->table} WHERE ({$where}) ";
+
         if ($publishedOnly) {
             $publishedPb    = $this->getPredicateBuilder()->all($this->getPredicatePublished());
             $publishedWhere = implode(',', $publishedPb->getWhere());
 
-            $query  = "SELECT id FROM {$this->table} WHERE {$publishedWhere} AND ({$where})";
+            $query .= " AND {$publishedWhere}";
             $params = array_merge($params, $publishedPb->getParams());
-        } else {
-            $query = "SELECT id FROM {$this->table} WHERE ({$where})";
         }
 
         /* Only include expired articles
