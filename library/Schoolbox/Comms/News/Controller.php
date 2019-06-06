@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Statement\Query\Dblib\Query;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
@@ -822,7 +823,7 @@ class Controller extends Base
             $this->databaseInternal,
             $this->articleResolver,
             $this->commentMapper
-        ))->find($this->getUser());
+        ))->find(new Querystring([]), $this->getUser());
 
         $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
 

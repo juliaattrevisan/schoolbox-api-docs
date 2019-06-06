@@ -174,31 +174,6 @@ class Archive extends Base
 
 
     /**
-     * From a slug, figure out what topic matches it
-     *
-     * By default, select the All tab...
-     * but try to find the topic whose slug matches the url param
-     *
-     * @param Collection|Topic[]  $topics
-     * @param null|string         $slug
-     * @return int
-     */
-    private function determineSelectedTopicId(Collection $topics, ?string $slug): int
-    {
-        $selectedTopicId = Mapper::TOPIC_ALL_ID;
-
-        foreach ($topics as $topic) {
-            if ($topic->getSlug() === $slug) {
-                return $topic->getId();
-            }
-        }
-
-        return $selectedTopicId;
-    }
-
-
-
-    /**
      * Generate a standard paginator to go with your article list
      *
      * @param string $url

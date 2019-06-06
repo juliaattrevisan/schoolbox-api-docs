@@ -13,6 +13,7 @@
 namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Database\Connector\IConnector;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IArticleResolver;
 use Schoolbox\Comms\News\Helper;
 use Schoolbox\Comms\News\Mapper;
@@ -23,6 +24,7 @@ use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
+use Schoolbox\News\Topic;
 use Schoolbox\User;
 
 abstract class Base
@@ -227,4 +229,29 @@ abstract class Base
 
         return $articles;
     }
+
+
+    /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection|Topic[]  $topics
+     * @param null|string         $slug
+     * @return int
+     */
+    protected function determineSelectedTopicId(Collection $topics, ?string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
+    }
+
 }

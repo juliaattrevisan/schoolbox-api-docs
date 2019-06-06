@@ -138,7 +138,7 @@ class Controller extends Base
 
             /* Get all the articles for the homepage
              */
-            $topicData = (new News\Lists\Homepage(
+            $articleIds = (new News\Lists\Homepage(
                 (int)$this->getConfigLoader()->get('search_type_limit'),
                 $this->newsMapper,
                 $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -153,9 +153,22 @@ class Controller extends Base
         }
         else {
 
+            /* If a topic slug exists, use it
+             * Otherwise, get articles across all topics
+             */
+            $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
+
+            $slug = (string)$this->getRequest()->query[News\Querystring::TOPIC_SLUG];
+
+            if ('' !== $slug) {
+                $args[News\Querystring::TOPIC_SLUG] = $slug;
+            }
+
+            $params = new News\Querystring($args);
+
             /* Get all the articles across all topics
              */
-            $topicData = (new News\Lists\Index(
+            $articleIds = (new News\Lists\Index(
                 (int)$this->getConfigLoader()->get('search_type_limit'),
                 $this->newsMapper,
                 $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
@@ -166,8 +179,12 @@ class Controller extends Base
                 $this->databaseInternal,
                 $this->articleResolver,
                 $this->commentMapper
-            ))->find($user);
+            ))->find($params, $user);
         }
+
+        /* Hydrate the set
+         */
+        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
         /* I haven't seen an outputter for xml in Web/Output
          */
@@ -177,7 +194,7 @@ class Controller extends Base
             'schoolName' => $this->getConfigLoader()->get('school_name'),
             'baseUrl' => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
             'url' => $this->getRequest()->url->get(),
-            'articles' => $topicData['articles']
+            'articles' => $articles
         ]));
     }
 }
