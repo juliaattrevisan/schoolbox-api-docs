@@ -450,6 +450,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          * Otherwise get $limit articles from any topic
          */
         $join = $groupBy = '';
+
         if ($topicId !== self::TOPIC_ALL_ID) {
             $join    = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id ";
             $groupBy = 'GROUP BY id';

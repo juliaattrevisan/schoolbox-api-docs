@@ -56,22 +56,21 @@ class Index extends Base
         /* If $topicId was provided, restrict data set to articles
          * that were in the specified topic
          */
-        if ($params->getSlug()) {
-            $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
+        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
-            $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
+        $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 
-            return $this->newsMapper->findArticleIdsForTopic(
-                $relevantArticles,
-                $topicId,
-                $params->getLimit(),
-                $params->getPageNum(),
-                null,
-                null,
-                null
-            );
-        }
-
-        return $relevantArticles;
+        /* Push those article ids through the topic filter which also circumstantially happens to
+         * restrict to published, but not expired, articles because we pass null as year and month values.
+         */
+        return $this->newsMapper->findArticleIdsForTopic(
+            $relevantArticles,
+            $topicId,
+            $params->getLimit(),
+            $params->getPageNum(),
+            null,
+            null,
+            null
+        );
     }
 }
