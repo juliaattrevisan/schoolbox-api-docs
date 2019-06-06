@@ -421,6 +421,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
+
     /**
      * Find just the ids for the articles in a topic
      * We generally use this for pagination counts where we need a count instead of hydrated things
@@ -436,7 +437,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param int|null $year
      * @param int|null $month
      * @param int|null $folderId
-     *
+     * @throws InvalidColumnException
+     * @throws \DomainException
+     * @throws \UnderflowException
      * @return array
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
