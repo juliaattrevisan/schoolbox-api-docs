@@ -82,25 +82,24 @@ class TokenParser
 
 
     /**
-     * Finds the user from a token in PHP's server vars.
+     * Finds the user from a JWT in PHP's server vars.
      *
-     * The token must be in the "Authorization" HTTP header, and be in the form
+     * The JWT must be in the "Authorization" HTTP header, and be in the form
      * "Bearer: $token".
      *
      * @param array  $serverVars The contents of the `$_SERVER` super-global.
      *
      * @return User
+     * @throws SchoolboxException\Exception       if the "Authorization" header doesn't exist
      * @throws SchoolboxException\Exception       if the "Authorization" header isn't type "Bearer"
-     * @throws SchoolboxException\NotFound        if the decoded token doesn't contain a "sub" (subject) key
-     * @throws SchoolboxException\NotFound        if the decoded token's "sub" key doesn't match a username
-     * @throws SchoolboxException\AccountDisabled if the user matched by the "sub" key isn't enabled
+     * @throws SchoolboxException\NotFound        if the claims in the JWT could not be mapped to a user
      */
     public function findUserFromServerVars(array $serverVars): User
     {
         // Find the auth header in server vars. If it's not there: do nothing
         $authHeader = $serverVars['HTTP_AUTHORIZATION'] ?? null;
         if (!isset($authHeader)) {
-            return null;
+            throw new SchoolboxException\Exception('No "Authorization" header found');
         }
 
         if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
