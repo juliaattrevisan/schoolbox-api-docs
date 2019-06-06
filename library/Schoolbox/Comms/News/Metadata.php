@@ -1,5 +1,12 @@
 <?php
 /**
+ * Metadata
+ *
+ * A container for various metadata about each article such as its comment count.
+ *
+ * In future this should be the place where we put other details like number of opens/views,
+ * number of reactions, etc.
+ *
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      https://www.alaress.com.au/
  */
@@ -11,7 +18,7 @@ class Metadata
     /**
      * @var int
      */
-    public $commentCount = 0;
+    private $commentCount = 0;
 
     /**
      * Metadata constructor.
