@@ -103,20 +103,18 @@ class Controller extends Base
      *
      * An optional ?topic= can be used to filter this
      *
-     * @api /news/feed/{key}{/folderId}
-     *
      * @param User              $user
      * @param null|Folder\Model $folder
+     * @throws Unauthorized
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidComponent
      * @throws \DomainException
      * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @api /news/feed/{key}{/folderId}
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
@@ -124,18 +122,6 @@ class Controller extends Base
          */
         $args = [];
 
-        $newsList = new News\Lists(
-            (int)$this->getConfigLoader()->get('search_type_limit'),
-            $this->newsMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-            $this->saveForLaterMapper,
-            $this->statisticsMapper,
-            $this->statisticsCumulativeMapper,
-            $this->databaseInternal,
-            $this->articleResolver,
-            $this->commentMapper
-        );
 
         /* If a folder was specified, get the feed for that folder
          */
@@ -152,36 +138,35 @@ class Controller extends Base
 
             /* Get all the articles for the homepage
              */
-            $topicData = $newsList->findArticlesForHomepage(
-                $params,
-                $user
-            );
+            $topicData = (new News\Lists\Homepage(
+                (int)$this->getConfigLoader()->get('search_type_limit'),
+                $this->newsMapper,
+                $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+                $this->saveForLaterMapper,
+                $this->statisticsMapper,
+                $this->statisticsCumulativeMapper,
+                $this->databaseInternal,
+                $this->articleResolver,
+                $this->commentMapper
+            ))->find($params, $user);
         }
         else {
 
-            /* If a topic slug exists, use it
-             * Otherwise, get articles across all topics
-             */
-            $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
-
-            $slug = $this->getRequest()->query[News\Querystring::TOPIC_SLUG];
-
-            if (\strlen($slug)) {
-                $args[News\Querystring::TOPIC_SLUG] = $slug;
-            }
-            $params = new News\Querystring($args);
-
             /* Get all the articles across all topics
              */
-            $topicData = $newsList->findForTopic(
-                '',
-                $params,
-                $user,
-                $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]),
-                null,
-                null
-            );
-
+            $topicData = (new News\Lists\Index(
+                (int)$this->getConfigLoader()->get('search_type_limit'),
+                $this->newsMapper,
+                $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+                $this->saveForLaterMapper,
+                $this->statisticsMapper,
+                $this->statisticsCumulativeMapper,
+                $this->databaseInternal,
+                $this->articleResolver,
+                $this->commentMapper
+            ))->find($user);
         }
 
         /* I haven't seen an outputter for xml in Web/Output
