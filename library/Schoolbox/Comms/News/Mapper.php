@@ -288,9 +288,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Get a list of years that have article(s) that were audienced to a user
      *
-     * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
+     * @throws \PDOException
+     * @return array
      */
     public function findYearsAndMonthsWithArticles(): array
     {
@@ -403,12 +404,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \UnderflowException
+     * @throws \PDOException
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
         /* This user can't see any articles
          */
-        if (null !== $folderId && count($availableArticleIds) < 1) {
+        if (null !== $folderId && \count($availableArticleIds) < 1) {
             return [];
         }
 
@@ -421,7 +423,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /* If either year or month is specified, we're looking in the news archive
          * Look for expired items matching a certain year/month combination
          */
-        $now = \Alaress_Date_Format::now()->getDatabase();
+        $now = Alaress_Date_Format::now()->getDatabase();
 
         /* Dates - must be accepted, published and not deleted
          */
@@ -430,7 +432,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             ->notNull('accepted_at')
             ->isNull('deleted_at');
 
-        if (count($availableArticleIds)) {
+        if (\count($availableArticleIds)) {
             $pb->in('id', $availableArticleIds);
         }
 
@@ -523,6 +525,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param int $folderId
      *
      * @return bool
+     * @throws InvalidColumnException
+     * @throws \PDOException
      */
     public function checkArchiveForHomepage(int $folderId): bool
     {
@@ -560,6 +564,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param int|null $folderId
      *
      * @return array
+     * @throws \PDOException
      */
     private function getArticleIdsByQuery(string $query, Builder $builder, ?int $pageNum, ?int $limit, ?int $folderId): array
     {
