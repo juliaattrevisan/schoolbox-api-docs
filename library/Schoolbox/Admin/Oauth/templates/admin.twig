@@ -1,0 +1,18 @@
+{#
+    configContext:  array     - Data required to render a config settings form
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread  %}
+{{ bread.crumbs(
+    [ 'Admin', routeLookup('adminHome.getIndex') ],
+    [ 'Messages', '/adminv2/messages' ],
+    [ 'oAuth Provider Configuration', routeLookup('adminOauth.getAdmin') ]
+) }}
+
+<div class="row">
+    <div class="island small-12">
+        <h1>oAuth Provider Configuration</h1>
+    </div>
+</div>
+
+{% include '@settings/moduleConfig.twig' with configContext only %}

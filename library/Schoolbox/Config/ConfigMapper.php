@@ -42,6 +42,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const MODULE_SETTINGS = 'settings';
     public const MODULE_COMMS    = 'comms';
     public const MODULE_CUSTOM   = 'custom';
+    public const MODULE_OAUTH    = 'oauth';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -95,9 +96,10 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
     public const _EXTERNAL_MS_SQL_SERVER_DRIVER = 'external_ms_sql_server_driver';
 
-    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = 'cloudwork_oauth_identity_provider';
-    public const _CLOUDWORK_OAUTH_CLIENT_ID         = 'cloudwork_oauth_client_id';
-    public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = 'cloudwork_oauth_client_secret';
+    public const PREFIX_CLOUDWORK_OAUTH             = 'cloudwork_oauth_';
+    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
+    public const _CLOUDWORK_OAUTH_CLIENT_ID         = self::PREFIX_CLOUDWORK_OAUTH . 'client_id';
+    public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
 
     /** @var array */
     protected $cache = array();
@@ -157,7 +159,13 @@ class ConfigMapper extends Mapper implements IConfigLoader
         $this->uses(self::COL_EDITABLE, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_HIDDEN, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_REQUIRED, self::TYPE_BOOL_ENUM);
-        $this->uses(self::COL_MODULE, self::TYPE_STRING, self::COLUMN_ENUM, null, [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM]);
+        $this->uses(
+            self::COL_MODULE,
+            self::TYPE_STRING,
+            self::COLUMN_ENUM,
+            null,
+            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH,]
+        );
     }
 
 

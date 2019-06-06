@@ -140,5 +140,9 @@ class Admin implements ModuleConfigInterface
         // Settings
         $news = new \Schoolbox\Admin\Settings\Module($di);
         $news->init('/adminv2/setting');
+
+        // oAuth-specific settings
+        $oauth = new \Schoolbox\Admin\Oauth\Module($di);
+        $oauth->init('/adminv2/oauth');
     }
 } 
