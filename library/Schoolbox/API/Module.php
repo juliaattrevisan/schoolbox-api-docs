@@ -1,6 +1,5 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,59 +9,43 @@
 namespace Schoolbox\API;
 
 use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
-use Alaress\Web\Router\RouteCollection;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
+use Authenticator;
 use Schoolbox\MobileApp\RegistryMapper;
+use Schoolbox\MobileApp\ServiceMapper;
+use Schoolbox\UserMapper;
 
-class Module extends BaseModule {
-
+class Module extends BaseModule
+{
     protected $basename = 'api';
 
-    /**
-     * @param Router|RouteCollection $router
-     * @param string $basePath
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        $this->addPostRoute($router, 'register', $basePath, '/register/{provider}');
-    }
-
 
     /**
-     * @param PathMatcher $matcher
+     * @inheritDoc
      */
-    public function initRoutePreloads(PathMatcher $matcher)
+    protected function registerRoutes(): void
     {
-        $this->addRoutePreload(
-            $matcher,
-            'register',
-            function ($params) {
-                return array(
-                    'provider' => $params['provider'],
-                );
-            }
-        );
+        $this->register('POST', '/register/{provider}', 'register');
+        $this->register('POST', '/session', 'initSession');
     }
 
 
     /**
      * @param ContainerInterface $injector
      */
-    public function initControllers(ContainerInterface $injector)
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            'controller:' . $this->basename,
+            $injector->lazyNew(
+                Controller::class,
+                [
+                    'auth'           => $injector->lazyNew(Authenticator::class),
+                    'userMapper'     => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'registryMapper' => $this->getMapperFactory()->getLazy(RegistryMapper::class),
+                    'serviceMapper'  => $this->getMapperFactory()->getLazy(ServiceMapper::class),
+                ]
+            )
         );
-
-        $injector->setters[Controller::class]['setAuth']
-            = $injector->lazyNew('Authenticator');
-
-        $injector->setters[Controller::class]['setRegistryMapper']
-            = $this->getMapperFactory()->getLazy(RegistryMapper::class);
-
     }
-
 }

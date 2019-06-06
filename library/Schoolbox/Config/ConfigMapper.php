@@ -95,6 +95,10 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _AUDIENCE_TO_FOLDER_TEACHERS = 'audience_to_folder_users_teachers';
     public const _EXTERNAL_MS_SQL_SERVER_DRIVER = 'external_ms_sql_server_driver';
 
+    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = 'cloudwork_oauth_identity_provider';
+    public const _CLOUDWORK_OAUTH_CLIENT_ID         = 'cloudwork_oauth_client_id';
+    public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = 'cloudwork_oauth_client_secret';
+
     /** @var array */
     protected $cache = array();
 
