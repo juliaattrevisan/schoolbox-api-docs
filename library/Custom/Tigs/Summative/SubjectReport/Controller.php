@@ -204,7 +204,7 @@ class Controller extends Web\Controller\Base
                     if (!$dueDateA) {
                         return $dueDateB ? -1 : 0;
                     }
-                    return $dueDateB ? $dueDateA->compare($dueDateB) : +1;
+                    return $dueDateB ? $dueDateB->compare($dueDateA) : +1;
                 }
             );
         }
