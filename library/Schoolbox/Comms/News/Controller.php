@@ -884,7 +884,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
-     * @throws Exception*@throws Unauthorized
+     * @throws Exception
      * @throws Unauthorized
      * @api   GET /news/archive{/year,month}
      * @level 18.1
