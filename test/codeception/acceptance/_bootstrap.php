@@ -1,6 +1,7 @@
 <?php
 /**
- * Bootstrap for Codeception tests.
+ * Bootstrap for Acceptance tests. Links to generic bootstrap.
+ * Any extra loading just for acceptance tests can be done here.
  *
  * (Identical to PHPUnit test bootstrap for now)
  *
@@ -8,7 +9,5 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-require_once __DIR__ . '/../../../conf/core/require.php';
+require_once __DIR__ . '/../_bootstrap.php';
 
-// sorry.
-Schoolbox\Mapper::di(new Aura\Di\Container(new Aura\Di\Factory()));
