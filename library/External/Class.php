@@ -52,7 +52,7 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCode): array
+    public function getTeachers(string $classCode): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

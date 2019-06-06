@@ -182,7 +182,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
             }
         }
 
-        $teacherCodes = $classHandler->getTeacherName($subject['folder']->getCodeString() ?: $subject['code']);
+        $teacherCodes = $classHandler->getTeachers($subject['folder']->getCodeString() ?: $subject['code']);
 
         if (is_array($teacherCodes) && count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([

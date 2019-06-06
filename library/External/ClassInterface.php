@@ -31,12 +31,12 @@ interface External_ClassInterface extends External\IConnector
 
     /**
      * Returns a list of *THE EXTERNAL IDs* of teachers that are associated
-     * with a class (method is misnamed)
+     * with a class
      *
      * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
      * @return string[]
      */
-    public function getTeacherName(string $classCode): array;
+    public function getTeachers(string $classCode): array;
 
     /**
      * @return array

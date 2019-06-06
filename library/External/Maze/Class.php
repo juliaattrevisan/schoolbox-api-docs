@@ -139,7 +139,7 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * @inheritdoc
      */
-    public function getTeacherName(string $classCode): array
+    public function getTeachers(string $classCode): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */
