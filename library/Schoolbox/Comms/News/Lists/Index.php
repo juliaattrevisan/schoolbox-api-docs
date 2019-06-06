@@ -10,7 +10,6 @@
 namespace Schoolbox\Comms\News\Lists;
 
 use Schoolbox\Comms\News\Querystring;
-use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 
 class Index extends Base
@@ -58,7 +57,7 @@ class Index extends Base
          * that were in the specified topic
          */
         if ($params->getSlug()) {
-            $topics = TopicMapper::getInstance()->findAll(['order'=>['sequence'=>'ASC']]);
+            $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
 
             $topicId = $this->determineSelectedTopicId($topics, $params->getSlug());
 

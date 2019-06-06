@@ -722,6 +722,7 @@ class Controller extends Base
 
         $topicData = (new Lists\Homepage(
             $searchLimit,
+            $this->topicMapper,
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
             $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
@@ -814,6 +815,7 @@ class Controller extends Base
     {
         $articleIds = (new Lists\Index(
             0,
+            $this->topicMapper,
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
             $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
@@ -996,6 +998,7 @@ class Controller extends Base
 
         $topicData = (new Lists\Archive(
             $searchLimit,
+            $this->topicMapper,
             $this->newsMapper,
             $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
             $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),

@@ -25,6 +25,7 @@ use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
+use Schoolbox\News\TopicMapper;
 use Schoolbox\User;
 
 abstract class Base
@@ -38,36 +39,54 @@ abstract class Base
      */
     protected $defaultLimit;
 
+
     /**
      * @var Mapper
      */
     protected $newsMapper;
 
-    /** @var string */
+
+    /**
+     * @var TopicMapper
+     */
+    protected $topicMapper;
+
+
+    /**
+     * @var string
+     */
     protected $readMoreText;
 
-    /** @var bool */
+
+    /**
+     * var bool
+     */
     protected $saveForLaterEnabled;
+
 
     /**
      * @var SaveForLater\Mapper
      */
     protected $saveForLaterMapper;
 
+
     /**
      * @var Statistics\Mapper
      */
     protected $statisticsMapper;
+
 
     /**
      * @var Statistics\Cumulative\Mapper
      */
     protected $statisticsCumulativeMapper;
 
+
     /**
      * @var IConnector
      */
     protected $databaseInternal;
+
 
     /**
      * @var IArticleResolver
@@ -85,6 +104,7 @@ abstract class Base
      * Lists constructor.
      *
      * @param int                          $defaultLimit
+     * @param TopicMapper                  $topicMapper
      * @param Mapper                       $newsMapper
      * @param string                       $readMoreText
      * @param bool                         $saveForLaterEnabled
@@ -97,6 +117,7 @@ abstract class Base
      */
     public function __construct(
         int $defaultLimit,
+        TopicMapper $topicMapper,
         Mapper $newsMapper,
         string $readMoreText,
         bool $saveForLaterEnabled,
@@ -108,6 +129,7 @@ abstract class Base
         Comment\Mapper $commentMapper
     ) {
         $this->defaultLimit               = $defaultLimit;
+        $this->topicMapper                = $topicMapper;
         $this->newsMapper                 = $newsMapper;
         $this->readMoreText               = $readMoreText;
         $this->saveForLaterEnabled        = $saveForLaterEnabled;
