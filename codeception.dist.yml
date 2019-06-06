@@ -27,6 +27,19 @@ suites:
                     0: '/usr/lib/chromium-browser/chromedriver --url-base=/wd/hub'
                     sleep: 5
 
+    integration:
+        actor: IntegrationTester
+        path: integration
+        modules:
+            enabled:
+                - \Helper\Integration
+                - Asserts
+                - Db:
+                      dsn: "mysql:host=localhost;dbname=schoolbox"
+                      user: "root"
+                      password: "tnp879"
+                      # dump goes here
+
 extensions:
     enabled:
         - Codeception\Extension\Logger
