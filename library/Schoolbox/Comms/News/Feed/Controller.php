@@ -156,6 +156,7 @@ class Controller extends Base
              */
             $articleIds = (new News\Lists\Homepage(
                 (int)$this->getConfigLoader()->get('search_type_limit'),
+                $this->topicMapper,
                 $this->newsMapper,
                 $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                 $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
