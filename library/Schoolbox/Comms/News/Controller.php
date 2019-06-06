@@ -169,7 +169,6 @@ class Controller extends Base
         $this->commentMapper              = $commentMapper;
     }
 
-    /* CRUD actions */
 
     /**
      * Provide form to create a news article
