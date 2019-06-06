@@ -825,8 +825,6 @@ class Controller extends Base
             $this->commentMapper
         ))->find(new Querystring([]), $this->getUser());
 
-        $articleIds = $this->newsMapper->findArticlesIdsPublished($articleIds, $this->getUser());
-
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
 
         $commentCounts = $this->commentMapper->getCommentCountByThreadIds(

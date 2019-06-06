@@ -331,46 +331,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Given a list of articles, returns those that are published and not expired
-     *
-     * @param array $availableArticleIds
-     * @param User  $user
-     *
-     * @return array
-     */
-    public function findArticlesIdsPublished(array $availableArticleIds, User $user): array
-    {
-        if (!count($availableArticleIds)) {
-            return [];
-        }
-
-        $articleIds = [];
-        $pb = $this->getPredicatePublished();
-
-        if (count($availableArticleIds)) {
-            $pb->in('id', $availableArticleIds);
-        }
-
-        $where = implode("\nAND ", $pb->getWhere());
-
-        $query = "
-            SELECT id
-            FROM {$this->table}
-            WHERE {$where}
-            ORDER BY publish_at DESC, created_at DESC
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-
-        while($id = $statement->fetchColumn(0)) {
-            $articleIds[] = $id;
-        }
-        return $articleIds;
-    }
-
-
-    /**
      * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
      * @param User $user
@@ -510,6 +470,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             {$groupBy}
             ORDER BY publish_at DESC, created_at DESC
         ";
+
         /* Limits and offsets
          * Apply either the $limit provided, or use the system default
          *
