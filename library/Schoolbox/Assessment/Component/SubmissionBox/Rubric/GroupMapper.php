@@ -177,6 +177,50 @@ class GroupMapper extends BaseMapper
 
 
     /**
+     * Find a group, given its parent ID, type and name.
+     *
+     * @param int    $parentId   The parent ID to find for
+     * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string $name       The name of the criterion
+     * @param bool   $cache      If false, bypass result cache
+     * @return Group
+     * @throws MapperException
+     */
+    public function findOneForParentByName(
+        int $parentId,
+        string $parentType,
+        string $name,
+        bool $cache = true
+    ): Group
+    {
+        return $this->findOneByColumnList(
+            [
+                'parent_id'   => $parentId,
+                'parent_type' => $parentType,
+                'name'        => $name,
+            ],
+            [],
+            ['cache' => $cache,]
+        );
+    }
+
+
+    /**
+     * Find a group, given its folder and name.
+     *
+     * @param int    $folderId  The folder ID to find for
+     * @param string $name      The name of the group
+     * @param bool   $cache     If false, bypass result cache
+     * @return Group
+     * @throws MapperException
+     */
+    public function findOneForFolderByName(int $folderId, string $name, bool $cache = true): Group
+    {
+        return $this->findOneForParentByName($folderId, Group::PARENT_TYPE_CATEGORY, $name, $cache);
+    }
+
+
+    /**
      * Find a group with the given name for the given parent.
      * If none is found, create one and return it.
      *
@@ -195,16 +239,7 @@ class GroupMapper extends BaseMapper
     ): Group
     {
         try {
-            return $this->findOneByColumnList(
-                [
-                    'parent_id'   => $parentId,
-                    'parent_type' => $parentType,
-                    'name'        => $name,
-                ],
-                [],
-                ['cache' => $cache,]
-            );
-
+            return $this->findOneForParentByName($parentId, $parentType, $name, $cache);
         } catch (MapperException\Deleted $e) {
             // It was deleted; restore it
             $item = $e->getDeletedObject();
