@@ -112,7 +112,7 @@ class External_Schoolpro_Class implements External_ClassInterface
         $allClassCodes = explode(',', $classCode);
         foreach ($allClassCodes as $currentClassCode) {
             $vars = [
-                'sbGetTeachers',
+                'sbGetTeacherName',
                 [
                     'pUserName' => 'alaress',
                     'pUserPass' => 'alaress',
