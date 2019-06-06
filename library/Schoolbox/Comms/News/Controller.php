@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
-use Alaress\Database\Statement\Query\Dblib\Query;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Specification\Exception\UnsatisfiedException;
 use Alaress\Web\Controller\Base;
@@ -803,12 +802,13 @@ class Controller extends Base
      * Get a list of articles that are audienced to me from anywhere and are published and not expired
      * This is only returns data as JSON
      *
+     * @api GET /news/lists/feed
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
-     * @throws \UnexpectedValueException*@throws \PDOException
+     * @throws \UnexpectedValueException
      * @throws \PDOException
      * @throws InvalidArgumentException
-     * @api GET /news/lists/feed
+     * @throws \DomainException
      */
     public function getListForIndex() :void
     {

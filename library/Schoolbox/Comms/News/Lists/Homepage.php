@@ -36,8 +36,10 @@ class Homepage extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
+     * @throws \UnderflowException
      */
-    public function find(Querystring $params, User $user): array {
+    public function find(Querystring $params, User $user): array
+    {
         $articleIds = $this->newsMapper->findArticleIdsForTopic(
             $this->articleResolver->findArticlesForUser($user),
             Mapper::TOPIC_ALL_ID,
@@ -57,6 +59,7 @@ class Homepage extends Base
 
         // Load audiences so module auth rules work in rendered templates
         $rootSegments = Audience\Mapper::getInstance()->findForArticles($articles->getPropertyValues($idProperty));
+
         foreach ($rootSegments as $rootSegment) {
             $articles[$rootSegment->getCommsNewsArticle()->getId()]->getAudience()[$rootSegment->getId()] = $rootSegment;
         }

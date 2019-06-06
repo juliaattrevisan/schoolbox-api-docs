@@ -253,5 +253,4 @@ abstract class Base
 
         return $selectedTopicId;
     }
-
 }

@@ -39,8 +39,10 @@ class Index extends Base
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException
+     * @throws \UnderflowException
      */
-    public function find(Querystring $params, User $user): array  {
+    public function find(Querystring $params, User $user): array
+    {
 
         /* You are in the audience of these articles
          * or you accepted/authored them

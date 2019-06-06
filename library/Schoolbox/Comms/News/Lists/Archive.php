@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Paginator\Paginator as BasePaginator;
 use Schoolbox\Collection;
-use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
@@ -49,9 +48,11 @@ class Archive extends Base
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \OutOfRangeException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
     public function find(string $urlPrefix, Querystring $params, User $user, Collection $topics, ?int $year, ?int $month): array

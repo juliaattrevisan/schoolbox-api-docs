@@ -26,41 +26,50 @@ class Controller extends Base
      */
     private $newsMapper;
 
+
     /**
      * @var TopicMapper
      */
     private $topicMapper;
+
 
     /**
      * @var News\SaveForLater\Mapper
      */
     private $saveForLaterMapper;
 
+
     /**
      * @var News\Statistics\Mapper
      */
     private $statisticsMapper;
+
 
     /**
      * @var News\Statistics\Cumulative\Mapper
      */
     private $statisticsCumulativeMapper;
 
+
     /**
      * @var Access
      */
     private $access;
+
 
     /**
      * @var IConnector
      */
     private $databaseInternal;
 
+
     /** @var ArticleResolver */
     private $articleResolver;
 
+
     /** @var CommentMapper */
     private $commentMapper;
+
 
     /**
      * Controller constructor.
@@ -72,7 +81,8 @@ class Controller extends Base
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                        $databaseInternal
      * @param ArticleResolver                   $articleResolver
-     * @param Access                            $accessMapper
+     * @param Access                            $access
+     * @param CommentMapper                     $commentMapper
      */
     public function __construct(
         News\Mapper $newsMapper,
@@ -103,6 +113,8 @@ class Controller extends Base
      *
      * An optional ?topic= can be used to filter this
      *
+     * @api /news/feed/{key}{/folderId}
+     *
      * @param User              $user
      * @param null|Folder\Model $folder
      * @throws Unauthorized
@@ -114,7 +126,7 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
-     * @api /news/feed/{key}{/folderId}
+     * @throws \UnderflowException
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
