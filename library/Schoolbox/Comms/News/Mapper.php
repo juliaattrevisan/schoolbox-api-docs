@@ -180,7 +180,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 $featureImage = $this->hydrateJoin($row, 'featureImage', 'fi');
 
                 /** @var \Schoolbox\File\Mimetype $mime */
-                $mime         = $this->hydrateJoin($row, 'featureImage.allowedFileExtension', 'afe');
+                $mime = $this->hydrateJoin($row, 'featureImage.allowedFileExtension', 'afe');
 
                 if ($featureImage) {
                     $article->setFeatureImage($featureImage->setMimetype($mime));
@@ -216,7 +216,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateDraft(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->isNull('submitted_at');
+            ->isNull('submitted_at');
     }
 
 
@@ -230,8 +230,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateRejected(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->notNull('rejected_at');
+            ->notNull('submitted_at')
+            ->notNull('rejected_at');
     }
 
 
@@ -245,10 +245,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateAwaitingModeration(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->isNull('accepted_at');
+            ->notNull('submitted_at')
+            ->isNull('rejected_at')
+            ->isNull('accepted_at');
     }
+
 
     /**
      * Returns a predicate for getting articles that are approved
@@ -260,7 +261,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateApproved(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->notNull('accepted_at');
+            ->notNull('accepted_at');
     }
 
 
@@ -276,12 +277,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->notNull('accepted_at')
-                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
-                    ->greaterThan('expires_at', $nowDatabase);
+            ->notNull('submitted_at')
+            ->isNull('rejected_at')
+            ->notNull('accepted_at')
+            ->lessThanOrEqualTo('publish_at', $nowDatabase)
+            ->greaterThan('expires_at', $nowDatabase);
     }
+
 
     /**
      * Get a list of years that have article(s) that were audienced to a user
@@ -349,16 +351,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $pb->equals('accepted_by', $user->getId());
         }
 
-        $where = implode("\nOR ", $pb->getWhere());
+        $where  = implode("\nOR ", $pb->getWhere());
         $params = $pb->getParams();
 
         /* Only include published articles
          */
         if ($publishedOnly) {
-            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
+            $publishedPb    = $this->getPredicateBuilder()->all($this->getPredicatePublished());
             $publishedWhere = implode(',', $publishedPb->getWhere());
 
-            $query = "SELECT id FROM {$this->table} WHERE {$publishedWhere} AND ({$where})";
+            $query  = "SELECT id FROM {$this->table} WHERE {$publishedWhere} AND ({$where})";
             $params = array_merge($params, $publishedPb->getParams());
         } else {
             $query = "SELECT id FROM {$this->table} WHERE ({$where})";
@@ -367,11 +369,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /* Only include expired articles
          */
         if (!$active) {
-            $now = \Alaress_Date_Format::now()->getDatabase();
-            $expiredPb = $this->getPredicateBuilder()->all($this->getPredicateBuilder()->lessThan('expires_at', $now));
+            $now          = \Alaress_Date_Format::now()->getDatabase();
+            $expiredPb    = $this->getPredicateBuilder()->all($this->getPredicateBuilder()->lessThan('expires_at', $now));
             $expiredWhere = implode(',', $expiredPb->getWhere());
 
-            $query .= " AND {$expiredWhere}";
+            $query  .= " AND {$expiredWhere}";
             $params = array_merge($params, $expiredPb->getParams());
         }
 
@@ -397,10 +399,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @param int|null $year
      * @param int|null $month
      * @param int|null $folderId
+     * @return array
      * @throws InvalidColumnException
      * @throws \DomainException
      * @throws \UnderflowException
-     * @return array
      */
     public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
@@ -455,7 +457,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         if (null !== $folderId) {
             $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id 
             AND cnau.entity_type = :entityType AND cnau.entity_value = :folderId";
-
         }
 
         $where = implode("\nAND ", $pb->getWhere());
@@ -515,6 +516,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $searcher;
     }
 
+
     /**
      * Performs a check whether the homepage has at least one archived news.
      *
@@ -522,7 +524,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @return bool
      */
-    public function checkArchiveForHomepage(int $folderId) :bool
+    public function checkArchiveForHomepage(int $folderId): bool
     {
         $now = \Alaress_Date_Format::now()->getDatabase();
 
@@ -538,7 +540,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             SELECT COUNT({$this->table}.id)
             FROM {$this->getTable()}
             INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id
-            AND cnau.entity_type = '". Folder::getEntityType() ."' AND cnau.entity_value = " . $folderId . "
+            AND cnau.entity_type = '" . Folder::getEntityType() . "' AND cnau.entity_value = " . $folderId . "
             WHERE {$where} LIMIT 1
         ";
 
@@ -546,8 +548,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $statement->execute($pb->getParams());
 
-        return (boolean) $statement->fetch(\PDO::FETCH_COLUMN);
+        return (boolean)$statement->fetch(\PDO::FETCH_COLUMN);
     }
+
 
     /**
      * @param string   $query
@@ -577,27 +580,16 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          */
         if ($pageNum && ($limit || $limit === null)) {
             /* Apply either the $limit provided, or use the system default */
-            $derivedLimit = $this->getDerivedLimit($limit);
+            $derivedLimit = $limit ?: (int)$this->getConfigLoader()->get('search_type_limit');
 
             $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
 
             /* Paginate */
-            $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
+            $statement->bindValue('offset', $derivedLimit * ($pageNum - 1), \PDO::PARAM_INT);
         }
         /* finally */
         $statement->execute();
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
-    }
-
-    /**
-     * Apply either the $limit provided, or use the system default
-     * @param int|null $limit
-     *
-     * @return int|null
-     */
-    private function getDerivedLimit(?int $limit)
-    {
-        return (!$limit) ? (int) $this->getConfigLoader()->get('search_type_limit') : $limit;
     }
 }
