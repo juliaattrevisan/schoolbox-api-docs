@@ -120,7 +120,7 @@ $kernel = new CliTool\Kernel(
                 if ($loadStudents) {
                     // Remove all students from specified classes
                     $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT);
-                    $log->info("Removing student access from '{$folders[$folderId]->getTitle()}'");
+                    $log->notice("Removing student access from '{$folders[$folderId]->getTitle()}'");
 
                     if (!$dryRun) {
                         foreach ($students as $student) {
@@ -134,7 +134,7 @@ $kernel = new CliTool\Kernel(
 
                 // Remove all parents from specified classes
                 $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT);
-                $log->info("Removing parent access from '{$folders[$folderId]->getTitle()}'");
+                $log->notice("Removing parent access from '{$folders[$folderId]->getTitle()}'");
 
                 if (!$dryRun) {
                     foreach ($parents as $parent) {
@@ -150,7 +150,7 @@ $kernel = new CliTool\Kernel(
                     if (empty($code)) {
                         continue;
                     }
-                    $log->info("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
+                    $log->notice("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
                     $parents = $this->getParents($code);
 
@@ -249,10 +249,10 @@ $kernel = new CliTool\Kernel(
                         $userAccessMapper->save($userAccess);
                     }
 
-                    $log->info(" Added:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
+                    $log->notice(" Added:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
                     $usersAdded[$user->getId()] = true;
                 } else {
-                    $log->info(" Skipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
+                    $log->notice(" Skipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
                 }
             } catch (MapperException $e) {
                 $log->error(" Error:    External {$role} user ID not found {$externalId}");
