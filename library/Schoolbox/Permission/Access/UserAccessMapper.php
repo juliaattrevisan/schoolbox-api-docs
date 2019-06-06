@@ -382,7 +382,7 @@ class UserAccessMapper extends Mapper
                     }
                 }
                 if ($getClassTeachers) {
-                    foreach ($externalClass->getTeacherName($folder->getCodeString()) as $teacherExternalId) {
+                    foreach ($externalClass->getTeachers($folder->getCodeString()) as $teacherExternalId) {
                         $externalIds[] = $teacherExternalId;
                     }
                 }
