@@ -13,8 +13,8 @@ INSERT INTO `config` (
         VALUES (
         'comments_module',
         '0',
-        'Enable/Disable comments module globally',
-        'If enabled, comments module will be available',
+        'Allow comments module globally',
+        'If enabled, users will be able to post new comments or moderate if they have the rights',
         '3',
         'true:false',
         '5',
