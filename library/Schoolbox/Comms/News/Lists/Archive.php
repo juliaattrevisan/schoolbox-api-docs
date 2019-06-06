@@ -20,7 +20,7 @@ class Archive extends Base
 {
 
     /**
-     * Note: This is now used only in News Archive and RSS
+     * Note: This is now used only in News Archive
      *
      * Find a list of articles that are somehow related to $topicId
      * This wraps around the hyperdrive to abstract away some pagination details
@@ -28,12 +28,18 @@ class Archive extends Base
      * The list consists of articles that fulfil this criteria, which accounts for all the articles that are
      * presentable to the audience:
      *
-     *   - has a publish_at date
-     *   - has been accepted for publication by the moderator
-     *   - has not yet expired (If the request is not news archive page)
-     *   - has not been deleted
+     * If the user is a superuser or a news moderator,
+     * Article must be published
+     * and one of the following conditions must be met:
+     *    - you're the author
+     *    - you approved the article
+     *    - you're in the audience
      *
-     * This equates to articles in the states "Awaiting Publication", "Published", "Expired" (Archived)
+     * Everyone else,
+     * Article must be published
+     * and one of the following conditions must be met:
+     *    - you're the author
+     *    - you're in the audience
      *
      * The n-n relational between articles and topics precludes proper usage of findAll()
      * with a limit - it doesn't count properly
@@ -92,7 +98,6 @@ class Archive extends Base
              * and one of the following conditions must be met:
              *    - you're the author
              *    - you're in the audience
-             *
              */
             $articleIdsForUser = array_unique(array_merge(
                 $this->articleResolver->findArticlesForUser($user),
