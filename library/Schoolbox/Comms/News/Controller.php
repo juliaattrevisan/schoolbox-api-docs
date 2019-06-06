@@ -670,13 +670,14 @@ class Controller extends Base
     /**
      * Get a list of articles that are audienced to me for homepage component
      *
+     * @api GET /news/lists/homepage
      * @throws MapperException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \PDOException
      * @throws InvalidArgumentException
-     * @api GET /news/lists/homepage
+     * @throws \UnderflowException
      */
     public function getListForHomepage() :void
     {
@@ -713,6 +714,7 @@ class Controller extends Base
      * @throws \DomainException
      * @throws \PDOException
      * @throws InvalidArgumentException
+     * @throws \UnderflowException
      */
     private function generatePartialForHomepage(Querystring $params): array
     {
@@ -982,14 +984,15 @@ class Controller extends Base
      * @param bool               $hidePaginator
      * @param int|null           $year
      * @param int|null           $month
-     *
-     * @return array
+     * @throws InvalidArgumentException
      * @throws MapperException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
      * @throws \OutOfRangeException
      * @throws \PDOException
+     * @throws \UnderflowException
+     * @return array
      */
     private function generatePartialForArchive(string $urlPrefix, Querystring $params, Collection $topics, bool $hidePaginator, ?int $year, ?int $month): array
     {
