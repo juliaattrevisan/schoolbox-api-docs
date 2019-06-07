@@ -154,7 +154,7 @@ class Controller extends Base
 
             /* Get all the articles for the homepage
              */
-            $articleIds = (new News\Lists\Homepage(
+            $articleData = (new News\Lists\Homepage(
                 (int)$this->getConfigLoader()->get('search_type_limit'),
                 $this->topicMapper,
                 $this->newsMapper,
@@ -167,6 +167,7 @@ class Controller extends Base
                 $this->articleResolver,
                 $this->commentMapper
             ))->find($params, $user);
+            $articles = $articleData['articles'];
         }
         else {
 
@@ -198,11 +199,11 @@ class Controller extends Base
                 $this->articleResolver,
                 $this->commentMapper
             ))->find($params, $user);
-        }
 
-        /* Hydrate the set
-         */
-        $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
+            /* Hydrate the set
+             */
+            $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
+        }
 
         /* I haven't seen an outputter for xml in Web/Output
          */
