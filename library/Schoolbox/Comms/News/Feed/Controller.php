@@ -26,41 +26,54 @@ class Controller extends Base
      */
     private $newsMapper;
 
+
     /**
      * @var TopicMapper
      */
     private $topicMapper;
+
 
     /**
      * @var News\SaveForLater\Mapper
      */
     private $saveForLaterMapper;
 
+
     /**
      * @var News\Statistics\Mapper
      */
     private $statisticsMapper;
+
 
     /**
      * @var News\Statistics\Cumulative\Mapper
      */
     private $statisticsCumulativeMapper;
 
+
     /**
      * @var Access
      */
     private $access;
+
 
     /**
      * @var IConnector
      */
     private $databaseInternal;
 
-    /** @var ArticleResolver */
+
+    /**
+     * @var ArticleResolver
+     */
     private $articleResolver;
 
-    /** @var CommentMapper */
+
+    /**
+     * @var CommentMapper
+     */
     private $commentMapper;
+
 
     /**
      * Controller constructor.
@@ -72,7 +85,8 @@ class Controller extends Base
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
      * @param IConnector                        $databaseInternal
      * @param ArticleResolver                   $articleResolver
-     * @param Access                            $accessMapper
+     * @param Access                            $access
+     * @param CommentMapper                     $commentMapper
      */
     public function __construct(
         News\Mapper $newsMapper,
@@ -107,16 +121,16 @@ class Controller extends Base
      *
      * @param User              $user
      * @param null|Folder\Model $folder
+     * @throws Unauthorized
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Aura\Web\Exception\InvalidComponent
      * @throws \DomainException
      * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnderflowException
      * @throws \UnexpectedValueException
+     * @throws \UnderflowException
      */
     public function getFeed(User $user, ?Folder\Model $folder)
     {
@@ -124,18 +138,6 @@ class Controller extends Base
          */
         $args = [];
 
-        $newsList = new News\Lists(
-            (int)$this->getConfigLoader()->get('search_type_limit'),
-            $this->newsMapper,
-            $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-            $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
-            $this->saveForLaterMapper,
-            $this->statisticsMapper,
-            $this->statisticsCumulativeMapper,
-            $this->databaseInternal,
-            $this->articleResolver,
-            $this->commentMapper
-        );
 
         /* If a folder was specified, get the feed for that folder
          */
@@ -152,10 +154,20 @@ class Controller extends Base
 
             /* Get all the articles for the homepage
              */
-            $topicData = $newsList->findArticlesForHomepage(
-                $params,
-                $user
-            );
+            $articleData = (new News\Lists\Homepage(
+                (int)$this->getConfigLoader()->get('search_type_limit'),
+                $this->topicMapper,
+                $this->newsMapper,
+                $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+                $this->saveForLaterMapper,
+                $this->statisticsMapper,
+                $this->statisticsCumulativeMapper,
+                $this->databaseInternal,
+                $this->articleResolver,
+                $this->commentMapper
+            ))->find($params, $user);
+            $articles = $articleData['articles'];
         }
         else {
 
@@ -164,25 +176,33 @@ class Controller extends Base
              */
             $args[News\Querystring::TOPIC_SLUG] = News\Mapper::TOPIC_ALL_SLUG;
 
-            $slug = $this->getRequest()->query[News\Querystring::TOPIC_SLUG];
+            $slug = (string)$this->getRequest()->query[News\Querystring::TOPIC_SLUG];
 
-            if (\strlen($slug)) {
+            if ('' !== $slug) {
                 $args[News\Querystring::TOPIC_SLUG] = $slug;
             }
+
             $params = new News\Querystring($args);
 
             /* Get all the articles across all topics
              */
-            $topicData = $newsList->findForTopic(
-                '',
-                $params,
-                $user,
-                $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]),
-                false,
-                null,
-                null
-            );
+            $articleIds = (new News\Lists\Index(
+                (int)$this->getConfigLoader()->get('search_type_limit'),
+                $this->topicMapper,
+                $this->newsMapper,
+                $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER),
+                $this->saveForLaterMapper,
+                $this->statisticsMapper,
+                $this->statisticsCumulativeMapper,
+                $this->databaseInternal,
+                $this->articleResolver,
+                $this->commentMapper
+            ))->find($params, $user);
 
+            /* Hydrate the set
+             */
+            $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
         }
 
         /* I haven't seen an outputter for xml in Web/Output
@@ -193,7 +213,7 @@ class Controller extends Base
             'schoolName' => $this->getConfigLoader()->get('school_name'),
             'baseUrl' => $this->getRequest()->url->get(PHP_URL_SCHEME) . '://' . $this->getRequest()->url->get(PHP_URL_HOST),
             'url' => $this->getRequest()->url->get(),
-            'articles' => $topicData['articles']
+            'articles' => $articles
         ]));
     }
 }

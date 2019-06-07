@@ -296,25 +296,6 @@ class Querystring
 
 
     /**
-     * Determine a slug from a topic id
-     * TODO: Probably should be assertSlug()
-     *
-     * @param int $topicId
-     * @return string
-     */
-    private function determineSlug(int $topicId): string
-    {
-        try {
-            return TopicMapper::getInstance()->findById($topicId)->getSlug();
-        } catch (MapperException $e) {
-            // unknown topic id; just return the default All Topics slug
-        }
-
-        return Mapper::TOPIC_ALL_SLUG;
-    }
-
-
-    /**
      * The page number to obtain; default to 1
      * Otherwise use the page number provided
      *

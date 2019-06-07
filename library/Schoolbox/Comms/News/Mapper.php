@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
+use function count;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
@@ -179,7 +180,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 $featureImage = $this->hydrateJoin($row, 'featureImage', 'fi');
 
                 /** @var \Schoolbox\File\Mimetype $mime */
-                $mime         = $this->hydrateJoin($row, 'featureImage.allowedFileExtension', 'afe');
+                $mime = $this->hydrateJoin($row, 'featureImage.allowedFileExtension', 'afe');
 
                 if ($featureImage) {
                     $article->setFeatureImage($featureImage->setMimetype($mime));
@@ -215,7 +216,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateDraft(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->isNull('submitted_at');
+            ->isNull('submitted_at');
     }
 
 
@@ -229,8 +230,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateRejected(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->notNull('rejected_at');
+            ->notNull('submitted_at')
+            ->notNull('rejected_at');
     }
 
 
@@ -244,10 +245,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateAwaitingModeration(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->isNull('accepted_at');
+            ->notNull('submitted_at')
+            ->isNull('rejected_at')
+            ->isNull('accepted_at');
     }
+
 
     /**
      * Returns a predicate for getting articles that are approved
@@ -259,7 +261,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     public function getPredicateApproved(): IBuilder
     {
         return $this->getPredicateBuilder()
-                    ->notNull('accepted_at');
+            ->notNull('accepted_at');
     }
 
 
@@ -275,19 +277,21 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->notNull('accepted_at')
-                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
-                    ->greaterThan('expires_at', $nowDatabase);
+            ->notNull('submitted_at')
+            ->isNull('rejected_at')
+            ->notNull('accepted_at')
+            ->lessThanOrEqualTo('publish_at', $nowDatabase)
+            ->greaterThan('expires_at', $nowDatabase);
     }
+
 
     /**
      * Get a list of years that have article(s) that were audienced to a user
      *
-     * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
+     * @throws \PDOException
+     * @return array
      */
     public function findYearsAndMonthsWithArticles(): array
     {
@@ -330,43 +334,56 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Given a list of articles, returns those that are published and not expired
+     * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
-     * @param array $availableArticleIds
-     * @param User  $user
-     *
+     * @param User $user
+     * @param bool $publishedOnly Published articles (publish date is reached)
+     * @param bool $active        non-expired articles (expiry date not yet reached)
      * @return array
+     * @throws InvalidColumnException
+     * @throws \PDOException
      */
-    public function findArticlesIdsPublished(array $availableArticleIds, User $user): array
+    public function findAuthoredOrAcceptedArticleIds(User $user, bool $publishedOnly = true, bool $active = true): array
     {
-        if (!\count($availableArticleIds) && !(new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
-            return [];
+        $pb = $this->getPredicateBuilder()
+            ->equals('author_id', $user->getId());
+
+        if ((new ValidNewsModerator(UserAccessMapper::getInstance()))->isSatisfiedBy($user)) {
+            $pb->equals('accepted_by', $user->getId());
         }
 
-        $articleIds = [];
-        $pb = $this->getPredicatePublished();
+        $where  = implode("\nOR ", $pb->getWhere());
+        $params = $pb->getParams();
 
-        if(\count($availableArticleIds)) {
-            $pb->in('id', $availableArticleIds);
+        /* Only include published articles
+         */
+        $query = "SELECT id FROM {$this->table} WHERE ({$where}) ";
+
+        if ($publishedOnly) {
+            $publishedPb    = $this->getPredicateBuilder()->all($this->getPredicatePublished());
+            $publishedWhere = implode(',', $publishedPb->getWhere());
+
+            $query .= " AND {$publishedWhere}";
+            $params = array_merge($params, $publishedPb->getParams());
         }
 
-        $where = implode("\nAND ", $pb->getWhere());
+        /* Only include expired articles
+         */
+        if (!$active) {
+            $now          = \Alaress_Date_Format::now()->getDatabase();
+            $expiredPb    = $this->getPredicateBuilder()->all($this->getPredicateBuilder()->lessThan('expires_at', $now));
+            $expiredWhere = implode(',', $expiredPb->getWhere());
 
-        $query = "
-            SELECT id
-            FROM {$this->table}
-            WHERE {$where}
-            ORDER BY publish_at DESC, created_at DESC
-        ";
+            $query  .= " AND {$expiredWhere}";
+            $params = array_merge($params, $expiredPb->getParams());
+        }
 
         $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
+        $statement->execute($params);
 
-        while($id = $statement->fetchColumn(0)) {
-            $articleIds[] = $id;
-        }
-        return $articleIds;
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
+
 
     /**
      * Find just the ids for the articles in a topic
@@ -378,20 +395,22 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      *
      * @param array    $availableArticleIds
      * @param int      $topicId
-     * @param bool     $isArchive
      * @param int|null $limit
      * @param int|null $pageNum
      * @param int|null $year
      * @param int|null $month
      * @param int|null $folderId
-     *
      * @return array
+     * @throws InvalidColumnException
+     * @throws \DomainException
+     * @throws \UnderflowException
+     * @throws \PDOException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, bool $isArchive, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
     {
         /* This user can't see any articles
          */
-        if (!$isArchive && !(\count($availableArticleIds) || $folderId)) {
+        if (null !== $folderId && \count($availableArticleIds) < 1) {
             return [];
         }
 
@@ -404,7 +423,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /* If either year or month is specified, we're looking in the news archive
          * Look for expired items matching a certain year/month combination
          */
-        $now = \Alaress_Date_Format::now()->getDatabase();
+        $now = Alaress_Date_Format::now()->getDatabase();
 
         /* Dates - must be accepted, published and not deleted
          */
@@ -413,15 +432,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             ->notNull('accepted_at')
             ->isNull('deleted_at');
 
-        if(\count($availableArticleIds)) {
+        if (\count($availableArticleIds)) {
             $pb->in('id', $availableArticleIds);
         }
-        if ($year || $month) {
-            $paddedMonth = '';
 
-            if ($month) {
-                $paddedMonth = str_pad((string)$month, 2, '0', STR_PAD_LEFT);
-            }
+        if ($year || $month) {
+            $paddedMonth = $month ? str_pad((string)$month, 2, '0', STR_PAD_LEFT) : '';
 
             $yearMonth = "{$year}-{$paddedMonth}%";
 
@@ -434,6 +450,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          * Otherwise get $limit articles from any topic
          */
         $join = $groupBy = '';
+
         if ($topicId !== self::TOPIC_ALL_ID) {
             $join    = "INNER JOIN comms_news_article_topic cnat ON {$this->table}.id = cnat.article_id ";
             $groupBy = 'GROUP BY id';
@@ -443,7 +460,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         if (null !== $folderId) {
             $join .= "INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id 
             AND cnau.entity_type = :entityType AND cnau.entity_value = :folderId";
-
         }
 
         $where = implode("\nAND ", $pb->getWhere());
@@ -458,6 +474,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             {$groupBy}
             ORDER BY publish_at DESC, created_at DESC
         ";
+
         /* Limits and offsets
          * Apply either the $limit provided, or use the system default
          *
@@ -465,14 +482,44 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          *     $limit === null: use system default for number of items per page
          *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
-        if ($pageNum) {
-            if ($limit || $limit === null) {
-                $query .= ' LIMIT :limit';
-                $query .= ' OFFSET :offset';
-            }
+        if ($pageNum && ($limit || $limit === null)) {
+            $query .= ' LIMIT :limit';
+            $query .= ' OFFSET :offset';
         }
 
-        return $this->getArticleIdsByQuery($query, $pb, $pageNum, $limit, $folderId);
+        $statement = $this->database->prepare($query);
+
+        /* Bind the pb params
+        */
+        foreach ($pb->getParams() as $key => $value) {
+            $statement->bindValue($key, $value);
+        }
+
+        if ($folderId) {
+            $statement->bindValue('folderId', $folderId);
+            $statement->bindValue('entityType', Folder::getEntityType());
+        }
+
+        /* Because pdo does some mickey mouse shenanigans
+         */
+        if ($pageNum && ($limit || $limit === null)) {
+
+            /* Apply either the $limit provided, or use the system default
+             */
+            $derivedLimit = $limit ?: (int)$this->getConfigLoader()->get('search_type_limit');
+
+            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
+
+            /* Paginate
+             */
+            $statement->bindValue('offset', $derivedLimit * ($pageNum - 1), \PDO::PARAM_INT);
+        }
+
+        /* finally
+         */
+        $statement->execute();
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
 
@@ -504,14 +551,17 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         return $searcher;
     }
 
+
     /**
      * Performs a check whether the homepage has at least one archived news.
      *
      * @param int $folderId
      *
      * @return bool
+     * @throws InvalidColumnException
+     * @throws \PDOException
      */
-    public function checkArchiveForHomepage(int $folderId) :bool
+    public function checkArchiveForHomepage(int $folderId): bool
     {
         $now = \Alaress_Date_Format::now()->getDatabase();
 
@@ -527,7 +577,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             SELECT COUNT({$this->table}.id)
             FROM {$this->getTable()}
             INNER JOIN comms_news_audience cnau ON {$this->table}.id = cnau.comms_news_article_id
-            AND cnau.entity_type = '". Folder::getEntityType() ."' AND cnau.entity_value = " . $folderId . "
+            AND cnau.entity_type = '" . Folder::getEntityType() . "' AND cnau.entity_value = " . $folderId . "
             WHERE {$where} LIMIT 1
         ";
 
@@ -535,59 +585,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $statement->execute($pb->getParams());
 
-        return (boolean) $statement->fetch(\PDO::FETCH_COLUMN);
-    }
-
-    /**
-     * @param string   $query
-     * @param Builder  $builder
-     * @param int|null $pageNum
-     * @param int|null $limit
-     * @param int|null $folderId
-     *
-     * @return array
-     */
-    private function getArticleIdsByQuery(string $query, Builder $builder, ?int $pageNum, ?int $limit, ?int $folderId): array
-    {
-        $statement = $this->database->prepare($query);
-
-        /* Bind the pb params
-        */
-        foreach ($builder->getParams() as $key => $value) {
-            $statement->bindValue($key, $value);
-        }
-
-        if ($folderId) {
-            $statement->bindValue('folderId', $folderId);
-            $statement->bindValue('entityType', Folder::getEntityType());
-        }
-
-        /* Because pdo does some mickey mouse shenanigans
-         */
-        if ($pageNum && ($limit || $limit === null)) {
-            /* Apply either the $limit provided, or use the system default */
-            $derivedLimit = $this->getDerivedLimit($limit);
-
-            $statement->bindValue('limit', $derivedLimit, \PDO::PARAM_INT);
-
-            /* Paginate */
-            $statement->bindValue('offset', $derivedLimit*($pageNum-1), \PDO::PARAM_INT);
-        }
-
-        /* finally */
-        $statement->execute();
-
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
-    }
-
-    /**
-     * Apply either the $limit provided, or use the system default
-     * @param int|null $limit
-     *
-     * @return int|null
-     */
-    private function getDerivedLimit(?int $limit)
-    {
-        return (!$limit) ? (int) $this->getConfigLoader()->get('search_type_limit') : $limit;
+        return (boolean)$statement->fetch(\PDO::FETCH_COLUMN);
     }
 }

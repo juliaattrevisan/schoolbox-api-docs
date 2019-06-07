@@ -1,0 +1,278 @@
+<?php
+/**
+ * Lists
+ *
+ * Generates a set of articles for a particular topic
+ * Also figures out whether the viewing user has saved any of those articles for later
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Comms\News\Lists;
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Collection;
+use Schoolbox\Comms\News\Audience\IArticleResolver;
+use Schoolbox\Comms\News\Helper;
+use Schoolbox\Comms\News\Mapper;
+use Schoolbox\Comms\News\Model;
+use Schoolbox\Comms\News\Querystring;
+use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\Statistics;
+use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Discussion\Comment;
+use Schoolbox\GenericCollection;
+use Schoolbox\News\Topic;
+use Schoolbox\News\TopicMapper;
+use Schoolbox\User;
+
+abstract class Base
+{
+
+    /**
+     * System default for the number of items per page
+     * Typically connects to search_type_limit
+     *
+     * @var int
+     */
+    protected $defaultLimit;
+
+
+    /**
+     * @var Mapper
+     */
+    protected $newsMapper;
+
+
+    /**
+     * @var TopicMapper
+     */
+    protected $topicMapper;
+
+
+    /**
+     * @var string
+     */
+    protected $readMoreText;
+
+
+    /**
+     * var bool
+     */
+    protected $saveForLaterEnabled;
+
+
+    /**
+     * @var SaveForLater\Mapper
+     */
+    protected $saveForLaterMapper;
+
+
+    /**
+     * @var Statistics\Mapper
+     */
+    protected $statisticsMapper;
+
+
+    /**
+     * @var Statistics\Cumulative\Mapper
+     */
+    protected $statisticsCumulativeMapper;
+
+
+    /**
+     * @var IConnector
+     */
+    protected $databaseInternal;
+
+
+    /**
+     * @var IArticleResolver
+     */
+    protected $articleResolver;
+
+
+    /**
+     * @var Comment\Mapper
+     */
+    protected $commentMapper;
+
+
+    /**
+     * Lists constructor.
+     *
+     * @param int                          $defaultLimit
+     * @param TopicMapper                  $topicMapper
+     * @param Mapper                       $newsMapper
+     * @param string                       $readMoreText
+     * @param bool                         $saveForLaterEnabled
+     * @param SaveForLater\Mapper          $saveForLaterMapper
+     * @param Statistics\Mapper            $statisticsMapper
+     * @param Statistics\Cumulative\Mapper $statisticsCumulativeMapper
+     * @param IConnector                   $databaseInternal
+     * @param IArticleResolver             $articleResolver
+     * @param Comment\Mapper               $commentMapper
+     */
+    public function __construct(
+        int $defaultLimit,
+        TopicMapper $topicMapper,
+        Mapper $newsMapper,
+        string $readMoreText,
+        bool $saveForLaterEnabled,
+        SaveForLater\Mapper $saveForLaterMapper,
+        Statistics\Mapper $statisticsMapper,
+        Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
+        IConnector $databaseInternal,
+        IArticleResolver $articleResolver,
+        Comment\Mapper $commentMapper
+    ) {
+        $this->defaultLimit               = $defaultLimit;
+        $this->topicMapper                = $topicMapper;
+        $this->newsMapper                 = $newsMapper;
+        $this->readMoreText               = $readMoreText;
+        $this->saveForLaterEnabled        = $saveForLaterEnabled;
+        $this->saveForLaterMapper         = $saveForLaterMapper;
+        $this->statisticsMapper           = $statisticsMapper;
+        $this->statisticsCumulativeMapper = $statisticsCumulativeMapper;
+        $this->databaseInternal           = $databaseInternal;
+        $this->articleResolver            = $articleResolver;
+        $this->commentMapper              = $commentMapper;
+    }
+
+
+    /**
+     * Find the article ids that were saved by $user in accordance with policy setting
+     *
+     * @param User    $user
+     * @param bool    $saveForLaterEnabled
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    protected function findSavedArticles(User $user, bool $saveForLaterEnabled): array
+    {
+        if ($saveForLaterEnabled) {
+            $savedArticleIds = (new SaveForLater\Lists($this->saveForLaterMapper, $this->newsMapper))->findSavedIdsForUser($user->getId());
+
+            return array_fill_keys($savedArticleIds, SaveForLater\Mapper::SAVED);
+        }
+
+        return [];
+    }
+
+
+    /**
+     * Populate each article's metadata instance
+     *
+     * @param GenericCollection $articles
+     *
+     * @return GenericCollection
+     * @throws \InvalidArgumentException
+     */
+    protected function populateMetadata(GenericCollection $articles): GenericCollection
+    {
+        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+            Helper::getThreadIdsFromCollection($articles),
+            $this->commentMapper::ARTICLE_ID
+        );
+
+        $this->loadCommentCounts($commentCounts, $articles);
+
+        /* Other metadata stuff can be listed here
+        *
+        * $this->addMoreMetadata($articles);
+        * $this->addEvenMoreMetadata($articles);
+        */
+
+        return $articles;
+    }
+
+
+    /**
+     * Load the count of comments for each article in $articles
+     * using pass-by-reference
+     *
+     * @param array             $commentCounts
+     * @param GenericCollection $articles
+     *
+     * @return void
+     */
+    private function loadCommentCounts(array $commentCounts, GenericCollection $articles): void
+    {
+        /** @var Model $article */
+        foreach ($articles as $article) {
+            if ($article->getDiscussionThread()) {
+                $article->getMetadata()->setCommentCount((int) $commentCounts[$article->getId()]);
+            }
+        }
+    }
+
+
+    /**
+     * @param array       $articleIds
+     * @param Querystring $params
+     * @param User        $user
+     * @return GenericCollection
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    protected function loadArticleByIds(array $articleIds, Querystring $params, User $user) : GenericCollection
+    {
+        $records = $this->newsMapper->findByColumn('id', $articleIds)->indexBy('id');
+
+        $articles = $this->newsMapper->createCollection();
+
+        foreach ($articleIds as $articleId) {
+            $record = $records->getOffset($articleId);
+
+            if (null !== $record) {
+                $articles->add($records->getOffset($articleId));
+
+                /* Statistics: save an impression record
+                 * Load the referrer value from $params
+                 * Also increment a tally elsewhere
+                 */
+
+                (new ImpressionsConversionsOpens(
+                    $this->databaseInternal,
+                    $this->statisticsMapper,
+                    $this->statisticsCumulativeMapper
+                ))->saveImpression(
+                    $record,
+                    $user->getId(),
+                    $user->getRole()->getType(),
+                    $user->getRole()->getId(),
+                    $params->getReferrer()
+                );
+            }
+        }
+
+        return $articles;
+    }
+
+
+    /**
+     * From a slug, figure out what topic matches it
+     *
+     * By default, select the All tab...
+     * but try to find the topic whose slug matches the url param
+     *
+     * @param Collection|Topic[]  $topics
+     * @param null|string         $slug
+     * @return int
+     */
+    protected function determineSelectedTopicId(Collection $topics, ?string $slug): int
+    {
+        $selectedTopicId = Mapper::TOPIC_ALL_ID;
+
+        foreach ($topics as $topic) {
+            if ($topic->getSlug() === $slug) {
+                return $topic->getId();
+            }
+        }
+
+        return $selectedTopicId;
+    }
+}
