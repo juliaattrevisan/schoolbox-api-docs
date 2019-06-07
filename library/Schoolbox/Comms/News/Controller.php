@@ -169,6 +169,7 @@ class Controller extends Base
         $this->commentMapper              = $commentMapper;
     }
 
+    /* CRUD actions */
 
     /**
      * Provide form to create a news article
@@ -257,87 +258,6 @@ class Controller extends Base
         ])->setTab('news')->setTitle("Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}"));
     }
 
-
-    /**
-     * Generate article's audience segments with audience filtering based on the account access permission.
-     * If the logged in user is a member of a staff, filtering will be skipped.
-     *
-     * @param Model $article
-     * @param boolean $hideIndividualUsers
-     * @return array
-     * @throws MapperException\InsufficientHydrationException
-     * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
-     */
-    private function getAudienceSegments(Model $article, $hideIndividualUsers = false) :array
-    {
-        $audienceSegments = [];
-
-        $codec = new Audience\Segment\Codec($this->audienceMapper);
-
-        $translator = new Audience\Segment\Translator(
-            $this->databaseInternal,
-            $this->strategyFactory
-        );
-        $translator->buildCache($article);
-
-        foreach ($article->getAudience() as $segment) {
-
-            if (($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
-                || !$this->isAudienceVisibleToUser($segment, $this->getUser())) {
-
-                continue;
-            }
-
-            // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
-            // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
-
-            // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
-            if ($segment->isSimple()) {
-                $encodedValue = $codec->encodeValue($segment->getEntityValue());
-
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
-            } else {
-                foreach ($segment->getChildren() as $child) {
-                    $encodedValue = $codec->encodeValue($child->getEntityValue());
-                    $option->addLabel($child->getEntityType(), $encodedValue, $translator->getSegmentName($child));
-                }
-            }
-
-            $audienceSegments[] = $option;
-        }
-
-        return $audienceSegments;
-    }
-
-
-    /**
-     * @param Audience\Model $segment
-     * @param User           $user
-     * @return bool
-     * @throws MapperException\InsufficientHydrationException
-     */
-    private function isAudienceVisibleToUser(Audience\Model $segment, User $user): bool
-    {
-        // Base Case:
-        if ($segment->isSimple()) {
-            $userAccessMapper = new UserAccessMapper();
-            return
-                $userAccessMapper->getAccessLevel($user, null, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
-                $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                Access::getInstance()->getFolderAccess($user, $segment->getEntityValue()) >= UserAccess::ACCESS_READ;
-        }
-
-        // Recursive Case:
-        foreach ($segment->getChildren() as $childSegment) {
-            // If any child is not visible, this composite is not visible
-            if (!$this->isAudienceVisibleToUser($childSegment, $user)) {
-                return false;
-            }
-        }
-        return true;
-    }
 
     /**
      * Redirects to `getCreate`, with a predefined audience brick for the given
@@ -664,8 +584,6 @@ class Controller extends Base
      */
     public function getDetail(Model $article): void
     {
-        $moderationEnabled = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-
         /* Figure out if this was Saved For Later for the current user
          */
         $saveForLater    = $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER);
@@ -724,14 +642,16 @@ class Controller extends Base
             $data = [
                 'article'               => $article,
                 'flashMessage'          => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
-                'moderationEnabled'     => $moderationEnabled,
                 'isSavedForLater'       => $isSavedForLater,
                 'returnUrl'             => $this->getExplicitReturnUrl(),
                 'encodedSegments'       => $this->getAudienceSegments($article, true),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
                 'isPublishable'         => $this->generateValidSubmittedArticleSpec()->isSatisfiedBy($article),
-                'commentsIsEnabled'     => $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                'policies'  => [
+                    'moderationEnabled'     => $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION),
+                    'commentsIsEnabled'     => $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                ],
             ];
         }
 
