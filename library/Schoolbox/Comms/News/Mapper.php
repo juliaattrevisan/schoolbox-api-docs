@@ -266,7 +266,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Returns a predicate for getting articles that are awaiting moderation
+     * Returns a predicate for getting articles that are published
      *
      * @param Alaress_Date_Format|null $now
      * @return Builder
@@ -282,6 +282,26 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             ->notNull('accepted_at')
             ->lessThanOrEqualTo('publish_at', $nowDatabase)
             ->greaterThan('expires_at', $nowDatabase);
+    }
+
+
+    /**
+     * Returns a predicate for getting articles that are expired
+     *
+     * @param Alaress_Date_Format|null $now
+     * @return Builder
+     * @throws InvalidColumnException
+     * @see Model::getDiscreteState()
+     */
+    public function getPredicateExpired(Alaress_Date_Format $now = null): IBuilder
+    {
+        $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
+        return $this->getPredicateBuilder()
+            ->notNull('submitted_at')
+            ->isNull('rejected_at')
+            ->notNull('accepted_at')
+            ->lessThanOrEqualTo('publish_at', $nowDatabase)
+            ->lessThan('expires_at', $nowDatabase);
     }
 
 
@@ -359,23 +379,27 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          */
         $query = "SELECT id FROM {$this->table} WHERE ({$where}) ";
 
+        /* $publishedOnly works in conjunction with $active
+         */
         if ($publishedOnly) {
-            $publishedPb    = $this->getPredicateBuilder()->all($this->getPredicatePublished());
-            $publishedWhere = implode(',', $publishedPb->getWhere());
+            if ($active) {
+
+                /* If it's published and active
+                 * publish_at < now and expires_at > now
+                 */
+                $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
+            } else {
+
+                /* If it's published and inactive
+                 * publish_at < now and expires_at < now
+                 */
+                $publishedPb = $this->getPredicateBuilder()->all($this->getPredicateExpired());
+            }
+
+            $publishedWhere = implode(' AND ', $publishedPb->getWhere());
 
             $query .= " AND {$publishedWhere}";
             $params = array_merge($params, $publishedPb->getParams());
-        }
-
-        /* Only include expired articles
-         */
-        if (!$active) {
-            $now          = \Alaress_Date_Format::now()->getDatabase();
-            $expiredPb    = $this->getPredicateBuilder()->all($this->getPredicateBuilder()->lessThan('expires_at', $now));
-            $expiredWhere = implode(',', $expiredPb->getWhere());
-
-            $query  .= " AND {$expiredWhere}";
-            $params = array_merge($params, $expiredPb->getParams());
         }
 
         $statement = $this->database->prepare($query);
