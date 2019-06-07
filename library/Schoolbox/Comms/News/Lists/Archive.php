@@ -101,7 +101,7 @@ class Archive extends Base
              */
             $articleIdsForUser = array_unique(array_merge(
                 $this->articleResolver->findArticlesForUser($user),
-                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, true, false)
+                $this->newsMapper->findAuthoredOrAcceptedArticleIds($user, false)
             ));
         }
 

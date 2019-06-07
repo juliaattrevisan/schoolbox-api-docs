@@ -357,13 +357,12 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
      *
      * @param User $user
-     * @param bool $publishedOnly Published articles (publish date is reached)
      * @param bool $active        non-expired articles (expiry date not yet reached)
      * @return array
      * @throws InvalidColumnException
      * @throws \PDOException
      */
-    public function findAuthoredOrAcceptedArticleIds(User $user, bool $publishedOnly = true, bool $active = true): array
+    public function findAuthoredOrAcceptedArticleIds(User $user, bool $active = true): array
     {
         $pb = $this->getPredicateBuilder()
             ->equals('author_id', $user->getId());
@@ -379,28 +378,22 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          */
         $query = "SELECT id FROM {$this->table} WHERE ({$where}) ";
 
-        /* $publishedOnly works in conjunction with $active
+        /* If it's published and active
+         * publish_at < now and expires_at > now
+         *
+         * If it's published and inactive
+         * publish_at < now and expires_at < now
          */
-        if ($publishedOnly) {
-            if ($active) {
-
-                /* If it's published and active
-                 * publish_at < now and expires_at > now
-                 */
-                $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
-            } else {
-
-                /* If it's published and inactive
-                 * publish_at < now and expires_at < now
-                 */
-                $publishedPb = $this->getPredicateBuilder()->all($this->getPredicateExpired());
-            }
-
-            $publishedWhere = implode(' AND ', $publishedPb->getWhere());
-
-            $query .= " AND {$publishedWhere}";
-            $params = array_merge($params, $publishedPb->getParams());
+        if ($active) {
+            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicatePublished());
+        } else {
+            $publishedPb = $this->getPredicateBuilder()->all($this->getPredicateExpired());
         }
+
+        $publishedWhere = implode(' AND ', $publishedPb->getWhere());
+
+        $query .= " AND {$publishedWhere}";
+        $params = array_merge($params, $publishedPb->getParams());
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
