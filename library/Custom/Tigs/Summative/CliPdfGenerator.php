@@ -707,6 +707,7 @@ class CliPdfGenerator extends CliTool\App
         $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
         $snappy->setOption('orientation', 'Landscape');
         $snappy->setOption('disable-external-links', true);
+        $snappy->setOption('viewport-size', 1024);
         $snappy->setOption('javascript-delay', $javascriptDelayMs);
         if ($userStyleSheet !== '') {
             $this->getLogger()->debug("Setting 'user-style-sheet' to $userStyleSheet");
