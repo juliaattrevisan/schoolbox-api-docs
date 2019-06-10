@@ -74,7 +74,7 @@ class Report_Parent extends Report_Abstract
 
         $yearLevel = trim($yearLevel);
         $this->sisAllYearLevels = $this->getExternalUserHandler()->getAllYearLevels();
-        $this->allowedSearchableYears = $this->getTheIntersection($this->getChildrensYears(), $this->sisAllYearLevels);
+        $this->allowedSearchableYears = $this->filterToStudentYearLevels($this->getChildrensYears(), $this->sisAllYearLevels);
         $yearColumn = array_column($this->allowedSearchableYears, 'Code');
 
         // Parents may only search in their student's year level
@@ -323,16 +323,16 @@ class Report_Parent extends Report_Abstract
     }
 
     /**
-     * Gets the intersection of a simple array and two-dimentional array
+     * Filters all year levels based on parent's student year levels to get the year level description
      *
-     * @param array $studentYearLevelsSIS
-     * @param array $allYearLevelsSIS
-     * @return array
+     * @param array $studentYearLevelsSIS (e.g. [5,6,9,12])
+     * @param array $allYearLevelsSIS - two-dimentional array of all years (e.g. [['Code'] => 5, ['Description']=>'Year 5',...])
+     * @return array - returns a two-dimentional array
      */
-    protected function getTheIntersection(array $studentYearLevelsSIS, array $allYearLevelsSIS): array
+    protected function filterToStudentYearLevels(array $studentYearLevelsSIS, array $allYearLevelsSIS): array
     {
         $intersection = [];
-        if (is_array($studentYearLevelsSIS) && !empty($studentYearLevelsSIS)) {
+        if (!empty($studentYearLevelsSIS)) {
             foreach ($studentYearLevelsSIS as $studentYear) {
                 foreach ($allYearLevelsSIS as $yearSIS) {
                     if ($studentYear == $yearSIS['Code']) {
@@ -724,15 +724,16 @@ class Report_Parent extends Report_Abstract
 
     /**
      * @param string $yearLevelCode
-     * @return string
+     * @return string|null
      */
-    protected function getYearLevelDescription(string $yearLevelCode): string
+    protected function getYearLevelDescription(string $yearLevelCode)
     {
-        foreach ($this->sisAllYearLevels as $sisYear) {
-            if ($yearLevelCode === $sisYear['Code']) {
-                return $sisYear['Description'];
+        foreach ($this->allowedSearchableYears as $year) {
+            if ($yearLevelCode == $year['Code']) {
+                return $year['Description'];
             }
         }
+        return null;
     }
 }
 
