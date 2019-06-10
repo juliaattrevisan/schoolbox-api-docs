@@ -867,7 +867,7 @@ class Controller extends Base
          * If comment module is enabled, load comment counts by thread ids
          * otherwise, provide the default metadata payload
          */
-        if ($this->getConfigLoader()->get(ConfigMapper::MODULE_COMMENTS)) {
+        if ($this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)) {
             $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
                 Helper::getThreadIdsFromCollection($articles),
                 $this->commentMapper::THREAD_ID
