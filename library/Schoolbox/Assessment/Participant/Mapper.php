@@ -38,16 +38,18 @@ class Mapper extends BaseMapper
 
 
     /**
-     * @param Assessment\Model $assessment
-     * @param User             $user
+     * Returns the participant model for the specified assessment and user, NULL if not exists
+     *
+     * @param int $assessmentId
+     * @param int $userId
      * @return Model|null
      * @throws BaseMapper\Exception
      */
-    public function findForAssessmentAndUser(Assessment\Model $assessment, User $user): ?Model
+    public function findForAssessmentAndUser(int $assessmentId, int $userId): ?Model
     {
         return $this->findByColumnList([
-            'pp.assessment_id' => $assessment->getId(),
-            'user_id'          => $user->getId(),
+            'pp.assessment_id' => $assessmentId,
+            'user_id'          => $userId,
         ])->first();
     }
 
