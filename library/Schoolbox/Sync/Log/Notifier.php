@@ -51,7 +51,7 @@ class Notifier extends AbstractModuleNotifier
     public function retrieveCallbacks($label)
     {
         return [
-            [ $this, 'notifyStaffLogged' ]
+            [$this, 'notifyStaffLogged'],
         ];
     }
 
@@ -91,8 +91,8 @@ class Notifier extends AbstractModuleNotifier
         }
 
         $bob->setTitle("User provisioning dry run has completed")
-            ->setIcon('/images/icon.php?size='.$this->iconSize.'&icon='.NSMapper::NS_UPS)
-            ->setHref('/adminv2/ups/log/'.$log->getId())
+            ->setIcon('/images/icon.php?size=' . $this->iconSize . '&icon=' . NSMapper::NS_UPS)
+            ->setHref('/adminv2/ups/log/' . $log->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
             ->addTopic(implode('.', ['ups', $log->getId(), self::TRIGGER_LOGGED]))

@@ -37,11 +37,15 @@ class BindingLoader implements ILoader
      * @param Folder\Mapper      $folderMapper
      * @param LoggerInterface    $log
      */
-    public function __construct(GeneratorInterface $generator, UserMapper $userMapper, Folder\Mapper $folderMapper, LoggerInterface $log)
-    {
-        $this->log         = $log;
-        $this->generator   = $generator;
-        $this->userMapper  = $userMapper;
+    public function __construct(
+        GeneratorInterface $generator,
+        UserMapper $userMapper,
+        Folder\Mapper $folderMapper,
+        LoggerInterface $log
+    ) {
+        $this->log          = $log;
+        $this->generator    = $generator;
+        $this->userMapper   = $userMapper;
         $this->folderMapper = $folderMapper;
     }
 
@@ -78,12 +82,28 @@ class BindingLoader implements ILoader
                     ++$totalRoutes;
                 }
             }
-            $this->log->debug(sprintf("$progressPattern %3d routes loaded for user %5d (%s)", $i+1, $userCount, $routeCount, $userId, $user->getUsername()));
+            $this->log->debug(
+                sprintf(
+                    "$progressPattern %3d routes loaded for user %5d (%s)",
+                    $i + 1,
+                    $userCount,
+                    $routeCount,
+                    $userId,
+                    $user->getUsername()
+                )
+            );
         }
 
         $b = microtime(true);
 
-        $this->log->debug(sprintf("%d subscriptions loaded for %d users in %0.3f seconds", $totalRoutes, $userCount, ($b - $a)));
+        $this->log->debug(
+            sprintf(
+                "%d subscriptions loaded for %d users in %0.3f seconds",
+                $totalRoutes,
+                $userCount,
+                ($b - $a)
+            )
+        );
 
         foreach ($this->getRedirects() as $from => $to) {
             $this->log->info("Adding redirect `$from` -> `$to`");
@@ -100,7 +120,7 @@ class BindingLoader implements ILoader
      */
     public function getUserSubscriptions($userId)
     {
-        $userRoutes  = [
+        $userRoutes = [
             "*.instant.user.$userId.#" => true,
         ];
 
@@ -108,7 +128,7 @@ class BindingLoader implements ILoader
 
         foreach ($bindings as $prefix => $data) {
             foreach ($data as $target) {
-                $binding = "*.notify.$prefix.$target";
+                $binding              = "*.notify.$prefix.$target";
                 $userRoutes[$binding] = true;
             }
         }
@@ -131,7 +151,7 @@ class BindingLoader implements ILoader
         /** @var Folder\Model[] $folders */
         $folders = $this->folderMapper->findByColumn('inherit', true);
 
-        $perms = [ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ];
+        $perms = [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL];
 
         foreach ($folders as $folder) {
             // we have to manually map each access level (sigh)
