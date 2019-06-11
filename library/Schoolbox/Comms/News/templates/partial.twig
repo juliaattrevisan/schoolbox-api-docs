@@ -42,7 +42,7 @@
                                 {% endfor %}
                                 </span>
                             {% endif %}
-                            {% if article.metadata and article.metadata.commentCount and article.metadata.commentCount > 0 %}
+                            {% if article.metadata and article.metadata.commentCount > 0 %}
                             <span> | <a href="{{ articleURL ~ '#discussion' }}">{{ article.metadata.commentCount }} comment{{ article.metadata.commentCount > 1 ? 's':'' }}</a></span>
                             {% endif %}
                         </p>

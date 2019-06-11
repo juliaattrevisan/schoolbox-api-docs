@@ -22,6 +22,7 @@ use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
@@ -99,6 +100,11 @@ abstract class Base
      */
     protected $commentMapper;
 
+    /**
+     * @var bool
+     */
+    private $commentsIsEnabled;
+
 
     /**
      * Lists constructor.
@@ -114,6 +120,7 @@ abstract class Base
      * @param IConnector                   $databaseInternal
      * @param IArticleResolver             $articleResolver
      * @param Comment\Mapper               $commentMapper
+     * @param bool                         $commentsIsEnabled
      */
     public function __construct(
         int $defaultLimit,
@@ -126,7 +133,8 @@ abstract class Base
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,
         IConnector $databaseInternal,
         IArticleResolver $articleResolver,
-        Comment\Mapper $commentMapper
+        Comment\Mapper $commentMapper,
+        bool $commentsIsEnabled
     ) {
         $this->defaultLimit               = $defaultLimit;
         $this->topicMapper                = $topicMapper;
@@ -139,6 +147,7 @@ abstract class Base
         $this->databaseInternal           = $databaseInternal;
         $this->articleResolver            = $articleResolver;
         $this->commentMapper              = $commentMapper;
+        $this->commentsIsEnabled          = $commentsIsEnabled;
     }
 
 
@@ -172,10 +181,14 @@ abstract class Base
      */
     protected function populateMetadata(GenericCollection $articles): GenericCollection
     {
-        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
-            Helper::getThreadIdsFromCollection($articles),
-            $this->commentMapper::ARTICLE_ID
-        );
+        $commentCounts = [];
+
+        if ($this->commentsIsEnabled) {
+            $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+                Helper::getThreadIdsFromCollection($articles),
+                $this->commentMapper::ARTICLE_ID
+            );
+        }
 
         $this->loadCommentCounts($commentCounts, $articles);
 

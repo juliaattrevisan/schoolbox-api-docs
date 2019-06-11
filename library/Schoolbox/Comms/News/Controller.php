@@ -25,6 +25,7 @@ use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
+use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -734,7 +735,8 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver,
-            $this->commentMapper
+            $this->commentMapper,
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(
             $params,
             $this->getUser()
@@ -816,6 +818,8 @@ class Controller extends Base
      */
     public function getListForIndex() :void
     {
+        $commentCounts = [];
+
         $articleIds = (new Lists\Index(
             0,
             $this->topicMapper,
@@ -827,7 +831,8 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver,
-            $this->commentMapper
+            $this->commentMapper,
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(new Querystring([]), $this->getUser());
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
@@ -835,11 +840,6 @@ class Controller extends Base
         /* TODO: Repair statistics logging here
          * See usages of saveImpression()
          */
-
-        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
-            Helper::getThreadIdsFromCollection($articles),
-            $this->commentMapper::THREAD_ID
-        );
 
         $map = [
             'id',
@@ -865,31 +865,22 @@ class Controller extends Base
 
         /**
          * If comment module is enabled, load comment counts by thread ids
-         * otherwise, provide the default metadata payload
          */
         if ($this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)) {
             $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
                 Helper::getThreadIdsFromCollection($articles),
                 $this->commentMapper::THREAD_ID
             );
-
-            $articles = $articles->jsonSerialize(
-                new PropertyDecorator(
-                    $map,
-                    new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                    new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
-                    new MetadataDecorator($commentCounts)
-                )
-            );
-        } else {
-            $articles = $articles->jsonSerialize(
-                new PropertyDecorator(
-                    $map,
-                    new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                    new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE))
-                )
-            );
         }
+
+        $articles = $articles->jsonSerialize(
+            new PropertyDecorator(
+                $map,
+                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
+                new MetadataDecorator($commentCounts)
+            )
+        );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
     }
@@ -1035,7 +1026,8 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver,
-            $this->commentMapper
+            $this->commentMapper,
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(
             $urlPrefix,
             $params,
