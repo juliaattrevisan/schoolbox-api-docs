@@ -29,11 +29,16 @@
          *  - the type currently selected
          *  - the corresponding Reason dropdown that needs to be replaced
          */
+        $('[data-absence-type]').on('click', function(event) {
+            var id = $(this).attr('data-absence-type');
 
-        /* When the Type dropdown changes, find its value
-         * then build the Reason dropdown
-         */
+            var destination = '#' + 'absenceReason' + id;
 
+            /* When the Type dropdown changes, find its value
+             * then build the Reason dropdown
+             */
+            console.log(destination);
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -106,14 +111,14 @@
                             </div>
                         </td>
                         <td class="hide-for-small">
-                            <select id='absenceType{STUDENT_SYNERGY_ID}' name='PossibleAbsenceCode[]'>
+                            <select id='absenceType{STUDENT_SYNERGY_ID}' name='PossibleAbsenceCode[]' data-absence-type="{STUDENT_SYNERGY_ID}">
                                 <!-- BEGIN absence_options -->
                                 <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
                                 <!-- END absence_options -->
                             </select>
                         </td>
                         <td class="hide-for-small">
-                            <select id='absenceReason{STUDENT_SYNERGY_ID}' name='PossibleReasonCode[]'>
+                            <select id='absenceReason{STUDENT_SYNERGY_ID}' name='PossibleReasonCode[]' data-absence-reason="{STUDENT_SYNERGY_ID}">
                                 <!-- BEGIN reason_options -->
                                 <option value='{REASON_OPTIONS_VALUE}' data-chained="{REASON_OPTIONS_TYPE}" {REASON_OPTIONS_VALUE_SELECTED}>{REASON_OPTIONS_DESCRIPTION}</option>
                                 <!-- END reason_options -->
