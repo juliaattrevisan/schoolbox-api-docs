@@ -98,13 +98,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     protected $cacheNnian = array();
 
     /**
-     * Interim nodes.
-     *
-     * @var array
-     */
-    protected $interimNodes = array();
-
-    /**
      * A cache of ancestral Folder instances, to save
      * on re-querying the same Folder from the db over
      * and over again
@@ -1690,31 +1683,35 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * // _-_-_-_-_-_-_-""  ""
      *
      * @param Model $folder
-     * @param int $iteration
+     * @param array $interimNodes
      * @return Model
      * @throws MapperException
      */
-    public function findNearestNonInheritingAncestralNode(Model $folder, $iteration = 0)
+    public function findNearestNonInheritingAncestralNode(Model $folder, array $interimNodes = [])
     {
         // Check cache first
 
         if (isset($this->cacheNnian[$folder->getId()])) {
+            // If found parent in cache, set the parent for interim nodes as well.
+            foreach ($interimNodes as $id) {
+                $this->cacheNnian[$id] = $this->cacheNnian[$folder->getId()];
+            }
             return $this->cacheNnian[$folder->getId()];
         }
 
         // If we've recursed too much error out
 
-        if ($iteration > $this->getMaxRecursionDepth()) {
+        if (\count($interimNodes) > $this->getMaxRecursionDepth()) {
             throw new MapperException("Recursion limit reached");
         }
 
         // Check if the node inherits permissions
 
-        if ($folder->getInherit())
-        {
-            // Just another interim node, store its ID so we can cache it for later calls
-
-            $this->interimNodes[] = $folder->getId();
+        if ($folder->getInherit()) {
+            // Current folder has already been visited.
+            if (\in_array($folder->getId(), $interimNodes)) {
+                throw new MapperException("Circular dependency detected");
+            }
 
             // Make sure we aren't hitting the root
             /** @var Model $parent */
@@ -1724,29 +1721,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 throw new MapperException("Folder has no NNIAN");
             }
 
+            // Just another interim node, store its ID so we can cache it for later calls
+            $interimNodes[] = $folder->getId();
             // Round we go again
-
             $parent = $this->findCheaplyById($folder->getParent()->getId(), ['deleted' => true]);
 
             /** @noinspection PhpUnusedLocalVariableInspection */
-            $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
-        }
-        else
-        {
+            $result = $this->findNearestNonInheritingAncestralNode($parent, $interimNodes);
+        } else {
             // The node doesn't inherit, we found what we were looking for! Cache it
-
             $this->cacheNnian[$folder->getId()] = $folder;
 
             // Cache any interim nodes we traversed as well
-
-            foreach ($this->interimNodes as $id) {
+            foreach ($interimNodes as $id) {
                 $this->cacheNnian[$id] = $folder;
             }
-
-            // Clear out the array
-
-            $this->interimNodes = array();
-
             return $folder;
         }
 
