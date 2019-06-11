@@ -85,6 +85,11 @@ class Controller extends Alaress\Web\Controller\Base
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_NO_SSO_IMPERSONATION);
         }
 
+        if ((int)$this->getConfigLoader()->get('external_tass_sso_token_generation_strategy') === SSO::SSO_STRATEGY_V3_SAML) {
+            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}");
+            return;
+        }
+
         // Generate the SSO token request params
         $config = [
             'prod_code' => $productCode,
