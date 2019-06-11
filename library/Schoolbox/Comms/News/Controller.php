@@ -25,7 +25,6 @@ use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Comms\News\Validation\Factory;
 use Schoolbox\Comms\News\Moderation\Controller as ModerationController;
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;

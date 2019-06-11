@@ -22,7 +22,6 @@ use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\News\Topic;
