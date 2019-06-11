@@ -57,6 +57,8 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
     $this->setBlock(TEMPLATE_content, 'event_resourcebooking', 'event_resourcebooking_block');
     $this->setBlock(TEMPLATE_content, 'has_modify_event', 'has_modify_event_block');
+    $this->setBlock(TEMPLATE_content, 'teacher_in_charge_link_start', 'teacher_in_charge_link_start_block');
+    $this->setBlock(TEMPLATE_content, 'teacher_in_charge_link_end', 'teacher_in_charge_link_end_block');
 
     /* Find out if the external sync config is enabled
      * Disable when not in db for some magical reason
@@ -71,6 +73,14 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setVar([
         'SYNC_ENABLED' => $syncConfig == 1 ? 'true' : 'false'
     ]);
+
+    if (!$event->getTeacherInCharge()->getDeletedAt()->isNull()) {
+        $this->setVar('teacher_in_charge_link_start_block', '');
+        $this->setVar('teacher_in_charge_link_end_block', '');
+    } else {
+        $this->parse('teacher_in_charge_link_start_block', 'teacher_in_charge_link_start');
+        $this->parse('teacher_in_charge_link_end_block', 'teacher_in_charge_link_end');
+    }
 
     /* Event details
      */
