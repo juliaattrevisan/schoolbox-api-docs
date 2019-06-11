@@ -289,7 +289,7 @@ if ($class) {
             /* Set default dropdown appearance on load
              */
             $this->dropDown(
-                'reason_options', [['Code' => '', 'AbsenceTypeCode' => '', 'Description' => 'Please select']], $reasonCode, 'student',
+                'reason_options', array_merge($reasonStack[$abscenceCode] ?: [], $reasonStack[INDEX_ALL]), $reasonCode, 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
