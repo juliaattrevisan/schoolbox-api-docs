@@ -1708,8 +1708,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // Check if the node inherits permissions
 
         if ($folder->getInherit()) {
-            // Just another interim node, store its ID so we can cache it for later calls
-            $interimNodes[] = $folder->getId();
+            // Current folder has already been visited.
+            if (\in_array($folder->getId(), $interimNodes)) {
+                throw new MapperException("Circular dependency detected");
+            }
 
             // Make sure we aren't hitting the root
             /** @var Model $parent */
@@ -1719,6 +1721,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 throw new MapperException("Folder has no NNIAN");
             }
 
+            // Just another interim node, store its ID so we can cache it for later calls
+            $interimNodes[] = $folder->getId();
             // Round we go again
             $parent = $this->findCheaplyById($folder->getParent()->getId(), ['deleted' => true]);
 
