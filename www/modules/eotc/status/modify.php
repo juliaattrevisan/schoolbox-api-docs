@@ -59,6 +59,8 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock(TEMPLATE_content, 'has_modify_event', 'has_modify_event_block');
     $this->setBlock(TEMPLATE_content, 'teacher_in_charge_link_start', 'teacher_in_charge_link_start_block');
     $this->setBlock(TEMPLATE_content, 'teacher_in_charge_link_end', 'teacher_in_charge_link_end_block');
+    $this->setBlock(TEMPLATE_content, 'author_link_start', 'author_link_start_block');
+    $this->setBlock(TEMPLATE_content, 'author_link_end', 'author_link_end_block');
 
     /* Find out if the external sync config is enabled
      * Disable when not in db for some magical reason
@@ -80,6 +82,17 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     } else {
         $this->parse('teacher_in_charge_link_start_block', 'teacher_in_charge_link_start');
         $this->parse('teacher_in_charge_link_end_block', 'teacher_in_charge_link_end');
+    }
+
+    /**
+     * If the author has been deleted, do not add hyperlink
+     */
+    if (!$event->getAuthor()->getDeletedAt()->isNull()) {
+        $this->setVar('author_link_start_block', '');
+        $this->setVar('author_link_end_block', '');
+    } else {
+        $this->parse('author_link_start_block', 'author_link_start');
+        $this->parse('author_link_end_block', 'author_link_end');
     }
 
     /* Event details
