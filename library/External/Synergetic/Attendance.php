@@ -143,8 +143,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
 
         foreach ($result as $resultCurrent) {
             $return = [];
-            $return['Code'] = trim($resultCurrent['Code']);
             $return['AbsenceTypeCode'] = trim($resultCurrent['AbsenceTypeCode']);
+            $return['Code'] = trim($resultCurrent['Code']);
 
             if (!empty($return['Code'])) {
                 $return['Description'] = "{$return['Code']} - {$resultCurrent['Description']}";

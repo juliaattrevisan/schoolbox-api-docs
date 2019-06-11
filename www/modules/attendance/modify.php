@@ -200,19 +200,39 @@ if ($class) {
         $reasonDropdownOptions = $attendanceHandler->findReasonDropdownOptions();
         $filteredReasons = [];
 
-        foreach ($reasonDropdownOptions as $absenceReason) {
-            if ($absenceReason['AbsenceTypeCode'] === '' && trim($absenceReason['Code']) !== '') {
-                foreach ($absenceDropdownOptions as $absenceType) {
-                    $filteredReasons[] = [
-                        'Code'            => $absenceReason['Code'],
-                        'AbsenceTypeCode' => $absenceType['Code'],
-                        'Description'     => $absenceReason['Description'],
-                    ];
-                }
-            } else {
-                $filteredReasons[] = $absenceReason;
+        /* Collate a list of (type code, reason[]) tuples to use as a hashed lookup
+         * Each Absence Reason dropdown should consist of the AbsenceTypeCode selected
+         * in the other dropdown concatenated with the _all stack
+         */
+        define('INDEX_ALL', '_all');
+
+        $reasonStack = [
+            INDEX_ALL => []
+        ];
+
+        foreach ($reasonDropdownOptions as $reason) {
+
+            /* Figure out where it should be stacked
+             */
+            $type = trim($reason['AbsenceTypeCode']) !== '' ? trim($reason['AbsenceTypeCode']): INDEX_ALL;
+
+            /* If we haven't seen this type code before, init an array
+             */
+            if (!isset($reasonStack[$type])) {
+                $reasonStack[$type] = [];
             }
+
+            /* A list of correlated (type code, reason[]) tuples
+             * All the ones without type codes get stashed into _all
+             */
+            $reasonStack[$type][] = $reason;
         }
+
+        /* Provide it to phpliberty land
+         */
+        $this->setVar([
+            'DROPDOWN_HASH' => json_encode($reasonStack)
+        ]);
 
         // Iterate each student
 
@@ -258,8 +278,10 @@ if ($class) {
 
             $reasonCode = $currentStudent['ActualAbsenceReasonCode'] ? $currentStudent['ActualAbsenceReasonCode'] : $currentStudent['PossibleReasonCode'];
 
+            /* Set default dropdown appearance on load
+             */
             $this->dropDown(
-                'reason_options', $filteredReasons, $reasonCode, 'student',
+                'reason_options', [['Code' => '', 'AbsenceTypeCode' => '', 'Description' => 'Please select']], $reasonCode, 'student',
                 array('Code' => 'REASON_OPTIONS_VALUE', 'AbsenceTypeCode' => 'REASON_OPTIONS_TYPE', 'Description' => 'REASON_OPTIONS_DESCRIPTION')
             );
 
