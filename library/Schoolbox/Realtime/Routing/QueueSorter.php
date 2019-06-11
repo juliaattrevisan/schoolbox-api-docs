@@ -205,6 +205,7 @@ class QueueSorter implements FilterInterface
         // Is this sent via the instant topic?
         // Route to instant if not already, and un-mute
         if (fnmatch('*.instant.*', $topic) && !$this->permMapper->isInstant($intent)) {
+            $this->log->debug('Topic is instant: upgrading to instant');
             if ($this->permMapper->isMuted($intent)) {
                 $intent = [];
             }
