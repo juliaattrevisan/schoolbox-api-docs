@@ -19,7 +19,21 @@
         absenceChecks.on('change', function() {
             absenceCounter.text(absenceChecks.not(':checked').length);
         });
-	});
+
+        /* Get the list of values that exist per type
+         */
+        var stack = $.parseJSON('{DROPDOWN_HASH}');
+
+        /* For each student's Type dropdown, figure out
+         *  - the type currently selected
+         *  - the corresponding Reason dropdown that needs to be replaced
+         */
+
+        /* When the Type dropdown changes, find its value
+         * then build the Reason dropdown
+         */
+
+    });
 </script>
 <!-- END custom_head -->
 
@@ -40,8 +54,6 @@
         <li><a href="/learning/class/{ID}" class="icon-class-list">View Class List</a></li>
     </ul>
 </div>
-
-{DROPDOWN_HASH}
 
 <div class="row">
     <div class="small-12 island">
@@ -116,11 +128,6 @@
                             <!-- END student_absent -->
                         </td>
                     </tr>
-                    <script>
-                        $(function() {
-                           $('#absenceReason{STUDENT_SYNERGY_ID}').chained('#absenceType{STUDENT_SYNERGY_ID}');
-                        })
-                    </script>
                     <!-- END student -->
                     </tbody>
                 </table>
