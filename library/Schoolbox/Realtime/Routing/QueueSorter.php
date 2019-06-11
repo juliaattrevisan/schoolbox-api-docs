@@ -197,7 +197,14 @@ class QueueSorter implements FilterInterface
      */
 	private function getReroutedLevel(User $user, Instance $instance)
     {
-        $topic  = $instance->getTopics()[0];
+        // For now just process the first topic.
+        // Could foreach over the list of topics if we wanted to?
+        $topic = $instance->getTopics()[0];
+
+        // Is this an instant message? Reroute to instant without further ado
+        if (fnmatch('*.instant.*', $topic)) {
+            return [ RoutePermission::INSTANT ];
+        }
 
 		$intent = $this->permMapper->findRouteLevels($topic, $user->getRole()->getId(), $user->getId(), $instance->getFolderId());
 
