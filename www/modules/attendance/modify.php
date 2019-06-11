@@ -234,6 +234,10 @@ if ($class) {
             'DROPDOWN_HASH' => json_encode($reasonStack)
         ]);
 
+        /* Remember what was already saved for this person
+         */
+        $preselectedReasons = [];
+
         // Iterate each student
 
         foreach ($allStudents as $currentStudent) {
@@ -277,6 +281,10 @@ if ($class) {
 
 
             $reasonCode = $currentStudent['ActualAbsenceReasonCode'] ? $currentStudent['ActualAbsenceReasonCode'] : $currentStudent['PossibleReasonCode'];
+
+            /* Remember what was already saved for this person
+             */
+            $preselectedReasons[$currentStudent['ID']] = $reasonCode;
 
             /* Set default dropdown appearance on load
              */
@@ -348,6 +356,12 @@ if ($class) {
             $this->setVar('absence_options_block', '');
             $this->setVar('reason_options_block', '');
         }
+
+        /* Provide it to phpliberty land
+         */
+        $this->setVar([
+            'PRESELECTED_REASONS' => json_encode($preselectedReasons)
+        ]);
 
     } else {
 
