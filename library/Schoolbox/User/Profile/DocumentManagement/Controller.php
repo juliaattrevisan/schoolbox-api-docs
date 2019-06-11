@@ -10,6 +10,8 @@ namespace Schoolbox\User\Profile\DocumentManagement;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\External\Connector\IDocument;
+use Schoolbox\File\Exception;
+use Schoolbox\File\MimetypeMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\User;
 
@@ -59,6 +61,18 @@ class Controller extends Base
 
         // And render this thing out
         $reports = $this->externalDocument->getAcademicReportsForStudent($student, $classificationCodes);
+
+        // Set icon
+        $icons = [];
+        foreach ($reports as $report) {
+            try {
+                $mimeType = MimetypeMapper::getInstance()->getByFilename($report['filename']);
+            } catch (Exception $e) {
+                $mimeType = MimetypeMapper::getInstance()->getUnknownMime();
+            }
+            $icons[$report['ID']] = $mimeType->getIconFile();
+        }
+
         $wysiwyg_value = $this->getConfigLoader()->get('academic_reports_wysiwyg');
         /* @var RosettaStone $l10n */
         $l10n = $this->getDi()->get('l10n');
@@ -70,6 +84,7 @@ class Controller extends Base
                 [
                     'student' => $student,
                     'reports' => $reports,
+                    'icons'   => $icons,
                     'wysiwyg_content' => $wysiwyg_value
                 ],
                 $l10n->translate('reports',true, true).' for '.$student->formatName()
@@ -93,10 +108,16 @@ class Controller extends Base
             $this->getRegisteredDocmanCategories()
         );
 
+        try {
+            $mimeType = MimetypeMapper::getInstance()->getByFilename($report['filename']);
+        } catch (Exception $e) {
+            $mimeType = MimetypeMapper::getInstance()->getUnknownMime();
+        }
+
         $headers = $this->getResponse()->headers;
         $headers->set('Pragma', ' ');
         $headers->set('Cache-Control', ' ');
-        $headers->set('Content-Type', 'application/pdf');
+        $headers->set('Content-Type', $mimeType->getMime());
         $headers->set('Content-Length', $report['filesize']);
         $headers->set('Content-Disposition', 'attachment; filename=' . $report['filename']);
 

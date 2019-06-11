@@ -82,6 +82,7 @@ class Document extends Base implements IDocument
             "
             SELECT      sral.StudentReportsArchiveSeq as ID,
                         sral.Description,
+                        CONCAT(sral.Description,'.PDF') as filename,
                         sral.FileYear,
                         CONVERT(VARCHAR(20), sra.CreatedDate, 20) AS CreatedDate,
                         'StudentReportsArchive' AS Source
@@ -116,6 +117,7 @@ class Document extends Base implements IDocument
 
                 SELECT  d.tDocumentsSeq AS ID,
                         d.Description,
+                        CONCAT(d.Description,'.',d.DocumentType) as filename,
                         YEAR(d.SourceDate) AS FileYear,
                         CONVERT(VARCHAR(20), d.SourceDate, 20) as CreatedDate,
                         'tDocuments' AS Source
@@ -162,6 +164,7 @@ class Document extends Base implements IDocument
                     
                     SELECT      d.tDocumentsSeq AS ID,
                                 d.Description,
+                                CONCAT(d.Description,'.',d.DocumentType) as filename,
                                 YEAR(d.SourceDate) AS FileYear,
                                 CONVERT(VARCHAR(20), SourceDate, 20) as CreatedDate,
                                 'tDocuments' AS Source
@@ -254,7 +257,7 @@ class Document extends Base implements IDocument
 
             $query = "
                 SELECT    Document,
-                          DocumentType,
+                          CONCAT(Description,'.',DocumentType) as filename,
                           Description
                 FROM      {$this->schema}.tDocuments d
                 JOIN      {$this->schema}.DocumentReferences dr ON dr.DocumentReferencesSeq = d.tDocumentsSeq
@@ -279,7 +282,7 @@ class Document extends Base implements IDocument
                 $query = "
                     
                     SELECT      d.Document,
-                                d.DocumentType,
+                                CONCAT(d.Description,'.',d.DocumentType) as filename,
                                 d.Description
                     FROM        {$this->schema}.pvDocumentReferences dr
                     INNER JOIN  {$this->schema}.tDocuments d ON d.tDocumentsSeq = dr.tDocumentsSeq
@@ -323,7 +326,7 @@ class Document extends Base implements IDocument
 
             $query = "
                 SELECT    Document,
-                          'PDF' AS DocumentType,
+                          CONCAT(Description,'.PDF') AS filename,
                           Description
                 FROM      {$this->schema}.StudentReportsArchive sra
                 JOIN      {$this->schema}.StudentReportsArchiveLink sral ON 
@@ -358,7 +361,7 @@ class Document extends Base implements IDocument
             // the historical code
 
             return [
-                'filename' => "{$row["Description"]}.{$row["DocumentType"]}",
+                'filename' => $row["filename"],
                 'filesize' => strlen($row["Document"]),
                 'blob'     => $row["Document"],
             ];
