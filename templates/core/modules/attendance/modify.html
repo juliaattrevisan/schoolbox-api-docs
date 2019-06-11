@@ -51,13 +51,13 @@
 
             /* All other uncorrelated options
              */
-            $.each(reasonStack['_all'], function(index, element) {
+            $.each(reasonStack['{INDEX_ALL}'], function(index, element) {
                 $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
             });
 
             /* Preselect value
              */
-            select.find('option[value="'+preselectedReasonStack[parseInt(id)]+'"]').attr('selected', true)
+            select.find('option[value="'+preselectedReasonStack[parseInt(id)]+'"]').attr('selected', true);
 
             /* Stick it in
              */

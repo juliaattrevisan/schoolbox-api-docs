@@ -231,6 +231,7 @@ if ($class) {
         /* Provide it to phpliberty land
          */
         $this->setVar([
+            'INDEX_ALL' => INDEX_ALL,
             'DROPDOWN_HASH' => json_encode($reasonStack)
         ]);
 
