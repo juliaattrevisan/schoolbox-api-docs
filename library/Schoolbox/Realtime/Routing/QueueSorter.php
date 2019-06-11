@@ -199,14 +199,17 @@ class QueueSorter implements FilterInterface
     {
         // For now just process the first topic.
         // Could foreach over the list of topics if we wanted to?
-        $topic = $instance->getTopics()[0];
-
-        // Is this an instant message? Reroute to instant without further ado
-        if (fnmatch('*.instant.*', $topic)) {
-            return [ RoutePermission::INSTANT ];
-        }
-
+        $topic  = $instance->getTopics()[0];
 		$intent = $this->permMapper->findRouteLevels($topic, $user->getRole()->getId(), $user->getId(), $instance->getFolderId());
+
+        // Is this sent via the instant topic?
+        // Route to instant if not already, and un-mute
+        if (fnmatch('*.instant.*', $topic) && !$this->permMapper->isInstant($intent)) {
+            if ($this->permMapper->isMuted($intent)) {
+                $intent = [];
+            }
+            $intent[] = RoutePermission::INSTANT;
+        }
 
 		if (count($intent) === 0) {
 			// if we got nothing back, this user isn't meant to see this message
