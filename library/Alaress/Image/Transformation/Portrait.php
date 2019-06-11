@@ -39,6 +39,18 @@ class Portrait extends BaseTransformation
                 ]
             ]
         ],
+
+        /* Used exclusively in the top bar
+         */
+        'square72' => [
+            [
+                'method' => 'Square',
+                'args' => [
+                    'width' => 72,
+                ]
+            ]
+        ],
+
         'square80' => [
             [
                 'method' => 'Square',
