@@ -29,7 +29,7 @@
          *  - the type currently selected
          *  - the corresponding Reason dropdown that needs to be replaced
          */
-        $('[data-absence-type]').on('click', function(event) {
+        $('[data-absence-type]').on('change', function(event) {
             var id = $(this).attr('data-absence-type');
 
             var destination = '#' + 'absenceReason' + id;
@@ -37,7 +37,31 @@
             /* When the Type dropdown changes, find its value
              * then build the Reason dropdown
              */
-            console.log(destination);
+            var availableOptions = reasonStack[$(this).val()];
+
+            var select = $('<select id="absenceReason'+id+'" name="PossibleAbsenceCode[]" data-absence-reason="'+id+'" />');
+
+            /* Correlated options
+             */
+            if (availableOptions !== undefined) {
+                $.each(availableOptions, function(index, element) {
+                    $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
+                });
+            }
+
+            /* All other uncorrelated options
+             */
+            $.each(reasonStack['_all'], function(index, element) {
+                $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
+            });
+
+            /* Preselect value
+             */
+            select.find('option[value="'+preselectedReasonStack[parseInt(id)]+'"]').attr('selected', true)
+
+            /* Stick it in
+             */
+            $(destination).replaceWith(select);
         });
     });
 </script>
