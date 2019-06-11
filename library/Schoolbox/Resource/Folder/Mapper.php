@@ -1687,7 +1687,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Model
      * @throws MapperException
      */
-    public function findNearestNonInheritingAncestralNode(Model $folder, $interimNodes = [])
+    public function findNearestNonInheritingAncestralNode(Model $folder, array $interimNodes = [])
     {
         // Check cache first
 
