@@ -228,7 +228,10 @@ class EventMetadataMapper extends BaseMapper
                 'relation' => array(
                     'column' => 'user_id',
                     'key'    => 'id',
-                    'mapper' => UserMapper::getInstance()
+                    'mapper' => UserMapper::getInstance(),
+                    'options' => [
+                        'deleted' => true,
+                    ],
                 ),
             )
         );
