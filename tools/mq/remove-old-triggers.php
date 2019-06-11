@@ -16,6 +16,12 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
+/**
+ * This script is focusing on removing old compressed triggers and cancel triggers which are no longer necessary
+ * after sending out its notification messages.
+ *
+ * To reset TTL to existing notification messages, use reset-ttls.php
+ */
 $kernel = new CliTool\Kernel(new class extends CliTool\App
 {
     private const TTL_NOT_SET = "not set";
@@ -55,7 +61,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $planMapper = Schoolbox\Assessment\Participant\Plan\Mapper::getInstance();
 
         // non-blocking search of the keyspace for all messages
-        $search = new Keyspace($this->redis, "msg:{$this->instanceId}*");
+        $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");
         foreach ($search as $key) {
 
             $expiryTime = self::ttlToDate($this->redis->ttl($key));
@@ -76,7 +82,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 try {
                     $output = $instance->extractTrigger();
                     $this->getLogger()->info(self::triggerInfo($output, $instance));
-                    $triggerDate = new \Alaress_Date_Format($output->getTimestamp(), 'U');
+                    $triggerDate = \Alaress_Date_Format::newFromTimestamp((int)$output->getTimestamp());
                     $expireTime = (clone $triggerDate)->addSeconds(Instance::DEFAULT_TTL);
 
                     // old triggers
@@ -101,7 +107,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 // Message
                 $output = $instance->jsonSerialize();
                 $this->getLogger()->info(date('Y-m-d H:i:s', $output['time']));
-                $triggerDate = new Alaress_Date_Format($output['time'], 'U');
+                $triggerDate = \Alaress_Date_Format::newFromTimestamp((int)$output['time']);
 
                 foreach ($output['topics'] as $topic) {
                     $this->getLogger()->info($topic);
@@ -109,8 +115,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         $id = (int)$matches[1];
                         try {
                             $planMapper->findById($id);
-                            // insert the msg reference into this 'queue'
-                            $this->addToObjectSet('plan', $id, $key);
                         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                             $this->getLogger()->warning("Plan {$id} is deleted.");
                             $this->deleteFromRedis("Message for plan {$id}", $triggerDate, $key);
@@ -122,8 +126,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         $id = (int)$matches[1];
                         try {
                             $newsMapper->findById($id);
-                            // insert the msg reference into this 'queue'
-                            $this->addToObjectSet('news', $id, $key);
                         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                             $this->getLogger()->warning("News {$id} is deleted.");
                             $this->deleteFromRedis("Message for news {$id}", $triggerDate, $key);
@@ -223,32 +225,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
         $this->redis->expireat($key, $expireTime->getUnixTimeStamp());
     }
-
-    /**
-     * Add given object to object set. This is used when retracted. Only plans and news are using this at the moment.
-     * @param string $type
-     * @param int $id
-     * @param string $key
-     */
-    private function addToObjectSet(string $type, int $id, string $key): void
-    {
-        $eventObjectSet = "msg:{$this->instanceId}:q:%s:%s";
-        $this->getLogger()->notice("[ADDING] {$type} {$id} to object set.");
-        if (!$this->perform()) {
-            return;
-        }
-
-        switch ($type) {
-            case 'plan':
-                $this->redis->sadd(sprintf($eventObjectSet, get_class(new \Schoolbox\Assessment\Participant\Plan\Model()), $id), [$key]);
-                break;
-            case 'news':
-                $this->redis->sadd(sprintf($eventObjectSet, get_class(new \Schoolbox\Comms\News\Model()), $id), [$key]);
-                break;
-            default:
-        }
-    }
-
 
 }, false, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
