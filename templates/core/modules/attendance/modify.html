@@ -23,7 +23,6 @@
         /* Get the list of values that exist per type
          */
         var reasonStack = $.parseJSON('{DROPDOWN_HASH}');
-        var preselectedReasonStack = $.parseJSON('{PRESELECTED_REASONS}');
 
         /* For each student's Type dropdown, figure out
          *  - the type currently selected
@@ -54,10 +53,6 @@
             $.each(reasonStack['{INDEX_ALL}'], function(index, element) {
                 $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
             });
-
-            /* Preselect value
-             */
-            select.find('option[value="'+preselectedReasonStack[parseInt(id)]+'"]').attr('selected', true);
 
             /* Stick it in
              */
