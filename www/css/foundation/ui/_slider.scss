@@ -6,12 +6,12 @@ $swipe-color-hover: $steel;
 
 .swiper-container {
   .swiper-wrapper {
-    min-height: 10rem;
+    height: auto;
   }
 
   .loader {
     position: absolute;
-    top: 5rem;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
