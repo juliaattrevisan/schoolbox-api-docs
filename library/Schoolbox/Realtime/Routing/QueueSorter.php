@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -20,25 +20,24 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing\Filter\FilterException;
 use Schoolbox\Realtime\Routing\Filter\FilterInterface;
-use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Swift_RfcComplianceException;
 
 class QueueSorter implements FilterInterface
 {
-    const TOPIC_DIGEST  = 'digest';
+    const TOPIC_DIGEST = 'digest';
     const TOPIC_INSTANT = 'instant';
 
 
-	/** @var FilterInterface */
-	private $filter;
+    /** @var FilterInterface */
+    private $filter;
 
-	/** @var LoggerInterface */
-	private $log;
+    /** @var LoggerInterface */
+    private $log;
 
-	/** @var RoutePermissionMapper */
-	private $permMapper;
+    /** @var RoutePermissionMapper */
+    private $permMapper;
 
     /** @var MessageList\IListFactory */
     private $listFactory;
@@ -64,18 +63,18 @@ class QueueSorter implements FilterInterface
 
 
     /**
-	 * @param User     $user
-	 * @param Instance $instance
-	 * @throws InvalidArgumentException
+     * @param User     $user
+     * @param Instance $instance
+     * @return bool
      * @throws PDOException
-	 * @return bool
-	 */
-	public function process(User $user, Instance $instance)
+     * @throws InvalidArgumentException
+     */
+    public function process(User $user, Instance $instance)
     {
         $userId = $user->getId();
 
-		try {
-			$this->validate($instance, $user);
+        try {
+            $this->validate($instance, $user);
 
             $outputLevels = $this->getReroutedLevel($user, $instance);
 
@@ -83,7 +82,15 @@ class QueueSorter implements FilterInterface
                 throw new FilterException('Reroute level is zero');
             }
 
-            $this->log->info(sprintf('SEND %s:%s -> user %d @ %s', $instance->getBaseHash(), $instance->getParamHash(), $userId, json_encode($outputLevels)));
+            $this->log->info(
+                sprintf(
+                    'SEND %s:%s -> user %d @ %s',
+                    $instance->getBaseHash(),
+                    $instance->getParamHash(),
+                    $userId,
+                    json_encode($outputLevels)
+                )
+            );
 
             // push for each output level
             foreach ($outputLevels as $level) {
@@ -111,11 +118,19 @@ class QueueSorter implements FilterInterface
             }
             return true;
 
-		} catch (FilterException $e) {
-			$this->log->notice(sprintf('DROP %s:%s -> user %d: %s', $instance->getBaseHash(), $instance->getParamHash(), $userId, $e->getMessage()));
-			return true;
+        } catch (FilterException $e) {
+            $this->log->notice(
+                sprintf(
+                    'DROP %s:%s -> user %d: %s',
+                    $instance->getBaseHash(),
+                    $instance->getParamHash(),
+                    $userId,
+                    $e->getMessage()
+                )
+            );
+            return true;
 
-		} catch (Swift_RfcComplianceException $e) {
+        } catch (Swift_RfcComplianceException $e) {
             $this->log->warning($e->getMessage());
 
         } catch (PDOException $e) {
@@ -123,30 +138,31 @@ class QueueSorter implements FilterInterface
             throw $e;
 
         } catch (Exception $e) {
-			$this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), [ 'exception'=>$e ]);
-		}
+            $this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), ['exception' => $e]);
+        }
 
-		return false;
-	}
+        return false;
+    }
 
 
-	/**
-	 * Iterates the installed filters, any of which will throw an exception if the message fails its validation
-	 *
-	 * @param Instance $message
-	 * @param User     $user
-	 * @throws FilterException
-	 * @return void
-	 */
-	public function validate(Instance $message, User $user)
+    /**
+     * Iterates the installed filters, any of which will throw an exception if the message fails its validation
+     *
+     * @param Instance $message
+     * @param User     $user
+     * @return void
+     * @throws FilterException
+     */
+    public function validate(Instance $message, User $user)
     {
         // exceptions get thrown if it fails a given filter
         $this->filter->validate($message, $user);
-	}
+    }
 
 
     /**
      * Process retract requests
+     *
      * @param Instance $instance
      * @return bool
      */
@@ -176,10 +192,11 @@ class QueueSorter implements FilterInterface
 
     /**
      * Adds an instance to a related event object list
+     *
      * @param Instance $instance
      * @return bool
      */
-    public function processEventObjectList(Instance $instance):bool
+    public function processEventObjectList(Instance $instance): bool
     {
         $this->log->debug('[QUEUE SORTER] Adding instance to event object list: ' . $instance->getEventObjectId());
         $this->listFactory->eventObjectList($instance->getEventObjectId())->push($instance);
@@ -187,7 +204,7 @@ class QueueSorter implements FilterInterface
     }
 
 
-	/**
+    /**
      * Calculate a set of route levels relevant to this user x instance.
      * Will be a subset of [ MU, DI, IN, MO, EM ]
      *
@@ -195,12 +212,17 @@ class QueueSorter implements FilterInterface
      * @param Instance $instance
      * @return array
      */
-	private function getReroutedLevel(User $user, Instance $instance)
+    private function getReroutedLevel(User $user, Instance $instance)
     {
         // For now just process the first topic.
         // Could foreach over the list of topics if we wanted to?
         $topic  = $instance->getTopics()[0];
-		$intent = $this->permMapper->findRouteLevels($topic, $user->getRole()->getId(), $user->getId(), $instance->getFolderId());
+        $intent = $this->permMapper->findRouteLevels(
+            $topic,
+            $user->getRole()->getId(),
+            $user->getId(),
+            $instance->getFolderId()
+        );
 
         // Is this sent via the instant topic?
         // Route to instant if not already, and un-mute
@@ -212,19 +234,19 @@ class QueueSorter implements FilterInterface
             $intent[] = RoutePermission::INSTANT;
         }
 
-		if (count($intent) === 0) {
-			// if we got nothing back, this user isn't meant to see this message
+        if (count($intent) === 0) {
+            // if we got nothing back, this user isn't meant to see this message
             $this->log->debug("Got no levels back, msg source is disabled for this user's role");
-            return [ RoutePermission::MUTE ];
-		}
+            return [RoutePermission::MUTE];
+        }
 
-		// if the user in question has no digest schedule and digest level is selected, upgrade to instant
-		if ($this->permMapper->isDigest($intent) && (string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER) {
-			$this->log->info("User doesn't have digest schedule: upgrading to instant");
-			$intent = [ RoutePermission::INSTANT ];
-		}
+        // if the user in question has no digest schedule and digest level is selected, upgrade to instant
+        if ($this->permMapper->isDigest($intent) && (string)$user->getRole()->getDigestSchedule() == (string)Role::DIGEST_NEVER) {
+            $this->log->info("User doesn't have digest schedule: upgrading to instant");
+            $intent = [RoutePermission::INSTANT];
+        }
 
-		return $intent;
-	}
+        return $intent;
+    }
 
 } 
