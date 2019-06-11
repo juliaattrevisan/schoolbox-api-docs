@@ -100,7 +100,9 @@ class BindingLoader implements ILoader
      */
     public function getUserSubscriptions($userId)
     {
-        $userRoutes  = [];
+        $userRoutes  = [
+            "*.instant.user.$userId.#" => true,
+        ];
 
         $bindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
 
