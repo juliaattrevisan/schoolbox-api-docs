@@ -76,6 +76,9 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
         'SYNC_ENABLED' => $syncConfig == 1 ? 'true' : 'false'
     ]);
 
+    /**
+     * If the teacher in charge has been deleted, do not add hyperlink
+     */
     if (!$event->getTeacherInCharge()->getDeletedAt()->isNull()) {
         $this->setVar('teacher_in_charge_link_start_block', '');
         $this->setVar('teacher_in_charge_link_end_block', '');
