@@ -70,17 +70,11 @@ class BindingLoader implements ILoader
 
         foreach ($userIds as $i => $userId) {
             $user       = $this->userMapper->findById($userId);
-            $routes     = $this->generator->generateBindingsForUser($user);
             $routeCount = 0;
-
-            foreach ($routes as $prefix => $bindings) {
-                foreach ($bindings as $binding) {
-                    // $route = "*.notify.$instanceId.$prefix.$binding";
-                    $route = "*.notify.$prefix.$binding";
-                    $router->add($route, $userId, true);
-                    ++$routeCount;
-                    ++$totalRoutes;
-                }
+            foreach (array_keys($this->getUserSubscriptions($userId)) as $userSub) {
+                $router->add($userSub, $userId, true);
+                ++$routeCount;
+                ++$totalRoutes;
             }
             $this->log->debug(
                 sprintf(
