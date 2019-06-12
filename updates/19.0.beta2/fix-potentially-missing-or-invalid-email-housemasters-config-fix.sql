@@ -21,7 +21,7 @@ INSERT INTO `config` (
             'Allow Email Housemasters from Class List',
             'If ticked, allows staff to email housemasters of a class with a single button',
             (SELECT id FROM lu_config_field WHERE field = 'boolean'),
-            'true:false',
+            null,
             (SELECT id FROM lu_config_type WHERE `type` = 'Policy'),
             'true',
             'false',
@@ -30,4 +30,5 @@ INSERT INTO `config` (
             )
         ON DUPLICATE KEY UPDATE
             `field_id` = (SELECT id FROM lu_config_field WHERE field = 'boolean'),
-            `type_id` = (SELECT id FROM lu_config_type WHERE `type` = 'Policy');
+            `type_id` = (SELECT id FROM lu_config_type WHERE `type` = 'Policy'),
+            `options` = null;
