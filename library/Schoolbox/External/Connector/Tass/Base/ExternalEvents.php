@@ -74,15 +74,19 @@ class ExternalEvents extends Base implements IExternalEvents
                 ec.event_desc AS comment,
                 ec.room_code AS room,
                 LTRIM(RTRIM(STUFF((SELECT ', ' + LTRIM(RTRIM(ecd.cat_desc))
-                    FROM eventcatdefs ecd WHERE ec.cat_num = ecd.cat_num FOR XML PATH('')), 1 , 1 , ''))) AS type,
+            FROM eventcatdefs ecd WHERE ec.cat_num = ecd.cat_num FOR XML PATH('')), 1 , 1 , ''))) AS type,
+ec.start_date, ec.start_time,
                 CASE 
                     WHEN ec.start_time IS NOT NULL THEN ec.start_date + CAST(ec.start_time AS TIME(0))
                     ELSE ec.start_date 
                 END as start,
+ec.start_date + ec.start_time AS startdateplusstarttime,                
+ec.end_date, ec.end_time,
                 CASE 
                     WHEN ec.end_time IS NOT NULL THEN ec.end_date + CAST(ec.end_time AS TIME(0))
                     ELSE ec.end_date 
                 END AS finish,
+ec.end_date + ec.end_time AS enddateplusendtime,
                 ec.campus_code AS location,
                 '' AS team
             FROM eventcalendar ec
