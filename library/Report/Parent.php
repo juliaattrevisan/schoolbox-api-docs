@@ -277,14 +277,13 @@ class Report_Parent extends Report_Abstract
             $this->getPage()->setVar([
                 'YEAR_CODE' => $year['Code'],
                 'YEAR_DESCRIPTION' => $year['Description'],
-                'YEAR_SELECTED' =>  $year['Code'] == $this->getYearLevel() ? 'selected="selected"' : '',
+                'YEAR_SELECTED' => $year['Code'] == $this->getYearLevel() ? 'selected="selected"' : '',
             ]);
 
             $this->getPage()->parse('all_year_option_block', 'all_year_option', true);
         }
 
         $this->getPage()->parse('all_year_selector_block', 'all_year_selector');
-
     }
 
 
