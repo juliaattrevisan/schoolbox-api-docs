@@ -150,6 +150,9 @@ then
     exit 1;
 fi
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Putting system in maintenance mode";
+/vagrant/tools/maintenance/site_down.sh;
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
 mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
@@ -627,6 +630,9 @@ service apache2 restart > /dev/null 2>&1;
 service php7.1-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
 service styleguide restart > /dev/null 2>&1;
+
+echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
+/vagrant/tools/maintenance/site_up.sh;
 
 # call custom provisioning
 if [ -f /vagrant/post-provision.sh ];
