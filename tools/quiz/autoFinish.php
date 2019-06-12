@@ -21,10 +21,18 @@
  */
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Application\Daemon;
+use Schoolbox\Assessment\Participant;
+use Schoolbox\MapperFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel("Quiz Attempt Automatic Closer", [Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 
+/**
+ * @var MapperFactory      $mapperFactory
+ * @var Participant\Mapper $participantMapper
+ */
+$mapperFactory = $kernel->getDependencyInjector()->get('mapperFactory');
+$participantMapper = $mapperFactory->get(Participant\Mapper::class);
 $log             = $kernel->logger();
 $attemptMapper   = QuizAttemptMapper::getInstance();
 $responseHandler = new Assess_Response();
@@ -54,6 +62,16 @@ foreach ($expiredAttempts as $attempt) {
         $log->warning('For some reason, this attempt has no owner - skipping');
         continue;
     }
+
+    $participant = $participantMapper->findForAssessmentAndUser(
+        $attempt->getQuiz()->getAssessmentModel()->getId(),
+        $attempt->getUser()->getId()
+    );
+    if ($participant && $participant->isExcluded()) {
+        $log->info('Attempt owner is excluded from this assessment - skipping');
+        continue;
+    }
+
     // Figure out what the finish date ought to be.
     // If it's less than 5 minutes ago, allow some leeway.
     $attemptFinishDate = clone $attempt->getStart();
