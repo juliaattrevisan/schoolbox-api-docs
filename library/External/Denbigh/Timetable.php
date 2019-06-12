@@ -371,8 +371,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         // Need to get the actual period IDs from the list of lessons,
         // not just rely on the timetable definition.
         $periods = $this->externalDatabase->executeQuery(
-            'SELECT DISTINCT period FROM Lessons l ORDER BY period',
-            ['externalUserId', $externalUserId]
+            'SELECT DISTINCT period FROM Lessons l ORDER BY period'
         )->fetchAll();
 
         foreach ($periods as $row) {
