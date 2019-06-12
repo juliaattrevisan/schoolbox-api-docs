@@ -90,10 +90,7 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
             $defaultEventType = self::DEFAULT_EVENTTYPE_ID;
         }
 
-        new \Alaress_Probe(Alaress_Date_Format::newFromTimestamp($startTimestamp)->getDatabase(), Alaress_Date_Format::newFromTimestamp($endTimestamp)->getDatabase());
-
         foreach ($externalEvents as $externalEvent) {
-            new \Alaress_Probe($externalEvent);
             $event = new Event();
             $event->setEventId($externalEvent['id']);
 
