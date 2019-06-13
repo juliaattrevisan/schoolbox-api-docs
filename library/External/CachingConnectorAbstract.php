@@ -117,8 +117,7 @@ class CachingConnectorAbstract
         try {
             return $this->cache->cacheFunctionCall($key, $callback, $params, $timeoutOverride ?? $this->timeout);
         } /** @noinspection PhpRedundantCatchClauseInspection */
-        // TODO: narrow exceptions to be thrown. Leaving it wide to handle exceptions thrown by notifiers.
-        catch (\Exception $e) {
+        catch (\Alaress\Database\Exception $e) {
             $this->isOffline = true;
             // If there was ANY problem with the connection, fall back to offline implementation for remainder of request
             if (PHP_SAPI === 'cli') {
@@ -127,7 +126,16 @@ class CachingConnectorAbstract
                 trigger_error($e->getMessage(), E_USER_WARNING);
                 $this->database = $this->offlineConnector;
             }
-
+            return $this->bypassCache($method, $params);
+        } catch (External\Exception $e) {
+            $this->isOffline = true;
+            // If there was ANY problem with the connection, fall back to offline implementation for remainder of request
+            if (PHP_SAPI === 'cli') {
+                throw new \Schoolbox\External\Exception('SIS connector failed to execute function: ' . $e->getMessage());
+            } else {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+                $this->database = $this->offlineConnector;
+            }
             return $this->bypassCache($method, $params);
         }
     }
