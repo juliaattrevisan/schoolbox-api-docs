@@ -1042,7 +1042,12 @@ class External_Maze_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        return [];
+        $query = "
+            SELECT DISTINCT REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS Code, REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS Description
+            FROM ST
+            WHERE ST.SCHOOL_YEAR IS NOT NULL OR NULLIF(ST.SCHOOL_YEAR,'') IS NOT NULL
+        ";
+        return $this->getDb()->getAll($query);
     }
 
     /* Getters/Setters
