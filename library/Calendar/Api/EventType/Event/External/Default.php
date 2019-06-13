@@ -77,7 +77,6 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
     public function getEvents($startTimestamp, $endTimestamp) {
 
         $stack = new Collection();
-
         /** @var IIterator $externalEvents */
         $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
 
