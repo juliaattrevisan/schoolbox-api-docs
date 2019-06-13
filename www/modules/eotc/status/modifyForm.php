@@ -21,6 +21,7 @@ use EOTC\EventMapper;
 use EOTC\EventMetadataMapper;
 use EOTC\EventStatus;
 use EOTC\EventStatusMapper;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
@@ -86,7 +87,10 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
     $status = $statusMapper->findById($_POST['statusId']);
 
     if (!$authenticator->isStatusChangeAllowed($event, $status)) {
-        error(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
+        $l10n = $page->getDi()->get('l10n');
+        $exceptionError = ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
+
+        throw new SchoolboxException($l10n->translateSentence($exceptionError->getMessage()), ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS, $error);
     }
 
     $event->getMetadata()->setStatus($status);
