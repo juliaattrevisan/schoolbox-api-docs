@@ -1,10 +1,9 @@
-INSERT INTO `schoolbox`.`config` (
+INSERT INTO config (
     `name`,
     `value`,
     `title`,
     `description`,
     `field_id`,
-    `options`,
     `type_id`,
     `editable`,
     `hidden`,
@@ -15,9 +14,8 @@ INSERT INTO `schoolbox`.`config` (
         '1',
         'Allow Email Housemasters from Class List',
         'If ticked, allows staff to email housemasters of a class with a single button',
-        '3',
-        'true:false',
-        '5',
+        (SELECT lcf.id FROM lu_config_field lcf WHERE lcf.field = 'boolean'),
+        (SELECT lct.id FROM lu_config_type lct WHERE lct.type = 'Policy'),
         'true',
         'false',
         'false',
