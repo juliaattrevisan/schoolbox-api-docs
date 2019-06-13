@@ -79,7 +79,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     /**
      * If the teacher in charge has been deleted, do not add hyperlink
      */
-    if (!$event->getTeacherInCharge()->getDeletedAt()->isNull()) {
+    if ($event->getTeacherInCharge()->isDeleted()) {
         $this->setVar('teacher_in_charge_link_start_block', '');
         $this->setVar('teacher_in_charge_link_end_block', '');
     } else {
@@ -90,7 +90,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     /**
      * If the author has been deleted, do not add hyperlink
      */
-    if (!$event->getAuthor()->getDeletedAt()->isNull()) {
+    if ($event->getAuthor()->isDeleted()) {
         $this->setVar('author_link_start_block', '');
         $this->setVar('author_link_end_block', '');
     } else {
