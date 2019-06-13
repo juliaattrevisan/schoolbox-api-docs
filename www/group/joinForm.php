@@ -37,6 +37,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
      * @var Group $group
      */
     $group = $groupMapper->findById($groupId);
+    $uaExists = false;
 
     try {
         $ua = $uaMapper->findOneByColumnList(
@@ -46,6 +47,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
                 'sid' => $groupId,
             ]
         );
+        $uaExists = true;
     } catch (Mapper\Exception $e) {
         $ua = new UserAccess();
         $ua->setUser($user)
@@ -62,7 +64,7 @@ foreach ($groupsSelected as $groupId => $isJoining) {
                 $uaMapper->save($ua);
                 $response = 'joined';
             }
-        } else if ($group->isModerated()) {
+        } else if ($group->isModerated() && !$uaExists) {
             // insert the user into the perms table, but deny them access (pending state)
             // If they already have access, keep it as is.
             $uaMapper->save($ua);
