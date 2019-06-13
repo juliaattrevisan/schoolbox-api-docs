@@ -6,19 +6,22 @@ $swipe-color-hover: $steel;
 
 .swiper-container {
   .swiper-wrapper {
-    min-height: 10rem;
+    min-height: 5rem;
   }
 
   .loader {
     position: absolute;
-    top: 5rem;
+    top: 50%;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto;
+    margin: -1.5rem auto 0;
   }
 
   .swiper-slide {
+    height: auto;
+    min-height: 5rem;
+
     // For dashboard slider, image fills space and maintains aspect ratio
     img {
       width: 100%;
@@ -45,7 +48,7 @@ $swipe-color-hover: $steel;
 
     .portrait {
       position: relative;
-      padding: 150% 0 0;
+      padding: 125% 0 0;
       overflow: hidden;
 
       img {
