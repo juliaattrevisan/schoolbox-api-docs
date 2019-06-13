@@ -1,9 +1,5 @@
 <?php
 /**
- * Mapper for user profile objects.
- *
- * This is only used by the Schoolbox connector.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright 2013 Alaress Pty Ltd
  * @link      http://www.alaress.com.au
@@ -13,6 +9,13 @@ namespace Schoolbox\External;
 use Schoolbox;
 use Schoolbox\UserMapper;
 
+/**
+ * Mapper for user profile objects.
+ *
+ * This is only used by the Schoolbox connector.
+ *
+ * @method UserProfile findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ */
 class UserProfileMapper extends Schoolbox\Mapper {
 
     /**
@@ -181,24 +184,13 @@ class UserProfileMapper extends Schoolbox\Mapper {
     /**
      * Gets a user profile object from the external ID of the user.
      *
-     * @param  string      $external_id
-     * @return UserProfile or false if not found
+     * @param  string $externalId
+     * @return UserProfile
+     * @throws Schoolbox\Mapper\Exception
+     * @throws Schoolbox\Mapper\Exception\Deleted
      */
-    public function findByExternalId($external_id) {
-        $user_join = $this->getJoinMapper('user');
-        $query     = "
-            SELECT {$this->getColumnString('up')}, {$user_join->getColumnString('u')}
-            FROM `{$this->getTable()}` `up`
-            INNER JOIN {$this->getJoinSql('user', 'up', 'u')}
-            WHERE `u`.`synergy_id` = ?
-        ";
-        $statement = $this->database->prepare($query);
-        $statement->execute(array($external_id));
-
-        if ($row = $statement->fetch()) {
-            return $this->hydrate($row, 'up');
-        }
-        // TODO in develop, make this throw exception on not found
-        return false;
+    public function findByExternalId(string $externalId): UserProfile
+    {
+        return $this->findOneByColumn('user.synergy_id', $externalId);
     }
 }
