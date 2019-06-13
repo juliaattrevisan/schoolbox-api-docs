@@ -39,6 +39,12 @@
 
             var select = $('<select id="absenceReason'+id+'" name="PossibleAbsenceCode[]" data-absence-reason="'+id+'" />');
 
+            /* All other uncorrelated options (also happens to include Not Selected)
+             */
+            $.each(reasonStack['{INDEX_ALL}'], function(index, element) {
+                $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
+            });
+
             /* Correlated options
              */
             if (availableOptions !== undefined) {
@@ -46,12 +52,6 @@
                     $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
                 });
             }
-
-            /* All other uncorrelated options
-             */
-            $.each(reasonStack['{INDEX_ALL}'], function(index, element) {
-                $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
-            });
 
             /* Stick it in
              */
