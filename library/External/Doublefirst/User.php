@@ -1150,7 +1150,12 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        return [];
+        $query = "
+            SELECT DISTINCT YearGroup AS Code, YearGroup AS Description
+            FROM V_PupilBasicInformation
+            WHERE YearGroup IS NOT NULL OR NULLIF(YearGroup,'') IS NOT NULL
+        ";
+        return $this->getDatabase()->getAll($query);
     }
 
     /* Getters/Setters
