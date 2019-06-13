@@ -12,9 +12,7 @@ use Schoolbox\Filter\Page;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
 
 /**
- * Displays a list of folders where any units specified in GET params have been imported to
- *
- * The list of folders is generated at run-time for the units specified in the GET params
+ * Displays a list of folders where the courseSpec has been imported
  *
  * Assessments will match this filter if their ultimate/indirect folder matches that selected.
  *
