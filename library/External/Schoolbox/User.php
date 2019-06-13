@@ -143,10 +143,6 @@ class External_Schoolbox_User implements External_UserInterface
                             pp.guardian2Name AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
                             pp.guardian2Email AS StudentContactSpouseDefaultEmail,
-                            pp.guardian2Address AS StudentContactSpouseAddress1,
-                            pp.guardian2Suburb AS StudentContactSpouseSuburb,
-                            pp.guardian2Postcode AS StudentContactSpousePostCode,
-                            '' AS StudentContactSpouseState,
                             pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
                             pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
                             pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
