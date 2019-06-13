@@ -16,8 +16,8 @@ INSERT INTO config (
     `module`
 ) VALUES (
     'comms_comments_enabled',
-    '0',
-    'Allow comments module',
+    '1',
+    'Allow comments',
     'If enabled, users will be able to turn on comments on news items',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
     null,
@@ -26,7 +26,8 @@ INSERT INTO config (
     'false',
     'comms'
 ) ON DUPLICATE KEY UPDATE
-            `title` = 'Allow comments module',
+            `title` = 'Allow comments',
+            `value` = '1',
             `description` = 'If enabled, users will be able to turn on comments on news items',
             `field_id` = (SELECT id FROM lu_config_field WHERE field = 'boolean'),
             `options` = null,
