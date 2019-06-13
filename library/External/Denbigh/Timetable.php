@@ -76,21 +76,9 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             return [];
         }
 
-        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
+        $periodList = $this->retrieveBasicPeriodList($externalUserId, $campus);
+        if (empty($periodList)) {
             return [];
-        }
-
-        $periodList = [];
-
-        for ($i = 1; $i <= $definition['periodCount']; $i++) {
-            $periodList[$i] = [
-                'periodNumber'   => $i,
-                'periodName'     => "Period $i",
-                'periodStart'    => '',
-                'periodEnd'      => '',
-                'periodSequence' => '1',
-                'day'            => array_fill(1, $definition['dayCount'], []),
-            ];
         }
 
         if ($this->isStaff($userId)) {
@@ -216,25 +204,13 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
-        $periodList = [];
-
         if (empty($externalUserId)) {
-            return $periodList;
+            return [];
         }
 
-        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
-            return $periodList;
-        }
-
-        for ($i = 1; $i <= $definition['periodCount']; $i++) {
-            $periodList[$i] = [
-                'periodNumber'   => $i,
-                'periodName'     => "Period $i",
-                'periodStart'    => '',
-                'periodEnd'      => '',
-                'periodSequence' => '1',
-                'class'          => [],
-            ];
+        $periodList = $this->retrieveBasicPeriodList($externalUserId, $campus);
+        if (empty($periodList)) {
+            return [];
         }
 
         if ($this->isStaff($userId)) {
@@ -375,5 +351,41 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                 ['timetableGroup' => $timetableGroup]
             )
         )->fetchAll();
+    }
+
+
+    /**
+     * Retrieve a basic list of periods, without any classes added.
+     *
+     * @param string|null $externalUserId
+     * @param Campus      $campus
+     * @return array
+     */
+    private function retrieveBasicPeriodList(?string $externalUserId, Campus $campus): array
+    {
+        $periodList = [];
+        if (!$definition = $this->getTimetableDefinition($externalUserId, $campus)) {
+            return $periodList;
+        }
+
+        // Need to get the actual period IDs from the list of lessons,
+        // not just rely on the timetable definition.
+        $periods = $this->externalDatabase->executeQuery(
+            'SELECT DISTINCT period FROM Lessons l ORDER BY period'
+        )->fetchAll();
+
+        foreach ($periods as $row) {
+            $period = $row['period'];
+            $periodList[$period] = [
+                'periodNumber'   => $period,
+                'periodName'     => "Period $period",
+                'periodStart'    => '',
+                'periodEnd'      => '',
+                'periodSequence' => '1',
+                'day'            => array_fill(1, $definition['dayCount'], []),
+                'class'          => [],
+            ];
+        }
+        return $periodList;
     }
 }
