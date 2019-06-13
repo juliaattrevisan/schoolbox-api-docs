@@ -20,152 +20,152 @@ class UserProfile
     /**
      * @var int
      */
-    protected $user_id;
+    private $user_id;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var Alaress_Date_Format
      */
-    protected $dob;
+    private $dob;
 
     /**
      * @var string
      */
-    protected $level;
+    private $level;
 
     /**
      * @var string
      */
-    protected $homegroup;
+    private $homegroup;
 
     /**
      * @var string
      */
-    protected $house;
+    private $house;
 
     /**
      * @var string
      */
-    protected $guardian1_name;
+    private $guardian1_name;
 
     /**
      * @var string
      */
-    protected $guardian1_home_phone;
+    private $guardian1_home_phone;
 
     /**
      * @var string
      */
-    protected $guardian1_work_phone;
+    private $guardian1_work_phone;
 
     /**
      * @var string
      */
-    protected $guardian1_mobile_phone;
+    private $guardian1_mobile_phone;
 
     /**
      * @var string
      */
-    protected $guardian1_address;
+    private $guardian1_address;
 
     /**
      * @var string
      */
-    protected $guardian1_suburb;
+    private $guardian1_suburb;
 
     /**
      * @var string
      */
-    protected $guardian1_postcode;
+    private $guardian1_postcode;
 
     /**
      * @var string
      */
-    protected $guardian1_email;
+    private $guardian1_email;
 
     /**
      * @var string
      */
-    protected $guardian1_mail_address;
+    private $guardian1_mail_address;
 
     /**
      * @var string
      */
-    protected $guardian2_name;
+    private $guardian2_name;
 
     /**
      * @var string
      */
-    protected $guardian2_home_phone;
+    private $guardian2_home_phone;
 
     /**
      * @var string
      */
-    protected $guardian2_work_phone;
+    private $guardian2_work_phone;
 
     /**
      * @var string
      */
-    protected $guardian2_mobile_phone;
+    private $guardian2_mobile_phone;
 
     /**
      * @var string
      */
-    protected $guardian2_address;
+    private $guardian2_address;
 
     /**
      * @var string
      */
-    protected $guardian2_suburb;
+    private $guardian2_suburb;
 
     /**
      * @var string
      */
-    protected $guardian2_postcode;
+    private $guardian2_postcode;
 
     /**
      * @var string
      */
-    protected $guardian2_email;
+    private $guardian2_email;
 
     /**
      * @var string
      */
-    protected $guardian2_mail_address;
+    private $guardian2_mail_address;
 
     /**
      * @var string
      */
-    protected $title;
+    private $title;
 
     /**
      * @var string
      */
-    protected $given_name;
+    private $given_name;
 
     /**
      * @var string
      */
-    protected $preferred_name;
+    private $preferred_name;
 
     /**
      * @var string
      */
-    protected $last_name;
+    private $last_name;
 
     /**
      * @var string
      */
-    protected $gender;
+    private $gender;
 
     /**
      * @var string
      */
-    protected $email;
+    private $email;
 
     /**
      * @return int|null
