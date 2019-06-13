@@ -57,8 +57,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
 
         $this->redis = $this->getDi()->get('redis');
-        $newsMapper = \Schoolbox\Comms\News\Mapper::getInstance();
-        $planMapper = Schoolbox\Assessment\Participant\Plan\Mapper::getInstance();
 
         // non-blocking search of the keyspace for all messages
         $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");
@@ -73,7 +71,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 $rawRedisData = $this->redis->get($key);
                 $instance = unserialize(gzuncompress($rawRedisData));
             } catch (Exception $e) {
-                $this->getLogger()->warning("[SKIPPING] type-{$keyType} : {$key}");
+                $this->getLogger()->debug("[SKIPPING] type-{$keyType} : {$key}");
                 continue;
             }
 
@@ -100,42 +98,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 } catch (Exception $e) {
                     $this->deleteFromRedis('CompressedTrigger for deleted object', null, $key);
                 }
-            } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
+            } elseif ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
                 // CancelTrigger
                 $this->deleteFromRedis('CancelTrigger', null, $key);
-            } else {
-                // Message
-                $output = $instance->jsonSerialize();
-                $this->getLogger()->info(date('Y-m-d H:i:s', $output['time']));
-                $triggerDate = \Alaress_Date_Format::newFromTimestamp((int)$output['time']);
-
-                foreach ($output['topics'] as $topic) {
-                    $this->getLogger()->info($topic);
-                    if (preg_match('/duework\.([0-9]+)\./', $topic, $matches)) {
-                        $id = (int)$matches[1];
-                        try {
-                            $planMapper->findById($id);
-                        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                            $this->getLogger()->warning("Plan {$id} is deleted.");
-                            $this->deleteFromRedis("Message for plan {$id}", $triggerDate, $key);
-                        } catch (Exception $e) {
-                            $this->getLogger()->warning("Plan {$id} not found.");
-                            $this->deleteFromRedis("Message for plan {$id}", $triggerDate, $key);
-                        }
-                    } elseif (preg_match('/news\.([0-9]+)\./', $topic, $matches)) {
-                        $id = (int)$matches[1];
-                        try {
-                            $newsMapper->findById($id);
-                        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-                            $this->getLogger()->warning("News {$id} is deleted.");
-                            $this->deleteFromRedis("Message for news {$id}", $triggerDate, $key);
-                        } catch (Exception $e) {
-                            $this->getLogger()->warning("News {$id} not found.");
-                            $this->deleteFromRedis("Message for news {$id}", $triggerDate, $key);
-                        }
-                    }
-                }
             }
+            // The rest of the cases should be taken care by the reset-ttls.php script.
         }
     }
 
