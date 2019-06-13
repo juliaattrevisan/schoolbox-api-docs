@@ -11,6 +11,7 @@
 
 namespace Schoolbox\External;
 use Schoolbox;
+use Schoolbox\UserMapper;
 
 class UserProfileMapper extends Schoolbox\Mapper {
 
@@ -66,31 +67,31 @@ class UserProfileMapper extends Schoolbox\Mapper {
             'property' => 'guardian1MobilePhone',
             'type'     => self::TYPE_STRING,
         ));
-        $this->hasMap(array(
-            'column'   => 'guardian1Address',
-            'property' => 'guardian1Address',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'guardian1Suburb',
-            'property' => 'guardian1Suburb',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'guardian1Postcode',
-            'property' => 'guardian1Postcode',
-            'type'     => self::TYPE_STRING,
-        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian1Address',
+//            'property' => 'guardian1Address',
+//            'type'     => self::TYPE_STRING,
+//        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian1Suburb',
+//            'property' => 'guardian1Suburb',
+//            'type'     => self::TYPE_STRING,
+//        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian1Postcode',
+//            'property' => 'guardian1Postcode',
+//            'type'     => self::TYPE_STRING,
+//        ));
         $this->hasMap(array(
             'column'   => 'guardian1Email',
             'property' => 'guardian1Email',
             'type'     => self::TYPE_STRING,
         ));
-        $this->hasMap(array(
-            'column'   => 'guardian1MailAddress',
-            'property' => 'guardian1MailAddress',
-            'type'     => self::TYPE_STRING,
-        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian1MailAddress',
+//            'property' => 'guardian1MailAddress',
+//            'type'     => self::TYPE_STRING,
+//        ));
         $this->hasMap(array(
             'column'   => 'guardian2Name',
             'property' => 'guardian2Name',
@@ -111,31 +112,31 @@ class UserProfileMapper extends Schoolbox\Mapper {
             'property' => 'guardian2MobilePhone',
             'type'     => self::TYPE_STRING,
         ));
-        $this->hasMap(array(
-            'column'   => 'guardian2Address',
-            'property' => 'guardian2Address',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'guardian2Suburb',
-            'property' => 'guardian2Suburb',
-            'type'     => self::TYPE_STRING,
-        ));
-        $this->hasMap(array(
-            'column'   => 'guardian2Postcode',
-            'property' => 'guardian2Postcode',
-            'type'     => self::TYPE_STRING,
-        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian2Address',
+//            'property' => 'guardian2Address',
+//            'type'     => self::TYPE_STRING,
+//        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian2Suburb',
+//            'property' => 'guardian2Suburb',
+//            'type'     => self::TYPE_STRING,
+//        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian2Postcode',
+//            'property' => 'guardian2Postcode',
+//            'type'     => self::TYPE_STRING,
+//        ));
         $this->hasMap(array(
             'column'   => 'guardian2Email',
             'property' => 'guardian2Email',
             'type'     => self::TYPE_STRING,
         ));
-        $this->hasMap(array(
-            'column'   => 'guardian2MailAddress',
-            'property' => 'guardian2MailAddress',
-            'type'     => self::TYPE_STRING,
-        ));
+//        $this->hasMap(array(
+//            'column'   => 'guardian2MailAddress',
+//            'property' => 'guardian2MailAddress',
+//            'type'     => self::TYPE_STRING,
+//        ));
         $this->hasMap(array(
             'column'   => 'title',
             'property' => 'title',
@@ -170,7 +171,7 @@ class UserProfileMapper extends Schoolbox\Mapper {
         $this->hasJoin(
             'user',
             array(
-                'mapper'    => '\\Schoolbox\\UserMapper',
+                'mapper'    => UserMapper::class,
                 'this_key'  => 'user_id',
                 'other_key' => 'id',
             )
