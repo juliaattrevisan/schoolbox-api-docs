@@ -320,12 +320,12 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      */
     public function handleError($identifier, $command, $data)
     {
-        $this->log->warning("[AbstractHandler] Received worker error for '$command'");
+        $this->log->warning("[AbstractScheduler] Received worker error for '$command'");
 
         // If this is handling ExternalException from a worker, most likely that this is caused by
         // SIS connector outage. Hence, rescheduling it.
         if ($identifier instanceof TriggerInterface && $command === DefaultDispatchStrategy::TASK_PUBLISH) {
-            $this->log->warning("[AbstractHandler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, array('char' => '-'));
+            $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, array('char' => '-'));
             $this->schedule($identifier, $this->timerCallback(), true, self::RETRY_TIME);
         }
     }
