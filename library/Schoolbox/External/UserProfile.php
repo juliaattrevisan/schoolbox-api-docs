@@ -70,27 +70,7 @@ class UserProfile
     /**
      * @var string
      */
-    private $guardian1_address;
-
-    /**
-     * @var string
-     */
-    private $guardian1_suburb;
-
-    /**
-     * @var string
-     */
-    private $guardian1_postcode;
-
-    /**
-     * @var string
-     */
     private $guardian1_email;
-
-    /**
-     * @var string
-     */
-    private $guardian1_mail_address;
 
     /**
      * @var string
@@ -115,27 +95,7 @@ class UserProfile
     /**
      * @var string
      */
-    private $guardian2_address;
-
-    /**
-     * @var string
-     */
-    private $guardian2_suburb;
-
-    /**
-     * @var string
-     */
-    private $guardian2_postcode;
-
-    /**
-     * @var string
-     */
     private $guardian2_email;
-
-    /**
-     * @var string
-     */
-    private $guardian2_mail_address;
 
     /**
      * @var string
@@ -348,56 +308,71 @@ class UserProfile
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian1Address(): ?string
     {
-        return $this->guardian1_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian1_address
      * @return static
      */
     public function setGuardian1Address(string $guardian1_address): self
     {
-        $this->guardian1_address = $guardian1_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian1Suburb(): ?string
     {
-        return $this->guardian1_suburb;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian1_suburb
      * @return static
      */
     public function setGuardian1Suburb(string $guardian1_suburb): self
     {
-        $this->guardian1_suburb = $guardian1_suburb;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian1Postcode(): ?string
     {
-        return $this->guardian1_postcode;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian1_postcode
      * @return static
      */
     public function setGuardian1Postcode(string $guardian1_postcode): self
     {
-        $this->guardian1_postcode = $guardian1_postcode;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -420,20 +395,25 @@ class UserProfile
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian1MailAddress(): ?string
     {
-        return $this->guardian1_mail_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian1_mail_address
      * @return static
      */
     public function setGuardian1MailAddress(string $guardian1_mail_address): self
     {
-        $this->guardian1_mail_address = $guardian1_mail_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -510,56 +490,71 @@ class UserProfile
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian2Address(): ?string
     {
-        return $this->guardian2_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian2_address
      * @return static
      */
     public function setGuardian2Address(string $guardian2_address): self
     {
-        $this->guardian2_address = $guardian2_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian2Suburb(): ?string
     {
-        return $this->guardian2_suburb;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian2_suburb
      * @return static
      */
     public function setGuardian2Suburb(string $guardian2_suburb): self
     {
-        $this->guardian2_suburb = $guardian2_suburb;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian2Postcode(): ?string
     {
-        return $this->guardian2_postcode;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian2_postcode
      * @return static
      */
     public function setGuardian2Postcode(string $guardian2_postcode): self
     {
-        $this->guardian2_postcode = $guardian2_postcode;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -582,20 +577,25 @@ class UserProfile
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @return string|null
      */
     public function getGuardian2MailAddress(): ?string
     {
-        return $this->guardian2_mail_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
+        return null;
     }
 
     /**
+     * @deprecated The user profile no longer provides address data
+     *
      * @param string $guardian2_mail_address
      * @return static
      */
     public function setGuardian2MailAddress(string $guardian2_mail_address): self
     {
-        $this->guardian2_mail_address = $guardian2_mail_address;
+        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
