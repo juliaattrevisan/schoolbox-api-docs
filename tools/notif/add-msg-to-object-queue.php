@@ -65,6 +65,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 $rawRedisData = $this->redis->get($key);
                 $instance = unserialize(gzuncompress($rawRedisData));
             } catch (Exception $e) {
+                $this->getLogger()->debug("[SKIPPING] type-{$keyType} : {$key}");
                 continue;
             }
 
