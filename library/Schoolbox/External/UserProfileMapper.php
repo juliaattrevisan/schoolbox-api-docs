@@ -17,6 +17,8 @@ use Schoolbox\UserMapper;
  *
  * This is only used by the Schoolbox connector.
  *
+ * @method UserProfile createModel($idValue = null)
+ * @method UserProfile findById($identifierValue)
  * @method UserProfile findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
 class UserProfileMapper extends Schoolbox\Mapper
