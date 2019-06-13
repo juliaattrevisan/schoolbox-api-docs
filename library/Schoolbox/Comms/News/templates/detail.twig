@@ -1,10 +1,10 @@
 {#
 Data:
     article                 News\Model
-    moderationEnabled       bool
     isSavedForLater         bool
     availableEntityTypes    string[]         The set of entity types that can be audienced by the current user
     entityTypesData         array
+    policies                array
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -164,7 +164,8 @@ Data:
                 {% include '@commsNews/layout/banner.twig' with {
                     article:     article,
                     modifyRoute: modifyRoute,
-                    isAuthor:    isAuthor
+                    isAuthor:    isAuthor,
+                    commentsIsEnabled: policies.commentsIsEnabled
                 } only %}
             </div>
         </section>

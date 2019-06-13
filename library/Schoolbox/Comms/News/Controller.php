@@ -584,8 +584,6 @@ class Controller extends Base
      */
     public function getDetail(Model $article): void
     {
-        $moderationEnabled = $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION);
-
         /* Figure out if this was Saved For Later for the current user
          */
         $saveForLater    = $this->getConfigLoader()->get(ConfigMapper::_SAVE_FOR_LATER);
@@ -644,13 +642,16 @@ class Controller extends Base
             $data = [
                 'article'               => $article,
                 'flashMessage'          => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
-                'moderationEnabled'     => $moderationEnabled,
                 'isSavedForLater'       => $isSavedForLater,
                 'returnUrl'             => $this->getExplicitReturnUrl(),
                 'encodedSegments'       => $this->getAudienceSegments($article, true),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
                 'isPublishable'         => $this->generateValidSubmittedArticleSpec()->isSatisfiedBy($article),
+                'policies'  => [
+                    'moderationEnabled'     => $this->getConfigLoader()->get(ConfigMapper::_GLOBAL_MODERATION),
+                    'commentsIsEnabled'     => $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                ],
             ];
         }
 
@@ -733,7 +734,8 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver,
-            $this->commentMapper
+            $this->commentMapper,
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(
             $params,
             $this->getUser()
@@ -815,6 +817,8 @@ class Controller extends Base
      */
     public function getListForIndex() :void
     {
+        $commentCounts = [];
+
         $articleIds = (new Lists\Index(
             0,
             $this->topicMapper,
@@ -826,7 +830,8 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver,
-            $this->commentMapper
+            $this->commentMapper,
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(new Querystring([]), $this->getUser());
 
         $articles = $this->newsMapper->findByColumn('id', $articleIds, ['order'=>['publish_at'=>'DESC']]);
@@ -834,11 +839,6 @@ class Controller extends Base
         /* TODO: Repair statistics logging here
          * See usages of saveImpression()
          */
-
-        $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
-            Helper::getThreadIdsFromCollection($articles),
-            $this->commentMapper::THREAD_ID
-        );
 
         $map = [
             'id',
@@ -861,11 +861,22 @@ class Controller extends Base
         ];
 
         $articles->reindex();
+
+        /**
+         * If comment module is enabled, load comment counts by thread ids
+         */
+        if ($this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)) {
+            $commentCounts = $this->commentMapper->getCommentCountByThreadIds(
+                Helper::getThreadIdsFromCollection($articles),
+                $this->commentMapper::THREAD_ID
+            );
+        }
+
         $articles = $articles->jsonSerialize(
             new PropertyDecorator(
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                new BlurbDecorator($this->getConfigLoader()->get('read_more')),
+                new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
                 new MetadataDecorator($commentCounts)
             )
         );
@@ -1014,7 +1025,8 @@ class Controller extends Base
             $this->statisticsCumulativeMapper,
             $this->databaseInternal,
             $this->articleResolver,
-            $this->commentMapper
+            $this->commentMapper,
+            $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(
             $urlPrefix,
             $params,
@@ -1169,7 +1181,7 @@ class Controller extends Base
 
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get('read_more')))
+            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));

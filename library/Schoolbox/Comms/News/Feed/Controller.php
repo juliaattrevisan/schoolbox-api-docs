@@ -165,7 +165,8 @@ class Controller extends Base
                 $this->statisticsCumulativeMapper,
                 $this->databaseInternal,
                 $this->articleResolver,
-                $this->commentMapper
+                $this->commentMapper,
+                $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
             ))->find($params, $user);
             $articles = $articleData['articles'];
         }
@@ -197,7 +198,8 @@ class Controller extends Base
                 $this->statisticsCumulativeMapper,
                 $this->databaseInternal,
                 $this->articleResolver,
-                $this->commentMapper
+                $this->commentMapper,
+                $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
             ))->find($params, $user);
 
             /* Hydrate the set
