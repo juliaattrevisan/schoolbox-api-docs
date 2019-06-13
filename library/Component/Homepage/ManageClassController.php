@@ -227,11 +227,11 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     private function buildCourseMarkbookLink(bool $isUnitPage, bool $isCoursePage): ?string
     {
+        $courseSpec = $this->getContext()->getCourseSpecification();
         if ($isCoursePage) {
-            return $this->getRouter()->generate('courseMarkbook.getRedirect', [
-                'courseSpecId' => $this->getContext()->getCourseSpecification()->getId(),
-                'unitSpecId'   => 0,
-                'folderId'     => 0,
+            return $this->getRouter()->generate('courseMarkbook.getMarkbook', [
+                'courseSpec'   => $courseSpec,
+                'courseSpecId' => $courseSpec->getId(),
             ]);
         }
         if ($isUnitPage) {
