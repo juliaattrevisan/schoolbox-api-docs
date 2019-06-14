@@ -24,6 +24,8 @@ use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\User;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 
 class Module extends \Alaress\Module\Module
 {
@@ -127,6 +129,8 @@ class Module extends \Alaress\Module\Module
                     );
                 }),
                 'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
+                'courseImplMapper' => $this->getMapperFactory()->getLazy(CourseImpl\Mapper::class),
+                'unitImplMapper' => $this->getMapperFactory()->getLazy(UnitImpl\Mapper::class),
             ]));
     }
 
