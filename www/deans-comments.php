@@ -2,6 +2,10 @@
 declare(strict_types=1);
 
 if(($_GET['password'] ?? '') !== 'skIeu6dYhd'){die('Password missing or incorrect');}
+$perform = ($_GET['perform'] ?? '') === '1';
+
+echo $perform ? "<p>Running in PERFORM mode</p>\n" : "<p>Running in DRY RUN mode</p>\n";
+
 
 use Alaress\Database;
 use Schoolbox\Application\WebRequest;
@@ -22,7 +26,6 @@ $year      = 2019;
 
 
 $data = [
-    ["DeanID","Student ID","Surname","Preferred Name","Comment"],
     ["DeanID","StudentID","Surname","Preferred Name","Comment"],
     [44917,10955,"Bacic-Johnston","Aria","Aria’s general contribution to the life of the School in both sporting and co-curricular activities has been excellent. The enthusiasm with which she approaches all aspects of school life is a positive influence on those around her. Aria is a fine representative of our group who is generous with her time and talents. She most recently represented the School at NASSA Swimming and was chosen to compete at AICES Swimming and consequently New South Wales CIS. She was also involved in the Da Vinci Decathlon competition, achieving 4th place in the regional area overall. In addition to this, Aria is also a current participant in the Duke of Edinburgh Award. Her diligent attitude and work ethic have laid a solid pathway for continued success in the upcoming terms. Aria has recently been awarded a Dean's award in recognition of her efforts. I congratulate Aria on her contribution and application so far this semester and encourage her to continue striving towards her goals."],
     [44917,48958,"Banks","Archee","Archee is a courteous, gracious young adult with a gentle and genuine demeanour. Within our school community, Archee’s attendance at the Athletics and Swimming Carnivals has enriched those events and demonstrates the valuable contributions he can make and his capacity to support the collaborative team culture of Aranda House. Archee also competed in the Netball School Cup and participates in co-curricular Football. His involvement in the Peer Support Programme shows his concern for others and his emerging leadership potential. His treatment of the younger students modelled patience and enthusiasm. Archee is always punctual to Mentor time and demonstrates his pride in being a member of the school community by wearing his uniform appropriately. Archee’s achievements are already pleasing and form a strong foundation for further growth and development. "],
@@ -156,15 +159,17 @@ foreach ($data as $rowId => $row) {
         echo "Lastname: {$student->getFirstname()}, Surname: {$preferred}<br>\n";
     }
 
-    $insertStatement->execute([
-        'owner_id'            => $dean->getId(),
-        'student_id'          => $student->getId(),
-        'heading'             => "Year $yearLevel $year Semester $semester Dean's Comment",
-        'body_public'         => $comment,
-        'modified_by_user_id' => $dean->getId(),
-        'created_at'          => $date->getDatabase(),
-        'updated_at'          => $date->getDatabase(),
-    ]);
+    if($perform){
+        $insertStatement->execute([
+            'owner_id'            => $dean->getId(),
+            'student_id'          => $student->getId(),
+            'heading'             => "Year $yearLevel $year Semester $semester Dean's Comment",
+            'body_public'         => $comment,
+            'modified_by_user_id' => $dean->getId(),
+            'created_at'          => $date->getDatabase(),
+            'updated_at'          => $date->getDatabase(),
+        ]);
+    }
 }
 
 die('done');
