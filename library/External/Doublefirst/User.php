@@ -1153,7 +1153,7 @@ class External_Doublefirst_User implements External_UserInterface
         $query = "
             SELECT DISTINCT YearGroup AS Code, YearGroup AS Description
             FROM V_PupilBasicInformation
-            WHERE YearGroup IS NOT NULL OR NULLIF(YearGroup,'') IS NOT NULL
+            WHERE YearGroup IS NOT NULL OR ISNULL(YearGroup, '') != ''
         ";
         return $this->getDatabase()->getAll($query);
     }
