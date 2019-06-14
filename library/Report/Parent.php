@@ -202,9 +202,9 @@ class Report_Parent extends Report_Abstract
         }
 
         if (strlen($this->getYearLevel())) {
-            $heading = 'Year ' . $this->getYearLevelDescription($this->getYearLevel());
+            $heading = ': ' . $this->getYearLevelDescription($this->getYearLevel());
         } else if (strlen($this->getSearchForm())) {
-            $heading = 'Form ' . $this->getSearchForm();
+            $heading = ': Form ' . $this->getSearchForm();
         } else {
             $heading = '';
         }
