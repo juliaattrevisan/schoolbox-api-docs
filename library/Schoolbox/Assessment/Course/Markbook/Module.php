@@ -86,12 +86,6 @@ class Module extends \Alaress\Module\Module
                 if (!\array_key_exists('courseSpec', $params)) {
                     throw new \InvalidArgumentException('No CourseSpec found in route params');
                 }
-                /** @var CourseSpec\Model $courseSpec */
-                $courseSpec = $params['courseSpec'];
-                if ($this->getAccess()->getFolderAccess($user, $courseSpec->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new Unauthorized('You do not have permission to view this course');
-                }
             })
         );
     }
