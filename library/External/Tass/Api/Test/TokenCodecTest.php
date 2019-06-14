@@ -44,10 +44,6 @@ class TokenCodecTest extends TestCase
     {
         $unpacked = $codec->unpackToken($codec->generateToken($data));
         $this->assertSame($data, $unpacked);
-
-        foreach ($data as $key => $value) {
-            $this->assertSame($value, $unpacked[$key]);
-        }
     }
 
 
