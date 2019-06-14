@@ -498,4 +498,13 @@ interface External_UserInterface extends External\IConnector
      * @return array [['Code' => string, 'Description' => string], ...]
      */
     public function getStudentForms(): array;
+
+    /**
+     * Retrieves a unique list of all year levels.
+     *
+     * @importance low - used on student report only.
+     *
+     * @return array [['Code' => string, 'Description' => string], ...]
+     */
+    public function getAllYearLevels(): array;
 }

@@ -525,4 +525,14 @@ class External_Isams_User implements External_UserInterface
     {
         return [];
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels(): array
+    {
+        return [];
+    }
 }

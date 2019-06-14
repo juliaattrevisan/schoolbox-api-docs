@@ -1350,4 +1350,15 @@ class External_Synergetic_User implements External_UserInterface
 
         return $fileYear === null ? null : (string)$fileYear;
     }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels(): array
+    {
+        $query = "SELECT DISTINCT Code, Description FROM  dbo.luYearLevel";
+        return $this->getConnector()->executeQuery($query)->fetchAll();
+    }
 }

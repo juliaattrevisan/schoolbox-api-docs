@@ -554,6 +554,16 @@ class External_Humanedge_User implements External_UserInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels(): array
+    {
+        return [];
+    }
+
+    /**
      * @param MSSQL $database
      */
     private function setDatabase($database)

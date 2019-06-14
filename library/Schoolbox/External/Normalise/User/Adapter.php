@@ -1429,7 +1429,17 @@ class Adapter {
      */
     public function getStudentForms(): array
     {
-        return $this->handler->getStudentForms();
+        return $this->getHandler()->getStudentForms();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels()
+    {
+        return [];
     }
 }
 

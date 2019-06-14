@@ -1143,6 +1143,16 @@ class External_Doublefirst_User implements External_UserInterface
         return $this->getDatabase()->getAll($query);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return array
+     */
+    public function getAllYearLevels(): array
+    {
+        return [];
+    }
+
     /* Getters/Setters
       */
 

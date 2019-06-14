@@ -44,23 +44,41 @@ class Report_Parent extends Report_Abstract
     private $boardingStatusOptions = array('any', 'yes', 'no');
 
     /**
-     * Constructor
+     * All available year levels from SIS
      *
+     * @var array
+     */
+    private $sisAllYearLevels;
+
+    /**
+     * Allowed searchable years for parents
+     *
+     * @var array
+     */
+    private $allowedSearchableYears;
+
+    /**
+     * Report_Parent constructor.
      * @param $page
      * @param $yearLevel
      * @param $searchName
      * @param $searchBoardingStatus
      * @param $searchForm
+     * @throws Exception
      */
     public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm)
     {
         $this->setGroupHandler(new Group());
 
-        // Must provide an int or be empty
+        $this->setExternalUserHandler(new External_User());
+
         $yearLevel = trim($yearLevel);
+        $this->sisAllYearLevels = $this->getExternalUserHandler()->getAllYearLevels();
+        $this->allowedSearchableYears = $this->filterToStudentYearLevels($this->getChildrensYears(), $this->sisAllYearLevels);
+        $yearColumn = array_column($this->allowedSearchableYears, 'Code');
 
         // Parents may only search in their student's year level
-        if ($this->isYearsRestricted() && !(in_array($yearLevel, $this->getChildrensYears()) || $yearLevel == '')) {
+        if ($this->isYearsRestricted() && !(in_array($yearLevel, $yearColumn) || $yearLevel == '')) {
             error(155);
         }
 
@@ -80,7 +98,6 @@ class Report_Parent extends Report_Abstract
         } else {
             $this->setPage($page);
 
-            $this->setExternalUserHandler(new External_User());
 
             $this->setup();
 
@@ -125,7 +142,8 @@ class Report_Parent extends Report_Abstract
             if (Cfg::get('restrict_parent_directory')) {
                 if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
                     foreach ($_SESSION['children'] as $currentChild) {
-                        if ($currentChild['year'] == $this->getYearLevel()) {
+                        $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
+                        if ($student['StudentYearLevel'] == $this->getYearLevel()) {
                             return true;
                         }
                     }
@@ -146,9 +164,8 @@ class Report_Parent extends Report_Abstract
         $this->getPage()->setFile(TEMPLATE_content, 'modules/report/parents.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_boarder', 'has_boarder_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'has_year_selector', 'has_year_selector_block');
-        $this->getPage()->setBlock('has_year_selector', 'year_selector_option', 'year_selector_option_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'all_year_selector', 'all_year_selector_block');
+        $this->getPage()->setBlock('all_year_selector', 'all_year_option', 'all_year_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'search_form_option', 'search_form_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'show_filter_options', 'show_filter_options_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'email_all_parents', 'email_all_parents_block');
@@ -185,9 +202,9 @@ class Report_Parent extends Report_Abstract
         }
 
         if (strlen($this->getYearLevel())) {
-            $heading = 'Year ' . $this->getYearLevel();
+            $heading = ': ' . $this->getYearLevelDescription($this->getYearLevel());
         } else if (strlen($this->getSearchForm())) {
-            $heading = 'Form ' . $this->getSearchForm();
+            $heading = ': Form ' . $this->getSearchForm();
         } else {
             $heading = '';
         }
@@ -245,33 +262,28 @@ class Report_Parent extends Report_Abstract
             $this->getPage()->setVar('search_form_option_block', '');
         }
 
+
         if ($this->isYearsRestricted()) {
-            $allYears = $this->getChildrensYears();
 
-            foreach ($allYears as $currentYear) {
-                if ($currentYear == $this->getYearLevel()) {
-                    $selected = 'selected="selected"';
-                } else {
-                    $selected = '';
-                }
+            $allYears = $this->sisAllYearLevels;
 
-                $this->getPage()->setVar(
-                    array(
-                        'YEAR_SELECTOR_VALUE'       => $currentYear,
-                        'YEAR_SELECTOR_SELECTED'    => $selected,
-                        'YEAR_SELECTOR_DESCRIPTION' => $currentYear,
-                    )
-                );
-
-                $this->getPage()->parse('year_selector_option_block', 'year_selector_option', true);
-            }
-
-            $this->getPage()->parse('has_year_selector_block', 'has_year_selector');
-            $this->getPage()->setVar('has_year_input_block', '');
         } else {
-            $this->getPage()->setVar('has_year_selector_block', '');
-            $this->getPage()->parse('has_year_input_block', 'has_year_input');
+
+            $allYears = $this->allowedSearchableYears;
+
         }
+
+        foreach ($allYears as $year) {
+            $this->getPage()->setVar([
+                'YEAR_CODE' => $year['Code'],
+                'YEAR_DESCRIPTION' => $year['Description'],
+                'YEAR_SELECTED' => $year['Code'] == $this->getYearLevel() ? 'selected="selected"' : '',
+            ]);
+
+            $this->getPage()->parse('all_year_option_block', 'all_year_option', true);
+        }
+
+        $this->getPage()->parse('all_year_selector_block', 'all_year_selector');
     }
 
 
@@ -301,13 +313,37 @@ class Report_Parent extends Report_Abstract
         $allYears = array();
         if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
             foreach ($_SESSION['children'] as $currentChild) {
-                $allYears[$currentChild['year']] = true;
+                $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
+                $allYears[$student['StudentYearLevel']] = true;
             }
         }
         $allYears = array_keys($allYears);
         return $allYears;
     }
 
+    /**
+     * Filters all year levels based on parent's student year levels to get the year level description
+     *
+     * @param array $studentYearLevelsSIS (e.g. [5,6,9,12])
+     * @param array $allYearLevelsSIS - two-dimentional array of all years (e.g. [['Code'] => 5, ['Description']=>'Year 5',...])
+     * @return array - returns a two-dimentional array
+     */
+    protected function filterToStudentYearLevels(array $studentYearLevelsSIS, array $allYearLevelsSIS): array
+    {
+        $intersection = [];
+        if (!empty($studentYearLevelsSIS)) {
+            foreach ($studentYearLevelsSIS as $studentYear) {
+                foreach ($allYearLevelsSIS as $yearSIS) {
+                    if ($studentYear == $yearSIS['Code']) {
+                        $intersection[] = $yearSIS;
+                    }
+                }
+            }
+        } else {
+            $intersection = $allYearLevelsSIS;
+        }
+        return $intersection;
+    }
 
     /**
      * Render data
@@ -683,6 +719,20 @@ class Report_Parent extends Report_Abstract
     protected function getBoardingStatusOptions()
     {
         return $this->boardingStatusOptions;
+    }
+
+    /**
+     * @param string $yearLevelCode
+     * @return string|null
+     */
+    protected function getYearLevelDescription(string $yearLevelCode): ?string
+    {
+        foreach ($this->allowedSearchableYears as $year) {
+            if ($yearLevelCode == $year['Code']) {
+                return $year['Description'];
+            }
+        }
+        return null;
     }
 }
 
