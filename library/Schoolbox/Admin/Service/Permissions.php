@@ -10,9 +10,16 @@
 namespace Schoolbox\Admin\Service;
 
 use Schoolbox\Permission\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Permissions
 {
+
+    /**
+     * This var is no longer in existence but it's in the lookup
+     */
+    private const SERVICE_TUTORIAL = 4;
+
 
     /**
      * @var Access\UserAccessMapper
@@ -51,12 +58,15 @@ class Permissions
         $query = '
             SELECT id, name
             FROM lu_service
-            WHERE id NOT IN (1, 4)
+            WHERE id NOT IN (:homepageConst, :tutorialConst)
             ORDER BY name
         ';
 
         $statement = $this->userAccessMapper->getDatabase()->prepare($query);
-        $statement->execute();
+        $statement->execute([
+            'homepageConst' => UserAccess::SERVICE_HOMEPAGE,
+            'tutorialConst' => self::SERVICE_TUTORIAL
+        ]);
 
         while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
