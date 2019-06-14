@@ -83,8 +83,7 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
                     $this->getSelectionMapper(),
                     $this->getFolderMapper(),
                     $this->getAccess(),
-                    $this->getFilterMapper(),
-                    $this->getUnitImplMapper()
+                    $this->getCourseImplMapper()
                 );
             case Filters\Assessment\Folder\StudentInteractions\Definition::class:
                 return new Filters\Assessment\Folder\StudentInteractions\Factory(
@@ -234,17 +233,6 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getMapperFactory()->get(Access::class);
-    }
-
-
-    /**
-     * @return Filter\Mapper
-     * @throws InvalidArgumentException
-     */
-    private function getFilterMapper(): Filter\Mapper
-    {
-        /** @noinspection PhpIncompatibleReturnTypeInspection */
-        return $this->getMapperFactory()->get(Filter\Mapper::class);
     }
 
 

@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
-use function count;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\Folder\KeyConverter;
@@ -16,9 +15,8 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Filter\Filters\Assessment\Folder as FolderFilter;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Mapper;
 
 /**
  * A factory for building CourseImport 'Folder' filter objects
@@ -26,11 +24,8 @@ use Schoolbox\Mapper;
 class Factory extends FolderFilter\Factory
 {
 
-    /** @var Filter\Mapper */
-    private $filterMapper;
-
-    /** @var UnitImplementation\Mapper */
-    private $unitImplMapper;
+    /** @var CourseImplementation\Mapper */
+    private $courseImplMapper;
 
 
     /**
@@ -39,8 +34,7 @@ class Factory extends FolderFilter\Factory
      * @param Filter\Selection\Mapper            $selectionMapper
      * @param Folder\Mapper                      $folderMapper
      * @param Access                             $access
-     * @param Filter\Mapper                      $filterMapper
-     * @param UnitImplementation\Mapper          $unitImplMapper
+     * @param CourseImplementation\Mapper        $courseImplMapper
      */
     public function __construct(
         Filter\Page\Option\Mapper $optionMapper,
@@ -48,12 +42,10 @@ class Factory extends FolderFilter\Factory
         Filter\Selection\Mapper $selectionMapper,
         Folder\Mapper $folderMapper,
         Access $access,
-        Filter\Mapper $filterMapper,
-        UnitImplementation\Mapper $unitImplMapper
+        CourseImplementation\Mapper $courseImplMapper
     ) {
         parent::__construct($optionMapper, $defaultMapper, $selectionMapper, $folderMapper, $access);
-        $this->filterMapper   = $filterMapper;
-        $this->unitImplMapper = $unitImplMapper;
+        $this->courseImplMapper = $courseImplMapper;
     }
 
 
@@ -74,14 +66,12 @@ class Factory extends FolderFilter\Factory
 
     /**
      * The 'Course Import Folder' component has the following custom functionality:
-     * * It inserts any folders specified in GET args if user has READ+ perm to them
-     * * Inserts any folders where GET-injected UnitImportSpecs reside
+     * * It inserts any folders specified in GET args if user is staff or instructor
+     * * Inserts any folders where course has been imported to
      *
      * @inheritDoc
      * @return Filter\IComponent|FolderFilter\Component
      * @throws \InvalidArgumentException If $viewee is null
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     public function buildComponent(
         Filter\IDefinition $definition,
@@ -101,20 +91,43 @@ class Factory extends FolderFilter\Factory
             $extraFolders = $this->getFolderMapper()->findByColumn($this->getFolderMapper()->getIdentifierColumn(), $folderIds);
 
             foreach ($extraFolders as $extraFolder) {
-                // Ensure user is Staff or has WRITE+ perm to the requested folder (this will also be enforced via key-converter)
-                if ($user->getRole()->isStaff() || $this->getAccess()->getFolderAccess($user, $extraFolder->getId()) >= UserAccess::ACCESS_WRITE) {
+                if ($this->isStaffOrInstructor($user, $extraFolder)) {
                     $folders[$extraFolder->getId()] = $extraFolder;
                 }
             }
         }
 
-        // Course Markbook enables insertion of unit-import-specs and their host folders
-        // TODO inspect new $routeArgs to more-reliably determine CourseSpec if on PAGE_COURSE_MARK_BOOK
+        // Course-markbook is only interested in units specs that were previously imported to folders,
+        // not the current courseSpec's unitSpecs
         if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
-            if (null === $folderOverrides) {
-                $folderOverrides = new GenericCollection(Filter\Selection\Model::class);
+
+            // Remove any folders that were added via override, only populate with relevant folders
+            // But don't modify the folder overrides, they will continue to affect selection of available folder options
+            // This ensures a user can't inject a random folder and unit-spec and see assessments that were not imported from the courseSpec
+            $folders = $this->getFolderMapper()->createCollection();
+
+            // Find all folders where the course has been imported
+            $courseSpecId     = $this->findCourseSpecModel($routeArgs)->getId();
+            $courseImpls      = $this->courseImplMapper->findAllByCourseSpecificationId($courseSpecId);
+            $availableFolders = $this->getFolderMapper()->createCollection();
+            foreach ($courseImpls as $courseImpl) {
+                $folder = $courseImpl->getFolder();
+                if ($this->isStaffOrInstructor($user, $folder)) {
+                    $availableFolders[$folder->getId()] = $folder;
+                }
             }
-            $this->insertUnitImportSpecFolders($definition, $user, $pageFilter, $overrides, $folders, $folderOverrides);
+
+            // If configured to display groups, we need to re-hydrate to check whether folder is a group
+            if ($pageFilter->getOptions()[Definition::KEY_GROUPS]->getAvailable()) {
+                $availableFolders = $this->getFolderMapper()->findByColumn('id', $availableFolders->getPropertyValues('id'));
+            }
+
+            // Ensure the admin has configured this sort of folder to be available.
+            foreach ($availableFolders as $folder) {
+                if ($this->isAvailable($folder->getFolder(), $pageFilter->getOptions())) {
+                    $folders[$folder->getId()] = $folder;
+                }
+            }
         }
 
         return new Component(
@@ -145,84 +158,30 @@ class Factory extends FolderFilter\Factory
 
 
     /**
-     * Inspects the query overrides for any UnitImportSpecs. If found, inserts any corresponding folders into the
-     * folder options, and mutates the overrides to ensure they are selected.
+     * Returns whether the specified user has the staff role type, or is an instructor of the specified folder
      *
-     * Ignores admin-configured group/class folder settings.
-     *
-     * @param Filter\IDefinition                                             $definition
-     * @param User                                                           $user
-     * @param Filter\Page\Model                                              $pageFilter
-     * @param GenericCollection|GenericCollection|Filter\Selection\Model[][] $overrides
-     * @param GenericCollection|Folder\Model[]                               $folders
-     * @param GenericCollection|Filter\Selection\Model[]                     $folderOverrides
-     * @throws \Schoolbox\Mapper\Exception     If unable to create a Selection model
+     * @param User         $user
+     * @param Folder\Model $folder
+     * @return bool
      */
-    private function insertUnitImportSpecFolders(
-        Filter\IDefinition $definition,
-        User $user,
-        Filter\Page\Model $pageFilter,
-        GenericCollection $overrides,
-        GenericCollection $folders,
-        GenericCollection $folderOverrides
-    ): void {
-        $definitionClass = Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class;
-        /** @var Filter\Model $unitSpecFilter */
-        $unitSpecFilter    = $this->filterMapper->findByClass($definitionClass)->first();
-        $unitSpecOverrides = $overrides[$unitSpecFilter->getId()];
-
-        if (!$unitSpecOverrides || count($unitSpecOverrides) === 0) {
-            // If no UnitSpecs requested via query args, then no folders require insertion and we are done.
-            return;
-        }
-
-        // Find any unit impls imported from these specs
-        $unitImpls = $this->unitImplMapper->findAllByUnitSpecificationId($unitSpecOverrides->getPropertyValues('key'));
-
-        foreach ($unitImpls as $unitImpl) {
-            $folderId = $unitImpl->getFolder()->getId();
-            // Ensure user is STAFF or has WRITE perm to the requested folder (this will also be enforced via key-converter)
-            if (!$user->getRole()->isStaff() && $this->getAccess()->getFolderAccess($user, $folderId) < UserAccess::ACCESS_WRITE) {
-                continue;
-            }
-
-            // Ensure the admin has configured this sort of folder to be available.
-            if (!$this->isAvailable($unitImpl->getFolder(), $pageFilter->getOptions())) {
-                continue;
-            }
-            // Insert folder into available options
-            $folders[$folderId] = $unitImpl->getFolder();
-
-            // Tweak overrides to ensure folder is selected
-            if (!$folderOverrides->keyExists($folderId)) {
-                $folderOverrides[$folderId] = $this->getSelectionMapper()->createModel()
-                                                   ->setFilter($definition->getFilter())
-                                                   ->setUser($user)
-                                                   ->setPage($pageFilter->getPage())
-                                                   ->setKey((string)$folderId)
-                                                   ->setSelected(false);
-            }
-
-        }
+    private function isStaffOrInstructor(User $user, Folder\Model $folder): bool
+    {
+        return $user->getRole()->isStaff() || $this->getAccess()->getFolderAccess($user, $folder->getId()) >= UserAccess::ACCESS_WRITE;
     }
 
 
     /**
      * Returns whether the admin has configured this sort of folder to be available in the filter options
      *
-     * @param Folder\Model                                 $folder
+     * @param Folder\Model                                 $folder (Must have group relationship hydrated if displaying groups)
      * @param GenericCollection|Filter\Page\Option\Model[] $options
      * @return bool
-     * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      */
     private function isAvailable(Folder\Model $folder, GenericCollection $options): bool
     {
         if ($options[Definition::KEY_CLASSES]->getAvailable() && ($folder->isClass() || $folder->wasClass())) {
             return true;
         }
-        // Re-hydrate group
-        $folder = $this->getFolderMapper()->findById($folder->getId());
         if ($folder->isGroup() && $options[Definition::KEY_GROUPS]->getAvailable()) {
             return true;
         }

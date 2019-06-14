@@ -16,11 +16,9 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Filter\Filters\Assessment\NullableContext;
-use TypeError;
 
 /**
  * A factory for building 'UnitSpec' filter objects
@@ -97,7 +95,7 @@ class Factory extends NullableContext\Factory
 
         $folders = $this->folderMapper->createCollection();
 
-        // Course-markbook is interested in units specs that were previously imported to folders,
+        // Course-markbook is only interested in units specs that were previously imported to folders,
         // not the current courseSpec's unitSpecs
         if (Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
             $courseSpecId = $this->findCourseSpecModel($routeArgs)->getId();
@@ -230,24 +228,6 @@ class Factory extends NullableContext\Factory
         $groupAccessLevel = $getGroups ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_FULL + 1;
 
         return $this->folderMapper->findForUser($viewee, $getClasses, $groupAccessLevel, false);
-    }
-
-
-    /**
-     * Finds a returns the first course specification model from an array of route args
-     *
-     * @param array $routeArgs
-     * @return CourseSpec\Model
-     * @throws TypeError If no CourseSpec model found in $routeArgs
-     */
-    private function findCourseSpecModel(array $routeArgs): CourseSpec\Model
-    {
-        foreach ($routeArgs as $routeArg) {
-            if ($routeArg instanceof CourseSpec\Model) {
-                return $routeArg;
-            }
-        }
-        return null;
     }
 
 
