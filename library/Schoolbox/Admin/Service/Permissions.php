@@ -9,15 +9,10 @@
 
 namespace Schoolbox\Admin\Service;
 
-use ReflectionClass;
 use Schoolbox\Permission\Access;
 
 class Permissions
 {
-    /**
-     * Service prefix
-     */
-    private const PREFIX = 'SERVICE_';
 
     /**
      * @var Access\UserAccessMapper
@@ -34,17 +29,6 @@ class Permissions
         $this->userAccessMapper = $userAccessMapper;
     }
 
-    /**
-     * Make fit for human consumption
-     *
-     * @param string $name
-     * @return string
-     */
-    private function nice(string $name) : string
-    {
-        return ucwords(strtolower(str_replace([self::PREFIX, '_'], ['', ' '], $name)));
-    }
-
 
     /**
      * Generate the list
@@ -55,24 +39,29 @@ class Permissions
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \PDOException
      */
     public function generate() : array
     {
         $services = [];
 
-        $constants = (new ReflectionClass(Access\UserAccess::class))->getConstants();
+        /* We don't need to list the HOMEPAGE service (1) here
+         * The TUTORIAL service (4) got deleted at some point
+         */
+        $query = '
+            SELECT id, name
+            FROM lu_service
+            WHERE id NOT IN (1, 4)
+            ORDER BY name
+        ';
 
-        ksort($constants);
+        $statement = $this->userAccessMapper->getDatabase()->prepare($query);
+        $statement->execute();
 
-        foreach ($constants as $constant => $value) {
-            if (strpos($constant, self::PREFIX) > -1) {
-                if ($value !== Access\UserAccess::SERVICE_HOMEPAGE) {
-                    $services[$this->nice($constant)] = $this->userAccessMapper->findUsersForService($value)->getUnique('id')->indexBy('id');
-                }
-            }
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
         }
 
         return $services;
     }
-
 }
