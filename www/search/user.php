@@ -28,11 +28,11 @@ use Schoolbox\User as SchoolboxUser;
  */
 function renderParent(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator)
 {
-    $externalUser = $synUserHandler->getParent($user['synergy_id']);
-    $enrolments = $synUserHandler->getEnrolledStudents($user['synergy_id']);
+    $externalUser = $user['synergy_id'] ? $synUserHandler->getParent($user['synergy_id']) : [];
     $students = new Collection();
 
-    if (\is_array($enrolments)) {
+    if ($user['synergy_id']) {
+        $enrolments = $synUserHandler->getEnrolledStudents($user['synergy_id']);
         foreach ($enrolments as $child) {
             try {
                 $students->add($userMapper->findByExternalId($child['RelatedID']));
@@ -95,7 +95,7 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
  */
 function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserMapper $userMapper, Eportfolio_Authenticator $authenticator, IConfigLoader $config)
 {
-    $externalUser = $synUserHandler->getStaff($user['synergy_id']);
+    $externalUser = $user['synergy_id'] ? $synUserHandler->getStaff($user['synergy_id']) : [];
     /** @var SchoolboxUser $sessionUser */
     $sessionUser = $_SESSION["user"];
 
@@ -142,15 +142,18 @@ function renderStaff(SitePage $page, $user, External_User $synUserHandler, UserM
  */
 function renderStudent(SitePage $page, $user, Group $groupHandler, External_User $synUserHandler, External_Class $classHandler, UserMapper $userMapper, FolderMapper $folderMapper, Eportfolio_Authenticator $authenticator, ProfessionalDevelopmentMapper $pdMapper)
 {
-    $externalUser                  = $synUserHandler->getStudent($user['synergy_id']);
-    $externalUser['AlertMessages'] = preg_split(
-        '/[\\n\\r]+/',
-        $externalUser['AlertMessage'],
-        -1,
-        PREG_SPLIT_NO_EMPTY
-    );
-    if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
-        $externalUser['AlertMessages'][] = "Court Order - ".trim($externalUser["CourtOrderType"]);
+    $externalUser = [];
+    if ($user['synergy_id']) {
+        $externalUser = $synUserHandler->getStudent($user['synergy_id']);
+        $externalUser['AlertMessages'] = preg_split(
+            '/[\\n\\r]+/',
+            $externalUser['AlertMessage'],
+            -1,
+            PREG_SPLIT_NO_EMPTY
+        );
+        if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
+            $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
+        }
     }
 
     /** @var SchoolboxUser $sessionUser */
@@ -299,8 +302,8 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
 
     // Load contact's user IDs
     $contacts    = [];
-    $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
-    if (is_array($contactList)) {
+    if ($user['synergy_id']) {
+        $contactList = $synUserHandler->getStudentContactList($user['synergy_id']);
         foreach ($contactList as $contact) {
             $main = null;
             try {
