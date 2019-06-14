@@ -23,6 +23,8 @@ use function trim;
  */
 class TokenCodec
 {
+    // The cipher method that openssl should use to encrypt/decrypt the token
+    private const CIPHER_METHOD = 'aes-128-ecb';
 
     /**
      * @var string
@@ -68,7 +70,7 @@ class TokenCodec
     public function generateToken(array $data): string
     {
         $parameters = json_encode($data);
-        $encrypted  = openssl_encrypt($parameters, 'aes-128-ecb', $this->decodedApiKey, OPENSSL_RAW_DATA);
+        $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedApiKey, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
     }
@@ -83,7 +85,7 @@ class TokenCodec
     public function unpackToken(string $token): array
     {
         $encrypted  = base64_decode($token);
-        $parameters = openssl_decrypt($encrypted, 'aes-128-ecb', $this->decodedApiKey, OPENSSL_RAW_DATA);
+        $parameters = openssl_decrypt($encrypted, self::CIPHER_METHOD, $this->decodedApiKey, OPENSSL_RAW_DATA);
 
         return json_decode($parameters, true);
     }
