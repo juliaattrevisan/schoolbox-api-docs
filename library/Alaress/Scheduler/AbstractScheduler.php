@@ -15,6 +15,7 @@ use Alaress\Scheduler\Trigger\CancelTrigger;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\DispatcherInterface;
+use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use InvalidArgumentException;
@@ -40,6 +41,9 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
 
     /** @var IClock */
     private $clock;
+
+    /** @var int Retry time in seconds to reschedule */
+    private const RETRY_TIME = 300;
 
 
     /**
@@ -168,9 +172,10 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      * @param TriggerInterface $trigger
      * @param callable         $callable
      * @param bool             $cancelPrevious
+     * @param null|int         $interval  in seconds
      * @return bool
      */
-    protected function schedule(TriggerInterface $trigger, callable $callable, $cancelPrevious = true)
+    protected function schedule(TriggerInterface $trigger, callable $callable, $cancelPrevious = true, ?int $interval = null)
     {
         // can't schedule a cancel trigger
         if ($trigger instanceof CancelTrigger) {
@@ -188,12 +193,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $label = $trigger->getLabel();
 
         /** @var TimerInterface $timer */
-        $timer = $this->loop->addTimer($trigger->getTimestamp() - $this->clock->time(), $callable);
+        $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
+        $timer = $this->loop->addTimer($interval, $callable);
         $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
         $this->log->info(
-            sprintf("Scheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
+            sprintf("[AbstractScheduler] Scheduling trigger '%s' for %s in %s seconds", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp()), $interval),
             ['char' => '+']
         );
 
@@ -314,7 +320,14 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
      */
     public function handleError($identifier, $command, $data)
     {
-        $this->log->notice("Received worker error for '$command': $data");
+        $this->log->warning("[AbstractScheduler] Received worker error for '$command'");
+
+        // If this is handling ExternalException from a worker, most likely that this is caused by
+        // SIS connector outage. Hence, rescheduling it.
+        if ($identifier instanceof TriggerInterface && $command === DefaultDispatchStrategy::TASK_PUBLISH) {
+            $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, array('char' => '-'));
+            $this->schedule($identifier, $this->timerCallback(), true, self::RETRY_TIME);
+        }
     }
 
 

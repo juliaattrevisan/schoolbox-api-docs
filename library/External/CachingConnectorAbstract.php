@@ -36,7 +36,10 @@ class CachingConnectorAbstract
      *
      * @var IOfflineConnector
      */
-    private $offline;
+    private $offlineConnector;
+
+    /** @var bool */
+    private $isOffline = false;
 
     /** @var Redis */
     private $cache;
@@ -54,9 +57,9 @@ class CachingConnectorAbstract
      */
     public function __construct(IConnector $database, IOfflineConnector $offline, Redis $cache, string $timeout = null)
     {
-        $this->database = $database;
-        $this->offline  = $offline;
-        $this->cache    = $cache;
+        $this->database         = $database;
+        $this->offlineConnector = $offline;
+        $this->cache            = $cache;
 
         if ($timeout === null) {
             // Null is fine
@@ -77,9 +80,13 @@ class CachingConnectorAbstract
      * @param string $method
      * @param array  $params
      * @return mixed
+     * @throws External\Exception
      */
     protected function bypassCache(string $method, array $params)
     {
+        if (PHP_SAPI === 'cli' && $this->isOffline) {
+            throw new External\Exception('SIS connector is offline.');
+        }
         return call_user_func_array([$this->database, $method], $params);
     }
 
@@ -93,10 +100,11 @@ class CachingConnectorAbstract
      * @param array    $params
      * @param int|null $timeoutOverride Optionally override configured timeout
      * @return mixed
+     * @throws External\Exception
      */
     protected function getCachedResult(string $method, array $params, int $timeoutOverride = null)
     {
-        if ($this->isOffline()) {
+        if ($this->isOffline) {
             return $this->bypassCache($method, $params);
         }
 
@@ -109,12 +117,15 @@ class CachingConnectorAbstract
         try {
             return $this->cache->cacheFunctionCall($key, $callback, $params, $timeoutOverride ?? $this->timeout);
         } /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (External\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
-
+        catch (\Alaress\Database\Exception $e) {
+            $this->isOffline = true;
             // If there was ANY problem with the connection, fall back to offline implementation for remainder of request
-            $this->database = $this->offline;
-
+            if (PHP_SAPI === 'cli') {
+                throw new \Schoolbox\External\Exception('SIS connector failed to execute function: ' . $e->getMessage());
+            } else {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+                $this->database = $this->offlineConnector;
+            }
             return $this->bypassCache($method, $params);
         }
     }
@@ -126,16 +137,5 @@ class CachingConnectorAbstract
     protected function getTimeout(): ?int
     {
         return $this->timeout;
-    }
-
-
-    /**
-     * Returns whether this connector is in offline mode
-     *
-     * @return bool
-     */
-    private function isOffline(): bool
-    {
-        return $this->database instanceof IOfflineConnector;
     }
 }

@@ -49,7 +49,11 @@ class ErrorIOListener extends LogIOListener
      */
     public function dataReceived(StreamEvent $e)
     {
-        $this->log->error($e->getData());
+        if (strpos($e->getData(), 'SIS connector') > 0) {
+            $this->log->error('[ErrorIOListener] Caught SIS connector issue.');
+        } else {
+            $this->log->error($e->getData());
+        }
 
         // draw the hard line: you get data down this pipe, say goodbye to the worker
         try {
