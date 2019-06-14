@@ -725,7 +725,7 @@ class Report_Parent extends Report_Abstract
      * @param string $yearLevelCode
      * @return string|null
      */
-    protected function getYearLevelDescription(string $yearLevelCode)
+    protected function getYearLevelDescription(string $yearLevelCode): ?string
     {
         foreach ($this->allowedSearchableYears as $year) {
             if ($yearLevelCode == $year['Code']) {
