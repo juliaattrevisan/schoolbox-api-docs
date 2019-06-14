@@ -61,7 +61,6 @@ $attendanceDay = $_POST['attendanceDay'];
 $timetableGroup = $_POST['timetableGroup'];
 
 // Deal with it all
-new \Alaress_Probe($_POST);die();
 try {
 
     $externalUserHandler = new External_User();
