@@ -890,7 +890,7 @@ class External_Tass_User implements External_UserInterface
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         return [];
     }

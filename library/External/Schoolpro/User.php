@@ -605,7 +605,7 @@ class External_Schoolpro_User implements External_UserInterface
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         return [];
     }

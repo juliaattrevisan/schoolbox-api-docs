@@ -550,7 +550,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         return [];
     }

@@ -603,7 +603,7 @@ class External_Denbigh_User implements External_UserInterface
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         return [];
     }

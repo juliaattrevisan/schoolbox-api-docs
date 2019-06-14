@@ -648,7 +648,7 @@ class External_Pcschools_User implements External_UserInterface
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         return [];
     }

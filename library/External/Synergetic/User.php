@@ -1356,7 +1356,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return array
      */
-    public function getAllYearLevels()
+    public function getAllYearLevels(): array
     {
         $query = "SELECT DISTINCT Code, Description FROM  dbo.luYearLevel";
         return $this->getConnector()->executeQuery($query)->fetchAll();
