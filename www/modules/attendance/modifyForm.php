@@ -61,7 +61,6 @@ $attendanceDay = $_POST['attendanceDay'];
 $timetableGroup = $_POST['timetableGroup'];
 
 // Deal with it all
-
 try {
 
     $externalUserHandler = new External_User();

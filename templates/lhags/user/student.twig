@@ -1,0 +1,54 @@
+{% extends '@core/user/student.twig' %}
+
+{% block details_formTeacher %}
+    {% if showClasses %}
+        {% if formTeacher %}
+            {% set inSeniorCampus = false %}
+
+            {% for campus in user.campusCollection %}
+                {% if campus.extTimetableCode == 'SEN' %}
+                    {% set inSeniorCampus = true %}
+                {% endif %}
+            {% endfor %}
+
+            <dt class="small-4 medium-3 columns">
+                {% if inSeniorCampus %}
+                    Home Group Teacher:
+                {% else %}
+                    Class Teacher:
+                {% endif %}
+            </dt>
+            <dd class="small-8 medium-9 columns">
+                {% if formTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ formTeacher.email }}">{{ formTeacher.formatName }}</a>
+                {% else %}
+                    {{ formTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_formTeacher %}
+
+{% block details_studentForm %}
+    {% if showClasses %}
+        {% if externalUser.StudentForm %}
+
+            {% set inSeniorCampus = false %}
+
+            {% for campus in user.campusCollection %}
+                {% if campus.extTimetableCode == 'SEN' %}
+                    {% set inSeniorCampus = true %}
+                {% endif %}
+            {% endfor %}
+
+            <dt class="small-4 medium-3 columns">
+                {% if inSeniorCampus %}
+                    Home Group:
+                {% else %}
+                    Class:
+                {% endif %}
+            </dt>
+            <dd class="small-8 medium-9 columns">{{ externalUser.StudentForm }}</dd>
+        {% endif %}
+    {% endif %}
+{% endblock details_studentForm %}
