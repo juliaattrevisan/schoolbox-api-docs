@@ -74,9 +74,13 @@
 
                         <li class="icon-teacher">
                             <strong>Teacher in Charge:</strong>
+                            <!-- BEGIN teacher_in_charge_link_start -->
                             <a href="/search/user/{EVENT_TEACHER_IN_CHARGE_ID}">
+                            <!-- END teacher_in_charge_link_start -->
                                 {EVENT_TEACHER_IN_CHARGE_NAME}
+                            <!-- BEGIN teacher_in_charge_link_end -->
                             </a>
+                            <!-- END teacher_in_charge_link_end -->
                         </li>
 
                         <li class="icon-location">
@@ -85,7 +89,13 @@
 
                         <li class="icon-staff-students">
                             <strong>Created by:</strong>
-                            <a href="/search/user/{EVENT_AUTHOR_ID}">{EVENT_AUTHOR_NAME}</a>
+                            <!-- BEGIN author_link_start -->
+                            <a href="/search/user/{EVENT_AUTHOR_ID}">
+                            <!-- END author_link_start -->
+                                {EVENT_AUTHOR_NAME}
+                            <!-- BEGIN author_link_end -->
+                            </a>
+                            <!-- END author_link_end -->
                             on {EVENT_CREATED_AT}
                         </li>
                     </ul>
