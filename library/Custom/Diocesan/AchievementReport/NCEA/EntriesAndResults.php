@@ -64,7 +64,7 @@ class EntriesAndResults extends Base
              */
             if (!in_array($result, $this->getExclusionLetterRegistry())) {
                 if (strlen($result) && ($internalExternal == 'EX') && ($studentYear == $this->getCurrentYear())) {
-                    $result = "[{$result}]";
+                    $result = "[{$strippedResult}]";
                 }
             }
             else {

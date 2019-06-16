@@ -143,6 +143,7 @@ class Controller extends Base {
             'template' => '@standardisedTest/StandardisedTest.twig',
             'data' => [
                 'externalUser' => $externalUser,
+                'user' => $user,
             ]
         ));
     }
