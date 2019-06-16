@@ -88,9 +88,9 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
     if (!$authenticator->isStatusChangeAllowed($event, $status)) {
         $l10n = $page->getDi()->get('l10n');
-        $exceptionError = ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
+        $errorMessage = ErrorMapper::getInstance()->getMessageById(ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS);
 
-        throw new SchoolboxException($l10n->translateSentence($exceptionError->getMessage()), ErrorMapper::ERROR_EOTC_EVENT_NO_STUDENTS, $error);
+        throw new SchoolboxException($l10n->translateSentence($errorMessage));
     }
 
     $event->getMetadata()->setStatus($status);
