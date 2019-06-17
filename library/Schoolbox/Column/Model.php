@@ -42,7 +42,16 @@ class Model implements IColumnType {
                 ? $mapper->getSetMethodName($id_property)
                 : $mapper->getSetIdentifierMethodName();
 
-            $model->$identifier_method($value);
+            // Hydrate the identifier before setting it, if possible
+            $identifier         = $mapper->getIdentifier();
+            $identifierHydrator = $identifier['hydrator'] ?? null;
+            if ($identifierHydrator instanceof IColumnType) {
+                $identifierJoin       = $identifier['join'] ?? null;
+                $identifierJoinMapper = $identifierJoin ? $mapper->getJoinMapper($identifierJoin) : null;
+                $model->$identifier_method($identifierHydrator->hydrate($value, $identifierJoinMapper));
+            } else {
+                $model->$identifier_method($value);
+            }
 
             return $model;
         });
