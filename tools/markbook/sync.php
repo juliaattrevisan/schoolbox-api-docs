@@ -316,6 +316,7 @@ $kernel->run(function (Injector $di, LoopInterface $loop, LoggerInterface $log, 
                         $return = new ReturnedWork();
                         $return->setSubmissionBox($submissionBox->getSubmissionBox());
                         $return->setNormalizedMark($result[0]['norm_mark']);
+                        $return->setHumanReadableMark($result[0]['visible_mark']);
                         $return->setMarker($marker);
                         $return->setOwner($owner);
                         $return->setComment($result[0]['comment']);
