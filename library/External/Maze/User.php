@@ -14,6 +14,8 @@ use Schoolbox\User;
 class External_Maze_User implements External_UserInterface
 {
 
+    protected const REPLACE_CHARACTERS_FROM_YEAR_LEVEL = "REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '')";
+
     /**
      * An instance of MSSQL
      *
@@ -287,7 +289,7 @@ class External_Maze_User implements External_UserInterface
          *
          * StudentForm is an identifier; StudentFormStaffName is their full name.
          */
-        $query = "
+        $query = sprintf("
 			SELECT
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentGiven1,
@@ -305,7 +307,7 @@ class External_Maze_User implements External_UserInterface
 				'' AS FormDescription,
 				ST.HOUSE AS StudentHouse,
 				KGH.DESCRIPTION AS StudentHouseDescription,
-				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				%s AS StudentYearLevel,
 				'' AS StudentYearLevelCoordinator,
 				'' AS YearLevelCoordID,
 				'' AS StudentLockerBook,
@@ -339,7 +341,7 @@ class External_Maze_User implements External_UserInterface
 			LEFT JOIN SF ADVISOR ON KCT.SFLINK = ADVISOR.SFKEY
 			LEFT JOIN KCY ON ST.SCHOOL_YEAR = KCY.KCYKEY
 			WHERE STKEY = '{$externalUserId}'
-		";
+		", self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL);
 
         $student = $this->getDb()->getRow($query);
 
@@ -448,12 +450,12 @@ class External_Maze_User implements External_UserInterface
     {
         /* Mega select
          */
-        $query = "
+        $query = sprintf("
 			SELECT
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentPreferred,
 				ST.SURNAME AS StudentSurname,
-				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				%s AS StudentYearLevel,
 				ST.HOUSE AS StudentHouse,
 				ST.BOARDER AS StudentBoarder,
 				KGC.DESCRIPTION AS StudentForm,
@@ -502,7 +504,7 @@ class External_Maze_User implements External_UserInterface
 			LEFT JOIN UM ON DF.HOMEKEY = UM.UMKEY
 			LEFT JOIN KGC ON ST.ROLL_GROUP = KGC.ROLL_GROUP
 			WHERE 1 = 1
-		";
+		", self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL);
 
         /* Search for a particular year level
          */
@@ -873,7 +875,7 @@ class External_Maze_User implements External_UserInterface
      */
     public function getStudentUserAccountInfo(): array
     {
-        $query = "
+        $query = sprintf("
 			SELECT
 				USER_NAME AS NetworkLogin,
 				NULL AS StudentTitle,
@@ -881,13 +883,13 @@ class External_Maze_User implements External_UserInterface
 				SURNAME AS StudentSurname,
 				STKEY AS StudentID,
 				NULL AS StudentOccupEmail,
-				REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS StudentYearLevel,
+				%s AS StudentYearLevel,
 				HOUSE AS StudentHouse,
 				BOARDER AS boarding_status,
 				CAMPUS AS campus
 			FROM ST
 			WHERE STATUS != 'LEFT'
-		";
+		", self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL);
 
         return $this->getDb()->getAll($query);
     }
@@ -1042,11 +1044,11 @@ class External_Maze_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        $query = "
-            SELECT DISTINCT REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS Code, REPLACE(REPLACE(ST.SCHOOL_YEAR, 'Y0', ''), 'Y', '') AS Description
+        $query = sprintf("
+            SELECT DISTINCT %s AS Code, %s AS Description
             FROM ST
-            WHERE ST.SCHOOL_YEAR IS NOT NULL OR NULLIF(ST.SCHOOL_YEAR,'') IS NOT NULL
-        ";
+            WHERE ISNULL(ST.SCHOOL_YEAR, '') != ''
+        ", self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL, self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL);
         return $this->getDb()->getAll($query);
     }
 

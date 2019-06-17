@@ -536,7 +536,7 @@ class External_Isams_User implements External_UserInterface
         $query =" 
             SELECT DISTINCT Grade AS Code, Grade AS Description
             FROM        V_Student
-            WHERE Grade IS NOT NULL OR NULLIF(Grade,'') IS NOT NULL            
+            WHERE ISNULL(Grade, '') != ''            
         ";
         return $this->getConnector()->executeQuery($query)->fetchAll();
     }
