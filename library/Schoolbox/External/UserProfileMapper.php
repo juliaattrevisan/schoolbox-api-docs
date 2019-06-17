@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External;
 
+use PDOStatement;
 use Schoolbox;
 use Schoolbox\UserMapper;
 
@@ -72,6 +73,52 @@ class UserProfileMapper extends Schoolbox\Mapper
      */
     public function findByExternalId(string $externalId): UserProfile
     {
-        return $this->findOneByColumn('user.synergy_id', $externalId);
+        return $this->findOneByColumn('u.synergy_id', $externalId);
+    }
+
+    /**
+     * Include the user object in any profiles retrieved.
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')}
+        ";
+    }
+
+    /**
+     * Include the user object in any profiles retrieved.
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->database->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('user', '', 'u')}
+        ";
+    }
+
+    /**
+     * Include the user object in any profiles retrieved.
+     *
+     * @param PDOStatement $statement
+     * @return Schoolbox\GenericCollection|UserProfile[]
+     * @throws Schoolbox\Mapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $result = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var UserProfile $profile */
+            $profile = $this->hydrate($row);
+            $profile->setUser($this->hydrateJoin($row, 'user', 'u'));
+            $result[$row['user_id']] = $profile;
+        }
+        return $result;
     }
 }
