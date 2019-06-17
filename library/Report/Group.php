@@ -46,9 +46,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'profile_home_phone'   => 'Home Phone',
         'profile_mobile_phone' => 'Mobile Phone',
         'profile_work_phone'   => 'Work Phone',
-        'profile_address'      => 'Address',
-        'profile_suburb'       => 'Suburb',
-        'profile_postcode'     => 'Postcode',
     );
 
     // fields that we will permit sorting on
@@ -156,10 +153,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             p.dob AS profile_dob,
             p.guardian1HomePhone AS profile_home_phone,
             p.guardian1MobilePhone AS profile_mobile_phone,
-            p.guardian1WorkPhone profile_work_phone,
-            p.guardian1Address AS profile_address,
-            p.guardian1Suburb AS profile_suburb,
-            p.guardian1Postcode AS profile_postcode
+            p.guardian1WorkPhone profile_work_phone
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
