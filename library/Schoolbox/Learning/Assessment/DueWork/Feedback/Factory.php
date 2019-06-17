@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -17,7 +18,6 @@ use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 
 class Factory
@@ -94,16 +94,16 @@ class Factory
      * Factory constructor.
      *
      * @param IFeedbackDataSource|DueWorkFeedbackDataSource $dueWorkFeedbackDataSource
-     * @param Participant $participant
-     * @param User $currentUser
-     * @param string $mark
-     * @param string $comment
-     * @param string $publish one of ['0'|'1']
-     * @param array $files
-     * @param bool $fromInlineGrader
-     * @param string $reviewRoute
-     * @param IFeedback|DueWorkFeedback|null $mostRecentFeedback
-     * @param DueWorkResponse|null $response
+     * @param Participant                                   $participant
+     * @param User                                          $currentUser
+     * @param string                                        $mark
+     * @param string                                        $comment
+     * @param string                                        $publish   one of ['0'|'1']
+     * @param array                                         $files
+     * @param bool                                          $fromInlineGrader
+     * @param string                                        $reviewRoute
+     * @param IFeedback|DueWorkFeedback|null                $mostRecentFeedback
+     * @param DueWorkResponse|null                          $response
      */
     public function __construct(
         IFeedbackDataSource $dueWorkFeedbackDataSource,
@@ -126,7 +126,7 @@ class Factory
         $this->comment                   = $comment;
         $this->publish                   = $publish;
         $this->files                     = $files;
-        $this->fromInlineGrader             = $fromInlineGrader;
+        $this->fromInlineGrader          = $fromInlineGrader;
         $this->reviewRoute               = $reviewRoute;
         $this->response                  = $response;
     }
