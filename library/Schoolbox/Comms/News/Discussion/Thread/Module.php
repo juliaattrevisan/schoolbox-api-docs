@@ -10,6 +10,7 @@ namespace Schoolbox\Comms\News\Discussion\Thread;
 
 use Alaress\Authorizer as Auth;
 use Schoolbox\Comms\News;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
 
@@ -91,15 +92,18 @@ class Module extends Thread\Module
      */
     protected function buildPostCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponContext(
-                    new News\Discussion\Permission\CanPostComment($authorizer)
-                );
-            })
+        return new Auth\Rule\All (
+            new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
+            new Auth\Rule\Any(
+                new Auth\Rule\IsSuperuser(),
+                new Auth\Rule\LazyCallback(function () {
+                    /** @var Auth\Authorizer $authorizer */
+                    $authorizer = $this->getInjector()->get('authorizer');
+                    return new Thread\Authorizer\CanActUponContext(
+                        new News\Discussion\Permission\CanPostComment($authorizer)
+                    );
+                })
+            )
         );
     }
 
