@@ -17,7 +17,9 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Thread;
+use Schoolbox\IMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Module for discussion comment requests.
@@ -139,9 +141,22 @@ abstract class Module extends BaseModule
      */
     public function preloadComment(array $params): array
     {
-        return [
-            'comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
-        ];
+        try {
+            return [
+                'comment' => $this->getMapperFactory()->get(Mapper::class)->findById($params['id']),
+            ];
+        } catch (Exception $e) {
+            throw $this->getErrorMapper()->generateException(\Schoolbox\Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+        }
+    }
+
+    /**
+     * @return Error\Mapper|IMapper
+     * @throws \InvalidArgumentException If mapper class not found
+     */
+    private function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class);
     }
 
 
