@@ -888,7 +888,7 @@ class External_Synergetic_User implements External_UserInterface
         }
         $relationships = $this->getRelationshipBindings();
         $contactTypes = $this->getStudentContactTypeBindings();
-        $externalIds = Builder::getArrayBindings(array_fill(0, 3, $externalId), 'externalId');
+        $externalIds = Builder::getArrayBindings(array_fill(0, 3, $externalUserId), 'externalId');
         $externalIdPlaceholders = array_keys($externalIds['bindings']);
 
         $query = "
