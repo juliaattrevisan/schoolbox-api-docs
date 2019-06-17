@@ -74,16 +74,19 @@ class Module extends Comment\Module
      */
     protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return new Auth\Rule\Any(
-            new Auth\Rule\IsSuperuser(),
-            new Comment\Authorizer\IsCommentAuthor(),
-            new Auth\Rule\LazyCallback(function () {
-                /** @var Auth\Authorizer $authorizer */
-                $authorizer = $this->getInjector()->get('authorizer');
-                return new Thread\Authorizer\CanActUponContext(
-                    new News\Discussion\Permission\CanModerateThread($authorizer)
-                );
-            })
+        return new Auth\Rule\All (
+            new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
+            new Auth\Rule\Any(
+                new Auth\Rule\IsSuperuser(),
+                new Comment\Authorizer\IsCommentAuthor(),
+                new Auth\Rule\LazyCallback(function () {
+                    /** @var Auth\Authorizer $authorizer */
+                    $authorizer = $this->getInjector()->get('authorizer');
+                    return new Thread\Authorizer\CanActUponContext(
+                        new News\Discussion\Permission\CanModerateThread($authorizer)
+                    );
+                })
+            )
         );
     }
 
