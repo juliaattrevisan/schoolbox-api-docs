@@ -61,9 +61,6 @@
 
                     <th class="rb-criterion-name">{{ critUsage.indicator.name }}</th>
 
-                    {# Required so that this form is recognised as containing a rubric, even if nothing is submitted #}
-                    <input name="saveEmpty" value="true" type="hidden"/>
-
                     {% set indicatorId   = critUsage.indicator.id %}
                     {% set indicatorMark = rubricMarkedGrid
                         ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)

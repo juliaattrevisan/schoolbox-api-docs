@@ -5,8 +5,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
@@ -71,11 +71,11 @@ class Factory
     private $files;
 
     /**
-     * Does this feedback have associated rubric marks ?
+     * Does this updated from inline grader
      *
      * @var bool
      */
-    private $hasRubric;
+    private $fromInlineGrader;
 
     /**
      * By which work-flow was the feedback created
@@ -94,28 +94,28 @@ class Factory
      * Factory constructor.
      *
      * @param IFeedbackDataSource|DueWorkFeedbackDataSource $dueWorkFeedbackDataSource
-     * @param Participant                                   $participant
-     * @param User                                          $currentUser
-     * @param IFeedback|DueWorkFeedback|null                $mostRecentFeedback
-     * @param string                                        $mark
-     * @param string                                        $comment
-     * @param string                                        $publish   one of ['0'|'1']
-     * @param array                                         $files
-     * @param bool                                          $hasRubric
-     * @param string                                        $reviewRoute
-     * @param DueWorkResponse|null                          $response
+     * @param Participant $participant
+     * @param User $currentUser
+     * @param string $mark
+     * @param string $comment
+     * @param string $publish one of ['0'|'1']
+     * @param array $files
+     * @param bool $fromInlineGrader
+     * @param string $reviewRoute
+     * @param IFeedback|DueWorkFeedback|null $mostRecentFeedback
+     * @param DueWorkResponse|null $response
      */
     public function __construct(
         IFeedbackDataSource $dueWorkFeedbackDataSource,
         Participant $participant,
         User $currentUser,
-        IFeedback $mostRecentFeedback = null,
         $mark,
         $comment,
         $publish,
         $files,
-        $hasRubric,
+        $fromInlineGrader,
         string $reviewRoute,
+        IFeedback $mostRecentFeedback = null,
         DueWorkResponse $response = null
     ) {
         $this->dueWorkFeedbackDataSource = $dueWorkFeedbackDataSource;
@@ -126,7 +126,7 @@ class Factory
         $this->comment                   = $comment;
         $this->publish                   = $publish;
         $this->files                     = $files;
-        $this->hasRubric                 = $hasRubric;
+        $this->fromInlineGrader             = $fromInlineGrader;
         $this->reviewRoute               = $reviewRoute;
         $this->response                  = $response;
     }
@@ -136,8 +136,10 @@ class Factory
      * such as mark, comment, publish, authors and attachments
      *
      * @return DueWorkFeedback
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function produce()
+    public function produce(): DueWorkFeedback
     {
         // Is this the first feedback for this participant, or is most recent feedback already published ?
         if (is_null($this->mostRecentFeedback) || $this->mostRecentFeedback->isPublished()) {
@@ -154,31 +156,10 @@ class Factory
         }
 
         // mutate model found, and save
-        $postMark        = trim($this->mark);
-        $postComment     = trim($this->comment);
-        $postReviewRoute = trim($this->reviewRoute);
-        $postPublish     = trim($this->publish);
-
-        /**
-         * Check if there's any content to this feedback
-         */
-        $hasContent = false;
-        if (strlen($postMark) || strlen($postComment) || !empty($this->files) || $this->hasRubric) {
-            $hasContent = true;
-        }
-
-        /**
-         * If they are updating an existing draft and there's no content: delete the draft.
-         * I have purposefully allowed empty drafts when creating a new draft, otherwise it's just
-         * too confusing for users when going from a published feedback.
-         * I've also purposefully allowed publishing of empty feedback, in order for teachers to overwrite a mistake
-         * (teachers are not allowed to delete from the feedback history).
-         */
-        if (!$hasContent && !$postPublish && $feedback->getId()) {
-            $feedback->setDeletedAt(\Alaress_Date_Format::now());
-            $feedback->setResponse($this->response);
-            return $feedback;
-        }
+        $postMark        = $this->mark ? trim($this->mark) : null;
+        $postComment     = $this->comment ? trim($this->comment) : null;
+        $postReviewRoute = $this->reviewRoute ? trim($this->reviewRoute) : null;
+        $postPublish     = $this->publish ? trim($this->publish) : null;
 
         /** @var DueWorkFeedback $feedback */
         $feedback
@@ -223,8 +204,10 @@ class Factory
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
-        $feedbackFileDecorator = new FileDecorator($feedback, $this->files);
-        $feedbackFileDecorator->decorate();
+        if ($this->fromInlineGrader) {
+            $feedbackFileDecorator = new FileDecorator($feedback, $this->files);
+            $feedbackFileDecorator->decorate();
+        }
 
         if ($postPublish == true) {
             // received signal to publish this

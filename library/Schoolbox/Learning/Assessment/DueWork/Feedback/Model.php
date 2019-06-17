@@ -175,4 +175,13 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         $this->rubricMarkedGrid = $rubricMarkedGrid;
         return $this;
     }
+
+    /**
+     * Checks whether is empty, excluding Rubric
+     * @return bool
+     */
+    public function isEmpty(): bool
+    {
+        return ($this->getAllFiles()->count() === 0) && empty($this->getNormalisedMark()) && empty($this->getComment());
+    }
 }
