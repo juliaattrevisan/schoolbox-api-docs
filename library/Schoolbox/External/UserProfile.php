@@ -28,102 +28,102 @@ class UserProfile
     private $user;
 
     /**
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     private $dob;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $level;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $homegroup;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $house;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian1_name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian1_home_phone;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian1_work_phone;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian1_mobile_phone;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian1_email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian2_name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian2_home_phone;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian2_work_phone;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian2_mobile_phone;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $guardian2_email;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $title;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $given_name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $preferred_name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $last_name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $gender;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $email;
 
@@ -172,10 +172,10 @@ class UserProfile
     }
 
     /**
-     * @param Alaress_Date_Format $dob
+     * @param Alaress_Date_Format|null $dob
      * @return static
      */
-    public function setDob(Alaress_Date_Format $dob): self
+    public function setDob(?Alaress_Date_Format $dob): self
     {
         $this->dob = $dob;
         return $this;
@@ -190,10 +190,10 @@ class UserProfile
     }
 
     /**
-     * @param string $level
+     * @param string|null $level
      * @return static
      */
-    public function setLevel(string $level): self
+    public function setLevel(?string $level): self
     {
         $this->level = $level;
         return $this;
@@ -208,10 +208,10 @@ class UserProfile
     }
 
     /**
-     * @param string $homegroup
+     * @param string|null $homegroup
      * @return static
      */
-    public function setHomegroup(string $homegroup): self
+    public function setHomegroup(?string $homegroup): self
     {
         $this->homegroup = $homegroup;
         return $this;
@@ -226,10 +226,10 @@ class UserProfile
     }
 
     /**
-     * @param string $house
+     * @param string|null $house
      * @return static
      */
-    public function setHouse(string $house): self
+    public function setHouse(?string $house): self
     {
         $this->house = $house;
         return $this;
@@ -244,10 +244,10 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian1_name
+     * @param string|null $guardian1_name
      * @return static
      */
-    public function setGuardian1Name(string $guardian1_name): self
+    public function setGuardian1Name(?string $guardian1_name): self
     {
         $this->guardian1_name = $guardian1_name;
         return $this;
@@ -262,10 +262,10 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian1_home_phone
+     * @param string|null $guardian1_home_phone
      * @return static
      */
-    public function setGuardian1HomePhone(string $guardian1_home_phone): self
+    public function setGuardian1HomePhone(?string $guardian1_home_phone): self
     {
         $this->guardian1_home_phone = $guardian1_home_phone;
         return $this;
@@ -280,10 +280,10 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian1_work_phone
+     * @param string|null $guardian1_work_phone
      * @return static
      */
-    public function setGuardian1WorkPhone(string $guardian1_work_phone): self
+    public function setGuardian1WorkPhone(?string $guardian1_work_phone): self
     {
         $this->guardian1_work_phone = $guardian1_work_phone;
         return $this;
@@ -298,81 +298,12 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian1_mobile_phone
+     * @param string|null $guardian1_mobile_phone
      * @return static
      */
-    public function setGuardian1MobilePhone(string $guardian1_mobile_phone): self
+    public function setGuardian1MobilePhone(?string $guardian1_mobile_phone): self
     {
         $this->guardian1_mobile_phone = $guardian1_mobile_phone;
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian1Address(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian1_address
-     * @return static
-     */
-    public function setGuardian1Address(string $guardian1_address): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian1Suburb(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian1_suburb
-     * @return static
-     */
-    public function setGuardian1Suburb(string $guardian1_suburb): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian1Postcode(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian1_postcode
-     * @return static
-     */
-    public function setGuardian1Postcode(string $guardian1_postcode): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -385,35 +316,12 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian1_email
+     * @param string|null $guardian1_email
      * @return static
      */
-    public function setGuardian1Email(string $guardian1_email): self
+    public function setGuardian1Email(?string $guardian1_email): self
     {
         $this->guardian1_email = $guardian1_email;
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian1MailAddress(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian1_mail_address
-     * @return static
-     */
-    public function setGuardian1MailAddress(string $guardian1_mail_address): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -426,10 +334,10 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian2_name
+     * @param string|null $guardian2_name
      * @return static
      */
-    public function setGuardian2Name(string $guardian2_name): self
+    public function setGuardian2Name(?string $guardian2_name): self
     {
         $this->guardian2_name = $guardian2_name;
         return $this;
@@ -444,10 +352,10 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian2_home_phone
+     * @param string|null $guardian2_home_phone
      * @return static
      */
-    public function setGuardian2HomePhone(string $guardian2_home_phone): self
+    public function setGuardian2HomePhone(?string $guardian2_home_phone): self
     {
         $this->guardian2_home_phone = $guardian2_home_phone;
         return $this;
@@ -462,10 +370,10 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian2_work_phone
+     * @param string|null $guardian2_work_phone
      * @return static
      */
-    public function setGuardian2WorkPhone(string $guardian2_work_phone): self
+    public function setGuardian2WorkPhone(?string $guardian2_work_phone): self
     {
         $this->guardian2_work_phone = $guardian2_work_phone;
         return $this;
@@ -480,81 +388,12 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian2_mobile_phone
+     * @param string|null $guardian2_mobile_phone
      * @return static
      */
-    public function setGuardian2MobilePhone(string $guardian2_mobile_phone): self
+    public function setGuardian2MobilePhone(?string $guardian2_mobile_phone): self
     {
         $this->guardian2_mobile_phone = $guardian2_mobile_phone;
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian2Address(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian2_address
-     * @return static
-     */
-    public function setGuardian2Address(string $guardian2_address): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian2Suburb(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian2_suburb
-     * @return static
-     */
-    public function setGuardian2Suburb(string $guardian2_suburb): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian2Postcode(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian2_postcode
-     * @return static
-     */
-    public function setGuardian2Postcode(string $guardian2_postcode): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -567,35 +406,12 @@ class UserProfile
     }
 
     /**
-     * @param string $guardian2_email
+     * @param string|null $guardian2_email
      * @return static
      */
-    public function setGuardian2Email(string $guardian2_email): self
+    public function setGuardian2Email(?string $guardian2_email): self
     {
         $this->guardian2_email = $guardian2_email;
-        return $this;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @return string|null
-     */
-    public function getGuardian2MailAddress(): ?string
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
-        return null;
-    }
-
-    /**
-     * @deprecated The user profile no longer provides address data
-     *
-     * @param string $guardian2_mail_address
-     * @return static
-     */
-    public function setGuardian2MailAddress(string $guardian2_mail_address): self
-    {
-        trigger_error('The user profile no longer provides address data', E_USER_DEPRECATED);
         return $this;
     }
 
@@ -608,10 +424,10 @@ class UserProfile
     }
 
     /**
-     * @param string $title
+     * @param string|null $title
      * @return static
      */
-    public function setTitle(string $title): self
+    public function setTitle(?string $title): self
     {
         $this->title = $title;
         return $this;
@@ -626,10 +442,10 @@ class UserProfile
     }
 
     /**
-     * @param string $given_name
+     * @param string|null $given_name
      * @return static
      */
-    public function setGivenName(string $given_name): self
+    public function setGivenName(?string $given_name): self
     {
         $this->given_name = $given_name;
         return $this;
@@ -644,10 +460,10 @@ class UserProfile
     }
 
     /**
-     * @param string $preferred_name
+     * @param string|null $preferred_name
      * @return static
      */
-    public function setPreferredName(string $preferred_name): self
+    public function setPreferredName(?string $preferred_name): self
     {
         $this->preferred_name = $preferred_name;
         return $this;
@@ -662,10 +478,10 @@ class UserProfile
     }
 
     /**
-     * @param string $last_name
+     * @param string|null $last_name
      * @return static
      */
-    public function setLastName(string $last_name): self
+    public function setLastName(?string $last_name): self
     {
         $this->last_name = $last_name;
         return $this;
@@ -680,10 +496,10 @@ class UserProfile
     }
 
     /**
-     * @param string $gender
+     * @param string|null $gender
      * @return static
      */
-    public function setGender(string $gender): self
+    public function setGender(?string $gender): self
     {
         $this->gender = $gender;
         return $this;
@@ -698,10 +514,10 @@ class UserProfile
     }
 
     /**
-     * @param string $email
+     * @param string|null $email
      * @return static
      */
-    public function setEmail(string $email): self
+    public function setEmail(?string $email): self
     {
         $this->email = $email;
         return $this;
