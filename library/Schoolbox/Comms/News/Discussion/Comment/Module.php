@@ -49,7 +49,7 @@ class Module extends Comment\Module
      */
     protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return new Auth\Rule\All (
+        return new Auth\Rule\All(
             new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
             new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
@@ -74,7 +74,7 @@ class Module extends Comment\Module
      */
     protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        return new Auth\Rule\All (
+        return new Auth\Rule\All(
             new Auth\Rule\IsConfigOn(ConfigMapper::COMMS_COMMENTS_ENABLED, $this->getConfig()),
             new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
