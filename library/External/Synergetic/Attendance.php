@@ -134,7 +134,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
      */
     public function findReasonDropdownOptions(): array
     {
-        $statement = $this->connector->executeQuery("SELECT Code, AbsenceTypeCode, Description FROM dbo.luAbsenceReason WHERE ActiveFlag = 1");
+        $statement = $this->connector->executeQuery("SELECT AbsenceTypeCode, Code, Description FROM dbo.luAbsenceReason WHERE ActiveFlag = 1 ORDER BY Code");
         $result = $statement->fetchAll();
 
         $returnArray = [];
@@ -143,8 +143,8 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
 
         foreach ($result as $resultCurrent) {
             $return = [];
-            $return['Code'] = trim($resultCurrent['Code']);
             $return['AbsenceTypeCode'] = trim($resultCurrent['AbsenceTypeCode']);
+            $return['Code'] = trim($resultCurrent['Code']);
 
             if (!empty($return['Code'])) {
                 $return['Description'] = "{$return['Code']} - {$resultCurrent['Description']}";
