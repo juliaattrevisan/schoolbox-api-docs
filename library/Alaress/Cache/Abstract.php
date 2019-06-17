@@ -9,7 +9,6 @@ use GuzzleHttp\Exception\RequestException as RequestException;
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 abstract class Alaress_Cache_Abstract
 {
@@ -112,7 +111,6 @@ abstract class Alaress_Cache_Abstract
      * @return self
      * @param null|array $params
      * @return self
-     * @throws InvalidArgumentException
      */
     public function init(string $url, ?array $params = null): \Alaress_Cache_Abstract
     {
@@ -139,7 +137,6 @@ abstract class Alaress_Cache_Abstract
      * Get contents of a stream using a lockfile-based mechanism
      *
      * @return void
-     * @throws InvalidArgumentException
      */
     protected function retrieveStreamContents(): void
     {
@@ -182,7 +179,6 @@ abstract class Alaress_Cache_Abstract
      * Sam's new cache update :P
      *
      * @return Alaress_Cache_Abstract
-     * @throws InvalidArgumentException
      */
     protected function newCacheUpdate(): \Alaress_Cache_Abstract
     {
@@ -215,7 +211,6 @@ abstract class Alaress_Cache_Abstract
      * Save stream contents from the url
      *
      * @return bool
-     * @throws InvalidArgumentException
      */
     protected function saveStreamContents(): bool
     {

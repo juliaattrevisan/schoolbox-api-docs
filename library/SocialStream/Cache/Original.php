@@ -101,7 +101,6 @@ class Original extends \Alaress_Cache_Abstract
 
     /**
      * @return void
-     * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      */
     protected function retrieveStreamContents(): void
@@ -122,7 +121,6 @@ class Original extends \Alaress_Cache_Abstract
      * @return bool
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     protected function saveStreamContents(): bool
     {
@@ -148,9 +146,7 @@ class Original extends \Alaress_Cache_Abstract
      *
      * @param $url
      * @return bool
-     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
      */
     private function processUrl($url): bool
     {
