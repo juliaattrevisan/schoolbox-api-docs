@@ -427,12 +427,24 @@ class Mapper extends \Schoolbox\Mapper
     {
         try {
 
-            /* Privatise in plagscan.com then update our records too
+            /* If this plagscan record has a plagscanId, privatise it
+             *
+             * Otherwise we are waiting to obtain it and can't operate on it yet,
+             * though the next time someone submits it'll privatise all previous
+             * incarnations again anyway. This might be an opportunity for two
+             * files in the same ancestry to co-exist as part of the comparison
+             * pool due to race conditions in a third party, but I don't think this
+             * is easily solved.
              */
-            $this->getConnector()->privatise($plagscan->getPlagscanId());
+            if ($plagscan->getPlagscanId()) {
 
-            $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
-            $this->save($plagscan);
+                /* Privatise in plagscan.com then update our records too
+                 */
+                $this->getConnector()->privatise($plagscan->getPlagscanId());
+
+                $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
+                $this->save($plagscan);
+            }
         }
         catch (\RuntimeException $e) {
 
