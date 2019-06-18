@@ -228,12 +228,12 @@ class Instance implements JsonSerializable
             $this->tokens = $matches[1];
 
         } else {
-            $this->tokens = array();
+            $this->tokens = [];
         }
 
         // cast params to array to prevent errors
         if (!is_array($params)) {
-            $params = array($params);
+            $params = [$params];
         }
 
         // test template vs tokens
@@ -267,12 +267,12 @@ class Instance implements JsonSerializable
 
         $this->params  = (array)$params;
         $this->topics  = (array)$topics;
-        $this->context = (array)$context ?: array();
+        $this->context = (array)$context ?: [];
 
-        $this->meta = array();
+        $this->meta = [];
 
         // cap the amount of data that can be stored in meta
-        $meta = (array)$meta ?: array();
+        $meta = (array)$meta ?: [];
 
         foreach ($meta as $key => $value) {
             // check if it's out of bounds
@@ -304,8 +304,8 @@ class Instance implements JsonSerializable
     /**
      * @param string $json
      * @param string $topic
-     * @throws InvalidArgumentException
      * @return self
+     * @throws InvalidArgumentException
      */
     public static function jsonUnserialize($json, $topic = '')
     {
@@ -335,20 +335,32 @@ class Instance implements JsonSerializable
 
         // override topic if relevant to do so (happens in QueueSorter::process())
         if ($topic) {
-            $topics = [ $topic ];
+            $topics = [$topic];
         } else {
             $topics = isset($array['topics']) ? $array['topics'] : [];
         }
 
         // cast param array to objects
-        $params = array();
+        $params = [];
         if (is_array($array['title']['params'])) {
             foreach ($array['title']['params'] as $token => $param) {
                 $params[$token] = new Param($param['text'], $param['href'], $param['mode']);
             }
         }
 
-        $instance = new self($messageString, $namespace, $icon, $href, $params, $severity, $topics, $folderId, $time, $meta, $context);
+        $instance = new self(
+            $messageString,
+            $namespace,
+            $icon,
+            $href,
+            $params,
+            $severity,
+            $topics,
+            $folderId,
+            $time,
+            $meta,
+            $context
+        );
         $instance->setAction($action);
 
         if (\array_key_exists(self::EVENT_OBJECT_ID, $array)) {
@@ -389,23 +401,23 @@ class Instance implements JsonSerializable
      */
     public function jsonSerialize()
     {
-        return array(
-            'title'     => [
+        return [
+            'title'               => [
                 'text'   => $this->messageString,
-                'params' => $this->params
+                'params' => $this->params,
             ],
-            'namespace' => $this->namespace,
-            'time'      => $this->time,
-            'icon'      => $this->icon,
-            'href'      => $this->href,
-            'meta'      => $this->meta,
-            'level'     => $this->severity,
-            'topics'    => $this->topics,
-            'context'   => $this->context,
-            'action'    => $this->action,
-            'folderId'  => $this->folderId,
+            'namespace'           => $this->namespace,
+            'time'                => $this->time,
+            'icon'                => $this->icon,
+            'href'                => $this->href,
+            'meta'                => $this->meta,
+            'level'               => $this->severity,
+            'topics'              => $this->topics,
+            'context'             => $this->context,
+            'action'              => $this->action,
+            'folderId'            => $this->folderId,
             self::EVENT_OBJECT_ID => $this->eventObjectId,
-        );
+        ];
     }
 
 
@@ -482,10 +494,10 @@ class Instance implements JsonSerializable
     public function getBaseHash()
     {
         // encoding is effectively a salt
-        return sha1(json_encode(array(
+        return sha1(json_encode([
             'text' => $this->messageString,
-            'href' => $this->href
-        )));
+            'href' => $this->href,
+        ]));
     }
 
 
@@ -496,7 +508,7 @@ class Instance implements JsonSerializable
      */
     public function getParamHash()
     {
-        $list = array();
+        $list = [];
         foreach ($this->params as $p) {
             $list[] = $p->jsonSerialize();
         }
@@ -595,6 +607,7 @@ class Instance implements JsonSerializable
 
     /**
      * Gets folder id
+     *
      * @return int
      */
     public function getFolderId(): int
@@ -604,6 +617,7 @@ class Instance implements JsonSerializable
 
     /**
      * Sets ttl
+     *
      * @param int $ttl
      */
     public function setTTL(int $ttl): void
@@ -613,6 +627,7 @@ class Instance implements JsonSerializable
 
     /**
      * Gets ttl
+     *
      * @return int ttl
      */
     public function getTTL(): int
@@ -623,6 +638,7 @@ class Instance implements JsonSerializable
 
     /**
      * Sets event object identifier
+     *
      * @param string $eventObjectId
      */
     public function setEventObjectId(string $eventObjectId): void
@@ -633,6 +649,7 @@ class Instance implements JsonSerializable
 
     /**
      * Gets event object identifier
+     *
      * @return string
      */
     public function getEventObjectId(): string
