@@ -80,7 +80,9 @@ class Login
                 WHERE group_id = groups.id AND login=1 AND `date` >= :start AND `date` <= :end AND `user`.created_at <=  :end AND
                       (`user`.deleted_at IS NULL OR `user`.deleted_at > :start) 
             ) AS total
-          FROM groups';
+          FROM groups
+          WHERE `groups`.deleted_at IS NULL
+          ';
 
         $statement = $this->database->prepareQuery($query);
         $statement->execute([
