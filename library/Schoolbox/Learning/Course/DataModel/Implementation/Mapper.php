@@ -97,7 +97,7 @@ class Mapper extends AbstractCourseMapper
     /**
      * @inheritdoc
      */
-    public function hydrateSelect(PDOStatement $statement)
+    public function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $modelList = $this->createCollection();
         foreach ($statement as $row) {
@@ -120,7 +120,7 @@ class Mapper extends AbstractCourseMapper
             $model->setSpecification($specification);
 
             // Add
-            $modelList->add($model);
+            $modelList[$model->getId()] = $model;
         }
         return $modelList;
     }
