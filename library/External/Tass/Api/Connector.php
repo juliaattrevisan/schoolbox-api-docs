@@ -15,6 +15,7 @@ use External\Tass\Api\Exception\UdParseException;
 use External\Tass\Api\Exception\Unauthorised;
 use GuzzleHttp;
 use GuzzleHttp\ClientInterface;
+use function in_array;
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Alaress_Date_Format;
@@ -61,8 +62,8 @@ class Connector
     /** @var string */
     private $apiUrl;
 
-    /** @var string */
-    private $apiKey;
+    /** @var TokenCodec */
+    private $tokenBuilder;
 
     /** @var string */
     private $appCode;
@@ -74,29 +75,28 @@ class Connector
     /**
      * @param ModelFactory    $responseFactory
      * @param ClientInterface $client
+     * @param TokenCodec      $tokenBuilder
      * @param string          $apiUrl
-     * @param string          $apiKey
      * @param string          $companyCode
      * @param string          $appCode
-     * @throws InvalidArgumentException If any construction arg is invalid
      */
     public function __construct(
         ModelFactory $responseFactory,
         ClientInterface $client,
+        TokenCodec $tokenBuilder,
         string $apiUrl,
-        string $apiKey,
         string $companyCode,
         string $appCode
     ) {
-        $errors = $this->validateConstructionArgs($apiUrl, $apiKey, $companyCode, $appCode);
+        $errors = $this->validateConstructionArgs($apiUrl, $companyCode, $appCode);
         if (\count($errors)) {
             throw new InvalidArgumentException(implode("\n", $errors));
         }
 
         $this->modelFactory = $responseFactory;
         $this->httpClient   = $client;
+        $this->tokenBuilder = $tokenBuilder;
         $this->apiUrl       = $apiUrl;
-        $this->apiKey       = $apiKey;
         $this->companyCode  = $companyCode;
         $this->appCode      = $appCode;
     }
@@ -104,6 +104,33 @@ class Connector
     // ---------------------------------------------------------------------------------------------------------------
     // Tass API methods
     // ---------------------------------------------------------------------------------------------------------------
+
+
+    /**
+     * TODO return object
+     *
+     * @param string $currentStatus
+     * @param bool   $includePhone
+     * @param bool   $thumbnail
+     * @return array
+     * @throws InvalidArg
+     */
+    public function getTeachers(string $currentStatus = 'current', bool $includePhone = false, bool $thumbnail = false): array
+    {
+        // TODO defined the magic strings as constants
+        if (!in_array($currentStatus, ['current', 'noncurrent'], true)) {
+            throw new InvalidArg("Invalid currentStatus arg: '$currentStatus'");
+        }
+
+        $methodArgs = [
+            'currentstatus' => $currentStatus,
+            'includephoto'  => $includePhone,
+            'thumbnail'     => $thumbnail,
+        ];
+
+        return $this->executeMethod('getTeachers', $methodArgs);
+    }
+
 
     /**
      * Returns a structure of Student data
@@ -445,19 +472,15 @@ class Connector
      * Returns an array of reasons why the specified construction args are invalid
      *
      * @param string $apiUrl
-     * @param string $apiKey
      * @param string $companyCode
      * @param string $appCode
      * @return string[]
      */
-    private function validateConstructionArgs(string $apiUrl, string $apiKey, string $companyCode, string $appCode): array
+    private function validateConstructionArgs(string $apiUrl, string $companyCode, string $appCode): array
     {
         $errors = [];
         if ('' === trim($apiUrl)) {
             $errors[] = 'Api URL cannot be empty';
-        }
-        if ('' === trim($apiKey)) {
-            $errors[] = 'Api Key cannot be empty';
         }
         if ('' === trim($companyCode)) {
             $errors[] = 'Company Code cannot be empty';
@@ -485,7 +508,8 @@ class Connector
             'method'  => $method,
             'appcode' => $this->appCode,
             'company' => $this->companyCode,
-            'token'   => $this->generateToken($params),
+             'v'      => 2,
+            'token'   => $this->tokenBuilder->generateToken($params),
         ];
 
         try {
@@ -498,6 +522,8 @@ class Connector
             $response = $e->getResponse();
             throw new Unauthorised($response->getReasonPhrase(), $response->getStatusCode(), $e);
         }
+
+        // TODO check returned token timestamp for MITM replay
 
         if (!$this->isSuccessful($response)) {
             // TODO may not be able to determine this yet without decoding, eg logical fail may still be 200, but contains an invalid flag
@@ -573,40 +599,6 @@ class Connector
         if(false){
             throw new InvalidArg();
         }
-    }
-
-
-    /**
-     * Returns an encrypted token (not URL encoded) that contains all the method arguments.
-     *
-     * @param array $data
-     * @return string
-     */
-    private function generateToken(array $data): string
-    {
-        // The token contains all of the function parameters we want to pass encrypted into a AES-128-ECB string
-        //
-        // The procedure is as follows
-        //
-        // 1. Concatenate all the API calls parameters together into a HTTP parameter string (e.g. "stucode=01&...=02")
-        // 2. base64_decode() the API key that TASS uses
-        // 3. openssl_encrypt() the result of step 1 with 'AES-128-ECB' cipher and the decoded API key from step 2
-        // 4. base64_decode() the result of step 3
-        // 5. convert_uuencode() the result of step 4
-        // 6. replace end-of-file control chars to match TASS API documentation (see note below)
-        $encrypted     = openssl_encrypt(http_build_query($data), 'AES-128-ECB', base64_decode($this->apiKey));
-        $base64decoded = base64_decode($encrypted);
-        $uuEncoded     = convert_uuencode($base64decoded);
-
-        // Uuencoding is designed for encoding binary data for transmission in email systems.
-        // Who knows why Tass is using it, but the native PHP function does not appear to match the examples in Tass docs.
-        // The replaced suffix here is part of the algorithm that specified end-of-file
-        // I suspect that convert_uuencode() and whatever algorithm is used by Tass share the same character mapping,
-        // but differ in end-of-file control chars.
-        // @see https://en.wikipedia.org/wiki/Uuencoding
-        $patternEndOfFile     = "/`\n`\n$/";
-        $replacementEndOfFile = "(\n";
-        return preg_replace($patternEndOfFile, $replacementEndOfFile, $uuEncoded, 1);
     }
 
 
