@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
@@ -49,7 +51,7 @@ class Factory
     private $mostRecentFeedback;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mark;
 
@@ -59,7 +61,7 @@ class Factory
     private $comment;
 
     /**
-     * @var string
+     * @var bool
      */
     private $publish;
 
@@ -98,8 +100,8 @@ class Factory
      * @param User                                          $currentUser
      * @param string                                        $mark
      * @param string                                        $comment
-     * @param string                                        $publish   one of ['0'|'1']
-     * @param array                                         $files
+     * @param string|null                                   $publish   one of [null|'0'|'1']
+     * @param array|null                                    $files
      * @param bool                                          $fromInlineGrader
      * @param string                                        $reviewRoute
      * @param IFeedback|DueWorkFeedback|null                $mostRecentFeedback
@@ -122,9 +124,9 @@ class Factory
         $this->participant               = $participant;
         $this->currentUser               = $currentUser;
         $this->mostRecentFeedback        = $mostRecentFeedback;
-        $this->mark                      = $mark;
-        $this->comment                   = $comment;
-        $this->publish                   = $publish;
+        $this->mark                      = $mark ? trim($mark) : null;
+        $this->comment                   = $comment ? trim($comment) : '';
+        $this->publish                   = $publish === '1';
         $this->files                     = $files;
         $this->fromInlineGrader          = $fromInlineGrader;
         $this->reviewRoute               = $reviewRoute;
@@ -153,28 +155,30 @@ class Factory
 
             // copy attachments over from the previous feedback.
             if ($this->mostRecentFeedback && $this->mostRecentFeedback->getAllFiles()->count() > 0) {
-                $feedback->setAllFiles($this->mostRecentFeedback->getAllFiles());
+                $filesToCopy = new Collection();
+                foreach ($this->mostRecentFeedback->getAllFiles() as $attachment) {
+                    $filesToCopy->add(
+                        (new DueWorkFeedbackFile())
+                            ->setStorage($attachment)
+                            ->setFilename($attachment->getFilename())
+                    );
+                }
+                $feedback->setAllFiles($filesToCopy);
             }
-
         } else {
             // most recent is draft, use that
             $feedback = $this->mostRecentFeedback;
         }
 
         // mutate model found, and save
-        $postMark        = $this->mark ? trim($this->mark) : null;
-        $postComment     = $this->comment ? trim($this->comment) : null;
-        $postReviewRoute = $this->reviewRoute ? trim($this->reviewRoute) : null;
-        $postPublish     = $this->publish ? trim($this->publish) : null;
-
         /** @var DueWorkFeedback $feedback */
         $feedback
             ->setReviewer($this->currentUser)
-            ->setReviewRoute($postReviewRoute)
+            ->setReviewRoute($this->reviewRoute)
             ->setUpdatedAt(\Alaress_Date_Format::now())
-            ->setComment($postComment);
+            ->setComment($this->comment);
 
-        if ($postMark && $postMark !== '') {
+        if ($this->mark && $this->mark !== '') {
 
             // mark defined and non-empty
             try {
@@ -182,7 +186,7 @@ class Factory
                 $scheme = $this->participant->getAssessable()->getMarkScheme();
 
                 // verify normalisation, then sanitise the output
-                $norm = $scheme->getNormalisedMark($postMark);
+                $norm = $scheme->getNormalisedMark($this->mark);
                 $humanReadableMark = $scheme->getHumanReadableMark($norm);
 
                 $feedback
@@ -190,11 +194,11 @@ class Factory
                     ->setHumanReadableMark($humanReadableMark);
             }
             catch (\InvalidArgumentException $e) {
-                $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
+                $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())
-                    ->setHumanReadableMark($postMark);
+                    ->setHumanReadableMark($this->mark);
             }
         }
         else {
@@ -215,11 +219,9 @@ class Factory
             $feedbackFileDecorator->decorate();
         }
 
-        if ($postPublish == true) {
+        if ($this->publish && !$feedback->isPublished()) {
             // received signal to publish this
-            if (!$feedback->isPublished()) {
-                $feedback->setPublishedAt(\Alaress_Date_Format::now());
-            }
+            $feedback->setPublishedAt(\Alaress_Date_Format::now());
         }
 
         /* Attach feedback to a particular Response instance
