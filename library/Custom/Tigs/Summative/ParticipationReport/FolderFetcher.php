@@ -74,7 +74,7 @@ class FolderFetcher
         $withFeedback  = $this->folderMapper->findFoldersWithFeedbackToStudent($student, $term);
         $folders       = $withResponses->mergeUnique($withFeedback, $idProperty);
 
-        // Remove any folders that are not current or rolled-over classes
+        // Only retain folders that are either current or rolled-over classes
         $folders = $folders->filter(static function (Folder\Model $folder) {
             return $folder->isClass() || $folder->wasClass();
         });
