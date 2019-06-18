@@ -562,6 +562,21 @@ class Instance implements JsonSerializable
         return $this->action === self::ACTION_RETRACT_ALL;
     }
 
+
+    /**
+     * Is this message always delivered instantly, regardless of routing?
+     *
+     * @return bool
+     */
+    public function isDeliveryAlwaysInstant(): bool
+    {
+        // TODO consider inspecting all topics, not just the first
+        // But what if the message is delivered to multiple users differently?
+        $topic = $this->topics[0];
+        [, $delivery] = explode('.', $topic);
+        return $delivery === InstanceBundle::DELIVERY_INSTANT;
+    }
+
     /**
      * Gets folder id
      * @return int

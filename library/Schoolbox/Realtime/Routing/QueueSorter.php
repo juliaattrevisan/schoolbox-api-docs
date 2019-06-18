@@ -221,10 +221,9 @@ class QueueSorter implements FilterInterface
             $instance->getFolderId()
         );
 
-        // Is this sent via the instant topic?
+        // Is this sent via instant delivery?
         // Route to instant if not already, and un-mute
-        [, $deliveryType] = explode('.', $topic);
-        if ($deliveryType === InstanceBundle::DELIVERY_INSTANT && !$this->permMapper->isInstant($intent)) {
+        if ($instance->isDeliveryAlwaysInstant() && !$this->permMapper->isInstant($intent)) {
             $this->log->debug('Delivery type is instant: upgrading to instant');
             if ($this->permMapper->isMuted($intent)) {
                 $intent = [];
