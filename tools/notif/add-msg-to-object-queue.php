@@ -74,6 +74,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
                 continue;
             }
+
+            /** @var Instance $instance */
             // Message
             $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
             $output = $instance->jsonSerialize();
