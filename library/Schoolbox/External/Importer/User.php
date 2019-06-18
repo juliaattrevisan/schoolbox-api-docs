@@ -169,23 +169,16 @@ class User extends AbstractImporter
                 // user_profile
                 "Date of Birth"                => '',
                 // Year Level should always be the same as Year
-//                "Year Level"                   => '',
                 "Guardian 1 Name"              => '',
                 "Guardian 1 Email"             => '',
                 "Guardian 1 Home Phone"        => '',
                 "Guardian 1 Mobile Phone"      => '',
                 "Guardian 1 Work Phone"        => '',
-                "Guardian 1 Address"           => '',
-                "Guardian 1 Suburb"            => '',
-                "Guardian 1 Postcode"          => '',
                 "Guardian 2 Name"              => '',
                 "Guardian 2 Email"             => '',
                 "Guardian 2 Home Phone"        => '',
                 "Guardian 2 Mobile Phone"      => '',
                 "Guardian 2 Work Phone"        => '',
-                "Guardian 2 Address"           => '',
-                "Guardian 2 Suburb"            => '',
-                "Guardian 2 Postcode"          => '',
             ];
         }
         return $format;
@@ -266,9 +259,6 @@ class User extends AbstractImporter
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Home Phone", 'setGuardian1HomePhone');
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Mobile Phone", 'setGuardian1MobilePhone');
         $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Work Phone", 'setGuardian1WorkPhone');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Address", 'setGuardian1Address');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Suburb", 'setGuardian1Suburb');
-        $this->userProfileHydrators[] = new UserProfile\Hydrator\Field("Postcode", 'setGuardian1Postcode');
 
         // Parent-child relation hydrator
         $this->userRelationHydrators[] = new UserRelation\Hydrator\ExternalId("Child External IDs", $this->userMapper);

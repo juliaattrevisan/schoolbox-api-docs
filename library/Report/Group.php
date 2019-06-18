@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -15,7 +16,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
     private $emailObj;
 
     // csv field mapping: index => humanreadable
-    private $fields = array(
+    private $fields = [
         'id'                  => 'Schoolbox User ID',
         'username'            => 'Username',
         'synergy_id'          => 'External ID',
@@ -38,21 +39,18 @@ class Report_Group extends Report_Abstract implements Report_IReport
         'display_grade_graph' => 'Display Graph on Student Grade Card?',
         'enabled'             => 'Account Enabled?',
         // Skip superuser field
-    );
+    ];
 
-    private $userProfileFields = array(
+    private $userProfileFields = [
         'profile_child_ids'    => 'Child External IDs',
         'profile_dob'          => 'Date of Birth',
         'profile_home_phone'   => 'Home Phone',
         'profile_mobile_phone' => 'Mobile Phone',
         'profile_work_phone'   => 'Work Phone',
-        'profile_address'      => 'Address',
-        'profile_suburb'       => 'Suburb',
-        'profile_postcode'     => 'Postcode',
-    );
+    ];
 
     // fields that we will permit sorting on
-    private $sortable = array('firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email');
+    private $sortable = ['firstname', 'lastname', 'username', 'synergy_id', 'campus', 'year', 'alt_email'];
     private $defaultOrderBy = 'lastname';
 
     public function __construct($page)
@@ -77,7 +75,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
         $this->getPage()->setBlock('user_t', 'user', 'user_block');
         $this->getPage()->setBlock('user', 'modify', 'modify_block');
-        $this->getPage()->setVar(array('group_block' => ''));
+        $this->getPage()->setVar(['group_block' => '']);
         $this->getPage()->setTitle('Group Report');
 
         if (Config::get('external_type') === 'schoolbox') {
@@ -130,17 +128,19 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
     public function populateDataset($offset, $limit, $orderBy = '', $orderDir = '')
     {
-        if($orderDir == '') {
+        if ($orderDir == '') {
             $orderDir = 'ASC';
         }
 
         // need fields from which to retrieve data
-        if(empty($this->fields))
+        if (empty($this->fields)) {
             return false;
+        }
 
         // fallback to default if unset
-        if($orderBy == '' || !in_array($orderBy, $this->sortable))
+        if ($orderBy == '' || !in_array($orderBy, $this->sortable)) {
             $orderBy = $this->getDefaultOrderBy();
+        }
 
         // filter data passed in by report
         $filterString = $this->getIndexID();
@@ -156,10 +156,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             p.dob AS profile_dob,
             p.guardian1HomePhone AS profile_home_phone,
             p.guardian1MobilePhone AS profile_mobile_phone,
-            p.guardian1WorkPhone profile_work_phone,
-            p.guardian1Address AS profile_address,
-            p.guardian1Suburb AS profile_suburb,
-            p.guardian1Postcode AS profile_postcode
+            p.guardian1WorkPhone profile_work_phone
             FROM `user` `u`
             LEFT JOIN `userCampus` `uc` ON `u`.`id`=`uc`.`uid`
             LEFT JOIN `luCampus` `c` ON `uc`.`campus`=`c`.`id`
@@ -180,7 +177,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
         $this->dataResource = $handler->query($query);
         $this->dataCount    = $this->dataResource->rowCount();
 
-        if(!$this->dataCount) {
+        if (!$this->dataCount) {
             return 0;
         }
 
@@ -197,13 +194,14 @@ class Report_Group extends Report_Abstract implements Report_IReport
     public function render()
     {
         // the group and the dataset must both not be null
-        if($this->getIndexID() == null || empty($this->dataSet))
+        if ($this->getIndexID() == null || empty($this->dataSet)) {
             error(19);
+        }
 
         $page = $this->getPage();
 
         $groupHandler = new Group();
-        $groupName = $groupHandler->getGroupName($this->getIndexID());
+        $groupName    = $groupHandler->getGroupName($this->getIndexID());
 
         // render users
         $isUserOutput = false;
@@ -211,18 +209,18 @@ class Report_Group extends Report_Abstract implements Report_IReport
             if (!$isUserOutput) {
                 $isUserOutput = true;
                 // Output this for first user only.
-                $page->setVar(array(
+                $page->setVar([
                     'COUNTABLE_COUNT' => $this->dataCount,
                     'REPORT_TITLE'    => Scrub::text($groupName),
                     'SORT_BASE'       => "group/{$this->getIndexID()}",
                     'COUNTABLE'       => 'members',
-                ));
+                ]);
             }
             // Format email address
             $address = Scrub::text($this->emailObj->formatEmailFromArray($user));
-            $email = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
+            $email   = $address ? "<a href=\"{$_SESSION['mailhandle']}$address\">$address</a>" : '';
 
-            $page->setVar(array(
+            $page->setVar([
                 'UID'             => Scrub::text($user['id']),
                 'USER_TITLE'      => Scrub::text($user['title']),
                 'USER_FIRSTNAME'  => Scrub::text($user['firstname']),
@@ -232,12 +230,13 @@ class Report_Group extends Report_Abstract implements Report_IReport
                 'USER_EMAIL'      => $email,
                 'USER_YEAR'       => empty($user['year']) && (string)$user['year'] != '0' ? '' : "Year {$user['year']}",
                 'USER_CAMPUS'     => Scrub::text($user['campus']),
-            ));
+            ]);
 
-            if(!$_SESSION['su'])
+            if (!$_SESSION['su']) {
                 $page->setVar('modify_block');
-            else
+            } else {
                 $page->parse('modify_block', 'modify');
+            }
 
             $page->parse('user_block', 'user', true);
         }
@@ -245,14 +244,14 @@ class Report_Group extends Report_Abstract implements Report_IReport
         if ($isUserOutput) {
             $page->parse('RESULT', 'user_t', true);
         } else {
-            $page->setVar(array(
+            $page->setVar([
                 'RESULT'                => 'No results.',
                 'USER_DISP_COUNT'       => $this->dataCount,
                 'USER_GROUP'            => Scrub::text($groupName),
                 'previous_button_block' => '',
                 'next_button_block'     => '',
-                'page_number_block'     => ''
-            ));
+                'page_number_block'     => '',
+            ]);
         }
     }
 
@@ -260,13 +259,14 @@ class Report_Group extends Report_Abstract implements Report_IReport
     {
         $exporter = new Report_Exporter($this->getReportTitle());
         $exporter->setHeadings($this->getFields());
-        $exporter->setData($this->dataResource, array($this, 'dataManipulator'));
+        $exporter->setData($this->dataResource, [$this, 'dataManipulator']);
 
         $exporter->export('CSV');
     }
 
-    public function dataManipulator($datum) {
-        $address = $this->emailObj->formatEmailFromArray($datum);
+    public function dataManipulator($datum)
+    {
+        $address            = $this->emailObj->formatEmailFromArray($datum);
         $datum['alt_email'] = $address;
         return $datum;
     }

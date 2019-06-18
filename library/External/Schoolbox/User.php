@@ -143,10 +143,6 @@ class External_Schoolbox_User implements External_UserInterface
                             pp.guardian2Name AS StudentContactSpousePreferred,
                             '' AS StudentContactSpouseSurname,
                             pp.guardian2Email AS StudentContactSpouseDefaultEmail,
-                            pp.guardian2Address AS StudentContactSpouseAddress1,
-                            pp.guardian2Suburb AS StudentContactSpouseSuburb,
-                            pp.guardian2Postcode AS StudentContactSpousePostCode,
-                            '' AS StudentContactSpouseState,
                             pp.guardian2HomePhone AS StudentContactSpousePhoneActual,
                             pp.guardian2MobilePhone AS StudentContactSpouseMobilePhone,
                             pp.guardian2WorkPhone AS StudentContactSpouseOccupPhone
@@ -159,58 +155,6 @@ class External_Schoolbox_User implements External_UserInterface
             ",
             ['externalUserId' => $externalUserId]
         )->fetchAll();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @param $externalUserId
-     *
-     * @return array
-     */
-    public function getLeaveStudentContactList($externalUserId)
-    {
-        $contactAdaptionList = [];
-
-        $iterateContacts = $this->internalDatabase->getQueryIterator(
-            "
-                SELECT      u.*
-                FROM        user_relation ur
-                LEFT JOIN   `user` u ON u.id = ur.user_id AND u.deleted_at IS NULL
-                WHERE       ur.relation_id = :externalUserId
-                AND         ur.relation_type = :typeParent
-            ",
-            [
-                'externalUserId' => $externalUserId,
-                'typeParent'     => UserRelation::RELATION_TYPE_PARENT,
-            ]
-        );
-
-        foreach ($iterateContacts as $contact) {
-            $contactAdaptionList[] = [
-                'StudentContactID'               => $contact['id'],
-                'StudentContactTitle'            => $contact['title'],
-                'StudentContactPreferred'        => $contact['firstname'],
-                'StudentContactSurname'          => $contact['lastname'],
-                'StudentContactDefaultEmail'     => $contact['alt_email'],
-                'StudentContactAddress1'         => '',
-                'StudentContactSuburb'           => '',
-                'StudentContactPostCode'         => '',
-                'StudentContactState'            => '',
-                'StudentContactPhoneActual'      => '',
-                'StudentContactMobilePhone'      => '',
-                'StudentContactOccupPhone'       => '',
-                'StudentContactSpouseID'         => '',
-                'StudentContactSpouseTitle'      => '',
-                'StudentContactSpousePreferred'  => '',
-                'StudentContactSpouseSurname'    => '',
-                'StudentContactSpouseMobilePhon' => '',
-                'StudentContactSpouseOccupPhone' => '',
-                'StudentContactSpouseDefaultEma' => '',
-                'StudentContactType'             => 'SC1',
-            ];
-        }
-
-        return $contactAdaptionList;
     }
 
 
