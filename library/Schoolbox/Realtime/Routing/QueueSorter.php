@@ -11,6 +11,7 @@ namespace Schoolbox\Realtime\Routing;
 
 
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Instance\InstanceBundle;
 use Exception;
 use InvalidArgumentException;
 use PDOException;
@@ -26,10 +27,6 @@ use Swift_RfcComplianceException;
 
 class QueueSorter implements FilterInterface
 {
-    const TOPIC_DIGEST = 'digest';
-    const TOPIC_INSTANT = 'instant';
-
-
     /** @var FilterInterface */
     private $filter;
 
@@ -226,9 +223,9 @@ class QueueSorter implements FilterInterface
 
         // Is this sent via the instant topic?
         // Route to instant if not already, and un-mute
-        [, $topicType] = explode('.', $topic);
-        if ($topicType === self::TOPIC_INSTANT && !$this->permMapper->isInstant($intent)) {
-            $this->log->debug('Topic is instant: upgrading to instant');
+        [, $deliveryType] = explode('.', $topic);
+        if ($deliveryType === InstanceBundle::DELIVERY_INSTANT && !$this->permMapper->isInstant($intent)) {
+            $this->log->debug('Delivery type is instant: upgrading to instant');
             if ($this->permMapper->isMuted($intent)) {
                 $intent = [];
             }
