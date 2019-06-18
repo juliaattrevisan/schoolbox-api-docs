@@ -91,90 +91,96 @@ class Factory extends NullableContext\Factory
         if (null === $viewee) {
             throw new InvalidArgumentException('Viewee cannot be null for UnitImportSpec filter');
         }
-        $unitSpecOverrides = $overrides[$definition->getFilter()->getId()];
 
-        $folders = $this->folderMapper->createCollection();
+        $unitSpecOverrides          = $overrides[$definition->getFilter()->getId()];
+        $unitSpecsImportedToFolders = $this->unitSpecMapper->createCollection();
+        $unitSpecsImportedToClasses = $this->unitSpecMapper->createCollection();
+        $unitSpecsImportedToGroups  = $this->unitSpecMapper->createCollection();
 
-        // Course-markbook is only interested in units specs that were previously imported to folders,
-        // not the current courseSpec's unitSpecs
+        // Course-markbook lists UnitImportSpecs that belonged to the specified CourseSpec at time of import
         if (Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
             $courseSpecId = $this->findCourseSpecModel($routeArgs)->getId();
-            $courseImpls  = $this->courseImplMapper->findAllByCourseSpecificationId($courseSpecId);
+            $courseImpls  = $this->courseImplMapper->findAllByCourseSpecificationId($courseSpecId, [], true);
             foreach ($courseImpls as $courseImpl) {
-                $courseImplFolder                    = $courseImpl->getFolder();
-                $folders[$courseImplFolder->getId()] = $courseImplFolder;
+                foreach ($courseImpl->getUnits() as $unitImpl) {
+                    $unitSpec = $unitImpl->getSpecification();
+                    $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+                    if ($courseImpl->getFolder()->isClass() || $courseImpl->getFolder()->wasClass()) {
+                        $unitSpecsImportedToClasses->setOffset($unitSpec->getId(), $unitSpec);
+                    }
+                    if ($courseImpl->getFolder()->isGroup()) {
+                        $unitSpecsImportedToGroups->setOffset($unitSpec->getId(), $unitSpec);
+                    }
+                }
             }
-        }
 
-        if ($this->isInvolvedFolderPage($pageFilter->getPage())) {
-            $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
-        }
-
-        // Are we in the context of a filtered page that is for a single folder?
-        if ($this->isSingleFolderPage($pageFilter->getPage())) {
-            $folder                    = $this->findFolderModel($routeArgs);
-            $folders[$folder->getId()] = $folder;
-        }
-
-        /* If we inserted any extra folder/s, we need to also insert any units imported to that folder,
-         * otherwise any assessments inside units imported to the extra folder will never be visible.
-         */
-        $extraFolderIds = $this->parseFolderIds($overrides);
-        if (count($extraFolderIds)) {
-            $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
-            $folders      = $folders->mergeUnique($extraFolders, 'id');
-        }
-
-        // Get all courses imported to these folders
-        $courseImpls = $this->courseImplMapper->findByFolderId($folders->getPropertyValues('id'));
-
-        // Get all unitSpecs imported to relevant folders
-        $unitSpecsImportedToFolders = $this->unitSpecMapper->createCollection();
-        foreach ($courseImpls as $courseImpl) {
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitSpec = $unitImpl->getSpecification();
-                $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+            // Course Markbook permits insertion of UnitImportSpecs
+            if ($unitSpecOverrides) {
+                $unitSpecs = $this->unitSpecMapper->findByColumn($this->unitSpecMapper->getIdentifierColumn(), $unitSpecOverrides->keys());
+                foreach ($unitSpecs as $unitSpec) {
+                    $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+                }
             }
-        }
+        } else {
+            // Get all unitSpecs imported to relevant folders
+            $folders = $this->folderMapper->createCollection();
 
-        // Divide folders into Classes and Groups (not mutually exclusive!)
-
-        // Was course imported to a class? ?
-        /** @var CourseImpl\Model[] $courseImplsOnClasses */
-        $courseImplsOnClasses = $courseImpls->filter(function (CourseImpl\Model $courseImpl) {
-            return $courseImpl->getFolder()->isClass() || $courseImpl->getFolder()->wasClass();
-        })->indexBy('id');
-
-        // Was course imported to a group? ?
-        /** @var CourseImpl\Model[] $courseImplsOnGroups */
-        $courseImplsOnGroups = $courseImpls->filter(function (CourseImpl\Model $courseImpl) {
-            return $courseImpl->getFolder()->isGroup();
-        })->indexBy('id');
-
-        // Get all unitSpecs imported to classes
-        $unitSpecsImportedToClasses = $this->unitSpecMapper->createCollection();
-        foreach ($courseImplsOnClasses as $courseImpl) {
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitSpec = $unitImpl->getSpecification();
-                $unitSpecsImportedToClasses->setOffset($unitSpec->getId(), $unitSpec);
+            if ($this->isInvolvedFolderPage($pageFilter->getPage())) {
+                $folders = $folders->mergeUnique($this->fetchRelatedFolders($pageFilter, $viewee), 'id');
             }
-        }
-
-        // Get all unitSpecs imported to groups
-        $unitSpecsImportedToGroups = $this->unitSpecMapper->createCollection();
-        foreach ($courseImplsOnGroups as $courseImpl) {
-            foreach ($courseImpl->getUnits() as $unitImpl) {
-                $unitSpec = $unitImpl->getSpecification();
-                $unitSpecsImportedToGroups->setOffset($unitSpec->getId(), $unitSpec);
+            // Are we in the context of a filtered page that is for a single folder?
+            if ($this->isSingleFolderPage($pageFilter->getPage())) {
+                $folder                    = $this->findFolderModel($routeArgs);
+                $folders[$folder->getId()] = $folder;
             }
-        }
 
+            /* If we inserted any extra folder/s, we need to also insert any units imported to that folder,
+             * otherwise any assessments inside units imported to the extra folder will never be visible.
+             */
+            $extraFolderIds = $this->parseFolderIds($overrides);
+            if (count($extraFolderIds)) {
+                $extraFolders = $this->folderMapper->findByColumn('id', $extraFolderIds);
+                $folders      = $folders->mergeUnique($extraFolders, 'id');
+            }
 
-        // Course Markbook enables insertion of unit-import-specs and their host folders
-        if ($unitSpecOverrides && Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
-            $unitSpecs = $this->unitSpecMapper->findByColumn($this->unitSpecMapper->getIdentifierColumn(), $unitSpecOverrides->keys());
-            foreach ($unitSpecs as $unitSpec) {
-                $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+            // Get all courses imported to these folders
+            $courseImpls = $this->courseImplMapper->findByFolderId($folders->getPropertyValues('id'));
+
+            foreach ($courseImpls as $courseImpl) {
+                foreach ($courseImpl->getUnits() as $unitImpl) {
+                    $unitSpec = $unitImpl->getSpecification();
+                    $unitSpecsImportedToFolders->setOffset($unitSpec->getId(), $unitSpec);
+                }
+            }
+
+            // Divide folders into Classes and Groups (not mutually exclusive!)
+
+            // Was course imported to a class? ?
+            /** @var CourseImpl\Model[] $courseImplsOnClasses */
+            $courseImplsOnClasses = $courseImpls->filter(static function (CourseImpl\Model $courseImpl) {
+                return $courseImpl->getFolder()->isClass() || $courseImpl->getFolder()->wasClass();
+            })->indexBy('id');
+
+            // Was course imported to a group? ?
+            /** @var CourseImpl\Model[] $courseImplsOnGroups */
+            $courseImplsOnGroups = $courseImpls->filter(static function (CourseImpl\Model $courseImpl) {
+                return $courseImpl->getFolder()->isGroup();
+            })->indexBy('id');
+
+            // Get all unitSpecs imported to classes
+            foreach ($courseImplsOnClasses as $courseImpl) {
+                foreach ($courseImpl->getUnits() as $unitImpl) {
+                    $unitSpec = $unitImpl->getSpecification();
+                    $unitSpecsImportedToClasses->setOffset($unitSpec->getId(), $unitSpec);
+                }
+            }
+
+            // Get all unitSpecs imported to groups
+            foreach ($courseImplsOnGroups as $courseImpl) {
+                foreach ($courseImpl->getUnits() as $unitImpl) {
+                    $unitSpec = $unitImpl->getSpecification();
+                    $unitSpecsImportedToGroups->setOffset($unitSpec->getId(), $unitSpec);
+                }
             }
         }
 
