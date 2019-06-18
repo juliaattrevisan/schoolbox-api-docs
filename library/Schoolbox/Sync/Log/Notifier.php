@@ -65,8 +65,7 @@ class Notifier extends AbstractModuleNotifier
         /** @var Model $log */
         $log = $bundle->getEvent()->getObject();
 
-        // for now, we only care about logging dry runs
-        if ($log->isDry() && $bundle->getMethod() == Mapper::METHOD_CREATE) {
+        if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
             $bundle->attach(self::TRIGGER_LOGGED, self::IMMEDIATELY);
         }
     }
