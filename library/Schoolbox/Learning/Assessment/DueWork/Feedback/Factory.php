@@ -168,7 +168,7 @@ class Factory
             ->setUpdatedAt(\Alaress_Date_Format::now())
             ->setComment($postComment);
 
-        if ($postMark !== '') {
+        if ($postMark && $postMark !== '') {
 
             // mark defined and non-empty
             try {

@@ -210,9 +210,8 @@ class Controller extends Base
             return true;
         }
 
-        // Did we not give marks, but the `saveEmpty` flag is set?
-        // Save empty marks
-        if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
+        // If from inline grader, save empty marks
+        if (array_key_exists('fromInlineGrader', $post) && $post['fromInlineGrader']) {
             $markedGrid = $factory->buildFromPostData(
                 $this->rubricMapper->retrieveMarkedGrid($feedback),
                 []
