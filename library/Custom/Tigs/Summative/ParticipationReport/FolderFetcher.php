@@ -49,19 +49,19 @@ class FolderFetcher
     /**
      * Returns the set of folders a user was enrolled in at the given point in time.
      *
-     * If $nowOverride is NULL, returns current enrolled folders
+     * If $reportDate is NULL, returns current enrolled folders
      *
      * Folders are indexed, and sorted by name (ignoring case)
      *
      * @param User              $student
      * @param StudentAttributes $attributes
-     * @param string|null       $nowOverride
+     * @param string|null       $reportDate
      * @param null|string       $excludedClassCodes
      * @return GenericCollection|Folder\Model[]
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
-    public function findForStudent(User $student, StudentAttributes $attributes, ?string $nowOverride, ?string $excludedClassCodes): GenericCollection
+    public function findForStudent(User $student, StudentAttributes $attributes, ?string $reportDate, ?string $excludedClassCodes): GenericCollection
     {
         // Always fetch folders with interactions
         $term = (new Term\Model())
@@ -80,7 +80,7 @@ class FolderFetcher
         });
 
         // If current report, also fetch enrolled folders
-        if (null === $nowOverride) {
+        if (null === $reportDate) {
             $folders = $folders->mergeUnique($this->folderMapper->findAllBySubjectList($this->externalUser->getSubjectList($student)), $idProperty);
         }
 

@@ -56,7 +56,7 @@ class Module extends Alaress\Module\Module
 
         $canSeeSubjectReport = $this->buildRuleCanViewSubjectReport();
 
-        $this->register('GET', '/{userId}/folder/{folderId}{/now}', 'getReport', $canSeeSubjectReport, $preloadUserAndFolder);
+        $this->register('GET', '/{userId}/folder/{folderId}{/reportDate}', 'getReport', $canSeeSubjectReport, $preloadUserAndFolder);
     }
 
 
@@ -202,7 +202,7 @@ class Module extends Alaress\Module\Module
                     // User must be enrolled in the specified folder and not excluded
                     /** @var User $user */
                     $user = $params['user'];
-                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['now'] ?? null)) {
+                    if (!$this->isUserEnrolledInFolder($user, $folder, $params['reportDate'] ?? null)) {
                         throw new InvalidPath("User {$user->getId()} is not enrolled in folder {$folder->getId()}");
                     }
                 }),
@@ -228,23 +228,23 @@ class Module extends Alaress\Module\Module
      *
      * @param User         $user
      * @param Folder\Model $folder
-     * @param string|null  $nowOverride
+     * @param string|null  $reportDate
      * @return bool
      * @throws InvalidArgumentException
      * @throws InvalidPath
      * @throws Mapper\DefinitionException
      * @throws UnexpectedValueException
      */
-    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $nowOverride): bool
+    private function isUserEnrolledInFolder(User $user, Folder\Model $folder, ?string $reportDate): bool
     {
         try {
-            $attributes = new StudentAttributes($this->getConfig(), $user, null, $nowOverride);
+            $attributes = new StudentAttributes($this->getConfig(), $user, null, $reportDate);
         } catch (InvalidArgumentException $e) {
-            throw new InvalidPath("Cannot parse 'now' url fragment as date time. Found: {$nowOverride}", 0, $e);
+            throw new InvalidPath("Cannot parse 'reportDate' url fragment as date time. Found: {$reportDate}", 0, $e);
         }
 
         $fetcher = new FolderFetcher($this->getFolderMapper(), $this->getExternalUser());
-        $folders = $fetcher->findForStudent($user, $attributes, $nowOverride, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+        $folders = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfig()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
 
         /** @var Folder\Model $involvedFolder */
         foreach ($folders as $involvedFolder) {

@@ -92,7 +92,7 @@ class Controller extends Web\Controller\Base
      * @api   GET /modules/custom/tigs/summative/participation/user/{userId}
      * @level 18.1.0
      * @param User        $user
-     * @param string|null $now
+     * @param string|null $reportDate
      * @throws Exception
      * @throws InvalidArgumentException
      * @throws ServiceNotFound
@@ -102,16 +102,16 @@ class Controller extends Web\Controller\Base
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
      */
-    public function getReport(User $user, ?string $now): void
+    public function getReport(User $user, ?string $reportDate): void
     {
         $externalStudent = $this->externalUser->getStudent($user->getExternalId());
-        $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $now);
+        $attributes      = new StudentAttributes($this->getConfigLoader(), $user, $externalStudent['StudentIBFlag'], $reportDate);
 
         $deanAndMentor = $this->getDeanAndMentor($user, $externalStudent);
         $awards        = $this->getAwardsData($user, $attributes);
         $houseEvents   = $this->getHouseEventsData($user, $attributes);
         $absences      = $this->getAbsenceData($user, $attributes);
-        $subjectList   = $this->getSubjectList($user, $attributes, $now);
+        $subjectList   = $this->getSubjectList($user, $attributes, $reportDate);
         $deansComments = $this->getDeansComment($user, $attributes);
         $explanation   = $this->getExplanation($attributes, (bool)$this->getRequest()->query->get('inline'));
 
@@ -127,7 +127,7 @@ class Controller extends Web\Controller\Base
             'subjects'      => $subjectList,
             'deansComments' => $deansComments,
             'explanation'   => $explanation,
-            'nowOverride'   => $now,
+            'reportDate'    => $reportDate,
         ];
         $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Participation Report");
 
@@ -347,7 +347,7 @@ class Controller extends Web\Controller\Base
      *
      * @param User              $user
      * @param StudentAttributes $attributes
-     * @param null|string       $nowOverride
+     * @param null|string       $reportDate
      * @return array
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -356,11 +356,11 @@ class Controller extends Web\Controller\Base
      * @throws \DomainException
      * @throws Exception
      */
-    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $nowOverride): array
+    private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate): array
     {
-        $getCurrent = null === $nowOverride;
+        $getCurrent = null === $reportDate;
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
-        $folders    = $fetcher->findForStudent($user, $attributes, $nowOverride, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
+        $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
 
         $subjects = [];
         foreach ($folders as $folder) {

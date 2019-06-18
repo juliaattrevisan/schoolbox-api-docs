@@ -52,7 +52,7 @@ class Module extends Alaress\Module\Module
 
         $canSeeParticipationReport = $this->buildRuleCanViewReport();
 
-        $this->register('GET', '/user/{userId}{/now}', 'getReport', $canSeeParticipationReport, $preloadUser);
+        $this->register('GET', '/user/{userId}{/reportDate}', 'getReport', $canSeeParticipationReport, $preloadUser);
     }
 
 

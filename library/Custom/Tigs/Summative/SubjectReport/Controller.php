@@ -96,12 +96,12 @@ class Controller extends Web\Controller\Base
     /**
      * Displays a student's subject report for specified folder and current term
      *
-     * @api   GET /modules/custom/tigs/summative/subject/user/{userId}/folder/{folderId}?now={time}
-     *            Where {time} is anything recognised by strtotime()
+     * @api   GET /modules/custom/tigs/summative/subject/user/{userId}/folder/{folderId}{/reportDate}
+     *            Where {reportDate} is anything recognised by strtotime()
      * @level 18.1.0
      * @param User         $user
      * @param Folder\Model $folder
-     * @param string|null  $now
+     * @param string|null  $reportDate
      * @throws ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
@@ -113,13 +113,13 @@ class Controller extends Web\Controller\Base
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \UnderflowException
      */
-    public function getReport(User $user, Folder\Model $folder, ?string $now): void
+    public function getReport(User $user, Folder\Model $folder, ?string $reportDate): void
     {
         $attributes = new StudentAttributes(
             $this->getConfigLoader(),
             $user,
             $this->externalUser->getStudent($user->getExternalId())['StudentIBFlag'],
-            $now
+            $reportDate
         );
         $roleTypeOverride = $this->request->query->get('role-type');
 
@@ -215,7 +215,7 @@ class Controller extends Web\Controller\Base
             'teachers'                  => $folder->loadTeachers()->getTeachers(),
             'courseSpec'                => $courseSpec,
             'isEnabled'                 => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            'showNoLongerEnrolledAlert' => $now === null && !$this->isCurrentEnrollment($user, $folder),
+            'showNoLongerEnrolledAlert' => $reportDate === null && !$this->isCurrentEnrollment($user, $folder),
             'attributes'                => $attributes,
             'errors'                    => $errors,
             'unitSpecs'                 => $unitSpecsWithData,
