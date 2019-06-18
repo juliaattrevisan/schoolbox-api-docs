@@ -37,11 +37,15 @@ class BindingLoader implements ILoader
      * @param Folder\Mapper      $folderMapper
      * @param LoggerInterface    $log
      */
-    public function __construct(GeneratorInterface $generator, UserMapper $userMapper, Folder\Mapper $folderMapper, LoggerInterface $log)
-    {
-        $this->log         = $log;
-        $this->generator   = $generator;
-        $this->userMapper  = $userMapper;
+    public function __construct(
+        GeneratorInterface $generator,
+        UserMapper $userMapper,
+        Folder\Mapper $folderMapper,
+        LoggerInterface $log
+    ) {
+        $this->log          = $log;
+        $this->generator    = $generator;
+        $this->userMapper   = $userMapper;
         $this->folderMapper = $folderMapper;
     }
 
@@ -66,24 +70,34 @@ class BindingLoader implements ILoader
 
         foreach ($userIds as $i => $userId) {
             $user       = $this->userMapper->findById($userId);
-            $routes     = $this->generator->generateBindingsForUser($user);
             $routeCount = 0;
-
-            foreach ($routes as $prefix => $bindings) {
-                foreach ($bindings as $binding) {
-                    // $route = "*.notify.$instanceId.$prefix.$binding";
-                    $route = "*.notify.$prefix.$binding";
-                    $router->add($route, $userId, true);
-                    ++$routeCount;
-                    ++$totalRoutes;
-                }
+            foreach (array_keys($this->getUserSubscriptions($userId)) as $userSub) {
+                $router->add($userSub, $userId, true);
+                ++$routeCount;
+                ++$totalRoutes;
             }
-            $this->log->debug(sprintf("$progressPattern %3d routes loaded for user %5d (%s)", $i+1, $userCount, $routeCount, $userId, $user->getUsername()));
+            $this->log->debug(
+                sprintf(
+                    "$progressPattern %3d routes loaded for user %5d (%s)",
+                    $i + 1,
+                    $userCount,
+                    $routeCount,
+                    $userId,
+                    $user->getUsername()
+                )
+            );
         }
 
         $b = microtime(true);
 
-        $this->log->debug(sprintf("%d subscriptions loaded for %d users in %0.3f seconds", $totalRoutes, $userCount, ($b - $a)));
+        $this->log->debug(
+            sprintf(
+                "%d subscriptions loaded for %d users in %0.3f seconds",
+                $totalRoutes,
+                $userCount,
+                ($b - $a)
+            )
+        );
 
         foreach ($this->getRedirects() as $from => $to) {
             $this->log->info("Adding redirect `$from` -> `$to`");
@@ -100,13 +114,15 @@ class BindingLoader implements ILoader
      */
     public function getUserSubscriptions($userId)
     {
-        $userRoutes  = [];
+        $userRoutes = [
+            "*.instant.user.$userId.#" => true,
+        ];
 
         $bindings = $this->generator->generateBindingsForUser($this->userMapper->findById($userId));
 
         foreach ($bindings as $prefix => $data) {
             foreach ($data as $target) {
-                $binding = "*.notify.$prefix.$target";
+                $binding              = "*.notify.$prefix.$target";
                 $userRoutes[$binding] = true;
             }
         }
@@ -129,7 +145,7 @@ class BindingLoader implements ILoader
         /** @var Folder\Model[] $folders */
         $folders = $this->folderMapper->findByColumn('inherit', true);
 
-        $perms = [ UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL ];
+        $perms = [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL];
 
         foreach ($folders as $folder) {
             // we have to manually map each access level (sigh)

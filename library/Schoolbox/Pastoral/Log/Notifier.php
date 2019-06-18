@@ -39,7 +39,8 @@ class Notifier extends AbstractModuleNotifier
                 ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::NOTICE)
-                ->addTopic("pastoral_log.{$model->getImportId()}.created");
+                ->addTopic("pastoral_log.{$model->getImportId()}.created")
+                ->setAllowSelfSend(true);
 
             $message = $builder->build();
             $envelope->targetToUser($model->getUserId(), $message, true);
