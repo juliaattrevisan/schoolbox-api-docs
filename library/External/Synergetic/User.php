@@ -745,17 +745,17 @@ class External_Synergetic_User implements External_UserInterface
                             a.StudentContactOccupPhone,
                             a.StudentContactRelation,
                             a.StudentContactPrimaryOnlyFlag,
-                            a.StudentContactSpouseID,
-                            a.StudentContactSpouseTitle,
-                            a.StudentContactSpousePreferred,
-                            a.StudentContactSpouseSurname,
-                            a.StudentContactSpouseMobilePhone,
-                            a.StudentContactSpouseOccupPhone,
-                            a.StudentContactSpouseDefaultEmail,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseID END AS StudentContactSpouseID,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseTitle END AS StudentContactSpouseTitle,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpousePreferred END AS StudentContactSpousePreferred,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseSurname END AS StudentContactSpouseSurname,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseMobilePhone END AS StudentContactSpouseMobilePhone,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseOccupPhone END AS StudentContactSpouseOccupPhone,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseDefaultEmail END AS StudentContactSpouseDefaultEmail,
                             a.StudentContactType,
-                            a.StudentContactSpouseRelation,
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE a.StudentContactSpouseRelation END AS StudentContactSpouseRelation,
                             r.UseEmail AS StudentContactUseEmail,
-                            rs.UseEmail AS StudentContactSpouseUseEmail                
+                            CASE WHEN a.StudentContactPrimaryOnlyFlag = 1 THEN '' ELSE rs.UseEmail END AS StudentContactSpouseUseEmail
             FROM            dbo.vStudentContactAllAddress a
             LEFT JOIN       Relationships r ON r.id = a.StudentID AND r.RelatedID = a.StudentContactID
             LEFT JOIN       Relationships rs ON rs.id = a.StudentID AND rs.RelatedID = a.StudentContactSpouseID            
@@ -767,18 +767,8 @@ class External_Synergetic_User implements External_UserInterface
                             StudentContactType IN ({$contactTypes['placeholders']})
         ";
 
-        $iteratorContacts = $this->getConnector()->getQueryIterator($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
-
-        $contactList = [];
-
-        foreach ($iteratorContacts as $contact) {
-            if ((bool)$contact['StudentContactPrimaryOnlyFlag']) {
-                $contact['StudentContactSpouseID'] = '';
-            }
-            $contactList[] = $contact;
-        }
-
-        return $this->clearInvalidValues($contactList);
+        $statement = $this->getConnector()->executeQuery($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
+        return $this->clearInvalidValues($statement->fetchAll());
     }
 
 
@@ -897,9 +887,9 @@ class External_Synergetic_User implements External_UserInterface
             JOIN     vStudentContactAllAddress a ON r.RelatedID = a.StudentID
             JOIN     FileSemesters Semester ON
                      Semester.FileSemester = a.FileSemester AND
-                     Semester.FileYear = a.FileYear AND
-                     Semester.SystemCurrentFlag = 1
+                     Semester.FileYear = a.FileYear
             WHERE    r.ID = {$externalIdPlaceholders[0]} AND
+                     Semester.SystemCurrentFlag = 1 AND
                      r.Relationship IN ({$relationships['placeholders']}) AND
                      (a.StudentContactID = {$externalIdPlaceholders[1]} OR
                       (a.StudentContactSpouseID = {$externalIdPlaceholders[2]} AND a.StudentContactPrimaryOnlyFlag = 0)) AND
@@ -915,8 +905,6 @@ class External_Synergetic_User implements External_UserInterface
                 $contactTypes['bindings']
             )
         )->fetchAll();
-
-        return $students;
     }
 
 
@@ -1339,9 +1327,9 @@ class External_Synergetic_User implements External_UserInterface
 
     /**
      * Gets query bindings for student contact type from admin config
-     * @return string[]
+     * @return array
      */
-    private function getStudentContactTypeBindings()
+    private function getStudentContactTypeBindings(): array
     {
         if ($this->config->get('external_synergetic_student_contact_types') === '') {
             // No relationships were found, use the default values we had before introducing this feature
@@ -1356,9 +1344,9 @@ class External_Synergetic_User implements External_UserInterface
 
     /**
      * Gets query bindings for relationship from admin config
-     * @return string[]
+     * @return array
      */
-    private function getRelationshipBindings()
+    private function getRelationshipBindings(): array
     {
         if ($this->config->get('external_synergetic_student_relationships') === '') {
             // No relationships were found, use the default values we had before introducing this feature
