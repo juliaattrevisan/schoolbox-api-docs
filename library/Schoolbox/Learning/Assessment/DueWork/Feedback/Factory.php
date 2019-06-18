@@ -150,6 +150,12 @@ class Factory
                 ->setReviewee($this->participant->getUser())
                 ->setCreatedAt(\Alaress_Date_Format::now());
             $this->participant->getAllFeedbacks()->add($feedback);
+
+            // copy attachments over from the previous feedback.
+            if ($this->mostRecentFeedback && $this->mostRecentFeedback->getAllFiles()->count() > 0) {
+                $feedback->setAllFiles($this->mostRecentFeedback->getAllFiles());
+            }
+
         } else {
             // most recent is draft, use that
             $feedback = $this->mostRecentFeedback;
