@@ -13,21 +13,6 @@ namespace Alaress\Async\Notification\Instance;
 use SplObjectStorage;
 
 class InstanceBundle {
-    /**
-     * Delivery: instant
-     *
-     * Set as part of a message's topic: if it's there, the message will bypass
-     * routing, and be upgraded to instant delivery.
-     */
-    public const DELIVERY_INSTANT = 'instant';
-
-    /**
-     * Delivery: notify
-     *
-     * Set as part of a message's topic: if it's there, the message will be
-     * routed through the standard channels.
-     */
-    public const DELIVERY_NOTIFY = 'notify';
 
 	/** @var SplObjectStorage|Instance[] */
 	protected $splStore;
@@ -65,8 +50,8 @@ class InstanceBundle {
 		// detect whether or not to force-send to the user
         // (DELIVERY_INSTANT will bypass routing, DELIVERY_NOTIFY is more courteous)
 		$prefix = ($force && strpos($target, 'user.') === 0)
-            ? self::DELIVERY_INSTANT
-            : self::DELIVERY_NOTIFY;
+            ? Instance::DELIVERY_INSTANT
+            : Instance::DELIVERY_NOTIFY;
 
 		// iterate the instance's topics, and prepend the given target
 		foreach($instance->getTopics() as $topic) {

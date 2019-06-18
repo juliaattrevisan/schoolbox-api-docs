@@ -62,6 +62,22 @@ class Instance implements JsonSerializable
     public const ACTION_RETRACT_ALL = 'retract-all';
 
     /**
+     * Delivery: instant
+     *
+     * Set as part of this instance's topic: if it's there, the message will
+     * bypass routing, and be upgraded to instant delivery.
+     */
+    public const DELIVERY_INSTANT = 'instant';
+
+    /**
+     * Delivery: notify
+     *
+     * Set as part of this instance's topic: if it's there, the message will be
+     * routed through the standard channels.
+     */
+    public const DELIVERY_NOTIFY = 'notify';
+
+    /**
      * Array key to find event object identifier.
      */
     public const EVENT_OBJECT_ID = 'eventObjectId';
@@ -574,7 +590,7 @@ class Instance implements JsonSerializable
         // But what if the message is delivered to multiple users differently?
         $topic = $this->topics[0];
         [, $delivery] = explode('.', $topic);
-        return $delivery === InstanceBundle::DELIVERY_INSTANT;
+        return $delivery === self::DELIVERY_INSTANT;
     }
 
     /**
