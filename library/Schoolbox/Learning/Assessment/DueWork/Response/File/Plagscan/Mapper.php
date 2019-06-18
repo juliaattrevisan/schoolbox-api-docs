@@ -122,7 +122,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function setup()
     {
-        $this->setValidFiles(new ValidFiles());
+        $this->validFiles = new ValidFiles();
 
         /* If plagscan credentials exist, set up all the other stuff
          */
@@ -140,7 +140,7 @@ class Mapper extends \Schoolbox\Mapper
          */
         if (strlen($plagscanApiKey) && strlen($plagscanClientId) && strlen($plagscanUsername)) {
             try {
-                $this->setConnector(new Connector($plagscanClientId, $plagscanApiKey));
+                $this->connector = new Connector($plagscanClientId, $plagscanApiKey);
             }
             catch (\DomainException $e) {
                 /* Could not spawn for some reason, but due to mapper usage
@@ -217,7 +217,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Invalid filetype
          */
-        if (!$this->getValidFiles()->isPlagscannable($file->getBasename())) {
+        if (!$this->validFiles->isPlagscannable($file->getBasename())) {
             return [];
         }
 
@@ -256,7 +256,7 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Invalid filetype
          */
-        if (!$this->getValidFiles()->isPlagscannable($file->getBasename())) {
+        if (!$this->validFiles->isPlagscannable($file->getBasename())) {
             return [];
         }
 
@@ -503,33 +503,5 @@ class Mapper extends \Schoolbox\Mapper
     public function getConnector(): v3\Connector
     {
         return $this->connector;
-    }
-
-    /**
-     * @param Connector $connector
-     * @return $this
-     */
-    private function setConnector($connector)
-    {
-        $this->connector = $connector;
-        return $this;
-    }
-
-    /**
-     * @return ValidFiles
-     */
-    private function getValidFiles(): ValidFiles
-    {
-        return $this->validFiles;
-    }
-
-    /**
-     * @param ValidFiles $validFiles
-     * @return $this
-     */
-    private function setValidFiles($validFiles)
-    {
-        $this->validFiles = $validFiles;
-        return $this;
     }
 }
