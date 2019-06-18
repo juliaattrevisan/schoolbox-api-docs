@@ -6,24 +6,24 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Aura\Di\Exception\ServiceNotFound;
+use PDOStatement;
 use Raven_Client;
+use RuntimeException;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3\Connector;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Model as Plagscan;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
-
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
@@ -49,7 +49,8 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Mapping.
      */
-    protected function mapping () {
+    protected function mapping (): void
+    {
         $this->hasTable('plagscan_document');
         $this->hasModel(Plagscan::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -68,7 +69,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         $storageMapper = $this->getJoinMapper('storage');
 
@@ -85,7 +86,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @inheritdoc
      */
-    protected function hydrateSelect(\PDOStatement $statement)
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         // Return attachments fully hydrated by default
         $collection = $this->createCollection();
@@ -148,11 +149,11 @@ class Mapper extends \Schoolbox\Mapper
                  */
                 $this->logConnectorException($e);
             }
-            catch (\RuntimeException $e) {
+            catch (RuntimeException $e) {
                 /* Could not spawn because plagscan api is down
                  */
                 $this->logConnectorException(
-                    new \RuntimeException(
+                    new RuntimeException(
                         "Error: Plagscan unavailable. Could not generate access token.",
                         $e->getCode(),
                         $e
@@ -172,7 +173,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param User $user
      * @return bool
      */
-    public function isEnabled(User $user)
+    public function isEnabled(User $user): bool
     {
         /* Did the Gateway spawn properly
          * If so, there is a functioning username/apikey
@@ -181,13 +182,13 @@ class Mapper extends \Schoolbox\Mapper
 
             /* Staffs and super can always see plagscan results
              */
-            if ($user->getRole()->isStaff() || $user->isSuperuser()) {
+            if ($user->isSuperuser() || $user->getRole()->isStaff()) {
                 return true;
             }
 
             /* If the $user is a student or a parent, check a config var too
              */
-            if (($user->getRole()->isStudent() || $user->getRole()->isParent()) && $this->getConfigLoader()->get('plagscan_student_visible')) {
+            if ($this->getConfigLoader()->get('plagscan_student_visible') && ($user->getRole()->isStudent() || $user->getRole()->isParent())) {
                 return true;
             }
         }
@@ -195,15 +196,18 @@ class Mapper extends \Schoolbox\Mapper
         return false;
     }
 
+
     /**
      * Save a plagscan stub, so the ui can handle immediate feedback
      * rather than wait for the asynchronous stuff to do its thang
      *
      * @param SubmissionFile $file
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws MapperException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
-    public function saveNewPlagscanStub(SubmissionFile $file)
+    public function saveNewPlagscanStub(SubmissionFile $file): array
     {
         /* If gateway never spawned, plagscan not configured
          */
@@ -228,6 +232,7 @@ class Mapper extends \Schoolbox\Mapper
         return parent::save($plagscan);
     }
 
+
     /**
      * Save a Plagscan payload into db
      *
@@ -236,6 +241,10 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @return array|bool|int[]
      * @throws MapperException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     public function saveNewPlagscan(SubmissionFile $file, $filename)
     {
@@ -297,11 +306,11 @@ class Mapper extends \Schoolbox\Mapper
             // Something went unrecoverably wrong, so remove the document from the queue
             $plagscan->setStatus(Plagscan::STATUS_UNSCANNABLE);
             $this->logConnectorException($e);
-        } catch (\RuntimeException $e) {
+        } catch (RuntimeException $e) {
             // Plagscan is unavailable or otherwise behaving unexpectedly - try again later
             // Status is already queued, no need to change that
             $this->logConnectorException(
-                new \RuntimeException(
+                new RuntimeException(
                     "Error: Plagscan unavailable. Could not generate access token.",
                     $e->getCode(),
                     $e
@@ -317,6 +326,7 @@ class Mapper extends \Schoolbox\Mapper
         return parent::save($plagscan);
     }
 
+
     /**
      * Derive a plagscan filename that's used in Plagscan's systems
      * to identify files that people upload
@@ -326,17 +336,18 @@ class Mapper extends \Schoolbox\Mapper
      *
      * @param SubmissionFile $submissionFile
      * @return null|string
+     * @throws \PDOException
      */
-    public function plagscanFilename(SubmissionFile $submissionFile)
+    public function plagscanFilename(SubmissionFile $submissionFile): ?string
     {
-        $query = "
+        $query = '
             SELECT u.id, u.firstname, u.lastname, sb.assessment_id
             FROM student_submission_file sf
             INNER JOIN student_submission ss ON sf.student_submission_id = ss.id
             INNER JOIN submission_box sb on ss.box_id = sb.id
             INNER JOIN user u ON ss.owner = u.id
             WHERE sf.id = :submissionFileId
-        ";
+        ';
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
@@ -352,6 +363,7 @@ class Mapper extends \Schoolbox\Mapper
         return null;
     }
 
+
     /**
      * Find previous incarnations of $studentSubmissionFileId
      * that haven't already been privatised
@@ -362,17 +374,18 @@ class Mapper extends \Schoolbox\Mapper
      * @param int $studentSubmissionFileId
      * @return Collection
      * @throws MapperException
+     * @throws \PDOException
      */
-    public function findPreviousIncarnationsOf($studentSubmissionFileId)
+    public function findPreviousIncarnationsOf($studentSubmissionFileId): Collection
     {
         $plagscanDocuments = new Collection();
 
-        $query = "
+        $query = '
             SELECT student_submission.`id`, `owner`, `box_id`
             FROM student_submission_file 
             INNER JOIN student_submission ON student_submission_file.`student_submission_id` = student_submission.`id`
             WHERE student_submission_file.`id` = :studentSubmissionFileId
-        ";
+        ';
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
@@ -415,15 +428,18 @@ class Mapper extends \Schoolbox\Mapper
         return $plagscanDocuments;
     }
 
+
     /**
      * Privatise a particular plagscan id
      * in both our db and in plagscan's
      *
      * @param Plagscan $plagscan
      *
-     * @throws \RuntimeException
+     * @throws MapperException
+     * @throws \DomainException
+     * @throws \InvalidArgumentException
      */
-    public function privatise(Plagscan $plagscan)
+    public function privatise(Plagscan $plagscan): void
     {
         try {
 
@@ -446,7 +462,7 @@ class Mapper extends \Schoolbox\Mapper
                 $this->save($plagscan);
             }
         }
-        catch (\RuntimeException $e) {
+        catch (RuntimeException $e) {
 
             /* Noop - could not privatise in plagscan
              *
@@ -455,7 +471,7 @@ class Mapper extends \Schoolbox\Mapper
              * but can't do much to stop it if plagscan screws us
              */
             $this->logConnectorException(
-                new \RuntimeException("Could not privatise document in Plagscan.", $e->getCode(), $e)
+                new RuntimeException('Could not privatise document in Plagscan.', $e->getCode(), $e)
             );
         }
     }
@@ -484,7 +500,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @return Connector
      */
-    public function getConnector()
+    public function getConnector(): v3\Connector
     {
         return $this->connector;
     }
@@ -502,7 +518,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * @return ValidFiles
      */
-    private function getValidFiles()
+    private function getValidFiles(): ValidFiles
     {
         return $this->validFiles;
     }
