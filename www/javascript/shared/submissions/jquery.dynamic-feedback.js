@@ -330,9 +330,7 @@
                     $btnPublish.show();
 
                     // If published feedback already existed, and this is the first change afterwards,
-                    // remove any info about being linked to a response & having attachments
                     if ($actionBar.is('[data-published]')) {
-//                        $actionBar.find('[data-feedback-attach-info]').html('');
                         $actionBar.removeAttr('data-published');
                     }
 
