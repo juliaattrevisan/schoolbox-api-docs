@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
-use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
@@ -17,11 +16,8 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
-use Schoolbox\User;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
@@ -61,9 +57,6 @@ class Module extends \Alaress\Module\Module
      * To visit the course markbook, you must be:
      * * Logged in
      * * A staff member or SU
-     * * Have READ+ perm to the requested course
-     * Note that when on the page, you will only be able to see assessments from folders where you have READ+ perm.
-     * This latter rule is enforced when generating the filter panel, and again when generating the filtered report.
      *
      * @return Rule\IAuthorizationRule
      * @throws \InvalidArgumentException
@@ -81,18 +74,7 @@ class Module extends \Alaress\Module\Module
             new Rule\Any(
                 new Rule\HasRole(Role::STAFF),
                 new Rule\IsSuperuser()
-            ),
-            new Rule\Callback(function (array $params, User $user) {
-                if (!\array_key_exists('courseSpec', $params)) {
-                    throw new \InvalidArgumentException('No CourseSpec found in route params');
-                }
-                /** @var CourseSpec\Model $courseSpec */
-                $courseSpec = $params['courseSpec'];
-                if ($this->getAccess()->getFolderAccess($user, $courseSpec->getFolder()->getId()) < UserAccess::ACCESS_READ) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new Unauthorized('You do not have permission to view this course');
-                }
-            })
+            )
         );
     }
 
@@ -139,17 +121,6 @@ class Module extends \Alaress\Module\Module
     {
         return $this->getMapperFactory()->get(CourseSpec\Mapper::class);
     }
-
-
-    /**
-     * @return Access|Mapper
-     * @throws \InvalidArgumentException
-     */
-    private function getAccess(): Access
-    {
-        return $this->getMapperFactory()->get(Access::class);
-    }
-
 
     /**
      * Returns a function that preloads a CourseSpec model
