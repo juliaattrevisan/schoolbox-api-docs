@@ -52,6 +52,9 @@ else
 	fi
 fi
 
+echo "Preparing conf.php"
+cp -f www/conf/tarball.conf.php www/conf/conf.php;
+
 echo "Running php unit"
 phpdbg -qrr -d memory_limit=-1 vendor/bin/phpunit --configuration phpunit.xml --testsuite default --coverage-clover clover.xml
 unitTestResult=$?;
