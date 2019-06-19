@@ -5,7 +5,6 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
 
@@ -38,7 +37,6 @@ class Alaress_Twitter_Cache extends Alaress_Cache_Abstract {
      * @param string     $url
      * @param null|array $params
      * @return $this
-     * @throws InvalidArgumentException
      */
     public function init(string $url, ?array $params = null): Alaress_Cache_Abstract {
         $this->setParameters($params);
