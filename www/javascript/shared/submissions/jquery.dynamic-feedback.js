@@ -169,7 +169,7 @@
                 }).done(function (response) {
                     // Have we inserted feedback meta message into action bar ?
                     if ($actionBar.find('[data-feedback-attach-info]').length) {
-                        $btnPublish.text('');
+                        $btnPublish.text(config.publishText).addClass('hide');
                         $btnDrafted.text('');
                     } else {
                         $actionBar.slideUp(function () {
