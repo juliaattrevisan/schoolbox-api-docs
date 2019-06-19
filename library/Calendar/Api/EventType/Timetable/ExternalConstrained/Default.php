@@ -212,8 +212,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param Alaress_Date_Format $date
      * @return array
      */
-    private function buildTimetableExpensively(Schoolbox\User $user, Campus $campus, Alaress_Date_Format $date)
+    private function buildTimetableExpensively(Schoolbox\User $user, Campus $campus, Alaress_Date_Format $date): array
     {
+        if (!$user->getExternalId()) {
+            return [];
+        }
         try {
             $timetable = $this->externalTimetable->getTimetableForDate(
                 $user->getExternalId(),
