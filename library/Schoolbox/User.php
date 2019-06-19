@@ -46,7 +46,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     /** @var string */
     private $lastname;
 
-    /** @var string */
+    /** @var null|string */
     private $externalId;
 
     /** @var string */
@@ -527,10 +527,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
 
     /**
-     * @param string $externalId
+     * @param null|string $externalId
      * @return self
      */
-    public function setExternalId($externalId)
+    public function setExternalId(?string $externalId): self
     {
         $this->externalId = $externalId;
         return $this;
@@ -538,9 +538,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getExternalId()
+    public function getExternalId(): ?string
     {
         return $this->externalId;
     }
