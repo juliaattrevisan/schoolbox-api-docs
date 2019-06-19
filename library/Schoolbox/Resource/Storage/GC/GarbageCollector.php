@@ -79,12 +79,20 @@ class GarbageCollector
      */
     public function getStale($hash = null)
     {
-        if( $hash ) {
-            $statement = $this->mapper->getDatabase()->query("SELECT `hash` FROM `storage` WHERE `hash` = :hash", ['hash'=>$hash]);
+        $query = 'SELECT `hash` FROM `storage` WHERE';
+
+        if ($hash) {
+            $query .= ' `hash` = :hash';
+            $statement = $this->mapper->getDatabase()->prepare($query);
+            $statement->bindValue(':hash', $hash);
         }
         else {
-            $statement = $this->mapper->getDatabase()->query("SELECT `hash` FROM `storage` WHERE `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0,:limit", ['limit'=>$this->limit]);
+            $query .= ' `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, :limit';
+            $statement = $this->mapper->getDatabase()->prepare($query);
+            $statement->bindValue(':limit', $this->limit, \PDO::PARAM_INT);
         }
+
+        $statement->execute();
 
         $this->list = [];
 

@@ -45,7 +45,7 @@ class HardLinks extends DbCheck
              AND deleted_at IS NULL",
 
             "SELECT image_hash FROM folder 
-             WHERE hash IS NOT NULL 
+             WHERE image_hash IS NOT NULL 
              AND deleted_at IS NULL",
 
             "SELECT hash FROM myFile
@@ -84,7 +84,7 @@ class HardLinks extends DbCheck
             "SELECT plagscan_document.`storage_hash`
             FROM plagscan_document
             INNER JOIN student_submission_file ON student_submission_file.`id` = plagscan_document.`student_submission_file_id`
-            WHERE student_submission_file.`deleted_at` IS NULL",
+            WHERE storage_hash IS NOT NULL AND student_submission_file.`deleted_at` IS NULL",
         ];
 
         return sprintf("`hash` NOT IN (%s)", implode(' UNION ', $queries));
