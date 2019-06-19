@@ -8,11 +8,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
+use function array_combine;
 use function func_get_args;
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Alaress\Web\Controller as WebController;
 use Schoolbox\Filter;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
@@ -41,6 +44,12 @@ class Controller extends WebController\Base
     /** @var GradeGroup\Model */
     private $defaultGradeGroup;
 
+    /** @var CourseImpl\Mapper */
+    private $courseImplMapper;
+
+    /** @var UnitImpl\Mapper */
+    private $unitImplMapper;
+
 
     /**
      * @param Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory
@@ -49,6 +58,8 @@ class Controller extends WebController\Base
      * @param Filter\Filters\Assessment\IdFinder       $assessmentIdFinder
      * @param Assessment\MapperProxy                   $assessmentMapperProxy
      * @param GradeGroup\Model                         $defaultGradeGroup
+     * @param CourseImpl\Mapper                        $courseImplMapper
+     * @param UnitImpl\Mapper                          $unitImplMapper
      */
     public function __construct(
         Filter\Filters\Assessment\FactoryFactory $filterFactoryFactory,
@@ -56,7 +67,9 @@ class Controller extends WebController\Base
         Filter\Selection\Mapper $filterSelectionMapper,
         Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         Assessment\MapperProxy $assessmentMapperProxy,
-        GradeGroup\Model $defaultGradeGroup
+        GradeGroup\Model $defaultGradeGroup,
+        CourseImpl\Mapper $courseImplMapper,
+        UnitImpl\Mapper $unitImplMapper
     ) {
         $this->filterFactoryFactory  = $filterFactoryFactory;
         $this->filterMapper          = $filterMapper;
@@ -64,6 +77,8 @@ class Controller extends WebController\Base
         $this->assessmentIdFinder    = $assessmentIdFinder;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->defaultGradeGroup     = $defaultGradeGroup;
+        $this->courseImplMapper      = $courseImplMapper;
+        $this->unitImplMapper        = $unitImplMapper;
     }
 
 
@@ -165,7 +180,7 @@ class Controller extends WebController\Base
              * @var Filter\Selection\Model[][] $selectionsPerFilter
              */
             // TODO add some intelligence around which filter settings to save (eg AssessmentType but not units)
-            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($request, false);
+            [$filters, $codec, $selectionsPerFilter] = $this->convertRequestToFilters($courseSpec, $request, false);
 
             $assessmentIds  = $this->assessmentIdFinder->findIdsByFilters($filters);
             $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
@@ -212,17 +227,19 @@ class Controller extends WebController\Base
 
 
     /**
-     * @param array $request  Indexed by filter.id, option.key
-     * @param bool  $saveToDB Should we persist these selections to the DB ?
+     * @param CourseSpec\Model $courseSpec
+     * @param array            $request  Indexed by filter.id, option.key
+     * @param bool             $saveToDB Should we persist these selections to the DB ?
      * @return array
-     * @throws \InvalidArgumentException If unable to find the filter mapper class
-     * @throws \ReflectionException If the specified class does not exist
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
      * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
      * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    private function convertRequestToFilters(array $request, $saveToDB): array
+    private function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
     {
         $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
         $codec           = $this->filterFactoryFactory->buildCodec();
@@ -235,9 +252,16 @@ class Controller extends WebController\Base
 
         $filters = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
-        // Ensure that assessments are not Assessment Specs
+        // Ensure that assessments are:
+        // * not Assessment Specs
+        // * Are inside unitImpls that belong to courseImpls that were imported from the courseSpec
+        $courseImpls = $this->courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId());
+        $pb          = $this->unitImplMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
+        $unitImplIds = $this->unitImplMapper->findIdsByPredicates($pb);
+
         $filters = array_merge($filters, [
             Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+            Filter\Filters\Assessment\NullableContext\UnitImpl\Definition::class => array_combine($unitImplIds, $unitImplIds),
         ]);
 
         return [$filters, $codec, $selectionsPerFilter];
