@@ -108,11 +108,11 @@ class GarbageCollector
         // iterate the checks, and retain the intersection each time
         foreach ($this->checks as $check) {
             $this->log->notice('Applying '.get_class($check), ['char' => '+']);
-            $hashes = $check->getStale($hashes);
-            $this->log->info('Retained '.count($hashes). ' stale');
+            $staleHashes = $check->getStale($hashes);
+            $this->log->info('Retained '.count($staleHashes). ' stale');
         }
 
-        return $hashes;
+        return $this->list;
     }
 
 
@@ -124,7 +124,6 @@ class GarbageCollector
     public function purge($hash = null)
     {
         $purge = $this->getStale($hash);
-
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
