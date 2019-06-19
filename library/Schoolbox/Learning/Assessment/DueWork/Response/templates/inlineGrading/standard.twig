@@ -148,6 +148,8 @@ Usage:
         }) }}">
             <section>
                 <input type="hidden" name="responseId" value="{{ response.id }}" />
+                {# Required so that this form is recognised as containing a rubric and files #}
+                <input name="fromInlineGrader" value="true" type="hidden"/>
 
                 {# Settings for the rubric grid #}
                 {% set showDescriptorValue = true %}

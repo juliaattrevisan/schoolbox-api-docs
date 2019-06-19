@@ -7,7 +7,6 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Web\Controller\Base;
-use Aura\Web\Request\Values as RequestValues;
 use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
@@ -211,9 +210,8 @@ class Controller extends Base
             return true;
         }
 
-        // Did we not give marks, but the `saveEmpty` flag is set?
-        // Save empty marks
-        if (array_key_exists('saveEmpty', $post) && $post['saveEmpty']) {
+        // If from inline grader, save empty marks
+        if (array_key_exists('fromInlineGrader', $post) && $post['fromInlineGrader']) {
             $markedGrid = $factory->buildFromPostData(
                 $this->rubricMapper->retrieveMarkedGrid($feedback),
                 []
@@ -313,6 +311,8 @@ class Controller extends Base
      * @param IFeedback|null $mostRecentFeedback
      * @param IResponse|null $response
      * @return DueWork\Feedback\Model
+     * @throws MapperException
+     * @throws MapperException\Deleted
      */
     private function processFeedback(
         Participant $participant,
@@ -322,9 +322,9 @@ class Controller extends Base
         IResponse $response = null
     ):Model {
 
-        // Check whether new rubric data is being passed through
-        $hasRubric = array_key_exists('rubric', $postVars) || array_key_exists('saveEmpty', $postVars);
-
+        // Check whether new rubric data and/or attachments are being passed through
+        $fromInlineGrader = array_key_exists('fromInlineGrader', $postVars);
+        $hasRubric = false;
         // Check whether the latest feedback actually has rubric data set.
         if ($mostRecentFeedback !== null
             && $mostRecentFeedback->getAssessable() instanceof DueWork\Model
@@ -337,18 +337,23 @@ class Controller extends Base
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
-            $mostRecentFeedback,
             $postVars['mark'],
             $postVars['comment'],
             $postVars['publish'],
             $postVars['attachment'],
-            $hasRubric,
+            $fromInlineGrader,
             $reviewRoute,
+            $mostRecentFeedback,
             $response
         );
 
         $feedback = $dueWorkFeedbackFactory->produce();
-        $this->getFeedbackDataSource()->save($feedback);
+
+        if (!$hasRubric && $feedback->isEmpty()) {
+            $this->getFeedbackDataSource()->delete($feedback);
+        } else {
+            $this->getFeedbackDataSource()->save($feedback);
+        }
 
         $data = [
             'success' => true,
@@ -428,5 +433,4 @@ class Controller extends Base
         }
         return $reviewRoute;
     }
-
 }

@@ -5,11 +5,14 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
@@ -17,7 +20,6 @@ use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 
 class Factory
@@ -49,7 +51,7 @@ class Factory
     private $mostRecentFeedback;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mark;
 
@@ -59,7 +61,7 @@ class Factory
     private $comment;
 
     /**
-     * @var string
+     * @var bool
      */
     private $publish;
 
@@ -71,11 +73,11 @@ class Factory
     private $files;
 
     /**
-     * Does this feedback have associated rubric marks ?
+     * Does this updated from inline grader
      *
      * @var bool
      */
-    private $hasRubric;
+    private $fromInlineGrader;
 
     /**
      * By which work-flow was the feedback created
@@ -96,37 +98,37 @@ class Factory
      * @param IFeedbackDataSource|DueWorkFeedbackDataSource $dueWorkFeedbackDataSource
      * @param Participant                                   $participant
      * @param User                                          $currentUser
-     * @param IFeedback|DueWorkFeedback|null                $mostRecentFeedback
      * @param string                                        $mark
      * @param string                                        $comment
-     * @param string                                        $publish   one of ['0'|'1']
-     * @param array                                         $files
-     * @param bool                                          $hasRubric
+     * @param string|null                                   $publish   one of [null|'0'|'1']
+     * @param array|null                                    $files
+     * @param bool                                          $fromInlineGrader
      * @param string                                        $reviewRoute
+     * @param IFeedback|DueWorkFeedback|null                $mostRecentFeedback
      * @param DueWorkResponse|null                          $response
      */
     public function __construct(
         IFeedbackDataSource $dueWorkFeedbackDataSource,
         Participant $participant,
         User $currentUser,
-        IFeedback $mostRecentFeedback = null,
         $mark,
         $comment,
         $publish,
         $files,
-        $hasRubric,
+        $fromInlineGrader,
         string $reviewRoute,
+        IFeedback $mostRecentFeedback = null,
         DueWorkResponse $response = null
     ) {
         $this->dueWorkFeedbackDataSource = $dueWorkFeedbackDataSource;
         $this->participant               = $participant;
         $this->currentUser               = $currentUser;
         $this->mostRecentFeedback        = $mostRecentFeedback;
-        $this->mark                      = $mark;
-        $this->comment                   = $comment;
-        $this->publish                   = $publish;
+        $this->mark                      = $mark ? trim($mark) : null;
+        $this->comment                   = $comment ? trim($comment) : '';
+        $this->publish                   = $publish === '1';
         $this->files                     = $files;
-        $this->hasRubric                 = $hasRubric;
+        $this->fromInlineGrader          = $fromInlineGrader;
         $this->reviewRoute               = $reviewRoute;
         $this->response                  = $response;
     }
@@ -136,8 +138,10 @@ class Factory
      * such as mark, comment, publish, authors and attachments
      *
      * @return DueWorkFeedback
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function produce()
+    public function produce(): DueWorkFeedback
     {
         // Is this the first feedback for this participant, or is most recent feedback already published ?
         if (is_null($this->mostRecentFeedback) || $this->mostRecentFeedback->isPublished()) {
@@ -148,46 +152,33 @@ class Factory
                 ->setReviewee($this->participant->getUser())
                 ->setCreatedAt(\Alaress_Date_Format::now());
             $this->participant->getAllFeedbacks()->add($feedback);
+
+            // copy attachments over from the previous feedback.
+            if ($this->mostRecentFeedback && $this->mostRecentFeedback->getAllFiles()->count() > 0) {
+                $filesToCopy = new Collection();
+                foreach ($this->mostRecentFeedback->getAllFiles() as $attachment) {
+                    $filesToCopy->add(
+                        (new DueWorkFeedbackFile())
+                            ->setStorage($attachment)
+                            ->setFilename($attachment->getFilename())
+                    );
+                }
+                $feedback->setAllFiles($filesToCopy);
+            }
         } else {
             // most recent is draft, use that
             $feedback = $this->mostRecentFeedback;
         }
 
         // mutate model found, and save
-        $postMark        = trim($this->mark);
-        $postComment     = trim($this->comment);
-        $postReviewRoute = trim($this->reviewRoute);
-        $postPublish     = trim($this->publish);
-
-        /**
-         * Check if there's any content to this feedback
-         */
-        $hasContent = false;
-        if (strlen($postMark) || strlen($postComment) || !empty($this->files) || $this->hasRubric) {
-            $hasContent = true;
-        }
-
-        /**
-         * If they are updating an existing draft and there's no content: delete the draft.
-         * I have purposefully allowed empty drafts when creating a new draft, otherwise it's just
-         * too confusing for users when going from a published feedback.
-         * I've also purposefully allowed publishing of empty feedback, in order for teachers to overwrite a mistake
-         * (teachers are not allowed to delete from the feedback history).
-         */
-        if (!$hasContent && !$postPublish && $feedback->getId()) {
-            $feedback->setDeletedAt(\Alaress_Date_Format::now());
-            $feedback->setResponse($this->response);
-            return $feedback;
-        }
-
         /** @var DueWorkFeedback $feedback */
         $feedback
             ->setReviewer($this->currentUser)
-            ->setReviewRoute($postReviewRoute)
+            ->setReviewRoute($this->reviewRoute)
             ->setUpdatedAt(\Alaress_Date_Format::now())
-            ->setComment($postComment);
+            ->setComment($this->comment);
 
-        if ($postMark !== '') {
+        if ($this->mark && $this->mark !== '') {
 
             // mark defined and non-empty
             try {
@@ -195,7 +186,7 @@ class Factory
                 $scheme = $this->participant->getAssessable()->getMarkScheme();
 
                 // verify normalisation, then sanitise the output
-                $norm = $scheme->getNormalisedMark($postMark);
+                $norm = $scheme->getNormalisedMark($this->mark);
                 $humanReadableMark = $scheme->getHumanReadableMark($norm);
 
                 $feedback
@@ -203,11 +194,11 @@ class Factory
                     ->setHumanReadableMark($humanReadableMark);
             }
             catch (\InvalidArgumentException $e) {
-                $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $postMark);
+                $code = \DueWork_ErrorMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())
-                    ->setHumanReadableMark($postMark);
+                    ->setHumanReadableMark($this->mark);
             }
         }
         else {
@@ -223,14 +214,14 @@ class Factory
         }
 
         // Attach any attached files (if this kind of attachment accepts them)
-        $feedbackFileDecorator = new FileDecorator($feedback, $this->files);
-        $feedbackFileDecorator->decorate();
+        if ($this->fromInlineGrader) {
+            $feedbackFileDecorator = new FileDecorator($feedback, $this->files);
+            $feedbackFileDecorator->decorate();
+        }
 
-        if ($postPublish == true) {
+        if ($this->publish && !$feedback->isPublished()) {
             // received signal to publish this
-            if (!$feedback->isPublished()) {
-                $feedback->setPublishedAt(\Alaress_Date_Format::now());
-            }
+            $feedback->setPublishedAt(\Alaress_Date_Format::now());
         }
 
         /* Attach feedback to a particular Response instance
