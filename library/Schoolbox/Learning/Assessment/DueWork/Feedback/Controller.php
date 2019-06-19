@@ -324,7 +324,7 @@ class Controller extends Base
 
         // Check whether new rubric data and/or attachments are being passed through
         $fromInlineGrader = array_key_exists('fromInlineGrader', $postVars);
-        $hasRubric = false;
+        $hasRubric        = array_key_exists('rubric', $postVars);
         // Check whether the latest feedback actually has rubric data set.
         if ($mostRecentFeedback !== null
             && $mostRecentFeedback->getAssessable() instanceof DueWork\Model
@@ -332,7 +332,7 @@ class Controller extends Base
         ) {
             $hasRubric = true;
         }
-        
+
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
