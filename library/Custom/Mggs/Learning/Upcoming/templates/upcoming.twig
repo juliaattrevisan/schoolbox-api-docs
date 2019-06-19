@@ -979,18 +979,17 @@
                 </ul>
 
                 <article class="detail" data-is-html="1"></article>
-                <div>
-                    <dl>
-                        <dd>
-                            {% if canModify %}
-                            <span>
-                                <input id="pblDateChange" data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
-                            </span>
-                            {% endif %}
-                            <span class="homepageLink" data-is-html="1"></span>
-                            <span class="moreDetailsLink" data-is-html="1"></span>
-                        </dd>
-                    </dl>
+
+                <div class="component-action">
+                    <section>
+                        {% if canModify %}
+                        <span>
+                            <input id="pblDateChange" data-datepicker data-datepicker-buttontext="Change Date" type="hidden" />
+                        </span>
+                        {% endif %}
+                        <span class="homepageLink" data-is-html="1"></span>
+                        <span class="moreDetailsLink" data-is-html="1"></span>
+                    </section>
                 </div>
             </div>
         </div>
