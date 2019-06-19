@@ -49,7 +49,7 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Mapping.
      */
-    protected function mapping (): void
+    protected function mapping(): void
     {
         $this->hasTable('plagscan_document');
         $this->hasModel(Plagscan::class);
