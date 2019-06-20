@@ -124,7 +124,7 @@ class Factory
         $this->participant               = $participant;
         $this->currentUser               = $currentUser;
         $this->mostRecentFeedback        = $mostRecentFeedback;
-        $this->mark                      = $mark ? trim($mark) : null;
+        $this->mark                      = ($mark === null || $mark === '') ? null : trim($mark);
         $this->comment                   = $comment ? trim($comment) : '';
         $this->publish                   = $publish === '1';
         $this->files                     = $files;
@@ -178,7 +178,7 @@ class Factory
             ->setUpdatedAt(\Alaress_Date_Format::now())
             ->setComment($this->comment);
 
-        if ($this->mark && $this->mark !== '') {
+        if ($this->mark !== null && $this->mark !== '') {
 
             // mark defined and non-empty
             try {
