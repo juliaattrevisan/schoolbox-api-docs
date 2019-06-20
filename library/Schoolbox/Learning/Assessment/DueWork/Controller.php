@@ -512,6 +512,14 @@ class Controller extends Assessment\Controller
         // array inside an array that's *nearly* empty...
         $data = [['Name', 'External ID']];
 
+        // array of all used indicator ids for the assessment
+        $allIndicatorUsageIds = [];
+        foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
+            foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
+                $allIndicatorUsageIds[] = $indicatorUsage->getIndicator()->getId();
+            }
+        }
+
         // put header row in array
         foreach ($this->getRubricHeaders($grid) as $grouping => $criteria) {
             foreach ($criteria as $id => $criterion) {
@@ -529,8 +537,10 @@ class Controller extends Assessment\Controller
         $participantsGrouped = $participants->groupByCallback(function(Participant $participant){
             return $participant->getUser()->getId();
         })->getAll();
-
         foreach ($this->getMarks($participants) as $studentId => $marks) {
+            // array of all marked indicator ids of the participant
+            $markedIndicatorIds = array_keys($marks);
+
             /** @var Participant $participant */
             $participant = $participantsGrouped[$studentId]->first();
             $studentName = $participant->getUser()->formatName('{lastname}, {firstname}');
@@ -539,25 +549,28 @@ class Controller extends Assessment\Controller
             $sum = null;
 
             if (count($marks)) {
-                foreach ($marks as $mark) {
-                    if ($mark instanceof IndicatorMark) {
-                        $descriptor = $mark->getDescriptor();
-                        $row[] = $descriptor ? $descriptor->getDescription() : '';
-                        $row[] = $mark->getValue();
-                        $sum += $mark->getValue();
+                foreach ($allIndicatorUsageIds as $indicatorUsageId) {
+                    if (in_array($indicatorUsageId, $markedIndicatorIds, true)) {
+                        if ($marks[$indicatorUsageId] instanceof IndicatorMark) {
+                            $descriptor = $marks[$indicatorUsageId]->getDescriptor();
+                            $row[] = $descriptor ? $descriptor->getDescription() : '';
+                            $row[] = $marks[$indicatorUsageId]->getValue();
+                            $sum += $marks[$indicatorUsageId]->getValue();
+                        } else {
+                            $row[] = $marks[$indicatorUsageId];
+                            $row[] = '';
+                        }
                     } else {
-                        $row[] = $mark;
+                        $row[] = '';
                         $row[] = '';
                     }
                 }
-                $row[] = $sum;
-
             } else {
                 $row = array_merge($row, array_pad([], count($data[0]) - 1, ''));
             }
+            $row[] = $sum;
             $data[] = $row;
         }
-
         return $data;
     }
 
