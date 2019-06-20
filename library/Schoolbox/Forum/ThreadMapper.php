@@ -164,7 +164,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
             return $thread;
         }
         else {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception\NotFound();
         }
 
     }

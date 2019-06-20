@@ -245,7 +245,7 @@ class ResourceVideoMapper extends Mapper
             $video->setFile($fileMapper->hydrate($row, 'f'));
         }
         if (!($video instanceof ResourceVideo)) {
-            throw new MapperException('Instance of object not found');
+            throw new MapperException\NotFound();
         }
         return $video;
 
@@ -287,7 +287,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new MapperException('Instance of object not found');
+            throw new MapperException\NotFound();
         }
 
         return $video;
@@ -342,7 +342,7 @@ class ResourceVideoMapper extends Mapper
         }
 
         if (!($video instanceof ResourceVideo)) {
-            throw new MapperException('Instance of object not found');
+            throw new MapperException\NotFound();
         }
         return $video;
     }

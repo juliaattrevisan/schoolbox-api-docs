@@ -302,7 +302,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         }
 
         if (!($submission_box instanceof SubmissionBox)) {
-            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Schoolbox\Mapper\Exception\NotFound();
         }
         $this->throwIfDeleted($submission_box);
         return $submission_box;

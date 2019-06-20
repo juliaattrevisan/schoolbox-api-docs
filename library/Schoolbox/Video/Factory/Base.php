@@ -86,7 +86,7 @@ abstract class Base {
                 return $videoMapper->findByStorageHash($file->getHash());
 		}
 
-        throw new MapperException('Instance of object not found');
+        throw new MapperException\NotFound();
 	}
 
 	/**

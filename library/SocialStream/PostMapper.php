@@ -182,7 +182,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
             return $postItem;
         }
 
-        throw new Schoolbox\Mapper\Exception('Instance of object not found');
+        throw new Schoolbox\Mapper\Exception\NotFound();
     }
 
 

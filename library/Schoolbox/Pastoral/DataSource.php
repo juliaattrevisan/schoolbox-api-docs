@@ -75,7 +75,7 @@ class DataSource
         $model = $this->mapper->filterRecordForUser($model, $currentUser);
 
         if (!$model instanceof Model) {
-            throw new MapperException('Instance of object not found');
+            throw new MapperException\NotFound();
         }
 
         return $model;

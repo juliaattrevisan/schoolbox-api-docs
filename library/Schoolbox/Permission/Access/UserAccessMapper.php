@@ -709,7 +709,7 @@ class UserAccessMapper extends Mapper
 
             if ($this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] == -1) {
                 // Found cached exception, throw it
-                throw new Mapper\Exception("Instance of object not found");
+                throw new Mapper\Exception\NotFound();
             }
 
             // Found cached result, return it
@@ -769,6 +769,6 @@ class UserAccessMapper extends Mapper
         // Cache and throw an exception
 
         $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = -1;
-        throw new Mapper\Exception("Instance of object not found");
+        throw new Mapper\Exception\NotFound();
     }
 }

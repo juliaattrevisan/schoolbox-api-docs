@@ -8,6 +8,8 @@
  */
 namespace DailyQuote;
 
+use Schoolbox\Mapper\Exception\NotFound;
+
 class QuoteMapper extends \Schoolbox\Mapper {
 
 	/**
@@ -81,6 +83,6 @@ class QuoteMapper extends \Schoolbox\Mapper {
 			return $quoteItem;
 		}
 
-		throw new \Exception('Instance of object not found');
+		throw new NotFound();
 	}
 }

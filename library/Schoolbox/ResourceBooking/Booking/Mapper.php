@@ -436,7 +436,7 @@ class Mapper extends BaseMapper
             $this->throwIfDeleted($model);
             return $model;
         }
-        throw new BaseMapper\Exception('Instance of object not found');
+        throw new BaseMapper\Exception\NotFound();
     }
 
     /**
