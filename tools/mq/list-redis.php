@@ -129,17 +129,21 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         $withId = '(which does not have an identifier)';
                     }
                 }
-                $this->getLogger()->info("Notify {$output->getLabel()}. Object {$classname} {$withId} {$output->getEvent()->getAction()}");
+                if (isset($withId)) {
+                    $this->getLogger()->info("Notify {$output->getLabel()}. Object {$classname} {$withId} {$output->getEvent()->getAction()}");
+                } else {
+                    $this->getLogger()->warning("Notify {$output->getLabel()}. Object {$classname} {$output->getEvent()->getAction()}");
+                }
             } catch (Exception $e) {
                 $this->getLogger()->warning($e->getMessage());
             }
-        } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
+        } elseif ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
             $this->getLogger()->info("CancelTrigger");
             $this->getLogger()->info($instance->getLabel());
             if ($instance->getTimestamp()) {
                 $this->getLogger()->info('Trigger Date:' . date('Y-m-d H:i:s', $instance->getTimestamp()));
             }
-        } else if ($instance instanceof Alaress\Async\Notification\Instance\Instance) {
+        } elseif ($instance instanceof Alaress\Async\Notification\Instance\Instance) {
             $output = $instance->jsonSerialize();
             $this->getLogger()->info('Trigger Date:' . date('Y-m-d H:i:s', $output['time']));
             foreach ($output['topics'] as $topic) {
