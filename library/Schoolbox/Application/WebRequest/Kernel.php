@@ -16,18 +16,11 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
-use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
-use Okta\JwtVerifier\Discovery\Oidc;
-use Okta\JwtVerifier\JwtVerifierBuilder;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebKernelAbstract;
-use Schoolbox\Auth\TokenParser;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\MapperFactory;
-use Schoolbox\UserMapper;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
@@ -267,6 +260,19 @@ class Kernel extends WebKernelAbstract
                 $session->getSegment(\Schoolbox\Application\Login\Controller::class)
                     ->setFlash(\Schoolbox\Application\Login\Controller::LOGIN_ERROR_FLASH, get_class($e));
                 $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
+            }
+        } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+            $response = $this->di->get('webFactory')->newResponse();
+            if ($controller->getRequest()->isXhr()) {
+                // TODO replace this with standard outputError (ApiProblem style payload)
+                // Fabricate an AJAX response. Don't redirect
+                $response->status->setCode(404);
+                $response->content->set([
+                    'format' => 'json',
+                    'data'   => ['error' => 'Object was deleted'],
+                ]);
+            } else {
+                $this->outputError($e, $e->getMessage(), '', [], 404);
             }
         } catch (Deleted $e) {
             $response = $this->di->get('webFactory')->newResponse();

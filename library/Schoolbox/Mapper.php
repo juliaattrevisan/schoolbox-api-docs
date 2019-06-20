@@ -1989,7 +1989,7 @@ abstract class Mapper implements IMapper, Serializable
             $options
         );
         if ($result_collection->count() === 0) {
-            throw new Exception('Instance of object not found');
+            throw new Exception\NotFound();
         }
 
         // Use the first non-deleted model
