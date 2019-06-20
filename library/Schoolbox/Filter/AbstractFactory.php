@@ -13,6 +13,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
 use TypeError;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 
 abstract class AbstractFactory implements IFactory
 {
@@ -127,6 +128,24 @@ abstract class AbstractFactory implements IFactory
     {
         foreach ($routeArgs as $routeArg) {
             if ($routeArg instanceof Folder\Model) {
+                return $routeArg;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Finds a returns the first course specification model from an array of route args
+     *
+     * @param array $routeArgs
+     * @return CourseSpec\Model
+     * @throws TypeError If no CourseSpec model found in $routeArgs
+     */
+    protected function findCourseSpecModel(array $routeArgs): CourseSpec\Model
+    {
+        foreach ($routeArgs as $routeArg) {
+            if ($routeArg instanceof CourseSpec\Model) {
                 return $routeArg;
             }
         }

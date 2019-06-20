@@ -83,7 +83,12 @@ class Controller extends WebController\Base
 
 
     /**
-     * Redirects to the course markbook, ensuring all units in the course are visible, with the specified unit pre-selected
+     * Redirects to the course markbook with the specified unit and folder pre-selected
+     *
+     * It is possible the specified unitSpec no longer belongs to the specified courseSpec.
+     * It may have been deleted or moved to a different course. This is fine, ultimately
+     * the assessments imported from the unitSpec belong to the courseSpec that was linked
+     * at the time of import.
      *
      * @level 18.0
      * @param CourseSpec\Model $courseSpec With all units hydrated
@@ -96,34 +101,39 @@ class Controller extends WebController\Base
      */
     public function getRedirect(CourseSpec\Model $courseSpec, int $unitSpecId, int $folderId): void
     {
-        /** @var Filter\Model[] $filters */
-        $filters      = $this->filterMapper->findByClass([
-            Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class,
-            Filter\Filters\Assessment\Folder\CourseImports\Definition::class,
-        ])->indexBy('class');
-        $unitFilter   = $filters[Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class];
-        $folderFilter = $filters[Filter\Filters\Assessment\Folder\CourseImports\Definition::class];
+        $getArgString = '';
+        if ($unitSpecId || $folderId) {
+            $classes = [];
+            if ($unitSpecId) {
+                $classes[] = Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class;
+            }
+            if ($folderId) {
+                $classes[] = Filter\Filters\Assessment\Folder\CourseImports\Definition::class;
+            }
+            $filters = $this->filterMapper->findByClass($classes);
+            $filters->indexBy('class');
 
-        $selections   = new GenericCollection(GenericCollection::class);
+            $selections = new GenericCollection(GenericCollection::class);
 
-        // Unit Filter options
-        $selections[$unitFilter->getId()] = $this->filterSelectionMapper->createCollection();
-        foreach ($courseSpec->getUnits() as $courseUnitSpec) {
-            $courseUnitSpecId                                = $courseUnitSpec->getId();
-            $selected                                        = $unitSpecId && $unitSpecId === (int)$courseUnitSpec->getId();
-            $selections[$unitFilter->getId()][$courseUnitSpecId] = $this->createSelectionModel($unitFilter, (string)$courseUnitSpecId, $selected);
+            // Unit Filter options
+            if ($unitSpecId) {
+                $unitFilter                                    = $filters[Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition::class];
+                $selections[$unitFilter->getId()]              = $this->filterSelectionMapper->createCollection();
+                $selections[$unitFilter->getId()][$unitSpecId] = $this->createSelectionModel($unitFilter, (string)$unitSpecId, true);
+            }
+
+            // Folder Filter options
+            if ($folderId) {
+                $folderFilter                                  = $filters[Filter\Filters\Assessment\Folder\CourseImports\Definition::class];
+                $selections[$folderFilter->getId()]            = $this->filterSelectionMapper->createCollection();
+                $selections[$folderFilter->getId()][$folderId] = $this->createSelectionModel($folderFilter, (string)$folderId, true);
+            }
+            $getArgString = '?' . $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);
         }
 
-        // Folder Filter options
-        if($folderId){
-            $selections[$folderFilter->getId()] = $this->filterSelectionMapper->createCollection();
-            $selections[$folderFilter->getId()][$folderId] = $this->createSelectionModel($folderFilter, (string)$folderId, true);
-        }
+        $route = $this->getRouter()->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
 
-        $getArgString = $this->filterFactoryFactory->buildCodec()->convertSelectionsToQueryString($selections);
-        $route        = $this->getRouter()->generate('courseMarkbook.getMarkbook', ['courseSpecId' => $courseSpec->getId()]);
-
-        $this->getResponse()->redirect->to("{$route}?{$getArgString}");
+        $this->getResponse()->redirect->to("{$route}{$getArgString}");
     }
 
 
