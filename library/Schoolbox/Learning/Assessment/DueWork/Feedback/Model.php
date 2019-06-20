@@ -176,6 +176,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         return $this;
     }
 
+
     /**
      * Checks whether is empty, excluding Rubric
      * @return bool
@@ -183,7 +184,7 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     public function isEmpty(): bool
     {
         return ($this->getAllFiles()->count() === 0)
-            && (!$this->getNormalisedMark() || $this->getNormalisedMark() === '')
+            && (!$this->getHumanReadableMark() || $this->getHumanReadableMark() === '')
             && $this->getComment() === '';
     }
 }
