@@ -186,6 +186,6 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
         return ($this->getAllFiles()->count() === 0)
             && ($this->getNormalisedMark() === null)
             && ($this->getHumanReadableMark() === null || trim($this->getHumanReadableMark()) === '')
-            && ($this->getComment() === null || $this->getComment() === '');
+            && ($this->getComment() === null || trim($this->getComment()) === '');
     }
 }
