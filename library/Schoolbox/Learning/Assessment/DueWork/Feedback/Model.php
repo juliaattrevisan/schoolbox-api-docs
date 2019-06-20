@@ -184,7 +184,8 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
     public function isEmpty(): bool
     {
         return ($this->getAllFiles()->count() === 0)
-            && (!$this->getHumanReadableMark() || $this->getHumanReadableMark() === '')
-            && $this->getComment() === '';
+            && ($this->getNormalisedMark() === null)
+            && ($this->getHumanReadableMark() === null || trim($this->getHumanReadableMark()) === '')
+            && ($this->getComment() === null || $this->getComment() === '');
     }
 }
