@@ -65,7 +65,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $expiryTime = self::ttlToDate($this->redis->ttl($key));
             $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
 
-            /** @var Instance $instance */
             $keyType = $this->redis->type($key);
             try {
                 $rawRedisData = $this->redis->get($key);

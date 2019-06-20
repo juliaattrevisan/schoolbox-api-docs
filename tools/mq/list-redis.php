@@ -1,127 +1,194 @@
 #!/usr/bin/php
 <?php
+/**
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au
+ */
 
-use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Redis;
+declare(strict_types=1);
 
-require __DIR__ . '/../../conf/core/require.php';
+use Predis\ClientInterface;
+use Predis\Collection\Iterator\Keyspace;
+use Schoolbox\Application\CliTool;
 
-new Schoolbox\Application\Daemon\Kernel(__FILE__);
+require_once __DIR__ . '/../../conf/core/require.php';
 
-$redis = Redis::getClientInstance();
-
-// non-blocking search of the keyspace for all messages
-$search = new \Predis\Collection\Iterator\Keyspace($redis, 'msg:' . INSTANCE_ID . '*');
-
-$idx = 0;
-foreach ($search as $key) {
-    echo "=====================================================================\n";
-    $readableTTL = secondsToTime($redis->ttl($key));
-    $expiryTime = ttlToDate($redis->ttl($key));
-    echo "[$idx] $key : ({$redis->ttl($key)}{$readableTTL} : {$expiryTime}) \n";
-
-    /** @var Instance $instance */
-    try {
-        $keytype = $redis->type($key);
-        $rawRedisData = $redis->get($key);
-        $instance = unserialize(gzuncompress($rawRedisData));
-    } catch (Exception $e) {
-        if ($keytype->getPayload() === 'set') {
-            $setcount = \count($redis->smembers($key));
-            echo "{$setcount} messages exist.\n";
-            foreach ($redis->smembers($key) as $skey) {
-                $sreadableTTL = secondsToTime($redis->ttl($skey));
-                $sexpiryTime = ttlToDate($redis->ttl($skey));
-                echo "       $skey : ({$redis->ttl($skey)}{$sreadableTTL} : {$sexpiryTime}) \n";
-                $sRawRedisData = $redis->get($skey);
-                $sInstance = unserialize(gzuncompress($sRawRedisData));
-                extractInstance($sInstance);
-            }
-        } else {
-            echo "Type of {$key} is {$keytype}\n";
-        }
-        continue;
-    }
-    extractInstance($instance);
-    $idx++;
-}
-
-
-function extractInstance($instance)
+/**
+ * Lists all notification triggers and messages in human readable way.
+ */
+$kernel = new CliTool\Kernel(new class extends CliTool\App
 {
-    if (!$instance) {
-        return;
-    }
-    $userMapper = \Schoolbox\UserMapper::getInstance();
+    private const TTL_NOT_SET = "not set";
 
-    if ($instance instanceof \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger) {
-        echo "CompressedTrigger \n";
-        try {
-            $output = $instance->extractTrigger();
-            echo date('Y-m-d H:i:s', $output->getTimestamp()) . "\n";
-            $classname = get_class($output->getEvent()->getObject());
-            $object = $output->getEvent()->getObject();
-            if (method_exists($instance->extractTrigger(), 'getModuleNotifier')) {
-                $mapper = $instance->getModuleNotifier()->getMapper();
-                if ($mapper->getIdentifier()) {
-                    $getIdMethod = $mapper->getGetIdentifierMethodName();
-                    $withId = "with ID {$object->$getIdMethod()}";
+    /** @var string if not specified INSTANCE_ID will be used */
+    private const OPT_LONG_INSTANCE_ID = 'instance-id:';
+
+    /** @var ClientInterface $redis */
+    private $redis;
+
+    /** @var string $instanceId */
+    private $instanceId;
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_INSTANCE_ID
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function run(): void
+    {
+        $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
+        if (empty($this->instanceId)) {
+            $this->instanceId = INSTANCE_ID;
+        }
+
+        $this->redis = $this->getDi()->get('redis');
+
+        // non-blocking search of the keyspace for all messages
+        $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");
+        $idx = 0;
+        foreach ($search as $key) {
+            $this->getLogger()->info('=====================================================================');
+            $readableTTL = self::secondsToTime($this->redis->ttl($key));
+            $expiryTime = self::ttlToDate($this->redis->ttl($key));
+            $this->getLogger()->info("[$idx] $key : ({$this->redis->ttl($key)}{$readableTTL} : {$expiryTime})");
+
+            $expiryTime = self::ttlToDate($this->redis->ttl($key));
+            $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
+
+            $keyType = $this->redis->type($key);
+            try {
+                $rawRedisData = $this->redis->get($key);
+                $instance = unserialize(gzuncompress($rawRedisData));
+            } catch (Exception $e) {
+                if ($keyType->getPayload() === 'set') {
+                    $setCount = \count($this->redis->smembers($key));
+                    $this->getLogger()->info("{$setCount} messages exist.");
+
+                    // list messages in this set
+                    foreach ($this->redis->smembers($key) as $memberKey) {
+                        $memberExpTime = self::secondsToTime($this->redis->ttl($memberKey));
+                        $memberReadableTTL = self::ttlToDate($this->redis->ttl($memberKey));
+                        if ($memberReadableTTL === self::TTL_NOT_SET) {
+                            $this->getLogger()->warning("       $memberKey : ({$this->redis->ttl($memberKey)}{$memberExpTime} : {$memberReadableTTL})");
+                        } else {
+                            $this->getLogger()->info("       $memberKey : ({$this->redis->ttl($memberKey)}{$memberExpTime} : {$memberReadableTTL})");
+                        }
+                        $memberRawRedisData = $this->redis->get($memberKey);
+                        if (!$memberRawRedisData) {
+                            continue;
+                        }
+                        try {
+                            $memberInstance = unserialize(gzuncompress($memberRawRedisData));
+                        } catch (Exception $e) {
+                            // probably expired
+                            continue;
+                        }
+                        $this->extractInstance($memberInstance);
+                    }
                 } else {
-                    $withId = '(which does not have an identifier)';
+                    $this->getLogger()->info("Type of {$key} is {$keyType}");
                 }
+                continue;
             }
-            echo "Notify {$output->getLabel()}. Object {$classname} {$withId} {$output->getEvent()->getAction()} \n";
-        } catch (Exception $e) {
-            echo $e->getMessage() . " \n";
+            $this->extractInstance($instance);
+            $idx++;
+
         }
-    } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
-        echo "CancelTrigger \n";
-        $output = $instance->getTimestamp();
-        echo date('Y-m-d H:i:s', $output['time']) . "\n";
-        echo $instance->getLabel() . "\n";
-    } else {
-        $output = $instance->jsonSerialize();
-        echo date('Y-m-d H:i:s', $output['time']) . "\n";
-        foreach ($output['topics'] as $topic) {
-            echo $topic . "\n";
+    }
+
+
+    /**
+     * Extracts instance
+     * @param $instance
+     */
+    private function extractInstance($instance): void
+    {
+        if (!$instance) {
+            return;
         }
-        $message = $output['title']['text'];
-        foreach ($output['title']['params'] as $paramName => $paramData) {
-            /** @var \Alaress\Async\Notification\Parameter\ParameterInterface $paramData */
-            $message = str_replace(":{$paramName}", "[{$paramData->getText()}]", $message);
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+
+        if ($instance instanceof \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger) {
+            $this->getLogger()->info("CompressedTrigger");
+            try {
+                $output = $instance->extractTrigger();
+                $classname = get_class($output->getEvent()->getObject());
+                $object = $output->getEvent()->getObject();
+                if (method_exists($instance->extractTrigger(), 'getModuleNotifier')) {
+                    $mapper = $instance->getModuleNotifier()->getMapper();
+                    if ($mapper->getIdentifier()) {
+                        $getIdMethod = $mapper->getGetIdentifierMethodName();
+                        $withId = "with ID {$object->$getIdMethod()}";
+                    } else {
+                        $withId = '(which does not have an identifier)';
+                    }
+                }
+                $this->getLogger()->info("Notify {$output->getLabel()}. Object {$classname} {$withId} {$output->getEvent()->getAction()}");
+            } catch (Exception $e) {
+                $this->getLogger()->warning($e->getMessage());
+            }
+        } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
+            $this->getLogger()->info("CancelTrigger");
+            $this->getLogger()->info($instance->getLabel());
+            if ($instance->getTimestamp()) {
+                $this->getLogger()->info('Trigger Date:' . date('Y-m-d H:i:s', $instance->getTimestamp()));
+            }
+        } else if ($instance instanceof Alaress\Async\Notification\Instance\Instance) {
+            $output = $instance->jsonSerialize();
+            $this->getLogger()->info('Trigger Date:' . date('Y-m-d H:i:s', $output['time']));
+            foreach ($output['topics'] as $topic) {
+                $this->getLogger()->info($topic);
+            }
+            $message = $output['title']['text'];
+            foreach ($output['title']['params'] as $paramName => $paramData) {
+                /** @var \Alaress\Async\Notification\Parameter\ParameterInterface $paramData */
+                $message = str_replace(":{$paramName}", "[{$paramData->getText()}]", $message);
+            }
+            $this->getLogger()->info($message);
         }
-        echo $message . "\n";
+
     }
-}
 
-function secondsToTime($seconds)
-{
-    if (!$seconds || $seconds < 1) {
-        return '';
+    /**
+     * Converts seconds to readable date time.
+     * @param $seconds
+     * @return string
+     */
+    private static function secondsToTime($seconds): string
+    {
+        if (!$seconds || $seconds < 1) {
+            return '';
+        }
+        $dtF = new \DateTime('@0');
+        $dtT = new \DateTime("@$seconds");
+        return $dtF->diff($dtT)->format(': %a days, %h hours, %i minutes and %s seconds');
     }
-    $dtF = new \DateTime('@0');
-    $dtT = new \DateTime("@$seconds");
-    return $dtF->diff($dtT)->format(': %a days, %h hours, %i minutes and %s seconds');
-}
 
-function ttlToDate($ttl)
-{
-    switch ($ttl) {
-        case -1:
-            return "no exp";
-        case -2:
-            return "expired";
-        default:
-            return date('Y-m-d H:i:s', time() + $ttl);
+
+    /**
+     * Displays ttl in human readable format
+     * @param $ttl
+     * @return string
+     */
+    private static function ttlToDate($ttl): string
+    {
+        switch ($ttl) {
+            case -1:
+                return self::TTL_NOT_SET;
+            case -2:
+                return "expired";
+            default:
+                return date('Y-m-d H:i:s', time() + $ttl) ?: '';
+        }
     }
-}
 
-echo "\n";
-echo "=====================================================================\n";
-echo "Cached messages\n";
-$rawRedisData = $redis->smembers('schedule:vagrantx:index');
-foreach ($rawRedisData as $rawmsg) {
-    echo $rawmsg . "\n";
-}
 
-exit;
+}, false, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+
+$kernel->runApp();

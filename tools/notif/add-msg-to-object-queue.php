@@ -56,30 +56,25 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         // non-blocking search of the keyspace for all messages
         $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");
         foreach ($search as $key) {
-
-            $expiryTime = self::ttlToDate($this->redis->ttl($key));
-
-            /** @var Instance $instance */
-            $keyType = $this->redis->type($key);
             try {
                 $rawRedisData = $this->redis->get($key);
                 $instance = unserialize(gzuncompress($rawRedisData));
             } catch (Exception $e) {
-                $this->getLogger()->debug("[SKIPPING] type-{$keyType} : {$key}");
+                // probably message set
                 continue;
             }
 
-            if ($instance instanceof \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger) {
-                continue;
-            } else if ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
+            if (!$instance instanceof Instance) {
+                // should be CompressedTrigger or CancelTrigger
                 continue;
             }
 
             /** @var Instance $instance */
             // Message
+            $expiryTime = self::ttlToDate($this->redis->ttl($key));
             $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
             $output = $instance->jsonSerialize();
-            $this->getLogger()->info(date('Y-m-d H:i:s', $output['time']));
+            $this->getLogger()->info('Trigger Date: ' . date('Y-m-d H:i:s', $output['time']));
 
             foreach ($output['topics'] as $topic) {
                 $this->getLogger()->info($topic);
