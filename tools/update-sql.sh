@@ -78,15 +78,54 @@ then
     exit;
 fi
 
-start=`grep -n "$sqlver" $versionlist | cut -d':' -f1`;
-end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
+# Compare two updates using version sort
+# Returns:
+#   0 if $1 = $2
+#   1 if $1 < $2
+#   2 if $1 > $2
+versionCompare () {
+    # Validate we got 2 function args
+    if [[ $# != 2 ]];
+    then
+        echo "Invalid arg count. Required: 2. Found: $#";
+        exit 1;
+    fi
 
+    # Are args equal?
+    if [[ $1 == $2 ]]
+    then
+        return 0
+    fi
+
+    # Which arg is first according to version sort?
+    if [[ `echo -e "$1\n$2" | sort -V | head -n1` == $1 ]];
+    then
+        return 1;
+    else
+        return 2;
+    fi;
+}
+
+# Determine the first update directory to execute
+firstUpdate='';
+for release in `cat ${versionlist}`;
+do
+    versionCompare ${sqlver} ${release};
+    if [[ $? == 1 ]];
+    then
+        firstUpdate=${release};
+        break;
+    fi;
+done
+
+start=`grep -n "$firstUpdate" $versionlist | cut -d':' -f1`;
 if [ -z $start ];
 then
     echo "Error: SQL version not supported for update, no changes made";
     exit;
 fi
 
+end=`grep -n "$newver" $versionlist | cut -d':' -f1`;
 if [ -z $end ];
 then
     echo "Error: SQL version greater than update, no changes made";
@@ -125,59 +164,55 @@ errormsg='';
 # Run update scripts in release order, SQL first then PHP for each release
 for release in `sed -n "$start","$end"p $versionlist`;
 do
-    # Don't run update if already at that release version
-    if [ $release != $sqlver ];
+    echo "Running update $release";
+    # Only run release upgrade if the scripts_list actually exists
+    if [ -f $instdir/updates/$release/scripts_list ];
     then
-        echo "Running update $release";
-        # Only run release upgrade if the scripts_list actually exists
-        if [ -f $instdir/updates/$release/scripts_list ];
-        then
-            # Run SQL update scripts for this release
-            for scriptcmd in `egrep "\.php|\.sql" $instdir/updates/$release/scripts_list`
-            do
-                script="$instdir/updates/$release/$scriptcmd";
-                # Check script listed in scripts_list actually exists
-                if [ -f $script ];
+        # Run SQL update scripts for this release
+        for scriptcmd in `egrep "\.php|\.sql" $instdir/updates/$release/scripts_list`
+        do
+            script="$instdir/updates/$release/$scriptcmd";
+            # Check script listed in scripts_list actually exists
+            if [ -f $script ];
+            then
+                echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
+                if [[ $scriptcmd == *".sql" ]]
                 then
-                    echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Starting script: $script";
-                    if [[ $scriptcmd == *".sql" ]]
+                    mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
+                    # Check for and report errors
+                    if [ $? -ne 0 ];
                     then
-                        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
-                        # Check for and report errors
-                        if [ $? -ne 0 ];
-                        then
-                            echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
-                            errorint=1;
-                            errormsg="$errormsg,$script";
-                        else
-                            echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
-                        fi
-                    fi
-                    if [[ $scriptcmd == *".php" ]]
-                    then
-                        scriptpath=${script%/*};
-                        cd $scriptpath;
-                        phpscript=${scriptcmd##*/};
-                        echo $phpscript;
-                        php -f $phpscript 2>&1;
-                        # Check for and report errors
-                        if [ $? -ne 0 ];
-                        then
-                            cd $curdir;
-                            echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
-                            errorint=1;
-                            errormsg="$errormsg,$script";
-                        else
-                            echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
-                        fi
-                        cd $curdir;
+                        echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
+                        errorint=1;
+                        errormsg="$errormsg,$script";
+                    else
+                        echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
                     fi
                 fi
-            done
+                if [[ $scriptcmd == *".php" ]]
+                then
+                    scriptpath=${script%/*};
+                    cd $scriptpath;
+                    phpscript=${scriptcmd##*/};
+                    echo $phpscript;
+                    php -f $phpscript 2>&1;
+                    # Check for and report errors
+                    if [ $? -ne 0 ];
+                    then
+                        cd $curdir;
+                        echo "[*]["`date +%Y-%m-%d\ %H:%M:%S`"] Error running update: $script";
+                        errorint=1;
+                        errormsg="$errormsg,$script";
+                    else
+                        echo "[ ]["`date +%Y-%m-%d\ %H:%M:%S`"] Success running update: $script";
+                    fi
+                    cd $curdir;
+                fi
+            fi
+        done
 
-            # Update the config table to show current release version
-            mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
-        fi
+        # Update the config table to show current release version
+        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
     fi
 done
 
