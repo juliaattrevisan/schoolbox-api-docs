@@ -212,8 +212,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param Alaress_Date_Format $date
      * @return array
      */
-    private function buildTimetableExpensively(Schoolbox\User $user, Campus $campus, Alaress_Date_Format $date)
+    private function buildTimetableExpensively(Schoolbox\User $user, Campus $campus, Alaress_Date_Format $date): array
     {
+        if (!$user->getExternalId()) {
+            return [];
+        }
         try {
             $timetable = $this->externalTimetable->getTimetableForDate(
                 $user->getExternalId(),
@@ -223,10 +226,10 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
             );
         } catch (Schoolbox\External\Exception $e) {
             // Can't fetch timetable? assume it's empty
-            $timetable = [];
+            return [];
         }
 
-        return $this->buildTimetable($timetable ?: []);
+        return $this->buildTimetable($timetable);
     }
 
 
@@ -239,8 +242,11 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param int            $dayNumber
      * @return array
      */
-    private function buildTimetableCheaply(Schoolbox\User $user, Campus $campus, $dayNumber)
+    private function buildTimetableCheaply(Schoolbox\User $user, Campus $campus, $dayNumber): array
     {
+        if (!$user->getExternalId()) {
+            return [];
+        }
         try {
             // we are aware of the deprecation of this method, but must use it regardless
             /** @noinspection PhpDeprecationInspection */
@@ -252,10 +258,10 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
             );
         } catch (Schoolbox\External\Exception $e) {
             // Can't fetch timetable? assume it's empty
-            $timetable = [];
+            return [];
         }
 
-        return $this->buildTimetable($timetable ?: []);
+        return $this->buildTimetable($timetable);
     }
 
 
@@ -266,7 +272,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * @param array $timetable
      * @return array
      */
-    private function buildTimetable(array $timetable)
+    private function buildTimetable(array $timetable): array
     {
         $dayTimetable        = array();
         $timetableStaff      = array();
