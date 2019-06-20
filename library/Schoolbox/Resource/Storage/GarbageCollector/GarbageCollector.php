@@ -1,0 +1,43 @@
+<?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\Resource\Storage\GarbageCollector;
+
+use Eportfolio\CoverPhotoMapper;
+use Schoolbox\Blog\Homepage\Image\Mapper;
+
+class GarbageCollector implements IGarbageCollector
+{
+    private $collectors;
+
+    public function __construct()
+    {
+        $this->collectors = [
+            new \Schoolbox\Blog\Homepage\Image\GarbageCollector(Mapper::getInstance()),
+            new \Schoolbox\Comms\News\GarbageCollector(\Schoolbox\Comms\News\Mapper::getInstance()),
+            new \Schoolbox\Blog\Eportfolio\Image\GarbageCollector(\Schoolbox\Blog\Eportfolio\Image\Mapper::getInstance()),
+
+            new \Eportfolio\GarbageCollector(CoverPhotoMapper::getInstance()),
+            new \Schoolbox\Pastoral\Attachment\GarbageCollector(\Schoolbox\Pastoral\Attachment\Mapper::getInstance()),
+//            new \Schoolbox\Resource\My\File\GarbageCollector(\Schoolbox\Resource\My\File\Mapper::getInstance()),
+
+            new \Schoolbox\Tile\GarbageCollector(\Schoolbox\Tile\Mapper::getInstance()),
+
+            new \Schoolbox\Resource\Storage\GarbageCollector(\Schoolbox\Resource\Storage\Mapper::getInstance()),
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function remove(string $hash)
+    {
+        foreach ($this->collectors as $collector) {
+            $collector->remove($hash);
+        }
+    }
+}
