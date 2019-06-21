@@ -657,4 +657,15 @@ class Instance implements JsonSerializable
         return $this->eventObjectId;
     }
 
+
+    /**
+     * Checks whether to retract related object before sending out the message
+     * CAUTION: This works only for a message to a single user.
+     *
+     * @return bool
+     */
+    public function retractFirst(): bool
+    {
+        return isset($this->meta['retractFirst']) && $this->meta['retractFirst'];
+    }
 }

@@ -195,10 +195,7 @@ class Notifier extends AbstractModuleNotifier
             return;
         } elseif ($article->isRejected() && $previous->canBeRejected()) {
             // just been rejected or unpublished from a valid status
-            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
-            // Wait for sometime so that the rejected notification will not be removed by retraction.
-            $offset = \Alaress_Date_Format::now()->addSeconds(60);
-            $bundle->attach(self::TRIGGER_MODERATED, $offset->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_MODERATED, self::IMMEDIATELY);
             $bundle->detach(self::TRIGGER_POSTED);
             $bundle->detach(self::TRIGGER_EXPIRED);
             return;
@@ -338,7 +335,7 @@ class Notifier extends AbstractModuleNotifier
             ->setParams([
                 'user'  => new UserParam($effector, Param::STACKING_REPLACE),
                 'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_REPLACE),
+                    Param::STACKING_APPEND),
             ])
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED);
@@ -438,6 +435,11 @@ class Notifier extends AbstractModuleNotifier
                     Param::STACKING_REPLACE)
             ])
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_MODERATED);
+
+        if (!$article->isApproved()) {
+            // magical meta to delete messages related to object first.
+            $bob->setMeta(['retractFirst' => true]);
+        }
 
         $envelope->targetToUser($author, $bob->build());
 
