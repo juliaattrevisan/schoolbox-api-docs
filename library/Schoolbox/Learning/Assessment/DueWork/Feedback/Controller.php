@@ -349,10 +349,11 @@ class Controller extends Base
 
         $feedback = $dueWorkFeedbackFactory->produce();
 
+        $this->getFeedbackDataSource()->save($feedback);
         if (!$hasRubric && $feedback->isEmpty()) {
             $this->getFeedbackDataSource()->delete($feedback);
-        } else {
-            $this->getFeedbackDataSource()->save($feedback);
+//        } else {
+//            $this->getFeedbackDataSource()->save($feedback);
         }
 
         $data = [
