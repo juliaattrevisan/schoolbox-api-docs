@@ -261,32 +261,19 @@ class Kernel extends WebKernelAbstract
                     ->setFlash(\Schoolbox\Application\Login\Controller::LOGIN_ERROR_FLASH, get_class($e));
                 $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
             }
-        } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+        } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
             $response = $this->di->get('webFactory')->newResponse();
+            $code     = $e instanceof Deleted ? 410 : 404;
             if ($controller->getRequest()->isXhr()) {
                 // TODO replace this with standard outputError (ApiProblem style payload)
                 // Fabricate an AJAX response. Don't redirect
-                $response->status->setCode(404);
+                $response->status->setCode($code);
                 $response->content->set([
                     'format' => 'json',
-                    'data'   => ['error' => 'Object was deleted'],
+                    'data'   => ['error' => $e->getMessage()],
                 ]);
             } else {
-                $this->outputError($e, $e->getMessage(), '', [], 404);
-            }
-        } catch (Deleted $e) {
-            $response = $this->di->get('webFactory')->newResponse();
-            if ($controller->getRequest()->isXhr()) {
-                //TODO replace this with standard outputError (ApiProblem style payload)
-                // Fabricate an AJAX response. Don't redirect
-                $response->status->setCode(410);
-                $response->content->set([
-                    'format' => 'json',
-                    'data'   => ['error' => 'Object was deleted'],
-                ]);
-            } else {
-                $this->outputError($e, $e->getMessage(), '', [], 410);
-                return;
+                $this->outputError($e, $e->getMessage(), '', [], $code);
             }
         } catch (Forbidden $e) {
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
