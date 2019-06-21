@@ -143,7 +143,7 @@ class External_Maze_Helper
      * Schoolbox ClassCode
      *
      * @param $classCode
-     * @param $classNumber
+     * @param int $classNumber
      * @return string
      */
     public function generateClassCode($classCode, $classNumber)
