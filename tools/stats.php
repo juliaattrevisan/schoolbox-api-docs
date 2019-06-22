@@ -76,19 +76,34 @@ $app = new class extends CliTool\App {
             'assessment_visibility_staff' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 0',
             'assessment_visibility_student' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 1',
             'assessment_visibility_parent' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 2',
+            'plagscan_docs'     => 'SELECT count(*) FROM plagscan_document WHERE status = 3 and deleted_at is null',
+            'plagscan_errors'   => 'SELECT count(*) FROM plagscan_document WHERE status = -1 and deleted_at is null',
+            'kami_docs'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "done" and deleted_at is null',
+            'kami_errors'         => 'SELECT count(*) FROM student_submission_file_kami WHERE status = "error" and deleted_at is null',
 
 
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted` <> "true"',
+            'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE deleted = "false"',
             'social_stream_posts' => 'SELECT count(*) FROM `socialstream_post` WHERE `deleted_at` IS NULL',
             'surveys'           => 'SELECT count(*) FROM assess WHERE availability = "survey" AND deleted_at IS NULL',
-            'polls'             => 'SELECT count(*) FROM poll p',
+            'polls'             => 'SELECT count(*) FROM poll',
+            'tiles'             => 'SELECT count(*) FROM tile WHERE deleted_at IS NULL',
+            'textbox'           => 'SELECT count(*) FROM textBox WHERE deleted IS NULL',
+            'wiki'              => 'SELECT count(*) FROM wiki WHERE deleted = "false"',
+            'etherpad'          => 'SELECT count(*) FROM etherpad_pad WHERE deleted_at IS NULL',
             'groups'            => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE f.deleted_at is null',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
             'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
             'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN folder_code fc ON homepage_log.folder_id = fc.folder_id',
             'views_course_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_specification cs ON homepage_log.folder_id = cs.folder_id',
             'views_course_unit_specifications' => 'SELECT SUM(hitcount) FROM homepage_log JOIN course_unit_specification ON course_unit_specification.folder_id = homepage_log.folder_id',
+
+            //News
+            'news_posts'    => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
+            'news_posts_comments_allowed'   => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null AND comments_allowed = 1',
+            'news_comments' => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
+            'news_saveforlater' => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
 
             //ePortfolio
             'eportfolio_pages'  => 'SELECT count(*) FROM `eportfolio_page` WHERE deleted_at IS NULL',
@@ -97,6 +112,13 @@ $app = new class extends CliTool\App {
             'eportfolio_blog_posts' => 'SELECT COUNT(*) FROM eportfolio_component_blog WHERE deleted_at is null',
             'showcased_work'        => 'SELECT COUNT(*) FROM eportfolio_showcase_item WHERE deleted_at is null',
 
+            //Resource Booking
+            'resource_booking_items'    => 'SELECT COUNT(*) FROM resource WHERE deleted_at IS NULL',
+            'resource_booking_events'   => 'SELECT COUNT(*) FROM resource_booking WHERE deleted_at IS NULL',
+
+            //Fixtures
+            'fixtures_teams'            => 'SELECT COUNT(*) FROM sportsfixtures_team WHERE deleted_at IS NULL',
+            'fixtures_matches'            => 'SELECT COUNT(*) FROM sportsfixtures_match WHERE deleted_at IS NULL',
 
             //Pastoral
             'pastoral_records'  => 'SELECT count(*) FROM `pastoral` WHERE deleted_at IS NULL',
@@ -105,16 +127,20 @@ $app = new class extends CliTool\App {
             //Mobile Users
             'mobile_registrations' => 'SELECT count(*) FROM `mobile_app_registry`',
 
+            //Calendar
+            'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = 3 AND deleted_at IS NULL',
+            'event_group'       => 'SELECT COUNT(*) FROM event WHERE type = 2 AND deleted_at IS NULL',
+            'event_personal'    => 'SELECT COUNT(*) FROM event WHERE type = 1 AND deleted_at IS NULL',
+
             //CMS
             'storage'           => 'SELECT count(*) FROM `storage`',
             'storage_size'      => 'SELECT sum(filesize) FROM `storage`',
             'files'             => 'SELECT COUNT(*) FROM file WHERE deleted_at IS NULL',
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
-            'folders'           => 'SELECT count(*) FROM folder f WHERE f.deleted_at IS NULL',
+            'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
 
         ];
 
-        $result['@timestamp'] = time();
         $result['instance_id'] = INSTANCE_ID;
         $result['school_code'] = $config->get('site_school_code');
         $result['type'] = $config->get('site_type');
@@ -122,7 +148,7 @@ $app = new class extends CliTool\App {
         foreach($queryList as $name => $query) {
 
             $statement = $db->executeQuery($query);
-            $result[$name] = $statement->fetchColumn(0);
+            $result[$name] = (int)$statement->fetchColumn(0);
         }
 
         echo json_encode($result);
