@@ -12,23 +12,23 @@ namespace Schoolbox\Tile;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Component_ConfigMapper;
 use Component_Instance;
 use Component_InstanceMapper;
-use Component_ConfigMapper;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
-use Alaress\Twig\Loader\IChainLoader;
-use Schoolbox\Tile\Mapper as TileMapper;
 use Schoolbox\Tile\Controller as TileController;
+use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
+use Schoolbox\Tile\Mapper as TileMapper;
 
 
 class Module extends BaseModule
@@ -69,12 +69,11 @@ class Module extends BaseModule
             $matcher,
             '(?:edit|update|update:post|delete|delete:post)',
             function ($params) {
-                $item = $this->getTileMapper()->findById(
-                    $params['id'],
-                    array('joins' => array('backgroundImage',),)
-                );
-
                 try {
+                    $item = $this->getTileMapper()->findById(
+                        $params['id'],
+                        ['joins' => ['backgroundImage',],]
+                    );
                     $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
                 } catch (MapperException\Deleted $e) {
                     throw $e;
