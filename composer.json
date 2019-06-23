@@ -79,7 +79,8 @@
         "ext-pdo": "*",
         "firebase/php-jwt": "^5.0",
         "okta/jwt-verifier": "^0.2.1",
-        "ext-openssl": "*"
+        "ext-openssl": "*",
+        "stomp-php/stomp-php": "^4.5"
 
     },
     "require-dev": {
