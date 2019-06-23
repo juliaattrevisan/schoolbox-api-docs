@@ -18,7 +18,9 @@ use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
 use Component_ConfigMapper;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
@@ -72,7 +74,13 @@ class Module extends BaseModule
                     array('joins' => array('backgroundImage',),)
                 );
 
-                $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
+                try {
+                    $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
+                } catch (MapperException\Deleted $e) {
+                    throw $e;
+                } catch (MapperException $e) {
+                    throw new NotFound();
+                }
                 return [
                     'item'   => $item,
                     'layout' => $layout,
@@ -85,8 +93,15 @@ class Module extends BaseModule
             $matcher,
             '(?:add|create|layout|layoutForm)',
             function ($params) {
+                try {
+                    $layout = $this->getTileLayoutMapper()->findById($params['layoutId']);
+                } catch (MapperException\Deleted $e) {
+                    throw $e;
+                } catch (MapperException $e) {
+                    throw new NotFound();
+                }
                 return [
-                    'layout' => $this->getTileLayoutMapper()->findById($params['layoutId']),
+                    'layout' => $layout,
                 ];
             }
         );
