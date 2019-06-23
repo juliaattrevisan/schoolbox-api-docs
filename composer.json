@@ -68,7 +68,6 @@
         "nesbot/carbon": "~1.22.1",
         "league/flysystem-ziparchive": "^1.0",
         "phpoffice/phpexcel": "dev-master",
-        "roave/security-advisories": "dev-master",
         "zendframework/zend-uri": "~2.5.2",
         "onelogin/php-saml": "^2.12",
         "karriere/json-decoder": "^2.1.1",
@@ -88,6 +87,7 @@
         "codeception/codeception": "^2.3",
         "phpunit/phpunit": "~6.4.3",
         "fzaninotto/faker": "^1.8",
-        "phpstan/phpstan": "^0.11.5"
+        "phpstan/phpstan": "^0.11.5",
+        "roave/security-advisories": "dev-master"
     }
 }
