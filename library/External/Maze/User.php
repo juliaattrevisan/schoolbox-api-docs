@@ -629,7 +629,7 @@ class External_Maze_User implements External_UserInterface
 					ST.FIRST_NAME,
 					ST.SURNAME,
 					KGC.ROLL_GROUP AS ClassCode,
-					'' AS ClassNumber,
+					NULL AS ClassNumber,
 					'' AS classType,
 					'' AS ClassCampus,
 					KGC.DESCRIPTION AS name
