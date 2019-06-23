@@ -168,9 +168,9 @@ class RouteTXRX implements TXRX
                         $count += $this->sorter->process($user, $instance) ? 1 : 0;
                         // re-add to object list, so that this can be retracted next time
                         $this->sorter->processEventObjectList($instance);
-                    } else {
-                        $count += $this->sorter->process($user, $instance) ? 1 : 0;
+                        break;
                     }
+                    $count += $this->sorter->process($user, $instance) ? 1 : 0;
                     break;
                 case self::TYPE_RETRACT:
                     $this->sorter->processRetract($instance);

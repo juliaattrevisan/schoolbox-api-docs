@@ -334,8 +334,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
                 'user'  => new UserParam($effector, Param::STACKING_REPLACE),
-                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_APPEND),
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()), Param::STACKING_APPEND),
             ])
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED);
@@ -431,8 +430,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
                 'user' => new UserParam($effector, Param::STACKING_REPLACE),
-                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_REPLACE)
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()), Param::STACKING_REPLACE)
             ])
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_MODERATED);
 
