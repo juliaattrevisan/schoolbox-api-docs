@@ -425,9 +425,12 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
 
         $cat_mapper  = $this->getJoinMapper('category');
         $user_mapper = $this->getJoinMapper('owner');
+        $assessment_mapper = $this->getJoinMapper('assessmentModel');
+
         $query = "
             SELECT
                 {$this->getColumnString('sb')},
+                {$assessment_mapper->getColumnString('a')},
                 {$cat_mapper->getColumnString('c')},
                 {$user_mapper->getColumnString('u')}
             FROM {$this->getTable()} sb
@@ -454,6 +457,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         // Hydrate as activity list, then add category codes
         foreach ($statement as $row) {
             $box = $this->hydrate($row, 'sb');
+            $box->setAssessmentModel($assessment_mapper->hydrate($row, 'a'));
             $box->setOwner($user_mapper->hydrate($row, 'u'));
             $box->setCategory($cat_mapper->hydrate($row, 'c'));
             $collection->add($factory->buildFromSubmissionBox($box, Schoolbox\Assessment\Activity::EVENT_OVERDUE));

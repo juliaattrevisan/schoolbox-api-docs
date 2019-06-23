@@ -319,6 +319,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     public function setMark($feedback): bool
     {
         $mark = null;
+        $markText = null;
 
         if ($feedback instanceof ReturnedWork) {
             // Handle submission box result
@@ -330,6 +331,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             // If the mark type is set to none then we shouldn't be saving a normalised mark
             if ($box->getMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
                 $mark = $feedback->getNormalizedMark();
+                $markText = $feedback->getHumanReadableMark();
             }
             $comment = $feedback->getComment();
 
@@ -362,7 +364,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        return $this->setActivityMark($activity, $marker, $student, $mark, $comment);
+        return $this->setActivityMark($activity, $marker, $student, $mark, $markText, $comment);
     }
 
 
@@ -564,13 +566,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param \Schoolbox\User $marker
      * @param \Schoolbox\User $student
      * @param null|float      $mark
+     * @param null|string     $markText
      * @param string          $comment
      * @return bool
      * @throws \Alaress\Database\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    private function setActivityMark(Activity $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $comment): bool
+    private function setActivityMark(Activity $activity, Schoolbox\User $marker, Schoolbox\User $student, $mark, $markText, $comment): bool
     {
         $studentExternalId   = $student->getExternalId();
         $studentFileYear     = $this->getUserFileYear($studentExternalId);
@@ -599,7 +602,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             ? self::NO_MARK_GIVEN
             : round($mark,2);
 
-        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment));
+        $hasMarkOrComment = (null !== $mark) || ('' !== trim($comment)) || ('' !== trim($markText)) ;
 
         $changesMade = false;
         foreach ($assessmentRemoteList as $assessmentRemote) {
