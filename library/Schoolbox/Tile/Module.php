@@ -70,10 +70,7 @@ class Module extends BaseModule
             '(?:edit|update|update:post|delete|delete:post)',
             function ($params) {
                 try {
-                    $item = $this->getTileMapper()->findById(
-                        $params['id'],
-                        ['joins' => ['backgroundImage',],]
-                    );
+                    $item   = $this->getTileMapper()->findById($params['id']);
                     $layout = $this->getTileLayoutMapper()->findById($item->getTileLayout()->getId());
                 } catch (MapperException\Deleted $e) {
                     throw $e;
