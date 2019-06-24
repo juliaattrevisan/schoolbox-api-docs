@@ -25,8 +25,11 @@ class GarbageCollector implements IGarbageCollector
             new \Schoolbox\Pastoral\Attachment\GarbageCollector(\Schoolbox\Pastoral\Attachment\Mapper::getInstance()),
 //            new \Schoolbox\Resource\My\File\GarbageCollector(\Schoolbox\Resource\My\File\Mapper::getInstance()),
 
-            new \Schoolbox\Tile\GarbageCollector(\Schoolbox\Tile\Mapper::getInstance()),
 
+            // Folder
+            new \Schoolbox\Resource\Folder\GarbageCollector(\Schoolbox\Resource\Folder\Mapper::getInstance()),
+
+            new \Schoolbox\Tile\GarbageCollector(\Schoolbox\Tile\Mapper::getInstance()),
 
             // Dropbox
             new \Schoolbox\Dropbox\GarbageCollector(\Schoolbox\Dropbox\Mapper::getInstance()),
