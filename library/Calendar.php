@@ -3,6 +3,8 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\Calendar\Event as EventModel;
+use Schoolbox\Permission\Access\UserAccess;
+
 
 class Calendar extends DeprecatedModel
 {
@@ -223,7 +225,7 @@ class Calendar extends DeprecatedModel
                     $categoryList = $this->getEventCategory($event['id']);
                 }
 
-                $this->groupHandler->setService(HOMEPAGE_SERVICE);
+                $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
                 $permissions = array();
                 foreach ($categoryList as $category) {
                     $permissions[] = $this->groupHandler->getPermission($category);
@@ -351,7 +353,7 @@ class Calendar extends DeprecatedModel
         $groupList  = array();
         $groupQuery = '';
 
-        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
         $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
         if (is_array($tempList)) {
@@ -492,7 +494,7 @@ class Calendar extends DeprecatedModel
         $groupList = array();
         $groupQuery = '';
 
-        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
         $tempList = $this->groupHandler->involvedInCategoryList($user->getId());
 
         if (is_array($tempList)) {
