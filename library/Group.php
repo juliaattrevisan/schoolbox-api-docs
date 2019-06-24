@@ -345,7 +345,7 @@ class Group extends DeprecatedModel
         }
     }
 
-    function addUser($relationID, $userID, $type = READ_ACCESS)
+    function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         if (!$this->isUser($relationID, $userID)) {
             $data = array(
@@ -403,12 +403,12 @@ class Group extends DeprecatedModel
         if (!$user_id) {
             return true;
         }
-        return $this->getPermission($category_id, $user_id) >= READ_ACCESS
+        return $this->getPermission($category_id, $user_id) >= UserAccess::ACCESS_READ
         && $this->isParent($user_id)
         && !$this->involvedInGroup($user_id, $category_id);
     }
 
-    function setUserPermission($relationID, $userID, $type = READ_ACCESS)
+    function setUserPermission($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         $this->deleteUser($relationID, $userID);
         return $this->addUser($relationID, $userID, $type);
@@ -735,7 +735,7 @@ class Group extends DeprecatedModel
      * @see Schoolbox\Resource\FolderMapper->getForUser() for an implementation
      *      that uses the mapper classes.
      */
-    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS, $requireHomepage = false)
+    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = UserAccess::ACCESS_READ, $requireHomepage = false)
     {
 
         $catList = array();
@@ -789,7 +789,7 @@ class Group extends DeprecatedModel
     /*
      * Deprecated in favour of involvedInCateogoryList above...
      */
-    function involvedCategoryList($id, $subjects = '', $accessType = READ_ACCESS)
+    function involvedCategoryList($id, $subjects = '', $accessType = UserAccess::ACCESS_READ)
     {
         //returns a list of categories that the user is involved in
         //optional accessType specifies read=1 , write=2, ownership=3 access levels
