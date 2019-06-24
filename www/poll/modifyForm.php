@@ -25,7 +25,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($_POST['folder_id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -91,7 +91,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($poll['folder_id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 

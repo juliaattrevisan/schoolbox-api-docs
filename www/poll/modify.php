@@ -20,7 +20,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     // check permission
-    if ($groupHandler->getPermission($poll['folder_id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -80,7 +80,7 @@ if (is_numeric($this->arg[0])) {
 } else if (is_numeric($this->arg[1])) {
 
     // check permission
-    if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($this->arg[1]) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
