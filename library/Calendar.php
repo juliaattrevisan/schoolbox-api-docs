@@ -5,7 +5,6 @@ use Calendar\Event\Type\Day\Event;
 use Schoolbox\Calendar\Event as EventModel;
 use Schoolbox\Permission\Access\UserAccess;
 
-
 class Calendar extends DeprecatedModel
 {
     /**
@@ -19,7 +18,7 @@ class Calendar extends DeprecatedModel
         $this->_table = "event";
         $this->_index = "id";
 
-        $this->groupHandler = new Group(CALENDAR_SERVICE);
+        $this->groupHandler = new Group(UserAccess::SERVICE_CALENDAR);
 
         parent::__construct();
     }
@@ -230,7 +229,7 @@ class Calendar extends DeprecatedModel
                 foreach ($categoryList as $category) {
                     $permissions[] = $this->groupHandler->getPermission($category);
                 }
-                $this->groupHandler->setService(CALENDAR_SERVICE);
+                $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
                 if (empty($permissions)) {
                     $permissions[] = 0;
@@ -373,7 +372,7 @@ class Calendar extends DeprecatedModel
             $sort_dir = '';
         }
 
-        $this->groupHandler->setService(CALENDAR_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
         //give people with userAccess to moderate Calendar Access to view all Camups Posts
         if (is_array($_SESSION['campus'])) {
@@ -520,7 +519,7 @@ class Calendar extends DeprecatedModel
             }
         }
 
-        $this->groupHandler->setService(CALENDAR_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
         /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
          * This check is done against the calendar user, not the logged-in user,
