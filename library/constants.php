@@ -10,7 +10,6 @@
  */
 
 // TODO remove all of these services, use UserAccess::SERVICE_* constants
-define('HOMEPAGE_SERVICE',    1);
 define('CALENDAR_SERVICE',    2);
 define('NEWS_SERVICE',        3);
 define('HOUSEMASTER_SERVICE', 6);
