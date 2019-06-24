@@ -7,6 +7,7 @@ use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 $assessHandler = new Assess_Main();
@@ -48,7 +49,7 @@ foreach ($_POST['selectedIds'] as $currentAttempt) {
 
 		$allAttempts[] = $attempt;
 
-		if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+		if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < UserAccess::ACCESS_WRITE)) {
 			error(142);
 		}
 	}
