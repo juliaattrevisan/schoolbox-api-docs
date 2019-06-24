@@ -73,7 +73,7 @@ class Authenticator
     {
         $userId = $this->getCurrentUser()->getId();
         if ($this->getCurrentUser()->isSuperuser()) {
-            $permission = FULL_ACCESS;
+            $permission = UserAccess::ACCESS_FULL;
         } elseif (!$userId) {
             // Don't fall back to getPermission() call with session user,
             // instead deny access if there's no actual user
