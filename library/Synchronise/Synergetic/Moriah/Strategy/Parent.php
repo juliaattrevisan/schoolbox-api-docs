@@ -10,6 +10,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
+
 class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synergetic_Moriah_Strategy_Abstract {
 	protected $strategyTitle = "Parent Synchronisation";
 	const PARENT_GROUP_ID = 19;
@@ -20,7 +22,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
     public function __construct() {
         parent::__construct();
 
-        $this->groupHandler = new Group(HOMEPAGE_SERVICE);
+        $this->groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
         $db = Database::getInstance();
         $result = $db->query("
