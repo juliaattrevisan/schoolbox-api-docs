@@ -6,13 +6,13 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-
 namespace Schoolbox\Resource;
+
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use \PDO;
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\User;
 
@@ -134,7 +134,7 @@ class GroupMapper extends Mapper {
             FROM `{$this->getTable()}` ug
             LEFT JOIN {$this->getJoinSql('folder', 'ug', 'f')}
             LEFT JOIN `userAccess`
-            ON (userAccess.service = " . HOMEPAGE_SERVICE . " AND ug.cid = userAccess.sid AND userAccess.uid = :userId)
+            ON (userAccess.service = " . UserAccess::SERVICE_HOMEPAGE . " AND ug.cid = userAccess.sid AND userAccess.uid = :userId)
             WHERE f.id IS NOT NULL
             AND userAccess.uid IS NULL
         ";
