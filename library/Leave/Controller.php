@@ -8,6 +8,7 @@
  */
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Leave_Controller extends Controller
 {
@@ -155,7 +156,7 @@ class Leave_Controller extends Controller
         $this->setRequestMapper(Leave_RequestMapper::getInstance());
         $this->setHouseMapper(HouseResidentialMapper::getInstance());
         $this->setExternalUser(new External_User());
-        $this->setGroup(new Group(HOUSEMASTER_SERVICE));
+        $this->setGroup(new Group(UserAccess::SERVICE_HOUSEMASTER));
         // Create a phantom "Not Specified" travel type (it doesn't exist in the DB)
         $emptyTravelType = new Leave_Request_TravelType();
         $emptyTravelType->setName('Not specified');
