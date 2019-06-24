@@ -5,15 +5,15 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 // kickstart a session
 new SitePage();
@@ -93,7 +93,7 @@ function getFolderMeta($folderId)
     $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
-/* Only throw error exception if a folderId is specified
+        /* Only throw error exception if a folderId is specified
          * and it can't be found; $folderId 0 is used to add a
          * folder to the root node
          */
@@ -141,7 +141,7 @@ function getFolderMeta($folderId)
         $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
         $joinable = 0; // either don't have access, or are already a member
-        if ($accessType == DENY_ACCESS) {
+        if ($accessType == UserAccess::ACCESS_DENY) {
             if (!is_null($accessType)) {
                 $joinable = 2; // pending approval
             } elseif ($groupHandler->canSubscribe($folderId)) {
