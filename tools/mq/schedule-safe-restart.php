@@ -17,6 +17,7 @@ use Alaress\Scheduler\Trigger\TriggerInterface;
 use Aura\Di\ContainerInterface;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
+use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
@@ -131,18 +132,10 @@ foreach ($sqlq as $qi) {
 }
 
 // now move onto stuff in rabbit
-$loop = \React\EventLoop\Factory::create();
-
-$stompFactory = new \React\Stomp\Factory($loop);
-
-$baseClient = $stompFactory->createClient([
-    'host'      => Cfg::get('amqp_host'),
-    'port'      => Cfg::get('amqp_stomp_port'),
-    'vhost'     => Cfg::get('amqp_vhost'),
-    'login'     => Cfg::get('amqp_user'),
-    'passcode'  => Cfg::get('amqp_pass'),
-]);
-$stomp = new Alaress\Async\Stomp\Implementation\React\Client($baseClient);
+/** @var LoopInterface $loop */
+/** @var IClient $stomp */
+$loop  = $kernel->getDependencyInjector()->values['react.loop'];
+$stomp = $kernel->getDependencyInjector()->get('stomp');
 
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
 $amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
@@ -150,9 +143,6 @@ $amqpConn->bindQueue(INSTANCE_ID.'.sb.reviewsched', 'deadmessage');
 $amqpConn->closeConnection();
 unset($amqpConn);
 
-/**
- * @var $stomp \React\Stomp\Client $stomp
- */
 $stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $kernel) {
 
     $di = $kernel->getDependencyInjector();
