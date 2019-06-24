@@ -145,6 +145,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     }
 
 
-}, false, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+}, false, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();
