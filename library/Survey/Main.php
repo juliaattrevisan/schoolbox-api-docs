@@ -1,6 +1,4 @@
 <?php
-
-use Schoolbox\Learning\Quiz\Model as Quiz;
 /**
  * Survey
  *
@@ -40,6 +38,9 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
+use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Permission\Access\UserAccess;
+
 class Survey_Main extends Evaluation_Main
 {
     const ONLINE_ASSESSMENT_TYPE_ID = 11;
@@ -57,7 +58,7 @@ class Survey_Main extends Evaluation_Main
         $groupHandler = new Group();
         $assess = $this->getByID($assess_id);
 
-        if ($groupHandler->getPermission($assess['category_id']) >= READ_ACCESS) {
+        if ($groupHandler->getPermission($assess['category_id']) >= UserAccess::ACCESS_READ) {
             return true;
         }
 
