@@ -11,10 +11,8 @@ namespace Schoolbox\Statistics;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Schoolbox\RoleMapper;
+use Schoolbox\Role;
 use Schoolbox\Resource\Folder\Model AS FolderModel;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\File\Mapper AS FileMapper;
 
 class Controller extends Base
 {
@@ -57,10 +55,10 @@ class Controller extends Base
      * @var array $roles
      */
     private $roles = [
-        RoleMapper::ROLE_STAFF,
-        RoleMapper::ROLE_PARENT,
-        RoleMapper::ROLE_STUDENT,
-        RoleMapper::ROLE_GUEST
+        Role::STAFF,
+        Role::PARENT,
+        Role::STUDENT,
+        Role::GUEST
     ];
 
     /**
