@@ -5,10 +5,9 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
-
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 
 $surveyHandler   = new Survey_Main();
 $attemptHandler  = new Survey_Attempt();
@@ -52,7 +51,7 @@ if ($surveyHandler->isExpired($survey['assess_id'])) {
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(144);
 }
 

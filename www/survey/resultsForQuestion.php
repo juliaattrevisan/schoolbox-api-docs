@@ -1,14 +1,14 @@
 <?php
 /**
- * Assessment export. Uses the handlers to export their question types into a
+ * Survey export. Uses the handlers to export their question types into a
  * Moodle format.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 $surveyHandler   = new Survey_Main();
@@ -31,7 +31,7 @@ if ($surveyHandler->isDeleted($this->arg[0])) {
 }
 
 if (!$surveyHandler->isOwner($survey['assess_id'])
-    && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)
+    && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)
 ) {
     error(125);
 }

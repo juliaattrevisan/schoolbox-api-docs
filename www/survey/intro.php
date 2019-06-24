@@ -1,16 +1,15 @@
 <?php
 /**
- * Assessment commencement. If the Assessment allows people to re-sit the test,
+ * Survey commencement. If the Survey allows people to re-sit the survey,
  * then clear the current attempt_id. Otherwise, remember it so people can't
- * reset the assessment timer by repeatedly refreshing the intro page.
+ * reset the survey timer by repeatedly refreshing the intro page.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
-
 use Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 $surveyHandler = new Survey_Main();
@@ -37,13 +36,13 @@ if ($surveyHandler->isDeleted($this->arg[0])) {
 }
 
 /* Check if you are in this category, so you can't submit other category's
- * online assessments unless you are a part of that category.
+ * surveys unless you are a part of that category.
  */
 if (!$surveyHandler->canDoAssessment($survey['assess_id'])) {
     error(19);
 }
 
-/* Check if this assessment can be started
+/* Check if this survey can be started
  */
 if ($surveyHandler->isExpired($survey['assess_id'])) {
     error(120);
@@ -52,11 +51,11 @@ if ($surveyHandler->isExpired($survey['assess_id'])) {
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(144);
 }
 
-/* Check if you have completed an assessment already
+/* Check if you have completed a survey already
  *
  * Set up Attempt vars
  */

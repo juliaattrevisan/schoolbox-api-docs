@@ -5,14 +5,14 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-$surveyHandler = new Survey_Main();
-$attemptHandler = new Survey_Attempt();
+$surveyHandler   = new Survey_Main();
+$attemptHandler  = new Survey_Attempt();
 $questionHandler = new Survey_Question();
-$sectionHandler = new Survey_Section();
-$groupHandler = new Group();
+$sectionHandler  = new Survey_Section();
+$groupHandler    = new Group();
 
 $question = $questionHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($question['section_id']);
@@ -43,7 +43,7 @@ if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
  */
 $survey = $surveyHandler->getByID($section['assess_id']);
 
-if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
 	error(144);
 }
 
