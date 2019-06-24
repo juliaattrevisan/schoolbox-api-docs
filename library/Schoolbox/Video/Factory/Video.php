@@ -5,12 +5,10 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Video\Factory;
 
-
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Model;
 
 class Video extends Base {
@@ -22,7 +20,7 @@ class Video extends Base {
 	 * @throws \Exception
 	 */
 	protected function permissionCheck($file) {
-		if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < READ_ACCESS) {
+		if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
 			throw new \Exception('You do not have permission to view this video.');
 		}
 	}
