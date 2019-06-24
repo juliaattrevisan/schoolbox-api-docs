@@ -14,7 +14,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($_POST['folder_id']) < READ_ACCESS) {
+    if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
