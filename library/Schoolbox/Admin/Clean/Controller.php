@@ -33,15 +33,6 @@ class Controller extends Base
         );
     }
 
-    function getClean()
-    {
-        $this->cleanStream();
-        $this->cleanZip();
-
-        $this->getResponse()->redirect->afterPost('/adminv2/cleanup');
-
-    }
-
     function cleanStream()
     {
         /* Clean downloaded stream files (twitter, rss, weather) */
