@@ -73,7 +73,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT type
 				   FROM userGroups
-				  WHERE cid = '{$categoryId}' AND type >= '" . GROUP_TYPE_MODERATED . "'";
+				  WHERE cid = '{$categoryId}' AND type >= '" . \Schoolbox\Resource\Group::MODERATED_GROUP . "'";
 
         $result = $this->db->getAll($query);
 
