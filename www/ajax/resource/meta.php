@@ -162,7 +162,7 @@ function getFolderMeta($folderId)
 
     // permissions: must have write access to see it
     $userAccess = $groupHandler->getPermission($folderId);
-    if ($userAccess >= WRITE_ACCESS) {
+    if ($userAccess >= UserAccess::ACCESS_WRITE) {
         $permissions = array();
 
         $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
@@ -192,7 +192,7 @@ function getFolderMeta($folderId)
                 $actions[] = 'zip';
             }
         // no break
-        case WRITE_ACCESS:
+        case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('file', 'link', 'folder', 'modify', 'download', 'multi'));
             $actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
 
@@ -266,7 +266,7 @@ function getSingleFileMeta($folderId, $fileId)
     $actions = array();
     switch ($userAccess) {
         case FULL_ACCESS:
-        case WRITE_ACCESS:
+        case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
         case UserAccess::ACCESS_READ:
@@ -326,7 +326,7 @@ function getSingleLinkMeta($folderId, $linkId)
 
     switch ($userAccess) {
         case FULL_ACCESS:
-        case WRITE_ACCESS:
+        case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
         case UserAccess::ACCESS_READ:
