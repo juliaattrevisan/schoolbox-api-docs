@@ -9,7 +9,9 @@ declare(strict_types=1);
 namespace Alaress\Async\Stomp;
 
 use React\Promise\PromiseInterface;
+use React\Stomp\AckResolver;
 use React\Stomp\Client;
+use React\Stomp\Protocol\Frame;
 
 /**
  * Adapter for the react/stomp Stomp client.
@@ -38,7 +40,18 @@ class ReactStompAdapter implements IClient
      */
     public function subscribeWithAck(string $destination, string $ackMode, callable $callback, array $headers = [])
     {
-        return $this->client->subscribeWithAck($destination, $ackMode, $callback, $headers);
+        // The callback for this object will need to:
+        // * provide a frame adapter
+        // * provide a resolver adapter
+        // and ensure the callback accepts those?
+        return $this->client->subscribeWithAck(
+            $destination,
+            $ackMode,
+            function (Frame $frame, AckResolver $resolver) {
+
+            },
+            $headers
+        );
     }
 
 

@@ -72,7 +72,11 @@ abstract class Broker implements IBroker
         }
 
         try {
-            $this->stomp->subscribeWithAck($this->queue, IClient::ACK_MODE_CLIENT_INDIVIDUAL, function (Frame $frame, AckResolver $resolver) use ($consumer) {
+            $this->stomp->subscribeWithAck(
+                $this->queue,
+                IClient::ACK_MODE_CLIENT_INDIVIDUAL,
+                function (Frame $frame, AckResolver $resolver) use ($consumer)
+                {
 
                 $resolve = new Resolver($resolver);
 
