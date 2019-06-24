@@ -1,13 +1,13 @@
 <?php
-
 /**
  * Eportfolio_Page_Showcase
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
+
 class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 {
 
@@ -196,7 +196,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                         /* Unpublish control
                          */
-                        if ($this->getPermission() >= WRITE_ACCESS) {
+                        if ($this->getPermission() >= UserAccess::ACCESS_WRITE) {
                             $this->getPage()->parse('has_modify_form_block', 'has_modify_form');
                         } else {
                             $this->getPage()->setVar('has_modify_form_block', '');

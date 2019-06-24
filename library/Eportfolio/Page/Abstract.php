@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 abstract class Eportfolio_Page_Abstract
@@ -64,7 +65,7 @@ abstract class Eportfolio_Page_Abstract
     protected $templateFile = '';
 
     /**
-     * A const equivalent corresponding to UserAccess::ACCESS_READ or WRITE_ACCESS etc.
+     * A const equivalent corresponding to UserAccess::ACCESS_READ or UserAccess::ACCESS_WRITE etc.
      *
      * This value is set in the factory, where a different class determines
      * the actual value.
@@ -158,7 +159,7 @@ abstract class Eportfolio_Page_Abstract
 
         $this->getPage()->setVar('can_add_page_block', '');
 
-        if ($this->getPermission() > WRITE_ACCESS) {
+        if ($this->getPermission() > UserAccess::ACCESS_WRITE) {
             $this->getPage()->parse('can_add_page_block', 'can_add_page');
         }
 

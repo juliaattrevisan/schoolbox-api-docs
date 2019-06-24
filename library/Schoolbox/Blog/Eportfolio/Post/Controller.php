@@ -263,7 +263,7 @@ class Controller extends Base
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
                     'record'            => $blog,
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
@@ -286,7 +286,7 @@ class Controller extends Base
             array(
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
+                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone(new Collection()),
