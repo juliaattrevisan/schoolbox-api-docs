@@ -265,7 +265,7 @@ class Controller extends Base
                     'record'            => $blog,
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                     'page'              => $page,
                     'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
@@ -288,7 +288,7 @@ class Controller extends Base
                 'data'     => array(
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone(new Collection()),
                     'page'              => $page,
                     'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
