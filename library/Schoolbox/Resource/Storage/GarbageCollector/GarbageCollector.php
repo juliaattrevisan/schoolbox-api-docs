@@ -27,9 +27,14 @@ class GarbageCollector implements IGarbageCollector
 
             new \Schoolbox\Tile\GarbageCollector(\Schoolbox\Tile\Mapper::getInstance()),
 
+
+            // Plagscan - \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\GarbageCollector should be the last to execute
             new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance()),
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\GarbageCollector(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Mapper::getInstance()),
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\GarbageCollector(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance()),
+
+            // Submission box file
+            new \Schoolbox\Assessment\Component\SubmissionBox\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance()),
 
             new \Schoolbox\Resource\Storage\GarbageCollector(\Schoolbox\Resource\Storage\Mapper::getInstance()),
         ];
