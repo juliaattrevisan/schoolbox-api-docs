@@ -1,5 +1,7 @@
 <?php
 // Copyright 2012 Alaress Pty Ltd. http://alaress.com.au
+use Schoolbox\Permission\Access\UserAccess;
+
 
 /**
  * Puts all resources from a folder into a zip
@@ -116,7 +118,7 @@ class ZipFolder
             $folderList = $this->getFolders($parentFolder->getId());
             foreach ($folderList as $folder) {
                 $permission = $this->getPermission($folder->getId());
-                if ($permission > DENY_ACCESS) {
+                if ($permission > UserAccess::ACCESS_DENY) {
                     $folderName = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
                     mkdir($folderLocation);
@@ -217,7 +219,7 @@ class ZipFolder
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return DENY_ACCESS|READ_ACCESS|WRITE_ACCESS|FULL_ACCESS
+     * @return UserAccess::ACCESS_DENY|READ_ACCESS|WRITE_ACCESS|FULL_ACCESS
      */
     protected function getPermission($folder_id)
     {
