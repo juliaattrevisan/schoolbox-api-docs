@@ -745,7 +745,7 @@ class Controller extends Base
 
                 /** @var UserAccess $admin */
                 foreach ($admins as $admin) {
-                    $admin->setAccessLevel(WRITE_ACCESS);
+                    $admin->setAccessLevel(UserAccess::ACCESS_WRITE);
                     $this->userAccessMapper->save($admin);
                 }
             }
