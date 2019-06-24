@@ -507,9 +507,9 @@ class Group extends DeprecatedModel
         if ($user->getRole()->isStaff()
             && (Cfg::get('news_staff_post_enabled') == '1')
             && ($this->_service == UserAccess::SERVICE_NEWS)
-            && ($permission < WRITE_ACCESS)
+            && ($permission < UserAccess::ACCESS_WRITE)
         ) {
-            $permission = WRITE_ACCESS;
+            $permission = UserAccess::ACCESS_WRITE;
         }
 
         /* Set cache */
