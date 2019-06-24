@@ -331,7 +331,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
         $perm         = $groupHandler->getPermission($assess['category_id']);
 
         // Users with write access can always do the assessment (generally teachers)
-        if($perm >= WRITE_ACCESS) {
+        if($perm >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
