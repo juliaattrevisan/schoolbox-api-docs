@@ -57,8 +57,16 @@ class StompPhpAdapter implements IClient
         $this->timer  = $this->loop->addPeriodicTimer(
             1,
             function() {
-                foreach ($this->callbacks as $subscriptionId => $callback) {
-                    $callback();
+                while (true) {
+                    $frame = $this->client->read();
+                    if ($frame === false) {
+                        break;
+                    }
+
+                    // Check each frame against the subscription ID?
+                    foreach ($this->callbacks as $subscriptionId => $callback) {
+                        $callback();
+                    }
                 }
             }
         );
