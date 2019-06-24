@@ -24,7 +24,7 @@ use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\RoleMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception;
@@ -126,7 +126,7 @@ class Notifier extends AbstractModuleNotifier
             return new Envelope();
         }
         $audience->add($author);
-        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_CREATED);
+        return $this->notify($comment, $effector, $audience, Role::STAFF, self::TRIGGER_CREATED);
     }
 
 
@@ -152,7 +152,7 @@ class Notifier extends AbstractModuleNotifier
         // Send it to all their teachers (across all subjects)
         $audience = $owner->loadTeachers()->getTeacherCollection();
 
-        return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_STAFF);
+        return $this->notifyCommented($comment, $effector, $audience, Role::STAFF);
     }
 
     /**
@@ -166,7 +166,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffBlogcommented(Model $comment, User $effector): Envelope
     {
-        return $this->notifyOwnerCommented($effector, $comment, RoleMapper::ROLE_STAFF, self::TRIGGER_BLOG_COMMENTED);
+        return $this->notifyOwnerCommented($effector, $comment, Role::STAFF, self::TRIGGER_BLOG_COMMENTED);
     }
 
     /**
@@ -180,7 +180,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentBlogcommented(Model $comment, User $effector): Envelope
     {
-        return $this->notifyOwnerCommented($effector, $comment, RoleMapper::ROLE_PARENT, self::TRIGGER_BLOG_COMMENTED);
+        return $this->notifyOwnerCommented($effector, $comment, Role::PARENT, self::TRIGGER_BLOG_COMMENTED);
     }
 
     /**
@@ -194,7 +194,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentCommented(Model $comment, User $effector): Envelope
     {
-        return $this->notifyOwnerCommented($effector, $comment, RoleMapper::ROLE_STUDENT, self::TRIGGER_COMMENTED);
+        return $this->notifyOwnerCommented($effector, $comment, Role::STUDENT, self::TRIGGER_COMMENTED);
     }
 
     /**
@@ -261,7 +261,7 @@ class Notifier extends AbstractModuleNotifier
             }
         }
 
-        return $this->notifyCommented($comment, $effector, $audience, RoleMapper::ROLE_PARENT);
+        return $this->notifyCommented($comment, $effector, $audience, Role::PARENT);
     }
 
 
@@ -276,8 +276,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffFollowed(Model $comment, User $effector): Envelope
     {
-        $audience = $this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STAFF);
-        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STAFF, self::TRIGGER_FOLLOWED);
+        $audience = $this->getOtherCommentAuthors($comment, Role::STAFF);
+        return $this->notify($comment, $effector, $audience, Role::STAFF, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -295,12 +295,12 @@ class Notifier extends AbstractModuleNotifier
     {
         $post     = $this->postMapper->findById($comment->getBlog()->getId());
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_STUDENT) as $student) {
+        foreach ($this->getOtherCommentAuthors($comment, Role::STUDENT) as $student) {
             if ($this->access->userCanView($post, $student)) {
                 $audience[$student->getId()] = $student;
             }
         }
-        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_STUDENT, self::TRIGGER_FOLLOWED);
+        return $this->notify($comment, $effector, $audience, Role::STUDENT, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -320,12 +320,12 @@ class Notifier extends AbstractModuleNotifier
         $post->getPage()->setOwner($this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents());
 
         $audience = $this->userMapper->createCollection();
-        foreach ($this->getOtherCommentAuthors($comment, RoleMapper::ROLE_PARENT) as $parent) {
+        foreach ($this->getOtherCommentAuthors($comment, Role::PARENT) as $parent) {
             if ($this->access->userCanView($post, $parent)) {
                 $audience[$parent->getId()] = $parent;
             }
         }
-        return $this->notify($comment, $effector, $audience, RoleMapper::ROLE_PARENT, self::TRIGGER_FOLLOWED);
+        return $this->notify($comment, $effector, $audience, Role::PARENT, self::TRIGGER_FOLLOWED);
     }
 
 
@@ -431,7 +431,7 @@ class Notifier extends AbstractModuleNotifier
         $owner    = $this->userMapper->findById($post->getPage()->getOwner()->getId())->loadParents();
 
         // Are we targeting parents?
-        if (RoleMapper::ROLE_PARENT === $roleType) {
+        if (Role::PARENT === $roleType) {
             // Load parents so we can display just their child's first name
             $effector->loadParents();
             if ($effector->getId() !== $owner->getId()) {
@@ -441,7 +441,7 @@ class Notifier extends AbstractModuleNotifier
 
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
-            $effectorParam = RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($effector)
+            $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector)
                 : new UserParam($effector);
 
@@ -454,7 +454,7 @@ class Notifier extends AbstractModuleNotifier
                 // Did effector comment on their own blog?
                 $ownerToken = 'their';
                 $ownerParam = [];
-            } elseif (RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($owner)) {
+            } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new ChildParam($owner)];
@@ -531,5 +531,4 @@ class Notifier extends AbstractModuleNotifier
         }
         return $audience;
     }
-
 }
