@@ -5,11 +5,10 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Etherpad;
 
+use Schoolbox\Permission\Access\UserAccess;
 
 class Authenticator {
 
@@ -18,7 +17,7 @@ class Authenticator {
 	 *
 	 * @var \Group
 	 */
-	private $groupHandler = null;
+	private $groupHandler;
 
 	/**
 	 * Constructor
@@ -34,7 +33,7 @@ class Authenticator {
 	 * @return bool
 	 */
 	public function canCreate($homepageId) {
-		if ($this->getGroupHandler()->getPermission($homepageId) > READ_ACCESS) {
+		if ($this->getGroupHandler()->getPermission($homepageId) > UserAccess::ACCESS_READ) {
 			return true;
 		}
 
@@ -48,7 +47,7 @@ class Authenticator {
 	 * @return bool
 	 */
 	public function isParticipator($homepageId) {
-		if ($this->getGroupHandler()->getPermission($homepageId) >= READ_ACCESS) {
+		if ($this->getGroupHandler()->getPermission($homepageId) >= UserAccess::ACCESS_READ) {
 			return true;
 		}
 
