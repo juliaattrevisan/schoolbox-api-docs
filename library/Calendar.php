@@ -504,7 +504,7 @@ class Calendar extends DeprecatedModel
             // Ensure that requested group is included in filter
             // (as long as user has at least read permission on that group)
             if ($filter['group']) {
-                if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= READ_ACCESS) {
+                if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= UserAccess::ACCESS_READ) {
                     $groupList[] = intval($filter['group']);
                 }
             }
