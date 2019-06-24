@@ -149,7 +149,7 @@ $componentCollection = $componentFactory->buildComponentList($folder->getId());
 // Decide which of parent/student view butonyes to show, if either
 $this->setVar('readonly_switch_on_block', '');
 $this->setVar('readonly_switch_off_block', '');
-if ($actualPermission >= WRITE_ACCESS) {
+if ($actualPermission >= UserAccess::ACCESS_WRITE) {
     if ($_GET['readonly']) {
         $this->parse('readonly_switch_off_block', 'readonly_switch_off');
     } else {
@@ -158,7 +158,7 @@ if ($actualPermission >= WRITE_ACCESS) {
 }
 
 // User has elevated priviliges: can write to page
-if ($virtualPermission >= WRITE_ACCESS) {
+if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
     $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');
