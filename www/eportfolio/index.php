@@ -15,7 +15,7 @@ $authenticator = new Eportfolio_Authenticator($currentUserId, $ownerId, $pageId)
 
 if ($authenticator->pageExists()) {
 	if ($authenticator->canCreate() || $authenticator->canModify()) {
-		$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, FULL_ACCESS);
+		$factory = new Eportfolio_Page_Factory($this, $ownerId, $pageId, UserAccess::ACCESS_FULL);
 		$factory->getPage()->renderPage();
 	}
 	else if ($authenticator->canView()) {

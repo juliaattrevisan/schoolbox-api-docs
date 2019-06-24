@@ -179,7 +179,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $page,
                 $eportfolioHandler->getPageInstance()->getOwner()->getId(),
                 $eportfolioHandler->getPageId(),
-                FULL_ACCESS
+                UserAccess::ACCESS_FULL
             );
 
             $renderer = new Component_Renderer();
@@ -282,7 +282,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                     $page,
                     $eportfolioHandler->getPageInstance()->getOwner()->getId(),
                     $eportfolioHandler->getPageId(),
-                    FULL_ACCESS
+                    UserAccess::ACCESS_FULL
                 );
 
                 $renderer->renderEportfolioComponent($eportfolioPage, $component);
