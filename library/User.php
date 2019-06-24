@@ -1,6 +1,8 @@
 <?php
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccess;
+
 
 class User extends DeprecatedModel
 {
@@ -56,7 +58,7 @@ class User extends DeprecatedModel
     {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
                   FROM user, userAccess
-                  WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "'
+                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "'
                   AND type > 0
                   AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname";
@@ -67,7 +69,7 @@ class User extends DeprecatedModel
     {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id 
                   FROM user, userAccess
-                  WHERE id = uid AND service = '" . HOMEPAGE_SERVICE . "' AND sid = '" . $categoryID . "' 
+                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "' 
                   and type in(3,2)
                   AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname";
