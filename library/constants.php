@@ -9,7 +9,6 @@
  * @version     SVN: $Id$
  */
 
-define('WRITE_ACCESS', 2);
 define('FULL_ACCESS',  3);
 
 define('GROUP_TYPE_RESTRICTED', 1);
