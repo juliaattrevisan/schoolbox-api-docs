@@ -39,6 +39,9 @@ class GarbageCollector implements IGarbageCollector
             // Submission return file
             new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper::getInstance()),
 
+            // Video Queue
+            new \Schoolbox\Video\GarbageCollector(\Schoolbox\Video\QueueMapper::getInstance()),
+
             new \Schoolbox\Resource\Storage\GarbageCollector(\Schoolbox\Resource\Storage\Mapper::getInstance()),
         ];
     }
