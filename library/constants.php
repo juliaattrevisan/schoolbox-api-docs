@@ -9,8 +9,6 @@
  * @version     SVN: $Id$
  */
 
-define('FULL_ACCESS',  3);
-
 define('GROUP_TYPE_RESTRICTED', 1);
 define('GROUP_TYPE_MODERATED',  2);
 define('GROUP_TYPE_FREE',       3);
