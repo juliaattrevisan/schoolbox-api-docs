@@ -23,10 +23,13 @@ class GarbageCollector implements IGarbageCollector
             // ePortfolio
             new \Schoolbox\Blog\Eportfolio\Image\GarbageCollector(\Schoolbox\Blog\Eportfolio\Image\Mapper::getInstance()),
             new \Eportfolio\GarbageCollector(CoverPhotoMapper::getInstance()),
+            new \Component\Eportfolio\GarbageCollector(\Schoolbox\Resource\My\File\Mapper::getInstance()),
 
             // Pastoral
             new \Schoolbox\Pastoral\Attachment\GarbageCollector(\Schoolbox\Pastoral\Attachment\Mapper::getInstance()),
-//            new \Schoolbox\Resource\My\File\GarbageCollector(\Schoolbox\Resource\My\File\Mapper::getInstance()),
+
+            // My File
+            new \Schoolbox\Resource\My\File\GarbageCollector(\Schoolbox\Resource\My\File\Mapper::getInstance()),
 
             // News
             new \Schoolbox\News\GarbageCollector(\Schoolbox\News\ArticleMapper::getInstance()),
