@@ -219,7 +219,7 @@ class ZipFolder
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|FULL_ACCESS
+     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
     protected function getPermission($folder_id)
     {
