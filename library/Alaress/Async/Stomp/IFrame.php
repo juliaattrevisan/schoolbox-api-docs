@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Async\Stomp\Frame;
+namespace Alaress\Async\Stomp;
 
 /**
  * Standard interface for Stomp message frames.

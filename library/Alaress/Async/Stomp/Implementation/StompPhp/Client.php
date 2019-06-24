@@ -6,8 +6,9 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Async\Stomp;
+namespace Alaress\Async\Stomp\Implementation\StompPhp;
 
+use Alaress\Async\Stomp\IClient;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
@@ -18,7 +19,7 @@ use Stomp\StatefulStomp;
 /**
  * Adapter for the stomp-php/stomp-php Stomp client.
  */
-class StompPhpAdapter implements IClient
+class Client implements IClient
 {
     /**
      * @var StatefulStomp

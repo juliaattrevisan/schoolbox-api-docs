@@ -6,20 +6,21 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Async\Stomp;
+namespace Alaress\Async\Stomp\Implementation\React;
 
+use Alaress\Async\Stomp\IClient;
 use React\Promise\PromiseInterface;
 use React\Stomp\AckResolver;
-use React\Stomp\Client;
+use React\Stomp\Client as BaseClient;
 use React\Stomp\Protocol\Frame;
 
 /**
  * Adapter for the react/stomp Stomp client.
  */
-class ReactStompAdapter implements IClient
+class Client implements IClient
 {
     /**
-     * @var Client
+     * @var BaseClient
      */
     private $client;
 
@@ -27,9 +28,9 @@ class ReactStompAdapter implements IClient
     /**
      * Constructor
      *
-     * @param Client $client
+     * @param BaseClient $client
      */
-    public function __construct(Client $client)
+    public function __construct(BaseClient $client)
     {
         $this->client = $client;
     }

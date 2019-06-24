@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Async\Stomp\ReactStompAdapter;
+use Alaress\Async\Stomp\Implementation\React\Client;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -19,8 +19,8 @@ use Psr\Log\LoggerInterface;
 use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
-use RuntimeException;
 use React\Stomp;
+use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 
 class Kernel extends CliKernelAbstract
@@ -374,7 +374,7 @@ EOL;
                 ]
             );
 
-            return new ReactStompAdapter($client);
+            return new Client($client);
         }));
 
 //        $di->set('stomp.new', $di->lazy(function () use ($di) {
