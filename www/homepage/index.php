@@ -11,6 +11,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
@@ -78,13 +79,13 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
 
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < READ_ACCESS) {
+if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < UserAccess::ACCESS_READ) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 // If I'm a write level user, I can downgrade myself to read access
-if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
-    $virtualPermission = READ_ACCESS;
+if ($actualPermission > UserAccess::ACCESS_READ && $_GET['readonly']) {
+    $virtualPermission = UserAccess::ACCESS_READ;
 } else {
     $virtualPermission = $actualPermission;
 }
