@@ -10,7 +10,7 @@ namespace Alaress\Async\Stomp\Implementation\React;
 
 use Alaress\Async\Stomp\IClient;
 use React\Promise\PromiseInterface;
-use React\Stomp\AckResolver;
+use React\Stomp\AckResolver as BaseAckResolver;
 use React\Stomp\Client as BaseClient;
 use React\Stomp\Protocol\Frame as BaseFrame;
 
@@ -49,9 +49,9 @@ class Client implements IClient
         return $this->client->subscribeWithAck(
             $destination,
             $ackMode,
-            static function (BaseFrame $frame, AckResolver $resolver) use ($callback) {
+            static function (BaseFrame $frame, BaseAckResolver $resolver) use ($callback) {
                 // Adapt frame
-                $callback(new Frame($frame), $resolver);
+                $callback(new Frame($frame), new AckResolver($resolver));
             },
             $headers
         );
