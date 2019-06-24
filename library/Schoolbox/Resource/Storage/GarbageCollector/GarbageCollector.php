@@ -56,6 +56,9 @@ class GarbageCollector implements IGarbageCollector
             // Video Queue
             new \Schoolbox\Video\GarbageCollector(\Schoolbox\Video\QueueMapper::getInstance()),
 
+            // File
+            new \Schoolbox\Resource\File\GarbageCollector(\Schoolbox\Resource\File\Mapper::getInstance()),
+
             // Storage (Final query)
             new \Schoolbox\Resource\Storage\GarbageCollector(\Schoolbox\Resource\Storage\Mapper::getInstance()),
         ];
