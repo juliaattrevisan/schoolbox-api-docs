@@ -1,10 +1,11 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
-$wiki  = new Wiki;
-$group = new Group(HOMEPAGE_SERVICE);
+$wiki  = new Wiki();
+$group = new Group(UserAccess::SERVICE_HOMEPAGE);
 $userHandler = new User();
 
 if (is_numeric($this->arg[0])) {
