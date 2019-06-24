@@ -6,9 +6,9 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Permission\Access\UserAccess;
 
 /* Get a list of questions and answers to softdelete
  */
@@ -33,7 +33,7 @@ if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
     $this->pageNotFound();
 }
 
-if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(130);
 }
 

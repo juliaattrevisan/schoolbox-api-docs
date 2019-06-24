@@ -6,10 +6,9 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
-
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Permission\Access\UserAccess;
 
 $assessHandler = new Assess_Main();
 $questionHandler = new Assess_Question();
@@ -38,7 +37,7 @@ if ($assessHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(130);
 }
 
