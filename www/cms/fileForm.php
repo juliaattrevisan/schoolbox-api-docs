@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\File\IFile;
@@ -9,7 +11,7 @@ use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $ajax = isset($_GET['ajax']) && $_GET['ajax'];
 
@@ -101,7 +103,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
         // sooo, this case is much simpler
         if ($modifyExisting) {
 
-            if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS || 0 == $_POST['category']) {
+            if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE || 0 == $_POST['category']) {
                 error(6);
             }
 
@@ -117,7 +119,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $destinations = is_array($_POST['category']) ? $_POST['category'] : array($_POST['category']);
 
             foreach ($destinations as $cat) {
-                if ($groupHandler->getPermission($cat) < WRITE_ACCESS || 0 == $cat) {
+                if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE || 0 == $cat) {
                     error(6);
                 }
 
@@ -196,9 +198,9 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 
         if(0 == $_POST['categoryID']){
             $result = "Cannot attach files to root";
-        } elseif ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
+        } elseif ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
             $result = "Insufficient permssions";
-        } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
+        } elseif ($groupHandler->getPermission($_POST['categoryID']) < UserAccess::ACCESS_WRITE) {
             $result = "Insufficient permssions";
         } else {
             $file->setFolder(FolderMapper::getInstance()->createModel($_POST['categoryID']));
@@ -218,7 +220,7 @@ elseif (is_numeric($_GET['delete'])) {
     try {
         $file = FileMapper::getInstance()->findById($_GET['delete']);
 
-        if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
+        if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -244,7 +246,7 @@ elseif (is_numeric($_GET['deleteList'])) {
                 try {
                     $file = FileMapper::getInstance()->findById($fileID);
 
-                    if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
+                    if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                         error(6);
                     }
 
@@ -262,7 +264,7 @@ elseif (is_numeric($_GET['deleteList'])) {
             try {
                 /** @var Link $link */
                 $link = LinkMapper::getInstance()->findById($linkID);
-                if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
+                if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                     error(6);
                 }
                 LinkMapper::getInstance()->delete($link);

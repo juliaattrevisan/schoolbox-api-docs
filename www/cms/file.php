@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\GenericZone;
 use \Schoolbox\Resource\File\Mapper as FileMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -26,7 +27,7 @@ if (is_numeric($this->arg[0])) {
         error(41);
     }
 
-    if ($groupHandler->getPermission($file->getFolder()->getId()) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
         error(6);
     }
 
@@ -94,7 +95,7 @@ if (is_numeric($this->arg[0])) {
         error(13);
     }
 
-    if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($folder->getId()) < UserAccess::ACCESS_WRITE) {
         error(6);
     }
 
@@ -152,7 +153,7 @@ if (is_numeric($this->arg[0])) {
 
     $zone->renderIntoSitePage($this, 'ATTACH_ZONE');
 
-    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, UserAccess::ACCESS_WRITE);
 
     if (is_array($categoryList) && count($categoryList)) {
         foreach ($categoryList as $category) {
