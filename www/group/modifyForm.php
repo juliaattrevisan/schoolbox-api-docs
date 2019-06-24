@@ -66,7 +66,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         // yes, group category doesn't map to an actual category.
         // no, I'm not fixing it right now, but will at least check it exists.
         $folder = $catMapper->findById($categoryId);
-        $group->setCategory($folder);
+        $group->setFolder($folder);
 //        try {
 //            $catMapper->findById($categoryId);
 //            $group->setCategory($categoryId);

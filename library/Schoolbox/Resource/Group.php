@@ -93,7 +93,7 @@ class Group {
      * @param Folder\Model $folder
      * @return $this
      */
-    public function setCategory($folder)
+    public function setFolder($folder)
     {
         $this->folder = $folder;
         return $this;
@@ -102,7 +102,7 @@ class Group {
     /**
      * @return Folder\Model
      */
-    public function getCategory(): Folder\Model
+    public function getFolder(): Folder\Model
     {
         return $this->folder;
     }

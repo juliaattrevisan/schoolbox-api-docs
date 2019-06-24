@@ -68,8 +68,8 @@ class GroupMapper extends Mapper {
         $folderMapper = $this->getJoinMapper('folder');
         $groups       = $this->createCollection();
         foreach ($statement as $row) {
-            $group = $this->hydrate($row)->setCategory($folderMapper->hydrate($row, 'f'));
-            $groups[$group->getCategory()->getId()] = $group;
+            $group = $this->hydrate($row)->setFolder($folderMapper->hydrate($row, 'f'));
+            $groups[$group->getFolder()->getId()] = $group;
         }
         return $groups;
     }
