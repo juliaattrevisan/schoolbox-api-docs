@@ -306,7 +306,7 @@ class Controller extends BaseController
 
         // Make sure they have access to delete the folder
 
-        if ($access->getFolderAccess($this->getUser(), $folder->getId()) < WRITE_ACCESS) {
+        if ($access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
         }
 
@@ -344,10 +344,10 @@ class Controller extends BaseController
                 throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
             }
 
-            if ($access->getFolderAccess($this->getUser(), $source->getId()) < WRITE_ACCESS)
+            if ($access->getFolderAccess($this->getUser(), $source->getId()) < UserAccess::ACCESS_WRITE)
                 throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
-            if ($access->getFolderAccess($this->getUser(), $destination->getId()) < WRITE_ACCESS)
+            if ($access->getFolderAccess($this->getUser(), $destination->getId()) < UserAccess::ACCESS_WRITE)
                 throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
 
             // Move the folder
@@ -791,7 +791,7 @@ class Controller extends BaseController
         {
             $folder = $folderMapper->findById($this->getRequest()->post["id"]);
 
-            if ($access->getFolderAccess($this->getUser(), $folder->getId()) < WRITE_ACCESS) {
+            if ($access->getFolderAccess($this->getUser(), $folder->getId()) < UserAccess::ACCESS_WRITE) {
                 throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, null);
             }
         }
