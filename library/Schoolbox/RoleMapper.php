@@ -22,11 +22,6 @@ use InvalidArgumentException;
 class RoleMapper extends Mapper
 {
 
-    /* Enum in groups table
-     */
-    const ROLE_GUEST = 'guest';
-
-
     /**
      * Setup mapper
      *
