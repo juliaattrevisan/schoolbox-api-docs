@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class SubmissionReturn
@@ -318,7 +319,7 @@ class SubmissionReturn extends DeprecatedModel
         $cid   = $this->db->getOne($query);
 
         if ($cid) {
-            if ($groupHandler->getPermission($cid) >= WRITE_ACCESS) {
+            if ($groupHandler->getPermission($cid) >= UserAccess::ACCESS_WRITE) {
                 return true;
             } else {
                 return false;
