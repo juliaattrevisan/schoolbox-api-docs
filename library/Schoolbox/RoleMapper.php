@@ -24,7 +24,6 @@ class RoleMapper extends Mapper
 
     /* Enum in groups table
      */
-    const ROLE_PARENT = 'parent';
     const ROLE_STUDENT = 'student';
     const ROLE_GUEST = 'guest';
 
