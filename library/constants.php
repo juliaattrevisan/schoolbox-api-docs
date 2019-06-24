@@ -9,7 +9,6 @@
  * @version     SVN: $Id$
  */
 
-define('DENY_ACCESS',  0);
 define('READ_ACCESS',  1);
 define('WRITE_ACCESS', 2);
 define('FULL_ACCESS',  3);
