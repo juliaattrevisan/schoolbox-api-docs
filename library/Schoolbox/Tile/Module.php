@@ -30,7 +30,6 @@ use Schoolbox\Tile\Controller as TileController;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Schoolbox\Tile\Mapper as TileMapper;
 
-
 class Module extends BaseModule
 {
     protected $basename = 'tile';
