@@ -13,7 +13,9 @@ use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\PayloadBrokenException;
 use Alaress\Async\Broker\PayloadMissingException;
+use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
+use Alaress\Async\Stomp\IFrame;
 use Predis\ClientInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Exception\ConnectionException;
@@ -75,17 +77,17 @@ abstract class Broker implements IBroker
             $this->stomp->subscribeWithAck(
                 $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
-                function (Frame $frame, AckResolver $resolver) use ($consumer)
+                function (IFrame $frame, IAckResolver $resolver) use ($consumer)
                 {
 
                 $resolve = new Resolver($resolver);
 
                 try {
-                    [ $key, $context ] = json_decode($frame->body, true);
+                    [ $key, $context ] = json_decode($frame->getBody(), true);
 
                 } catch (\Throwable $e) {
                     // if the JSON decode fails, fall back to assuming frame.body == key
-                    $key     = $frame->body;
+                    $key     = $frame->getBody();
                     $context = null;
                 }
 

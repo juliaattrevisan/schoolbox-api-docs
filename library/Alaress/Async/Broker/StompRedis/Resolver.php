@@ -10,7 +10,7 @@ namespace Alaress\Async\Broker\StompRedis;
 
 use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IResolver;
-use React\Stomp\AckResolver;
+use Alaress\Async\Stomp\IAckResolver;
 use RuntimeException;
 
 
@@ -22,15 +22,15 @@ use RuntimeException;
 class Resolver implements IResolver
 {
     /**
-     * @var AckResolver
+     * @var IAckResolver
      */
     private $resolver;
 
 
     /**
-     * @param AckResolver $resolver
+     * @param IAckResolver $resolver
      */
-    public function __construct(AckResolver $resolver)
+    public function __construct(IAckResolver $resolver)
     {
         $this->resolver = $resolver;
     }
