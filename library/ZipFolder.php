@@ -27,7 +27,7 @@ class ZipFolder
         $this->folderDetails = $this->getFolderDetails($folder);
 
         if (is_numeric($this->folderDetails->getId())) {
-            if ($this->getPermission($this->folderDetails->getId()) < READ_ACCESS) {
+            if ($this->getPermission($this->folderDetails->getId()) < UserAccess::ACCESS_READ) {
                 error(5);
             }
         } else {
@@ -219,7 +219,7 @@ class ZipFolder
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return UserAccess::ACCESS_DENY|READ_ACCESS|WRITE_ACCESS|FULL_ACCESS
+     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|WRITE_ACCESS|FULL_ACCESS
      */
     protected function getPermission($folder_id)
     {
