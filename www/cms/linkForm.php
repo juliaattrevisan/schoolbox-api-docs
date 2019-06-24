@@ -1,10 +1,12 @@
 <?php
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
-
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Link;
 use Schoolbox\Resource\LinkMapper;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new Kernel();
 
 $page         = new SitePage();
 $groupHandler = new Group();
@@ -28,7 +30,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             /** @var Link $link */
             $link = LinkMapper::getInstance()->findById($_POST['linkID']);
 
-            if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
+            if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                 error(6);
             }
         } catch (Exception $e) {
@@ -63,7 +65,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         if (is_array($_POST['category'])) {
             $linkCollection = LinkMapper::getInstance()->createCollection();
             foreach ($_POST['category'] as $cat) {
-                if ($groupHandler->getPermission($cat) < WRITE_ACCESS) {
+                if ($groupHandler->getPermission($cat) < UserAccess::ACCESS_WRITE) {
                     error(6);
                 }
 
@@ -73,7 +75,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             }
             $link = $linkCollection;
         } else {
-            if ($groupHandler->getPermission($_POST['category']) < WRITE_ACCESS) {
+            if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE) {
                 error(6);
             }
 
@@ -92,9 +94,9 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         try {
             $link = LinkMapper::getInstance()->findById($_POST['move']);
 
-            if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
+            if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                 $result = "Insufficient permssions";
-            } elseif ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
+            } elseif ($groupHandler->getPermission($_POST['categoryID']) < UserAccess::ACCESS_WRITE) {
                 $result = "Insufficient permssions";
             } else {
                 $link->setFolder(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel($_POST['categoryID']));
@@ -116,7 +118,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         try {
             $link = LinkMapper::getInstance()->findById($_GET['delete']);
 
-            if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
+            if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
                 error(6);
             }
 
