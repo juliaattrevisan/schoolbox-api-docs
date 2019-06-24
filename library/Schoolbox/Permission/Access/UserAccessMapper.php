@@ -110,7 +110,7 @@ class UserAccessMapper extends Mapper
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
-            'service' => HOMEPAGE_SERVICE,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
             'type' => UserAccess::ACCESS_FULL
         ));
 
@@ -133,7 +133,7 @@ class UserAccessMapper extends Mapper
     {
         $userAccess = $this->findByColumnList(array(
             'sid' => $folder->getId(),
-            'service' => HOMEPAGE_SERVICE,
+            'service' => UserAccess::SERVICE_HOMEPAGE,
             'type' => UserAccess::ACCESS_FULL,
             'uid' => $user->getId()
         ));
@@ -678,7 +678,7 @@ class UserAccessMapper extends Mapper
 
         // If we are getting the permission for a homepage, we need to take into account inheritance
 
-        if ($serviceIdentifier != 0 && $service == HOMEPAGE_SERVICE) {
+        if ($serviceIdentifier != 0 && $service == UserAccess::SERVICE_HOMEPAGE) {
 
             // Find the NNIAN for the folder
             $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
