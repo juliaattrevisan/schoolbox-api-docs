@@ -39,7 +39,7 @@ $this->setTab('resources');
 
 if (is_numeric($this->arg[0])) {
     $userHandler      = new User();
-    $groupHandler     = new \Group(HOMEPAGE_SERVICE);
+    $groupHandler     = new \Group(UserAccess::SERVICE_HOMEPAGE);
     $userAccessMapper = UserAccessMapper::getInstance();
     $access           = Access::getInstance();
     $roleAccessMapper = RoleAccessMapper::getInstance();
@@ -298,7 +298,7 @@ if (is_numeric($this->arg[0])) {
        Warning will show if they decrease their perms
     */
 
-    $userAccess = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => HOMEPAGE_SERVICE, 'type' => UserAccess::ACCESS_FULL]);
+    $userAccess = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => UserAccess::SERVICE_HOMEPAGE, 'type' => UserAccess::ACCESS_FULL]);
     $admin = $userAccess->count();
 
     $this->setVar('ADMIN_NOT_SU', $admin && !$_SESSION['user']->isSuperuser());
