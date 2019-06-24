@@ -6,10 +6,9 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Comms\News\Statistics;
 
-use Schoolbox\RoleMapper;
+use Schoolbox\Role;
 
 /**
  * Class Mapper
@@ -56,10 +55,10 @@ class Mapper extends \Schoolbox\Mapper
      * Known role types
      */
     public const ROLETYPES = [
-        RoleMapper::ROLE_STAFF,
-        RoleMapper::ROLE_PARENT,
-        RoleMapper::ROLE_STUDENT,
-        RoleMapper::ROLE_GUEST
+        Role::STAFF,
+        Role::PARENT,
+        Role::STUDENT,
+        Role::GUEST
     ];
         
     /**
