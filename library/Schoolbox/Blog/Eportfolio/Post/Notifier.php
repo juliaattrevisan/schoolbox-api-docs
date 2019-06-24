@@ -24,7 +24,7 @@ use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\RoleMapper;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use OutOfBoundsException;
@@ -123,7 +123,7 @@ class Notifier extends AbstractModuleNotifier
             // Send it to all their teachers (across all subjects)
             $audience = $owner->loadTeachers()->getTeacherCollection();
 
-            return $this->notifyPosted($post, $owner, $effector, $audience, RoleMapper::ROLE_STAFF);
+            return $this->notifyPosted($post, $owner, $effector, $audience, Role::STAFF);
         } catch (Exception $e) {
             // page or owner was invalid.
             return new Envelope();
@@ -141,7 +141,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffBlogposted(Model $post, User $effector): Envelope
     {
-        return $this->notifyOwnerPosted($effector, $post, RoleMapper::ROLE_STAFF, self::TRIGGER_BLOG_POSTED);
+        return $this->notifyOwnerPosted($effector, $post, Role::STAFF, self::TRIGGER_BLOG_POSTED);
     }
 
     /**
@@ -155,7 +155,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyParentBlogposted(Model $post, User $effector): Envelope
     {
-        return $this->notifyOwnerPosted($effector, $post, RoleMapper::ROLE_PARENT, self::TRIGGER_BLOG_POSTED);
+        return $this->notifyOwnerPosted($effector, $post, Role::PARENT, self::TRIGGER_BLOG_POSTED);
     }
 
     /**
@@ -169,7 +169,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStudentPosted(Model $post, User $effector): Envelope
     {
-        return $this->notifyOwnerPosted($effector, $post, RoleMapper::ROLE_STUDENT, self::TRIGGER_POSTED);
+        return $this->notifyOwnerPosted($effector, $post, Role::STUDENT, self::TRIGGER_POSTED);
     }
 
     /**
@@ -248,7 +248,7 @@ class Notifier extends AbstractModuleNotifier
             }
         }
 
-        return $this->notifyPosted($post, $owner, $effector, $audience, RoleMapper::ROLE_PARENT);
+        return $this->notifyPosted($post, $owner, $effector, $audience, Role::PARENT);
     }
 
     /**
@@ -269,7 +269,7 @@ class Notifier extends AbstractModuleNotifier
 
         foreach ($audience as $target) {
             // Just first name if advising parent of child's action
-            $effectorParam = RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($effector)
+            $effectorParam = Role::PARENT === $roleType && $target->isParentOf($effector)
                 ? new ChildParam($effector, ParameterInterface::STACKING_REPLACE)
                 : new UserParam($effector, ParameterInterface::STACKING_REPLACE);
 
@@ -282,7 +282,7 @@ class Notifier extends AbstractModuleNotifier
                 // Did effector comment on their own blog?
                 $ownerToken = 'their';
                 $ownerParam = [];
-            } elseif (RoleMapper::ROLE_PARENT === $roleType && $target->isParentOf($owner)) {
+            } elseif (Role::PARENT === $roleType && $target->isParentOf($owner)) {
                 // Are we sending to post owner's parents?
                 $ownerToken = ":student's";
                 $ownerParam = ['student' => new ChildParam($owner, ParameterInterface::STACKING_REPLACE)];
