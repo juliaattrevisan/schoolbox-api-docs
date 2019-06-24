@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
@@ -31,9 +32,9 @@ class Group extends DeprecatedModel
      *
      * @var int
      */
-    private $_service = HOMEPAGE_SERVICE;
+    private $_service;
 
-    function __construct($service = HOMEPAGE_SERVICE)
+    function __construct($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_table = 'userGroups';
         $this->_index = 'cid';
@@ -56,7 +57,7 @@ class Group extends DeprecatedModel
     }
 
 
-    function setService($service = HOMEPAGE_SERVICE)
+    function setService($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_service = $service;
     }
@@ -188,7 +189,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT name, id, userAccess.type accessType
 				  FROM (folder, userGroups )
-				  LEFT JOIN userAccess ON cid = sid AND service = " . HOMEPAGE_SERVICE . " AND uid = '" . $_SESSION['id'] . "'
+				  LEFT JOIN userAccess ON cid = sid AND service = " . UserAccess::SERVICE_HOMEPAGE . " AND uid = '" . $_SESSION['id'] . "'
 				  WHERE cid = id
 				  AND folder.deleted_at IS NULL
 				  AND userGroups.type = '$type'
@@ -417,7 +418,7 @@ class Group extends DeprecatedModel
      * The new getPermission method, which uses `\Schoolbox\Permission\Access\Access::getFolderAccess`
      * under the hood.
      *
-     * This only works when `$this->_service` is `HOMEPAGE_SERVICE` - if it
+     * This only works when `$this->_service` is `UserAccess::SERVICE_HOMEPAGE` - if it
      * isn't, it proxies through to `$this->legacyGetPermission`.
      *
      * @param  int  $relationID The ID of the object to get permissions on.
@@ -451,7 +452,7 @@ class Group extends DeprecatedModel
             $user = $this->cacheUser[$userID];
         }
 
-        if ($this->_service == HOMEPAGE_SERVICE) {
+        if ($this->_service == UserAccess::SERVICE_HOMEPAGE) {
             return Access::getInstance()->getFolderAccess($user, $relationID, $cache);
         } else {
             return $this->legacyGetPermission($relationID, $user);
@@ -460,7 +461,7 @@ class Group extends DeprecatedModel
 
     /**
      * The old getPermission method, used when `$this->_service` isn't
-     * `HOMEPAGE_SERVICE`.
+     * `UserAccess::SERVICE_HOMEPAGE`.
      *
      * @param  int  $relationID The ID of the object to get permissions on.
      *                          Depending on `$this->_service` could be a
