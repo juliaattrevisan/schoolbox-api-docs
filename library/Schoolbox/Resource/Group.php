@@ -16,7 +16,7 @@ class Group {
      * The three types of groups you can join:
      *
      * PRIVATE (invite only)
-     * MODERATED (assigned, by superusers)
+     * MODERATED (assigned, by group admin)
      * FREE (anyone can come and go)
      */
     public const PRIVATE_GROUP = 1;
