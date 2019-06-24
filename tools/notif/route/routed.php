@@ -8,6 +8,7 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Alaress\Async\Stomp\IClient;
 use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
@@ -18,7 +19,6 @@ use Aura\Di;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stomp\Client;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\DispatchResponder;
@@ -34,7 +34,7 @@ $kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,])
 // ROUTING APP
 $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
-    $di->get('stomp')->connect()->then(function (Client $client) use ($di, $loop, $log, $opts, $flags) {
+    $di->get('stomp')->connect()->then(function (IClient $client) use ($di, $loop, $log, $opts, $flags) {
         try {
             $log->info('Connected to STOMP', [ 'char' => '+' ]);
 
