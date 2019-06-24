@@ -33,10 +33,14 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      */
     protected $digestSchedule;
 
-    const GUEST = 'guest';
-    const STUDENT = 'student';
-    const PARENT = 'parent';
-    const STAFF = 'staff';
+    /**
+     * Role Types
+     * Every role has a type
+     */
+    public const GUEST = 'guest';
+    public const STUDENT = 'student';
+    public const PARENT = 'parent';
+    public const STAFF = 'staff';
 
     const DIGEST_NEVER = '0';
 
