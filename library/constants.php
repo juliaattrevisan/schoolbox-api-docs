@@ -9,9 +9,6 @@
  * @version     SVN: $Id$
  */
 
-// TODO remove all of these services, use UserAccess::SERVICE_* constants
-define('HOUSEMASTER_SERVICE', 6);
-
 define('DENY_ACCESS',  0);
 define('READ_ACCESS',  1);
 define('WRITE_ACCESS', 2);
