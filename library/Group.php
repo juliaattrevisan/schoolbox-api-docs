@@ -486,7 +486,7 @@ class Group extends DeprecatedModel
         }
 
         $serviceIdFilter = '';
-        if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, HOUSEMASTER_SERVICE))) {
+        if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, UserAccess::SERVICE_HOUSEMASTER))) {
             $serviceIdFilter = "AND sid = {$this->db->smartQuote($relationID)}";
         }
 
