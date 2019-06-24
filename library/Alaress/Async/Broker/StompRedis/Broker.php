@@ -13,9 +13,9 @@ use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\PayloadBrokenException;
 use Alaress\Async\Broker\PayloadMissingException;
+use Alaress\Async\Stomp\IClient;
 use Predis\ClientInterface;
 use React\Stomp\AckResolver;
-use React\Stomp\Client;
 use React\Stomp\Exception\ConnectionException;
 use React\Stomp\Protocol\Frame;
 
@@ -30,7 +30,7 @@ abstract class Broker implements IBroker
 {
     const ACK_MODE = 'client-individual';
 
-    /** @var Client */
+    /** @var IClient */
     private $stomp;
 
     /** @var ClientInterface */
@@ -47,10 +47,10 @@ abstract class Broker implements IBroker
      * @param string          $queue   the name of the queue to deposit into in AMQP
      * @param AMQPInterface   $amqp    an instance of the AMQP client interface
      * @param ClientInterface $redis   an instance of the Predis client interface
-     * @param Client          $stomp   an instanceof the STOMP client interface
+     * @param IClient         $stomp   an instanceof the STOMP client interface
      *                                 (only needs to be supplied if attaching a consumer, otherwise can be omitted)
      */
-    public function __construct($queue, AMQPInterface $amqp, ClientInterface $redis, Client $stomp = null)
+    public function __construct($queue, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
     {
         $this->queue = $queue;
         $this->redis = $redis;
