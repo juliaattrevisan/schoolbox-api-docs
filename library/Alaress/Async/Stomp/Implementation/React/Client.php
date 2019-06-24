@@ -12,7 +12,7 @@ use Alaress\Async\Stomp\IClient;
 use React\Promise\PromiseInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client as BaseClient;
-use React\Stomp\Protocol\Frame;
+use React\Stomp\Protocol\Frame as BaseFrame;
 
 /**
  * Adapter for the react/stomp Stomp client.
@@ -45,11 +45,13 @@ class Client implements IClient
         // * provide a frame adapter
         // * provide a resolver adapter
         // and ensure the callback accepts those?
+
         return $this->client->subscribeWithAck(
             $destination,
             $ackMode,
-            function (Frame $frame, AckResolver $resolver) {
-
+            static function (BaseFrame $frame, AckResolver $resolver) use ($callback) {
+                // Adapt frame
+                $callback(new Frame($frame), $resolver);
             },
             $headers
         );
