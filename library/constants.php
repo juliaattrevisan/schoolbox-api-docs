@@ -10,7 +10,6 @@
  */
 
 // TODO remove all of these services, use UserAccess::SERVICE_* constants
-define('NEWS_SERVICE',        3);
 define('HOUSEMASTER_SERVICE', 6);
 
 define('DENY_ACCESS',  0);
