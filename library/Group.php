@@ -319,7 +319,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . DENY_ACCESS . " AND user.deleted_at IS NULL
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . UserAccess::ACCESS_DENY . " AND user.deleted_at IS NULL
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
@@ -328,7 +328,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id
 				  FROM userAccess, user
-				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid AND user.deleted_at IS NULL
+				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . UserAccess::ACCESS_DENY . " AND user.id = uid AND user.deleted_at IS NULL
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
@@ -436,7 +436,7 @@ class Group extends DeprecatedModel
                 $userID = $_SESSION['id'];
                 $this->cacheUser[$userID] = $_SESSION['user'];
             } else {
-                return DENY_ACCESS;
+                return UserAccess::ACCESS_DENY;
             }
         }
 
@@ -446,7 +446,7 @@ class Group extends DeprecatedModel
             try {
                 $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
             } catch (MapperException $e) {
-                return DENY_ACCESS;
+                return UserAccess::ACCESS_DENY;
             }
         } else {
             $user = $this->cacheUser[$userID];
