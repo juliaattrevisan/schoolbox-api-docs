@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp;
 
+use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Stomp\Exception\StompException;
@@ -25,13 +27,50 @@ class StompPhpAdapter implements IClient
 
 
     /**
+     * @var LoopInterface
+     */
+    private $loop;
+
+
+    /**
+     * @var TimerInterface
+     */
+    private $timer;
+
+
+    /**
+     * @var callable[]
+     */
+    private $callbacks = [];
+
+
+    /**
      * Constructor
      *
      * @param StatefulStomp $client
+     * @param LoopInterface $loop
      */
-    public function __construct(StatefulStomp $client)
+    public function __construct(StatefulStomp $client, LoopInterface $loop)
     {
         $this->client = $client;
+        $this->loop   = $loop;
+        $this->timer  = $this->loop->addPeriodicTimer(
+            1,
+            function() {
+                foreach ($this->callbacks as $subscriptionId => $callback) {
+                    $callback();
+                }
+            }
+        );
+    }
+
+
+    /**
+     * Destructor
+     */
+    public function __destruct()
+    {
+        $this->loop->cancelTimer($this->timer);
     }
 
 
@@ -43,7 +82,12 @@ class StompPhpAdapter implements IClient
         $subscriptionId = $this->client->subscribe($destination, null, $ackMode, $headers);
 
         // TODO figure out what to do with $callback
-        // react/stomp uses an input stream
+        // react/stomp uses an input stream, which I think asynchronously
+        // listens for frames?
+        // I may need React's timer class? React/stomp uses evenement, which
+        // seems to provide async timers?
+        // Digging deep: it uses a pipe?
+        $this->callbacks[$subscriptionId] = $callback;
         return $subscriptionId;
     }
 
