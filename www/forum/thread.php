@@ -75,7 +75,7 @@ $this->setVar($output);
 $this->setVar('modify_thread_block', '');
 
 
-if ($groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+if ($groupHandler->getPermission($category->getId()) >= UserAccess::ACCESS_WRITE) {
     $this->parse('modify_thread_block', 'modify_thread');
 }
 
@@ -87,7 +87,7 @@ $is_post_allowed = !$groupHandler->hasChildAccessOnly($category->getId());
 if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
     error(19);
 }
-if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= UserAccess::ACCESS_WRITE) {
     if ($is_post_allowed) {
         $this->parse('reply_block', 'reply');
     }
@@ -193,7 +193,7 @@ if (is_array($postList)) {
 
         if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission(
             $category->getId()
-        ) >= WRITE_ACCESS) {
+        ) >= UserAccess::ACCESS_WRITE) {
             $this->parse('modify_block', 'modify');
 
             // delete post
@@ -210,7 +210,7 @@ if (is_array($postList)) {
 
         // reply to this post
         $this->setVar('reply_post_block', '');
-        if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= WRITE_ACCESS) {
+        if (!$threadLocked || $groupHandler->getPermission($category->getId()) >= UserAccess::ACCESS_WRITE) {
             if ($is_post_allowed) {
                 $this->parse('reply_post_block', 'reply_post');
             }

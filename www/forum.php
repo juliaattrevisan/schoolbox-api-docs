@@ -76,7 +76,7 @@ $this->setVar(array(
     'modify_heading_block' => '',
 ));
 
-if ($perm >= WRITE_ACCESS) {
+if ($perm >= UserAccess::ACCESS_WRITE) {
     $this->parse('delete_button_block', 'delete_button');
     $this->parse('modify_heading_block', 'modify_heading');
 }
@@ -179,7 +179,7 @@ if (is_array($threadList)) {
             'last_post_block' => ''
         ));
 
-        if ($perm >= WRITE_ACCESS) {
+        if ($perm >= UserAccess::ACCESS_WRITE) {
             $this->parse('modify_thread_block', 'modify_thread', true);
         }
 
