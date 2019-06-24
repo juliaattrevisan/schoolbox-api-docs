@@ -135,13 +135,14 @@ $loop = \React\EventLoop\Factory::create();
 
 $stompFactory = new \React\Stomp\Factory($loop);
 
-$stomp = $stompFactory->createClient([
+$baseClient = $stompFactory->createClient([
     'host'      => Cfg::get('amqp_host'),
     'port'      => Cfg::get('amqp_stomp_port'),
     'vhost'     => Cfg::get('amqp_vhost'),
     'login'     => Cfg::get('amqp_user'),
     'passcode'  => Cfg::get('amqp_pass'),
 ]);
+$stomp = new Alaress\Async\Stomp\Implementation\React\Client($baseClient);
 
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
 $amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
