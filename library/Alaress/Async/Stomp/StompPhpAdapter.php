@@ -110,7 +110,7 @@ class StompPhpAdapter implements IClient
         // As far as I can tell: connection is synchronous
         try {
             $this->client->getClient()->connect();
-            $deferred->resolve();
+            $deferred->resolve($this);
         } catch (StompException $e) {
             $deferred->reject($e);
         }
