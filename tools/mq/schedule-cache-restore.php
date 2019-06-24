@@ -10,9 +10,9 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Async\Stomp\IClient;
 use Alaress\Scheduler\Cache\RedisCache;
 use Predis\ClientInterface;
-use React\Stomp\Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\MQ\Connector;
 use Aura\Di;
@@ -77,7 +77,7 @@ $k->run(function ($di, $loop, $log, $opts) {
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');
 
-            /** @var Client $stomp */
+            /** @var IClient $stomp */
             $stomp = $di->get('stomp');
 
             $broker = new Schedule\Broker(INSTANCE_ID, $amqp, $redis, $stomp);

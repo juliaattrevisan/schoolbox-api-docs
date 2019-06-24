@@ -9,6 +9,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Async\Stomp\IClient;
 use Alaress\Redis;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Aura\Di\ContainerInterface;
@@ -151,13 +152,13 @@ unset($amqpConn);
 /**
  * @var $stomp \React\Stomp\Client $stomp
  */
-$stomp->connect()->then(function (Stomp\Client $stomp) use ($d, $loop, $perform, $kernel) {
+$stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $kernel) {
 
     $di = $kernel->getDependencyInjector();
 
     $timer = $loop->addTimer(4, function() { exit(0); });
 
-    $stomp->subscribeWithAck(INSTANCE_ID.'.sb.sched', 'client-individual', function (Frame $frame, Stomp\AckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
+    $stomp->subscribeWithAck(INSTANCE_ID.'.sb.sched', IClient::ACK_MODE_CLIENT_INDIVIDUAL, function (Frame $frame, Stomp\AckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
         $loop->cancelTimer($timer);
         $timer = $loop->addTimer(4, function() { exit(0); });
 

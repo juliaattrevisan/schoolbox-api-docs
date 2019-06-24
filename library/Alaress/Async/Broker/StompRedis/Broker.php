@@ -28,8 +28,6 @@ use React\Stomp\Protocol\Frame;
  */
 abstract class Broker implements IBroker
 {
-    const ACK_MODE = 'client-individual';
-
     /** @var IClient */
     private $stomp;
 
@@ -74,7 +72,7 @@ abstract class Broker implements IBroker
         }
 
         try {
-            $this->stomp->subscribeWithAck($this->queue, self::ACK_MODE, function (Frame $frame, AckResolver $resolver) use ($consumer) {
+            $this->stomp->subscribeWithAck($this->queue, IClient::ACK_MODE_CLIENT_INDIVIDUAL, function (Frame $frame, AckResolver $resolver) use ($consumer) {
 
                 $resolve = new Resolver($resolver);
 
