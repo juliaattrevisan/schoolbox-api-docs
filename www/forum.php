@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -40,7 +41,7 @@ if (!$forumHandler->hasForum($category->getId())) {
 }
 
 // check permissions
-if (($perm = $groupHandler->getPermission($category->getId())) < READ_ACCESS) {
+if (($perm = $groupHandler->getPermission($category->getId())) < UserAccess::ACCESS_READ) {
     error(19);
 }
 //
