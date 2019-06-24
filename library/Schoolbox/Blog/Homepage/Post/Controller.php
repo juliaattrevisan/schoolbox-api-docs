@@ -277,7 +277,7 @@ class Controller extends Base
                     'record'            => $blog,
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone($this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                 ),
             )
@@ -300,7 +300,7 @@ class Controller extends Base
                     'folder'            => $folder,
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone(),
                 ),
             )
@@ -369,7 +369,7 @@ class Controller extends Base
                     'dateSelectorArray' => $dateSelectorArray,
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone(),
                 ),
             )
