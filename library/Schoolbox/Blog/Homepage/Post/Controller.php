@@ -20,6 +20,7 @@ use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -275,7 +276,7 @@ class Controller extends Base
                     'session'           => $_SESSION,
                     'record'            => $blog,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone($this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                 ),
@@ -298,7 +299,7 @@ class Controller extends Base
                     'session'           => $_SESSION,
                     'folder'            => $folder,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone(),
                 ),
@@ -367,7 +368,7 @@ class Controller extends Base
                     'blogComments'      => $blogComments,
                     'dateSelectorArray' => $dateSelectorArray,
                     'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
                     'FULL_ACCESS'       => FULL_ACCESS,
                     'attachzone'        => $this->getAttachZone(),
                 ),
