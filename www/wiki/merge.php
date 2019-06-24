@@ -24,7 +24,7 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	// check permission
-	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS)
+	if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ)
 		error(19);
 
 	// check locked

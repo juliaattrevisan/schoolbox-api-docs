@@ -36,7 +36,7 @@ if ($this->arg[0] == 'revision') {
     }
 
     // check permission
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
@@ -135,12 +135,12 @@ if ($this->arg[0] == 'revision') {
     }
 
     $this->setVar('modify_link_block', '');
-    if (($permission >= READ_ACCESS && !$locked) || $permission >= WRITE_ACCESS) {
+    if (($permission >= UserAccess::ACCESS_READ && !$locked) || $permission >= WRITE_ACCESS) {
         $this->parse('modify_link_block', 'modify_link');
     }
 
     $this->setVar('export_link_block', '');
-    if ($permission >= READ_ACCESS) {
+    if ($permission >= UserAccess::ACCESS_READ) {
         $this->parse('export_link_block', 'export_link');
     }
 
@@ -232,7 +232,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         }
 
         // check permission
-        if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+        if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
             error(19);
         }
 
@@ -331,12 +331,12 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         }
 
         $this->setVar('modify_link_block', '');
-        if (($permission >= READ_ACCESS && !$locked) || $permission >= WRITE_ACCESS) {
+        if (($permission >= UserAccess::ACCESS_READ && !$locked) || $permission >= WRITE_ACCESS) {
             $this->parse('modify_link_block', 'modify_link');
         }
 
         $this->setVar('export_link_block', '');
-        if ($permission >= READ_ACCESS) {
+        if ($permission >= UserAccess::ACCESS_READ) {
             $this->parse('export_link_block', 'export_link');
         }
 

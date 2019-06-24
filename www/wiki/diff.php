@@ -31,7 +31,7 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	// check permission
-	if (($permission = $group->getPermission($from['categoryID'])) < READ_ACCESS)
+	if (($permission = $group->getPermission($from['categoryID'])) < UserAccess::ACCESS_READ)
 		error(19);
 
 	$this->setTitle('Wiki Diff');

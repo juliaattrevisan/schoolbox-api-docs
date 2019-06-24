@@ -117,7 +117,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     }
 
     // check category permission
-    if (($permission = $groupHandler->getPermission($wiki->getCategory()->getId())) < READ_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki->getCategory()->getId())) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
