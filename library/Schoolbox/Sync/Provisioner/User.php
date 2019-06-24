@@ -156,7 +156,7 @@ class User extends SchoolboxUser
              */
             foreach ($this->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
                 if (in_array($current->getServiceIdentifier(), $identifiers)) {
-                    if ($current->getAccesslevel() < FULL_ACCESS) {
+                    if ($current->getAccesslevel() < UserAccess::ACCESS_FULL) {
                         $current->setAccessLevel($level);
                     }
 

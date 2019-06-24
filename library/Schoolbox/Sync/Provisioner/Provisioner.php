@@ -217,10 +217,10 @@ class Provisioner
                      */
                     $preserved = new Collection();
 
-                    /* Don't blow away any FULL_ACCESS settings
+                    /* Don't blow away any UserAccess::ACCESS_FULL settings
                      */
                     foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
-                        if ($current->getAccessLevel() == FULL_ACCESS) {
+                        if ($current->getAccessLevel() == UserAccess::ACCESS_FULL) {
                             $preserved->add($current);
 
                             $this->logger->debug("{$internalUser->getFullname()} is staying at access level {$current->getAccessLevel()} for {$current->getServiceIdentifier()}", $commonContext);
