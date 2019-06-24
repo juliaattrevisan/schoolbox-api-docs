@@ -115,7 +115,7 @@ class Authenticator
      */
     public function canDelete()
     {
-        if ($this->getPermission() >= WRITE_ACCESS) {
+        if ($this->getPermission() >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
@@ -136,7 +136,7 @@ class Authenticator
      */
     public function canCollaborate()
     {
-        if ($this->getPermission() >= WRITE_ACCESS) {
+        if ($this->getPermission() >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
@@ -157,7 +157,7 @@ class Authenticator
      */
     public function canAddComment()
     {
-        if ($this->getPermission() >= WRITE_ACCESS) {
+        if ($this->getPermission() >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
@@ -182,7 +182,7 @@ class Authenticator
      */
     public function canComment()
     {
-        if ($this->getPermission() >= WRITE_ACCESS) {
+        if ($this->getPermission() >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
