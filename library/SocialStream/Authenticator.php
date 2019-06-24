@@ -12,6 +12,7 @@ namespace SocialStream;
 
 use Component_Instance;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Class Authenticator
@@ -25,21 +26,21 @@ class Authenticator
      *
      * @var null
      */
-    private $newPost = null;
+    private $newPost;
 
     /**
      * A component instance
      *
      * @var Component_Instance
      */
-    private $instance = null;
+    private $instance;
 
     /**
      * A user instance
      *
      * @var \Schoolbox\User
      */
-    private $currentUser = null;
+    private $currentUser;
 
     /**
      * Default permission level
@@ -76,7 +77,7 @@ class Authenticator
         } elseif (!$userId) {
             // Don't fall back to getPermission() call with session user,
             // instead deny access if there's no actual user
-            $permission = DENY_ACCESS;
+            $permission = UserAccess::ACCESS_DENY;
         } else {
             $accessor = Access::getInstance();
             //If we are dealing with a post, check its permission, else check permission of component for rendering purposes
