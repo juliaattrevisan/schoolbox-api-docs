@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use \PDO;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * @method GenericCollection|Campus[] findAll($options = array())
@@ -42,7 +43,7 @@ class CampusMapper extends Mapper {
 	 */
 	public function getAvailableCampusesForUser(User $user, $accessType = 1)
     {
-		$calendarService = CALENDAR_SERVICE;
+		$calendarService = UserAccess::SERVICE_CALENDAR;
 
 		/* Superusers get access to all campuses
 		 */
