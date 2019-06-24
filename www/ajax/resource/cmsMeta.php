@@ -8,6 +8,9 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Permission\Access\UserAccess;
+
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -180,7 +183,7 @@ function getMultiFileMeta($folderId) {
 	$groupHandler = new Group();
 	$access = $groupHandler->getPermission($folderId);
 
-	if($access <= READ_ACCESS) {
+	if($access <= UserAccess::ACCESS_READ) {
 		return array(
 			'actions' => array()
 		);
