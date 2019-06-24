@@ -18,7 +18,7 @@ if (isset($_GET['wikiID'])) {
         error(2);
     }
 
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
