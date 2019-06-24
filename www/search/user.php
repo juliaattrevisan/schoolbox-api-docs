@@ -6,6 +6,7 @@ use Alaress\Mail\AbstractMailer;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -200,7 +201,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
     }
 
     // Load the list of groups, and their owner.
-    $groups = $groupHandler->involvedInCategoryList($user['uid'], false, READ_ACCESS, true);
+    $groups = $groupHandler->involvedInCategoryList($user['uid'], false, UserAccess::ACCESS_READ, true);
     foreach ($groups as &$group) {
         $group['perms'] = $groupHandler->getPermission($group['id']);
 
