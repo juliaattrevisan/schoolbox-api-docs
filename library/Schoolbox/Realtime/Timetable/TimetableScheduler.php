@@ -18,7 +18,6 @@ use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stomp\Client;
 use RuntimeException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
@@ -42,7 +41,6 @@ class TimetableScheduler extends CronScheduler
     /**
      * @param LoopInterface $loop
      * @param DispatchStrategyInterface $dispatchStrategy
-     * @param Client $client
      * @param LoggerInterface $log
      * @param Collection|Campus[] $campuses
      * @param TriggerFactory $factory
@@ -52,7 +50,6 @@ class TimetableScheduler extends CronScheduler
     public function __construct(
         LoopInterface $loop,
         DispatchStrategyInterface $dispatchStrategy,
-        Client $client,
         LoggerInterface $log,
         Collection $campuses,
         TriggerFactory $factory,
