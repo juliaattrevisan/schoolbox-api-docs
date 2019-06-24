@@ -9,8 +9,6 @@
  * @version     SVN: $Id$
  */
 
-define('GROUP_TYPE_MODERATED',  2);
-
 define('DEBUG_SQL_ENABLED', false);
 define('MOBILE_SESSION_TIMEOUT', 31536000); // hr * day * year = 3600 * 24 * 365 = 31,536,000
 
