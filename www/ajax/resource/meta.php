@@ -186,7 +186,7 @@ function getFolderMeta($folderId)
     // actions: if write, some; if full, all.
     $actions = array();
     switch ($userAccess) {
-        case FULL_ACCESS:
+        case UserAccess::ACCESS_FULL:
             $actions[] = 'multi';
             if ($groupHandler->isSuperuser()) {
                 $actions[] = 'zip';
@@ -265,7 +265,7 @@ function getSingleFileMeta($folderId, $fileId)
     // write access provides actions
     $actions = array();
     switch ($userAccess) {
-        case FULL_ACCESS:
+        case UserAccess::ACCESS_FULL:
         case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
@@ -325,7 +325,7 @@ function getSingleLinkMeta($folderId, $linkId)
     $actions = array();
 
     switch ($userAccess) {
-        case FULL_ACCESS:
+        case UserAccess::ACCESS_FULL:
         case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
