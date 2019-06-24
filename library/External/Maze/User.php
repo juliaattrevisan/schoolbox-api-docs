@@ -629,7 +629,7 @@ class External_Maze_User implements External_UserInterface
 					ST.FIRST_NAME,
 					ST.SURNAME,
 					KGC.ROLL_GROUP AS ClassCode,
-					'' AS ClassNumber,
+					NULL AS ClassNumber,
 					'' AS classType,
 					'' AS ClassCampus,
 					KGC.DESCRIPTION AS name
@@ -671,7 +671,7 @@ class External_Maze_User implements External_UserInterface
             $query = "
                 SELECT
                     KGC.ROLL_GROUP AS ClassCode,
-                    '' AS ClassNumber,
+                    NULL AS ClassNumber,
                     '' AS classType,
                     '' AS ClassCampus,
                     KGC.DESCRIPTION AS name
@@ -728,7 +728,7 @@ class External_Maze_User implements External_UserInterface
                 $match = preg_match('#^NOT|^FACUL|^MEET|^TSHOP|^FRONT|^STAFF|\d?A/F|^QUAD#', $currentSubject['ClassCode']);
 
                 if (!$match) {
-                    if (strlen($currentSubject['ClassNumber'])) {
+                    if ($currentSubject['ClassNumber'] !== null) {
                         $classCode = $this->getHelper()->generateClassCode($currentSubject['ClassCode'], $currentSubject['ClassNumber']);
                     } else {
                         $classCode = $currentSubject['ClassCode'];
