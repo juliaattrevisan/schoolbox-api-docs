@@ -34,7 +34,7 @@ $folderId = $_POST['folderId'];
 // check 2: user logged in an has at minimum read access
 $groupHandler = new Group();
 $access = $groupHandler->getPermission($folderId);
-if ($access < READ_ACCESS) {
+if ($access < UserAccess::ACCESS_READ) {
     sendError('User does not have access to this folder');
 }
 
@@ -147,7 +147,7 @@ function getFolderMeta($folderId)
             } elseif ($groupHandler->canSubscribe($folderId)) {
                 $joinable = 1; // can join
             }
-        } elseif ($accessType >= READ_ACCESS) {
+        } elseif ($accessType >= UserAccess::ACCESS_READ) {
             $joinable = 3; //member of group
         }
 
@@ -204,7 +204,7 @@ function getFolderMeta($folderId)
 
 
         // no break
-        case READ_ACCESS:
+        case UserAccess::ACCESS_READ:
         default:
             // no actions available
             break;
@@ -269,7 +269,7 @@ function getSingleFileMeta($folderId, $fileId)
         case WRITE_ACCESS:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
-        case READ_ACCESS:
+        case UserAccess::ACCESS_READ:
             $actions = array_merge($actions, array('open', 'download', 'properties'));
         // no break
         default:
@@ -329,7 +329,7 @@ function getSingleLinkMeta($folderId, $linkId)
         case WRITE_ACCESS:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
-        case READ_ACCESS:
+        case UserAccess::ACCESS_READ:
             $actions = array_merge($actions, array('open', 'properties'));
         // no break
         default:
@@ -366,7 +366,7 @@ function getMultiFileMeta($folderId)
     $groupHandler = new Group();
     $access = $groupHandler->getPermission($folderId);
 
-    if ($access <= READ_ACCESS) {
+    if ($access <= UserAccess::ACCESS_READ) {
         return array(
             'actions' => array()
         );
