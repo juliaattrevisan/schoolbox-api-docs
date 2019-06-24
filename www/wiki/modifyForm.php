@@ -111,7 +111,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
 
         /* Allow Create is off
          */
-        if (((int)$value === 0) && ($groupHandler->getPermission($wiki->getCategory()->getId()) < WRITE_ACCESS)) {
+        if (((int)$value === 0) && ($groupHandler->getPermission($wiki->getCategory()->getId()) < UserAccess::ACCESS_WRITE)) {
             error(19);
         }
     }
@@ -122,7 +122,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     }
 
     // check locked-ness
-    if ($wiki->getLocked() && $permission < WRITE_ACCESS) {
+    if ($wiki->getLocked() && $permission < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -156,7 +156,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     $wiki = $wikiHandler->getByID($_GET['wikiID']);
 
     // Check permission
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -168,7 +168,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     $wiki = $wikiHandler->getByID($_GET['delete']);
 
     // Check permission
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < WRITE_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -186,7 +186,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     }
 
     // Check permissions
-    if ($groupHandler->getPermission($wiki['categoryID']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($wiki['categoryID']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 

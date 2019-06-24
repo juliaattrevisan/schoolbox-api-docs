@@ -28,7 +28,7 @@ if (is_numeric($this->arg[0])) {
 		error(19);
 
 	// check locked
-	if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS)
+	if ($wiki['locked'] == 'true' && $permission < UserAccess::ACCESS_WRITE)
 		error(19);
 
     $previousRevision = $wikiHandler->getLatestRevision($wiki['wikiID']);
@@ -67,7 +67,7 @@ if (is_numeric($this->arg[0])) {
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
 
 	// check permission
-	if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)
+	if ($groupHandler->getPermission($this->arg[1]) < UserAccess::ACCESS_WRITE)
 		error(19);
 
     try{
