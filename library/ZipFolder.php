@@ -46,7 +46,7 @@ class ZipFolder
     {
         return $this->fileMapper->findForFolders(
             array($folder),
-            array('getHidden' => ($permission >= WRITE_ACCESS))
+            array('getHidden' => ($permission >= UserAccess::ACCESS_WRITE))
         );
     }
 
@@ -219,7 +219,7 @@ class ZipFolder
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|WRITE_ACCESS|FULL_ACCESS
+     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|FULL_ACCESS
      */
     protected function getPermission($folder_id)
     {
