@@ -63,6 +63,10 @@ class Client implements IClient
      */
     public function connect(): PromiseInterface
     {
-        return $this->client->connect();
+        return $this->client->connect()->then(
+            function() {
+                return $this;
+            }
+        );
     }
 }

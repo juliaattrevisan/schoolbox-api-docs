@@ -34,6 +34,8 @@ interface IClient
      *
      * @return PromiseInterface Resolves when the queue is connected to,
      *                          rejects if it cannot connect.
+     *                          The resolve callback will take this object as
+     *                          its only parameter.
      */
     public function connect(): PromiseInterface;
 }
