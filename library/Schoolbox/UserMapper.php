@@ -281,10 +281,10 @@ class UserMapper extends Mapper
                 {$this->getJoinColumnString('portrait.allowedFileExtension', 'afe')}
             FROM `user`
             LEFT JOIN superusers su ON su.id = user.id
-            LEFT JOIN {$this->getJoinSql('role', '', 'g')}
+            JOIN {$this->getJoinSql('role', '', 'g', true)}
             LEFT JOIN {$this->getJoinSql('userCampus', '', 'c')}
             LEFT JOIN {$this->getJoinSql('user_link', '', 'lu')}
-            LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur')}
+            LEFT JOIN {$this->getJoinSql('role', 'lu', 'lur', true)}
             LEFT JOIN {$this->getJoinSql('schoolHouse', '', 'h')}
             LEFT JOIN {$this->getJoinSql('portrait', '', 'portrait')}
             LEFT JOIN {$this->getJoinSql('portrait.allowedFileExtension', 'portrait', 'afe', true)}
