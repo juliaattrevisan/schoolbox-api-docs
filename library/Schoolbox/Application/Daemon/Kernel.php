@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Application\Daemon;
 
+use Alaress\Async\Stomp\ReactStompAdapter;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -21,8 +22,6 @@ use React\EventLoop\LoopInterface;
 use RuntimeException;
 use React\Stomp;
 use Schoolbox\Application\CliKernelAbstract;
-use Schoolbox\IConfigLoader;
-use Stomp as StompPhp;
 
 class Kernel extends CliKernelAbstract
 {
@@ -364,7 +363,8 @@ EOL;
         $di->set('stomp', $di->lazy(function () use ($di) {
             $conf = $di->get('config');
 
-            return $di->get('stomp.factory')->createClient(
+            /** @var Stomp\Client $client */
+            $client = $di->get('stomp.factory')->createClient(
                 [
                     'host'     => $conf->get('amqp_host'),
                     'port'     => $conf->get('amqp_stomp_port'),
@@ -373,17 +373,19 @@ EOL;
                     'passcode' => $conf->get('amqp_pass'),
                 ]
             );
+
+            return new ReactStompAdapter($client);
         }));
 
-        $di->set('stomp.new', $di->lazy(function () use ($di) {
-            /** @var IConfigLoader $conf */
-            $conf = $di->get('config');
-            $url  = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
-            $client = new StompPhp\Client($url);
-            $client->setLogin($conf->get('amqp_user'), $conf->get('amqp_pass'));
-            $client->setVhostname($conf->get('amqp_vhost'));
-            return $client;
-        }));
+//        $di->set('stomp.new', $di->lazy(function () use ($di) {
+//            /** @var IConfigLoader $conf */
+//            $conf = $di->get('config');
+//            $url  = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
+//            $client = new StompPhp\Client($url);
+//            $client->setLogin($conf->get('amqp_user'), $conf->get('amqp_pass'));
+//            $client->setVhostname($conf->get('amqp_vhost'));
+//            return $client;
+//        }));
 
         $di->values['logger'] = $this->logger();
     }
