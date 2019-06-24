@@ -141,7 +141,7 @@ class Authenticator
         }
 
         if ($this->findConfigValue('collaborate')) {
-            if ($this->getPermission() >= READ_ACCESS) {
+            if ($this->getPermission() >= UserAccess::ACCESS_READ) {
                 return true;
             }
         }
@@ -162,7 +162,7 @@ class Authenticator
         }
 
         if ($this->findConfigValue('commentsAllowed')) {
-            if ($this->getPermission() >= READ_ACCESS) {
+            if ($this->getPermission() >= UserAccess::ACCESS_READ) {
                 if ($this->getNewPost()->getRootId() > 0) {
                     if ($this->getNewPost()->getParentId() > 0) {
                         return true;
@@ -187,7 +187,7 @@ class Authenticator
         }
 
         if ($this->findConfigValue('commentsAllowed')) {
-            if ($this->getPermission() >= READ_ACCESS) {
+            if ($this->getPermission() >= UserAccess::ACCESS_READ) {
                 return true;
             }
         }
