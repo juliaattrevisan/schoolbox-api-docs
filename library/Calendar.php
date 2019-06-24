@@ -376,7 +376,7 @@ class Calendar extends DeprecatedModel
 
         //give people with userAccess to moderate Calendar Access to view all Camups Posts
         if (is_array($_SESSION['campus'])) {
-            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND event_group.group_id = {$_SESSION['gid']}";
@@ -527,7 +527,7 @@ class Calendar extends DeprecatedModel
          * an admin.
          */
         if ($user->getCampusCollection()->count()) {
-            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND event_group.group_id = {$user->getRole()->getId()}";
@@ -846,7 +846,7 @@ class Calendar extends DeprecatedModel
     function create($event)
     {
 
-        if ($this->getPerm($event) < WRITE_ACCESS) {
+        if ($this->getPerm($event) < UserAccess::ACCESS_WRITE) {
             error(35);
         }
 
@@ -870,12 +870,12 @@ class Calendar extends DeprecatedModel
         $cleanEvent = $this->getByID($event['id']);
 
         /* Check perms on existing event */
-        if ($this->getPerm($event['id']) < WRITE_ACCESS) {
+        if ($this->getPerm($event['id']) < UserAccess::ACCESS_WRITE) {
             error(34);
         }
 
         /* Check perms on what we want the event to become */
-        if ($this->getPerm($event) < WRITE_ACCESS) {
+        if ($this->getPerm($event) < UserAccess::ACCESS_WRITE) {
             error(34);
         }
 
@@ -904,7 +904,7 @@ class Calendar extends DeprecatedModel
     {
         $event = $this->getByID($eventID);
 
-        if ($this->getPerm($eventID) < WRITE_ACCESS) {
+        if ($this->getPerm($eventID) < UserAccess::ACCESS_WRITE) {
             error(34);
         }
 
