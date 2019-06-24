@@ -281,7 +281,7 @@ class Group extends DeprecatedModel
         //get the owner(s) of the group
         $query = "SELECT title, firstname, lastname, uid, alt_email, local_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = " . FULL_ACCESS;
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = " . UserAccess::ACCESS_FULL;
         return $this->db->getAll($query);
     }
 
@@ -319,7 +319,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . UserAccess::ACCESS_DENY . " AND user.deleted_at IS NULL
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . UserAccess::ACCESS_FULL . " AND type > " . UserAccess::ACCESS_DENY . " AND user.deleted_at IS NULL
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
@@ -481,8 +481,8 @@ class Group extends DeprecatedModel
 
         // if superuser just return highest permission type
         if ($user->isSuperuser()) {
-            $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
-            return FULL_ACCESS;
+            $this->cache[$this->_service][$relationID][$userID] = UserAccess::ACCESS_FULL;
+            return UserAccess::ACCESS_FULL;
         }
 
         $serviceIdFilter = '';
