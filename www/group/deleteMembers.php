@@ -17,7 +17,7 @@ $uaMapper = UserAccessMapper::getInstance();
 
 // Check access
 
-if ($groupHandler->getPermission($categoryId) < FULL_ACCESS) {
+if ($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
     error(19);
 }
 
