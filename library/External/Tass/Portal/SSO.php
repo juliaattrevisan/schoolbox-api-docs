@@ -20,6 +20,7 @@ class SSO
     public const SSO_STRATEGY_V1_ONLY    = 1;
     public const SSO_STRATEGY_V2_ONLY    = 2;
     public const SSO_STRATEGY_V2_THEN_V1 = 3;
+    public const SSO_STRATEGY_V3_SAML    = 4;
 
     // If not configured in db, what should the default strategy be?
     public const SSO_STRATEGY_DEFAULT    = self::SSO_STRATEGY_V2_THEN_V1;
@@ -74,9 +75,10 @@ class SSO
     public static function getSsoStrategies(): array
     {
         return [
-            self::SSO_STRATEGY_V2_THEN_V1,
-            self::SSO_STRATEGY_V2_ONLY,
             self::SSO_STRATEGY_V1_ONLY,
+            self::SSO_STRATEGY_V2_ONLY,
+            self::SSO_STRATEGY_V2_THEN_V1,
+            self::SSO_STRATEGY_V3_SAML,
         ];
     }
 
