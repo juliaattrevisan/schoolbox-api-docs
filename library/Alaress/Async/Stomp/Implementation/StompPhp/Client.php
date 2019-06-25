@@ -10,11 +10,11 @@ namespace Alaress\Async\Stomp\Implementation\StompPhp;
 
 use Alaress\Async\Stomp\IClient;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Stomp\Exception\StompException;
 use Stomp\StatefulStomp;
+use Stomp\Transport\Frame as BaseFrame;
 
 /**
  * Adapter for the stomp-php/stomp-php Stomp client.
@@ -34,15 +34,17 @@ class Client implements IClient
 
 
     /**
-     * @var TimerInterface
-     */
-    private $timer;
-
-
-    /**
      * @var callable[]
      */
     private $callbacks = [];
+
+
+    /**
+     * Is this client actually reading frames?
+     *
+     * @var bool
+     */
+    private $readingFrames = false;
 
 
     /**
@@ -55,23 +57,6 @@ class Client implements IClient
     {
         $this->client = $client;
         $this->loop   = $loop;
-        // Should there instead be an observer for frames?
-        $this->timer  = $this->loop->addPeriodicTimer(
-            1,
-            function() {
-                while (true) {
-                    $frame = $this->client->read();
-                    if ($frame === false) {
-                        break;
-                    }
-
-                    // Check each frame against the subscription ID?
-                    foreach ($this->callbacks as $subscriptionId => $callback) {
-                        $callback(new Frame($frame), new AckResolver($this->client, $frame));
-                    }
-                }
-            }
-        );
     }
 
 
@@ -80,7 +65,7 @@ class Client implements IClient
      */
     public function __destruct()
     {
-        $this->loop->cancelTimer($this->timer);
+        $this->stopReadingFrames();
     }
 
 
@@ -90,6 +75,7 @@ class Client implements IClient
     public function subscribeWithAck(string $destination, string $ackMode, callable $callback, array $headers = [])
     {
         $subscriptionId = $this->client->subscribe($destination, null, $ackMode, $headers);
+        $this->startReadingFrames();
 
         // TODO figure out what to do with $callback
         // react/stomp uses an input stream, which I think asynchronously
@@ -118,5 +104,61 @@ class Client implements IClient
         }
 
         return $deferred->promise();
+    }
+
+
+    /**
+     * Loop event for reading frames.
+     */
+    private function readNextFrame(): void
+    {
+        if (!$this->readingFrames) {
+            return;
+        }
+
+        // Batch a set of frames together, and process them all at once?
+        $frame = $this->client->read();
+
+        // Run this again next tick
+        $this->loop->futureTick(function () {
+            $this->readNextFrame();
+        });
+
+        // No frame?
+        if (!$frame instanceof BaseFrame) {
+            return;
+        }
+
+        $subscriptionId = $frame['subscription'];
+        $resolver       = new AckResolver($this->client, $frame);
+        if (isset($this->callbacks[$subscriptionId])) {
+            $this->callbacks[$subscriptionId](new Frame($frame), $resolver);
+        }
+
+        // Did nothing accept the frame? Nack the message?
+        // (Maybe doesn't matter because there's only one subscriber)
+    }
+
+
+    /**
+     * Start reading frames from the client.
+     */
+    private function startReadingFrames(): void
+    {
+        if (!$this->readingFrames) {
+            $this->readingFrames = true;
+            $this->loop->nextTick(function () {
+                $this->readNextFrame();
+            });
+        }
+    }
+
+
+    /**
+     * Stop reading frames from the client.
+     */
+    private function stopReadingFrames(): void
+    {
+        $this->readingFrames = false;
     }
 }
