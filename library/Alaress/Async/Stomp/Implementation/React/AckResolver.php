@@ -12,7 +12,8 @@ use Alaress\Async\Stomp\IAckResolver;
 use React\Stomp\AckResolver as BaseAckResolver;
 
 /**
- * Class AckResolver
+ * Adapter for the acknowledgement resolver for frames retrieved via the STOMP
+ * protocol, when accessed via the React\Stomp library.
  */
 class AckResolver implements IAckResolver
 {

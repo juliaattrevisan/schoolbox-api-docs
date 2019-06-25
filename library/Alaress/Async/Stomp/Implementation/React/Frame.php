@@ -12,7 +12,8 @@ use Alaress\Async\Stomp\IFrame;
 use React\Stomp\Protocol\Frame as BaseFrame;
 
 /**
- * Class Frame
+ * Adapter for frames that are retrieved via the STOMP protocol, when accessed
+ * via the React\Stomp library.
  */
 class Frame implements IFrame
 {
