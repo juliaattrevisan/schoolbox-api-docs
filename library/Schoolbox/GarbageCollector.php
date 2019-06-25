@@ -7,7 +7,12 @@ declare(strict_types=1);
 
 namespace Schoolbox;
 
-class GarbageCollector
-{
+use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
+use Schoolbox\Resource\Storage\GarbageCollector\SoftLink;
 
+class GarbageCollector extends SoftLink implements IGarbageCollector
+{
+    protected $hashColumn = 'portrait_hash';
+
+    protected $setMethods = ['setPortrait'];
 }

@@ -57,12 +57,14 @@ class GarbageCollector implements IGarbageCollector
             // Socialstream
             new \SocialStream\GarbageCollector(\SocialStream\PostMapper::getInstance()),
 
-
             // Assessments
             // Submission box file
             new \Schoolbox\Assessment\Component\SubmissionBox\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance()),
             // Submission return file
             new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper::getInstance()),
+
+            // User
+            new \Schoolbox\GarbageCollector(\Schoolbox\UserMapper::getInstance()),
 
             // Video Queue
             new \Schoolbox\Video\GarbageCollector(\Schoolbox\Video\QueueMapper::getInstance()),
