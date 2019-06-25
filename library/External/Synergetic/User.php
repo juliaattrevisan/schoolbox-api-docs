@@ -770,6 +770,7 @@ class External_Synergetic_User implements External_UserInterface
         $statement = $this->getConnector()->executeQuery($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
         $contacts = $this->clearInvalidValues($statement->fetchAll());
         $contactIdList = [];
+        $contactReturn = [];
         //Dedupe contacts when mother and father are both contacts
         foreach($contacts as $contact) {
             if(!($contactIdList[$contact['StudentContactID']] || $contactIdList[$contact['StudentContactSpouseID']])) {
