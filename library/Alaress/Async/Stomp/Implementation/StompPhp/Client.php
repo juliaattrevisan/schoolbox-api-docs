@@ -55,6 +55,7 @@ class Client implements IClient
     {
         $this->client = $client;
         $this->loop   = $loop;
+        // Should there instead be an observer for frames?
         $this->timer  = $this->loop->addPeriodicTimer(
             1,
             function() {
