@@ -31,6 +31,12 @@ class AckResolver implements IAckResolver
 
 
     /**
+     * @var bool
+     */
+    private $isAckd;
+
+
+    /**
      * Constructor
      *
      * @param BaseClient $client
@@ -58,5 +64,16 @@ class AckResolver implements IAckResolver
     public function nack(array $headers = []): void
     {
         $this->client->nack($this->frame);
+    }
+
+
+    /**
+     * Has the frame been acknowledged?
+     *
+     * @return bool
+     */
+    public function isAcknowledged(): bool
+    {
+        return $this->isAckd;
     }
 }
