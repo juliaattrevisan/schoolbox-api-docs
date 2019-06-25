@@ -9,7 +9,8 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Async\Stomp\Implementation\React\Client;
+use Alaress\Async\Stomp\Implementation\React;
+use Alaress\Async\Stomp\Implementation\StompPhp;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -22,6 +23,9 @@ use React\EventLoop\LoopInterface;
 use React\Stomp;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\IConfigLoader;
+use Stomp as StompLib;
+use Stomp\StatefulStomp;
 
 class Kernel extends CliKernelAbstract
 {
@@ -374,18 +378,18 @@ EOL;
                 ]
             );
 
-            return new Client($client);
+            return new React\Client($client);
         }));
 
-//        $di->set('stomp.new', $di->lazy(function () use ($di) {
-//            /** @var IConfigLoader $conf */
-//            $conf = $di->get('config');
-//            $url  = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
-//            $client = new StompPhp\Client($url);
-//            $client->setLogin($conf->get('amqp_user'), $conf->get('amqp_pass'));
-//            $client->setVhostname($conf->get('amqp_vhost'));
-//            return $client;
-//        }));
+        $di->set('stomp.new', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $conf */
+            $conf = $di->get('config');
+            $url  = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
+            $client = new StompLib\Client($url);
+            $client->setLogin($conf->get('amqp_user'), $conf->get('amqp_pass'));
+            $client->setVhostname($conf->get('amqp_vhost'));
+            return new StompPhp\Client(new StatefulStomp($client), $this->loop);
+        }));
 
         $di->values['logger'] = $this->logger();
     }
