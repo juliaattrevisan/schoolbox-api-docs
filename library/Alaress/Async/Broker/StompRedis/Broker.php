@@ -13,13 +13,11 @@ use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\PayloadBrokenException;
 use Alaress\Async\Broker\PayloadMissingException;
+use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IAckResolver;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Async\Stomp\IFrame;
 use Predis\ClientInterface;
-use React\Stomp\AckResolver;
-use React\Stomp\Exception\ConnectionException;
-use React\Stomp\Protocol\Frame;
 
 
 /**
@@ -64,8 +62,8 @@ abstract class Broker implements IBroker
 
     /**
      * @param IConsumer $consumer
-     * @throws \React\Stomp\Exception\ConnectionException
      * @return void
+     * @throws ConnectionException
      */
     public function registerConsumer(IConsumer $consumer)
     {
@@ -77,38 +75,36 @@ abstract class Broker implements IBroker
             $this->stomp->subscribeWithAck(
                 $this->queue,
                 IClient::ACK_MODE_CLIENT_INDIVIDUAL,
-                function (IFrame $frame, IAckResolver $resolver) use ($consumer)
-                {
+                function (IFrame $frame, IAckResolver $resolver) use ($consumer) {
+                    $resolve = new Resolver($resolver);
 
-                $resolve = new Resolver($resolver);
+                    try {
+                        [ $key, $context ] = json_decode($frame->getBody(), true);
 
-                try {
-                    [ $key, $context ] = json_decode($frame->getBody(), true);
+                    } catch (\Throwable $e) {
+                        // if the JSON decode fails, fall back to assuming frame.body == key
+                        $key     = $frame->getBody();
+                        $context = null;
+                    }
 
-                } catch (\Throwable $e) {
-                    // if the JSON decode fails, fall back to assuming frame.body == key
-                    $key     = $frame->getBody();
-                    $context = null;
-                }
+                    // payload from STOMP is a key for collecting a redis payload
+                    if (!$this->redis->exists($key)) {
+                        $consumer->onException(new PayloadMissingException($key, $resolve));
+                        return;
+                    }
 
-                // payload from STOMP is a key for collecting a redis payload
-                if (!$this->redis->exists($key)) {
-                    $consumer->onException(new PayloadMissingException($key, $resolve));
-                    return;
-                }
+                    try {
+                        $gzip    = $this->redis->get($key);
+                        $serial  = gzuncompress($gzip);
+                        $payload = unserialize($serial);
 
-                try {
-                    $gzip    = $this->redis->get($key);
-                    $serial  = gzuncompress($gzip);
-                    $payload = unserialize($serial);
+                    } catch (\Throwable $e) {
+                        $consumer->onException(new PayloadBrokenException($key, $resolve, $e->getCode(), $e));
+                        return;
+                    }
 
-                } catch (\Throwable $e) {
-                    $consumer->onException(new PayloadBrokenException($key, $resolve, $e->getCode(), $e));
-                    return;
-                }
-
-                $consumer->onMessage($payload, $resolve, $context);
-            });
+                    $consumer->onMessage($payload, $resolve, $context);
+                });
 
         } catch (\Exception $e) {
             $consumer->onException($e);

@@ -149,36 +149,39 @@ $stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $ker
 
     $timer = $loop->addTimer(4, function() { exit(0); });
 
-    $stomp->subscribeWithAck(INSTANCE_ID.'.sb.sched', IClient::ACK_MODE_CLIENT_INDIVIDUAL, function (IFrame $frame, IAckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
-        $loop->cancelTimer($timer);
-        $timer = $loop->addTimer(4, function() { exit(0); });
+    $stomp->subscribeWithAck(
+        INSTANCE_ID.'.sb.sched',
+        IClient::ACK_MODE_CLIENT_INDIVIDUAL,
+        function (IFrame $frame, IAckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
+            $loop->cancelTimer($timer);
+            $timer = $loop->addTimer(4, function() { exit(0); });
 
-        $date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
+            $date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
 
-        // do this for every message that comes in
-        $d->info("Processing message (arrived at $date)", [ 'char' => '>' ]);
+            // do this for every message that comes in
+            $d->info("Processing message (arrived at $date)", [ 'char' => '>' ]);
 
-        Database::reinitialise();
-        DeprecatedDatabase::reinitialise();
+            Database::reinitialise();
+            DeprecatedDatabase::reinitialise();
 
-        // if the interrogation says to dismiss the message, we do
-        if (interrogate($frame, $d, $di)) {
-            $d->error("Message broken");
+            // if the interrogation says to dismiss the message, we do
+            if (interrogate($frame, $d, $di)) {
+                $d->error("Message broken");
 
-            if ($perform) {
-                // split this message off onto a special queue
-                $amqpConn = new \Schoolbox\Notif\MQ\Connector();
-                $amqpConn->publish($frame->getBody(), 'deadmessage');
-                $amqpConn->closeConnection();
-                unset($amqpConn);
-                $resolver->ack();
+                if ($perform) {
+                    // split this message off onto a special queue
+                    $amqpConn = new \Schoolbox\Notif\MQ\Connector();
+                    $amqpConn->publish($frame->getBody(), 'deadmessage');
+                    $amqpConn->closeConnection();
+                    unset($amqpConn);
+                    $resolver->ack();
+                }
+
+            } else {
+                $d->notice("Message retained", [ 'char' => '+' ]);
             }
-
-        } else {
-            $d->notice("Message retained", [ 'char' => '+' ]);
         }
-
-    });
+    );
 });
 
 

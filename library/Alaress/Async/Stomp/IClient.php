@@ -36,6 +36,8 @@ interface IClient
      *                          rejects if it cannot connect.
      *                          The resolve callback will take this object as
      *                          its only parameter.
+     *                          The reject callback takes a ConnectionException
+     *                          as its only parameter.
      */
     public function connect(): PromiseInterface;
 }

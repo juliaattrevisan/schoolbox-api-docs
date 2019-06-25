@@ -9,6 +9,7 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
@@ -22,7 +23,6 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use React\Stomp\Exception\ConnectionException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;

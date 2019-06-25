@@ -8,11 +8,14 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\React;
 
+use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
+use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stomp\AckResolver as BaseAckResolver;
 use React\Stomp\Client as BaseClient;
 use React\Stomp\Protocol\Frame as BaseFrame;
+use Throwable;
 
 /**
  * Adapter for the react/stomp Stomp client.
@@ -63,10 +66,21 @@ class Client implements IClient
      */
     public function connect(): PromiseInterface
     {
-        return $this->client->connect()->then(
-            function() {
-                return $this;
+        $deferred = new Deferred();
+        $this->client->connect()->then(
+            function () use ($deferred) {
+                $deferred->resolve($this);
+            },
+            static function ($e) use ($deferred) {
+                $deferred->reject(
+                    new ConnectionException(
+                        'Could not connect to STOMP server',
+                        0,
+                        $e instanceof Throwable ? $e : null
+                    )
+                );
             }
         );
+        return $deferred->promise();
     }
 }
