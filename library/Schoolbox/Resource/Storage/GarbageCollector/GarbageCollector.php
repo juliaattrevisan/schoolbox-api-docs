@@ -28,6 +28,7 @@ class GarbageCollector implements IGarbageCollector
 
             // Pastoral
             new \Schoolbox\Pastoral\Attachment\GarbageCollector(\Schoolbox\Pastoral\Attachment\Mapper::getInstance()),
+            new \Schoolbox\Pastoral\UploadQueue\GarbageCollector(\Schoolbox\Pastoral\UploadQueue\Mapper::getInstance()),
 
             // My File
             new \Schoolbox\Resource\My\File\GarbageCollector(\Schoolbox\Resource\My\File\Mapper::getInstance()),
