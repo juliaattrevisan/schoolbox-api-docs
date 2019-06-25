@@ -9,6 +9,7 @@ namespace Schoolbox\Resource\Storage\GarbageCollector;
 
 use Eportfolio\CoverPhotoMapper;
 use Schoolbox\Blog\Homepage\Image\Mapper;
+use Schoolbox\Engagement\SocialStream;
 
 class GarbageCollector implements IGarbageCollector
 {
@@ -49,6 +50,9 @@ class GarbageCollector implements IGarbageCollector
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\GarbageCollector(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Migration\Mapper::getInstance()),
             // Must be the last to execute
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\GarbageCollector(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance()),
+
+            // Socialstream
+            new \SocialStream\GarbageCollector(\SocialStream\PostMapper::getInstance()),
 
             // Submission box file
             new \Schoolbox\Assessment\Component\SubmissionBox\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance()),

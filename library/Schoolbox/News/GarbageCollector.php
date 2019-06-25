@@ -14,5 +14,5 @@ class GarbageCollector extends SoftLink implements IGarbageCollector
 {
     protected $hashColumn = 'item_image';
 
-    protected $setMethod = 'setImage';
+    protected $setMethods = ['setImage'];
 }

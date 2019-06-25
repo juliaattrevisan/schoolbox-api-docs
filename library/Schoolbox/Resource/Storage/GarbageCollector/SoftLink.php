@@ -16,7 +16,7 @@ class SoftLink implements IGarbageCollector
 
     protected $hashColumn = 'hash';
 
-    protected $setMethod;
+    protected $setMethods = [];
 
     /**
      * Base constructor.
@@ -37,11 +37,17 @@ class SoftLink implements IGarbageCollector
      */
     public function remove(string $hash)
     {
+        if (!\count($this->setMethods)) {
+            throw new Mapper\Exception('setMethods cannot be empty...');
+        }
+
         $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash);
 
         foreach ($records as $record) {
             $obj = $this->mapper->findById($record);
-            $obj->{$this->setMethod}(null);
+            foreach ($this->setMethods as $method) {
+                $obj->{$method}(null);
+            }
             $this->mapper->save($obj);
         }
     }
