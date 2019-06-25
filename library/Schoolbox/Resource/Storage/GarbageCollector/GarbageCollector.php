@@ -51,12 +51,16 @@ class GarbageCollector implements IGarbageCollector
             // Must be the last to execute
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\GarbageCollector(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance()),
 
+            // Resource
+            new \Schoolbox\ResourceBooking\Item\GarbageCollector(\Schoolbox\ResourceBooking\Item\Mapper::getInstance()),
+
             // Socialstream
             new \SocialStream\GarbageCollector(\SocialStream\PostMapper::getInstance()),
 
+
+            // Assessments
             // Submission box file
             new \Schoolbox\Assessment\Component\SubmissionBox\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance()),
-
             // Submission return file
             new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\GarbageCollector(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper::getInstance()),
 
