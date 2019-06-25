@@ -768,7 +768,18 @@ class External_Synergetic_User implements External_UserInterface
         ";
 
         $statement = $this->getConnector()->executeQuery($query, array_merge($contactTypes['bindings'], ['externalId' => $externalUserId]));
-        return $this->clearInvalidValues($statement->fetchAll());
+        $contacts = $this->clearInvalidValues($statement->fetchAll());
+        $contactIdList = [];
+        $contactReturn = [];
+        //Dedupe contacts when mother and father are both contacts
+        foreach ($contacts as $contact) {
+            if (!($contactIdList[$contact['StudentContactID']] || $contactIdList[$contact['StudentContactSpouseID']])) {
+                $contactReturn[] = $contact;
+            }
+            $contactIdList[$contact['StudentContactID']] = true;
+            $contactIdList[$contact['StudentContactSpouseID']] = true;
+        }
+        return $contactReturn;
     }
 
 
@@ -897,7 +908,7 @@ class External_Synergetic_User implements External_UserInterface
             ORDER BY a.StudentBirthDate;
         ";
 
-        return $this->getConnector()->executeQuery(
+        $students = $this->getConnector()->executeQuery(
             $query,
             array_merge(
                 $relationships['bindings'],
@@ -905,6 +916,8 @@ class External_Synergetic_User implements External_UserInterface
                 $contactTypes['bindings']
             )
         )->fetchAll();
+
+        return array_unique($students, SORT_REGULAR);
     }
 
 
