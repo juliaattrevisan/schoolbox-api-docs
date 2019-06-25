@@ -86,6 +86,7 @@ class StudentLists
             $students[$key]['email']                = $user->getEmail();
             $students[$key]['ePortfolioIsEnabled']  = $user->getEportfolioEnable();
             $students[$key]['lastAccessTime']       = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
+            $students[$key]['timetable']            = $user->getHideTimetable();
             $students[$key]['routes']               = [
                 'pastoral'  => $this->pastoralIsEnabled ? $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]) : '',
                 'duework'   => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
