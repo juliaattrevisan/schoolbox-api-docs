@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Students;
 
+use Aura\Router\Router;
 use External_ClassInterface;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Folder;
@@ -35,6 +36,10 @@ class StudentLists
     /** @var Folder\Model */
     private $folder;
 
+    private $router;
+
+    private $pastoralIsEnabled;
+
     /**
      * StudentLists constructor.
      *
@@ -42,18 +47,24 @@ class StudentLists
      * @param UserMapper              $userMapper
      * @param Folder\Model            $folder
      * @param LogMapper               $logMapper
+     * @param Router                  $router
+     * @param bool                    $pastoralIsEnabled
      */
     public function __construct(
         External_ClassInterface $externalClass,
         UserMapper $userMapper,
         Model $folder,
-        LogMapper $logMapper
+        LogMapper $logMapper,
+        Router $router,
+        bool $pastoralIsEnabled
     ) {
 
-        $this->externalClass    = $externalClass;
-        $this->userMapper       = $userMapper;
-        $this->logMapper        = $logMapper;
-        $this->folder           = $folder;
+        $this->externalClass        = $externalClass;
+        $this->userMapper           = $userMapper;
+        $this->logMapper            = $logMapper;
+        $this->folder               = $folder;
+        $this->router               = $router;
+        $this->pastoralIsEnabled    = $pastoralIsEnabled;
     }
 
     /**
@@ -61,10 +72,12 @@ class StudentLists
      *
      * @return array
      * @throws Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getStudentLists(): array
     {
         $students = $this->externalClass->getStudents($this->folder->getCodeString());
+
         foreach ($students as $key => $student) {
             $user = $this->userMapper->findByExternalId($student['synergy_id']);
             $lastVisit = $this->logMapper->lastVisit($this->folder, $user)->first();
@@ -73,6 +86,11 @@ class StudentLists
             $students[$key]['email']                = $user->getEmail();
             $students[$key]['ePortfolioIsEnabled']  = $user->getEportfolioEnable();
             $students[$key]['lastAccessTime']       = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
+            $students[$key]['routes']               = [
+                'pastoral'  => $this->pastoralIsEnabled ? $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]) : '',
+                'duework'   => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
+                'grades'    => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
+            ];
         }
 
         return $students;
