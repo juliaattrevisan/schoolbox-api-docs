@@ -66,7 +66,7 @@ class Client implements IClient
 
                     // Check each frame against the subscription ID?
                     foreach ($this->callbacks as $subscriptionId => $callback) {
-                        $callback();
+                        $callback(new Frame($frame), new AckResolver($this->client, $frame));
                     }
                 }
             }
