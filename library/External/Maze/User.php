@@ -80,7 +80,7 @@ class External_Maze_User implements External_UserInterface
 			WHERE DFKEY = '{$externalUserId}'
 		";
 
-        return $this->getDb()->getRow($query);
+        return $this->getDb()->getRow($query) ?: [];
     }
 
     /**
@@ -343,7 +343,7 @@ class External_Maze_User implements External_UserInterface
 			WHERE STKEY = '{$externalUserId}'
 		", self::REPLACE_CHARACTERS_FROM_YEAR_LEVEL);
 
-        $student = $this->getDb()->getRow($query);
+        $student = $this->getDb()->getRow($query) ?: [];
 
         /* Assign birthday
          */
@@ -403,7 +403,7 @@ class External_Maze_User implements External_UserInterface
 			WHERE SFKEY = '{$externalUserId}'
 		";
 
-        return $this->getDb()->getRow($query);
+        return $this->getDb()->getRow($query) ?: [];
     }
 
     /**
