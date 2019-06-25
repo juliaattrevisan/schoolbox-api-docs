@@ -381,11 +381,18 @@ class Controller extends Base
      * @param Folder\Model $folder
      *
      * @throws Mapper\Exception
+     * @throws RouteNotFound
      */
     public function getStudentListByClassId(Folder\Model $folder): void
     {
-        $students = (new StudentLists($this->externalClass, $this->userMapper, $folder, $this->logMapper))
-            ->getStudentLists();
+        $students = (new StudentLists(
+            $this->externalClass,
+            $this->userMapper,
+            $folder,
+            $this->logMapper,
+            $this->getRouter(),
+            $this->getConfigLoader()->get('pastoral_enabled')
+        ))->getStudentLists();
 
         $this->getResponse()->content->set($this->buildJsonOutput($students));
     }
@@ -402,7 +409,6 @@ class Controller extends Base
                 'specialNeeds'      => $this->rosettaStone->translate('specialNeeds',true, true),
                 'replyTo'           => $this->getUser()->getEmail(),
                 'mailEnabled'       => $this->getConfigLoader()->get('mail_enable'),
-                'pastoralEnabled'   => $this->getConfigLoader()->get('pastoral_enabled'),
                 'today'             => Alaress_Date_Format::now()->getURLDate(),
                 'mailHandle'        => $this->getSession()->get('mailhandle'),
                 'emailGroups'       => $this->getClassListsEmailGroups(),
