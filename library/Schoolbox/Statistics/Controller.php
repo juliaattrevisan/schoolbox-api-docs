@@ -44,11 +44,11 @@ class Controller extends Base
     /**
      * Max number of items for each component
      */
-    const MAX_TOP_VISITORS = 5;
-    const MAX_TOP_FILES = 5;
-    const MAX_RECENT_VISITORS = 8;
-    const MAX_YET_TO_VISIT = 8;
-    const MAX_TOP_LINKS = 5;
+    private const MAX_TOP_VISITORS = 5;
+    private const MAX_TOP_FILES = 5;
+    private const MAX_RECENT_VISITORS = 8;
+    private const MAX_YET_TO_VISIT = 8;
+    private const MAX_TOP_LINKS = 5;
 
 
     /**
