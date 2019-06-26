@@ -149,7 +149,7 @@ class Client implements IClient
     private function startReadingFrames(Consumer $consumer, callable $callback): void
     {
         $this->readingFrames = true;
-        $this->loop->nextTick(function () use ($consumer, $callback) {
+        $this->loop->futureTick(function () use ($consumer, $callback) {
             $this->readNextFrame($consumer, $callback);
         });
     }
