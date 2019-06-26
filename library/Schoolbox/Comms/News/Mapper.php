@@ -398,7 +398,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        return array_map('intval',$statement->fetchAll(\PDO::FETCH_COLUMN));
+        return array_map('intval', $statement->fetchAll(\PDO::FETCH_COLUMN));
     }
 
 
