@@ -364,28 +364,31 @@ EOL;
             'loop' => $di->lazyValue('react.loop')
         ]));
 
+//        $di->set('stomp', $di->lazy(function () use ($di) {
+//            $conf = $di->get('config');
+//
+//            /** @var Stomp\Client $client */
+//            $client = $di->get('stomp.factory')->createClient(
+//                [
+//                    'host'     => $conf->get('amqp_host'),
+//                    'port'     => $conf->get('amqp_stomp_port'),
+//                    'vhost'    => $conf->get('amqp_vhost'),
+//                    'login'    => $conf->get('amqp_user'),
+//                    'passcode' => $conf->get('amqp_pass'),
+//                ]
+//            );
+//
+//            return new React\Client($client);
+//        }));
+
         $di->set('stomp', $di->lazy(function () use ($di) {
-            $conf = $di->get('config');
-
-            /** @var Stomp\Client $client */
-            $client = $di->get('stomp.factory')->createClient(
-                [
-                    'host'     => $conf->get('amqp_host'),
-                    'port'     => $conf->get('amqp_stomp_port'),
-                    'vhost'    => $conf->get('amqp_vhost'),
-                    'login'    => $conf->get('amqp_user'),
-                    'passcode' => $conf->get('amqp_pass'),
-                ]
-            );
-
-            return new React\Client($client);
-        }));
-
-        $di->set('stomp.new', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
             $url  = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
-            $client = new StompLib\Client($url);
+            $conn = new StompLib\Network\Connection($url);
+            // 500 ms read timeout
+            $conn->setReadTimeout(0, 500000);
+            $client = new StompLib\Client($conn);
             $client->setLogin($conf->get('amqp_user'), $conf->get('amqp_pass'));
             $client->setVhostname($conf->get('amqp_vhost'));
             return new StompPhp\Client(new StatefulStomp($client), $this->loop);
