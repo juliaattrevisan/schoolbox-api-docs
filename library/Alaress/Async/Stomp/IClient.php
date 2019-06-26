@@ -15,7 +15,14 @@ use React\Promise\PromiseInterface;
  */
 interface IClient
 {
-    public const ACK_MODE_AUTO              = 'auto';
+    /**
+     * Acknowledgement mode: frames are automatically acknowledged.
+     */
+    public const ACK_MODE_AUTO = 'auto';
+
+    /**
+     * Acknowledgement mode: frames must be acknowledged by the client.
+     */
     public const ACK_MODE_CLIENT_INDIVIDUAL = 'client-individual';
 
     /**
