@@ -7,9 +7,11 @@
  * @link        http://www.alaress.com.au
  */
 namespace Schoolbox;
+
+use JsonSerializable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
-class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
+class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
 {
     use ModelTrait\DeletedAtDate;
 
@@ -42,7 +44,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
     public const PARENT = 'parent';
     public const STAFF = 'staff';
 
-    const DIGEST_NEVER = '0';
+    public const DIGEST_NEVER = '0';
 
 
     /**
@@ -50,7 +52,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      *
      * @return string[]
      */
-    public static function getRoleTypes()
+    public static function getRoleTypes(): array
     {
         return [
             self::STAFF,
@@ -65,9 +67,9 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      *
      * @return bool
      */
-    public function isGuest()
+    public function isGuest(): bool
     {
-        return $this->type == self::GUEST;
+        return $this->type === self::GUEST;
     }
 
     /**
@@ -75,9 +77,9 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      *
      * @return bool
      */
-    public function isStudent()
+    public function isStudent(): bool
     {
-        return $this->type == self::STUDENT;
+        return $this->type === self::STUDENT;
     }
 
     /**
@@ -85,9 +87,9 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      *
      * @return bool
      */
-    public function isStaff()
+    public function isStaff(): bool
     {
-        return $this->type == self::STAFF;
+        return $this->type === self::STAFF;
     }
 
     /**
@@ -95,16 +97,16 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      *
      * @return bool
      */
-    public function isParent()
+    public function isParent(): bool
     {
-        return $this->type == self::PARENT;
+        return $this->type === self::PARENT;
     }
 
     /**
      * @param bool $canChangePassword
      * @return self
      */
-    public function setCanChangePassword($canChangePassword)
+    public function setCanChangePassword($canChangePassword): Role
     {
         $this->canChangePassword = $canChangePassword;
         return $this;
@@ -113,7 +115,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
     /**
      * @return bool
      */
-    public function getCanChangePassword()
+    public function getCanChangePassword(): bool
     {
         return $this->canChangePassword;
     }
@@ -130,7 +132,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      *
      * @return array
      */
-    public function findValueLabelPair()
+    public function findValueLabelPair(): array
     {
         return [
             'value' => $this->getId(),
@@ -145,7 +147,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      * @param int $id
      * @return self
      */
-    public function setId($id)
+    public function setId(int $id): Role
     {
         $this->id = $id;
         return $this;
@@ -154,7 +156,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -163,7 +165,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      * @param string $name
      * @return self
      */
-    public function setName($name)
+    public function setName(string $name): Role
     {
         $this->name = $name;
         return $this;
@@ -172,7 +174,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -181,7 +183,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      * @param string $type
      * @return self
      */
-    public function setType($type)
+    public function setType(string $type): Role
     {
         $this->type = $type;
         return $this;
@@ -190,7 +192,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
     /**
      * @return string
      */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
@@ -199,7 +201,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
      * @param  string $digestSchedule
      * @return self
      */
-    public function setDigestSchedule($digestSchedule)
+    public function setDigestSchedule(string $digestSchedule): Role
     {
         $this->digestSchedule = $digestSchedule;
         return $this;
@@ -208,16 +210,16 @@ class Role implements ValueLabelInterface, ISoftDeletable, \JsonSerializable
     /**
      * @return string
      */
-    public function getDigestSchedule()
+    public function getDigestSchedule(): string
     {
         return $this->digestSchedule;
     }
 
 
     /**
-     * @return array|mixed
+     * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id'      => $this->id,
