@@ -9,8 +9,7 @@
 use Schoolbox\Campus;
 use Schoolbox\UserMapper;
 
-
-class External_Schooledge_Timetable extends External_Humanedge_Timetable implements External_TimetableInterface
+class External_Schooledge_Timetable implements External_TimetableInterface
 {
 
     /**
