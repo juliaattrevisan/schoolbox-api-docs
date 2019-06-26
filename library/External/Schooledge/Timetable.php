@@ -168,7 +168,6 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             $result
         );
 
-        // This is all the same as HumanEdge
         $definition = [
             'desc'        => [],
             'start'       => [],
