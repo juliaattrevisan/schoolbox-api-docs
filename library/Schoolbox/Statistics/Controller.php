@@ -42,15 +42,6 @@ class Controller extends Base
 
 
     /**
-     * Graph colours for each role type
-     */
-    const STAFF_COLOUR = '#579DCF';
-    const STUDENT_COLOUR = '#E99D12';
-    const PARENT_COLOUR = '#3DB114';
-    const GUEST_COLOUR = '#762AAE';
-
-
-    /**
      * Max number of items for each component
      */
     const MAX_TOP_VISITORS = 5;
