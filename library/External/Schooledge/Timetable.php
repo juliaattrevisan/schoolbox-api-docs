@@ -1,20 +1,48 @@
 <?php
 /**
+ * Schooledge implementation of timetable.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 use Schoolbox\Campus;
+use Schoolbox\UserMapper;
 
-/**
- * Schooledge implementation of timetable.
- */
+
 class External_Schooledge_Timetable extends External_Humanedge_Timetable implements External_TimetableInterface
 {
-    // Common timetable query parts
 
-    private $classSelect = "
+    /**
+     * Timetable date type constant - this date is not in the sequence.
+     *
+     * @var int
+     */
+    private const TIMETABLE_DATE_TYPE_NON_DAY = 10000;
+
+    /**
+     * Timetable date type constant - this day is forced to a particular day in the sequence.
+     *
+     * @var int
+     */
+    private const TIMETABLE_DATE_TYPE_FIXED_DAY = 10003;
+
+    /**
+     * Timetable date type constant - the timetable restarts on this day.
+     *
+     * @var int
+     */
+    private const TIMETABLE_DATE_TYPE_RESTART_DAY = 10002;
+
+    /**
+     * Timetable date type constant - this day is in the sequence, but is skipped?
+     *
+     * @var int
+     */
+    private const TIMETABLE_DATE_TYPE_SKIP_DAY = 10001;
+
+    // Common timetable query parts
+    private $classSelect = '
         t.Name                      AS ClassCampus,
         tc.Name                     AS ClassCode,
         ts.Name                     AS ClassName,
@@ -24,8 +52,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         CAST(tpe.StartTime AS TIME) AS PeriodStart,
         CAST(tpe.EndTime   AS TIME) AS PeriodEnd,
         tpe.Name                    AS PeriodName
-    ";
-    private $baseStaffSelect = "
+    ';
+
+    private $baseStaffSelect = '
         CASE WHEN tcis.TimetableClassStaffID IS NULL
             THEN 1
             ELSE 0
@@ -34,8 +63,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         staff_base.FirstName        AS BaseStaffPreferredName,
         staff_base.LastName         AS BaseStaffSurname,
         staff_base.Title            AS BaseStaffTitle
-    ";
-    private $replacementStaffSelect = "
+    ';
+
+    private $replacementStaffSelect = '
         CASE WHEN staff_replacement.Code IS NOT NULL
             THEN 1
             ELSE 0
@@ -44,65 +74,46 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         staff_replacement.FirstName AS ReplacementStaffPreferredName,
         staff_replacement.LastName  AS ReplacementStaffSurname,
         staff_replacement.Title     AS ReplacementStaffTitle
-    ";
-    private $baseRoomSelect = "
+    ';
+
+    private $baseRoomSelect = '
         room_base.Code              AS BaseRoom
-    ";
-    private $replacementRoomSelect = "
+    ';
+
+    private $replacementRoomSelect = '
         room_replacement.Code       AS ReplacementRoom
-    ";
-    private $timetableJoin = "INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID";
-    private $baseStaffJoin = "
+    ';
+
+    private $timetableJoin = 'INNER JOIN fc.Timetable t ON ts.TimetableID = t.ID';
+
+    private $baseStaffJoin = '
         LEFT  JOIN fc.TimetableClassStaff tcs        ON tc.ID        = tcs.TimetableClassId
         LEFT  JOIN dbo.Staff              staff_base ON tcs.PersonID = staff_base.PersonID
-    ";
-    private $replacementStaffJoin = "
+    ';
+
+    private $replacementStaffJoin = '
         LEFT  JOIN fc.TimetableClassInstanceStaff tcis              ON tci.ID        = tcis.TimetableClassInstanceId
         LEFT  JOIN dbo.Staff                      staff_replacement ON tcis.PersonID = staff_replacement.PersonID
-    ";
-    private $baseRoomJoin = "
+    ';
+
+    private $baseRoomJoin = '
         LEFT  JOIN fc.TimetableClassRoom tcr       ON tc.ID            = tcr.TimetableClassId
         LEFT  JOIN fc.Room               tcrr      ON tcr.RoomID       = tcrr.ID
         LEFT  JOIN dbo.Room              room_base ON tcrr.AdminRoomID = room_base.ID
-    ";
-    private $replacementRoomJoin = "
+    ';
+
+    private $replacementRoomJoin = '
         LEFT  JOIN fc.TimetableClassInstanceRoom tcir             ON tci.ID            = tcir.TimetableClassInstanceId AND tcir.RoomSpecified = 1
         LEFT  JOIN fc.Room                       tcirr            ON tcir.RoomID       = tcirr.ID
         LEFT  JOIN dbo.Room                      room_replacement ON tcirr.AdminRoomID = room_replacement.ID
-    ";
+    ';
 
-    /**
-     * Timetable date type constant - this date is not in the sequence.
-     *
-     * @var int
-     */
-    const TIMETABLE_DATE_TYPE_NON_DAY = 10000;
-
-    /**
-     * Timetable date type constant - this day is forced to a particular day in the sequence.
-     *
-     * @var int
-     */
-    const TIMETABLE_DATE_TYPE_FIXED_DAY = 10003;
-
-    /**
-     * Timetable date type constant - the timetable restarts on this day.
-     *
-     * @var int
-     */
-    const TIMETABLE_DATE_TYPE_RESTART_DAY = 10002;
-
-    /**
-     * Timetable date type constant - this day is in the sequence, but is skipped?
-     *
-     * @var int
-     */
-    const TIMETABLE_DATE_TYPE_SKIP_DAY = 10001;
 
     /**
      * @var MSSQL
      */
     private $database;
+
 
     /**
      * Constructor
@@ -111,6 +122,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
     {
         $this->database = MSSQL::getInstance();
     }
+
 
     /**
      * @inheritdoc
@@ -178,6 +190,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return $definition;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -190,20 +203,22 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return 0;
     }
 
+
     /**
      * @inheritdoc
      */
     public function getDayName($dayNumber): string
     {
         // Kind of requires a campus, be this method doesn't have one.
-        return $this->database->getOne("
+        return $this->database->getOne('
             SELECT DISTINCT td.Name
             FROM       fc.Timetable       t
             INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
             WHERE t.Enabled = 1
             AND   td.SortOrder = :day_number
-        ", ['day_number' => $dayNumber]);
+        ', [ 'day_number' => $dayNumber]);
     }
+
 
     /**
      * @inheritdoc
@@ -235,6 +250,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         ];
     }
 
+
     /**
      * @inheritdoc
      */
@@ -259,6 +275,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         }
         return $timetable;
     }
+
 
     /**
      * @inheritdoc
@@ -296,6 +313,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return $timetable;
     }
 
+
     /**
      * @inheritdoc
      */
@@ -321,6 +339,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         }
         return $timetable;
     }
+
 
     /**
      * @inheritdoc
@@ -427,8 +446,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      *
      * @param Campus $campus
      * @return array
+     * @throws InvalidArgumentException
      */
-    protected function getTimetableDates(Campus $campus)
+    protected function getTimetableDates(Campus $campus): array
     {
         // Adapted from some C# code SchoolEdge gave us
         $quotedCampus   = $this->database->smartQuote($campus->getExtTimetableCode());
@@ -551,18 +571,21 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return $timetableDates;
     }
 
+
     /**
      * Extract date object from timestamp.
      *
-     * @param  int $timestamp
+     * @param int $timestamp
      * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
      */
-    protected function getDateObjectFromTimestamp($timestamp)
+    protected function getDateObjectFromTimestamp($timestamp): \Alaress_Date_Format
     {
         return $timestamp
             ? new Alaress_Date_Format($timestamp, Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now();
     }
+
 
     /**
      * Fetches the timetable date for a given day
@@ -570,8 +593,9 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      * @param Campus              $campus
      * @param Alaress_Date_Format $dateObject
      * @return array the timetable date, or null if it doesn't exist
+     * @throws InvalidArgumentException
      */
-    protected function getTimetableDate(Campus $campus, Alaress_Date_Format $dateObject)
+    protected function getTimetableDate(Campus $campus, Alaress_Date_Format $dateObject): array
     {
         $timetableDates = $this->getTimetableDates($campus);
         $key            = $dateObject->getDatabaseDate();
@@ -579,6 +603,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
             ? $timetableDates[$key]
             : null;
     }
+
 
     /**
      * Gets timetable definition into a form which timetable methods can use.
@@ -588,7 +613,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      * @param int    $day
      * @return array
      */
-    protected function getTimetableDefinitionForTimetable($externalUserId, Campus $campus, $day = 0)
+    protected function getTimetableDefinitionForTimetable($externalUserId, Campus $campus, $day = 0): array
     {
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $day);
         $timetable    = [];
@@ -605,11 +630,12 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return $timetable;
     }
 
+
     /**
      * @param $timetabledClass
      * @return array
      */
-    protected function getTimetableEntries($timetabledClass)
+    protected function getTimetableEntries($timetabledClass): array
     {
         $parts     = [];
         $classCode = $timetabledClass['ClassCode'];
@@ -638,6 +664,7 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return $parts;
     }
 
+
     /**
      * Helper function for getting all timetable related rows for a user.
      *
@@ -647,10 +674,10 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
      * @param string $extraWhere
      * @return array
      */
-    protected function getAllTimetableRows($externalUserId, $userId, Campus $campus, $extraWhere = '')
+    protected function getAllTimetableRows($externalUserId, $userId, Campus $campus, $extraWhere = ''): array
     {
         try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+            $user = UserMapper::getInstance()->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             return [];
         }
@@ -687,12 +714,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         return is_array($result) ? $result : [];
     }
 
+
     /**
      * @param mixed  $externalUserId
      * @param Campus $campus
      * @return string
      */
-    protected function getStaffBlockedTimetableQuery($externalUserId, Campus $campus)
+    protected function getStaffBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
         $quotedId = $this->database->smartQuote($externalUserId);
         return "
@@ -732,12 +760,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         ";
     }
 
+
     /**
      * @param mixed  $externalUserId
      * @param Campus $campus
      * @return string
      */
-    protected function getStaffNonBlockedTimetableQuery($externalUserId, Campus $campus)
+    protected function getStaffNonBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
         $quotedId = $this->database->smartQuote($externalUserId);
         return "
@@ -776,12 +805,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         ";
     }
 
+
     /**
      * @param mixed  $externalUserId
      * @param Campus $campus
      * @return string
      */
-    protected function getStudentBlockedTimetableQuery($externalUserId, Campus $campus)
+    protected function getStudentBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
         $quotedId = $this->database->smartQuote($externalUserId);
         return "
@@ -815,12 +845,13 @@ class External_Schooledge_Timetable extends External_Humanedge_Timetable impleme
         ";
     }
 
+
     /**
      * @param mixed  $externalUserId
      * @param Campus $campus
      * @return string
      */
-    protected function getStudentNonBlockedTimetableQuery($externalUserId, Campus $campus)
+    protected function getStudentNonBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
         $quotedId = $this->database->smartQuote($externalUserId);
         return "
