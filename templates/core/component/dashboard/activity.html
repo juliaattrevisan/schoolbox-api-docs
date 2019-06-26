@@ -5,52 +5,60 @@
         <div class="small-12 island">
             <h2 class="subheader">{COMPONENT_NAME}</h2>
             <section>
-                <ul class="information-list">
+                <ul class="information-list threaded">
                     <!-- BEGIN category_block -->
                     <li class="row">
-                        <div class="small-12 columns">
-                            <h3><a href="/homepage/{NEW_CATEGORY_ID}/">{NEW_CATEGORY_NAME}</a></h3>
+                        <div class="compact card small-12">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">
+                                <div class="icon-folder"></div><h3>{NEW_CATEGORY_NAME}</h3>
+                            </a>
                         </div>
                     </li>
                     <!-- BEGIN new_news -->
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <a href="/homepage/{NEW_CATEGORY_ID}/" class="icon-news">{NEW_NEWS} News Article{NEW_PLURAL_NEWS}</a>
+                    <li class="child">
+                        <div class="compact card small-12">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">
+                                <div class="icon-news"></div> {NEW_NEWS} News Article{NEW_PLURAL_NEWS}</a>
                         </div>
                     </li>
                     <!-- END new_news -->
                     <!-- BEGIN new_blog -->
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <a href="/homepage/{NEW_CATEGORY_ID}/" class="icon-news">{NEW_BLOG} Blog Post{NEW_PLURAL_BLOG}</a>
+                    <li class="child">
+                        <div class="compact card small-12">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">
+                                <div class="icon-news"></div>{NEW_BLOG} Blog Post{NEW_PLURAL_BLOG}</a>
                         </div>
                     </li>
                     <!-- END new_blog -->
                     <!-- BEGIN new_file -->
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <a href="/homepage/{NEW_CATEGORY_ID}/" class="icon-files">{NEW_FILES} File{NEW_PLURAL_FILE}</a>
+                    <li class="child">
+                        <div class="compact card small-12">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">
+                                <div class="icon-files"></div>{NEW_FILES} File{NEW_PLURAL_FILE}</a>
                         </div>
                     </li>
                     <!-- END new_file -->
                     <!-- BEGIN new_url -->
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <a href="/homepage/{NEW_CATEGORY_ID}/" class="icon-link">{NEW_URLS} Link{NEW_PLURAL_LINK}</a>
+                    <li class="child">
+                        <div class="compact card small-12">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">
+                                <div class="icon-link"></div>{NEW_URLS} Link{NEW_PLURAL_LINK}</a>
                         </div>
                     </li>
                     <!-- END new_url -->
                     <!-- BEGIN new_forum -->
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <a href="/forum/{NEW_CATEGORY_ID}" class="icon-forum">{NEW_FORUM} Forum Post{NEW_PLURAL_FORUM}</a>
+                    <li class="child">
+                        <div class="compact card small-12">
+                            <a href="/forum/{NEW_CATEGORY_ID}">
+                                <div class="icon-forum"></div>{NEW_FORUM} Forum Post{NEW_PLURAL_FORUM}</a>
                         </div>
                     </li>
                     <!-- END new_forum -->
                     <!-- BEGIN new_wiki -->
-                    <li class="row">
-                        <div class="small-12 columns">
-                            <a href="/homepage/{NEW_CATEGORY_ID}/" class="icon-wiki">{NEW_WIKI} Wiki Revision{NEW_PLURAL_WIKI}</a>
+                    <li class="child">
+                        <div class="compact card small-12">
+                            <a href="/homepage/{NEW_CATEGORY_ID}/">
+                                <div class="icon-wiki"></div>{NEW_WIKI} Wiki Revision{NEW_PLURAL_WIKI}</a>
                         </div>
                     </li>
                     <!-- END new_wiki -->
