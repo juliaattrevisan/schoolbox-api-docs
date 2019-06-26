@@ -202,8 +202,24 @@ class Controller extends Base
             }
 
             if (!isset($colours[$roleName])) {
-                $const = strtoupper($roleName) . '_COLOUR';
-                $colours[$roleName] = \constant('self::'. $const);
+                switch ($roleName) {
+                    case Role::STAFF:
+                        $colours[$roleName] = self::STAFF_COLOUR;
+                        break;
+
+                    case Role::STUDENT:
+                        $colours[$roleName] = self::STUDENT_COLOUR;
+                        break;
+
+                    case Role::PARENT:
+                        $colours[$roleName] = self::PARENT_COLOUR;
+                        break;
+
+                    case Role::GUEST:
+                    default:
+                        $colours[$roleName] = self::GUEST_COLOUR;
+                        break;
+                }
             }
         }
 
