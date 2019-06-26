@@ -48,6 +48,12 @@ class Client implements IClient
 
 
     /**
+     * The max number of frames to attempt to read per tick.
+     */
+    private const MAX_FRAMES_PER_TICK = 10;
+
+
+    /**
      * Constructor
      *
      * @param StatefulStomp $client
@@ -116,8 +122,19 @@ class Client implements IClient
             return;
         }
 
-        // Batch a set of frames together, and process them all at once?
-        $frame = $this->client->read();
+        // Batch a set of frames together, and process them all at once
+        /** @var BaseFrame[] $frames */
+        $frames = [];
+        while (count($frames) < self::MAX_FRAMES_PER_TICK) {
+            $frame = $this->client->read();
+            if (!$frame instanceof BaseFrame) {
+                break;
+            }
+            $frames[] = $frame;
+        }
+
+
+//        $frame = $this->client->read();
 
         // Run this again next tick
         $this->loop->futureTick(function () {
@@ -125,18 +142,20 @@ class Client implements IClient
         });
 
         // No frame?
-        if (!$frame instanceof BaseFrame) {
-            return;
-        }
+//        if (!$frame instanceof BaseFrame) {
+//            return;
+//        }
 
-        $subscriptionId = $frame['subscription'];
-        $resolver       = new AckResolver($this->client, $frame);
-        if (isset($this->callbacks[$subscriptionId])) {
-            $this->callbacks[$subscriptionId](new Frame($frame), $resolver);
-        }
+        foreach ($frames as $frame) {
+            $subscriptionId = $frame['subscription'];
+            $resolver       = new AckResolver($this->client, $frame);
+            if (isset($this->callbacks[$subscriptionId])) {
+                $this->callbacks[$subscriptionId](new Frame($frame), $resolver);
+            }
 
-        // Did nothing accept the frame? Nack the message?
-        // (Maybe doesn't matter because there's only one subscriber)
+            // Did nothing accept the frame? Nack the message?
+            // (Maybe doesn't matter because there's only one subscriber)
+        }
     }
 
 
