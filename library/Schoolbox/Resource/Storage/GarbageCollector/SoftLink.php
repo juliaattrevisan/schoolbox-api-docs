@@ -33,7 +33,6 @@ class SoftLink implements IGarbageCollector
      *
      * @return mixed|void
      * @throws Mapper\Exception
-     * @throws Mapper\Exception\Deleted
      */
     public function remove(string $hash)
     {
@@ -41,10 +40,10 @@ class SoftLink implements IGarbageCollector
             throw new Mapper\Exception('setMethods cannot be empty...');
         }
 
-        $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash);
+        $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
         foreach ($records as $record) {
-            $obj = $this->mapper->findById($record);
+            $obj = $this->mapper->findByIdWithFallback($record);
             foreach ($this->setMethods as $method) {
                 $obj->{$method}(null);
             }
