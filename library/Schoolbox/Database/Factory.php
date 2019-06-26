@@ -153,7 +153,6 @@ class Factory
             case 'maze':
             case 'isams':
             case 'doublefirst':
-            case 'humanedge':
             case 'schooledge':
                 $connectorExternal = $this->factory->createMssql($config->get(ConfigMapper::_EXTERNAL_MS_SQL_SERVER_DRIVER));
                 break;
