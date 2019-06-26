@@ -161,9 +161,6 @@ class Healthcheck
             case 'pcschools':
                 $this->pcschoolsTest();
                 break;
-            case 'humanedge':
-                $this->humanedgeTest();
-                break;
             case 'doublefirst':
                 $this->doublefirstTest();
                 break;
@@ -692,59 +689,6 @@ class Healthcheck
             'sbGetPortraitFile',
         ];
         $this->executeTest($procedures);
-    }
-
-
-    /**
-     * @throws PDOException If transactions not supported and we attempt to begin or rollback a transaction
-     */
-    private function humanedgeTest(): void
-    {
-        $tables = [
-            'Contact',
-            'Staff',
-            'Student',
-            'StudentContact',
-            'vw_Contact_Addresses',
-        ];
-
-        $tables = array_merge($tables, $this->customUPSTest());
-        $this->selectTest($tables);
-
-        /**
-         * Check HumanEdge A+ tables
-         *
-         * private
-         * function HumanedgeCheckAPlusTables()
-         * {
-         * $this->log .= "\nHumanedge Permission Check - SAS Tables\n";
-         * $tables = [
-         * 'tblAllocation',
-         * 'tblBlockItem',
-         * 'tblCalendarDay',
-         * 'tblDay',
-         * 'tblPeriod',
-         * 'tblPeriodTimesByDay',
-         * 'tblRoom',
-         * 'tblStudent',
-         * 'tblSubject',
-         * 'tblSubjectChoice',
-         * 'tblTeacher',
-         * ];
-         * foreach ($tables as $table) {
-         * $this->log .= "  $table : ";
-         *
-         * $result = $this->secondaryConnectors[$this->configMapper->get('external_humanedge_aplus_db_db')]->query("SELECT TOP 1 * FROM $table");
-         *
-         * if ($result) {
-         * $this->log .= "OK\n";
-         * } else {
-         * $this->log .= "\n    Failed - " . mssql_get_last_message() . "\n";
-         * }
-         * unset($db, $result);
-         * }
-         * }
-         */
     }
 
 
