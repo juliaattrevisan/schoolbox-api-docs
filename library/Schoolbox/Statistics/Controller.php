@@ -6,7 +6,6 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Statistics;
 
 use Alaress\Web\Controller\Base;
@@ -151,6 +150,7 @@ class Controller extends Base
     public function getIndex($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
         $dataSource = $this->getDataSource();
+        $colours = [];
 
         if ($startDate !== null) {
             $this->setStartDate($startDate);
@@ -191,7 +191,7 @@ class Controller extends Base
 
             if (!isset($colours[$roleName])) {
                 $const = strtoupper($roleName) . '_COLOUR';
-                $colours[$roleName] = constant('self::'. $const);
+                $colours[$roleName] = \constant('self::'. $const);
             }
         }
 
@@ -210,9 +210,12 @@ class Controller extends Base
         foreach ($data as $groupName => $series) {
             $groupData = [];
             $k = array_keys($series);
-            for ($i = 0; $i < count($series); ++$i) {
+
+            $n = \count($series);
+
+            for ($i = 0; $i < $n; ++$i) {
                 if ($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
-                    $groupData[] = array(($k[$i]) * 86400000, (int)$series[$k[$i]]);
+                    $groupData[] = array($k[$i] * 86400000, (int)$series[$k[$i]]);
                 }
             }
 
@@ -250,13 +253,13 @@ class Controller extends Base
 
         $topFileInfo = '';
         if (!empty($topFiles)) {
-            $topFileInfo = array_values($topFiles)[0];
+            $topFileInfo = array_values($topFiles->getAll())[0];
         }
 
         $topFilesMore = false;
         $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        if (count($topFilesAll) > self::MAX_TOP_FILES) {
+        if (\count($topFilesAll) > self::MAX_TOP_FILES) {
             $topFilesMore = true;
         }
 
@@ -290,13 +293,13 @@ class Controller extends Base
 
         $topLinkInfo = '';
         if (!empty($topLinks)) {
-            $topLinkInfo = array_values($topLinks)[0];
+            $topLinkInfo = array_values($topLinks->getAll())[0];
         }
 
         $topLinksMore = false;
         $topLinksAll = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        if (count($topLinksAll) > self::MAX_TOP_LINKS) {
+        if (\count($topLinksAll) > self::MAX_TOP_LINKS) {
             $topLinksMore = true;
         }
 
