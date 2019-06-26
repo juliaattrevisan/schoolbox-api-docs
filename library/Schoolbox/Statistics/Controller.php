@@ -6,62 +6,64 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Statistics;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
-use Schoolbox\RoleMapper;
+use Schoolbox\Role;
 use Schoolbox\Resource\Folder\Model AS FolderModel;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\File\Mapper AS FileMapper;
 
 class Controller extends Base
 {
-    /** @var DataSource $dataSource */
+
+    /**
+     * @var DataSource $dataSource
+     */
     private $dataSource;
+
 
     /**
      * @var Alaress_Date_Format $startDate
      */
     protected $startDate;
 
+
     /**
      * @var Alaress_Date_Format $endDate
      */
     protected $endDate;
+
 
     /**
      * @var string $roleFilter
      */
     protected $roleFilter;
 
+
     /**
      * Graph colours for each role type
      */
-    const STAFF_COLOUR = '#579DCF';
-    const STUDENT_COLOUR = '#E99D12';
-    const PARENT_COLOUR = '#3DB114';
-    const GUEST_COLOUR = '#762AAE';
+    private const STAFF_COLOUR = '#579DCF';
+    private const STUDENT_COLOUR = '#E99D12';
+    private const PARENT_COLOUR = '#3DB114';
+    private const GUEST_COLOUR = '#762AAE';
+
 
     /**
      * Max number of items for each component
      */
-    const MAX_TOP_VISITORS = 5;
-    const MAX_TOP_FILES = 5;
-    const MAX_RECENT_VISITORS = 8;
-    const MAX_YET_TO_VISIT = 8;
-    const MAX_TOP_LINKS = 5;
+    private const MAX_TOP_VISITORS = 5;
+    private const MAX_TOP_FILES = 5;
+    private const MAX_RECENT_VISITORS = 8;
+    private const MAX_YET_TO_VISIT = 8;
+    private const MAX_TOP_LINKS = 5;
+
 
     /**
      * @var array $roles
      */
-    private $roles = [
-        RoleMapper::ROLE_STAFF,
-        RoleMapper::ROLE_PARENT,
-        RoleMapper::ROLE_STUDENT,
-        RoleMapper::ROLE_GUEST
-    ];
+    private $roles;
+
 
     /**
      * List of months & year for the date filter
@@ -71,6 +73,8 @@ class Controller extends Base
 
     /**
      * Controller constructor
+     *
+     * @param DataSource $dataSource
      */
     public function __construct(DataSource $dataSource)
     {
@@ -99,6 +103,10 @@ class Controller extends Base
         }
 
         $this->filterDateOptions = $filterDateOptions;
+
+        /* A stack known role types
+         */
+        $this->roles = Role::getRoleTypes();
     }
 
 
@@ -141,17 +149,20 @@ class Controller extends Base
 
 
     /**
-     * @api GET /statistics/homepage/{folderId}{/startDate,endDate,roleFilter}
+     * @api   GET /statistics/homepage/{folderId}{/startDate,endDate,roleFilter}
      * @level 165
      *
-     * @param FolderModel $folder
+     * @param FolderModel         $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param string $roleFilter
+     * @param string              $roleFilter
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getIndex($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
         $dataSource = $this->getDataSource();
+        $colours = [];
 
         if ($startDate !== null) {
             $this->setStartDate($startDate);
@@ -191,8 +202,24 @@ class Controller extends Base
             }
 
             if (!isset($colours[$roleName])) {
-                $const = strtoupper($roleName) . '_COLOUR';
-                $colours[$roleName] = constant('self::'. $const);
+                switch ($roleName) {
+                    case Role::STAFF:
+                        $colours[$roleName] = self::STAFF_COLOUR;
+                        break;
+
+                    case Role::STUDENT:
+                        $colours[$roleName] = self::STUDENT_COLOUR;
+                        break;
+
+                    case Role::PARENT:
+                        $colours[$roleName] = self::PARENT_COLOUR;
+                        break;
+
+                    case Role::GUEST:
+                    default:
+                        $colours[$roleName] = self::GUEST_COLOUR;
+                        break;
+                }
             }
         }
 
@@ -211,9 +238,12 @@ class Controller extends Base
         foreach ($data as $groupName => $series) {
             $groupData = [];
             $k = array_keys($series);
-            for ($i = 0; $i < count($series); ++$i) {
+
+            $n = \count($series);
+
+            for ($i = 0; $i < $n; ++$i) {
                 if ($series[$k[$i]] || $series[$k[$i+1]] || $series[$k[$i-1]]) {
-                    $groupData[] = array(($k[$i]) * 86400000, (int)$series[$k[$i]]);
+                    $groupData[] = array($k[$i] * 86400000, (int)$series[$k[$i]]);
                 }
             }
 
@@ -257,7 +287,7 @@ class Controller extends Base
         $topFilesMore = false;
         $topFilesAll = $dataSource->getTopAccessed($folder->getId(), $dataSource::FILTER_FILE, $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        if (count($topFilesAll) > self::MAX_TOP_FILES) {
+        if (\count($topFilesAll) > self::MAX_TOP_FILES) {
             $topFilesMore = true;
         }
 
@@ -297,7 +327,7 @@ class Controller extends Base
         $topLinksMore = false;
         $topLinksAll = $dataSource->getTopAccessed($folder->getId(), 'link', $this->getStartDate(), $this->getEndDate(), $this->getRoleFilter());
 
-        if (count($topLinksAll) > self::MAX_TOP_LINKS) {
+        if (\count($topLinksAll) > self::MAX_TOP_LINKS) {
             $topLinksMore = true;
         }
 
@@ -392,13 +422,15 @@ class Controller extends Base
 
 
     /**
-     * @api GET /statistics/homepage/{folderId}/topFiles{/startDate,endDate,roleFilter}
+     * @api   GET /statistics/homepage/{folderId}/topFiles{/startDate,endDate,roleFilter}
      * @level 165
      *
-     * @param FolderModel $folder
+     * @param FolderModel         $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param string $roleFilter
+     * @param string              $roleFilter
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getTopFiles($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
@@ -521,13 +553,15 @@ class Controller extends Base
 
 
     /**
-     * @api GET /statistics/homepage/{folderId}/topLinks{/startDate,endDate,roleFilter}
+     * @api   GET /statistics/homepage/{folderId}/topLinks{/startDate,endDate,roleFilter}
      * @level 165
      *
-     * @param FolderModel $folder
+     * @param FolderModel         $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param string $roleFilter
+     * @param string              $roleFilter
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getTopLinks($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {

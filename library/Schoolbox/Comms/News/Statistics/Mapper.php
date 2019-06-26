@@ -6,10 +6,7 @@
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Comms\News\Statistics;
-
-use Schoolbox\RoleMapper;
 
 /**
  * Class Mapper
@@ -34,10 +31,12 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_SAVED = 'saved';
     public const REFERRER_SEARCH = 'search';
 
+
     /**
      * This const represents a string value for an empty referrer so it can be meaningful to humans
      */
     public const REFERRER_EMPTY = 'unknown';
+
 
     /**
      * These are the referrers that we understand in the domain logic
@@ -52,16 +51,7 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_SEARCH,
     ];
 
-    /**
-     * Known role types
-     */
-    public const ROLETYPES = [
-        RoleMapper::ROLE_STAFF,
-        RoleMapper::ROLE_PARENT,
-        RoleMapper::ROLE_STUDENT,
-        RoleMapper::ROLE_GUEST
-    ];
-        
+
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException

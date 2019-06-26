@@ -17,7 +17,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\RoleMapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
@@ -105,7 +105,7 @@ class TimetableClass
      */
     private function findUserLookup(): array
     {
-        $groupType = RoleMapper::ROLE_STUDENT;
+        $groupType = Role::STUDENT;
 
         $userStatement = $this->userMapper->getDatabase()->query("
             SELECT u.`id`, synergy_id
