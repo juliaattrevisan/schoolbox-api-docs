@@ -10,6 +10,7 @@ declare(strict_types=1);
  */
 class External_Schooledge_Ccb_User extends External_Schooledge_User
 {
+
     /**
      * Builds a filter for a student's contacts.
      *
@@ -21,12 +22,13 @@ class External_Schooledge_Ccb_User extends External_Schooledge_User
      * @see buildStudentContactAdhocJoins
      * @return string
      */
-    protected function buildStudentContactFilter()
+    protected function buildStudentContactFilter(): string
     {
         return parent::buildStudentContactFilter() . "
             OR ad.FieldValue = 'Y'
         ";
     }
+
 
     /**
      * Builds a set of joins onto the AdHoc table.
@@ -35,7 +37,7 @@ class External_Schooledge_Ccb_User extends External_Schooledge_User
      *
      * @return string
      */
-    protected function buildStudentContactAdhocJoins()
+    protected function buildStudentContactAdhocJoins(): string
     {
         return 'LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = ad.SourceID';
     }
