@@ -13,7 +13,7 @@ echo 'Taking Schoolbox online...';
 
 # Get this file's directory, and derive the maintenance filename relatively from it
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-maintenanceFileName=`realpath "$DIR/../../.maintenance"`;
+maintenanceFileName="$DIR/../../.maintenance";
 
 # Does maintenance file already exist
 echo "Checking for maintenance file '$maintenanceFileName'..."
