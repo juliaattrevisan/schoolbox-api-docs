@@ -192,7 +192,7 @@ class ArticleResolver implements IArticleResolver
             HAVING COUNT(comms_news_audience.parent_id) = 2;
         ";
 
-        return $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN);
+        return array_map('intval', $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN) );
     }
 
 

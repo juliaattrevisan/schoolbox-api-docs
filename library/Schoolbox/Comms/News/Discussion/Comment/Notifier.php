@@ -290,7 +290,7 @@ class Notifier extends AbstractModuleNotifier
             // permission for folder is handled above. getting global moderators only.
             $this->moderatorResolver->findModeratorsForArticle($article, false)
         );
-        if (!\in_array($article->getAuthor()->getId(), $validUserIds)) {
+        if (!\in_array($article->getAuthor()->getId(), $validUserIds, true)) {
             return $envelope;
         }
 
