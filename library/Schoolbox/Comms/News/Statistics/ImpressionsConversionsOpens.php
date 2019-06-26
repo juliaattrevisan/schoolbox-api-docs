@@ -18,6 +18,8 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Scale\Factory;
+use Schoolbox\Role;
+
 
 class ImpressionsConversionsOpens
 {
@@ -394,7 +396,7 @@ class ImpressionsConversionsOpens
      */
     public function fetchRoleTypeDemographic(News\Model $article): array
     {
-        $breakdown = $this->generateDefaultBreakdown(Mapper::ROLETYPES);
+        $breakdown = $this->generateDefaultBreakdown(Role::getRoleTypes());
 
         $statement = $this->database->prepareQuery("
             SELECT 

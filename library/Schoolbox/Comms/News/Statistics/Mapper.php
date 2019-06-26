@@ -8,8 +8,6 @@
  */
 namespace Schoolbox\Comms\News\Statistics;
 
-use Schoolbox\Role;
-
 /**
  * Class Mapper
  * @package Schoolbox\Comms\News\Statistics
@@ -33,10 +31,12 @@ class Mapper extends \Schoolbox\Mapper
     public const REFERRER_SAVED = 'saved';
     public const REFERRER_SEARCH = 'search';
 
+
     /**
      * This const represents a string value for an empty referrer so it can be meaningful to humans
      */
     public const REFERRER_EMPTY = 'unknown';
+
 
     /**
      * These are the referrers that we understand in the domain logic
@@ -51,16 +51,7 @@ class Mapper extends \Schoolbox\Mapper
         self::REFERRER_SEARCH,
     ];
 
-    /**
-     * Known role types
-     */
-    public const ROLETYPES = [
-        Role::STAFF,
-        Role::PARENT,
-        Role::STUDENT,
-        Role::GUEST
-    ];
-        
+
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException
