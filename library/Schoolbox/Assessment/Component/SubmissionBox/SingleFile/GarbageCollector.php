@@ -12,5 +12,8 @@ use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
 
 class GarbageCollector extends HardLink implements IGarbageCollector
 {
+    /**
+     * @var string
+     */
     protected $hashColumn = 'storage_id';
 }

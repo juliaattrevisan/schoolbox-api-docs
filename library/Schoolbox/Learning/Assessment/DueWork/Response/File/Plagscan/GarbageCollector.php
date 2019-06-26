@@ -7,24 +7,39 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\GarbageCollector\HardLink;
 use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
 
 class GarbageCollector extends HardLink implements IGarbageCollector
 {
+    /**
+     * @var string
+     */
     protected $hashColumn = 'storage_hash';
 
+    /**
+     * @var \Database
+     */
     private $database;
 
-    public function __construct(Mapper $mapper)
+    /**
+     * GarbageCollector constructor.
+     *
+     * @param Mapper          $mapper
+     */
+    public function __construct(Mapper $mapper, LoggerInterface $logger)
     {
-        parent::__construct($mapper);
+        parent::__construct($mapper, $logger);
 
         $this->database = \Database::getInstance();
     }
 
-    public function remove(string $hash)
+    /**
+     * @inheritDoc
+     */
+    public function remove(string $hash, bool $performDryRun)
     {
         /**
          * Some items do exists in student_submission_file only but not in plagscan_document

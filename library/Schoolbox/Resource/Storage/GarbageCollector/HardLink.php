@@ -7,37 +7,63 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\GarbageCollector;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
 class HardLink implements IGarbageCollector
 {
+    /**
+     * @var Mapper
+     */
     protected $mapper;
 
+    /**
+     * @var string
+     */
     protected $hashColumn = 'hash';
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * Base constructor.
      *
-     * @param Mapper $mapper
+     * @param Mapper          $mapper
+     * @param LoggerInterface $logger
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, LoggerInterface $logger)
     {
         $this->mapper = $mapper;
+
+        $this->logger = $logger;
     }
 
     /**
      * @param string $hash
      *
+     * @param bool   $performDryRun
+     *
      * @return mixed|void
      * @throws Mapper\Exception
      */
-    public function remove(string $hash)
+    public function remove(string $hash, bool $performDryRun)
     {
         $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
         if ($records->count() > 0) {
-            foreach ($records as $record) {
-                $this->mapper->hardDelete($record);
+            if ($performDryRun) {
+                $this->logger->notice('Will delete existing record(s) in: ' . $this->mapper->getTable());
+            } else {
+                foreach ($records as $record) {
+                    try {
+                        $this->mapper->hardDelete($record);
+                    } catch (\Exception $exception) {
+                        throw new Mapper\Exception($exception->getMessage());
+                    }
+                }
+                $this->logger->notice('Record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }

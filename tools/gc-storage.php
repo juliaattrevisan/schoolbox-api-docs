@@ -16,6 +16,7 @@
  */
 
 use Alaress\Lumberjack\Logger;
+use Schoolbox\Resource\Storage\GarbageCollector\GarbageCollector;
 use Schoolbox\Resource\Storage\GC;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Application\Daemon;
@@ -34,8 +35,6 @@ new Daemon\Kernel(
     ]
 );
 
-$pdo = Database::getInstance();
-
 $threshold = 0;
 if(isset($opts['v'])) {
     $threshold = 1;
@@ -53,16 +52,29 @@ $limits = [
 
 $sm  = StorageMapper::getInstance();
 $log = new Logger(STDOUT, STDERR, $limits[$threshold]);
-$gc  = new GC\GarbageCollector(
-    [
-        new GC\Check\ExpiryDate($pdo, 2),
-        new GC\Check\HardLinks($pdo),
-        new GC\Check\SoftLinks($pdo, SQL_db, $log),
-    ],
-    $sm, $log, $limit, $perform
-);
 
-$deleted = $gc->purge($hash);
+//$pdo = Database::getInstance();
+
+
+//$hashes = $pdo->query('SELECT hash FROM storage')->fetchAll(PDO::FETCH_COLUMN);
+
+//foreach($hashes as $hash) {
+(new Schoolbox\Resource\Storage\GarbageCollector\GarbageCollector($log))->remove($hash);
+//}
+
+
+die();
+
+//$gc  = new GC\GarbageCollector(
+//    [
+//        new GC\Check\ExpiryDate($pdo, 2),
+//        new GC\Check\HardLinks($pdo),
+//        new GC\Check\SoftLinks($pdo, SQL_db, $log),
+//    ],
+//    $sm, $log, $limit, $perform
+//);
+
+//$deleted = $gc->purge($hash);
 
 // if nothing was deleted, consider that an error case
-exit($deleted ? 0 : 1);
+//exit($deleted ? 0 : 1);

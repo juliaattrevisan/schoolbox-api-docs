@@ -7,34 +7,53 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\GarbageCollector;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
 class SoftLink implements IGarbageCollector
 {
-
+    /**
+     * @var Mapper
+     */
     protected $mapper;
 
+    /**
+     * @var string
+     */
     protected $hashColumn = 'hash';
 
+    /**
+     * @var array
+     */
     protected $setMethods = [];
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
 
     /**
      * Base constructor.
      *
-     * @param Mapper $mapper
+     * @param Mapper          $mapper
+     * @param LoggerInterface $logger
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, LoggerInterface $logger)
     {
         $this->mapper = $mapper;
+
+        $this->logger = $logger;
     }
 
     /**
      * @param string $hash
      *
+     * @param bool   $performDryRun
+     *
      * @return mixed|void
      * @throws Mapper\Exception
      */
-    public function remove(string $hash)
+    public function remove(string $hash, bool $performDryRun)
     {
         if (!\count($this->setMethods)) {
             throw new Mapper\Exception('setMethods cannot be empty...');
@@ -43,11 +62,16 @@ class SoftLink implements IGarbageCollector
         $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
         foreach ($records as $record) {
-            $obj = $this->mapper->findByIdWithFallback($record);
-            foreach ($this->setMethods as $method) {
-                $obj->{$method}(null);
+            if ($performDryRun) {
+                $this->logger->notice('Will unlink record from: ' . $this->mapper->getTable(), ['char' => '+']);
+            } else {
+                $obj = $this->mapper->findByIdWithFallback($record);
+                foreach ($this->setMethods as $method) {
+                    $obj->{$method}(null);
+                }
+                $this->mapper->save($obj);
+                $this->logger->notice('Record unlinked from: ' . $this->mapper->getTable(), ['char' => '-']);
             }
-            $this->mapper->save($obj);
         }
     }
 }

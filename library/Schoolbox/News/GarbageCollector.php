@@ -12,7 +12,13 @@ use Schoolbox\Resource\Storage\GarbageCollector\SoftLink;
 
 class GarbageCollector extends SoftLink implements IGarbageCollector
 {
+    /**
+     * @var string
+     */
     protected $hashColumn = 'item_image';
 
+    /**
+     * @var array
+     */
     protected $setMethods = ['setImage'];
 }

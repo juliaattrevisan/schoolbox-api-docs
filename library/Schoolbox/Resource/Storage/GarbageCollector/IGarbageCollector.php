@@ -12,7 +12,9 @@ interface IGarbageCollector
     /**
      * @param string $hash
      *
+     * @param bool   $performDryRun
+     *
      * @return mixed
      */
-    public function remove(string $hash);
+    public function remove(string $hash, bool $performDryRun);
 }

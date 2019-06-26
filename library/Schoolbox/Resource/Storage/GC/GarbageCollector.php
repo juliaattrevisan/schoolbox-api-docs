@@ -15,7 +15,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
-
 class GarbageCollector 
 {
 
