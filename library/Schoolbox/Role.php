@@ -103,24 +103,6 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
     }
 
     /**
-     * @param bool $canChangePassword
-     * @return self
-     */
-    public function setCanChangePassword(bool $canChangePassword): Role
-    {
-        $this->canChangePassword = $canChangePassword;
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getCanChangePassword(): bool
-    {
-        return $this->canChangePassword;
-    }
-
-    /**
      * Find a key/value representation of this model's data
      * and return it as a 2D array of value (an identifier)
      * and label (a human-readable description, usually)
@@ -142,6 +124,25 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
 
     /* Getters/Setters
      */
+
+    /**
+     * @param bool|null $canChangePassword
+     * @return self
+     */
+    public function setCanChangePassword(?bool $canChangePassword): Role
+    {
+        $this->canChangePassword = $canChangePassword;
+        return $this;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getCanChangePassword(): ?bool
+    {
+        return $this->canChangePassword;
+    }
+
 
     /**
      * @param int|null $id
