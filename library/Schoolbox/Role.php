@@ -144,73 +144,73 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
      */
 
     /**
-     * @param int $id
+     * @param int|null $id
      * @return self
      */
-    public function setId(int $id): Role
+    public function setId(?int $id): Role
     {
         $this->id = $id;
         return $this;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @return self
      */
-    public function setName(string $name): Role
+    public function setName(?string $name): Role
     {
         $this->name = $name;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param string $type
+     * @param string|null $type
      * @return self
      */
-    public function setType(string $type): Role
+    public function setType(?string $type): Role
     {
         $this->type = $type;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
 
     /**
-     * @param  string $digestSchedule
+     * @param  string|null $digestSchedule
      * @return self
      */
-    public function setDigestSchedule(string $digestSchedule): Role
+    public function setDigestSchedule(?string $digestSchedule): Role
     {
         $this->digestSchedule = $digestSchedule;
         return $this;
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDigestSchedule(): string
+    public function getDigestSchedule(): ?string
     {
         return $this->digestSchedule;
     }

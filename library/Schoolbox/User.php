@@ -547,7 +547,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
 
     /**
-     * @param string$firstname
+     * @param string $firstname
      * @return self
      */
     public function setFirstname($firstname)
