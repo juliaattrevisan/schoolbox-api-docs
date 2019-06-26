@@ -41,6 +41,15 @@ class Controller extends Base
 
 
     /**
+     * Graph colours for each role type
+     */
+    private const STAFF_COLOUR = '#579DCF';
+    private const STUDENT_COLOUR = '#E99D12';
+    private const PARENT_COLOUR = '#3DB114';
+    private const GUEST_COLOUR = '#762AAE';
+
+
+    /**
      * Max number of items for each component
      */
     private const MAX_TOP_VISITORS = 5;
@@ -253,7 +262,7 @@ class Controller extends Base
 
         $topFileInfo = '';
         if (!empty($topFiles)) {
-            $topFileInfo = array_values($topFiles->getAll())[0];
+            $topFileInfo = array_values($topFiles)[0];
         }
 
         $topFilesMore = false;
@@ -293,7 +302,7 @@ class Controller extends Base
 
         $topLinkInfo = '';
         if (!empty($topLinks)) {
-            $topLinkInfo = array_values($topLinks->getAll())[0];
+            $topLinkInfo = array_values($topLinks)[0];
         }
 
         $topLinksMore = false;

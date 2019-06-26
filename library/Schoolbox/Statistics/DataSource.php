@@ -240,16 +240,19 @@ class DataSource
     /**
      * Get top files downloaded for the homepage
      *
-     * @param int $folderId
-     * @param string $object
+     * @param int                  $folderId
+     * @param string               $object
      * @param \Alaress_Date_Format $startDate
      * @param \Alaress_Date_Format $endDate
-     * @param string $role
-     * @param int $limit
-     * @param bool $hydrate
-     * @return Collection
+     * @param string               $role
+     * @param int                  $limit
+     * @param bool                 $hydrate
+     * @return array
+     *
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getTopAccessed($folderId, $object, $startDate, $endDate, $role = null, $limit = null, $hydrate = false)
+    public function getTopAccessed($folderId, $object, $startDate, $endDate, $role = null, $limit = null, $hydrate = false): array
     {
         $queryParams = [
             'folderId' => $folderId,
@@ -271,11 +274,11 @@ class DataSource
         $fileJoins = '';
         $fileSelects = '';
         if ($object == self::FILTER_FILE) {
-            $fileJoins = "
+            $fileJoins = '
                 LEFT JOIN storage ON f.hash = storage.hash
                 LEFT JOIN allowedFileExtension as afe ON storage.ext = afe.extension
                 LEFT JOIN allowedFileTypes as aft ON afe.fileTypeID = aft.fileTypeID
-            ";
+            ';
             $fileSelects = ',storage.filesize, aft.iconFile';
         }
 
