@@ -23,8 +23,8 @@ class News
     }
 
     public function schoolCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT COUNT(*) FROM news_items
-                  WHERE item_datetime_posted >= :start AND item_datetime_posted <= :end";
+        $query = "SELECT COUNT(*) FROM comms_news_article
+                  WHERE created_at >= :start AND created_at <= :end";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
@@ -35,8 +35,9 @@ class News
     }
 
     public function groupCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
-        $query = "SELECT COUNT(*) FROM subject_news
-                  WHERE datetime_posted >= :start AND datetime_posted <= :end";
+        $query = "SELECT COUNT(*) FROM comms_news_article
+                  JOIN comms_news_audience cna on comms_news_article.id = cna.comms_news_article_id AND entity_type = 'folder'
+                  WHERE created_at >= :start AND created_at <= :end";
 
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());

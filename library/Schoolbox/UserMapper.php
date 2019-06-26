@@ -936,12 +936,6 @@ class UserMapper extends Mapper
         $query = "UPDATE link SET owner = :toId WHERE owner = :fromId";
         $this->database->query($query, $params);
 
-        // Update all news
-        $query = "UPDATE news_items SET item_owner = :toId WHERE item_owner = :fromId";
-        $this->database->query($query, $params);
-        $query = "UPDATE subject_news SET owner = :toId WHERE owner = :fromId";
-        $this->database->query($query, $params);
-
         // Update wikis
         $query = "UPDATE wikiRevision SET userID = :toId WHERE userID = :fromId";
         $this->database->query($query, $params);

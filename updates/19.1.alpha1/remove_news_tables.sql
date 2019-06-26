@@ -1,4 +1,5 @@
-DROP newsGroup;
-DROP newsUser;
-DROP news_items;
-DROP subject_news;
+DROP TABLE newsGroup;
+DROP TABLE newsCampus;
+DROP TABLE newsUser;
+DROP TABLE news_items;
+DROP TABLE subject_news;
