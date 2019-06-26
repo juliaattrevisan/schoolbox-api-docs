@@ -121,14 +121,15 @@ class Client implements IClient
         }
 
         // Batch a set of messages together, and process them all at once
-        /** @var Message[] $messages */
-        $messages = [];
-        while (count($messages) < self::MAX_FRAMES_PER_TICK) {
+        $i = 0;
+        while ($i < self::MAX_FRAMES_PER_TICK) {
             $message = $consumer->receiveNoWait();
             if (!$message instanceof Message) {
                 break;
             }
-            $messages[] = $message;
+            $i++;
+            $resolver = new AckResolver($consumer, $message);
+            $callback(new Frame($message), $resolver);
         }
 
 
@@ -136,14 +137,6 @@ class Client implements IClient
         $this->loop->futureTick(function () use ($consumer, $callback) {
             $this->readNextFrame($consumer, $callback);
         });
-
-        foreach ($messages as $message) {
-            $resolver = new AckResolver($consumer, $message);
-            $callback(new Frame($message), $resolver);
-
-            // Did nothing accept the message? Nack the message?
-            // (Maybe doesn't matter because there's only one subscriber)
-        }
     }
 
 
