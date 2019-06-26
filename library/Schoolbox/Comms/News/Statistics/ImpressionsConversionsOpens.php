@@ -20,7 +20,6 @@ use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Statistics\Scale\Factory;
 use Schoolbox\Role;
 
-
 class ImpressionsConversionsOpens
 {
 
