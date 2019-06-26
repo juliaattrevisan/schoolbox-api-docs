@@ -106,7 +106,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable
      * @param bool $canChangePassword
      * @return self
      */
-    public function setCanChangePassword($canChangePassword): Role
+    public function setCanChangePassword(bool $canChangePassword): Role
     {
         $this->canChangePassword = $canChangePassword;
         return $this;
