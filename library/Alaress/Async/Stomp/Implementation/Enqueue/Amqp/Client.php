@@ -8,18 +8,15 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\Enqueue\Amqp;
 
-use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use Enqueue\AmqpLib\AmqpConnectionFactory;
 use Interop\Queue\Consumer;
 use Interop\Queue\Context;
 use Interop\Queue\Message;
 use Interop\Queue\SubscriptionConsumer;
+use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use React\Stomp\AckResolver as BaseAckResolver;
-use React\Stomp\Client as BaseClient;
-use React\Stomp\Protocol\Frame as BaseFrame;
 use Throwable;
 
 /**
@@ -40,13 +37,27 @@ class Client implements IClient
 
 
     /**
+     * @var LoopInterface
+     */
+    private $loop;
+
+
+    /**
+     * @var SubscriptionConsumer[]
+     */
+    private $subscribers = [];
+
+
+    /**
      * Constructor
      *
      * @param AmqpConnectionFactory $factory
+     * @param LoopInterface         $loop
      */
-    public function __construct(AmqpConnectionFactory $factory)
+    public function __construct(AmqpConnectionFactory $factory, LoopInterface $loop)
     {
         $this->factory = $factory;
+        $this->loop    = $loop;
     }
 
 
@@ -57,11 +68,23 @@ class Client implements IClient
     {
         $queue      = $this->context->createQueue($destination);
         $consumer   = $this->context->createConsumer($queue);
+
+
+        // TODO consider a polling fallback for contexts which don't support subscription
+
         $subscriber = $this->context->createSubscriptionConsumer();
-        $subscriber->subscribe($consumer, static function (Message $message, Consumer $consumer) use ($callback) {
-            $callback(new Frame($message), new AckResolver($consumer, $message));
+
+
+        $this->subscribers[] = $subscriber;
+
+        $this->loop->nextTick(static function () use ($subscriber, $consumer, $callback) {
+            // Do this in a react loop
+            $subscriber->subscribe($consumer, static function (Message $message, Consumer $consumer) use ($callback) {
+                $callback(new Frame($message), new AckResolver($consumer, $message));
+            });
+            $subscriber->consume();
         });
-        $subscriber->consume();
+
     }
 
 
