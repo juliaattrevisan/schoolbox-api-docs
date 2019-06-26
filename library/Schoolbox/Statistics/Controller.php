@@ -73,6 +73,7 @@ class Controller extends Base
 
     /**
      * Controller constructor
+     *
      * @param DataSource $dataSource
      */
     public function __construct(DataSource $dataSource)
@@ -148,13 +149,15 @@ class Controller extends Base
 
 
     /**
-     * @api GET /statistics/homepage/{folderId}{/startDate,endDate,roleFilter}
+     * @api   GET /statistics/homepage/{folderId}{/startDate,endDate,roleFilter}
      * @level 165
      *
-     * @param FolderModel $folder
+     * @param FolderModel         $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param string $roleFilter
+     * @param string              $roleFilter
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getIndex($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
@@ -403,13 +406,15 @@ class Controller extends Base
 
 
     /**
-     * @api GET /statistics/homepage/{folderId}/topFiles{/startDate,endDate,roleFilter}
+     * @api   GET /statistics/homepage/{folderId}/topFiles{/startDate,endDate,roleFilter}
      * @level 165
      *
-     * @param FolderModel $folder
+     * @param FolderModel         $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param string $roleFilter
+     * @param string              $roleFilter
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getTopFiles($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
@@ -532,13 +537,15 @@ class Controller extends Base
 
 
     /**
-     * @api GET /statistics/homepage/{folderId}/topLinks{/startDate,endDate,roleFilter}
+     * @api   GET /statistics/homepage/{folderId}/topLinks{/startDate,endDate,roleFilter}
      * @level 165
      *
-     * @param FolderModel $folder
+     * @param FolderModel         $folder
      * @param Alaress_Date_Format $startDate
      * @param Alaress_Date_Format $endDate
-     * @param string $roleFilter
+     * @param string              $roleFilter
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function getTopLinks($folder, $startDate = null, $endDate = null, $roleFilter = null)
     {
