@@ -6,14 +6,13 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Async\Stomp\Implementation\Enqueue\Amqp;
+namespace Alaress\Async\Stomp\Implementation\Enqueue;
 
 use Alaress\Async\Stomp\IFrame;
 use Interop\Queue\Message;
 
 /**
- * Adapter for frames that are retrieved via the AMQP protocol, when accessed
- * via the Enqueue library.
+ * Adapter for frames that are retrieved via the Enqueue library.
  */
 class Frame implements IFrame
 {

@@ -6,15 +6,14 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Async\Stomp\Implementation\Enqueue\Amqp;
+namespace Alaress\Async\Stomp\Implementation\Enqueue;
 
 use Alaress\Async\Stomp\IAckResolver;
 use Interop\Queue\Consumer;
 use Interop\Queue\Message;
 
 /**
- * Adapter for the acknowledgement resolver for frames retrieved via the AMQP
- * protocol, when accessed via the Enqueue library.
+ * Adapter for the acknowledgement resolver for frames via the Enqueue library.
  */
 class AckResolver implements IAckResolver
 {

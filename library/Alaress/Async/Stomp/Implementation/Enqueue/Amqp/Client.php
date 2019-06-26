@@ -9,6 +9,8 @@ declare(strict_types=1);
 namespace Alaress\Async\Stomp\Implementation\Enqueue\Amqp;
 
 use Alaress\Async\Stomp\IClient;
+use Alaress\Async\Stomp\Implementation\Enqueue\AckResolver;
+use Alaress\Async\Stomp\Implementation\Enqueue\Frame;
 use Enqueue\AmqpLib\AmqpConnectionFactory;
 use Interop\Queue\Consumer;
 use Interop\Queue\Context;
