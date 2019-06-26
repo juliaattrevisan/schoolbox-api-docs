@@ -61,7 +61,7 @@ class Client implements IClient
     /**
      * The max number of frames to attempt to read per tick.
      */
-    private const MAX_FRAMES_PER_TICK = 10;
+    private const MAX_FRAMES_PER_TICK = 1000;
 
 
     /**
