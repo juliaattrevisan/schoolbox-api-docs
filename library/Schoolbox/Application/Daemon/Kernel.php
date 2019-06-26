@@ -15,6 +15,7 @@ use Alaress\Async\Stomp\Implementation\StompPhp;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Enqueue\AmqpLib\AmqpConnectionFactory;
+use Enqueue\Stomp\StompConnectionFactory;
 use ErrorException;
 use Exception;
 use PDOException;
@@ -396,30 +397,30 @@ EOL;
 //            return new StompPhp\Client(new StatefulStomp($client), $this->loop);
 //        }));
 
+//        $di->set('stomp', $di->lazy(function () use ($di) {
+//            /** @var IConfigLoader $conf */
+//            $conf    = $di->get('config');
+//            $factory = new AmqpConnectionFactory([
+//                'host'     => $conf->get('amqp_host'),
+//                'port'     => $conf->get('amqp_port'),
+//                'vhost'    => $conf->get('amqp_vhost'),
+//                'login'    => $conf->get('amqp_user'),
+//                'password' => $conf->get('amqp_pass'),
+//            ]);
+//            return new Enqueue\Amqp\Client($factory, $this->loop);
+//        }));
+
         $di->set('stomp', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf    = $di->get('config');
-            $factory = new AmqpConnectionFactory([
+            $factory = new StompConnectionFactory([
                 'host'     => $conf->get('amqp_host'),
-                'port'     => $conf->get('amqp_port'),
+                'port'     => $conf->get('amqp_stomp_port'),
                 'vhost'    => $conf->get('amqp_vhost'),
                 'login'    => $conf->get('amqp_user'),
                 'password' => $conf->get('amqp_pass'),
             ]);
-            return new Enqueue\Amqp\Client($factory, $this->loop);
-
-//            $context    = $factory->createContext();
-//
-//
-//            $conf = $di->get('config');
-//            $url  = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
-//            $conn = new StompLib\Network\Connection($url);
-//            // 500 ms read timeout
-//            $conn->setReadTimeout(0, 500000);
-//            $client = new StompLib\Client($conn);
-//            $client->setLogin($conf->get('amqp_user'), $conf->get('amqp_pass'));
-//            $client->setVhostname($conf->get('amqp_vhost'));
-//            return new StompPhp\Client(new StatefulStomp($client), $this->loop);
+            return new Enqueue\Stomp\Client($factory, $this->loop);
         }));
 
         $di->values['logger'] = $this->logger();
