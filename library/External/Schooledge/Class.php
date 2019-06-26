@@ -10,8 +10,6 @@ use Schoolbox\CampusMapper;
 
 class External_Schooledge_Class implements External_ClassInterface
 {
-    use External_Humanedge_APlusDatabaseTrait;
-
 
     /**
      * By default, class-teacher relations require that the timetable entry
