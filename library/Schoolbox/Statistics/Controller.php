@@ -16,23 +16,30 @@ use Schoolbox\Resource\Folder\Model AS FolderModel;
 
 class Controller extends Base
 {
-    /** @var DataSource $dataSource */
+
+    /**
+     * @var DataSource $dataSource
+     */
     private $dataSource;
+
 
     /**
      * @var Alaress_Date_Format $startDate
      */
     protected $startDate;
 
+
     /**
      * @var Alaress_Date_Format $endDate
      */
     protected $endDate;
 
+
     /**
      * @var string $roleFilter
      */
     protected $roleFilter;
+
 
     /**
      * Graph colours for each role type
@@ -41,6 +48,7 @@ class Controller extends Base
     const STUDENT_COLOUR = '#E99D12';
     const PARENT_COLOUR = '#3DB114';
     const GUEST_COLOUR = '#762AAE';
+
 
     /**
      * Max number of items for each component
@@ -51,15 +59,12 @@ class Controller extends Base
     const MAX_YET_TO_VISIT = 8;
     const MAX_TOP_LINKS = 5;
 
+
     /**
      * @var array $roles
      */
-    private $roles = [
-        Role::STAFF,
-        Role::PARENT,
-        Role::STUDENT,
-        Role::GUEST
-    ];
+    private $roles;
+
 
     /**
      * List of months & year for the date filter
@@ -69,6 +74,7 @@ class Controller extends Base
 
     /**
      * Controller constructor
+     * @param DataSource $dataSource
      */
     public function __construct(DataSource $dataSource)
     {
@@ -97,6 +103,10 @@ class Controller extends Base
         }
 
         $this->filterDateOptions = $filterDateOptions;
+
+        /* A stack known role types
+         */
+        $this->roles = Role::getRoleTypes();
     }
 
 
