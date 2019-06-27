@@ -103,9 +103,13 @@ class GarbageCollector implements IGarbageCollector
      */
     public function remove(string $hash, bool $performDryRun)
     {
+        $debugMessage = 'Executing in delete/unlink mode...';
+
         if ($performDryRun) {
-            $this->logger->debug('Executing in dry run mode...');
+            $debugMessage = 'Executing in dry run mode...';
         }
+
+        $this->logger->debug($debugMessage);
 
         if ($this->validateIfHashExists($hash)) {
             foreach ($this->collectors as $collector) {

@@ -10,7 +10,7 @@ namespace Schoolbox\Resource\Storage\GarbageCollector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
-class HardLink implements IGarbageCollector
+class Deletable implements IGarbageCollector
 {
     /**
      * @var Mapper
@@ -54,7 +54,7 @@ class HardLink implements IGarbageCollector
 
         if ($records->count() > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will delete existing record(s) in: ' . $this->mapper->getTable());
+                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
             } else {
                 foreach ($records as $record) {
                     try {
@@ -63,7 +63,7 @@ class HardLink implements IGarbageCollector
                         throw new Mapper\Exception($exception->getMessage());
                     }
                 }
-                $this->logger->notice('Record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }

@@ -9,10 +9,10 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Storage\GarbageCollector\HardLink;
+use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
 use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
 
-class GarbageCollector extends HardLink implements IGarbageCollector
+class GarbageCollector extends Deletable implements IGarbageCollector
 {
     /**
      * @var string
@@ -54,8 +54,17 @@ class GarbageCollector extends HardLink implements IGarbageCollector
             $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
             if ($records->count() > 0) {
-                foreach ($records as $record) {
-                    $this->mapper->hardDelete($record);
+                if ($performDryRun) {
+                    $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
+                } else {
+                    foreach ($records as $record) {
+                        try {
+                            $this->mapper->hardDelete($record);
+                        } catch (\Exception $exception) {
+                            throw new Mapper\Exception($exception->getMessage());
+                        }
+                    }
+                    $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
                 }
             }
         }

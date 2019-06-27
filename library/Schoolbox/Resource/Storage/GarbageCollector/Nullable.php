@@ -10,7 +10,7 @@ namespace Schoolbox\Resource\Storage\GarbageCollector;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
-class SoftLink implements IGarbageCollector
+class Nullable implements IGarbageCollector
 {
     /**
      * @var Mapper
@@ -63,14 +63,14 @@ class SoftLink implements IGarbageCollector
 
         foreach ($records as $record) {
             if ($performDryRun) {
-                $this->logger->notice('Will unlink record from: ' . $this->mapper->getTable(), ['char' => '+']);
+                $this->logger->notice('Will unlink ['. \count($records) .'] record(s) in: ' . $this->mapper->getTable(), ['char' => '+']);
             } else {
                 $obj = $this->mapper->findByIdWithFallback($record);
                 foreach ($this->setMethods as $method) {
                     $obj->{$method}(null);
                 }
                 $this->mapper->save($obj);
-                $this->logger->notice('Record unlinked from: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('['. \count($records) . '] record(s) unlinked in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }

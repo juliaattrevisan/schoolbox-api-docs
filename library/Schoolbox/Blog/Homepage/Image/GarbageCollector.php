@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Blog\Homepage\Image;
 
 use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
-use Schoolbox\Resource\Storage\GarbageCollector\HardLink;
+use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
 
-class GarbageCollector extends HardLink implements IGarbageCollector
+class GarbageCollector extends Deletable implements IGarbageCollector
 {
 
 }

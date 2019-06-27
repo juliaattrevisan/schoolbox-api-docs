@@ -8,9 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox;
 
 use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
-use Schoolbox\Resource\Storage\GarbageCollector\SoftLink;
+use Schoolbox\Resource\Storage\GarbageCollector\Nullable;
 
-class GarbageCollector extends SoftLink implements IGarbageCollector
+class GarbageCollector extends Nullable implements IGarbageCollector
 {
     /**
      * @var string

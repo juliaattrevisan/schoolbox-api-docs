@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\My\File;
 
-use Schoolbox\Resource\Storage\GarbageCollector\HardLink;
+use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
 use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
 
-class GarbageCollector extends HardLink implements IGarbageCollector
+class GarbageCollector extends Deletable implements IGarbageCollector
 {
 
 }
