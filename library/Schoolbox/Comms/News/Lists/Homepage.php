@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Comms\News\Lists;
 
-use Schoolbox\Comms\News\Mapper;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
@@ -39,31 +39,10 @@ class Homepage extends Base
      */
     public function find(Querystring $params, User $user): array
     {
-
-        /* Article ids in which $user was in the audience, simply by being associated with $folderId
-         * The user needs to appear in the class list for this statement to be true
-         */
-        $specificallyForUser = $this->articleResolver->findArticlesForUser($user);
-
-        /* These article ids are when you have role-based access to $folder
-         * $user won't appear in their audience so we have to find them roundabout-ly
-         */
-        $withRoleBasedPerms = $this->fromRoleBasedPermissions($params->getFolderId());
-
-        /* The uniqued, combined set of unique articles ids including role-based accessibility
-         */
-        $combined = array_unique(array_merge($specificallyForUser, $withRoleBasedPerms));
-
-        /* Get them all
-         */
-        $articleIds = $this->newsMapper->findArticleIdsForTopic(
-            $combined,
-            Mapper::TOPIC_ALL_ID,
-            $params->getLimit(),
-            $params->getPageNum(),
-            null,
-            null,
-            $params->getFolderId()
+        $articleIds = $this->articleResolver->findArticlesForAudience(
+            Folder::getEntityType(),
+            $params->getFolderId(),
+            null
         );
 
         $idProperty = $this->newsMapper->getIdentifierProperty();
@@ -85,34 +64,5 @@ class Homepage extends Base
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
             'unsaved' => SaveForLater\Mapper::UNSAVED,
         ];
-    }
-
-
-    /**
-     * The articles where $folderId was in its audience
-     * READ accessors can see all these
-     *
-     * @param int $folderId
-     * @return array
-     */
-    private function fromRoleBasedPermissions(int $folderId): array
-    {
-        $articlesWithRoleBasedPermissions = [];
-
-        /* Find a list of folders that are in an article's audience
-         * See if there's an intersection; if there is, you can see the article
-         */
-        $result = $this->audienceMapper->getDatabase()->query("
-            SELECT comms_news_article_id, entity_value
-            FROM {$this->audienceMapper->getTable()}
-            WHERE entity_type = 'folder'
-            AND entity_value = '{$folderId}'
-        ");
-
-        foreach ($result as $row) {
-            $articlesWithRoleBasedPermissions[] = $row['comms_news_article_id'];
-        }
-
-        return array_unique($articlesWithRoleBasedPermissions);
     }
 }
