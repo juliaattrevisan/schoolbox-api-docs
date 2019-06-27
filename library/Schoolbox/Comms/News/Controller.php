@@ -735,6 +735,7 @@ class Controller extends Base
             $this->databaseInternal,
             $this->articleResolver,
             $this->commentMapper,
+            $this->audienceMapper,
             $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(
             $params,
@@ -831,6 +832,7 @@ class Controller extends Base
             $this->databaseInternal,
             $this->articleResolver,
             $this->commentMapper,
+            $this->audienceMapper,
             $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(new Querystring([]), $this->getUser());
 
@@ -1026,6 +1028,7 @@ class Controller extends Base
             $this->databaseInternal,
             $this->articleResolver,
             $this->commentMapper,
+            $this->audienceMapper,
             $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
         ))->find(
             $urlPrefix,

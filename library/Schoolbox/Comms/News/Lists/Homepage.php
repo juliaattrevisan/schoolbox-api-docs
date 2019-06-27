@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Comms\News\Lists;
 
-use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Mapper;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
@@ -73,7 +72,7 @@ class Homepage extends Base
         $articles = $this->loadArticleByIds($articleIds, $params, $user)->indexBy($idProperty);
 
         // Load audiences so module auth rules work in rendered templates
-        $rootSegments = Audience\Mapper::getInstance()->findForArticles($articles->getPropertyValues($idProperty));
+        $rootSegments = $this->audienceMapper->findForArticles($articles->getPropertyValues($idProperty));
 
         foreach ($rootSegments as $rootSegment) {
             $articles[$rootSegment->getCommsNewsArticle()->getId()]->getAudience()[$rootSegment->getId()] = $rootSegment;
@@ -103,11 +102,9 @@ class Homepage extends Base
         /* Find a list of folders that are in an article's audience
          * See if there's an intersection; if there is, you can see the article
          */
-        $audienceMapper = \Schoolbox\Comms\News\Audience\Mapper::getInstance();
-
-        $result = $audienceMapper->getDatabase()->query("
+        $result = $this->audienceMapper->getDatabase()->query("
             SELECT comms_news_article_id, entity_value
-            FROM {$audienceMapper->getTable()}
+            FROM {$this->audienceMapper->getTable()}
             WHERE entity_type = 'folder'
             AND entity_value = '{$folderId}'
         ");
