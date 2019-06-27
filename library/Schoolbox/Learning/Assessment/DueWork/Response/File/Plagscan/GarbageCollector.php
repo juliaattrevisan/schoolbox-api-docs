@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
-use phpDocumentor\Reflection\Types\Integer;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\GarbageCollector\Deletable;

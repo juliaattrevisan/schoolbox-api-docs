@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-/***
+/**
  * Usage: ./gc-storage.php [--hash] [-p] [-vvv]
  *
  * A tool that will perform a removal of file in storage by the provided hash
