@@ -16,16 +16,18 @@ case "$1" in
         maintenanceFileName="/usr/share/schoolbox/.maintenance";
         # Does maintenance file already exist
         echo "Checking for maintenance file '$maintenanceFileName'..." | tee -a /var/log/schoolbox/upgrade.log;
-        if [[ -f ${maintenanceFileName} ]]; then
-          echo "Maintenance file already present." | tee -a /var/log/schoolbox/upgrade.log;
+        if [ ! -d /usr/share/schoolbox ]; then
+            echo "Schoolbox folder does not yet exist, maintenance file cannot be created." | tee -a /var/log/schoolbox/upgrade.log;
+        elif [ -f ${maintenanceFileName} ]; then
+            echo "Maintenance file already present." | tee -a /var/log/schoolbox/upgrade.log;
         else
-          echo "Maintenance file not present, creating..." | tee -a /var/log/schoolbox/upgrade.log;
-          touch ${maintenanceFileName};
-          if [[ $? != 0 ]]; then
-            echo "Unable to create maintenance file, exiting" | tee -a /var/log/schoolbox/upgrade.log;
-            exit 1;
-          fi;
-          echo "Maintenance file created at '$maintenanceFileName'" | tee -a /var/log/schoolbox/upgrade.log;
+            echo "Maintenance file not present, creating..." | tee -a /var/log/schoolbox/upgrade.log;
+            touch ${maintenanceFileName};
+            if [ $? != 0 ]; then
+                echo "Unable to create maintenance file, exiting" | tee -a /var/log/schoolbox/upgrade.log;
+                exit 1;
+            fi;
+            echo "Maintenance file created at '$maintenanceFileName'" | tee -a /var/log/schoolbox/upgrade.log;
         fi;
         # Production servers use 'open_file_cache', need to reload to detect file change
         nginx -s reload | tee -a /var/log/schoolbox/upgrade.log;
