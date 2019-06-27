@@ -11,14 +11,6 @@ use Schoolbox\CampusMapper;
 class External_Schooledge_Class implements External_ClassInterface
 {
 
-    /**
-     * By default, class-teacher relations require that the timetable entry
-     * has a room attached to it.
-     *
-     * @var bool
-     */
-    protected $requireClassTeachersHaveRooms = true;
-
 
     /**
      * @var MSSQL

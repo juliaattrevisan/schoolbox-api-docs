@@ -23,15 +23,6 @@ class External_Schooledge_User implements External_UserInterface
 
 
     /**
-     * By default, teacher-subject relations require that the timetable entry
-     * has a room attached to it.
-     *
-     * @var bool
-     */
-    protected $requireTeacherSubjectsHaveRooms = true;
-
-
-    /**
      * @var MSSQL $database
      */
     private $database;
