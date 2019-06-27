@@ -1,49 +1,41 @@
 <?php
 
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Client;
+
 class SmokeInitialCest {
 
-    public function CreateNews(IntegrationTester $i){
-        $data = array(
-            'page' => '/login/',
-            'username' => 'alaress',
-            'password' => 'alaress',
-            'Submit' => 'Login'
-        );
+    public function LoginLocalUser(IntegrationTester $i){
 
-        $page='/login/';
-        $url = 'https://vagrant.dev.schoolbox.cloud'.$page;
-        $ch = curl_init($url);
-        $postString = http_build_query($data, '', '&');
+        #GIVEN
+        $user='alaress';
+        $password='alaress';
+        #WHEN
+        /** @var GuzzleHttp\Psr7\Response $response */
+        $response = $i->loginUser($user, $password);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected from the login page.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/', $redirect_history[0], 'I expect that we get redirected to the main index page.');
+        $i->assertArrayNotHasKey(1, $redirect_history_status, 'I expect there is only one redirect in the history of this request');
+    }
 
-        $User_Agent = 'Mozilla/5.0 (X11; Linux i686) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31';
+    /**
+     *
+     */
+    public function SmokeNews(IntegrationTester $i){
 
-        $request_headers = array();
-        $request_headers[] = 'Host: vagrant.dev.schoolbox.cloud';
-        $request_headers[] = 'User-Agent: '.$User_Agent;
-        $request_headers[] = 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8';
-        $request_headers[] = 'Content-Type: application/x-www-form-urlencoded';
-        $request_headers[] = 'Content-Length: 63';
-        $request_headers[] = 'Referer: https://vagrant.dev.schoolbox.cloud/login/';
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $request_headers);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-
-        $response = curl_exec($ch);
-
-        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $header = substr($response, 0, $header_size);
-
-        $header_temp=explode(PHP_EOL, $header);
-
-        curl_close($ch);
-
-        print_r($header_temp);
-
-
-
+        #GIVEN
+        $title = 'Smoke Test News Title';
+        $session_cookies=$i->loginAdminGetToken();
+        #WHEN
+        /** @var GuzzleHttp\Psr7\Response $response */
+        $response = $i->draftNews($session_cookies, $title);
+        print_r($response->getHeaders());
+        #THEN
+        $i->assertEquals(303, $response->getStatusCode(), 'I expect that we get a 303 after a draft is submitted.');
     }
 }
 
