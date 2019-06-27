@@ -6,14 +6,14 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-$factory = new Survey_Factory();
+$factory         = new Survey_Factory();
 $questionHandler = new Survey_Question();
-$sectionHandler = new Survey_Section();
-$surveyHandler = new Survey_Main();
-$groupHandler = new Group();
+$sectionHandler  = new Survey_Section();
+$surveyHandler   = new Survey_Main();
+$groupHandler    = new Group();
 
 $currentQuestion = $questionHandler->getById($this->arg[0]);
 $section = $sectionHandler->getByID($currentQuestion['section_id']);
@@ -27,7 +27,7 @@ if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
     $this->pageNotFound();
 }
 
-if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(125);
 }
 

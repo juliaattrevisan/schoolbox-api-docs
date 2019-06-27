@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Collection;
 use Schoolbox\Realtime\Message\RerouteOverride;
 use Schoolbox\Realtime\Message\RerouteOverrideMapper;
@@ -10,10 +12,10 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $page = new SitePage();
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 $uaMapper = UserAccessMapper::getInstance();
 $ua = new UserAccess();
@@ -64,7 +66,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         // yes, group category doesn't map to an actual category.
         // no, I'm not fixing it right now, but will at least check it exists.
         $folder = $catMapper->findById($categoryId);
-        $group->setCategory($folder);
+        $group->setFolder($folder);
 //        try {
 //            $catMapper->findById($categoryId);
 //            $group->setCategory($categoryId);

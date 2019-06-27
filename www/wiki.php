@@ -1,10 +1,11 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
 $wikiHandler = new Wiki();
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 /* Load a past revision
  */
@@ -35,7 +36,7 @@ if ($this->arg[0] == 'revision') {
     }
 
     // check permission
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
@@ -114,18 +115,18 @@ if ($this->arg[0] == 'revision') {
 
     // output links
     $this->setVar('revert_link_block', '');
-    if ($wiki['revisionID'] != $finalRevision && $permission >= WRITE_ACCESS) {
+    if ($wiki['revisionID'] != $finalRevision && $permission >= UserAccess::ACCESS_WRITE) {
         $this->parse('revert_link_block', 'revert_link');
     }
 
     $this->setVar('delete_link_block', '');
-    if ($permission >= WRITE_ACCESS) {
+    if ($permission >= UserAccess::ACCESS_WRITE) {
         $this->parse('delete_link_block', 'delete_link');
     }
 
     $this->setVar('lock_link_block', '');
     $this->setVar('unlock_link_block', '');
-    if ($permission >= WRITE_ACCESS) {
+    if ($permission >= UserAccess::ACCESS_WRITE) {
         if ($locked) {
             $this->parse('unlock_link_block', 'unlock_link');
         } else {
@@ -134,12 +135,12 @@ if ($this->arg[0] == 'revision') {
     }
 
     $this->setVar('modify_link_block', '');
-    if (($permission >= READ_ACCESS && !$locked) || $permission >= WRITE_ACCESS) {
+    if (($permission >= UserAccess::ACCESS_READ && !$locked) || $permission >= UserAccess::ACCESS_WRITE) {
         $this->parse('modify_link_block', 'modify_link');
     }
 
     $this->setVar('export_link_block', '');
-    if ($permission >= READ_ACCESS) {
+    if ($permission >= UserAccess::ACCESS_READ) {
         $this->parse('export_link_block', 'export_link');
     }
 
@@ -231,7 +232,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         }
 
         // check permission
-        if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+        if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
             error(19);
         }
 
@@ -310,18 +311,18 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
 
         // output links
         $this->setVar('revert_link_block', '');
-        if ($wiki['revisionID'] != $finalRevision && $permission >= WRITE_ACCESS) {
+        if ($wiki['revisionID'] != $finalRevision && $permission >= UserAccess::ACCESS_WRITE) {
             $this->parse('revert_link_block', 'revert_link');
         }
 
         $this->setVar('delete_link_block', '');
-        if ($permission >= WRITE_ACCESS) {
+        if ($permission >= UserAccess::ACCESS_WRITE) {
             $this->parse('delete_link_block', 'delete_link');
         }
 
         $this->setVar('lock_link_block', '');
         $this->setVar('unlock_link_block', '');
-        if ($permission >= WRITE_ACCESS) {
+        if ($permission >= UserAccess::ACCESS_WRITE) {
             if ($locked) {
                 $this->parse('unlock_link_block', 'unlock_link');
             } else {
@@ -330,12 +331,12 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         }
 
         $this->setVar('modify_link_block', '');
-        if (($permission >= READ_ACCESS && !$locked) || $permission >= WRITE_ACCESS) {
+        if (($permission >= UserAccess::ACCESS_READ && !$locked) || $permission >= UserAccess::ACCESS_WRITE) {
             $this->parse('modify_link_block', 'modify_link');
         }
 
         $this->setVar('export_link_block', '');
-        if ($permission >= READ_ACCESS) {
+        if ($permission >= UserAccess::ACCESS_READ) {
             $this->parse('export_link_block', 'export_link');
         }
 

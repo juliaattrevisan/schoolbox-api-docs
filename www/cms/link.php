@@ -1,10 +1,10 @@
 <?php
-
-$groupHandler = new Group;
-
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\LinkMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
+
+$groupHandler = new Group;
 
 if (is_numeric($this->arg[0])) {
     try {
@@ -14,7 +14,7 @@ if (is_numeric($this->arg[0])) {
         $folder = FolderMapper::getInstance()->findById($link->getFolder()->getId());
 
         /* Check permissions to submit */
-        if ($groupHandler->getPermission($link->getFolder()->getId()) < WRITE_ACCESS) {
+        if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -62,7 +62,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         $folder = FolderMapper::getInstance()->findById($this->arg[1]);
 
         /* Check permissions to submit */
-        if ($groupHandler->getPermission($folder->getId()) < WRITE_ACCESS) {
+        if ($groupHandler->getPermission($folder->getId()) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -116,7 +116,7 @@ elseif ($this->arg[0] == 'multicat') {
     $this->setTab('resources');
 
     $groupHandler = new Group;
-    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, WRITE_ACCESS);
+    $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id'], true, UserAccess::ACCESS_WRITE);
 
     if (is_array($categoryList) && count($categoryList)) {
         foreach ($categoryList as $category) {

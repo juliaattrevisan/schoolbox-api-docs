@@ -6,13 +6,13 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-$factory = new Assess_Factory();
-$assessHandler = new Assess_Main();
-$sectionHandler = new Assess_Section();
-$groupHandler = new Group();
+$factory         = new Assess_Factory();
+$assessHandler   = new Assess_Main();
+$sectionHandler  = new Assess_Section();
+$groupHandler    = new Group();
 $questionHandler = new Assess_Question();
 
 if (!is_numeric($this->arg[0])) {
@@ -30,7 +30,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
 	error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
 	error(125);
 }
 

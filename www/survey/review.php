@@ -11,16 +11,16 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-$factory = new Survey_Factory();
-$surveyHandler = new Survey_Main();
-$attemptHandler = new Survey_Attempt();
+$factory         = new Survey_Factory();
+$surveyHandler   = new Survey_Main();
+$attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
-$sectionHandler = new Survey_Section();
-$groupHandler = new Group();
-$userHandler = new User;
+$sectionHandler  = new Survey_Section();
+$groupHandler    = new Group();
+$userHandler     = new User;
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -56,7 +56,7 @@ if ($surveyHandler->isDeleted($this->arg[0])) {
 
 if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
     $survey['category_id']
-) < WRITE_ACCESS)
+) < UserAccess::ACCESS_WRITE)
 ) {
     error(127);
 }

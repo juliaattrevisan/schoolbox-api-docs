@@ -735,17 +735,17 @@ class Controller extends Base
         try {
             // If assigning a group admin, demote any existing group admins
 
-            if ($post['type'] == FULL_ACCESS) {
+            if ($post['type'] == UserAccess::ACCESS_FULL) {
                 $admins = $this->userAccessMapper->findByColumnList([
                     'uid' => $user->getId(),
                     'sid' => $folder->getId(),
                     'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'type' => FULL_ACCESS
+                    'type' => UserAccess::ACCESS_FULL
                 ]);
 
                 /** @var UserAccess $admin */
                 foreach ($admins as $admin) {
-                    $admin->setAccessLevel(WRITE_ACCESS);
+                    $admin->setAccessLevel(UserAccess::ACCESS_WRITE);
                     $this->userAccessMapper->save($admin);
                 }
             }

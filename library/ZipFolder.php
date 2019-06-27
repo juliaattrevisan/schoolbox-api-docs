@@ -1,5 +1,7 @@
 <?php
 // Copyright 2012 Alaress Pty Ltd. http://alaress.com.au
+use Schoolbox\Permission\Access\UserAccess;
+
 
 /**
  * Puts all resources from a folder into a zip
@@ -25,7 +27,7 @@ class ZipFolder
         $this->folderDetails = $this->getFolderDetails($folder);
 
         if (is_numeric($this->folderDetails->getId())) {
-            if ($this->getPermission($this->folderDetails->getId()) < READ_ACCESS) {
+            if ($this->getPermission($this->folderDetails->getId()) < UserAccess::ACCESS_READ) {
                 error(5);
             }
         } else {
@@ -44,7 +46,7 @@ class ZipFolder
     {
         return $this->fileMapper->findForFolders(
             array($folder),
-            array('getHidden' => ($permission >= WRITE_ACCESS))
+            array('getHidden' => ($permission >= UserAccess::ACCESS_WRITE))
         );
     }
 
@@ -116,7 +118,7 @@ class ZipFolder
             $folderList = $this->getFolders($parentFolder->getId());
             foreach ($folderList as $folder) {
                 $permission = $this->getPermission($folder->getId());
-                if ($permission > DENY_ACCESS) {
+                if ($permission > UserAccess::ACCESS_DENY) {
                     $folderName = $this->cleanName($folder->getName());
                     $folderLocation = $currentDir . '/' . $folderName;
                     mkdir($folderLocation);
@@ -217,7 +219,7 @@ class ZipFolder
      * Gets a Group permission level for the given folder
      *
      * @param $folder_id
-     * @return DENY_ACCESS|READ_ACCESS|WRITE_ACCESS|FULL_ACCESS
+     * @return UserAccess::ACCESS_DENY|UserAccess::ACCESS_READ|UserAccess::ACCESS_WRITE|UserAccess::ACCESS_FULL
      */
     protected function getPermission($folder_id)
     {

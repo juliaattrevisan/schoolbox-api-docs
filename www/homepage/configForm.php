@@ -1,18 +1,21 @@
 <?php
+
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 // The kernel contains the dependency injection engine.
 // If you inject the dependency injection engine into Sitepage,
 // it can use Twig to generate component content.
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (is_numeric($_REQUEST['cid'])) {
-    if ($groupHandler->getPermission($_REQUEST['cid']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($_REQUEST['cid']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -75,7 +78,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 ->setPosition('top');
 
             // check perms
-            if (($permission = $groupHandler->getPermission($_POST['cid'])) < WRITE_ACCESS) {
+            if (($permission = $groupHandler->getPermission($_POST['cid'])) < UserAccess::ACCESS_WRITE) {
                 exit;
             }
 

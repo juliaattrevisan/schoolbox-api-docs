@@ -1,16 +1,18 @@
 <?php
 
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
+use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 // Update page, or its stuff
 
@@ -177,7 +179,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 $page,
                 $eportfolioHandler->getPageInstance()->getOwner()->getId(),
                 $eportfolioHandler->getPageId(),
-                FULL_ACCESS
+                UserAccess::ACCESS_FULL
             );
 
             $renderer = new Component_Renderer();
@@ -280,7 +282,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                     $page,
                     $eportfolioHandler->getPageInstance()->getOwner()->getId(),
                     $eportfolioHandler->getPageId(),
-                    FULL_ACCESS
+                    UserAccess::ACCESS_FULL
                 );
 
                 $renderer->renderEportfolioComponent($eportfolioPage, $component);

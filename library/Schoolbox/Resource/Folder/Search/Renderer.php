@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Resource\Folder\Search;
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
 use Scrub;
@@ -100,7 +101,7 @@ class Renderer extends Base
                 $userAccessMapper = new UserAccessMapper();
                 $userAccess = $userAccessMapper->findByColumnList(array(
                     'uid' => $_SESSION['user']->getId(),
-                    'service' => HOMEPAGE_SERVICE,
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
                     'sid' => $currentFolder->getId()
                 ));
 

@@ -5,11 +5,10 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Video\Factory;
 
+use Schoolbox\Permission\Access\UserAccess;
 
 class Thumbnail extends Base {
 
@@ -20,7 +19,7 @@ class Thumbnail extends Base {
 	 * @throws \Exception
 	 */
 	protected function permissionCheck($file) {
-		if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < READ_ACCESS) {
+		if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
 			\SitePage::redirectToBrokenImageOfSize(64, 64, 403);
 		}
 	}

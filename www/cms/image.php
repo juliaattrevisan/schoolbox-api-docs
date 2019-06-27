@@ -7,14 +7,17 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
+
+use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
 use Alaress\Image\Cache;
 use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
+use Schoolbox\Permission\Access\UserAccess;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel = new Kernel();
 
 /* Preserve old checks
  */
@@ -30,7 +33,7 @@ try {
      */
     $groupHandler = new Group();
 
-    if ($groupHandler->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
+    if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
         SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 403);
     }
 

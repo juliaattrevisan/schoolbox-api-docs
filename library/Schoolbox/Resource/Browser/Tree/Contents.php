@@ -7,18 +7,15 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Resource\Browser\Tree;
 
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
-use Schoolbox\Resource\Browser\Tree\Node;
 use Schoolbox\Resource\Browser\Tree\Node\Icon;
-use Schoolbox\User;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 
 class Contents
@@ -29,7 +26,7 @@ class Contents
      *
      * @var FolderModel
      */
-    private $category = null;
+    private $category;
 
     /**
      * Permission value
@@ -43,35 +40,35 @@ class Contents
      *
      * @var array
      */
-    private $filterOptions = array();
+    private $filterOptions = [];
 
     /**
      * An instance of \Schoolbox\Collection
      *
      * @var \Schoolbox\Collection
      */
-    private $linkNodes = null;
+    private $linkNodes;
 
     /**
      * An instance of \Schoolbox\Collection
      *
      * @var \Schoolbox\Collection
      */
-    private $fileNodes = null;
+    private $fileNodes;
 
     /**
      * An instance of \Schoolbox\Collection
      *
      * @var \Schoolbox\Collection
      */
-    private $allNodes = null;
+    private $allNodes;
 
     /**
      * An instance of \Schoolbox\Resource\LinkMapper
      *
      * @var \Schoolbox\Resource\LinkMapper
      */
-    private $linkMapper = null;
+    private $linkMapper;
 
 
     /**
@@ -79,14 +76,14 @@ class Contents
      *
      * @var FileMapper
      */
-    private $fileMapper = null;
+    private $fileMapper;
 
     /**
      * Folder permission access library
      *
      * @var Access
      */
-    private $access = null;
+    private $access;
 
 
     /**
@@ -182,7 +179,7 @@ class Contents
     private function buildFiles()
     {
         $filterOptions  = $this->getFilterOptions();
-        $hasWriteAccess = $this->getPermission() >= WRITE_ACCESS;
+        $hasWriteAccess = $this->getPermission() >= UserAccess::ACCESS_WRITE;
         if (!isset($filterOptions['getHidden'])) {
             $filterOptions['getHidden'] = $hasWriteAccess;
         }

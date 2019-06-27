@@ -6,6 +6,8 @@
  ************************************************************/
 //timetable object that displays the users timetable
 
+use Schoolbox\Permission\Access\UserAccess;
+
 if (!isset($this)) {
     require_once __DIR__ . '/../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -271,7 +273,7 @@ foreach ($userList as $user) {
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
                                     ]);
 
-                                    if (isset($catCache[$class['code']]) && $groupHandler->getPermission($catCache[$class['code']]->getId()) >= READ_ACCESS) {
+                                    if (isset($catCache[$class['code']]) && $groupHandler->getPermission($catCache[$class['code']]->getId()) >= UserAccess::ACCESS_READ) {
                                         // Yes you really do need to double url-encode this
                                         $this->setVar(
                                             'PERIOD_URL',

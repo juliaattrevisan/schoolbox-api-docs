@@ -1,21 +1,19 @@
 <?php
 /**
- * Assessment deletion. Sections, Questions and Answers are all softdeleted if
- * the assessment is softdeleted.
+ * Survey deletion. Sections, Questions and Answers are all softdeleted if
+ * the survey is softdeleted.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-/* Get a list of questions and answers to softdelete
- */
-$surveyHandler = new Survey_Main();
+$surveyHandler   = new Survey_Main();
 $questionHandler = new Survey_Question();
-$answerHandler = new Survey_Answer();
-$sectionHandler = new Survey_Section();
-$groupHandler = new Group();
+$answerHandler   = new Survey_Answer();
+$sectionHandler  = new Survey_Section();
+$groupHandler    = new Group();
 
 /* Proceed regardless of whether the section has been previously erased or not
  *
@@ -32,7 +30,7 @@ if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
 
 $survey = $surveyHandler->getByID($this->arg[0]);
 
-if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
 	error(126);
 }
 

@@ -1,5 +1,6 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
@@ -31,9 +32,9 @@ class Group extends DeprecatedModel
      *
      * @var int
      */
-    private $_service = HOMEPAGE_SERVICE;
+    private $_service;
 
-    function __construct($service = HOMEPAGE_SERVICE)
+    function __construct($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_table = 'userGroups';
         $this->_index = 'cid';
@@ -56,7 +57,7 @@ class Group extends DeprecatedModel
     }
 
 
-    function setService($service = HOMEPAGE_SERVICE)
+    function setService($service = UserAccess::SERVICE_HOMEPAGE)
     {
         $this->_service = $service;
     }
@@ -72,7 +73,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT type
 				   FROM userGroups
-				  WHERE cid = '{$categoryId}' AND type >= '" . GROUP_TYPE_MODERATED . "'";
+				  WHERE cid = '{$categoryId}' AND type >= '" . \Schoolbox\Resource\Group::MODERATED_GROUP . "'";
 
         $result = $this->db->getAll($query);
 
@@ -188,7 +189,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT name, id, userAccess.type accessType
 				  FROM (folder, userGroups )
-				  LEFT JOIN userAccess ON cid = sid AND service = " . HOMEPAGE_SERVICE . " AND uid = '" . $_SESSION['id'] . "'
+				  LEFT JOIN userAccess ON cid = sid AND service = " . UserAccess::SERVICE_HOMEPAGE . " AND uid = '" . $_SESSION['id'] . "'
 				  WHERE cid = id
 				  AND folder.deleted_at IS NULL
 				  AND userGroups.type = '$type'
@@ -280,7 +281,7 @@ class Group extends DeprecatedModel
         //get the owner(s) of the group
         $query = "SELECT title, firstname, lastname, uid, alt_email, local_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = " . FULL_ACCESS;
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type = " . UserAccess::ACCESS_FULL;
         return $this->db->getAll($query);
     }
 
@@ -318,7 +319,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
 				  FROM userAccess, user
-				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . FULL_ACCESS . " AND type > " . DENY_ACCESS . " AND user.deleted_at IS NULL
+				  WHERE uid = id AND service = " . $this->_service . " AND sid = $relationID AND type < " . UserAccess::ACCESS_FULL . " AND type > " . UserAccess::ACCESS_DENY . " AND user.deleted_at IS NULL
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
@@ -327,7 +328,7 @@ class Group extends DeprecatedModel
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id
 				  FROM userAccess, user
-				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . DENY_ACCESS . " AND user.id = uid AND user.deleted_at IS NULL
+				  WHERE service = " . $this->_service . " AND sid = $relationID AND type = " . UserAccess::ACCESS_DENY . " AND user.id = uid AND user.deleted_at IS NULL
 				  ORDER BY lastname, firstname";
         return $this->db->getAll($query);
     }
@@ -344,7 +345,7 @@ class Group extends DeprecatedModel
         }
     }
 
-    function addUser($relationID, $userID, $type = READ_ACCESS)
+    function addUser($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         if (!$this->isUser($relationID, $userID)) {
             $data = array(
@@ -402,12 +403,12 @@ class Group extends DeprecatedModel
         if (!$user_id) {
             return true;
         }
-        return $this->getPermission($category_id, $user_id) >= READ_ACCESS
+        return $this->getPermission($category_id, $user_id) >= UserAccess::ACCESS_READ
         && $this->isParent($user_id)
         && !$this->involvedInGroup($user_id, $category_id);
     }
 
-    function setUserPermission($relationID, $userID, $type = READ_ACCESS)
+    function setUserPermission($relationID, $userID, $type = UserAccess::ACCESS_READ)
     {
         $this->deleteUser($relationID, $userID);
         return $this->addUser($relationID, $userID, $type);
@@ -417,7 +418,7 @@ class Group extends DeprecatedModel
      * The new getPermission method, which uses `\Schoolbox\Permission\Access\Access::getFolderAccess`
      * under the hood.
      *
-     * This only works when `$this->_service` is `HOMEPAGE_SERVICE` - if it
+     * This only works when `$this->_service` is `UserAccess::SERVICE_HOMEPAGE` - if it
      * isn't, it proxies through to `$this->legacyGetPermission`.
      *
      * @param  int  $relationID The ID of the object to get permissions on.
@@ -435,7 +436,7 @@ class Group extends DeprecatedModel
                 $userID = $_SESSION['id'];
                 $this->cacheUser[$userID] = $_SESSION['user'];
             } else {
-                return DENY_ACCESS;
+                return UserAccess::ACCESS_DENY;
             }
         }
 
@@ -445,13 +446,13 @@ class Group extends DeprecatedModel
             try {
                 $this->cacheUser[$userID] = $user = UserMapper::getInstance()->findById($userID);
             } catch (MapperException $e) {
-                return DENY_ACCESS;
+                return UserAccess::ACCESS_DENY;
             }
         } else {
             $user = $this->cacheUser[$userID];
         }
 
-        if ($this->_service == HOMEPAGE_SERVICE) {
+        if ($this->_service == UserAccess::SERVICE_HOMEPAGE) {
             return Access::getInstance()->getFolderAccess($user, $relationID, $cache);
         } else {
             return $this->legacyGetPermission($relationID, $user);
@@ -460,7 +461,7 @@ class Group extends DeprecatedModel
 
     /**
      * The old getPermission method, used when `$this->_service` isn't
-     * `HOMEPAGE_SERVICE`.
+     * `UserAccess::SERVICE_HOMEPAGE`.
      *
      * @param  int  $relationID The ID of the object to get permissions on.
      *                          Depending on `$this->_service` could be a
@@ -480,12 +481,12 @@ class Group extends DeprecatedModel
 
         // if superuser just return highest permission type
         if ($user->isSuperuser()) {
-            $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
-            return FULL_ACCESS;
+            $this->cache[$this->_service][$relationID][$userID] = UserAccess::ACCESS_FULL;
+            return UserAccess::ACCESS_FULL;
         }
 
         $serviceIdFilter = '';
-        if (in_array($this->_service, array(CALENDAR_SERVICE, HOUSEMASTER_SERVICE))) {
+        if (in_array($this->_service, array(UserAccess::SERVICE_CALENDAR, UserAccess::SERVICE_HOUSEMASTER))) {
             $serviceIdFilter = "AND sid = {$this->db->smartQuote($relationID)}";
         }
 
@@ -502,13 +503,13 @@ class Group extends DeprecatedModel
         $permission = $this->db->getOne($query);
         $permission = (int)$permission;
 
-        // allow staff write access to NEWS_SERVICE by default except at shore...
+        // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
         if ($user->getRole()->isStaff()
             && (Cfg::get('news_staff_post_enabled') == '1')
-            && ($this->_service == NEWS_SERVICE)
-            && ($permission < WRITE_ACCESS)
+            && ($this->_service == UserAccess::SERVICE_NEWS)
+            && ($permission < UserAccess::ACCESS_WRITE)
         ) {
-            $permission = WRITE_ACCESS;
+            $permission = UserAccess::ACCESS_WRITE;
         }
 
         /* Set cache */
@@ -734,7 +735,7 @@ class Group extends DeprecatedModel
      * @see Schoolbox\Resource\FolderMapper->getForUser() for an implementation
      *      that uses the mapper classes.
      */
-    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = READ_ACCESS, $requireHomepage = false)
+    function involvedInCategoryList($userID, $includeSubjectList = true, $accessType = UserAccess::ACCESS_READ, $requireHomepage = false)
     {
 
         $catList = array();
@@ -788,7 +789,7 @@ class Group extends DeprecatedModel
     /*
      * Deprecated in favour of involvedInCateogoryList above...
      */
-    function involvedCategoryList($id, $subjects = '', $accessType = READ_ACCESS)
+    function involvedCategoryList($id, $subjects = '', $accessType = UserAccess::ACCESS_READ)
     {
         //returns a list of categories that the user is involved in
         //optional accessType specifies read=1 , write=2, ownership=3 access levels

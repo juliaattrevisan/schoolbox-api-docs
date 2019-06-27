@@ -6,9 +6,7 @@
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
- *
  */
-
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Alaress\Web\Controller\Base;
@@ -23,12 +21,12 @@ use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\RoleMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -265,9 +263,9 @@ class Controller extends Base
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
                     'record'            => $blog,
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone($this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId())),
                     'page'              => $page,
                     'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),
@@ -288,9 +286,9 @@ class Controller extends Base
             array(
                 'template' => '@eportfolioBlog/modify.twig',
                 'data'     => array(
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'attachzone'        => $this->getAttachZone(new Collection()),
                     'page'              => $page,
                     'pageOwner'         => $this->userMapper->findById($page->getOwner()->getId()),

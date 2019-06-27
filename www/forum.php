@@ -1,6 +1,7 @@
 <?php
 
 use \Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -40,7 +41,7 @@ if (!$forumHandler->hasForum($category->getId())) {
 }
 
 // check permissions
-if (($perm = $groupHandler->getPermission($category->getId())) < READ_ACCESS) {
+if (($perm = $groupHandler->getPermission($category->getId())) < UserAccess::ACCESS_READ) {
     error(19);
 }
 //
@@ -75,7 +76,7 @@ $this->setVar(array(
     'modify_heading_block' => '',
 ));
 
-if ($perm >= WRITE_ACCESS) {
+if ($perm >= UserAccess::ACCESS_WRITE) {
     $this->parse('delete_button_block', 'delete_button');
     $this->parse('modify_heading_block', 'modify_heading');
 }
@@ -178,7 +179,7 @@ if (is_array($threadList)) {
             'last_post_block' => ''
         ));
 
-        if ($perm >= WRITE_ACCESS) {
+        if ($perm >= UserAccess::ACCESS_WRITE) {
             $this->parse('modify_thread_block', 'modify_thread', true);
         }
 

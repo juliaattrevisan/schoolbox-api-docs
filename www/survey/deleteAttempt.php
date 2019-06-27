@@ -1,20 +1,18 @@
 <?php
 /**
- * Assessment Attempt deletion. Responses are all softdeleted if
+ * Survey Attempt deletion. Responses are all softdeleted if
  * the Attempt is softdeleted.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-/* Get a list of questions and answers to softdelete
- */
-$surveyHandler = new Survey_Main();
-$attemptHandler = new Survey_Attempt();
+$surveyHandler   = new Survey_Main();
+$attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
-$groupHandler = new Group();
+$groupHandler    = new Group();
 
 $user_id = $this->arg[1];
 
@@ -34,7 +32,7 @@ foreach ($_POST['attemptIds'] as $currentAttempt) {
 
 		$allAttempts[] = $attempt;
 
-		if (!$surveyHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < WRITE_ACCESS)) {
+		if (!$surveyHandler->isOwner($attempt['assess_id']) && ($groupHandler->getPermission($attempt['assess']['category_id']) < UserAccess::ACCESS_WRITE)) {
 			error(142);
 		}
 	}

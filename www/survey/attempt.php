@@ -1,21 +1,21 @@
 <?php
 /**
- * Attempt creation. When someone makes an Attempt at an Assessment, record the
- * various details. This is loaded for each Section in the Assessment.
+ * Attempt creation. When someone makes an Attempt at an Survey, record the
+ * various details. This is loaded for each Section in the Survey.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-$surveyHandler = new Survey_Main();
-$sectionHandler = new Survey_Section();
+$surveyHandler   = new Survey_Main();
+$sectionHandler  = new Survey_Section();
 $questionHandler = new Survey_Question();
-$factory = new Survey_Factory();
-$attemptHandler = new Survey_Attempt();
+$factory         = new Survey_Factory();
+$attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
-$groupHandler = new Group();
+$groupHandler    = new Group();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -58,7 +58,7 @@ if ($surveyHandler->isExpired($survey['assess_id'])) {
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(144);
 }
 

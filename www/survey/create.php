@@ -5,9 +5,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
-
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 
@@ -15,7 +14,7 @@ $groupHandler  = new Group();
 $surveyHandler = new Survey_Main();
 
 if (!empty($_POST)) {
-    if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission(Scrub::text($_POST['category_id'])) < UserAccess::ACCESS_WRITE) {
         error(126);
     }
 
@@ -72,7 +71,7 @@ if (!empty($_POST)) {
         exit;
     }
 
-    if ($groupHandler->getPermission($this->arg[0]) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($this->arg[0]) < UserAccess::ACCESS_WRITE) {
         error(126);
     }
 

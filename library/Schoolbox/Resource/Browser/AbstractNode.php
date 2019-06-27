@@ -13,12 +13,11 @@
 
 namespace Schoolbox\Resource\Browser;
 
-
 use InvalidArgumentException;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\File\ILocator as FileLocatorInterface;
 use Schoolbox\Resource\Folder\ILocator as FolderLocatorInterface;
 
@@ -156,7 +155,7 @@ abstract class AbstractNode implements NodeInterface
 
                 $folder = $currentFolder;
 
-                if (!$this->hasPermission($folder->getParent()->getId(), READ_ACCESS)) {
+                if (!$this->hasPermission($folder->getParent()->getId(), UserAccess::ACCESS_READ)) {
                     $crumb['disabled'] = 'disabled';
                 }
 
@@ -183,7 +182,7 @@ abstract class AbstractNode implements NodeInterface
         $allFolders = $this->getFolderLocator()->findByParentId($this->getNodeId());
 
         foreach ($allFolders as $currentFolder) {
-            if ($this->hasPermission($currentFolder->getId(), READ_ACCESS)) {
+            if ($this->hasPermission($currentFolder->getId(), UserAccess::ACCESS_READ)) {
                 $output[] = $this->folderToArray($currentFolder);
             }
         }
@@ -224,7 +223,7 @@ abstract class AbstractNode implements NodeInterface
         $mimetypeMapper = new MimetypeMapper();
 
         //Double check perms, should not get here but just incase
-        if (!$this->hasPermission($this->getNodeId(), READ_ACCESS)) {
+        if (!$this->hasPermission($this->getNodeId(), UserAccess::ACCESS_READ)) {
             return $output;
         }
 

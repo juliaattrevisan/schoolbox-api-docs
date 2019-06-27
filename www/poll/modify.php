@@ -1,13 +1,15 @@
 <?php
 
+use Schoolbox\Application\WebRequest\Kernel;
 use \Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $pollHandler = new Poll;
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (is_numeric($this->arg[0])) {
 
@@ -18,7 +20,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     // check permission
-    if ($groupHandler->getPermission($poll['folder_id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -78,7 +80,7 @@ if (is_numeric($this->arg[0])) {
 } else if (is_numeric($this->arg[1])) {
 
     // check permission
-    if ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($this->arg[1]) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 

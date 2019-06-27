@@ -5,15 +5,15 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 // kickstart a session
 new SitePage();
@@ -34,7 +34,7 @@ $folderId = $_POST['folderId'];
 // check 2: user logged in an has at minimum read access
 $groupHandler = new Group();
 $access = $groupHandler->getPermission($folderId);
-if ($access < READ_ACCESS) {
+if ($access < UserAccess::ACCESS_READ) {
     sendError('User does not have access to this folder');
 }
 
@@ -93,7 +93,7 @@ function getFolderMeta($folderId)
     $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
-/* Only throw error exception if a folderId is specified
+        /* Only throw error exception if a folderId is specified
          * and it can't be found; $folderId 0 is used to add a
          * folder to the root node
          */
@@ -141,13 +141,13 @@ function getFolderMeta($folderId)
         $accessType = $groupHandler->involvedInGroup($_SESSION['id'], $folderId);
 
         $joinable = 0; // either don't have access, or are already a member
-        if ($accessType == DENY_ACCESS) {
+        if ($accessType == UserAccess::ACCESS_DENY) {
             if (!is_null($accessType)) {
                 $joinable = 2; // pending approval
             } elseif ($groupHandler->canSubscribe($folderId)) {
                 $joinable = 1; // can join
             }
-        } elseif ($accessType >= READ_ACCESS) {
+        } elseif ($accessType >= UserAccess::ACCESS_READ) {
             $joinable = 3; //member of group
         }
 
@@ -162,7 +162,7 @@ function getFolderMeta($folderId)
 
     // permissions: must have write access to see it
     $userAccess = $groupHandler->getPermission($folderId);
-    if ($userAccess >= WRITE_ACCESS) {
+    if ($userAccess >= UserAccess::ACCESS_WRITE) {
         $permissions = array();
 
         $roleAccessMapper = new \Schoolbox\Permission\Access\RoleAccessMapper();
@@ -186,13 +186,13 @@ function getFolderMeta($folderId)
     // actions: if write, some; if full, all.
     $actions = array();
     switch ($userAccess) {
-        case FULL_ACCESS:
+        case UserAccess::ACCESS_FULL:
             $actions[] = 'multi';
             if ($groupHandler->isSuperuser()) {
                 $actions[] = 'zip';
             }
         // no break
-        case WRITE_ACCESS:
+        case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('file', 'link', 'folder', 'modify', 'download', 'multi'));
             $actions[] = $groupHandler->isSuperuser() ? 'delete_all' : 'delete';
 
@@ -204,7 +204,7 @@ function getFolderMeta($folderId)
 
 
         // no break
-        case READ_ACCESS:
+        case UserAccess::ACCESS_READ:
         default:
             // no actions available
             break;
@@ -265,11 +265,11 @@ function getSingleFileMeta($folderId, $fileId)
     // write access provides actions
     $actions = array();
     switch ($userAccess) {
-        case FULL_ACCESS:
-        case WRITE_ACCESS:
+        case UserAccess::ACCESS_FULL:
+        case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
-        case READ_ACCESS:
+        case UserAccess::ACCESS_READ:
             $actions = array_merge($actions, array('open', 'download', 'properties'));
         // no break
         default:
@@ -325,11 +325,11 @@ function getSingleLinkMeta($folderId, $linkId)
     $actions = array();
 
     switch ($userAccess) {
-        case FULL_ACCESS:
-        case WRITE_ACCESS:
+        case UserAccess::ACCESS_FULL:
+        case UserAccess::ACCESS_WRITE:
             $actions = array_merge($actions, array('modify', 'delete'));
         // no break
-        case READ_ACCESS:
+        case UserAccess::ACCESS_READ:
             $actions = array_merge($actions, array('open', 'properties'));
         // no break
         default:
@@ -366,7 +366,7 @@ function getMultiFileMeta($folderId)
     $groupHandler = new Group();
     $access = $groupHandler->getPermission($folderId);
 
-    if ($access <= READ_ACCESS) {
+    if ($access <= UserAccess::ACCESS_READ) {
         return array(
             'actions' => array()
         );

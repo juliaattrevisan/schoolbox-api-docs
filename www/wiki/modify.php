@@ -1,10 +1,11 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
-$wikiHandler  = new Wiki;
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$wikiHandler  = new Wiki();
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 $this->setTitle('Modify Wiki');
 $this->setTab('resources');
@@ -24,12 +25,12 @@ if (is_numeric($this->arg[0])) {
     }
 
     // check permission
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
     // check locked
-    if ($wiki['locked'] == 'true' && $permission < WRITE_ACCESS) {
+    if ($wiki['locked'] == 'true' && $permission < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -88,7 +89,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
         error(2);
     }
 
-    if (((int)$value === 0) && ($groupHandler->getPermission($this->arg[1]) < WRITE_ACCESS)) {
+    if (((int)$value === 0) && ($groupHandler->getPermission($this->arg[1]) < UserAccess::ACCESS_WRITE)) {
         error(19);
     }
 

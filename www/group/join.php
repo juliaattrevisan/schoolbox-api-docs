@@ -86,7 +86,7 @@ if ($moderatedGroupList->count()) {
 
             $this->setVar('waiting_block', '');
 
-            if ($userPerms[$folderId] && $userPerms[$folderId]->getAccessLevel() == DENY_ACCESS) {
+            if ($userPerms[$folderId] && $userPerms[$folderId]->getAccessLevel() == UserAccess::ACCESS_DENY) {
                 $this->parse('waiting_block', 'waiting');
             }
 

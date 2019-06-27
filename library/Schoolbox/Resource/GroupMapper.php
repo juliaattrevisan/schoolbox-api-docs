@@ -6,13 +6,13 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-
 namespace Schoolbox\Resource;
+
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use \PDO;
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\User;
 
@@ -31,7 +31,7 @@ class GroupMapper extends Mapper {
         $this->hasTable('userGroups');
         $this->uses('type', self::TYPE_INTEGER);
         $this->uses('force_follow', self::TYPE_BOOLEAN);
-        $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'category', 'folder');
+        $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'folder', 'folder');
     }
 
 
@@ -68,8 +68,8 @@ class GroupMapper extends Mapper {
         $folderMapper = $this->getJoinMapper('folder');
         $groups       = $this->createCollection();
         foreach ($statement as $row) {
-            $group = $this->hydrate($row)->setCategory($folderMapper->hydrate($row, 'f'));
-            $groups[$group->getCategory()->getId()] = $group;
+            $group = $this->hydrate($row)->setFolder($folderMapper->hydrate($row, 'f'));
+            $groups[$group->getFolder()->getId()] = $group;
         }
         return $groups;
     }
@@ -134,7 +134,7 @@ class GroupMapper extends Mapper {
             FROM `{$this->getTable()}` ug
             LEFT JOIN {$this->getJoinSql('folder', 'ug', 'f')}
             LEFT JOIN `userAccess`
-            ON (userAccess.service = " . HOMEPAGE_SERVICE . " AND ug.cid = userAccess.sid AND userAccess.uid = :userId)
+            ON (userAccess.service = " . UserAccess::SERVICE_HOMEPAGE . " AND ug.cid = userAccess.sid AND userAccess.uid = :userId)
             WHERE f.id IS NOT NULL
             AND userAccess.uid IS NULL
         ";

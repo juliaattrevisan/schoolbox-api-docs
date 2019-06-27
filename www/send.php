@@ -9,10 +9,12 @@
 //rather than just octet stream
 
 //includes
+use Schoolbox\Application\BasicRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+$kernel = new Kernel();
 
 
 if (is_numeric($_GET['id'])) {
@@ -23,7 +25,7 @@ if (is_numeric($_GET['id'])) {
 
     if (isset($_GET['folder'])) {
 
-        if ($groupHandler->getPermission($_GET['id']) < READ_ACCESS) {
+        if ($groupHandler->getPermission($_GET['id']) < UserAccess::ACCESS_READ) {
             error(5);
         }
 
@@ -39,7 +41,7 @@ if (is_numeric($_GET['id'])) {
         try {
             $file = $fileMapper->findById($_GET['id']);
 
-            if ($groupHandler->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
+            if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
                 error(5);
             }
 

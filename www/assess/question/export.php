@@ -6,8 +6,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
 $factory         = new Assess_Factory();
 $questionHandler = new Assess_Question();
@@ -28,7 +28,7 @@ if (!$currentQuestion) {
 }
 
 if (!$assessHandler->isOwner($assess['assess_id'])
-    && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)
+    && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)
 ) {
     error(125);
 }

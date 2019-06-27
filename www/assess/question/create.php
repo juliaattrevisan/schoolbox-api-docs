@@ -10,11 +10,9 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
-
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Breadcrumbs;
 use Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler = new Assess_Main();
@@ -36,7 +34,7 @@ if (!empty($_POST)) {
         $this->pageNotFound();
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
         error(130);
     }
 
@@ -110,7 +108,7 @@ if (!empty($_POST)) {
         error(112);
     }
 
-    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+    if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
         error(130);
     }
 

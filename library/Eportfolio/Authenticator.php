@@ -1,14 +1,14 @@
 <?php
-use Eportfolio\Permission;
-
 /**
  * Eportfolio_Authenticator
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
+use Eportfolio\Permission;
+use Schoolbox\Permission\Access\UserAccess;
+
 class Eportfolio_Authenticator
 {
 
@@ -38,35 +38,35 @@ class Eportfolio_Authenticator
      *
      * @var null
      */
-    private $userHandler = null;
+    private $userHandler;
 
     /**
      * A user record from handler
      *
      * @var array
      */
-    private $owner = array();
+    private $owner = [];
 
     /**
      * An instance of group handler
      *
      * @var null
      */
-    private $groupHandler = null;
+    private $groupHandler ;
 
     /**
      * An instance of eportfolio handler
      *
      * @var null
      */
-    private $eportfolioHandler = null;
+    private $eportfolioHandler;
 
     /**
      * These pages are always visible to everyone
      *
      * @var array
      */
-    private $publicPages = array('profile', 'showcase');
+    private $publicPages = ['profile', 'showcase'];
 
     /**
      * Constructor
@@ -82,7 +82,7 @@ class Eportfolio_Authenticator
         $this->setPageId($pageId);
 
         $this->setUserHandler(new User());
-        $this->setGroupHandler(new Group(HOMEPAGE_SERVICE));
+        $this->setGroupHandler(new Group(UserAccess::SERVICE_HOMEPAGE));
         try {
             $this->setEportfolioHandler(new Eportfolio($this->getOwnerId(), $this->getPageId()));
         } catch (\Schoolbox\Mapper\Exception $e) {

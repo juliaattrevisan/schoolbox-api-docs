@@ -1,19 +1,22 @@
 <?php
 
 // require no sitepage context
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
+
 if (isset($this)) {
     // vicious lies
     $this->pageNotFound();
 }
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $page         = new SitePage();
 $groupHandler = new Group();
 
 if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
-    if ($groupHandler->getPermission($_POST['categoryID']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($_POST['categoryID']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -72,7 +75,7 @@ if (isset($_POST['textBoxHeading']) && is_numeric($_POST['categoryID'])) {
             exit;
         }
 
-        if ($groupHandler->getPermission($textbox->getCategory()->getId()) < WRITE_ACCESS) {
+        if ($groupHandler->getPermission($textbox->getCategory()->getId()) < UserAccess::ACCESS_WRITE) {
             error(8);
         }
 

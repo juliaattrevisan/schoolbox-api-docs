@@ -1,33 +1,32 @@
 <?php
-use Eportfolio\Permission;
-
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 use Alaress\Color\ColorFactory;
+use Eportfolio\Permission;
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 {
     /** @var Component_FactoryAbstract $componentFactory An instance of Component_FactoryAbstract */
-    private $componentFactory = null;
+    private $componentFactory;
 
     /** @var string $templateFile The template file to use */
     protected $templateFile = 'eportfolio/instance.html';
 
     /** @var ColorFactory $colorFactory An object which builds color objects from color strings */
-    private $colorFactory = null;
+    private $colorFactory;
 
     /** @var Collection|null $componentCollection An instance of Collection */
-    private $componentCollection = null;
+    private $componentCollection;
 
     /** @var null $colours A list of colours to use */
-    private $colours = null;
+    private $colours;
 
     /** @var array $tabList A list of component tab categories */
     private $tabList = [];
@@ -100,7 +99,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
     {
         $this->renderComponents();
 
-        if ($this->getPermission() > WRITE_ACCESS) {
+        if ($this->getPermission() > UserAccess::ACCESS_WRITE) {
             $this->renderTabList();
         }
 
@@ -111,7 +110,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
         // Container blocks must parse after their inner organs
 
-        if ($this->getPermission() > WRITE_ACCESS) {
+        if ($this->getPermission() > UserAccess::ACCESS_WRITE) {
             $this->getPage()->parse('edit_page_block', 'edit_page');
             $this->getPage()->parse('modify_layout_block', 'modify_layout');
             $this->getPage()->parse('customise_page_block', 'customise_page');

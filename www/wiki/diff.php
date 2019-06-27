@@ -1,10 +1,11 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
-$wiki  = new Wiki;
-$group = new Group(HOMEPAGE_SERVICE);
+$wiki  = new Wiki();
+$group = new Group(UserAccess::SERVICE_HOMEPAGE);
 $userHandler = new User();
 
 if (is_numeric($this->arg[0])) {
@@ -30,7 +31,7 @@ if (is_numeric($this->arg[0])) {
 	}
 
 	// check permission
-	if (($permission = $group->getPermission($from['categoryID'])) < READ_ACCESS)
+	if (($permission = $group->getPermission($from['categoryID'])) < UserAccess::ACCESS_READ)
 		error(19);
 
 	$this->setTitle('Wiki Diff');

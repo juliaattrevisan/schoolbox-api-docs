@@ -3,6 +3,7 @@
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\Calendar\Event as EventModel;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Calendar extends DeprecatedModel
 {
@@ -17,7 +18,7 @@ class Calendar extends DeprecatedModel
         $this->_table = "event";
         $this->_index = "id";
 
-        $this->groupHandler = new Group(CALENDAR_SERVICE);
+        $this->groupHandler = new Group(UserAccess::SERVICE_CALENDAR);
 
         parent::__construct();
     }
@@ -223,12 +224,12 @@ class Calendar extends DeprecatedModel
                     $categoryList = $this->getEventCategory($event['id']);
                 }
 
-                $this->groupHandler->setService(HOMEPAGE_SERVICE);
+                $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
                 $permissions = array();
                 foreach ($categoryList as $category) {
                     $permissions[] = $this->groupHandler->getPermission($category);
                 }
-                $this->groupHandler->setService(CALENDAR_SERVICE);
+                $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
                 if (empty($permissions)) {
                     $permissions[] = 0;
@@ -351,7 +352,7 @@ class Calendar extends DeprecatedModel
         $groupList  = array();
         $groupQuery = '';
 
-        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
         $tempList = $this->groupHandler->involvedInCategoryList($_SESSION['id']);
 
         if (is_array($tempList)) {
@@ -371,11 +372,11 @@ class Calendar extends DeprecatedModel
             $sort_dir = '';
         }
 
-        $this->groupHandler->setService(CALENDAR_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
         //give people with userAccess to moderate Calendar Access to view all Camups Posts
         if (is_array($_SESSION['campus'])) {
-            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($_SESSION['campus'][0]) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND event_group.group_id = {$_SESSION['gid']}";
@@ -492,7 +493,7 @@ class Calendar extends DeprecatedModel
         $groupList = array();
         $groupQuery = '';
 
-        $this->groupHandler->setService(HOMEPAGE_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
         $tempList = $this->groupHandler->involvedInCategoryList($user->getId());
 
         if (is_array($tempList)) {
@@ -503,7 +504,7 @@ class Calendar extends DeprecatedModel
             // Ensure that requested group is included in filter
             // (as long as user has at least read permission on that group)
             if ($filter['group']) {
-                if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= READ_ACCESS) {
+                if ($this->groupHandler->getPermission($filter['group'], $user->getId()) >= UserAccess::ACCESS_READ) {
                     $groupList[] = intval($filter['group']);
                 }
             }
@@ -518,7 +519,7 @@ class Calendar extends DeprecatedModel
             }
         }
 
-        $this->groupHandler->setService(CALENDAR_SERVICE);
+        $this->groupHandler->setService(UserAccess::SERVICE_CALENDAR);
 
         /* Give people with userAccess to moderate Calendar Access to view all Campus Posts
          * This check is done against the calendar user, not the logged-in user,
@@ -526,7 +527,7 @@ class Calendar extends DeprecatedModel
          * an admin.
          */
         if ($user->getCampusCollection()->count()) {
-            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > WRITE_ACCESS) {
+            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND event_group.group_id = {$user->getRole()->getId()}";
@@ -845,7 +846,7 @@ class Calendar extends DeprecatedModel
     function create($event)
     {
 
-        if ($this->getPerm($event) < WRITE_ACCESS) {
+        if ($this->getPerm($event) < UserAccess::ACCESS_WRITE) {
             error(35);
         }
 
@@ -869,12 +870,12 @@ class Calendar extends DeprecatedModel
         $cleanEvent = $this->getByID($event['id']);
 
         /* Check perms on existing event */
-        if ($this->getPerm($event['id']) < WRITE_ACCESS) {
+        if ($this->getPerm($event['id']) < UserAccess::ACCESS_WRITE) {
             error(34);
         }
 
         /* Check perms on what we want the event to become */
-        if ($this->getPerm($event) < WRITE_ACCESS) {
+        if ($this->getPerm($event) < UserAccess::ACCESS_WRITE) {
             error(34);
         }
 
@@ -903,7 +904,7 @@ class Calendar extends DeprecatedModel
     {
         $event = $this->getByID($eventID);
 
-        if ($this->getPerm($eventID) < WRITE_ACCESS) {
+        if ($this->getPerm($eventID) < UserAccess::ACCESS_WRITE) {
             error(34);
         }
 

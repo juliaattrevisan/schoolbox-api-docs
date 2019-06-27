@@ -8,13 +8,11 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
 namespace Schoolbox\Resource\Browser\Resources;
 
-
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource\Browser\AbstractNode;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -52,7 +50,7 @@ class Node extends AbstractNode
         $this->setAccess(Access::getInstance());
 
         // Check we have permission to render node
-        if ($nodeId > 0 && !$this->hasPermission($nodeId, READ_ACCESS)) {
+        if ($nodeId > 0 && !$this->hasPermission($nodeId, UserAccess::ACCESS_READ)) {
             throw new Exception('Permission denied');
         }
     }

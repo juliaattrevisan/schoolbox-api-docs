@@ -5,21 +5,21 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
-
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Breadcrumbs;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 SitePage::extendExecutionTime(300);
 
 $groupHandler = new Group();
 
-if ($groupHandler->getPermission($_POST['homepageId']) < WRITE_ACCESS) {
+if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRITE) {
     error(19);
 } else {
     $user = $_SESSION['user'];

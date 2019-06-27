@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Evaluation
  *
@@ -37,6 +36,8 @@
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
+use Schoolbox\Permission\Access\UserAccess;
+
 abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
     public $_table = 'assess';
@@ -330,12 +331,12 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
         $perm         = $groupHandler->getPermission($assess['category_id']);
 
         // Users with write access can always do the assessment (generally teachers)
-        if($perm >= WRITE_ACCESS) {
+        if($perm >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
         // Students that are involved in the class can do the assessment, but not other students
-        if($perm >= READ_ACCESS) {
+        if($perm >= UserAccess::ACCESS_READ) {
 
             $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
 

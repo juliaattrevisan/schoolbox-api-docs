@@ -6,14 +6,14 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-$surveyHandler = new Survey_Main();
+$surveyHandler   = new Survey_Main();
 $questionHandler = new Survey_Question();
-$answerHandler = new Survey_Answer();
-$sectionHandler = new Survey_Section();
-$groupHandler = new Group();
+$answerHandler   = new Survey_Answer();
+$sectionHandler  = new Survey_Section();
+$groupHandler    = new Group();
 
 /* Soft delete the question
  */
@@ -36,7 +36,7 @@ if ($surveyHandler->isDeleted($section['assess_id'])) {
 	error(112);
 }
 
-if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(130);
 }
 
@@ -62,4 +62,3 @@ $answerHandler->update(array(
 $questionHandler->resequenceQuestionsAfterDelete($section['assess_id'], $section['section_id']);
 
 SitePage::localRedir('/survey/summary/' . $section['assess_id']);
-

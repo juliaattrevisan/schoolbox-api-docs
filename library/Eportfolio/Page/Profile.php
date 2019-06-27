@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  */
 
+use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Folder\Model as Folder;
 
@@ -354,7 +355,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $groupHandler = new Group();
         $folderMapper = new FolderMapper();
         /** @var Schoolbox\Collection $allGroups */
-        $allGroups = $folderMapper->findForUser($this->getUser(), false, READ_ACCESS, false, true);
+        $allGroups = $folderMapper->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);
         $allGroups->sortByCallback(function (Folder $f1, Folder $f2) {
             return strnatcasecmp($f1->getName(), $f2->getName());
         }, true);
@@ -365,7 +366,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /* Check permissions on whether you can view this subject's homepage
                  * If you can get there, you can see it, otherwise it's hidden
                  */
-                if ($groupHandler->getPermission($currentGroup->getId()) >= READ_ACCESS) {
+                if ($groupHandler->getPermission($currentGroup->getId()) >= UserAccess::ACCESS_READ) {
                     $this->getPage()->setVar(array(
                         'GROUP_ID' => $currentGroup->getId(),
                         'GROUP_NAME' => $currentGroup->getName(),
@@ -416,7 +417,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                 /* Check permissions on whether you can view this subject's
                  * homepage - if not, don't link it
                  */
-                if (($permission = $groupHandler->getPermission($currentSubject['id'])) < READ_ACCESS) {
+                if (($permission = $groupHandler->getPermission($currentSubject['id'])) < UserAccess::ACCESS_READ) {
                     $this->getPage()->parse('subject_unlinked_block', 'subject_unlinked');
                 } else {
                     $this->getPage()->parse('subject_linked_block', 'subject_linked');

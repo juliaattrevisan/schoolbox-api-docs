@@ -11,6 +11,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificati
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use \Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 $termMapper = Schoolbox\Assessment\Term\Mapper::getInstance();
@@ -78,13 +79,13 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
 
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < READ_ACCESS) {
+if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), $folder->getId())) < UserAccess::ACCESS_READ) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 // If I'm a write level user, I can downgrade myself to read access
-if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
-    $virtualPermission = READ_ACCESS;
+if ($actualPermission > UserAccess::ACCESS_READ && $_GET['readonly']) {
+    $virtualPermission = UserAccess::ACCESS_READ;
 } else {
     $virtualPermission = $actualPermission;
 }
@@ -148,7 +149,7 @@ $componentCollection = $componentFactory->buildComponentList($folder->getId());
 // Decide which of parent/student view butonyes to show, if either
 $this->setVar('readonly_switch_on_block', '');
 $this->setVar('readonly_switch_off_block', '');
-if ($actualPermission >= WRITE_ACCESS) {
+if ($actualPermission >= UserAccess::ACCESS_WRITE) {
     if ($_GET['readonly']) {
         $this->parse('readonly_switch_off_block', 'readonly_switch_off');
     } else {
@@ -157,7 +158,7 @@ if ($actualPermission >= WRITE_ACCESS) {
 }
 
 // User has elevated priviliges: can write to page
-if ($virtualPermission >= WRITE_ACCESS) {
+if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $this->setBlock('customise_page', 'homepage_component_tab', 'homepage_component_tab_block');
     $this->setBlock('customise_page', 'homepage_component_page', 'homepage_component_page_block');
     $this->setBlock('customise_page', 'homepage_color_selector', 'homepage_color_selector_block');

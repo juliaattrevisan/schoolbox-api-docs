@@ -6,16 +6,14 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 
-/* Get a list of questions and answers to softdelete
- */
-$surveyHandler = new Survey_Main();
-$sectionHandler = new Survey_Section();
+$surveyHandler   = new Survey_Main();
+$sectionHandler  = new Survey_Section();
 $questionHandler = new Survey_Question();
-$answerHandler = new Survey_Answer();
-$groupHandler = new Group();
+$answerHandler   = new Survey_Answer();
+$groupHandler    = new Group();
 
 $questionList = $questionHandler->getList($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[0]);
@@ -28,7 +26,7 @@ if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
     $this->pageNotFound();
 }
 
-if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOwner($section['assess_id']) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(130);
 }
 
@@ -64,4 +62,3 @@ $sectionHandler->update($section);
 $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
 
 SitePage::localRedir('/survey/summary/' . $section['assess_id']);
-

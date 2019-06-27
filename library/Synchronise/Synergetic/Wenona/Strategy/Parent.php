@@ -8,6 +8,7 @@
  * @version     SVN: $Id$
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>
  */
+use Schoolbox\Permission\Access\UserAccess;
 
 class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synergetic_Wenona_Strategy_Abstract {
 
@@ -105,7 +106,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
 
         $db = DeprecatedDatabase::getInstance();
 
-        $groupHandler = new Group(HOMEPAGE_SERVICE);
+        $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
         $userHandler = new User();
 
         $result = $db->getAll("SELECT `id`, `name` FROM `folder` WHERE `name` LIKE '%Wenona Parents%'");

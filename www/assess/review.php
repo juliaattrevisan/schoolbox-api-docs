@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -67,7 +68,7 @@ if ($assessHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < WRITE_ACCESS)) {
+if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
     error(127);
 }
 

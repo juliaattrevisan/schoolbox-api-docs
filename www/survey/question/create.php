@@ -10,8 +10,8 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 use \Schoolbox\Learning\Assessment\Redirect;
@@ -34,7 +34,7 @@ if (!empty($_POST)) {
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
                 $survey['category_id']
-            ) < WRITE_ACCESS)
+            ) < UserAccess::ACCESS_WRITE)
     ) {
         error(130);
     }
@@ -104,7 +104,7 @@ if (!empty($_POST)) {
 
     if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
                 $survey['category_id']
-            ) < WRITE_ACCESS)
+            ) < UserAccess::ACCESS_WRITE)
     ) {
         error(130);
     }

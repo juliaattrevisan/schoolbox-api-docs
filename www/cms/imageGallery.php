@@ -6,6 +6,7 @@
  ************************************************************/
 
 use \Schoolbox\Breadcrumbs;
+use Schoolbox\Permission\Access\UserAccess;
 
 /* This page generates a photo gallery of the provided folder.
  * Displays one image at large size and the rest as thumbnails.
@@ -26,7 +27,7 @@ if (is_numeric($this->arg[0])) {
         error(2);
     }
 
-    if ($groupHandler->getPermission($this->arg[0]) < READ_ACCESS) {
+    if ($groupHandler->getPermission($this->arg[0]) < UserAccess::ACCESS_READ) {
         error(6);
     }
 
@@ -70,7 +71,7 @@ if (is_numeric($this->arg[0])) {
     if (isset($_GET['returnId'])) {
         try {
             $returnFolder = $folderMapper->findById((int)$_GET['returnId']);
-            if ($groupHandler->getPermission($returnFolder->getId()) >= READ_ACCESS) {
+            if ($groupHandler->getPermission($returnFolder->getId()) >= UserAccess::ACCESS_READ) {
                 $folder = $returnFolder;
             }
         } catch (\Schoolbox\Mapper\Exception $e) {

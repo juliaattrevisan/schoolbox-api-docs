@@ -1,25 +1,20 @@
 <?php
-
-use Schoolbox\Learning\Quiz\ActionValidator;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Quiz\Model as Quiz;
-
 /**
  * Review completion. Marks when an assessment review is finished.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
  */
 
+use Schoolbox\Learning\Quiz\ActionValidator;
+use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Error;
-use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
@@ -77,7 +72,7 @@ if (!$actionValidator->canReviewAttempts($sessionUser, $attempt->getUser(), $qui
 }
 
 
-if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < WRITE_ACCESS) {
+if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < UserAccess::ACCESS_WRITE) {
 	error(Error\Mapper::ERROR_PERM_TEST_REVIEW);
 }
 
@@ -88,4 +83,3 @@ $assessmentId = $assess->getAssessmentModel()->getId();
 $this->localRedir($this->routeLookup('learningAssessment.getStatus', [ 'assessmentId' => $assessmentId ]));
 
 die();
-

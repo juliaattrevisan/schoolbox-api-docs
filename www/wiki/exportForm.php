@@ -1,11 +1,14 @@
 <?php
 
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
+
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $page         = $kernel->getDependencyInjector()->get('layoutEngine');
 $wikiHandler  = new Wiki;
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (isset($_GET['wikiID'])) {
     // wiki exists
@@ -15,7 +18,7 @@ if (isset($_GET['wikiID'])) {
         error(2);
     }
 
-    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < READ_ACCESS) {
+    if (($permission = $groupHandler->getPermission($wiki['categoryID'])) < UserAccess::ACCESS_READ) {
         error(19);
     }
 

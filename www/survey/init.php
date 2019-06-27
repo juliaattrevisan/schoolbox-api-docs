@@ -1,17 +1,20 @@
 <?php
 /**
- * ${NAME}
+ * Initialise a survey
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-$surveyHandler = new Survey_Main();
-$sectionHandler = new Survey_Section();
+
+use Schoolbox\Permission\Access\UserAccess;
+
+$surveyHandler   = new Survey_Main();
+$sectionHandler  = new Survey_Section();
 $questionHandler = new Survey_Question();
-$attemptHandler = new Survey_Attempt();
-$groupHandler = new Group();
+$attemptHandler  = new Survey_Attempt();
+$groupHandler    = new Group();
 
 if (!is_numeric($this->arg[0])) {
 	error(112);
@@ -25,11 +28,8 @@ if (!is_numeric($this->arg[1])) {
 	error(115);
 }
 
-
-
 $survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
-
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
 	error(112);
@@ -40,7 +40,7 @@ if (!$section) {
 }
 
 /* Check if you are in this category, so you can't submit other category's
- * online assessments unless you are a part of that category.
+ * surveys unless you are a part of that category.
  */
 if (!$surveyHandler->canDoAssessment($survey['assess_id'])) {
 	error(19);
@@ -55,7 +55,7 @@ if ($surveyHandler->isExpired($survey['assess_id'])) {
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
-if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < WRITE_ACCESS)) {
+if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
 	error(144);
 }
 

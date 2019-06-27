@@ -1,16 +1,20 @@
 <?php
+
+use Schoolbox\Application\WebRequest\Kernel;
+use Schoolbox\Permission\Access\UserAccess;
+
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+$kernel = new Kernel();
 
 $page = new SitePage();
 $pollHandler = new Poll();
-$groupHandler = new Group(HOMEPAGE_SERVICE);
+$groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST['vote'])) {
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($_POST['folder_id']) < READ_ACCESS) {
+    if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_READ) {
         error(19);
     }
 
@@ -21,7 +25,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($_POST['folder_id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 
@@ -87,7 +91,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     /* Check permission
      */
-    if ($groupHandler->getPermission($poll['folder_id']) < WRITE_ACCESS) {
+    if ($groupHandler->getPermission($poll['folder_id']) < UserAccess::ACCESS_WRITE) {
         error(19);
     }
 

@@ -1,22 +1,27 @@
 <?php
 /**
- * Contains information about the type of group that a category represents
- * Categories can have groups of type, free, moderator or private.
- * A category is not a group unless this is set
+ * Contains information about the type of group that a folder represents
+ * Folders can have groups of type, free, moderator or private.
+ * A folder is not a group unless this is set
  *
  * @author    James Leckie <james.leckie@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
-
 namespace Schoolbox\Resource;
 
 class Group {
 
-    const PRIVATE_GROUP = 1;
-    const MODERATED_GROUP = 2;
-    const FREE_GROUP = 3;
+    /**
+     * The three types of groups you can join:
+     *
+     * PRIVATE (invite only)
+     * MODERATED (assigned, by group admin)
+     * FREE (anyone can come and go)
+     */
+    public const PRIVATE_GROUP = 1;
+    public const MODERATED_GROUP = 2;
+    public const FREE_GROUP = 3;
 
     /**
      * The type of group
@@ -30,7 +35,9 @@ class Group {
      */
     protected $folder;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $forceFollow;
 
     /**
@@ -38,13 +45,9 @@ class Group {
      *
      * @return bool
      */
-    public function isPrivate() {
-        if($this->getType() == self::PRIVATE_GROUP) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    public function isPrivate(): bool
+    {
+        return $this->getType() === self::PRIVATE_GROUP;
     }
 
     /**
@@ -52,13 +55,9 @@ class Group {
      *
      * @return bool
      */
-    public function isModerated() {
-        if($this->getType() ==self::MODERATED_GROUP) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    public function isModerated(): bool
+    {
+        return $this->getType() === self::MODERATED_GROUP;
     }
 
     /**
@@ -66,13 +65,9 @@ class Group {
      *
      * @return bool
      */
-    public function isFree() {
-        if($this->getType() == self::FREE_GROUP) {
-            return true;
-        }
-        else {
-            return false;
-        }
+    public function isFree(): bool
+    {
+        return $this->getType() === self::FREE_GROUP;
     }
 
     /**
@@ -88,7 +83,7 @@ class Group {
     /**
      * @return int
      */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }
@@ -98,7 +93,7 @@ class Group {
      * @param Folder\Model $folder
      * @return $this
      */
-    public function setCategory($folder)
+    public function setFolder($folder)
     {
         $this->folder = $folder;
         return $this;
@@ -107,7 +102,7 @@ class Group {
     /**
      * @return Folder\Model
      */
-    public function getCategory()
+    public function getFolder(): Folder\Model
     {
         return $this->folder;
     }
@@ -117,7 +112,7 @@ class Group {
      * @param boolean $forceFollow
      * @return self
      */
-    public function setForceFollow($forceFollow)
+    public function setForceFollow($forceFollow): Group
     {
         $this->forceFollow = $forceFollow;
         return $this;
@@ -127,11 +122,8 @@ class Group {
     /**
      * @return boolean
      */
-    public function getForceFollow()
+    public function getForceFollow(): bool
     {
         return $this->forceFollow;
     }
-
-
-
 }
