@@ -44,6 +44,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
+        $this->getLogger()->info('Starting add-msg-to-object-queue');
         $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
         if (empty($this->instanceId)) {
             $this->instanceId = INSTANCE_ID;
@@ -72,12 +73,12 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             /** @var Instance $instance */
             // Message
             $expiryTime = self::ttlToDate($this->redis->ttl($key));
-            $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
+            $this->getLogger()->debug("[ $key : (TTL: {$expiryTime}) ]");
             $output = $instance->jsonSerialize();
-            $this->getLogger()->info('Trigger Date: ' . date('Y-m-d H:i:s', $output['time']));
+            $this->getLogger()->debug('Trigger Date: ' . date('Y-m-d H:i:s', $output['time']));
 
             foreach ($output['topics'] as $topic) {
-                $this->getLogger()->info($topic);
+                $this->getLogger()->debug($topic);
                 if (preg_match('/duework\.([0-9]+)\./', $topic, $matches)) {
                     $id = (int)$matches[1];
                     try {
@@ -85,7 +86,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         // insert the msg reference into this 'queue'
                         $this->addToObjectSet('plan', $id, $key);
                     } catch (Exception $e) {
-                        $this->getLogger()->warning("Plan {$id} not found.");
+                        $this->getLogger()->debug("Plan {$id} not found.");
                     }
                 } elseif (preg_match('/news\.([0-9]+)\./', $topic, $matches)) {
                     $id = (int)$matches[1];
@@ -94,11 +95,12 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         // insert the msg reference into this 'queue'
                         $this->addToObjectSet('news', $id, $key);
                     } catch (Exception $e) {
-                        $this->getLogger()->warning("News {$id} not found.");
+                        $this->getLogger()->debug("News {$id} not found.");
                     }
                 }
             }
         }
+        $this->getLogger()->info('Finished add-msg-to-object-queue');
     }
 
 
@@ -128,7 +130,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     private function addToObjectSet(string $type, int $id, string $key): void
     {
         $eventObjectSet = "msg:{$this->instanceId}:q:%s:%s";
-        $this->getLogger()->notice("[ADDING] {$type} {$id} to object set.");
+        $this->getLogger()->info("[ADDING] {$type} {$id} to object set.");
         if (!$this->perform()) {
             return;
         }
