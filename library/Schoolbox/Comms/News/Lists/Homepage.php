@@ -49,7 +49,7 @@ class Homepage extends Base
         /* These article ids are when you have role-based access to $folder
          * $user won't appear in their audience so we have to find them roundabout-ly
          */
-        $withRoleBasedPerms = $this->withReadAccess($params->getFolderId());
+        $withRoleBasedPerms = $this->fromRoleBasedPermissions($params->getFolderId());
 
         /* The uniqued, combined set of unique articles ids including role-based accessibility
          */
@@ -96,7 +96,7 @@ class Homepage extends Base
      * @param int $folderId
      * @return array
      */
-    private function withReadAccess(int $folderId): array
+    private function fromRoleBasedPermissions(int $folderId): array
     {
         $articlesWithRoleBasedPermissions = [];
 
