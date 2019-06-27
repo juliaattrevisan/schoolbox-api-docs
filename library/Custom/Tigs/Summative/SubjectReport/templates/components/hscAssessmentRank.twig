@@ -9,7 +9,8 @@ Data:
     showErrors           bool             - Should we render errors?
     dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
-<h2 class="subheader">HSC Assessment Rank</h2>
+<div class="hsc-rank-wrap">
+<h2 class="subheader hsc-rank-heading">HSC Assessment Rank</h2>
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
@@ -36,3 +37,4 @@ Data:
         </table>
     </div>
 {% endif %}
+</div>

@@ -14,7 +14,8 @@ Data:
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(studentMark / 7 * 100) ~ '-bg' %}
 
-<h2 class="subheader">{{ header }}</h2>
+<div class="ib-graph-wrap">
+<h2 class="subheader ib-graph-heading">{{ header }}</h2>
 
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
@@ -107,3 +108,4 @@ Data:
         <div id="ib-graph" class="grade-graph"></div>
     {% endif %}
 {% endif %}
+</div>

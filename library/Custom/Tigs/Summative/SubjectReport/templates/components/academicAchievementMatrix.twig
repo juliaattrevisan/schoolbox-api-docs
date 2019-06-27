@@ -11,7 +11,8 @@ Data:
     dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 
-<p class="meta">Approaches to Learning</p>
+<div class="atl-wrap">
+<p class="meta atl-heading">Approaches to Learning</p>
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
@@ -46,3 +47,4 @@ Data:
         </table>
     </div>
 {% endif %}
+</div>

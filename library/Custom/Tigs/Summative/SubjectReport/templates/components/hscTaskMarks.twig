@@ -18,7 +18,8 @@ Data:
     }
 </style>
 
-<p class="meta">HSC Task Marks (%)</p>
+<div class="hsc-task-marks-wrap">
+<p class="meta hsc-task-marks-heading">HSC Task Marks (%)</p>
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
@@ -41,3 +42,4 @@ Data:
         </table>
     </div>
 {% endif %}
+</div>

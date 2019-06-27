@@ -13,7 +13,8 @@ Data:
     dataAttributeError   string           - A string to apply as a data attribute to error alerts
 #}
 
-<p class="meta">Academic Achievement Summary</p>
+<div class="aas-wrap">
+<p class="meta aas-heading">Academic Achievement Summary</p>
 {% if error|default(null) %}
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
@@ -29,3 +30,4 @@ Data:
         } only %}
     </div>
 {% endif %}
+</div>
