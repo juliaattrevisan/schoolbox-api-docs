@@ -1,1 +1,1 @@
-DELETE FROM config WHERE name like 'homepage_news_expiry';
+DELETE FROM config WHERE name = 'homepage_news_expiry';
