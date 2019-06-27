@@ -80,6 +80,9 @@ class StudentAttributes
     /** @var Alaress_Date_Format */
     private $curriculumYearFinish;
 
+    /** @var bool */
+    private $isHistorical;
+
 
     /**
      * @param IConfigLoader $config
@@ -115,6 +118,7 @@ class StudentAttributes
         // If unknown (NULL), assume $ibFlag is FALSE
         $this->isIb           = (bool)$ibFlag;
         $this->reportDateYear = (int)$reportDate->getYear();
+        $this->isHistorical   = $reportDate->lt($now);
 
         $this->calculateDerivedAttributes($config, (int)$user->getYear(), $reportDate, $now);
     }
@@ -288,6 +292,16 @@ class StudentAttributes
         ];
     }
 
+
+    /**
+     * Returns whether this is for a historical report, as opposed to a current report
+     *
+     * @return bool
+     */
+    public function isHistorical(): bool
+    {
+        return $this->isHistorical;
+    }
 
 
     /**
