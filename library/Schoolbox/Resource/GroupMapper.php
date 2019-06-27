@@ -31,7 +31,7 @@ class GroupMapper extends Mapper {
         $this->hasTable('userGroups');
         $this->uses('type', self::TYPE_INTEGER);
         $this->uses('force_follow', self::TYPE_BOOLEAN);
-        $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'category', 'folder');
+        $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'folder', 'folder');
     }
 
 
