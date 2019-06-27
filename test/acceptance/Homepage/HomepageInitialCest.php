@@ -92,9 +92,11 @@ class HomepageInitialCest
         $i->canSee("Test Homepage");
         $i->click("Test Homepage");
         $i->waitForText("Homepage", 5);
+        sleep(2);
         $i->click("Homepage");
         $home_page_url=$i->getCurrentUrl();
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
+        sleep(2);
         $i->click("Add a blog post");
         $i->canSee("Post Blog");
         $i->fillField("heading","Test Blog Title");
@@ -102,6 +104,7 @@ class HomepageInitialCest
         $i->click(['css'=>'input[type=submit]']);
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        sleep(2);
         $i->click("Post a news article");
         $i->fillField("title","Test News Title");
         $i->fillCkEditorById('body', 'wow what interesting news');
@@ -110,6 +113,7 @@ class HomepageInitialCest
         sleep(5);
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css'=>'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        sleep(2);
         $i->click("Add text and multimedia, or embed content");
         sleep(5);
         $i->fillField("textBoxHeading","Test Text Box Title");
@@ -133,10 +137,13 @@ class HomepageInitialCest
         $i->impersonate("Rachel Rhodes");
         $i->amOnUrl($home_page_url);
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
+        sleep(2);
         $i->canSee("Test Blog Title");
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        sleep(2);
         $i->canSee("Test News Title");
         $i->canSeeElement(['css'=>'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        sleep(2);
         $i->canSee("Test Text Box Title");
     }
 
@@ -153,13 +160,17 @@ class HomepageInitialCest
         $home_page_url=$i->getCurrentUrl();
         $i->click(['css'=>'label[for=component-lock-toggle]']);
         $i->canSeeElement(['css'=>'span[class=icon-unlocked]']);
+        sleep(2);
         $i->click(['css'=>'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a.icon-close[data-state=closed][title=Close]']);
+        sleep(2);
         $i->canSeeElement(['css'=>'a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a.icon-close[data-state=closed][title=Close]']);
+        sleep(2);
         $i->canSeeElement(['css'=>'a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Component_Homepage_TextBoxController a.icon-close[data-state=closed][title=Close]']);
+        sleep(2);
         $i->canSeeElement(['css'=>'a[class=button\ submit]']);
         $i->click(['css'=>'div.component-container.Component_Homepage_TextBoxController a[class=button\ submit]']);
         echo "Not done yet";
