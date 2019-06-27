@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Comms\News\Lists;
 
+use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
@@ -42,7 +43,10 @@ class Homepage extends Base
         $articleIds = $this->articleResolver->findArticlesForAudience(
             Folder::getEntityType(),
             $params->getFolderId(),
-            null
+            Audience\Model::RELATIONSHIP_SELF,
+            true,
+            [ "{$this->newsMapper->getTable()}.publish_at" => 'DESC', "{$this->newsMapper->getTable()}.created_at" => 'DESC'],
+            $params->getLimit()
         );
 
         $idProperty = $this->newsMapper->getIdentifierProperty();
