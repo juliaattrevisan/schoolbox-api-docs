@@ -15,7 +15,7 @@ class GarbageCollector extends Deletable implements IGarbageCollector
     /**
      * @inheritDoc
      */
-    public function remove(string $hash, bool $performDryRun)
+    public function remove(string $hash, bool $performDryRun): void
     {
         $fileListItemMapper = new FileListMapper();
 

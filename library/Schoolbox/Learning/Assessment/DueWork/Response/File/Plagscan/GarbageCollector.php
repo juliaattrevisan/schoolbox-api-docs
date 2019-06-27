@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
+use phpDocumentor\Reflection\Types\Integer;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
@@ -39,7 +40,7 @@ class GarbageCollector extends Deletable implements IGarbageCollector
     /**
      * @inheritDoc
      */
-    public function remove(string $hash, bool $performDryRun)
+    public function remove(string $hash, bool $performDryRun): void
     {
         /**
          * Some items do exists in student_submission_file only but not in plagscan_document
@@ -51,32 +52,18 @@ class GarbageCollector extends Deletable implements IGarbageCollector
             $statement = $this->database->prepare($query);
             $statement->execute(['hash' => $hash]);
         } else {
-            $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
-
-            if ($records->count() > 0) {
-                if ($performDryRun) {
-                    $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
-                } else {
-                    foreach ($records as $record) {
-                        try {
-                            $this->mapper->hardDelete($record);
-                        } catch (\Exception $exception) {
-                            throw new Mapper\Exception($exception->getMessage());
-                        }
-                    }
-                    $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
-                }
-            }
+            parent::remove($hash, $performDryRun);
         }
     }
 
     /**
      * Check if there's a record that needs to be purged in plagscan_document via student_submission_file.id
+     *
      * @param $hash
      *
-     * @return bool
+     * @return int
      */
-    private function hasStudentSubmissionRecord($hash)
+    private function hasStudentSubmissionRecord($hash): int
     {
         $query = 'SELECT COUNT(*) FROM ' . $this->mapper->getTable() . ' WHERE student_submission_file_id
             IN (SELECT id FROM student_submission_file WHERE hash = :hash)';
@@ -84,6 +71,6 @@ class GarbageCollector extends Deletable implements IGarbageCollector
         $statement = $this->database->prepare($query);
         $statement->execute(['hash' => $hash]);
 
-        return $statement->fetchColumn();
+        return (int) $statement->fetchColumn();
     }
 }

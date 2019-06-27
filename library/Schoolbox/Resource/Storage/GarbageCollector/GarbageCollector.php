@@ -101,7 +101,7 @@ class GarbageCollector implements IGarbageCollector
     /**
      * @inheritDoc
      */
-    public function remove(string $hash, bool $performDryRun)
+    public function remove(string $hash, bool $performDryRun): void
     {
         $debugMessage = 'Executing in delete/unlink mode...';
 

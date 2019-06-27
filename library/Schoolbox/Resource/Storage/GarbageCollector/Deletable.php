@@ -42,13 +42,11 @@ class Deletable implements IGarbageCollector
 
     /**
      * @param string $hash
-     *
      * @param bool   $performDryRun
      *
-     * @return mixed|void
      * @throws Mapper\Exception
      */
-    public function remove(string $hash, bool $performDryRun)
+    public function remove(string $hash, bool $performDryRun): void
     {
         $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 

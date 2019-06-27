@@ -47,13 +47,11 @@ class Nullable implements IGarbageCollector
 
     /**
      * @param string $hash
-     *
      * @param bool   $performDryRun
      *
-     * @return mixed|void
      * @throws Mapper\Exception
      */
-    public function remove(string $hash, bool $performDryRun)
+    public function remove(string $hash, bool $performDryRun): void
     {
         if (!\count($this->setMethods)) {
             throw new Mapper\Exception('setMethods cannot be empty...');
@@ -61,16 +59,18 @@ class Nullable implements IGarbageCollector
 
         $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
-        foreach ($records as $record) {
+        if (\count($records) > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will unlink ['. \count($records) .'] record(s) in: ' . $this->mapper->getTable(), ['char' => '+']);
+                $this->logger->notice('Will unlink [' . \count($records) . '] record(s) in: ' . $this->mapper->getTable());
             } else {
-                $obj = $this->mapper->findByIdWithFallback($record);
-                foreach ($this->setMethods as $method) {
-                    $obj->{$method}(null);
+                foreach ($records as $record) {
+                    $obj = $this->mapper->findByIdWithFallback($record);
+                    foreach ($this->setMethods as $method) {
+                        $obj->{$method}(null);
+                    }
+                    $this->mapper->save($obj);
                 }
-                $this->mapper->save($obj);
-                $this->logger->notice('['. \count($records) . '] record(s) unlinked in: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('[' . \count($records) . '] record(s) unlinked in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }
