@@ -10,7 +10,7 @@
 namespace Schoolbox\Comms\News\Lists;
 
 use Schoolbox\Comms\News\Audience;
-use Schoolbox\Comms\News\Mapper;
+use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
@@ -27,30 +27,27 @@ class Homepage extends Base
      * and article must have been audienced to this folder
      * and $user must have READ access to the folder specified in the article's audience
      *
-     * @param Querystring $params
-     * @param User        $user
+     * @param Querystring     $params
+     * @param User            $user
      * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \DomainException
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
      * @throws \UnderflowException
+     * @throws \UnexpectedValueException
      */
     public function find(Querystring $params, User $user): array
     {
-        $articleIds = $this->newsMapper->findArticleIdsForTopic(
-            $this->articleResolver->findArticlesForUser($user),
-            Mapper::TOPIC_ALL_ID,
-            $params->getLimit(),
-            $params->getPageNum(),
-            null,
-            null,
-            $params->getFolderId()
+        $articleIds = $this->articleResolver->findArticlesForAudience(
+            Folder::getEntityType(),
+            $params->getFolderId(),
+            Audience\Model::RELATIONSHIP_SELF,
+            true,
+            [ "{$this->newsMapper->getTable()}.publish_at" => 'DESC', "{$this->newsMapper->getTable()}.created_at" => 'DESC'],
+            $params->getLimit()
         );
-
-        $articleIds = array_unique($articleIds);
 
         $idProperty = $this->newsMapper->getIdentifierProperty();
 
@@ -58,7 +55,7 @@ class Homepage extends Base
         $articles = $this->loadArticleByIds($articleIds, $params, $user)->indexBy($idProperty);
 
         // Load audiences so module auth rules work in rendered templates
-        $rootSegments = Audience\Mapper::getInstance()->findForArticles($articles->getPropertyValues($idProperty));
+        $rootSegments = $this->audienceMapper->findForArticles($articles->getPropertyValues($idProperty));
 
         foreach ($rootSegments as $rootSegment) {
             $articles[$rootSegment->getCommsNewsArticle()->getId()]->getAudience()[$rootSegment->getId()] = $rootSegment;
