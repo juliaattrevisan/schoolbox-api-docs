@@ -6,7 +6,5 @@
  * @link      https://schoolbox.com.au/
  */
 
-declare(strict_types=1);
-
-passthru(__DIR__ .  '/../../tools/mq/remove-old-triggers.php --perform', $returnVar);
-exit($returnVar);
+$result = pcntl_exec(__DIR__ .  '/../../tools/mq/clean-up-redis.sh');
+echo $result;

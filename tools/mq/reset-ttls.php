@@ -38,6 +38,8 @@ try {
          */
         public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
         {
+            $log->info('Starting reset-ttls');
+
             /** @var ClientInterface $redis */
             $redis = $di->get('redis');
 
@@ -100,6 +102,7 @@ try {
             }
 
             $log->debug('Search complete');
+            $log->info('Finishing reset-ttls');
         }
 
     });

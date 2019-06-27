@@ -51,19 +51,29 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
+        $this->getLogger()->info('Starting remove-old-triggers');
+
         $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
         if (empty($this->instanceId)) {
             $this->instanceId = INSTANCE_ID;
         }
 
         $this->redis = $this->getDi()->get('redis');
+        $numKeys = $this->redis->dbsize();
+        $this->getLogger()->info("Number of keys : {$numKeys}");
 
         // non-blocking search of the keyspace for all messages
+        $numKeysProcessed = 0;
         $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");
         foreach ($search as $key) {
+            $numKeysProcessed++;
+            $progress = round($numKeysProcessed / $numKeys * 100, 2);
+            if ($progress % 10 === 0) {
+                $this->getLogger()->info("{$progress} % processed");
+            }
 
             $expiryTime = self::ttlToDate($this->redis->ttl($key));
-            $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
+            $this->getLogger()->debug("[ $key : (TTL: {$expiryTime}) ]");
 
             $keyType = $this->redis->type($key);
             try {
@@ -103,6 +113,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             }
             // The rest of the cases should be taken care by the reset-ttls.php script.
         }
+        $this->getLogger()->info('Finished remove-old-triggers');
+        $numKeys = $this->redis->dbsize();
+        $this->getLogger()->info("Number of keys : {$numKeys}");
     }
 
 
@@ -157,7 +170,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     private function deleteFromRedis(string $target, ?Alaress_Date_Format $triggerDate, string $key): void
     {
-        $this->getLogger()->alert("[DELETING] {$target} " . ($triggerDate ? date('Y-m-d H:i:s', $triggerDate->getUnixTimeStamp()) : ''));
+        $this->getLogger()->info("[DELETING] {$target} " . ($triggerDate ? date('Y-m-d H:i:s', $triggerDate->getUnixTimeStamp()) : ''));
         // If dry run
         if (!$this->perform()) {
             return;
@@ -184,7 +197,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     private function setTTL(string $target, ?Alaress_Date_Format $triggerDate, string $key): void
     {
         $expireTime = (clone $triggerDate)->addSeconds(Instance::DEFAULT_TTL);
-        $this->getLogger()->warning("[SETTING] {$target} TTL " . date('Y-m-d H:i:s', $expireTime->getUnixTimeStamp()));
+        $this->getLogger()->info("[SETTING] {$target} TTL " . date('Y-m-d H:i:s', $expireTime->getUnixTimeStamp()));
         // If dry run
         if (!$this->perform()) {
             return;
