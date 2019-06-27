@@ -40,20 +40,24 @@ if (Config::get('saml_auth_context') !== 'unspecified') {
 
 SAMLDebugLog(json_encode($settingsInfo));
 
-$url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
-$idpMetadataUrl = $url->toString();
+try {
+    $url = new \Zend\Uri\Uri(Cfg::get('saml_idp_metadata_url'));
+    $idpMetadataUrl = $url->toString();
 
-$cache = new Alaress_Saml_Cache();
-$idpMetadata = $cache->init($idpMetadataUrl);
+    $cache = new Alaress_Saml_Cache();
+    $idpMetadata = $cache->init($idpMetadataUrl);
 
-// if cache exists, update $setting info from cache
-if (file_exists($idpMetadata->getCachedFile())) {
-    try {
-        $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
-    } catch (Exception $e) {
-        $cache->invalidateCache();
-        SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
+    // if cache exists, update $setting info from cache
+    if (file_exists($idpMetadata->getCachedFile())) {
+        try {
+            $settingsInfo = OneLogin_Saml2_IdPMetadataParser::injectIntoSettings($settingsInfo, OneLogin_Saml2_IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
+        } catch (Exception $e) {
+            $cache->invalidateCache();
+            SAMLDebugLog("Invalidating cache as we failed to get valid metadata from IDP");
+        }
     }
+} catch (Exception $e) {
+    //noop, metadata url invalid
 }
 
 /**
