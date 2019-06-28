@@ -68,6 +68,26 @@ class StudentAttributesTest extends TestCase
 
 
     /**
+     * Tests that we can detect whether the report is current or historical
+     *
+     * @dataProvider providerCurrentOrHistoricalReport
+     * @param null|string $reportDate
+     * @param null|string $now
+     * @param bool   $isHistorical
+     * @throws InvalidArgumentException
+     * @throws UnexpectedValueException
+     */
+    public function testCurrentOrHistoricalReport(?string $reportDate, ?string $now, bool $isHistorical): void
+    {
+        $user = (new User())->setYear(7);
+        $attributes = new StudentAttributes($this->getConfigLoader(), $user, null, $reportDate, $now);
+
+        $this->assertSame($isHistorical, $attributes->isHistorical());
+        $this->assertSame(!$isHistorical, $attributes->isCurrent());
+    }
+
+
+    /**
      * Test that we can derive a student year level for a current or historical report
      *
      * @dataProvider providerValidYearLevel
@@ -474,6 +494,21 @@ class StudentAttributesTest extends TestCase
              ]],
         ];
     }
+
+
+    /**
+     * @return array
+     */
+    public function providerCurrentOrHistoricalReport(): array
+    {
+        // $reportDate, $now, bool $isHistorical
+        return [
+            [null, null, false],
+            ['2010-10-10', '2010-10-11', true],     // one day ago
+            ['2010-10-10', '2010-10-10', false],    // now
+        ];
+    }
+
 
     /**
      * @return array

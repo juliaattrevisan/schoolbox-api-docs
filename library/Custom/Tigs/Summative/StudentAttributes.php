@@ -294,6 +294,14 @@ class StudentAttributes
 
 
     /**
+     * @return bool
+     */
+    public function isCurrent(): bool
+    {
+        return !$this->isHistorical;
+    }
+
+    /**
      * Returns whether this is for a historical report, as opposed to a current report
      *
      * @return bool
