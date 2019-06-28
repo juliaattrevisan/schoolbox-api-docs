@@ -46,6 +46,7 @@ class StudentAttributesTest extends TestCase
      * @dataProvider providerInvalidTermDates
      * @param array $invalidTermDates
      * @expectedException InvalidArgumentException
+     * @throws UnexpectedValueException
      */
     public function testInvalidTermDates(array $invalidTermDates): void
     {
