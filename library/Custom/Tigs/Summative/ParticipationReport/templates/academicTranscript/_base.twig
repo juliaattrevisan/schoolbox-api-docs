@@ -1,0 +1,84 @@
+{#
+Data:
+    student                                                      User
+    subjects                                                     array
+    subjects[idx].name                                           string
+    subjects[idx].codes                                          string[]
+    subjects[idx].folderId                                       int
+    subjects[idx].teachers                                       User[]
+    data[folderId]                                               array
+    reportDate                                                   null|string
+#}
+<style>
+    .results {
+        color: black;
+        text-align: right;
+    }
+    .result-group {
+        display: inline-block;
+        background-color: #cccccc;
+        text-align: center;
+    }
+    .result-item {
+        display: inline-block;
+        padding: 3px 10px;
+    }
+    .result-heading {
+        font-weight: bold;
+    }
+    .subject-list > .subject-list-item{
+        margin-bottom: 0.5rem;
+        background-color: white;
+    }
+    .teacher-comment{
+        color: black;
+    }
+</style>
+
+<h2 class="subheader">Academic Transcript</h2>
+<div>
+    <ul class="subject-list">
+        {% for subject in subjects %}
+            {% set folderId = subject.folderId %}
+            {% set folderData = data[folderId] %}
+            {% set firstTeacher = subject.teachers | first %}
+            <li class="subject-list-item">
+                <a href="{{ routeLookup('tigsSubjectReport.getReport', {userId: student.id, folderId: subject.folderId, reportDate: reportDate}) }}" class="link-row">
+                    <div class="list-item">
+                        <div class="card column small-12 medium-6">
+
+                            <img src="/portrait.php?userId={{ firstTeacher.externalId }}&amp;size=square64" width="48" alt="{{ firstTeacher.fullName }}">
+                            <h3>{{ subject.name }}
+                                <span class="meta">
+                                {% for code in subject.codes %}
+                                    ({{ code }}){% if not loop.last %},{% endif %}
+                                {% endfor %}
+                            </span>
+                            </h3>
+
+                            <div class="meta">
+                                <p>{{ firstTeacher.fullName }} <span class="pipe meta">{{ firstTeacher.role.name }}</span></p>
+                            </div>
+                        </div>
+                        <div class="column small-12 medium-6 results">
+                            {% block results %}
+                                {# Structure and CSS classes that extending templates should mimic #}
+                                <div class="result-group">
+                                    <div class="result-item">
+                                        <span class="result-heading">Heading</span><br>
+                                        <span class="result-value">Value</span>
+                                    </div>
+                                </div>
+                            {% endblock %}
+                        </div>
+                        <div class="column small-12 teacher-comment">
+                            {% block comment %}{% endblock %}
+                        </div>
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
