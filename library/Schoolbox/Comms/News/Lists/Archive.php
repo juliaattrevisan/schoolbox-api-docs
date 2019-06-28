@@ -112,8 +112,7 @@ class Archive extends Base
             $params->getPageNum(),
             $year,
             $month,
-            $folderId,
-            true
+            $folderId
         );
 
         $availableIds = $this->newsMapper->findArticleIdsForTopic(
@@ -123,8 +122,7 @@ class Archive extends Base
             0,
             $year,
             $month,
-            $folderId,
-            true
+            $folderId
         );
 
         $articles = $this->loadArticleByIds($articleIds, $params, $user);
