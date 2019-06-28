@@ -75,7 +75,7 @@ class Controller extends Base
     private $commentMapper;
 
     /**
-     * @var Audience\Mapper
+     * @var News\Audience\Mapper
      */
     private $audienceMapper;
 
