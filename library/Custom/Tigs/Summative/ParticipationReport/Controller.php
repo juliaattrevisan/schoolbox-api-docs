@@ -480,7 +480,7 @@ class Controller extends Web\Controller\Base
      */
     private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes): void
     {
-        if (!$attributes->isHistorical()) {
+        if ($attributes->isCurrent()) {
             // If viewing current, just use SIS values
             $folder->loadTeachers();
             return;
