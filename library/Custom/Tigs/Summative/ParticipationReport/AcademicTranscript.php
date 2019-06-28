@@ -113,28 +113,6 @@ class AcademicTranscript
 
 
     /**
-     * @param StudentAttributes $attributes
-     * @return string
-     */
-    public function getTemplate(StudentAttributes $attributes): string
-    {
-        if ($attributes->isMyp()) {
-            return 'myp.twig';
-        }
-        if ($attributes->isDp()) {
-            return 'dp.twig';
-        }
-        if ($attributes->getCurriculumYearLevel() === 11) {
-            return 'hsc-11.twig';
-        }
-        if ($attributes->getCurriculumSemester() === 1) {
-            return 'hsc-12-1.twig';
-        }
-        return 'hsc-12-2.twig';
-    }
-
-
-    /**
      * @param User              $viewer
      * @param User              $student
      * @param StudentAttributes $attributes
@@ -151,7 +129,7 @@ class AcademicTranscript
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    public function getTemplateData(User $viewer, User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
+    public function toContext(User $viewer, User $student, StudentAttributes $attributes, array $subjectList, ?string $roleTypeOverride): array
     {
         $folders = $this->folderMapper->findByColumn('id', array_column($subjectList, 'folderId'))->indexBy('id');
 

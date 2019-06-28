@@ -146,10 +146,11 @@ Data:
     </div>
     <div class="row subject-list-group">
         <div class="small-12 island">
-            {% include '@tigsParticipationReport/academicTranscript/' ~ academicTranscript.template with {
+            {% include '@tigsParticipationReport/fragments/academicTranscript.twig' with {
+                attributes: attributes,
                 student:    user,
                 subjects:   subjects,
-                data:       academicTranscript.data,
+                data:       academicTranscript,
                 reportDate: reportDate
             } only %}
         </div>

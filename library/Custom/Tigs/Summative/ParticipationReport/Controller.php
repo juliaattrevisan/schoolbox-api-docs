@@ -426,10 +426,7 @@ class Controller extends Web\Controller\Base
             $this->getRouter()
         );
 
-        return [
-            'template' => $at->getTemplate($attributes),
-            'data'     => $at->getTemplateData($this->getUser(), $student, $attributes, $subjectList, $roleTypeOverride),
-        ];
+        return $at->toContext($this->getUser(), $student, $attributes, $subjectList, $roleTypeOverride);
     }
 
 
