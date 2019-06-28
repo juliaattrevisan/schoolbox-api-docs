@@ -28,11 +28,13 @@ use function strtotime;
  * * The year 12 curriculum semester 1 runs from the previous year's term 4 into term 1
  * * The year 12 curriculum semester 2 runs for terms 2/3/4
  * * Technically nothing should be due in Yr 12 Term 4, but we include it in Sem2 so the report will continue to show at this time.
+ *
+ * In the client data, Year12 students are soft-deleted at the end of year 12, and stay as year 12 in the DB.
+ * In our test data, we don't delete students, and keep incrementing their year levels so we don't need to keep updating the test data
  */
 class StudentAttributes
 {
     private const YEAR_LEVEL_MIN = 7;  // Reports are not relevant for students with year level less than this
-    private const YEAR_LEVEL_MAX = 12; // It appears finishing year 12 students are set to this, then soft-deleted some time later.
 
     /**
      * The student's year level at the time of the report
@@ -94,9 +96,6 @@ class StudentAttributes
         ?string $reportDateOverride = null,
         ?string $nowOverride = null
     ) {
-        $this->validateTermDates($config);
-        $this->validateUser($user);
-
         $reportDate = $reportDateOverride
             ? new Alaress_Date_Format(strtotime($reportDateOverride), Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now();
@@ -108,6 +107,9 @@ class StudentAttributes
         if ($reportDate->gt($now)) {
             throw new InvalidArgumentException('Cannot generate a report for the future.');
         }
+
+        $this->validateTermDates($config);
+        $this->validateUser($user, $reportDate, $now);
 
         // If unknown (NULL), assume $ibFlag is FALSE
         $this->isIb           = (bool)$ibFlag;
@@ -312,7 +314,7 @@ class StudentAttributes
 
 
     /**
-     * Ensure user is not deleted and has a supported year level
+     * Ensure user is/was not deleted at time of report and has a supported year level
      *
      * @param User $user
      * @throws InvalidArgumentException
@@ -333,11 +335,10 @@ class StudentAttributes
         if (!is_numeric($userYear)) {
             throw new InvalidArgumentException("User must have a numeric year. Found '{$userYear}'");
         }
-        if ($userYear < self::YEAR_LEVEL_MIN || $userYear > self::YEAR_LEVEL_MAX) {
+        if ($userYear < self::YEAR_LEVEL_MIN) {
             throw new InvalidArgumentException(sprintf(
-                "User year must be between %d and %d. Found '%s'",
+                "User year must be greater than %d Found '%s'",
                 self::YEAR_LEVEL_MIN,
-                self::YEAR_LEVEL_MAX,
                 $userYear
             ));
         }
