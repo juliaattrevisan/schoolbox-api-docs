@@ -110,6 +110,7 @@ class Module extends BaseModule
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),
             'databaseInternal'           => $injector->lazyGet('databaseInternal'),
             'articleResolver'            => $injector->lazyGet('commsNewsArticleResolver'),
+            'audienceMapper'             => $this->getMapperFactory()->getLazy(\Schoolbox\Comms\News\Audience\Mapper::class),
         ];
     }
 

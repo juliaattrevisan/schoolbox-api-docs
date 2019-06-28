@@ -74,6 +74,11 @@ class Controller extends Base
      */
     private $commentMapper;
 
+    /**
+     * @var Audience\Mapper
+     */
+    private $audienceMapper;
+
 
     /**
      * Controller constructor.
@@ -87,6 +92,7 @@ class Controller extends Base
      * @param ArticleResolver                   $articleResolver
      * @param Access                            $access
      * @param CommentMapper                     $commentMapper
+     * @param News\Audience\Mapper              $audienceMapper
      */
     public function __construct(
         News\Mapper $newsMapper,
@@ -97,7 +103,8 @@ class Controller extends Base
         IConnector $databaseInternal,
         ArticleResolver $articleResolver,
         Access $access,
-        CommentMapper $commentMapper
+        CommentMapper $commentMapper,
+        News\Audience\Mapper $audienceMapper
     ) {
         $this->newsMapper                 = $newsMapper;
         $this->topicMapper                = $topicMapper;
@@ -108,6 +115,7 @@ class Controller extends Base
         $this->articleResolver            = $articleResolver;
         $this->access                     = $access;
         $this->commentMapper              = $commentMapper;
+        $this->audienceMapper             = $audienceMapper;
     }
 
 
@@ -166,6 +174,7 @@ class Controller extends Base
                 $this->databaseInternal,
                 $this->articleResolver,
                 $this->commentMapper,
+                $this->audienceMapper,
                 $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
             ))->find($params, $user);
             $articles = $articleData['articles'];
@@ -199,6 +208,7 @@ class Controller extends Base
                 $this->databaseInternal,
                 $this->articleResolver,
                 $this->commentMapper,
+                $this->audienceMapper,
                 $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)
             ))->find($params, $user);
 
