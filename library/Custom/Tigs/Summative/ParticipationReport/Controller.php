@@ -449,13 +449,12 @@ class Controller extends Web\Controller\Base
      */
     private function getSubjectList(User $user, StudentAttributes $attributes, ?string $reportDate): array
     {
-        $getCurrent = null === $reportDate;
         $fetcher    = new FolderFetcher($this->folderMapper, $this->externalUser);
         $folders    = $fetcher->findForStudent($user, $attributes, $reportDate, $this->getConfigLoader()->get(Config::_TIGS_EXCLUDED_CLASS_CODES));
 
         $subjects = [];
         foreach ($folders as $folder) {
-            $this->loadTeachers($folder, $attributes, $getCurrent);
+            $this->loadTeachers($folder, $attributes);
             $subjects[] = [
                 'name'     => $folder->getName(),
                 'codes'    => $folder->getCodes()->getPropertyValues('code'),
@@ -473,16 +472,15 @@ class Controller extends Web\Controller\Base
      *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
-     * @param bool              $getCurrent
      * @throws UnexpectedValueException
      * @throws InvalidColumnException
      * @throws DomainException
      * @throws UnderflowException
      * @throws Exception
      */
-    private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes, bool $getCurrent): void
+    private function loadTeachers(Folder\Model $folder, StudentAttributes $attributes): void
     {
-        if ($getCurrent) {
+        if (!$attributes->isHistorical()) {
             // If viewing current, just use SIS values
             $folder->loadTeachers();
             return;
