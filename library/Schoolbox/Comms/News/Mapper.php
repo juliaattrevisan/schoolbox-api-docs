@@ -423,14 +423,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * @throws \UnderflowException
      * @throws \PDOException
      */
-    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId): array
+    public function findArticleIdsForTopic(array $availableArticleIds, int $topicId, ?int $limit, ?int $pageNum, ?int $year, ?int $month, ?int $folderId, bool $expired = false): array
     {
-        /* This user can't see any articles
-         */
-        if (null !== $folderId && \count($availableArticleIds) < 1) {
-            return [];
-        }
-
         /* Invalid combination of year/month params
          */
         if ($month && !$year) {
@@ -459,6 +453,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             $yearMonth = "{$year}-{$paddedMonth}%";
 
             $pb->like('publish_at', $yearMonth);
+
+            if ($expired) {
+                $pb->lessThan('expires_at', $now);
+            }
+
         } else {
             $pb->greaterThan('expires_at', $now);
         }
