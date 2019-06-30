@@ -12,7 +12,6 @@
 namespace Schoolbox\Learning\Quiz;
 
 use \Alaress_Date_Format;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -80,11 +79,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
     * @var string
     */
     protected $title;
-
-    /**
-    * @var Task
-    */
-    protected $task;
 
     /**
      * @var string
@@ -344,24 +338,6 @@ class Model implements ISoftDeletable, IAssessableDataModel
     {
         $this->category = $category;
         return $this;
-    }
-
-    /**
-    * @param  \Schoolbox\Assessment\Course\Task $task
-    * @return $this
-    */
-    public function setTask($task)
-    {
-        $this->task = $task;
-        return $this;
-    }
-
-    /**
-    * @return \Schoolbox\Assessment\Course\Task
-    */
-    public function getTask()
-    {
-        return $this->task;
     }
 
     /**

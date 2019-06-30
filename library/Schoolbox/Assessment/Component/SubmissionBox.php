@@ -22,7 +22,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Collection;
@@ -64,11 +63,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      * @var string
      */
     protected $description;
-
-    /**
-     * @var Task
-     */
-    protected $task;
 
     /**
      * @var SubmissionBox\SingleFile\Model[]|GenericCollection
@@ -359,23 +353,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         return $this->name;
     }
 
-    /**
-     * @param  \Schoolbox\Assessment\Course\Task $task
-     * @return $this
-     */
-    public function setTask($task)
-    {
-        $this->task = $task;
-        return $this;
-    }
-
-    /**
-     * @return \Schoolbox\Assessment\Course\Task
-     */
-    public function getTask()
-    {
-        return $this->task;
-    }
 
     /**
      * @return GenericCollection|SubmissionBox\SingleFile\Model[]
