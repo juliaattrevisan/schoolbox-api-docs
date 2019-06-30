@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Alaress\Async\Stomp\Stream;
+namespace Alaress\Async\Stomp\Implementation\Stream;
 
 use Alaress\Async\Stomp\IClient;
 use React\Promise\Deferred;
