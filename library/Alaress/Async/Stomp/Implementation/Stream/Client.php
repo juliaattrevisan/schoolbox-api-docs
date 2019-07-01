@@ -8,12 +8,13 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\Stream;
 
+use Alaress\Async\Stomp\ConnectionException;
 use Alaress\Async\Stomp\IClient;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\Stream;
 use Stomp\Protocol;
-use Stomp\Transport\Frame;
+use Stomp\Transport\Frame as BaseFrame;
 use Stomp\Transport\Parser;
 
 /**
@@ -59,6 +60,12 @@ class Client implements IClient
     private $parser;
 
 
+    /**
+     * @var callable[]
+     */
+    private $callbacks;
+
+
     public function __construct(
         Stream $stream,
         string $login,
@@ -76,7 +83,20 @@ class Client implements IClient
 
     public function subscribeWithAck(string $destination, string $ackMode, callable $callback, array $headers = [])
     {
-        // TODO: Implement subscribeWithAck() method.
+        // Generate a subscription ID
+        $subscriptionId = uniqid('', true);
+        $subscribeFrame = $this->protocol->getSubscribeFrame($destination, $subscriptionId, $ackMode);
+        $this->callbacks[$subscriptionId] = $callback;
+        $this->stream->write($subscribeFrame);
+        $this->stream->on('message', function (BaseFrame $frame) use ($subscriptionId) {
+            if ($frame['subscription'] === $subscriptionId) {
+                $this->callbacks[$subscriptionId](
+                    new Frame($frame),
+                    new AckResolver($this->stream, $this->protocol, $frame)
+                );
+            }
+        });
+        return $subscriptionId;
     }
 
 
@@ -86,17 +106,17 @@ class Client implements IClient
         $connectFrame = $this->protocol->getConnectFrame($this->login, $this->passcode, [], $this->host);
         $this->stream->write($connectFrame);
 
-        $connectListener = static function (Frame $frame) use ($deferred) {
-            $deferred->resolve();
+        $connectListener = function (BaseFrame $frame) use ($deferred) {
+            $deferred->resolve($this);
         };
-        $connectErrorListener = static function (Frame $frame) use ($deferred) {
-            $deferred->reject();
+        $connectErrorListener = static function (BaseFrame $frame) use ($deferred) {
+            $deferred->reject(new ConnectionException($frame->getBody()));
         };
-        $this->stream->once('connect', function (Frame $frame) use ($connectListener, $connectErrorListener) {
+        $this->stream->once('connect', function (BaseFrame $frame) use ($connectListener, $connectErrorListener) {
             $this->stream->removeListener('error', $connectErrorListener);
             $connectListener($frame);
         });
-        $this->stream->once('error', static function (Frame $frame) use ($connectListener, $connectErrorListener) {
+        $this->stream->once('error', static function (BaseFrame $frame) use ($connectListener, $connectErrorListener) {
             $this->stream->removeListener('connect', $connectListener);
             $connectErrorListener($frame);
         });
@@ -112,7 +132,7 @@ class Client implements IClient
         $this->stream->on('data', function ($data) {
             $this->parser->addData($data);
             while ($frame = $this->parser->nextFrame()) {
-                if ($frame instanceof Frame) {
+                if ($frame instanceof BaseFrame) {
                     // What kind of frame?
                     switch ($frame->getCommand()) {
                         case 'CONNECTED':
