@@ -16,6 +16,7 @@ use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Aura\Di;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Ratchet\Server\IoServer;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\ConnectionException;
@@ -23,7 +24,6 @@ use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
-use Schoolbox\Realtime\Pipe\Server;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -59,21 +59,18 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $db, INSTANCE_ID, $stratBuilder->build($flags), $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
     ))->build();
 
-    $wss = new Ratchet\WebSocket\WsServer($pipeManager);
-
-    $https   = new HttpServer($wss);
-    $webSock = new Server($loop);
+    $wss    = new Ratchet\WebSocket\WsServer($pipeManager);
+    $https  = new HttpServer($wss);
+    $server = IoServer::factory($https, $port);
 
     try {
-        $webSock->listen($port, '0.0.0.0');
+        $server->run();
         $log->info("Listening for incoming websockets on port {$port}...", [ 'char' => '+' ]);
 
     } catch (ConnectionException $e) {
         $log->alert('Unable to launch: ' . $e->getMessage(), [ 'exception'=>$e ]);
         throw $e;
     }
-
-    new Ratchet\Server\IoServer($https, $webSock, $loop);
 });
 
 
