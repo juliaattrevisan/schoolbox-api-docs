@@ -73,7 +73,9 @@
         "okta/jwt-verifier": "^0.2.1",
         "ext-openssl": "*",
         "stomp-php/stomp-php": "^4.5",
-        "cboden/ratchet": "^0.4.1"
+        "cboden/ratchet": "^0.4.1",
+        "react/socket": "^1.2.1",
+        "react/promise": "^2.7"
 
     },
     "require-dev": {
