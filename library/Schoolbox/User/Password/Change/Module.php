@@ -10,6 +10,7 @@ namespace Schoolbox\User\Password\Change;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Password\Service as PasswordService;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
@@ -85,6 +86,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
+            'passwordService' => $injector->lazyNew(PasswordService::class),
         ];
     }
 

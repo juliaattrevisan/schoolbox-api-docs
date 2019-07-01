@@ -16,6 +16,23 @@
         });
     });
 </script>
+
+{% if isRequestMade %}
+    <div class="row">
+        <div class="small-12 columns">
+            {% if isPasswordReset %}
+                <div class="alert-box success">
+                    Your password has been changed successfully.
+                </div>
+            {% else %}
+                <div class="alert-box alert">
+                    There was a problem changing your password; please try again.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Change Your Password</h1>
@@ -65,4 +82,3 @@
         {% endif %}
     </div>
 </div>
-

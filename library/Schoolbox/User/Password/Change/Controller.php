@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\User\Password\Change;
 
+use Alaress\Password\Service;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -29,15 +30,29 @@ class Controller extends Base
 
 
     /**
+     * @var Service
+     */
+    private $passwordService;
+
+
+    /**
+     * Minimum number of characters in a password
+     */
+    private const MIN_PASSWORD_LENGTH = 8;
+
+
+    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
+     * @param Service     $passwordService
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, Service $passwordService)
     {
         $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
+        $this->passwordService = $passwordService;
     }
 
 
@@ -48,29 +63,55 @@ class Controller extends Base
      */
     public function getChangePassword()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@passwordChange/index.twig', [])->setTitle('Change Password'));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@passwordChange/index.twig', [
+            'isRequestMade' => $this->getSessionSegment()->getFlash('isRequestMade'),
+            'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
+        ])->setTitle('Change Password'));
     }
 
 
     /**
      * Process the form vars
+     * @throws MapperException
+     * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postChangePassword()
     {
-        /* Check that this user still exists at the time of post
+        /* Flash message that will appear on the getPasswordChange screen
          */
-        try {
-            $user = $this->userMapper->findById($this->getUser()->getId());
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        $this->getSessionSegment()->setFlash('isRequestMade', true);
+        $this->getSessionSegment()->setFlash('isPasswordReset', false);
+
+        $user = $this->getUser();
+        $currentPassword = $this->getRequest()->post->get('current_password', '');
+        $password = $this->getRequest()->post->get('new_password', '');
+        $confirm = $this->getRequest()->post->get('confirm_password', '');
+
+        /* To change a password:
+         * - the existing password has to match the current_password form var
+         * - the new password has to match the confirmation
+         * - it has to be at least MIN_PASSWORD_LENGTH chars long
+         * - it has to successfully save
+         */
+        if ($password === $confirm &&
+            mb_strlen($password, 'UTF-8') >= self::MIN_PASSWORD_LENGTH &&
+            $this->getUser() &&
+            $this->passwordService->verify($currentPassword, $user->getPassword())) {
+
+            $user->setPassword($this->passwordService->hash($this->getRequest()->post['new_password']));
+
+            try {
+                $this->userMapper->save($user);
+                $this->getSessionSegment()->setFlash('isPasswordReset', true);
+            } catch (\UnexpectedValueException $e) {
+                // noop
+            }
         }
 
-        new \Alaress_Probe(
-            $this->getRequest()->post['current_password'],
-            $this->getRequest()->post['new_password'],
-            $this->getRequest()->post['confirm_password']
+        $this->getResponse()->redirect->to(
+            $this->getRouter()->generate('passwordChange.getChangePassword')
         );
     }
 }
