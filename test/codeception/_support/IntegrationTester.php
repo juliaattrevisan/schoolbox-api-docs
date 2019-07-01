@@ -31,6 +31,20 @@ class IntegrationTester extends \Codeception\Actor
 {
     use _generated\IntegrationTesterActions;
 
+    /**
+     * Define custom actions here
+     */
+    const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
+
+    public $client;
+    public $client_cookie_jar;
+
+    function initGuzzleClient()
+    {
+        $this->client = new Client(['base_uri' => 'https://'.$this::VAGRANT_DOMAIN, 'timeout' => 5.0, 'cookies' => true]);
+        $this->client_cookie_jar = new CookieJar();
+    }
+
     function getUser($username){
 
         $database=Database::getInstance();
@@ -83,51 +97,55 @@ class IntegrationTester extends \Codeception\Actor
         return NULL;
     }
 
-    public function loginUser($username, $password)
+    public function loginUser($username, $password, $redirect=true)
     {
-        $headers = ['Host' => 'vagrant.dev.schoolbox.cloud',
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
             'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Referer'=>'https://vagrant.dev.schoolbox.cloud/login/'];
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/login/'];
         $page='/login/';
-        $url = 'https://vagrant.dev.schoolbox.cloud'.$page;
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
         $data =[
             'page' => '/login/',
             'username' => $username,
             'password' => $password,
             'Submit'=> 'Login'
         ];
-        $jar = new CookieJar();
 
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
+        if ($redirect) {
+            $allow_redirects = [
+                'max' => 5,
+                'referer' => true,
+                'protocols' => ['http', 'https'],
+                'track_redirects' => true
+            ];
+        } else {
+            $allow_redirects=false;
+        }
 
-        $client = new Client(['base_uri' => 'https://vendor.dev.schoolbox.cloud', 'timeout' => 5.0, 'cookies' => true]);
-        return $client->request('POST', $url, [
+        $this->initGuzzleClient();
+
+        return $this->client->request('POST', $url, [
                             'headers'=>$headers,
                             'query' =>'page=/login/',
                             'form_params' => $data,
-                            'cookies' => $jar,
+                            'cookies' => $this->client_cookie_jar,
                             'allow_redirects' => $allow_redirects
             ]);
     }
 
-    public function loginUserForCookies($jar, $username, $password)
+
+    public function createAssessemntHomepage($title, $HomePageID)
     {
-        $headers = ['Host' => 'vagrant.dev.schoolbox.cloud',
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Referer'=>'https://vagrant.dev.schoolbox.cloud/login/'];
-        $page='/login/';
-        $url = 'https://vagrant.dev.schoolbox.cloud'.$page;
-        $data =[
-            'page' => '/login/',
-            'username' => $username,
-            'password' => $password,
-            'Submit'=> 'Login'
-        ];
+
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork'];
+
+        $page='/learning/folders/'.$HomePageID.'/assessments';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
 
         $allow_redirects=[
             'max'             => 5,
@@ -136,42 +154,309 @@ class IntegrationTester extends \Codeception\Actor
             'track_redirects' => true
         ];
 
-        $client = new Client(['base_uri' => 'https://vendor.dev.schoolbox.cloud', 'timeout' => 5.0, 'cookies' => true]);
-        $client->request('GET', 'https://vagrant.dev.schoolbox.cloud', [
-            'cookies' => $jar,
-            'allow_redirects' => $allow_redirects
-        ]);
 
-        return $client->request('POST', $url, [
-            'headers'=>$headers,
-            'query' =>'page=/login/',
-            'form_params' => $data,
-            'allow_redirects' => $allow_redirects
-        ]);
+        $data =[
+            'contextType' => 'folders',
+            'contextId' => $HomePageID,
+            'folderId' => $HomePageID,
+            'assessmentType' => 'dueWork',
+            'title' => 'A Test Assignment',
+            'description' => '<p>This is a test assignment for automated tests</p>',
+            'acceptOnline' => 0,
+            'publishDate' => '01/07/2019 12:00am',
+            'openDate' => '01/07/2019 12:00am',
+            'dueDate' => '02/07/2019 11:59pm',
+            'closeDate' => '02/07/2019 11:59pm',
+            'weight' => 13,
+            'self_reviewable'=>'none',
+            'visibility'=>2,
+            'markType'=>1,
+            'maxMark'=>'',
+            'gradingScheme'=>1,
+            'resultset'=>1,
+            'formField'=>'rb',
+            'rb[0][level][0][id]'=>'',
+            'rb[0][level][0][name]'=>'',
+            'rb[0][level][1][id]'=>'',
+            'rb[0][level][1][name]'=>'',
+            'curriculumCodes'=>'',
+            'part-2'=>1
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
     }
 
-    public function draftNews($session_cookies, $title)
+    public function determineMarkInvalidation($HomePageID, $assignmentID)
     {
-        $new_cookie=[
-            'Name'=>$session_cookies[0]['Name'],
-            'Value'=>$session_cookies[0]['Value'],
-            'Domain'=>$session_cookies[0]['Domain'],
-            'Max-Age'=>$session_cookies[0]['Max-Age'],
-            'Expires'=>$session_cookies[0]['Expires'],
-            'Path'=>$session_cookies[0]['Path'],
-            'HttpOnly'=>$session_cookies[0]['HttpOnly']
-        ];
-        $jar = new CookieJar();
-        $jar->setCookie(new GuzzleHttp\Cookie\SetCookie($new_cookie));
 
-        $headers = ['Host' => 'vagrant.dev.schoolbox.cloud',
+        //https://vagrant.dev.schoolbox.cloud/rubric/determineMarkInvalidation
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork'];
+
+        $page='/learning/folders/'.$HomePageID.'/assessments';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+        /*
+         *assessmentType=dueWork
+            returnUrl=L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ==
+            id=381
+            folderId=552
+            title=A+Test+Assignment
+            workType
+            description=<p>afdsgadfg</p>
+
+            acceptOnline=0
+            publishDate=01/07/2019+12:00am
+            openDate=01/07/2019+12:00am
+            dueDate=02/07/2019+11:59pm
+            closeDate=02/07/2019+11:59pm
+            weight=13
+            self_reviewable=none
+            visibility=2
+            assessmentType=dueWork
+            markType=1
+            maxMark
+            gradingScheme=1
+            resultset=1
+            formField=rb
+            rb[381][level][0][id]
+            rb[381][level][0][name]
+            rb[381][level][1][id]
+            rb[381][level][1][name]
+            curriculumCodes[]
+         *
+        */
+
+        $data =[
+            'contextType' => 'folders',
+            'contextId' => $HomePageID,
+            'folderId' => $HomePageID,
+            'assessmentType' => 'dueWork',
+            'title' => 'A Test Assignment',
+            'description' => '<p>This is a test assignment for automated tests</p>',
+            'acceptOnline' => 0,
+            'publishDate' => '01/07/2019 12:00am',
+            'openDate' => '01/07/2019 12:00am',
+            'dueDate' => '02/07/2019 11:59pm',
+            'closeDate' => '02/07/2019 11:59pm',
+            'weight' => 13,
+            'self_reviewable'=>'none',
+            'visibility'=>2,
+            'markType'=>1,
+            'maxMark'=>'',
+            'gradingScheme'=>1,
+            'resultset'=>1,
+            'formField'=>'rb',
+            'rb[0][level][0][id]'=>'',
+            'rb[0][level][0][name]'=>'',
+            'rb[0][level][1][id]'=>'',
+            'rb[0][level][1][name]'=>'',
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function updateAssessemntHomepage($HomePageID, $assignmentID)
+    {
+
+        //https://vagrant.dev.schoolbox.cloud/learning/assessments/381
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork'];
+
+        $page='/learning/folders/'.$HomePageID.'/assessments';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+
+        /*
+         *
+         * assessmentType=dueWork
+            returnUrl=L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ==
+            id=381
+            folderId=552
+            title=A+Test+Assignment
+            workType
+            description=<p>afdsgadfg</p>
+
+            acceptOnline=0
+            publishDate=01/07/2019+12:00am
+            openDate=01/07/2019+12:00am
+            dueDate=02/07/2019+11:59pm
+            closeDate=02/07/2019+11:59pm
+            weight=13
+            self_reviewable=none
+            visibility=2
+            assessmentType=dueWork
+            markType=1
+            maxMark
+            gradingScheme=1
+            resultset=1
+            formField=rb
+            rb[381][level][0][id]
+            rb[381][level][0][name]
+            rb[381][level][1][id]
+            rb[381][level][1][name]
+            curriculumCodes[]
+            curriculumCodes[]
+            part-2=1
+         */
+        $data =[
+            'contextType' => 'folders',
+            'contextId' => $HomePageID,
+            'folderId' => $HomePageID,
+            'assessmentType' => 'dueWork',
+            'title' => 'A Test Assignment',
+            'description' => '<p>This is a test assignment for automated tests</p>',
+            'acceptOnline' => 0,
+            'publishDate' => '01/07/2019 12:00am',
+            'openDate' => '01/07/2019 12:00am',
+            'dueDate' => '02/07/2019 11:59pm',
+            'closeDate' => '02/07/2019 11:59pm',
+            'weight' => 13,
+            'self_reviewable'=>'none',
+            'visibility'=>2,
+            'markType'=>1,
+            'maxMark'=>'',
+            'gradingScheme'=>1,
+            'resultset'=>1,
+            'formField'=>'rb',
+            'rb[0][level][0][id]'=>'',
+            'rb[0][level][0][name]'=>'',
+            'rb[0][level][1][id]'=>'',
+            'rb[0][level][1][name]'=>'',
+            'curriculumCodes'=>'',
+            'part-2'=>1
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function draftNews($title)
+    {
+
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
                     'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
                     'Accept'=>'application/json, text/javascript, */*; q=0.01',
-                    'Referer'=>'vagrant.dev.schoolbox.cloud/news/create';
+                    'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/create'];
 
         $page='/news/create';
-        $url = 'https://vagrant.dev.schoolbox.cloud'.$page;
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+
+        $data =[
+            'returnUrl' => Querystring::encode('/'),
+            'title' => $title,
+            'body' => '',
+            'blurb' => '',
+            'audience' => 'role:IjMi:self',
+            'publishAt' => '01/07/2019 12:47pm',
+            'expiresAt' => '08/07/2019 11:59pm',
+            'draft'=> true
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function createNewsToModerate($title, $news_id)
+    {
+
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+
+        $page='/news/moderation/'.$news_id.'/submit';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
 
         $allow_redirects=[
@@ -186,19 +471,20 @@ class IntegrationTester extends \Codeception\Actor
             'title' => $title,
             'body' => '',
             'blurb' => '',
-            'audience' => '',
-            'publishAt' => '26/06/2019+1:47pm',
-            'expiresAt' => '03/07/2019+11:59pm',
-            'draft'=> true
+            'audience' => 'role:IjMi:self',
+            'publishAt' => '01/07/2019 12:47pm',
+            'expiresAt' => '08/07/2019 11:59pm'
         ];
 
-
-        $client = new Client(['base_uri' => 'https://vendor.dev.schoolbox.cloud', 'timeout' => 5.0, 'cookies' => true]);
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
         try {
-            return $client->request('POST', $url, [
+            return $this->client->request('POST', $url, [
                 'headers' => $headers,
                 'allow_redirects' => $allow_redirects,
-                'cookies'=>$jar,
+                'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
@@ -206,18 +492,183 @@ class IntegrationTester extends \Codeception\Actor
             print($e->getResponse()->getBody()->getContents());
             throw $e;
         }
-
     }
 
-    public function loginAdminGetToken()
+    public function publishNewsByID($news_id)
+    {
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+
+        $page='/news/moderation/'.$news_id.'/accept';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+        $data =[
+            'articleID' => $news_id
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function rejectNewsByID($news_id)
+    {
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+
+        $page='/news/moderation/'.$news_id.'/reject';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+        $data =[
+            'articleID' => $news_id,
+            'rejectReason' => 'The reason is valid'
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function deleteNewsByID($news_id)
+    {
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+
+        $page='/news/'.$news_id.'/delete';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+        $data =[
+            'articleID' => $news_id
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function publishNewsForm($title, $news_id)
+    {
+
+        $headers = ['Host' => $this::VAGRANT_DOMAIN,
+            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+            'Accept'=>'application/json, text/javascript, */*; q=0.01',
+            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+
+        $page='/news/moderation/'.$news_id.'/accept';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+
+        $allow_redirects=[
+            'max'             => 5,
+            'referer'         => true,
+            'protocols'       => ['http', 'https'],
+            'track_redirects' => true
+        ];
+
+        $data =[
+            'title' => $title,
+            'body' => '',
+            'blurb' => '',
+            'audience' => 'role:IjMi:self',
+            'publishAt' => '01/07/2019 12:47pm',
+            'expiresAt' => '08/07/2019 11:59pm'
+        ];
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function loginAdmin()
     {
         $admin_username='alaress';
         $admin_password='alaress';
-        $mycookies = new CookieJar();
-        $response = $this->loginUserForCookies($mycookies, $admin_username, $admin_password);
-        if ($mycookies->getCookieByName('PHPSESSID'))
+        $response = $this->loginUser($admin_username, $admin_password, false);
+        if ($response->getStatusCode() == 303)
         {
-            return $mycookies->toArray();
+            return true;
         }
         throw (new Exception('Unable to login for some reason'));
     }
