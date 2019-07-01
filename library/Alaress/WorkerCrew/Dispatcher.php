@@ -17,7 +17,7 @@ use Exception;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 use RuntimeException;
 use SplQueue;
 

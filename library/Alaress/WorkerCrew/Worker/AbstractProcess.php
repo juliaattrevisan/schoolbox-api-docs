@@ -16,7 +16,7 @@ use Alaress\WorkerCrew\Worker\IO\Listener\InputStreamListener;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 use React\Stream\Stream;
 use RuntimeException;
 

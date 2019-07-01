@@ -11,7 +11,7 @@ namespace Alaress\WorkerCrew\Transaction;
 
 
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 class Transaction extends AbstractTransaction
 {

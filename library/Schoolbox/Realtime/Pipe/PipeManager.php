@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Pipe\Action\IAction;

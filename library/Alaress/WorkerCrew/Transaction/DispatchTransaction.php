@@ -10,7 +10,7 @@ namespace Alaress\WorkerCrew\Transaction;
 
 use Alaress\WorkerCrew\DispatcherInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 class DispatchTransaction extends AbstractTransaction
 {

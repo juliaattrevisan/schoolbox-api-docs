@@ -21,7 +21,7 @@ use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
