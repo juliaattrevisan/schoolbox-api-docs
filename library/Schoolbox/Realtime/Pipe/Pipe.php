@@ -9,8 +9,7 @@
 
 namespace Schoolbox\Realtime\Pipe;
 
-use Guzzle\Http\Message\EntityEnclosingRequest;
-use Guzzle\Http\Message\Header;
+use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 
 
@@ -95,6 +94,7 @@ class Pipe implements PipeInterface
 	 * @return string
 	 */
 	public function getRemoteAddress() {
+        // kosher according to http://socketo.me/docs/migration-3
 		return $this->socketConnection->remoteAddress ?: '0.0.0.0';
 	}
 
@@ -140,8 +140,7 @@ class Pipe implements PipeInterface
 
         $value = $rq->getHeader($header);
 
-        if ($value instanceof Header) {
-            $value = $value->toArray();
+        if (count($value) > 0) {
 			return (string)reset($value);
 		}
 		// otherwise header not found
@@ -150,11 +149,12 @@ class Pipe implements PipeInterface
 
     /**
      * @param ConnectionInterface $conn
-     * @return EntityEnclosingRequest
+     * @return RequestInterface
      */
 	protected static function extractWebSocketRequest(ConnectionInterface $conn)
     {
-        return $conn->WebSocket->request;
+        // kosher according to http://socketo.me/docs/migration-3
+        return $conn->httpRequest;
     }
 
     /**
