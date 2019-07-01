@@ -9,12 +9,9 @@ namespace Schoolbox\User\Password;
 
 use PDOException;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Mail\CoreContext;
-use Schoolbox\Mail\TwigEmail;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Swift_RfcComplianceException;
 use Swift_SwiftException;
 
 /**
