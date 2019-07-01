@@ -1,27 +1,31 @@
 <?php
 /**
+ * Schooledge implementation of class connection.
+ *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+use Schoolbox\CampusMapper;
 
-/**
- * Schooledge implementation of class connection.
- */
-class External_Schooledge_Class extends External_Humanedge_Class implements External_ClassInterface
+class External_Schooledge_Class implements External_ClassInterface
 {
+
+
     /**
      * @var MSSQL
      */
     private $database;
+
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = MSSQL::getInstance();
     }
+
 
     /**
      * Gets the class code part of a query.
@@ -29,7 +33,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
      * @param  string $subCode
      * @return string
      */
-    protected function getClassCodeQuery($subCode)
+    protected function getClassCodeQuery($subCode): string
     {
         $classQuery = '(';
         $subCodeArray = explode(',', $subCode);
@@ -44,18 +48,19 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
         return substr($classQuery, 0, -3) . ')';
     }
 
+
     /**
      * Get a query string that contains all the timetable codes
      * @return null|string
      * @throws \Schoolbox\Mapper\Exception
      */
-    protected function getTimetableCodes()
+    protected function getTimetableCodes(): ?string
     {
-        $allCampusCodes = \Schoolbox\CampusMapper::getInstance()->findDistinct('ext_timetable_code');
+        $allCampusCodes = CampusMapper::getInstance()->findDistinct('ext_timetable_code');
         $quotedCode     = [];
         foreach ($allCampusCodes as $code) {
             if (strlen($code) > 0) {
-                $quotedCode[$code] = "'" . $this->getDatabase()->quote($code) . "'";
+                $quotedCode[$code] = "'" . $this->database->quote($code) . "'";
             }
         }
 
@@ -64,6 +69,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
         }
         return null;
     }
+
 
     /**
      * @inheritDoc
@@ -136,8 +142,9 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             
             ORDER BY synergy_id ASC
         ";
-        return $this->getDatabase()->getAll($query);
+        return $this->database->getAll($query);
     }
+
 
     /**
      * @inheritDoc
@@ -210,7 +217,7 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
             ORDER BY code ASC
         ";
 
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->database->query($query);
         while ($teacher = $statement->fetch()) {
             $teachers[] = $teacher['code'];
         }
@@ -218,19 +225,24 @@ class External_Schooledge_Class extends External_Humanedge_Class implements Exte
         return array_unique($teachers);
     }
 
-    /**
-     * @param MSSQL $database
-     */
-    private function setDatabase($database)
-    {
-        $this->database = $database;
-    }
 
     /**
-     * @return MSSQL
+     * @return array
      */
-    private function getDatabase()
+    public function findClassTypes(): array
     {
-        return $this->database;
+        return [];
+    }
+
+
+    /**
+     * @param string $filetype
+     * @param array  $timetableCode
+     *
+     * @return array
+     */
+    public function findClassesByType(string $filetype, array $timetableCode): array
+    {
+        return [];
     }
 }

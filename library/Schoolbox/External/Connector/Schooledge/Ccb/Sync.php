@@ -6,7 +6,6 @@
  * @copyright Copyright 2017, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\External\Connector\Schooledge\Ccb;
 
 use Schoolbox\External\Connector\Schooledge\Base\Sync as BaseSync;
@@ -24,7 +23,7 @@ class Sync extends BaseSync
      * @see buildStudentContactAdhocJoins
      * @return string
      */
-    protected function buildStudentContactFilter()
+    protected function buildStudentContactFilter(): string
     {
         return parent::buildStudentContactFilter() . "
             OR ad.FieldValue = 'Y'
@@ -38,7 +37,7 @@ class Sync extends BaseSync
      *
      * @return string
      */
-    protected function buildStudentContactAdhocJoins()
+    protected function buildStudentContactAdhocJoins(): string
     {
         return 'LEFT JOIN AdhocData ad ON ad.AdhocID = 53 AND c.ID = ad.SourceID';
     }
