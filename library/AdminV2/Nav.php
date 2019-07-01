@@ -32,7 +32,6 @@ class AdminV2_Nav
         'messages'           => 'Notifications',
         'lists'              => 'Lists',
         'lti'                => 'LTI Providers',
-        'cleanup'            => 'Cleanup',
         'usage'              => 'Usage',
         'engagement'         => 'Engagement',
         'ups'                => 'User Provisioning System',
