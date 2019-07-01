@@ -9,15 +9,10 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Async\Stomp\Implementation\Enqueue;
-use Alaress\Async\Stomp\Implementation\React;
-use Alaress\Async\Stomp\Implementation\StompPhp;
 use Alaress\Async\Stomp\Implementation\Stream\Client;
 use Alaress\Async\Stomp\Implementation\Stream\Connection;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
-use Enqueue\AmqpLib\AmqpConnectionFactory;
-use Enqueue\Stomp\StompConnectionFactory;
 use ErrorException;
 use Exception;
 use PDOException;
@@ -25,15 +20,11 @@ use Psr\Log\LoggerInterface;
 use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
-use React\Stomp;
-use React\Stream\Stream;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\IConfigLoader;
-use Stomp as StompLib;
 use Stomp\Protocol\Protocol;
 use Stomp\Protocol\Version;
-use Stomp\StatefulStomp;
 use Stomp\Transport\Parser;
 
 class Kernel extends CliKernelAbstract
@@ -88,7 +79,7 @@ class Kernel extends CliKernelAbstract
     /**
      * Initialise
      *
-     * @param string $name The name of this Daemon
+     * @param string $name    The name of this Daemon
      * @param array  $options Keys are one of the self::OPTION_X constants
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
@@ -123,7 +114,10 @@ class Kernel extends CliKernelAbstract
      */
     protected function getValidConstructionOptions(): array
     {
-        return \array_merge(parent::getValidConstructionOptions(), [self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS]);
+        return \array_merge(
+            parent::getValidConstructionOptions(),
+            [self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS]
+        );
     }
 
 
@@ -221,10 +215,13 @@ EOL;
             $flags = \implode(' ', \array_slice($argv, 1));
             $callable($this->di, $this->loop, $this->logger(), $this->opts, $flags);
         } catch (\Schoolbox\External\Exception $e) {
-            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
             throw $e;
         } catch (Exception $e) {
-            $this->logger()->critical("{$this->name} daemon failed to launch: " . $e->getMessage(), ['exception'=>$e]);
+            $this->logger()->critical(
+                "{$this->name} daemon failed to launch: " . $e->getMessage(),
+                ['exception' => $e]
+            );
             throw $e;
         }
 
@@ -232,12 +229,19 @@ EOL;
             $this->loop->run();
             $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
-            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
         } catch (\Schoolbox\External\Exception $e) {
-            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
         } catch (Exception $e) {
-            $this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, get_class($e),
-                $e->getMessage()), ['exception'=>$e]);
+            $this->logger()->critical(
+                sprintf(
+                    "%s daemon received %s: %s",
+                    $this->name,
+                    get_class($e),
+                    $e->getMessage()
+                ),
+                ['exception' => $e]
+            );
         }
     }
 
@@ -343,7 +347,7 @@ EOL;
         }
 
         $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->opts);
-        $logger = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
+        $logger    = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
         $this->addRavenHandler($logger);
 
