@@ -11,11 +11,11 @@
 
 namespace Schoolbox\Admin\SHAPS;
 
-use Guzzle\Http\Exception\TooManyRedirectsException;
 use GuzzleHttp;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
 use Schoolbox\Admin\SHAPS\Auth;
 use Schoolbox\User;
 use Schoolbox\UserMapper;

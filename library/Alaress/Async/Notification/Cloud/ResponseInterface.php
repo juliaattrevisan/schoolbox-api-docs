@@ -9,8 +9,8 @@
 
 namespace Alaress\Async\Notification\Cloud;
 
-use Guzzle\Http\Message\Response as HttpResponse;
 use OutOfBoundsException;
+use Psr\Http\Message\ResponseInterface as HttpResponse;
 use RangeException;
 
 
