@@ -46,7 +46,7 @@ class Callback
     {
         /* Plagscan not configured - nothing to do
          */
-        if (!$this->getMapper()->getConnector()) {
+        if (!$this->getMapper()->hasConnector()) {
             return false;
         }
 

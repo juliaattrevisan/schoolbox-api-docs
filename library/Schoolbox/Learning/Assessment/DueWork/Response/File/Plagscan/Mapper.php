@@ -178,7 +178,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Did the Gateway spawn properly
          * If so, there is a functioning username/apikey
          */
-        if ($this->getConnector()) {
+        if ($this->hasConnector()) {
 
             /* Staffs and super can always see plagscan results
              */
@@ -211,7 +211,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* If gateway never spawned, plagscan not configured
          */
-        if (!$this->getConnector()) {
+        if (!$this->hasConnector()) {
             return [];
         }
 
@@ -250,7 +250,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         /* If gateway never spawned, plagscan not configured
          */
-        if (!$this->getConnector()) {
+        if (!$this->hasConnector()) {
             return [];
         }
 
@@ -503,5 +503,15 @@ class Mapper extends \Schoolbox\Mapper
     public function getConnector(): v3\Connector
     {
         return $this->connector;
+    }
+
+
+    /**
+     * Checks whether connector is properly set
+     * @return bool
+     */
+    public function hasConnector(): bool
+    {
+        return $this->connector instanceof v3\Connector;
     }
 }
