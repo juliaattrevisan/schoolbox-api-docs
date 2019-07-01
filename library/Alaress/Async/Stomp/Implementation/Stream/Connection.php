@@ -11,9 +11,7 @@ namespace Alaress\Async\Stomp\Implementation\Stream;
 use Alaress\Async\Stomp\ConnectionException;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
-use React\Promise\FulfilledPromise;
 use React\Promise\PromiseInterface;
-use React\Promise\RejectedPromise;
 use React\Stream\Stream;
 use Stomp\Exception\StompException;
 use Stomp\Protocol;
@@ -22,6 +20,9 @@ use Stomp\Transport\Parser;
 
 /**
  * Streaming connection to a STOMP server.
+ *
+ * This provides a wrapper around the setup of a STOMP stream, and the protocol
+ * used to parse messages from it.
  */
 class Connection
 {
@@ -160,22 +161,22 @@ class Connection
         $connectFrame = $this->protocol->getConnectFrame($this->login, $this->passcode, [], $this->vhost);
         $this->stream->write($connectFrame);
 
-        // If the connection is successful, $connectListener is called:
-        // otherwise, $connectErrorListener is called.
+        // If the connection is successful, $onConnect is called:
+        // otherwise, $onError is called.
         // Either way, once I know the status remove both listeners.
-        $connectListener = static function () use ($deferred) {
+        $onConnect = static function () use ($deferred) {
             $deferred->resolve();
         };
-        $connectErrorListener = static function (BaseFrame $frame) use ($deferred) {
+        $onError   = static function (BaseFrame $frame) use ($deferred) {
             $deferred->reject($frame->getBody());
         };
-        $this->stream->once('connect', function () use ($connectListener, $connectErrorListener) {
-            $this->stream->removeListener('error', $connectErrorListener);
-            $connectListener();
+        $this->stream->once('connect', function () use ($onConnect, $onError) {
+            $this->stream->removeListener('error', $onError);
+            $onConnect();
         });
-        $this->stream->once('error', static function (BaseFrame $frame) use ($connectListener, $connectErrorListener) {
-            $this->stream->removeListener('connect', $connectListener);
-            $connectErrorListener($frame);
+        $this->stream->once('error', static function (BaseFrame $frame) use ($onConnect, $onError) {
+            $this->stream->removeListener('connect', $onConnect);
+            $onError($frame);
         });
 
         return $this->connectionPromise;
@@ -203,6 +204,26 @@ class Connection
 
 
     /**
+     * Log a callback to occur when a message with a particular subscription ID
+     * is received.
+     *
+     * @param string   $subscriptionId
+     * @param callable $callback
+     */
+    public function onMessage(string $subscriptionId, callable $callback): void
+    {
+        $this->stream->on('message', function (BaseFrame $frame) use ($subscriptionId, $callback) {
+            if ($frame['subscription'] === $subscriptionId) {
+                $callback(
+                    $frame,
+                    new AckResolver($this->stream, $this->protocol, $frame)
+                );
+            }
+        });
+    }
+
+
+    /**
      * Creates the stream connection to the STOMP server, and sets up a
      * connection to its data feed.
      */
@@ -217,7 +238,7 @@ class Connection
             throw new ConnectionException($errstr, $errno);
         }
 
-        // Create the stream, subscribe to its data stream
+        // Create the stream, subscribe to its data event
         $this->stream = new Stream($socket, $this->loop);
         $this->stream->on('data', function ($data) {
             $this->parser->addData($data);
@@ -236,7 +257,7 @@ class Connection
                             break;
                     }
                 }
-            };
+            }
         });
     }
 }
