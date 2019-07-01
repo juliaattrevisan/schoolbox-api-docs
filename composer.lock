@@ -4,35 +4,37 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3c4a058c53f1b82b19e47879c9826fb8",
+    "content-hash": "2b2d68d7543e5320c8951a484dceebe1",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
-            "version": "dev-schoolbox-14.0-dep",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
-                "url": "https://github.com/alaress/etherpad-lite-client.git",
-                "reference": "c619a93aebaeed2da99883baff237d0cfc694019"
+                "url": "https://github.com/0x46616c6b/etherpad-lite-client.git",
+                "reference": "6ec6bb5fcdb5a05b4223860c26a086136997d53b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/alaress/etherpad-lite-client/zipball/c619a93aebaeed2da99883baff237d0cfc694019",
-                "reference": "c619a93aebaeed2da99883baff237d0cfc694019",
+                "url": "https://api.github.com/repos/0x46616c6b/etherpad-lite-client/zipball/6ec6bb5fcdb5a05b4223860c26a086136997d53b",
+                "reference": "6ec6bb5fcdb5a05b4223860c26a086136997d53b",
                 "shasum": ""
             },
             "require": {
-                "guzzle/guzzle": "~3.7",
-                "php": ">=5.3.3"
+                "guzzlehttp/guzzle": "~6.3",
+                "php": "^7.1|^7.2|^7.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "*@stable"
+                "behat/behat": "^3.3",
+                "phpunit/phpunit": "~7.5"
             },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "EtherpadLite": "src/"
+                "psr-4": {
+                    "": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-3.0"
             ],
@@ -43,10 +45,7 @@
                 }
             ],
             "description": "PHP Client for Etherpad Lite",
-            "support": {
-                "source": "https://github.com/alaress/etherpad-lite-client/tree/master"
-            },
-            "time": "2014-04-29T03:47:44+00:00"
+            "time": "2019-06-19T07:44:25+00:00"
         },
         {
             "name": "aura/di",
@@ -8558,19 +8557,11 @@
             "time": "2016-11-23T20:04:58+00:00"
         }
     ],
-    "aliases": [
-        {
-            "alias": "dev-master",
-            "alias_normalized": "9999999-dev",
-            "version": "dev-schoolbox-14.0-dep",
-            "package": "0x46616c6b/etherpad-lite-client"
-        }
-    ],
+    "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
         "shareworks/xml-security": 20,
         "predis/predis-async": 20,
-        "0x46616c6b/etherpad-lite-client": 20,
         "phpoffice/phpexcel": 20,
         "lox/xhprof": 20,
         "roave/security-advisories": 20
