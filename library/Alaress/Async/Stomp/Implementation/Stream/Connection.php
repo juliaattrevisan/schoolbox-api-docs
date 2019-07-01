@@ -8,10 +8,214 @@ declare(strict_types=1);
 
 namespace Alaress\Async\Stomp\Implementation\Stream;
 
+use Alaress\Async\Stomp\ConnectionException;
+use React\EventLoop\LoopInterface;
+use React\Promise\Deferred;
+use React\Promise\FulfilledPromise;
+use React\Promise\PromiseInterface;
+use React\Promise\RejectedPromise;
+use React\Stream\Stream;
+use Stomp\Protocol;
+use Stomp\Transport\Frame as BaseFrame;
+use Stomp\Transport\Parser;
+
 /**
- * Class Connection
+ * Streaming connection to a STOMP server.
  */
 class Connection
 {
+    /**
+     * @var LoopInterface
+     */
+    private $loop;
 
+
+    /**
+     * @var string
+     */
+    private $host;
+
+
+    /**
+     * @var int
+     */
+    private $port;
+
+
+    /**
+     * @var string|null
+     */
+    private $login;
+
+
+    /**
+     * @var string|null
+     */
+    private $passcode;
+
+
+    /**
+     * @var string|null
+     */
+    private $vhost;
+
+
+    // Things created in setup or connect
+
+
+    /**
+     * @var Protocol\Protocol
+     */
+    private $protocol;
+
+
+    /**
+     * @var Parser
+     */
+    private $parser;
+
+
+    /**
+     * @var Stream
+     */
+    private $stream;
+
+
+    /**
+     * @var PromiseInterface
+     */
+    private $connectionPromise;
+
+
+    /**
+     * Constructor
+     *
+     * @param LoopInterface     $loop
+     * @param Protocol\Protocol $protocol
+     * @param Parser            $parser
+     * @param string            $host
+     * @param int               $port
+     * @param string|null       $login
+     * @param string|null       $passcode
+     * @param string|null       $vhost
+     */
+    public function __construct(
+        LoopInterface $loop,
+        Protocol\Protocol $protocol,
+        Parser $parser,
+        string $host,
+        int $port,
+        ?string $login,
+        ?string $passcode,
+        ?string $vhost
+    ) {
+        $this->loop     = $loop;
+        $this->protocol = $protocol;
+        $this->parser   = $parser;
+        $this->host     = $host;
+        $this->port     = $port;
+        $this->login    = $login;
+        $this->passcode = $passcode;
+        $this->vhost    = $vhost;
+    }
+
+
+    /**
+     * Destructor: close the stream once this object is destroyed.
+     */
+    public function __destruct()
+    {
+        if ($this->stream instanceof Stream) {
+            $this->stream->close();
+        }
+    }
+
+
+    /**
+     * Attempt to connect to the STOMP server.
+     *
+     * @return PromiseInterface Resolves (no parameters) when the connection is successful,
+     *                          rejects with a reason when it is not.
+     */
+    public function connect(): PromiseInterface
+    {
+        // Have I tried to connect already? Give the same promise back
+        if ($this->connectionPromise instanceof PromiseInterface) {
+            return $this->connectionPromise;
+        }
+
+        // Make a promise
+        $deferred                = new Deferred();
+        $this->connectionPromise = $deferred->promise();
+
+        // Setup the stream
+        try {
+            $this->setupStream();
+        } catch (ConnectionException $e) {
+            $deferred->reject($e->getMessage());
+        }
+
+        // Now attempt to connect, waiting for a response.
+        $connectFrame = $this->protocol->getConnectFrame($this->login, $this->passcode, [], $this->vhost);
+        $this->stream->write($connectFrame);
+
+        // If the connection is successful, $connectListener is called:
+        // otherwise, $connectErrorListener is called.
+        // Either way, once I know the status remove both listeners.
+        $connectListener = static function () use ($deferred) {
+            $deferred->resolve();
+        };
+        $connectErrorListener = static function (BaseFrame $frame) use ($deferred) {
+            $deferred->reject($frame->getBody());
+        };
+        $this->stream->once('connect', function () use ($connectListener, $connectErrorListener) {
+            $this->stream->removeListener('error', $connectErrorListener);
+            $connectListener();
+        });
+        $this->stream->once('error', static function (BaseFrame $frame) use ($connectListener, $connectErrorListener) {
+            $this->stream->removeListener('connect', $connectListener);
+            $connectErrorListener($frame);
+        });
+
+        return $this->connectionPromise;
+    }
+
+
+    /**
+     * Creates the stream connection to the STOMP server, and sets up a
+     * connection to its data feed.
+     */
+    private function setupStream(): void
+    {
+        $socket = stream_socket_client(
+            sprintf('tcp://%s:%d/', $this->host, $this->port),
+            $errno,
+            $errstr
+        );
+        if (!$socket) {
+            throw new ConnectionException($errstr, $errno);
+        }
+
+        // Create the stream, subscribe to its data stream
+        $this->stream = new Stream($socket, $this->loop);
+        $this->stream->on('data', function ($data) {
+            $this->parser->addData($data);
+            while ($frame = $this->parser->nextFrame()) {
+                if ($frame instanceof BaseFrame) {
+                    // What kind of frame?
+                    switch ($frame->getCommand()) {
+                        case 'CONNECTED':
+                            $this->stream->emit('connect', [$frame]);
+                            break;
+                        case 'ERROR':
+                            $this->stream->emit('error', [$frame]);
+                            break;
+                        case 'MESSAGE':
+                            $this->stream->emit('message', [$frame]);
+                            break;
+                    }
+                }
+            };
+        });
+    }
 }
