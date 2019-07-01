@@ -62,9 +62,6 @@ class Connection
     private $vhost;
 
 
-    // Things created in setup or connect
-
-
     /**
      * @var Protocol\Protocol
      */
