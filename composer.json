@@ -72,7 +72,8 @@
         "firebase/php-jwt": "^5.0",
         "okta/jwt-verifier": "^0.2.1",
         "ext-openssl": "*",
-        "stomp-php/stomp-php": "^4.5"
+        "stomp-php/stomp-php": "^4.5",
+        "cboden/ratchet": "^0.4.1"
 
     },
     "require-dev": {
