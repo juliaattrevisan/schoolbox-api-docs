@@ -19,6 +19,7 @@ Data:
     {% if showErrors %}<div data-alert {{ dataAttributeError }} class="alert-box alert">{{ error|raw }}</div>{% endif %}
 {% else %}
 
+<div class="nesa-wrap">
     <div{% if gradientClass %} class="{{ gradientClass }}"{% endif %}>
         <h3 class="grade-heading {% if gradientClass %}has-gradient{% endif %}">{{ studentMark|default('-') }}</h3>
     </div>
@@ -103,3 +104,4 @@ Data:
     {% endautoescape %}
     <div id="{{ graphId }}" class="grade-graph"></div>
 {% endif %}
+</div>
