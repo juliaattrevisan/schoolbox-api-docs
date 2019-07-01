@@ -1,0 +1,68 @@
+<script type="text/javascript" src="/javascript/shared/jquery.validate.extensions.js"></script>
+<script type="text/javascript" src="/javascript/jquery.alaressValidate.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#accountForm').alaressValidate({
+            rules: {
+                confirm_password: {
+                    equalsOtherField: $('#new_password')
+                }
+            },
+            messages: {
+                confirm_password: {
+                    equalsOtherField: 'New Password and Confirm New Password must match.'
+                }
+            }
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Change Your Password</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% set formAction = routeLookupIfAuthorized('passwordChange.postChangePassword') %}
+        {% if formAction %}
+            <form id="accountForm" method="post" action="{{ formAction }}">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 column">
+                            <label>
+                                Current Password
+                                <input type="password"
+                                       name="current_password"
+                                       id="current_password"
+                                       required/>
+                            </label>
+                            <label>
+                                New Password
+                                <input type="password"
+                                       name="new_password"
+                                       id="new_password"
+                                       data-rule-minlength="8"
+                                       required/>
+                            </label>
+                            <label>
+                                Confirm New Password
+                                <input type="password"
+                                       name="confirm_password"
+                                       id="confirm_password"
+                                       data-rule-minlength="8"
+                                       required/>
+                            </label>
+                        </div>
+                    </fieldset>
+                </section>
+                <div class="row">
+                    <div class="small-12 column">
+                        <input type="submit" name="submit" value="Update Password"/>
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+</div>
+
