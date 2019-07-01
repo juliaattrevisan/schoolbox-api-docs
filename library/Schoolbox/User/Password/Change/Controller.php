@@ -10,7 +10,6 @@ namespace Schoolbox\User\Password\Change;
 
 use Alaress\Password\Service;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
@@ -24,12 +23,6 @@ class Controller extends Base
 
 
     /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-
-    /**
      * @var Service
      */
     private $passwordService;
@@ -38,13 +31,11 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
      * @param UserMapper  $userMapper
      * @param Service     $passwordService
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper, Service $passwordService)
+    public function __construct(UserMapper $userMapper, Service $passwordService)
     {
-        $this->errorMapper = $errorMapper;
         $this->userMapper = $userMapper;
         $this->passwordService = $passwordService;
     }
@@ -66,6 +57,7 @@ class Controller extends Base
 
     /**
      * Process the form vars
+     *
      * @throws MapperException
      * @throws \PDOException
      * @throws \Schoolbox\Application\Exception\Exception
