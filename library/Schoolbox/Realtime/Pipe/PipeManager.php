@@ -30,7 +30,6 @@ use Schoolbox\Realtime\SessionException;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
-use Ratchet\WebSocket\Version\RFC6455;
 use Schoolbox\Realtime\Subscription\ISubscriptionManager;
 
 /**
@@ -136,13 +135,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     public function onOpen(ConnectionInterface $conn)
     {
         // receive new connection, register a pipe based on it
-        if (!$conn instanceof RFC6455\Connection) {
-            $this->log->warning('Socket does not conform to RFC6455, cannot handle');
-
-            $this->closeConnectionWithReason($conn, 400);
-            return;
-        }
-
         $fdOpen = open_fd_count();
 
         if ($fdOpen >= $this->fdLimit) {
@@ -213,11 +205,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $conn->WebSocket->request->getBody()->close();
         }
 
-        if ($conn instanceof RFC6455\Connection) {
-            // if it's an RFC6455, we can safely assume there's a pipe to unregister
-            $key = Pipe::getSocketKeyForConnection($conn);
-            $this->pipes->unregisterPipe($key);
-        }
+        // all WS are RFC6455, we can safely assume there's a pipe to unregister
+        $key = Pipe::getSocketKeyForConnection($conn);
+        $this->pipes->unregisterPipe($key);
     }
 
 
