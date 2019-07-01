@@ -10,7 +10,6 @@ namespace Schoolbox\User\Password\Change;
 
 use Alaress\Password\Service;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
