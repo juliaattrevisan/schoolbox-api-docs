@@ -11,6 +11,7 @@ namespace Schoolbox\User\Password\Change;
 use Alaress\Password\Service;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -58,9 +59,7 @@ class Controller extends Base
     /**
      * Process the form vars
      *
-     * @throws MapperException
      * @throws \PDOException
-     * @throws \Schoolbox\Application\Exception\Exception
      * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postChangePassword()
@@ -89,7 +88,7 @@ class Controller extends Base
             try {
                 $this->userMapper->save($user);
                 $this->getSessionSegment()->setFlash('isPasswordReset', true);
-            } catch (\UnexpectedValueException $e) {
+            } catch (\UnexpectedValueException|Exception $e) {
                 // noop
             }
         }
