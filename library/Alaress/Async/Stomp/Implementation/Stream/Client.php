@@ -18,7 +18,7 @@ use Stomp\Transport\Frame as BaseFrame;
 use Stomp\Transport\Parser;
 
 /**
- * Class Client
+ * Implementation for a streaming STOMP client.
  */
 class Client implements IClient
 {
