@@ -111,8 +111,11 @@ Message Queue Publishers.
 Schoolbox Message Queues use [STOMP](https://stomp.github.io/) as the protocol
 for registering a Consumer.
 
-Schoolbox uses an instance of `\React\Stomp\Client` for its Message Queue
-Consumers.
+Schoolbox uses an instance of `\Alaress\Async\Stomp\Implementation\Stream\Connection`
+for its Message Queue Consumers.
+ 
+> This is a client developed by Schoolbox: no off-the-shelf clients under 
+  active development support subscribing to a stream as an event emitter. 
 
 
 #### Why two separate protocols?
@@ -127,6 +130,10 @@ particular exchange.
 STOMP is best suited for consumers, because of its asynchronicity: the STOMP
 client library Schoolbox uses makes use of the Event Loop so that consumers do
 not block.
+
+> This is a peculiarity of the STOMP client in use, not the STOMP protocol.
+  It would be possible to develop an AMQP client that is also an event emitter,
+  thus obviating the need for STOMP. 
 
 RabbitMQ is able to understand both protocols, and can translate a message
 published via AMQP into STOMP when a Consumer receives it.
