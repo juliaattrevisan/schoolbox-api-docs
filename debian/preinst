@@ -9,8 +9,11 @@ set -e
 # the debian-policy package
 
 case "$1" in
-    install|upgrade)
-
+    install)
+        # Ensure the alaress user exists
+        useradd -m alaress 2> /dev/null || true;
+    ;;
+    upgrade)
         # We cannot reference a file in the package from a prinst script, so need to inline it here
         echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
         maintenanceFileName="/usr/share/schoolbox/.maintenance";
