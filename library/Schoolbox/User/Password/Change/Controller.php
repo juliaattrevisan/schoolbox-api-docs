@@ -36,12 +36,6 @@ class Controller extends Base
 
 
     /**
-     * Minimum number of characters in a password
-     */
-    private const MIN_PASSWORD_LENGTH = 8;
-
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
@@ -85,21 +79,19 @@ class Controller extends Base
         $this->getSessionSegment()->setFlash('isPasswordReset', false);
 
         $user = $this->getUser();
+
         $currentPassword = $this->getRequest()->post->get('current_password', '');
-        $password = $this->getRequest()->post->get('new_password', '');
-        $confirm = $this->getRequest()->post->get('confirm_password', '');
+        $userPassword = $user->getPassword();
+        $newPassword = $this->getRequest()->post->get('new_password', '');
+        $confirmPassword = $this->getRequest()->post->get('confirm_password', '');
 
         /* To change a password:
-         * - the existing password has to match the current_password form var
-         * - the new password has to match the confirmation
-         * - it has to be at least MIN_PASSWORD_LENGTH chars long
+         * - all specification criteria must be met
          * - it has to successfully save
          */
-        if ($password === $confirm &&
-            mb_strlen($password, 'UTF-8') >= self::MIN_PASSWORD_LENGTH &&
-            $this->getUser() &&
-            $this->passwordService->verify($currentPassword, $user->getPassword())) {
+        $validChangeRequest = new ValidChangeRequest($this->passwordService);
 
+        if ($validChangeRequest->isSatisfiedBy($currentPassword, $userPassword, $newPassword, $confirmPassword)) {
             $user->setPassword($this->passwordService->hash($this->getRequest()->post['new_password']));
 
             try {
