@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
-use React\Socket\ConnectionException;
+//use React\Socket\ConnectionException;
 use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Pipe\HttpServer;
@@ -63,14 +63,16 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     $https  = new HttpServer($wss);
     $server = IoServer::factory($https, $port);
 
-    try {
-        $server->run();
-        $log->info("Listening for incoming websockets on port {$port}...", [ 'char' => '+' ]);
-
-    } catch (ConnectionException $e) {
-        $log->alert('Unable to launch: ' . $e->getMessage(), [ 'exception'=>$e ]);
-        throw $e;
-    }
+    $log->info("Listening for incoming websockets on port {$port}...", [ 'char' => '+' ]);
+    $server->run();
+//    try {
+//        $server->run();
+//        $log->info("Listening for incoming websockets on port {$port}...", [ 'char' => '+' ]);
+//
+//    } catch (ConnectionException $e) {
+//        $log->alert('Unable to launch: ' . $e->getMessage(), [ 'exception'=>$e ]);
+//        throw $e;
+//    }
 });
 
 

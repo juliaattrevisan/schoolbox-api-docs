@@ -22,7 +22,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
-use React\Socket\ConnectionException;
+//use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Pipe\Action\IAction;
 use Schoolbox\Realtime\Pipe\Action;
@@ -224,10 +224,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        if ($e instanceof ConnectionException) {
-            $this->log->warning("Connection to client lost, terminating");
-        }
-        else if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
+//        if ($e instanceof ConnectionException) {
+//            $this->log->warning("Connection to client lost, terminating");
+//        }
+//        else
+        if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
         } else {
             $this->log->critical(
