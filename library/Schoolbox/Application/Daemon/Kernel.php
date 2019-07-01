@@ -24,6 +24,7 @@ use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use React\Stomp;
+use React\Stream\Stream;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\IConfigLoader;
@@ -367,22 +368,22 @@ EOL;
             'loop' => $di->lazyValue('react.loop')
         ]));
 
-        $di->set('stomp', $di->lazy(function () use ($di) {
-            $conf = $di->get('config');
-
-            /** @var Stomp\Client $client */
-            $client = $di->get('stomp.factory')->createClient(
-                [
-                    'host'     => $conf->get('amqp_host'),
-                    'port'     => $conf->get('amqp_stomp_port'),
-                    'vhost'    => $conf->get('amqp_vhost'),
-                    'login'    => $conf->get('amqp_user'),
-                    'passcode' => $conf->get('amqp_pass'),
-                ]
-            );
-
-            return new React\Client($client);
-        }));
+//        $di->set('stomp', $di->lazy(function () use ($di) {
+//            $conf = $di->get('config');
+//
+//            /** @var Stomp\Client $client */
+//            $client = $di->get('stomp.factory')->createClient(
+//                [
+//                    'host'     => $conf->get('amqp_host'),
+//                    'port'     => $conf->get('amqp_stomp_port'),
+//                    'vhost'    => $conf->get('amqp_vhost'),
+//                    'login'    => $conf->get('amqp_user'),
+//                    'passcode' => $conf->get('amqp_pass'),
+//                ]
+//            );
+//
+//            return new React\Client($client);
+//        }));
 
 //        $di->set('stomp', $di->lazy(function () use ($di) {
 //            /** @var IConfigLoader $conf */
@@ -409,18 +410,29 @@ EOL;
 //            ]);
 //            return new Enqueue\Amqp\Client($factory, $this->loop);
 //        }));
+//
+//        $di->set('stomp', $di->lazy(function () use ($di) {
+//            /** @var IConfigLoader $conf */
+//            $conf    = $di->get('config');
+//            $factory = new StompConnectionFactory([
+//                'host'     => $conf->get('amqp_host'),
+//                'port'     => $conf->get('amqp_stomp_port'),
+//                'vhost'    => $conf->get('amqp_vhost'),
+//                'login'    => $conf->get('amqp_user'),
+//                'password' => $conf->get('amqp_pass'),
+//            ]);
+//            return new Enqueue\Stomp\Client($factory, $this->loop);
+//        }));
 
         $di->set('stomp', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
-            $conf    = $di->get('config');
-            $factory = new StompConnectionFactory([
-                'host'     => $conf->get('amqp_host'),
-                'port'     => $conf->get('amqp_stomp_port'),
-                'vhost'    => $conf->get('amqp_vhost'),
-                'login'    => $conf->get('amqp_user'),
-                'password' => $conf->get('amqp_pass'),
-            ]);
-            return new Enqueue\Stomp\Client($factory, $this->loop);
+            $conf   = $di->get('config');
+            $url    = sprintf('tcp://%s:%d/', $conf->get('amqp_host'), $conf->get('amqp_stomp_port'));
+            $stream = new Stream(stream_socket_client($url), $this->loop);
+
+            return new \Alaress\Async\Stomp\Implementation\Stream\Client($stream, $conf->get('amqp_user'), $conf->get('amqp_pass'), $conf->get('amqp_vhost'));
+            // 500 ms read timeout
+//            $conn->setReadTimeout(0, 500000);
         }));
 
         $di->values['logger'] = $this->logger();
