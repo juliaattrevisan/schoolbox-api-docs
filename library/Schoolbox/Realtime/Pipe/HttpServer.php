@@ -22,8 +22,8 @@ class HttpServer extends \Ratchet\Http\HttpServer
     /**
      * Close a connection with an HTTP response
      *
-     * @param \Ratchet\ConnectionInterface $conn
-     * @param int                          $code HTTP status code
+     * @param ConnectionInterface $conn
+     * @param int                 $code HTTP status code
      * @return void
      */
     protected function close(ConnectionInterface $conn, $code = 400)

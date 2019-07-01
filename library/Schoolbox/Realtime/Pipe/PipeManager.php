@@ -16,6 +16,7 @@ use Alaress\WorkerCrew\Transaction\Transaction;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\CommunicationException;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
@@ -198,11 +199,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onClose(ConnectionInterface $conn)
     {
-        if (isset($conn->WebSocket)) {
+        if ($conn->httpRequest instanceof RequestInterface) {
             // Explicitly close the descriptor to the temporary-file associated with the request that initiated this
             // connection.  Before this fix, we were running out of file descriptors because they were never being
             // released due to a bug in the vendor implementation.
-            $conn->WebSocket->request->getBody()->close();
+            $conn->httpRequest->getBody()->close();
         }
 
         // all WS are RFC6455, we can safely assume there's a pipe to unregister
@@ -245,8 +246,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * Triggered when a client sends data through the socket
      *
-     * @param  \Ratchet\ConnectionInterface $from The socket/connection that sent the message to your application
-     * @param  string                       $msg  The message received
+     * @param  ConnectionInterface $from The socket/connection that sent the message to your application
+     * @param  string              $msg  The message received
      * @throws \Exception
      * @return void
      */

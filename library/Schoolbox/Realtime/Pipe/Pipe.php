@@ -34,7 +34,7 @@ class Pipe implements PipeInterface
     /** @var string */
     private $commandLock;
 
-    /** @var \Ratchet\ConnectionInterface */
+    /** @var ConnectionInterface */
 	protected $socketConnection;
 
 	/** @var int */

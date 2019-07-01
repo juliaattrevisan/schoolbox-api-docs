@@ -60,7 +60,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     ))->build();
 
     $wss = new Ratchet\WebSocket\WsServer($pipeManager);
-    $wss->disableVersion(0);
 
     $https   = new HttpServer($wss);
     $webSock = new Server($loop);
