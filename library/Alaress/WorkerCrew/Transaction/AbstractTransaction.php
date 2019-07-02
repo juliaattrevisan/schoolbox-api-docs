@@ -96,6 +96,7 @@ abstract class AbstractTransaction implements ITransaction
         }
         $this->timer = $this->loop->addTimer($this->cacheInterval, function (TimerInterface $timer) {
             $this->execute($timer);
+            $this->timer = null;
         });
     }
 
@@ -106,7 +107,7 @@ abstract class AbstractTransaction implements ITransaction
      * @return bool
      */
     private function isTicking() {
-        return isset($this->timer) && $this->timer->isActive();
+        return isset($this->timer);
     }
 
     /**
