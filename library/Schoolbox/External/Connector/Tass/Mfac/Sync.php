@@ -110,7 +110,6 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
             WHERE p.cmpy_code = :companyCode
             AND   p.f_name IS NOT NULL
             AND   s.given_name IS NOT NULL
-            AND sf.sfa_num IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
             AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
             AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
@@ -165,7 +164,6 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
             WHERE p.cmpy_code = :companyCode2
             AND   p.m_name IS NOT NULL
             AND   s.given_name IS NOT NULL
-            AND sf.sfa_num IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
             AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
             AND   ((CHARINDEX(','+RTRIM(pa.add_num)+',', ','+RTRIM(sf.add_nums)+',') IS NULL)
@@ -183,42 +181,33 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
         $stack = [];
 
         while ($row = $statement->fetch()) {
-            $rawId = substr($row['student_contact_id'], 1);
-            $contactId = $row['student_contact_id'];
-            $studentId = "{$row['student_preferred']} {$row['student_surname']}";
+            if ($row['sfa_num']) {
+                $rawId     = substr($row['student_contact_id'], 1);
+                $contactId = $row['student_contact_id'];
+                $studentId = "{$row['student_preferred']} {$row['student_surname']}";
 
-            $stack[$rawId]['contacts'][$contactId] = array_intersect_key($row, [
-                'sfa_num' => '',
-                'student_contact_id' => '',
-                'student_contact_network_login' => '',
-                'student_contact_title' => '',
-                'student_contact_given_name' => '' ,
-                'student_contact_preferred' => '',
-                'student_contact_surname' => '',
-                'student_contact_home_email' => '',
-                'student_contact_default_email' => '',
-                'student_contact_work_email' => '',
-            ]);
+                $stack[$rawId]['contacts'][$contactId] = array_intersect_key($row, [
+                    'sfa_num' => '',
+                    'student_contact_id' => '',
+                    'student_contact_network_login' => '',
+                    'student_contact_title' => '',
+                    'student_contact_given_name' => '',
+                    'student_contact_preferred' => '',
+                    'student_contact_surname' => '',
+                ]);
 
-            $stack[$rawId]['students'][$studentId] = array_intersect_key($row, [
-                'student_preferred' => '',
-                'student_surname' => '',
-                'student_year_level' => '',
-                'student_campus' => '',
-                'student_house' => '',
-                'student_gender' => '',
-            ]);
+                $stack[$rawId]['students'][$studentId] = array_intersect_key($row, [
+                    'student_preferred' => '',
+                    'student_surname' => '',
+                    'student_year_level' => '',
+                    'student_campus' => '',
+                    'student_house' => '',
+                    'student_gender' => '',
+                ]);
+            }
         }
 
         print_r($stack);
-
-        foreach ($stack as $id => $data) {
-            foreach ($data as $datum) {
-                if ($datum['student_contact_surname'] == 'Mackellar') {
-                    print_r($data);
-                }
-            }
-        }
 
         die();
     }
