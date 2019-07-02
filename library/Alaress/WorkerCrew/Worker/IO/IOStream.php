@@ -21,6 +21,8 @@ use SplObjectStorage;
  * Class WorkerIOStream that tries to safely encapsulate React's "looseness"
  *
  * @package Alaress\WorkerCrew\Worker\IO
+ * @deprecated see `WrappedIoStream` for an implementation which doesn't extend
+ *             a now final class
  */
 class IOStream extends Stream implements Listenable
 {

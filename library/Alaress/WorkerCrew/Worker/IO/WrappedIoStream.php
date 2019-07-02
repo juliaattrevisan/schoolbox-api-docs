@@ -17,7 +17,9 @@ use React\Stream\DuplexResourceStream;
 use SplObjectStorage;
 
 /**
- * Class WrappedIoStream
+ * Wrapper around a DuplexResourceStream.
+ *
+ * Attempts to safely encapsulate React's "looseness".
  */
 class WrappedIoStream implements Listenable
 {
