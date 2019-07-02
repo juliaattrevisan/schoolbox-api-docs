@@ -26,7 +26,7 @@ $log = $kernel->logger();
 $mapper = PlagscanMapper::getInstance();
 $storageMapper = StorageMapper::getInstance();
 
-if (!$mapper->hasConnector()) {
+if (!$mapper->getConnector()) {
 
     /* Plagscan not configured - nothing to do
      */
