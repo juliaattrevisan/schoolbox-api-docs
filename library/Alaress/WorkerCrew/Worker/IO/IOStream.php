@@ -14,7 +14,7 @@ use Alaress\Async\Listener\Listenable;
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\Async\Listener\Stream\StreamListener;
 use React\EventLoop\LoopInterface;
-use React\Stream\Stream;
+use React\Stream\DuplexResourceStream as Stream;
 use SplObjectStorage;
 
 /**
