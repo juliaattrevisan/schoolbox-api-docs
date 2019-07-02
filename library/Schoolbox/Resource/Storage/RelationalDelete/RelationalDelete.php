@@ -11,6 +11,11 @@ use Eportfolio\CoverPhotoMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Blog\Homepage\Image\Mapper;
 
+/**
+ * Delete storage files and it's relationships with other entites.
+ *
+ * @package Schoolbox\Resource\Storage\RelationalDelete
+ */
 class RelationalDelete implements IRelationalDelete
 {
     /**
@@ -95,7 +100,7 @@ class RelationalDelete implements IRelationalDelete
             // File
             new \Schoolbox\Resource\File\RelationalDelete(\Schoolbox\Resource\File\Mapper::getInstance(), $this->logger),
 
-            // Storage (Final query)
+            // Storage (Do NOT move this anywhere. Must be the last item that gets executed due to the table relationships.)
             new \Schoolbox\Resource\Storage\RelationalDelete(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->logger),
         ];
     }
