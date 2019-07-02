@@ -13,7 +13,7 @@ use Alaress\Async\Listener\Listenable;
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\Async\Listener\Stream\StreamListener;
 use React\EventLoop\LoopInterface;
-use React\Stream\DuplexResourceStream;
+use React\Stream\ReadableResourceStream;
 use SplObjectStorage;
 
 /**
@@ -43,7 +43,7 @@ class WrappedIoStream implements Listenable
         StreamListener $listener = null,
         int $readChunkSize = null
     ) {
-        $streamObject        = new DuplexResourceStream($stream, $loop, $readChunkSize);
+        $streamObject        = new ReadableResourceStream($stream, $loop, $readChunkSize);
         $this->listenerStore = new SplObjectStorage();
 
         if ($listener) {
