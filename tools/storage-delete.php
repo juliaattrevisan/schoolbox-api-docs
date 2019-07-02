@@ -14,6 +14,7 @@
 
 use Alaress\Lumberjack\Logger;
 use Schoolbox\Application\Daemon;
+use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
 $errors  = [];
 $opts    = getopt('pvn:', ['hash:']);
@@ -50,6 +51,6 @@ if (!$hash) {
     die();
 }
 
-(new Schoolbox\Resource\Storage\GarbageCollector\GarbageCollector($log))->remove($hash, $performDelete);
+(new RelationalDelete($log))->remove($hash, $performDelete);
 
 exit(0);

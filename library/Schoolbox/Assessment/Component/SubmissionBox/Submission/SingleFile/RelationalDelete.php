@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 
-use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
-use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
+use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
+use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 
-class GarbageCollector extends Deletable implements IGarbageCollector
+class RelationalDelete extends Deletable implements IRelationalDelete
 {
 
 }

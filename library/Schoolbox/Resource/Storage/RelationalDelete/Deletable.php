@@ -5,20 +5,49 @@
  */
 declare(strict_types=1);
 
-namespace Component\Eportfolio;
+namespace Schoolbox\Resource\Storage\RelationalDelete;
 
-use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
-use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
+use Psr\Log\LoggerInterface;
+use Schoolbox\Mapper;
 
-class GarbageCollector extends Deletable implements IGarbageCollector
+class Deletable implements IRelationalDelete
 {
     /**
-     * @inheritDoc
+     * @var Mapper
+     */
+    protected $mapper;
+
+    /**
+     * @var string
+     */
+    protected $hashColumn = 'hash';
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * Base constructor.
+     *
+     * @param Mapper          $mapper
+     * @param LoggerInterface $logger
+     */
+    public function __construct(Mapper $mapper, LoggerInterface $logger)
+    {
+        $this->mapper = $mapper;
+
+        $this->logger = $logger;
+    }
+
+    /**
+     * @param string $hash
+     * @param bool   $performDryRun
+     *
+     * @throws Mapper\Exception
      */
     public function remove(string $hash, bool $performDryRun): void
     {
-        $fileListItemMapper = new FileListMapper();
-
         $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
         if ($records->count() > 0) {
@@ -26,9 +55,8 @@ class GarbageCollector extends Deletable implements IGarbageCollector
                 $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
             } else {
                 foreach ($records as $record) {
-                    $file = $fileListItemMapper->findByColumn('file_id', $record->getId(), ['deleted' => true]);
                     try {
-                        $fileListItemMapper->hardDelete($file);
+                        $this->mapper->hardDelete($record);
                     } catch (\Exception $exception) {
                         throw new Mapper\Exception($exception->getMessage());
                     }

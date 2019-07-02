@@ -5,12 +5,12 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Resource\Storage\GarbageCollector;
+namespace Schoolbox\Resource\Storage\RelationalDelete;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
 
-class Deletable implements IGarbageCollector
+class Nullable implements IRelationalDelete
 {
     /**
      * @var Mapper
@@ -21,6 +21,11 @@ class Deletable implements IGarbageCollector
      * @var string
      */
     protected $hashColumn = 'hash';
+
+    /**
+     * @var array
+     */
+    protected $setMethods = [];
 
     /**
      * @var LoggerInterface
@@ -48,20 +53,24 @@ class Deletable implements IGarbageCollector
      */
     public function remove(string $hash, bool $performDryRun): void
     {
-        $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
+        if (!\count($this->setMethods)) {
+            throw new Mapper\Exception('setMethods cannot be empty...');
+        }
 
-        if ($records->count() > 0) {
+        $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash, ['deleted' => true]);
+
+        if (\count($records) > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
+                $this->logger->notice('Will unlink [' . \count($records) . '] record(s) in: ' . $this->mapper->getTable());
             } else {
                 foreach ($records as $record) {
-                    try {
-                        $this->mapper->hardDelete($record);
-                    } catch (\Exception $exception) {
-                        throw new Mapper\Exception($exception->getMessage());
+                    $obj = $this->mapper->findByIdWithFallback($record);
+                    foreach ($this->setMethods as $method) {
+                        $obj->{$method}(null);
                     }
+                    $this->mapper->save($obj);
                 }
-                $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('[' . \count($records) . '] record(s) unlinked in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }

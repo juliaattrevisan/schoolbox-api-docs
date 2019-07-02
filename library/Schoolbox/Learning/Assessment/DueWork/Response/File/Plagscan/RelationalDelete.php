@@ -9,10 +9,10 @@ namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Storage\GarbageCollector\Deletable;
-use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
+use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
+use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 
-class GarbageCollector extends Deletable implements IGarbageCollector
+class RelationalDelete extends Deletable implements IRelationalDelete
 {
     /**
      * @var string
@@ -25,7 +25,7 @@ class GarbageCollector extends Deletable implements IGarbageCollector
     private $database;
 
     /**
-     * GarbageCollector constructor.
+     * RelationalDelete constructor.
      *
      * @param Mapper          $mapper
      */

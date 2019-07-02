@@ -5,9 +5,9 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Resource\Storage\GarbageCollector;
+namespace Schoolbox\Resource\Storage\RelationalDelete;
 
-interface IGarbageCollector
+interface IRelationalDelete
 {
     /**
      * @param string $hash

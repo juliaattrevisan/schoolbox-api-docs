@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\ResourceBooking\Item;
 
-use Schoolbox\Resource\Storage\GarbageCollector\IGarbageCollector;
-use Schoolbox\Resource\Storage\GarbageCollector\Nullable;
+use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
+use Schoolbox\Resource\Storage\RelationalDelete\Nullable;
 
-class GarbageCollector extends Nullable implements IGarbageCollector
+class RelationalDelete extends Nullable implements IRelationalDelete
 {
     /**
      * @var string
