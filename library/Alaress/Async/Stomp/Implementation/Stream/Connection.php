@@ -12,7 +12,7 @@ use Alaress\Async\Stomp\ConnectionException;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use React\Stream\Stream;
+use React\Stream\DuplexResourceStream as Stream;
 use Stomp\Exception\StompException;
 use Stomp\Protocol;
 use Stomp\Transport\Frame as BaseFrame;

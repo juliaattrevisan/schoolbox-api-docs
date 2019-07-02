@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Alaress\Async\Stomp\Implementation\Stream;
 
 use Alaress\Async\Stomp\IAckResolver;
-use React\Stream\Stream;
+use React\Stream\DuplexResourceStream as Stream;
 use Stomp\Protocol\Protocol;
 use Stomp\Transport\Frame as BaseFrame;
 

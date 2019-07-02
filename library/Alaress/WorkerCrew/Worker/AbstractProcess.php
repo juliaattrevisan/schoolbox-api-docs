@@ -17,7 +17,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
-use React\Stream\Stream;
+use React\Stream\DuplexResourceStream as Stream;
 use RuntimeException;
 
 abstract class AbstractProcess implements WorkerInterface
