@@ -75,7 +75,9 @@ class RelationalDelete implements IRelationalDelete
             new \Schoolbox\ResourceBooking\Item\RelationalDelete(\Schoolbox\ResourceBooking\Item\Mapper::getInstance(), $this->logger),
 
             // Socialstream
-            new \SocialStream\RelationalDelete(\SocialStream\PostMapper::getInstance(), $this->logger),
+            new \SocialStream\Cache\RelationalDelete(\SocialStream\PostMapper::getInstance(), $this->logger),
+            new \SocialStream\Post\Thumbnail\RelationalDelete(\SocialStream\PostMapper::getInstance(), $this->logger),
+            new \SocialStream\Post\Url\RelationalDelete(\SocialStream\PostMapper::getInstance(), $this->logger),
 
             // Assessments
             new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\RelationalDelete(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->logger),

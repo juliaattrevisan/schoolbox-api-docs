@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace SocialStream;
+namespace SocialStream\Post\Url;
 
 use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 use Schoolbox\Resource\Storage\RelationalDelete\Nullable;
@@ -15,10 +15,15 @@ class RelationalDelete extends Nullable implements IRelationalDelete
     /**
      * @var string
      */
-    protected $hashColumn = 'cache_hash';
+    protected $hashColumn = 'url';
 
     /**
      * @var array
      */
-    protected $setMethods = ['setCacheHash', 'setThumbnail', 'setUrl'];
+    protected $setMethods = ['setUrl'];
+
+    /**
+     * @var string
+     */
+    protected $hashPrefix = '/storage/image.php?size=maxsize&hash=';
 }

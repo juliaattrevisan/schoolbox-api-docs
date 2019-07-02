@@ -32,6 +32,8 @@ class Nullable implements IRelationalDelete
      */
     protected $logger;
 
+    protected $hashPrefix = '';
+
     /**
      * Base constructor.
      *
@@ -57,7 +59,7 @@ class Nullable implements IRelationalDelete
             throw new Mapper\Exception('setMethods cannot be empty...');
         }
 
-        $records = $this->mapper->findIdsByColumn($this->hashColumn, $hash, ['deleted' => true]);
+        $records = $this->mapper->findIdsByColumn($this->hashColumn, $this->hashPrefix . $hash, ['deleted' => true]);
 
         if (\count($records) > 0) {
             if ($performDryRun) {
