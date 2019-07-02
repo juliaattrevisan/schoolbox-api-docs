@@ -41,11 +41,9 @@ class WrappedIoStream implements Listenable
             $this->attachListener($listener);
         }
 
-        $listenerStore = $this->getListeners();
-
         $streamObject->on(
             'data',
-            static function ($data) use ($listenerStore, $streamObject, $stream) {
+            function ($data) use ($streamObject, $stream) {
                 /**
                  * @var string $data
                  */
@@ -68,7 +66,7 @@ class WrappedIoStream implements Listenable
                     return;
                 }
 
-                foreach ($listenerStore as $listener) {
+                foreach ($this->listenerStore as $listener) {
                     $listener->dataReceived($e);
                 }
 
@@ -78,8 +76,8 @@ class WrappedIoStream implements Listenable
 
         $streamObject->on(
             'close',
-            static function () use ($listenerStore, $stream) {
-                foreach ($listenerStore as $listener) {
+            function () use ($stream) {
+                foreach ($this->listenerStore as $listener) {
                     $listener->streamClosed(new StreamEvent($stream));
                 }
                 unset($e);
@@ -88,8 +86,8 @@ class WrappedIoStream implements Listenable
 
         $streamObject->on(
             'error',
-            static function ($error) use ($listenerStore, $stream) {
-                foreach ($listenerStore as $listener) {
+            function ($error) use ($stream) {
+                foreach ($this->listenerStore as $listener) {
                     $listener->errorOccurred(new StreamEvent($stream, $error));
                 }
                 unset($e);
@@ -98,8 +96,8 @@ class WrappedIoStream implements Listenable
 
         $streamObject->on(
             'drain',
-            static function () use ($listenerStore) {
-                foreach ($listenerStore as $listener) {
+            function () {
+                foreach ($this->listenerStore as $listener) {
                     $listener->streamDrained(new StreamEvent(null));
                 }
                 unset($e);
@@ -111,19 +109,10 @@ class WrappedIoStream implements Listenable
 
 
     /**
-     * @return StreamListener[]|SplObjectStorage
-     */
-    protected function getListeners()
-    {
-        return $this->listenerStore;
-    }
-
-
-    /**
      * @param EventListener $listener
      * @return void
      */
-    public function attachListener(EventListener $listener)
+    public function attachListener(EventListener $listener): void
     {
         $this->listenerStore->attach($listener);
     }
@@ -133,7 +122,7 @@ class WrappedIoStream implements Listenable
      * @param EventListener $listener
      * @return void
      */
-    public function detachListener(EventListener $listener)
+    public function detachListener(EventListener $listener): void
     {
         $this->listenerStore->detach($listener);
     }
