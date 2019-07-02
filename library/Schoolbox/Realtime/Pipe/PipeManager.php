@@ -451,14 +451,14 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (empty($this->pushTransactions[$userId][$pipeId])) {
             $this->pushTransactions[$userId][$pipeId] = new Transaction(
                 $this->reactLoop,
-                function (TimerInterface $timer) use ($pipe, $userId) {
+                function ($data) use ($pipe, $userId) {
 
                     // the timer contains the data to be processed
                     $this->log->info("Pushing cached messages to user $userId", [ 'char' => '<' ]);
 
                     try {
                         // enqueue to be dispatched
-                        $this->enqueueInstances($pipe, $timer->getData());
+                        $this->enqueueInstances($pipe, $data);
 
                     } catch (QueueingException $e) {
                         $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);

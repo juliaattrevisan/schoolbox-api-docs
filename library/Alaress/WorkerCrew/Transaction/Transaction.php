@@ -42,7 +42,7 @@ class Transaction extends AbstractTransaction
      */
     protected function execute(TimerInterface $timer, $data)
     {
-        call_user_func($this->callback, $timer);
+        call_user_func($this->callback, $data);
     }
 
 }
