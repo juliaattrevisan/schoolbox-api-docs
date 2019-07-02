@@ -14,10 +14,54 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
 {
 
     /**
+     * Find the contents of each table
+     *
+     * - everything seems to join onto a (par_code, cmpy_code) tuple in one way or another
+     * - P = primary parent; S = secondary parent (spouse)
+     * - add_num and commtype_code are instance-configurable csv
+     * - persondefs is metadata about a specific individual, not a nukular family unit
+     * - sfa_num determines whether the parent+spouse is split (null === split family, otherwise nukular)
+     *
+     * @throws \Alaress\Database\Exception
+     */
+    private function explorer()
+    {
+        $tables = [
+            'parent',
+            'paraddress',
+            'pia_sfaccess',
+            'family',
+            'persondefs',
+            'student',
+            'studcommrules',
+        ];
+
+        foreach ($tables as $table) {
+            $query = "
+                SELECT TOP 1 * 
+                FROM {$table}
+            ";
+
+            $statement = $this->databaseExternal->prepareQuery($query);
+            $statement->execute();
+
+            while ($row = $statement->fetch()) {
+                print_r("{$table} ");
+                print_r($row);
+            }
+        }
+
+        die();
+    }
+
+
+    /**
      * {@inheritdoc}
      */
     public function findAllParents()
     {
+        $this->explorer();
+
         /* If Tass Comm rules are enabled then locate the guardian relationship
          * from there as well
          */
