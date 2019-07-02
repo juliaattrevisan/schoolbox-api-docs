@@ -137,13 +137,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $markedUsingRange;
 
     /**
-     * The actual rubric grid in use for this submission box.
-     *
-     * @var Rubric
-     */
-    protected $rubric;
-
-    /**
      * @var int
      */
     protected $mark_visibility;
@@ -697,24 +690,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     public function setPublishDate($publish_date)
     {
         $this->publish_date = $publish_date;
-        return $this;
-    }
-
-    /**
-     * @return Rubric
-     */
-    public function getRubric()
-    {
-        return $this->rubric;
-    }
-
-    /**
-     * @param Rubric $rubric
-     * @return static
-     */
-    public function setRubric(Rubric $rubric = null)
-    {
-        $this->rubric = $rubric;
         return $this;
     }
 
