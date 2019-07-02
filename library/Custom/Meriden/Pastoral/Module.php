@@ -132,11 +132,6 @@ class Module extends BaseModule
             = $injector->lazyGet('assessmentDataSource');
         $injector->params[StudentInvolvement\Factory::class]['rubricMapper']
             = $this->getMapperFactory()->getLazy(RubricMapper::class);
-        $injector->params[StudentInvolvement\Factory::class]['rubricContext']
-            = $injector->lazyNew(
-                RubricContext::class,
-                [$this->getMapperFactory()->getLazy(RubricMapper::class)]
-            );
         $injector->params[StudentInvolvement\Factory::class]['currentUser']
             = $injector->lazyGet('user');
         $injector->params[StudentInvolvement\Factory::class]['access'] = Access::getInstance();
