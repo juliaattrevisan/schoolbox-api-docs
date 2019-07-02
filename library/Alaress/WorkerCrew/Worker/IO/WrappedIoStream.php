@@ -28,13 +28,20 @@ class WrappedIoStream implements Listenable
 
 
     /**
-     * @param resource       $stream
-     * @param LoopInterface  $loop
-     * @param StreamListener $listener
+     * Constructor
+     *
+     * @param resource            $stream
+     * @param LoopInterface       $loop
+     * @param StreamListener|null $listener
+     * @param int|null            $readChunkSize
      */
-    public function __construct($stream, LoopInterface $loop, StreamListener $listener = null)
-    {
-        $streamObject        = new DuplexResourceStream($stream, $loop);
+    public function __construct(
+        $stream,
+        LoopInterface $loop,
+        StreamListener $listener = null,
+        int $readChunkSize = null
+    ) {
+        $streamObject        = new DuplexResourceStream($stream, $loop, $readChunkSize);
         $this->listenerStore = new SplObjectStorage();
 
         if ($listener) {

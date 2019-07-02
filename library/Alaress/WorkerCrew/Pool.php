@@ -13,7 +13,7 @@ namespace Alaress\WorkerCrew;
 use Alaress\Async\Listener\Stream\StreamListener;
 use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\Worker\IO\IOStream;
+use Alaress\WorkerCrew\Worker\IO\WrappedIoStream as IOStream;
 use Alaress\WorkerCrew\Worker\IO\Listener\DataIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\ErrorIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\LogIOListener;
