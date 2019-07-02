@@ -649,19 +649,21 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             unset($this->userTimeouts[$userId]);
         }
 
-        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(self::INACTIVE_TIMEOUT, [ $this, 'onTimeout' ]);
-
-        $this->userTimeouts[$userId]->setData($userId);
+        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(
+            self::INACTIVE_TIMEOUT,
+            function () use ($userId) {
+                $this->onTimeout($userId);
+            }
+        );
     }
 
 
     /**
-     * @param TimerInterface $timer
+     * @param int $userId
      * @return void
      */
-    public function onTimeout(TimerInterface $timer)
+    private function onTimeout($userId)
     {
-        $userId  = $timer->getData();
         $success = $this->subscriptionManager->removeSubscription($userId);
         $this->log->info("User $userId has timed out, " . ($success ? 'unsubscribed' : 'failed to unsubscribe'));
 
