@@ -37,9 +37,10 @@ class Transaction extends AbstractTransaction
 
     /**
      * @param TimerInterface $timer
+     * @param mixed          $data
      * @return void
      */
-    protected function execute(TimerInterface $timer)
+    protected function execute(TimerInterface $timer, $data)
     {
         call_user_func($this->callback, $timer);
     }
