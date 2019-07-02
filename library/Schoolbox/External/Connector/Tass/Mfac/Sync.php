@@ -72,7 +72,12 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                     THEN 'P' + RTRIM(p.par_code)
                     ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
                 END              AS student_contact_id,
-                f.person_num     AS student_contact_network_login,
+                CASE
+                    WHEN
+                        (sf.sfa_num) IS NULL
+                    THEN 'P' + RTRIM(p.par_code)
+                    ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
+                END              AS student_contact_network_login,
                 ''               AS student_contact_title,
                 RTRIM(p.f_name)  AS student_contact_given_name,
                 LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
@@ -122,7 +127,12 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                     THEN 'S' + RTRIM(p.par_code)
                     ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
                 END              AS student_contact_id,
-                f.person_num     AS student_contact_network_login,
+                CASE
+                    WHEN
+                        (sf.sfa_num) IS NULL
+                    THEN 'S' + RTRIM(p.par_code)
+                    ELSE REVERSE('S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num))
+                END              AS student_contact_network_login,
                 ''               AS student_contact_title,
                 RTRIM(p.m_name)  AS student_contact_given_name,
                 LEFT(p.m_name, CHARINDEX(' ', p.m_name)) AS student_contact_preferred,
