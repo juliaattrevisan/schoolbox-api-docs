@@ -73,7 +73,7 @@ class AssessmentType implements IType
             $object = (new DueWork())->setContext($context);
 
             if ($context) {
-                $object->setRubric(RubricMapper::getInstance()->createForContext($context));
+                $object->setRubricGrid(RubricMapper::getInstance()->retrieveGrid($object, true));
             }
 
             return $object;

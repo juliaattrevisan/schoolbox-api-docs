@@ -313,7 +313,7 @@ class Acquisition
                 /* Summon rubrics
                  */
                 if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
-                    $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+                    $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
                 }
 
                 foreach ($people as $person) {

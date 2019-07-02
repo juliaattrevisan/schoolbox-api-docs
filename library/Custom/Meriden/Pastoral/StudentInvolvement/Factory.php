@@ -422,19 +422,20 @@ class Factory
                     // Load rubrics into assessment whilst here
                     $rubric = [];
                     if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
-                        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-                        $rubric = (new RubricContext($this->rubricMapper))
-                                       ->generate(
-                                           $assessment,
-                                           $student,
-                                           $this->currentUser,
-                                           $this->access
-                                       )['rubric'];
+                        $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
+//                        $rubric = (new RubricContext($this->rubricMapper))
+//                                       ->generate(
+//                                           $assessment,
+//                                           $student,
+//                                           $this->currentUser,
+//                                           $this->access
+//                                       )['rubric'];
                     }
 
+                    // TODO update template to query rubric in assessment instead
                     $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => $assessment,
-                        'rubric'      => $rubric,
+                        'rubric'      => null,
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),
