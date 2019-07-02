@@ -466,7 +466,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             $this->log->info('Trigger not complete, rescheduling');
 
             try {
-                $this->schedule($trigger, $this->timerCallback(), false);
+                $this->schedule($trigger, $this->timerCallback($trigger), false);
 
                 // don't detach, just return the count
                 $resolver = $this->resolvers->getResolverByTrigger($trigger);
