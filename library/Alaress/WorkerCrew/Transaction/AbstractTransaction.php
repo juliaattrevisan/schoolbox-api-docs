@@ -92,7 +92,7 @@ abstract class AbstractTransaction implements ITransaction
      */
     private function resetTimer() {
         if(isset($this->timer)) {
-            $this->timer->cancel();
+            $this->loop->cancelTimer($this->timer);
         }
         $this->timer = $this->loop->addTimer($this->cacheInterval, function (TimerInterface $timer) {
             $this->execute($timer);
@@ -125,7 +125,7 @@ abstract class AbstractTransaction implements ITransaction
     {
         if (isset($this->timer)) {
             $this->execute($this->timer);
-            $this->timer->cancel();
+            $this->loop->cancelTimer($this->timer);
             $this->timer = null;
         }
 
