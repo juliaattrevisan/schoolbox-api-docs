@@ -76,13 +76,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     protected $useRubric = false;
 
     /**
-     * @deprecated use `$this->rubricGrid` for all your rubric grid needs
-     *
-     * @var Rubric|null
-     */
-    private $rubric;
-
-    /**
      * @var Grid|null
      */
     private $rubricGrid;
@@ -625,30 +618,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setUseRubric($useRubric)
     {
         $this->useRubric = $useRubric;
-        return $this;
-    }
-
-    /**
-     * @deprecated use `getRubricGrid` instead
-     *
-     * @return Rubric|null
-     */
-    public function getRubric()
-    {
-//        trigger_error('This method is deprecated; use "getRubricGrid()" instead', E_USER_DEPRECATED);
-        return $this->rubric;
-    }
-
-    /**
-     * @deprecated use `setRubricGrid` instead
-     *
-     * @param Rubric|null $rubric
-     * @return static
-     */
-    public function setRubric(Rubric $rubric = null)
-    {
-//        trigger_error('This method is deprecated; use "setRubricGrid()" instead', E_USER_DEPRECATED);
-        $this->rubric = $rubric;
         return $this;
     }
 
