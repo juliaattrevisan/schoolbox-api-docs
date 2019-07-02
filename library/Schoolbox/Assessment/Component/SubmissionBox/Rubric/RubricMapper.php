@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
-use Schoolbox\Assessment\Rubric\Factory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
@@ -77,14 +76,10 @@ class RubricMapper
     /** @var Database */
     protected $database;
 
-    /** @var Factory */
-    protected $factory;
-
     /** */
     public function __construct()
     {
         $this->database = Database::getInstance();
-        $this->factory  = new Factory(new Rubric());
     }
 
 
@@ -1017,57 +1012,6 @@ class RubricMapper
     }
 
     /**
-     * Given a box ID, return the rubric assigned to it, if any
-     *
-     * Unlike createForContext(), this is a data-level method (ie it works on data models).
-     *
-     * @param SubmissionBox $box
-     * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
-     * @param bool          $editMode          - whether to include criteria not in use on box
-     *
-     * @return Rubric
-     */
-    public function findBySubmissionBox(SubmissionBox $box, $getParentCriteria = false, $editMode = false)
-    {
-        list ($groups, $criteria) = $this->findCriteria($box, $getParentCriteria);
-        $descriptors = $this->findDescriptors($box);
-        $levelList   = $this->generateLevelList($box);
-
-        // setup the data structure to match what the factory expects
-        $postdata = [
-            $box->getId() => [
-                'level'      => $levelList,
-                'group'      => $groups,
-                'criterion'  => $criteria,
-                'descriptor' => $descriptors,
-            ],
-        ];
-
-        // use the factory to produce the rubric object
-        /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData($postdata, $box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange(), $getParentCriteria || $editMode);
-
-        return $rubric->setSubmissionBox($box);
-    }
-
-    /**
-     * Given a DueWork, return the rubric assigned to it, if any
-     *
-     * @param DueWork\Model $dueWork
-     * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
-     * @param bool          $editMode          - whether to include criteria not in use on box
-     *
-     * @return Rubric
-     */
-    public function findByDueWork(DueWork\Model $dueWork, $getParentCriteria = false, $editMode = false)
-    {
-        /** @var SubmissionBox $box */
-        $box = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $dueWork->getId());
-
-        return $this->findBySubmissionBox($box, $getParentCriteria, $editMode);
-    }
-
-    /**
      * Find all criteria that are available or in use by the $box.
      *
      * We would wish to retrieve parent criteria when the $box lives in a UnitSpec, or project
@@ -1271,21 +1215,6 @@ class RubricMapper
         }
 
         return $levelList;
-    }
-
-    /**
-     * Convenience (or safety) method wrapping grid fetch and mark application
-     *
-     * @param SubmissionBox $box
-     * @param User          $student
-     *
-     * @return Rubric
-     */
-    public function findBySubmissionBoxAndStudent(SubmissionBox $box, User $student)
-    {
-        $grid = $this->findBySubmissionBox($box);
-
-        return (new GridGenerator($this, $grid, $student))->applyInstructorGivenMark(true);
     }
 
     /**
