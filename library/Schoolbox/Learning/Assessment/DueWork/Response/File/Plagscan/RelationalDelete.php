@@ -15,11 +15,6 @@ use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 class RelationalDelete extends Deletable implements IRelationalDelete
 {
     /**
-     * @var string
-     */
-    protected $hashColumn = 'storage_hash';
-
-    /**
      * @var \Database
      */
     private $database;
@@ -31,7 +26,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
      */
     public function __construct(Mapper $mapper, LoggerInterface $logger)
     {
-        parent::__construct($mapper, $logger);
+        parent::__construct($mapper, $logger, 'storage_hash');
 
         $this->database = \Database::getInstance();
     }

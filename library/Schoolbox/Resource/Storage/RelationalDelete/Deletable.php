@@ -20,7 +20,7 @@ class Deletable implements IRelationalDelete
     /**
      * @var string
      */
-    protected $hashColumn = 'hash';
+    protected $hashColumn;
 
     /**
      * @var LoggerInterface
@@ -32,12 +32,13 @@ class Deletable implements IRelationalDelete
      *
      * @param Mapper          $mapper
      * @param LoggerInterface $logger
+     * @param string          $hashColumn
      */
-    public function __construct(Mapper $mapper, LoggerInterface $logger)
+    public function __construct(Mapper $mapper, LoggerInterface $logger, string $hashColumn = 'hash')
     {
-        $this->mapper = $mapper;
-
-        $this->logger = $logger;
+        $this->mapper       = $mapper;
+        $this->logger       = $logger;
+        $this->hashColumn   = $hashColumn;
     }
 
     /**

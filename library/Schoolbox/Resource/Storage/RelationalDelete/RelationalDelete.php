@@ -9,7 +9,6 @@ namespace Schoolbox\Resource\Storage\RelationalDelete;
 
 use Eportfolio\CoverPhotoMapper;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Blog\Homepage\Image\Mapper;
 
 /**
  * Delete storage files and it's relationships with other entites.
@@ -46,19 +45,19 @@ class RelationalDelete implements IRelationalDelete
 
         $this->collectors = [
             // Blog
-            new \Schoolbox\Blog\Homepage\Image\RelationalDelete(Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Blog\Homepage\Image\Mapper::getInstance(), $this->logger),
 
             // ePortfolio
-            new \Schoolbox\Blog\Eportfolio\Image\RelationalDelete(\Schoolbox\Blog\Eportfolio\Image\Mapper::getInstance(), $this->logger),
-            new \Eportfolio\RelationalDelete(CoverPhotoMapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Blog\Eportfolio\Image\Mapper::getInstance(), $this->logger),
+            new Deletable(CoverPhotoMapper::getInstance(), $this->logger, 'imagehash'),
             new \Component\Eportfolio\RelationalDelete(\Schoolbox\Resource\My\File\Mapper::getInstance(), $this->logger),
 
             // Pastoral
-            new \Schoolbox\Pastoral\Attachment\RelationalDelete(\Schoolbox\Pastoral\Attachment\Mapper::getInstance(), $this->logger),
-            new \Schoolbox\Pastoral\UploadQueue\RelationalDelete(\Schoolbox\Pastoral\UploadQueue\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Pastoral\Attachment\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Pastoral\UploadQueue\Mapper::getInstance(), $this->logger),
 
             // My File
-            new \Schoolbox\Resource\My\File\RelationalDelete(\Schoolbox\Resource\My\File\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Resource\My\File\Mapper::getInstance(), $this->logger),
 
             // News - The first line may be deleted when the old news has been deprecated
             new \Schoolbox\News\RelationalDelete(\Schoolbox\News\ArticleMapper::getInstance(), $this->logger),
@@ -71,7 +70,7 @@ class RelationalDelete implements IRelationalDelete
             new \Schoolbox\Tile\RelationalDelete(\Schoolbox\Tile\Mapper::getInstance(), $this->logger),
 
             // Dropbox
-            new \Schoolbox\Dropbox\RelationalDelete(\Schoolbox\Dropbox\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Dropbox\Mapper::getInstance(), $this->logger),
 
             // Plagscan
             new \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\RelationalDelete(\Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper::getInstance(), $this->logger),
@@ -85,23 +84,23 @@ class RelationalDelete implements IRelationalDelete
             new \SocialStream\Post\Url\RelationalDelete(\SocialStream\PostMapper::getInstance(), $this->logger),
 
             // Assessments
-            new \Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\RelationalDelete(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper::getInstance(), $this->logger),
             // Submission box file
-            new \Schoolbox\Assessment\Component\SubmissionBox\SingleFile\RelationalDelete(\Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Mapper::getInstance(), $this->logger, 'storage_id'),
             // Submission return file
-            new \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\RelationalDelete(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile\Mapper::getInstance(), $this->logger),
 
             // User
             new \Schoolbox\RelationalDelete(\Schoolbox\UserMapper::getInstance(), $this->logger),
 
             // Video Queue
-            new \Schoolbox\Video\RelationalDelete(\Schoolbox\Video\QueueMapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Video\QueueMapper::getInstance(), $this->logger),
 
             // File
-            new \Schoolbox\Resource\File\RelationalDelete(\Schoolbox\Resource\File\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Resource\File\Mapper::getInstance(), $this->logger),
 
             // Storage (Do NOT move this anywhere. Must be the last item that gets executed due to the table relationships.)
-            new \Schoolbox\Resource\Storage\RelationalDelete(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->logger),
+            new Deletable(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->logger)
         ];
     }
 
