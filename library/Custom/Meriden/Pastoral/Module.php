@@ -19,7 +19,6 @@ use House;
 use HouseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\External\SubjectMapper;
-use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;

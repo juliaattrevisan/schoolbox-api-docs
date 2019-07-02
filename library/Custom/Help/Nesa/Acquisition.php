@@ -15,7 +15,6 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
