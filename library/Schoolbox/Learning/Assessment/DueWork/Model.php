@@ -15,7 +15,6 @@ use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\ISelfAssessable;
 use UnexpectedValueException;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Collection;
 use \Schoolbox\User;

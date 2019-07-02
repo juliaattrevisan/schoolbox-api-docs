@@ -867,30 +867,6 @@ class RubricMapper
         return $validCapMarkCount > 0;
     }
 
-
-    /**
-     * @param AssessmentContext $context
-     * @param string[]          $levelNames
-     *
-     * @return Rubric
-     */
-    public function createForContext(AssessmentContext $context, array $levelNames = [])
-    {
-        // Go one deeper to get unit and course
-        if ($context instanceof Project) {
-            return $this->createForContext($context->getBaseContext(), $levelNames);
-        }
-
-        $folderId       = $context->getFolder()->getId();
-        $parentFolderId = null;
-
-        if ($context instanceof UnitSpecification) {
-            $parentFolderId = $context->getFolder()->getParent()->getId();
-        }
-
-        return $this->createForFolder($folderId, $parentFolderId, $levelNames);
-    }
-
     /**
      * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
      *
@@ -1477,6 +1453,7 @@ class RubricMapper
         }
 
         // get a new rubric in array form
+        // TODO use rubric grid instead
         $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
 
         // overlay descriptor and max points data
@@ -1610,63 +1587,6 @@ class RubricMapper
         }
         $groupMarkMapper->save($destinationGroupMarks);
         $descriptorMarkMapper->save($destinationDescriptorMarks);
-    }
-
-    /**
-     * @deprecated use `persistGrid` instead
-     *
-     * @param Rubric        $rubric
-     * @param SubmissionBox $submissionBox
-     */
-    public function save(Rubric $rubric, SubmissionBox $submissionBox)
-    {
-        // Commented out for now so that Atlas import doesn't break
-        // TODO make Atlas import not use this (SA-7796)
-//        trigger_error('This method is deprecated; use "persistGrid" instead', E_USER_DEPRECATED);
-
-        // juuust in case
-        $rubric->setSubmissionBox($submissionBox);
-
-        // TODO some way to wrap all this in a transaction would be nice... -_-;
-        $existingLevelIds    = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
-        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
-        $existingDescriptors = $existingDescriptors->map(function (Descriptor $d) {
-            return clone $d;
-        });
-
-        // first, persist the row and column headers (criteria and levels, respectively)
-        GroupMapper::getInstance()->save($rubric->getORMGroups());
-        CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
-        LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
-
-        // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
-        // TODO consider removing submission_box_id, associating with group ID instead
-        CriterionUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        CriterionUsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
-
-        // ditto group usages
-        GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        GroupUsageMapper::getInstance()->save($rubric->getORMGroupUsages());
-
-        // finally, now that everything else is saved, save the descriptors
-        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
-
-        $this->checkDescriptorValueChanges($existingDescriptors, $descs);
-
-        // wash up before dinner, kids
-
-        // remove all levels that have zero descriptors attached - extract from the descriptors
-        $seenLevels = [];
-        foreach ($descs as $desc) {
-            $seenLevels[$desc->getLevel()->getId()] = true;
-        }
-        $seenLevels = array_keys($seenLevels);
-
-        $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
-
-        // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
-        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
-        $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
     }
 
     /**
