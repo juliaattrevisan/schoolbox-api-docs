@@ -311,7 +311,7 @@ class Report_Parent extends Report_Abstract
     protected function getChildrensYears()
     {
         $allYears = array();
-        if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
+        if (!empty($_SESSION['children']) && count($_SESSION['children'])) {
             foreach ($_SESSION['children'] as $currentChild) {
                 $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
                 $allYears[$student['StudentYearLevel']] = true;
