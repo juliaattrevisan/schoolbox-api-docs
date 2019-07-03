@@ -108,17 +108,17 @@ class CsvImporterFactory
 
             // extract the criterion uniquely (can be blank)
             // (The group values persist from previous rows)
-            $groups[$workingGroupName]['id']                         = null;
-            $groups[$workingGroupName]['name']                       = $workingGroupName;
-            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue !== '' ? $groupMaxValue : null;
-            $groups[$workingGroupName]['criteria'][$workingCritName] = [
+            $groups[$workingGroupName]['id']                           = null;
+            $groups[$workingGroupName]['name']                         = $workingGroupName;
+            $groups[$workingGroupName]['maxValue']                     = $groupMaxValue !== '' ? $groupMaxValue : null;
+            $groups[$workingGroupName]['indicators'][$workingCritName] = [
                 'id'   => null,
                 'name' => $workingCritName,
             ];
 
             $square[] = $row;
         }
-        return new CsvImporter($levels, $square, $useMarkRange, $markPerCapability);
+        return new CsvImporter($levels, $groups, $square, $useMarkRange, $markPerCapability);
     }
 
 
