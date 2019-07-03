@@ -187,23 +187,24 @@ class UserAccessMapper extends Mapper
 
         foreach ($extSubjs as $extSubj) {
             try {
-                $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
+                if(!isset($extSubj['code'])) {
+                    $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
 
-                $ua = new UserAccess();
+                    $ua = new UserAccess();
 
-                $ua->setService(UserAccess::SERVICE_HOMEPAGE)
-                   ->setServiceIdentifier($catId)
-                   ->setUser($user);
+                    $ua->setService(UserAccess::SERVICE_HOMEPAGE)
+                        ->setServiceIdentifier($catId)
+                        ->setUser($user);
 
-                //Teachers automatically get write access to their class pages
-                if($user->getRole()->isStaff()) {
-                    $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+                    //Teachers automatically get write access to their class pages
+                    if ($user->getRole()->isStaff()) {
+                        $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+                    } else {
+                        $ua->setAccessLevel(UserAccess::ACCESS_READ);
+                    }
+
+                    $external->add($ua);
                 }
-                else {
-                    $ua->setAccessLevel(UserAccess::ACCESS_READ);
-                }
-
-                $external->add($ua);
 
             } catch (Mapper\Exception $e) {
                 // noop
