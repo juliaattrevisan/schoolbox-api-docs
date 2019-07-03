@@ -1425,7 +1425,7 @@ class RubricMapper
                 if (!$thisIndicator) {
                     $rowsetChanged = true;
                     $thisIndicator = (new Indicator())
-                        ->setName($crit['name'])
+                        ->setName($crit['name']);
                     $thisCapability->getIndicators()->add($thisIndicator);
                 }
             }
