@@ -109,7 +109,7 @@ class StudentAttributes
         }
 
         $this->validateTermDates($config);
-        $this->validateUser($user, $reportDate, $now);
+        $this->validateUser($user);
 
         // If unknown (NULL), assume $ibFlag is FALSE
         $this->isIb           = (bool)$ibFlag;
