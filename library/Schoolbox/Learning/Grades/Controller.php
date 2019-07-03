@@ -587,8 +587,7 @@ class Controller extends Base
                         [
                             'info'  => null,
                             'uid'   => null,
-                            // TODO: Find the real way to calculate the 1st/3rd quartiles
-                            'value' => $statistics[$assessment->getId()]['meanNormalized'] - $statistics[$assessment->getId()]['sdNormalized'],
+                            'value' => $statistics[$assessment->getId()]['quartile1'],
                         ],
                         // Median
                         [
@@ -600,8 +599,7 @@ class Controller extends Base
                         [
                             'info'  => null,
                             'uid'   => null,
-                            // TODO: Find the real way to calculate the 1st/3rd quartiles
-                            'value' => $statistics[$assessment->getId()]['meanNormalized'] + $statistics[$assessment->getId()]['sdNormalized'],
+                            'value' => $statistics[$assessment->getId()]['quartile3'],
                         ],
                         // Maximum
                         [

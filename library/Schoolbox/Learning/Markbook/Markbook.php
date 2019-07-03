@@ -278,6 +278,26 @@ class Markbook
             }
         }
 
+        // Exclude null values of students' marks
+        $notNullMarks = array_values(array_filter($normMarks));
+        $quartile2 = $this->quartile($notNullMarks);
+        $quartilesArray = array();
+        if (count($notNullMarks) > 1) {
+            // split up marks into 2 arrays to find the 1st and 3rd quartiles
+            foreach ($notNullMarks as $key => $mark) {
+                if ($mark > $quartile2) {
+                    $quartilesArray['third'][] = $mark;
+                } else if ($mark < $quartile2) {
+                    $quartilesArray['first'][] = $mark;
+                }
+            }
+        } else {
+            $quartilesArray['first'][] = $notNullMarks[0];
+            $quartilesArray['third'][] = $notNullMarks[0];
+        }
+        count($quartilesArray['first']) > 1 ? $quartile1 = $this->quartile($quartilesArray['first']) : $quartile1 = $quartilesArray['first'][0] / 2;
+        count($quartilesArray['third']) > 1 ? $quartile3 = $this->quartile($quartilesArray['third']) : $quartile3 = $quartilesArray['third'][0] / 2;
+
         $statistics = [
             'mean'              => null,
             'sd'                => null,
@@ -286,6 +306,8 @@ class Markbook
             'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
             'maxNormalized'     => $maxSummator->summateList($normMarks),
             'count'             => $countSummator->summateList($normMarks),
+            'quartile1'         => $quartile1,
+            'quartile3'         => $quartile3,
         ];
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
@@ -358,5 +380,29 @@ class Markbook
         }
         $this->assessments->sortByCallback($comparator->getCallable());
         return $this;
+    }
+
+    /**
+     * Returns quartile
+     *
+     * @param $marksArr
+     * @return float|int|null
+     */
+    public function quartile($marksArr)
+    {
+        if (!empty($marksArr)) {
+            $count = count($marksArr);
+            $midleval = (int)floor(($count - 1) / 2); // find the middle value, or the lowest middle value
+            $midleval < 0 ? 0 : $midleval;
+            if ($count % 2) { // odd number, middle is the median
+                $median = $marksArr[$midleval];
+            } else { // even number, calculate average of 2 medians
+                $low = $marksArr[$midleval];
+                $high = $marksArr[$midleval + 1];
+                $median = (($low + $high) / 2);
+            }
+            return $median;
+        }
+        return null;
     }
 }
