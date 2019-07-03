@@ -52,16 +52,17 @@ class Conversation
     {
         $this->participants = new Collection();
 
+        /* Find the teachers of this particular category
+         */
+        $this->category = $category;
+        $this->category->loadTeachers(true);
+
         if($config->get('grade_comments_enable')) {
             /* Find the parents of this particular student
              */
             $this->student = $student;
             $this->student->loadParents();
 
-            /* FInd the teachers of this particular category
-             */
-            $this->category = $category;
-            $this->category->loadTeachers(true);
 
             /* Generate participants: the student, their parent(s), and the category teacher(s)
              *
