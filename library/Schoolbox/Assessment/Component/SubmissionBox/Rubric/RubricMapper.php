@@ -19,6 +19,8 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
@@ -1290,7 +1292,7 @@ class RubricMapper
     public function buildFromCSV(IStorage $file, RowSet $rubricRowSet, $maxLevels): array
     {
         $folderId = $rubricRowSet->getContext()->getFolder()->getId();
-        $square = [];
+        $square   = [];
 
         // Determine if the specified folder has a UnitSpec
         /** @var UnitSpecification $unitSpec */
@@ -1398,6 +1400,58 @@ class RubricMapper
 
             $square[] = $row;
         }
+
+
+        // Add to the rowset as necessary
+        $rowsetChanged = false;
+        foreach ($groups as $groupName => $group) {
+            // Is this capability within the rowset? If not add it
+            $thisCapability = null;
+            foreach ($rubricRowSet->getCapabilities() as $capability) {
+                if ($capability->getName() === $groupName) {
+                    $thisCapability = $capability;
+                    break;
+                }
+            }
+
+            if (!$thisCapability) {
+                $rowsetChanged = true;
+                $rubricRowSet->getCapabilities()->add(
+                    (new Capability())
+                        ->setName($groupName)
+                        ->setIsCourseLevel(false)
+                );
+            }
+
+
+            foreach ($group['criteria'] as $crit) {
+                // Is this indicator in the capability? If not add it
+                $critName      = $crit['name'];
+                $thisIndicator = null;
+                foreach ($thisCapability->getIndicators() as $indicator) {
+                    if ($indicator->getName() !== $critName) {
+                        $thisIndicator = $indicator;
+                        break;
+                    }
+                }
+
+                if (!$thisIndicator) {
+                    $rowsetChanged = true;
+                    $thisCapability->getIndicators()->add(
+                        (new Indicator())->setName($crit['name'])
+                    );
+                }
+            }
+        }
+
+        // Was the rowset changed? Preserve it if so
+        if ($rowsetChanged) {
+            $this->persistRowSet($rubricRowSet, true, false);
+        }
+
+
+        // Now start building the grid
+
 
         // ensure all given criteria exist: create new ones if necessary
         $criterionMapper = CriterionMapper::getInstance();
