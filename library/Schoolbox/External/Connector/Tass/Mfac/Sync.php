@@ -73,8 +73,8 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
         $stack = [];
 
         while ($row = $statement->fetch()) {
-            if ($row['sfa_num']) {
-                $rawId     = substr($row['student_contact_id'], 1);
+            if (!$row['sfa_num']) {
+                $rawId     = $row['student_contact_network_login'];
                 $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
 
@@ -149,7 +149,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                 CASE
                     WHEN
                         (sf.sfa_num) IS NULL
-                    THEN 'P' + RTRIM(p.par_code)
+                    THEN RTRIM(p.par_code)
                     ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
                 END              AS student_contact_network_login,
                 ''               AS student_contact_title,
@@ -202,7 +202,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                 CASE
                     WHEN
                         (sf.sfa_num) IS NULL
-                    THEN 'S' + RTRIM(p.par_code)
+                    THEN RTRIM(p.par_code)
                     ELSE REVERSE('S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num))
                 END              AS student_contact_network_login,
                 ''               AS student_contact_title,
