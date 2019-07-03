@@ -15,7 +15,9 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
@@ -1293,7 +1295,7 @@ class RubricMapper
      */
     public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): array
     {
-        $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), true);
+        $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), false);
         $folderId = $rubricRowSet->getContext()->getFolder()->getId();
         $square   = [];
 
@@ -1407,42 +1409,28 @@ class RubricMapper
 
         // Add to the rowset as necessary
         $rowsetChanged = false;
-        foreach ($groups as $groupName => $group) {
+        foreach ($groups as $group) {
             // Is this capability within the rowset? If not add it
-            $thisCapability = null;
-            foreach ($rubricRowSet->getCapabilities() as $capability) {
-                if ($capability->getName() === $groupName) {
-                    $thisCapability = $capability;
-                    break;
-                }
-            }
-
+            $groupName      = $group['name'];
+            $thisCapability = $rubricRowSet->retrieveCapabilityByName($groupName);
             if (!$thisCapability) {
-                $rowsetChanged = true;
-                $rubricRowSet->getCapabilities()->add(
-                    (new Capability())
-                        ->setName($groupName)
-                        ->setIsCourseLevel(false)
-                );
+                $rowsetChanged  = true;
+                $thisCapability = (new Capability())
+                    ->setName($groupName)
+                    ->setIsCourseLevel(false);
+                $rubricRowSet->getCapabilities()->add($thisCapability);
             }
 
 
             foreach ($group['criteria'] as $crit) {
                 // Is this indicator in the capability? If not add it
                 $critName      = $crit['name'];
-                $thisIndicator = null;
-                foreach ($thisCapability->getIndicators() as $indicator) {
-                    if ($indicator->getName() !== $critName) {
-                        $thisIndicator = $indicator;
-                        break;
-                    }
-                }
-
+                $thisIndicator = $thisCapability->retrieveIndicatorByName($critName);
                 if (!$thisIndicator) {
                     $rowsetChanged = true;
-                    $thisCapability->getIndicators()->add(
-                        (new Indicator())->setName($crit['name'])
-                    );
+                    $thisIndicator = (new Indicator())
+                        ->setName($crit['name'])
+                    $thisCapability->getIndicators()->add($thisIndicator);
                 }
             }
         }
@@ -1450,10 +1438,41 @@ class RubricMapper
         // Was the rowset changed? Preserve it if so
         if ($rowsetChanged) {
             $this->persistRowSet($rubricRowSet, true, false);
+            // Reload it?
+            $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), false);
         }
 
 
         // Now start building the grid
+        $dueWork
+            ->setMarkPerCapability($markPerCapability)
+            ->setUseMarkRange($useMarkRange);
+        $grid = new Grid($dueWork, $rubricRowSet);
+
+        // Create levels
+        foreach ($levelNames as $i => $levelName) {
+            $grid->getLevels()[$i] = (new \Schoolbox\Assessment\Rubric\Grid\Level())
+                ->setName($levelName);
+        }
+
+        foreach ($groups as $group) {
+            $groupName = $group['name'];
+
+            // Set this criterion as in use in the grid
+            $capability      = $rubricRowSet->retrieveCapabilityByName($groupName);
+            $capabilityUsage = (new CapabilityUsage($capability))
+                ->setMaxValue(filter_var($group['maxValue'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
+
+            foreach ($group['criteria'] as $crit) {
+                $critName       = $crit['name'];
+                $indicator      = $capability->retrieveIndicatorByName($crit['name']);
+                $indicatorUsage = new IndicatorUsage($indicator);
+
+                // Create descriptors in these indicators
+            }
+            $grid->getCapabilityUsages()->add($capabilityUsage);
+        }
+
 
 
 //        // ensure all given criteria exist: create new ones if necessary

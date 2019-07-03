@@ -66,6 +66,19 @@ class RowSet
 
 
     /**
+     * Retrieves a capability by its name.
+     *
+     * @param string $name
+     * @return Capability|null
+     */
+    public function retrieveCapabilityByName(string $name): ?Capability
+    {
+        // TODO consider if normalized capability names should be used
+        return $this->capabilities->getBy('name', $name);
+    }
+
+
+    /**
      * Retrieves an indicator by its ID.
      *
      * @param int $indicatorId
