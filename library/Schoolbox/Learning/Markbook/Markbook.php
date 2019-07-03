@@ -287,7 +287,7 @@ class Markbook
             foreach ($notNullMarks as $key => $mark) {
                 if ($mark > $quartile2) {
                     $quartilesArray['third'][] = $mark;
-                } else if ($mark < $quartile2) {
+                } elseif ($mark < $quartile2) {
                     $quartilesArray['first'][] = $mark;
                 }
             }
