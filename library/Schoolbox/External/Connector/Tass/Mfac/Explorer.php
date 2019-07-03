@@ -54,7 +54,7 @@ class Explorer
      * - P = primary parent; S = secondary parent (spouse)
      * - add_num and commtype_code are instance-configurable csv
      * - persondefs is metadata about a specific individual, not a nukular family unit
-     * - sfa_num determines whether the parent+spouse is split (null === split family, otherwise nukular)
+     * - sfa_num determines whether the parent+spouse is split (null === nukular family, otherwise split)
      *
      * @throws \Alaress\Database\Exception
      */
