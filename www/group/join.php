@@ -42,7 +42,7 @@ $userPerms = $accessMapper->findByColumnList([
 
 
 $natStrSort = function(Group $a, Group $b) {
-    return strnatcasecmp($a->getCategory()->getName(), $b->getCategory()->getName());
+    return strnatcasecmp($a->getFolder()->getName(), $b->getFolder()->getName());
 };
 
 // output free access groups
