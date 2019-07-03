@@ -6,12 +6,12 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\Grid;
+namespace Schoolbox\Assessment\Rubric\Grid\Importer;
 
 /**
  * Helper class for loading rubric grids from CSV.
  */
-class CsvImport
+class CsvImporter
 {
     /**
      * The levels in the imported CSV.
