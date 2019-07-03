@@ -145,7 +145,7 @@ class Explorer
             ]);
         }
 
-        print_r($stack['nuclear']);
+        print_r($stack['split']);
 
         die();
     }

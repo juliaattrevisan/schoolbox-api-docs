@@ -48,12 +48,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
         $query = "
             SELECT DISTINCT
                 sf.sfa_num,
-                CASE
-                    WHEN
-                        (sf.sfa_num) IS NULL
-                    THEN 'P' + RTRIM(p.par_code)
-                    ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
-                END               AS student_contact_id,
+                'P' + RTRIM(p.par_code) AS student_contact_id,
                 RTRIM(p.par_code) AS student_contact_network_login,
                 ''                AS student_contact_title,
                 RTRIM(p.f_name)   AS student_contact_given_name,
@@ -96,12 +91,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
 
             SELECT DISTINCT
                 sf.sfa_num,
-                CASE
-                    WHEN
-                        (sf.sfa_num) IS NULL
-                    THEN 'S' + RTRIM(p.par_code)
-                    ELSE 'S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
-                END              AS student_contact_id,
+                'S' + RTRIM(p.par_code) AS student_contact_id,
                 CASE
                     WHEN
                         (sf.sfa_num) IS NULL
@@ -147,6 +137,8 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
 
             ORDER BY student_contact_id ASC
         ";
+
+//        (new Explorer($this->databaseExternal, $this->companyCode))->recombine($query);
 
         // Single Tuple contains data for [P]arent and [S]pouse
         $iterator = $this->databaseExternal->getQueryIterator
