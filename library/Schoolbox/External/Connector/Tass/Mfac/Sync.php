@@ -74,32 +74,44 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
 
         while ($row = $statement->fetch()) {
             if (!$row['sfa_num']) {
+
+                /* Nuclear family
+                 */
+                $type      = 'nuclear';
                 $rawId     = $row['student_contact_network_login'];
                 $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
+            } else {
 
-                $stack[$rawId]['contacts'][$contactId] = array_intersect_key($row, [
-                    'sfa_num' => '',
-                    'student_contact_id' => '',
-                    'student_contact_network_login' => '',
-                    'student_contact_title' => '',
-                    'student_contact_given_name' => '',
-                    'student_contact_preferred' => '',
-                    'student_contact_surname' => '',
-                ]);
-
-                $stack[$rawId]['students'][$studentId] = array_intersect_key($row, [
-                    'student_preferred' => '',
-                    'student_surname' => '',
-                    'student_year_level' => '',
-                    'student_campus' => '',
-                    'student_house' => '',
-                    'student_gender' => '',
-                ]);
+                /* Split family
+                 */
+                $type      = 'split';
+                $rawId     = $row['student_contact_network_login'];
+                $contactId = $row['student_contact_id'];
+                $studentId = "{$row['student_preferred']} {$row['student_surname']}";
             }
+
+            $stack[$type][$rawId]['contacts'][$contactId] = array_intersect_key($row, [
+                'sfa_num' => '',
+                'student_contact_id' => '',
+                'student_contact_network_login' => '',
+                'student_contact_title' => '',
+                'student_contact_given_name' => '',
+                'student_contact_preferred' => '',
+                'student_contact_surname' => '',
+            ]);
+
+            $stack[$type][$rawId]['students'][$studentId] = array_intersect_key($row, [
+                'student_preferred' => '',
+                'student_surname' => '',
+                'student_year_level' => '',
+                'student_campus' => '',
+                'student_house' => '',
+                'student_gender' => '',
+            ]);
         }
 
-        print_r($stack);
+        print_r($stack['split']);
 
         die();
     }
