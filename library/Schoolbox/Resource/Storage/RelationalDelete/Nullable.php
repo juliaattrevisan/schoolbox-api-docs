@@ -20,31 +20,39 @@ class Nullable implements IRelationalDelete
     /**
      * @var string
      */
-    protected $hashColumn = 'hash';
+    protected $hashColumn;
 
     /**
      * @var array
      */
-    protected $setMethods = [];
+    protected $fields = [];
 
     /**
      * @var LoggerInterface
      */
     protected $logger;
 
-    protected $hashPrefix = '';
+    /**
+     * @var string
+     */
+    protected $hashPrefix;
 
     /**
      * Base constructor.
      *
      * @param Mapper          $mapper
      * @param LoggerInterface $logger
+     * @param array           $fields
+     * @param string          $hashColumn
+     * @param string          $hashPrefix
      */
-    public function __construct(Mapper $mapper, LoggerInterface $logger)
+    public function __construct(Mapper $mapper, LoggerInterface $logger, array $fields, string $hashColumn = 'hash', string $hashPrefix = '')
     {
-        $this->mapper = $mapper;
-
-        $this->logger = $logger;
+        $this->mapper       = $mapper;
+        $this->logger       = $logger;
+        $this->hashColumn   = $hashColumn;
+        $this->fields       = $fields;
+        $this->hashPrefix   = $hashPrefix;
     }
 
     /**
@@ -55,8 +63,8 @@ class Nullable implements IRelationalDelete
      */
     public function remove(string $hash, bool $performDryRun): void
     {
-        if (!\count($this->setMethods)) {
-            throw new Mapper\Exception('setMethods cannot be empty...');
+        if (!\count($this->fields)) {
+            throw new Mapper\Exception('Fields cannot be empty...');
         }
 
         $records = $this->mapper->findIdsByColumn($this->hashColumn, $this->hashPrefix . $hash, ['deleted' => true]);
@@ -67,8 +75,9 @@ class Nullable implements IRelationalDelete
             } else {
                 foreach ($records as $record) {
                     $obj = $this->mapper->findByIdWithFallback($record);
-                    foreach ($this->setMethods as $method) {
-                        $obj->{$method}(null);
+                    foreach ($this->fields as $field) {
+                        $field = 'set' . ucwords($field);
+                        $obj->{$field}(null);
                     }
                     $this->mapper->save($obj);
                 }
