@@ -267,7 +267,7 @@ class Controller extends BaseController
 
             if ($assessmentId = (int)$post->get('assessmentId')) {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
-                $folder     = $assessment->getBaseContext()->getFolder();
+//                $folder     = $assessment->getBaseContext()->getFolder();
 
             } elseif ($folderId = $post->get('folderId')) {
                 // TODO need to check if this respects presence of course spec
@@ -283,7 +283,7 @@ class Controller extends BaseController
             }
 
             // attempt to build the grid
-            $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
+            $rubricRowSet = $this->mapper->retrieveRowSet($assessment->getContext(), true);
             $maxLevels    = $this->getDi()->get('config')->get('rubric_max_levels');
 //            $dummyDueWork = (new DueWork())
 //                ->setId($assessmentId)
