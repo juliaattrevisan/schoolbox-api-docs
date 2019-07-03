@@ -8,29 +8,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
 
-use Schoolbox\Resource\Storage\IStorage;
-
 /**
  * Helper class for loading rubric grids from CSV.
  */
 class CsvImport
 {
-    /**
-     * The file that is being parsed
-     *
-     * @var IStorage
-     */
-    private $file;
-
-
-    /**
-     * What's the maximum amount of levels that can be parsed?
-     *
-     * @var int
-     */
-    private $maxLevels;
-
-
     /**
      * The levels in the imported CSV.
      *
@@ -68,25 +50,15 @@ class CsvImport
 
 
     /**
-     * Constructor
+     * Attempt to parse a CSV import from a file.
      *
-     * @param IStorage $file
-     * @param int      $maxLevels
-     */
-    public function __construct(IStorage $file, int $maxLevels)
-    {
-        $this->file      = $file;
-        $this->maxLevels = $maxLevels;
-    }
-
-
-    /**
+     * @param resource $fp
+     * @param int      $maxLevels The max number of levels to parse
      * @throws \Schoolbox\Resource\Exception
      */
-    public function parse(): void
+    public function parse($fp, int $maxLevels): void
     {
-        $fp        = $this->file->readStream();
-        $headerRow = $this->readCsvLine($fp);
+        $headerRow = $this->readCsvLine($fp, $maxLevels);
 
         // must be an array, and must have at least 3 "cells"
         if (!is_array($headerRow) || count($headerRow) < 3) {
@@ -146,7 +118,7 @@ class CsvImport
         // build the square, extracting data as we go
         $groups            = [];
         $isLastRowNewGroup = false;
-        while ($row = $this->readCsvLine($fp)) {
+        while ($row = $this->readCsvLine($fp, $maxLevels)) {
             if ($isLastRowNewGroup) {
                 $groupMaxValue     = $row[0];
                 $isLastRowNewGroup = false;
@@ -186,9 +158,10 @@ class CsvImport
      * Reads a line from a file pointer that points to a CSV.
      *
      * @param resource $fp
+     * @param int      $maxLevels
      * @return array|null
      */
-    private function readCsvLine($fp): ?array
+    private function readCsvLine($fp, int $maxLevels): ?array
     {
         $line = fgetcsv($fp);
 
@@ -202,7 +175,7 @@ class CsvImport
             // Normalize line values
             return array_map(
                 [$this, 'normalizeEncoding'],
-                \array_slice($line, 0, $this->maxLevels + 2)
+                \array_slice($line, 0, $maxLevels + 2)
             );
         }
 
@@ -239,5 +212,4 @@ class CsvImport
                 return $string;
         }
     }
-
 }
