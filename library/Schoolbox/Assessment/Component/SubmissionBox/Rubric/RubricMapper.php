@@ -1277,7 +1277,7 @@ class RubricMapper
 
     /**
      * @param IStorage $file
-     * @param int      $folderId
+     * @param RowSet   $rubricRowSet
      * @param int      $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
@@ -1287,8 +1287,9 @@ class RubricMapper
      *                         from their actual value)
      *               2: bool: does the rubric have mark ranges switched on?
      */
-    public function buildFromCSV(IStorage $file, $folderId, $maxLevels): array
+    public function buildFromCSV(IStorage $file, RowSet $rubricRowSet, $maxLevels): array
     {
+        $folderId = $rubricRowSet->getContext()->getFolder()->getId();
         $square = [];
 
         // Determine if the specified folder has a UnitSpec

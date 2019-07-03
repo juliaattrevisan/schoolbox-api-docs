@@ -279,14 +279,14 @@ class Controller extends BaseController
             }
 
             // attempt to build the grid
-            $maxLevels = $this->getDi()->get('config')->get('rubric_max_levels');
+            $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
+            $maxLevels    = $this->getDi()->get('config')->get('rubric_max_levels');
             [$postData, $usingMarkPerCapability, $usingMarkRange] = $this->mapper->buildFromCSV(
                 $file,
-                $folder->getId(),
+                $rubricRowSet,
                 $maxLevels
             );
 
-            $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
             $dummyDueWork = (new DueWork())
                 ->setId($assessmentId)
                 ->setMarkPerCapability($usingMarkPerCapability)
