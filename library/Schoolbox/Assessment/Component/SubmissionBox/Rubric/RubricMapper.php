@@ -1287,13 +1287,9 @@ class RubricMapper
      * @param int           $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
-     * @return array 0: rubric POST data used to build a rubric grid
-     *               1: bool: does the rubric have customised max mark per group values?
-     *                        (required as the rubric object doesn't store this separately
-     *                         from their actual value)
-     *               2: bool: does the rubric have mark ranges switched on?
+     * @return void
      */
-    public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): array
+    public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): void
     {
         $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), false);
         $folderId = $rubricRowSet->getContext()->getFolder()->getId();
@@ -1455,23 +1451,23 @@ class RubricMapper
                 ->setName($levelName);
         }
 
-        foreach ($groups as $group) {
-            $groupName = $group['name'];
-
-            // Set this criterion as in use in the grid
-            $capability      = $rubricRowSet->retrieveCapabilityByName($groupName);
-            $capabilityUsage = (new CapabilityUsage($capability))
-                ->setMaxValue(filter_var($group['maxValue'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
-
-            foreach ($group['criteria'] as $crit) {
-                $critName       = $crit['name'];
-                $indicator      = $capability->retrieveIndicatorByName($crit['name']);
-                $indicatorUsage = new IndicatorUsage($indicator);
-
-                // Create descriptors in these indicators
-            }
-            $grid->getCapabilityUsages()->add($capabilityUsage);
-        }
+//        foreach ($groups as $group) {
+//            $groupName = $group['name'];
+//
+//            // Set this criterion as in use in the grid
+//            $capability      = $rubricRowSet->retrieveCapabilityByName($groupName);
+//            $capabilityUsage = (new CapabilityUsage($capability))
+//                ->setMaxValue(filter_var($group['maxValue'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
+//
+//            foreach ($group['criteria'] as $crit) {
+//                $critName       = $crit['name'];
+//                $indicator      = $capability->retrieveIndicatorByName($crit['name']);
+//                $indicatorUsage = new IndicatorUsage($indicator);
+//
+//                // Create descriptors in these indicators
+//            }
+//            $grid->getCapabilityUsages()->add($capabilityUsage);
+//        }
 
 
 
@@ -1529,9 +1525,9 @@ class RubricMapper
 //
 //        }
 
-        // get a new rubric in array form
-        // TODO use rubric grid instead
-        $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
+//        // get a new rubric in array form
+//        // TODO use rubric grid instead
+//        $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
 
         // overlay descriptor and max points data
         for ($i = 1; $i < count($square); $i += 2) {
@@ -1546,10 +1542,19 @@ class RubricMapper
                 continue;
             }
 
-            $groupId   = $groups[$gLookup]['id'];
-            $critId    = $crit['id'];
+            $group     = $groups[$gLookup];
             $critInUse = false;
 
+            $capability      = $rubricRowSet->retrieveCapabilityByName($group['name']);
+            $capabilityUsage = (new CapabilityUsage($capability))
+                ->setMaxValue(filter_var($group['maxValue'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
+
+            $indicator       = $capability->retrieveIndicatorByName($crit['name']);
+            $indicatorUsage  = new IndicatorUsage($indicator);
+
+
+
+            // Iterate descriptors
             for ($j = 2; $j < count($square[$i]); ++$j) {
 
                 $levelSequence = $j - 2;
@@ -1559,64 +1564,77 @@ class RubricMapper
 
 
                 // Set the group's max value
-                $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
+//                $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
 
                 if (strlen($dText) || strlen($dVal)) {
                     // assign the descriptor data to the appropriate cell
                     $critInUse = true;
-                    $postdata['descriptor'][$critId][$levelSequence] = [
-                        'id'     => null,
-                        'text'   => $dText,
-                        'points' => $dVal,
-                    ];
+
+                    $indicatorUsage->getDescriptors()[$levelSequence] =
+                        (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                            ->setDescription($dText)
+                            ->setMaxValue($dVal)
+                    ;
+
+//                    $postdata['descriptor'][$critId][$levelSequence] = [
+//                        'id'     => null,
+//                        'text'   => $dText,
+//                        'points' => $dVal,
+//                    ];
                 }
             }
 
-            // turn this criterion on, only if it's actually in use
+//            // turn this criterion on, only if it's actually in use
             if ($critInUse) {
-                $postdata['criterion'][$critId]['on'] = true;
+                $indicatorUsage->applyDescriptorMinValues($useMarkRange);
+                $capabilityUsage->getIndicatorUsages()->add($indicatorUsage);
+                // Don't add twice
+                if (!$grid->retrieveCapabilityUsage($capability)) {
+                    $grid->getCapabilityUsages()->add($capabilityUsage);
+                }
+//                $postdata['criterion'][$critId]['on'] = true;
             }
         }
 
 
-        // For each group: infer its mark-per-capability
-        if ($markPerCapability) {
-            foreach ($postdata['group'] as $groupId => $group) {
-                // Only infer if it's not provided
-                if (isset($group['maxValue'])) {
-                    continue;
-                }
-
-                // Find the criteria for this group
-                $inferredMaxValue = 0;
-                foreach ($postdata['criterion'] as $criterionId => $criterion) {
-                    if ((int)$criterion['groupId'] !== $groupId) {
-                        continue;
-                    }
-
-
-                    // Now go thru its descriptors
-                    $criterionMaxValue = 0;
-                    foreach ($postdata['descriptor'][$criterionId] ?? [] as $descriptor) {
-                        $criterionMaxValue = max($criterionMaxValue, $descriptor['points']);
-                    }
-
-                    $inferredMaxValue += $criterionMaxValue;
-                }
-
-                $postdata['group'][$groupId]['maxValue'] = $inferredMaxValue;
-            }
-        }
-
-
-        // Get rid of level IDs
-        foreach ($postdata['level'] as &$level) {
-            unset($level['id']);
-        }
-        unset($level);
+//        // For each group: infer its mark-per-capability
+//        if ($markPerCapability) {
+//            foreach ($postdata['group'] as $groupId => $group) {
+//                // Only infer if it's not provided
+//                if (isset($group['maxValue'])) {
+//                    continue;
+//                }
+//
+//                // Find the criteria for this group
+//                $inferredMaxValue = 0;
+//                foreach ($postdata['criterion'] as $criterionId => $criterion) {
+//                    if ((int)$criterion['groupId'] !== $groupId) {
+//                        continue;
+//                    }
+//
+//
+//                    // Now go thru its descriptors
+//                    $criterionMaxValue = 0;
+//                    foreach ($postdata['descriptor'][$criterionId] ?? [] as $descriptor) {
+//                        $criterionMaxValue = max($criterionMaxValue, $descriptor['points']);
+//                    }
+//
+//                    $inferredMaxValue += $criterionMaxValue;
+//                }
+//
+//                $postdata['group'][$groupId]['maxValue'] = $inferredMaxValue;
+//            }
+//        }
 
 
-        return [$postdata, $markPerCapability, $useMarkRange];
+//        // Get rid of level IDs
+//        foreach ($postdata['level'] as &$level) {
+//            unset($level['id']);
+//        }
+//        unset($level);
+//
+//
+//        return [$postdata, $markPerCapability, $useMarkRange];
     }
 
     /**
