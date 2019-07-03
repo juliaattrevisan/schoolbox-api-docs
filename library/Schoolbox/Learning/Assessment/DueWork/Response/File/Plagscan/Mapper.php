@@ -498,9 +498,9 @@ class Mapper extends \Schoolbox\Mapper
      */
 
     /**
-     * @return Connector
+     * @return null|Connector
      */
-    public function getConnector(): v3\Connector
+    public function getConnector(): ?v3\Connector
     {
         return $this->connector;
     }
