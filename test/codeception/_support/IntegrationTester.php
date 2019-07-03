@@ -10,6 +10,7 @@ use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\User;
 
 /**
@@ -38,10 +39,21 @@ class IntegrationTester extends \Codeception\Actor
 
     public $client;
     public $client_cookie_jar;
+    public $guzzle_headers=[];
+    public $redirect_settings;
 
     function initGuzzleClient()
     {
         $this->client = new Client(['base_uri' => 'https://'.$this::VAGRANT_DOMAIN, 'timeout' => 5.0, 'cookies' => true]);
+        $this->guzzle_headers=[ 'Host' => $this::VAGRANT_DOMAIN,
+                                'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
+                                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'];
+        $this->redirect_settings=[
+            'max' => 5,
+            'referer' => true,
+            'protocols' => ['http', 'https'],
+            'track_redirects' => true
+        ];
         $this->client_cookie_jar = new CookieJar();
     }
 
@@ -56,6 +68,13 @@ class IntegrationTester extends \Codeception\Actor
         $database=Database::getInstance();
         $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
         return NewsMapper::getInstance()->findOneByColumn('title', $title);
+    }
+
+    function getFirstHomepageIdByTitle($title)
+    {
+        $database=Database::getInstance();
+        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        return FolderMapper::getInstance()->findOneByColumn('title', $title);
     }
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
@@ -99,9 +118,13 @@ class IntegrationTester extends \Codeception\Actor
 
     public function loginUser($username, $password, $redirect=true)
     {
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/login/'];
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/login/';
+
         $page='/login/';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
         $data =[
@@ -112,20 +135,13 @@ class IntegrationTester extends \Codeception\Actor
         ];
 
         if ($redirect) {
-            $allow_redirects = [
-                'max' => 5,
-                'referer' => true,
-                'protocols' => ['http', 'https'],
-                'track_redirects' => true
-            ];
+            $allow_redirects = $this->redirect_settings;
         } else {
             $allow_redirects=false;
         }
 
-        $this->initGuzzleClient();
-
         return $this->client->request('POST', $url, [
-                            'headers'=>$headers,
+                            'headers'=>$this->guzzle_headers,
                             'query' =>'page=/login/',
                             'form_params' => $data,
                             'cookies' => $this->client_cookie_jar,
@@ -133,27 +149,58 @@ class IntegrationTester extends \Codeception\Actor
             ]);
     }
 
+    public function createHomepage($title)
+    {
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/resource/folder/create/0';
+
+        $page='/resource/folder/update';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $data = [   'parent'=>0,
+                    'categoryID'=>null,
+                    'name'=>$title,
+                    'template'=>9,
+                    'colour'=>'',
+                    'group[1]'=>2,
+                    'group[2]'=>1,
+                    'group[3]'=>1,
+                    'group[4]'=>1,
+                    'group[5]'=>1,
+                    'group[6]'=>0,
+                    'code'=>'',
+                    'curriculumCodes[]'=>''];
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers'=>$this->guzzle_headers,
+            'form_params' => $data,
+            'cookies' => $this->client_cookie_jar,
+            'allow_redirects' => $allow_redirects
+        ]);
+
+    }
 
     public function createAssessemntHomepage($title, $HomePageID)
     {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork'];
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
 
         $page='/learning/folders/'.$HomePageID.'/assessments';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
-
+        $allow_redirects = $this->redirect_settings;
 
         $data =[
             'contextType' => 'folders',
@@ -183,13 +230,9 @@ class IntegrationTester extends \Codeception\Actor
             'part-2'=>1
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -203,24 +246,18 @@ class IntegrationTester extends \Codeception\Actor
 
     public function determineMarkInvalidation($HomePageID, $assignmentID)
     {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
         //https://vagrant.dev.schoolbox.cloud/rubric/determineMarkInvalidation
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork'];
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
 
         $page='/learning/folders/'.$HomePageID.'/assessments';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
+        $allow_redirects = $this->redirect_settings;
 
         /*
          *assessmentType=dueWork
@@ -279,13 +316,9 @@ class IntegrationTester extends \Codeception\Actor
             'rb[0][level][1][name]'=>'',
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -299,25 +332,18 @@ class IntegrationTester extends \Codeception\Actor
 
     public function updateAssessemntHomepage($HomePageID, $assignmentID)
     {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
         //https://vagrant.dev.schoolbox.cloud/learning/assessments/381
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork'];
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
 
         $page='/learning/folders/'.$HomePageID.'/assessments';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
-
+        $allow_redirects = $this->redirect_settings;
 
         /*
          *
@@ -379,13 +405,9 @@ class IntegrationTester extends \Codeception\Actor
             'part-2'=>1
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -399,24 +421,17 @@ class IntegrationTester extends \Codeception\Actor
 
     public function draftNews($title)
     {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-                    'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-                    'Accept'=>'application/json, text/javascript, */*; q=0.01',
-                    'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/create'];
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news/create';
 
         $page='/news/create';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
-
+        $allow_redirects = $this->redirect_settings;
 
         $data =[
             'returnUrl' => Querystring::encode('/'),
@@ -429,13 +444,9 @@ class IntegrationTester extends \Codeception\Actor
             'draft'=> true
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -449,22 +460,17 @@ class IntegrationTester extends \Codeception\Actor
 
     public function createNewsToModerate($title, $news_id)
     {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update';
 
         $page='/news/moderation/'.$news_id.'/submit';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
+        $allow_redirects = $this->redirect_settings;
 
         $data =[
             'returnUrl' => Querystring::encode('/'),
@@ -476,13 +482,9 @@ class IntegrationTester extends \Codeception\Actor
             'expiresAt' => '08/07/2019 11:59pm'
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -496,33 +498,25 @@ class IntegrationTester extends \Codeception\Actor
 
     public function publishNewsByID($news_id)
     {
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update';
 
         $page='/news/moderation/'.$news_id.'/accept';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
+        $allow_redirects = $this->redirect_settings;
 
         $data =[
             'articleID' => $news_id
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -536,34 +530,26 @@ class IntegrationTester extends \Codeception\Actor
 
     public function rejectNewsByID($news_id)
     {
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update';
 
         $page='/news/moderation/'.$news_id.'/reject';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
+        $allow_redirects = $this->redirect_settings;
 
         $data =[
             'articleID' => $news_id,
             'rejectReason' => 'The reason is valid'
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -577,33 +563,26 @@ class IntegrationTester extends \Codeception\Actor
 
     public function deleteNewsByID($news_id)
     {
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
-
-        $page='/news/'.$news_id.'/delete';
-        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
-
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
-
-        $data =[
-            'articleID' => $news_id
-        ];
 
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
         }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update';
+
+        $page='/news/'.$news_id.'/delete';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects = $this->redirect_settings;
+
+        $data =[
+            'articleID' => $news_id
+        ];
+
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data
@@ -618,21 +597,17 @@ class IntegrationTester extends \Codeception\Actor
     public function publishNewsForm($title, $news_id)
     {
 
-        $headers = ['Host' => $this::VAGRANT_DOMAIN,
-            'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-            'Accept'=>'application/json, text/javascript, */*; q=0.01',
-            'Referer'=>'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update'];
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news/'.$news_id.'/update';
 
         $page='/news/moderation/'.$news_id.'/accept';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-
-        $allow_redirects=[
-            'max'             => 5,
-            'referer'         => true,
-            'protocols'       => ['http', 'https'],
-            'track_redirects' => true
-        ];
+        $allow_redirects = $this->redirect_settings;
 
         $data =[
             'title' => $title,
@@ -643,13 +618,9 @@ class IntegrationTester extends \Codeception\Actor
             'expiresAt' => '08/07/2019 11:59pm'
         ];
 
-        if (!isset($this->client))
-        {
-            $this->initGuzzleClient();
-        }
         try {
             return $this->client->request('POST', $url, [
-                'headers' => $headers,
+                'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,
                 'form_params'=>$data

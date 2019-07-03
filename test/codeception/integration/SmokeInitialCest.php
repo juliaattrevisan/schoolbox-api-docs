@@ -114,13 +114,18 @@ class SmokeInitialCest {
      *
      */
     public function SmokeAssessment(IntegrationTester $i){
+        $capture_homepage_id='/news\/(\d+)\?returnUrl/';
+
         $i->loginAdmin();
+        $response = $i->createHomepage('Testing Assessment Home Page');
+
+        print_r($response);
 
         $title = 'Smoke Test Assignment Title';
         $capture_new_assignment_id='/news\/(\d+)\?returnUrl/';
-        $response = $i->createAssessemntHomepage($title, 552);
+        #$response = $i->createAssessemntHomepage($title, 552);
 
-        print_r($response);
+        #print_r($response);
     }
 
 
