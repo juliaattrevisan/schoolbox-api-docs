@@ -270,8 +270,12 @@ class Controller extends BaseController
                 $folder     = $assessment->getBaseContext()->getFolder();
 
             } elseif ($folderId = $post->get('folderId')) {
-                $assessmentId = 0;
-                $folder       = $this->folderMapper->findById($folderId);
+                // TODO need to check if this respects presence of course spec
+                $assessment = (new DueWork())
+                    ->setId(0)
+                    ->setContext($this->folderMapper->findById($folderId));
+//                $assessmentId = 0;
+//                $folder       = $this->folderMapper->findById($folderId);
 
             } else {
                 // can't work with that
@@ -281,19 +285,23 @@ class Controller extends BaseController
             // attempt to build the grid
             $rubricRowSet = $this->mapper->retrieveRowSet($folder, true);
             $maxLevels    = $this->getDi()->get('config')->get('rubric_max_levels');
-            [$postData, $usingMarkPerCapability, $usingMarkRange] = $this->mapper->buildFromCSV(
+//            $dummyDueWork = (new DueWork())
+//                ->setId($assessmentId)
+//                ->setContext($folder);
+//            [$postData, $usingMarkPerCapability, $usingMarkRange] =
+            $this->mapper->importGridFromCsv(
                 $file,
-                $rubricRowSet,
+                $assessment,
                 $maxLevels
             );
 
-            $dummyDueWork = (new DueWork())
-                ->setId($assessmentId)
-                ->setMarkPerCapability($usingMarkPerCapability)
-                ->setUseMarkRange($usingMarkRange);
-            $rubricGrid   = new Grid($dummyDueWork, $rubricRowSet);
-            $rubricGrid   = (new GridFactory())
-                ->buildFromPostData($rubricGrid, [$assessmentId => $postData], false);
+//            $assessment
+//                ->setMarkPerCapability($usingMarkPerCapability)
+//                ->setUseMarkRange($usingMarkRange);
+//
+//            $rubricGrid   = new Grid($dummyDueWork, $rubricRowSet);
+//            $rubricGrid   = (new GridFactory())
+//                ->buildFromPostData($rubricGrid, [$assessmentId => $postData], false);
 
         } catch (\Exception $e) {
 
@@ -307,9 +315,9 @@ class Controller extends BaseController
 
         $context = [
             'formField'              => $post->get('formField', 'rb'),
-            'rubricGrid'             => $rubricGrid,
-            'usingMarkPerCapability' => $usingMarkPerCapability,
-            'usingMarkRange'         => $usingMarkRange,
+            'rubricGrid'             => $assessment->getRubricGrid(),
+            'usingMarkPerCapability' => $assessment->getMarkPerCapability(),
+            'usingMarkRange'         => $assessment->getUseMarkRange(),
         ];
 
         $this->getResponse()->content->set([

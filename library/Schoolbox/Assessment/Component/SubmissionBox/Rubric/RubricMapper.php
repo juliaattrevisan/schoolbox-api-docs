@@ -1278,9 +1278,11 @@ class RubricMapper
     }
 
     /**
-     * @param IStorage $file
-     * @param RowSet   $rubricRowSet
-     * @param int      $maxLevels
+     * Imports a rubric grid from a CSV into the given due work.
+     *
+     * @param IStorage      $file
+     * @param DueWork\Model $dueWork
+     * @param int           $maxLevels
      *
      * @throws \Schoolbox\Resource\Exception
      * @return array 0: rubric POST data used to build a rubric grid
@@ -1289,8 +1291,9 @@ class RubricMapper
      *                         from their actual value)
      *               2: bool: does the rubric have mark ranges switched on?
      */
-    public function buildFromCSV(IStorage $file, RowSet $rubricRowSet, $maxLevels): array
+    public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): array
     {
+        $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), true);
         $folderId = $rubricRowSet->getContext()->getFolder()->getId();
         $square   = [];
 
@@ -1453,59 +1456,59 @@ class RubricMapper
         // Now start building the grid
 
 
-        // ensure all given criteria exist: create new ones if necessary
-        $criterionMapper = CriterionMapper::getInstance();
-        foreach ($groups as $groupName => $group) {
-            foreach ($group['criteria'] as $crit) {
-                $criterionName = $crit['name'];
-                $model         = null;
-
-                // Which criterion is used?
-                try {
-                    // If there's a matching criterion in the folder: use it
-                    $model = $criterionMapper->findOneForFolderByKey($folderId, $criterionName, $groupName);
-
-                } catch (MapperException $e) {
-                    // If there isn't:
-                    // * If there's a course spec: use a matching criterion from it
-                    if ($courseSpecFolderId) {
-                        try {
-                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
-                        } catch (MapperException $e) {
-                            // There's no match in the folder or spec.
-                            // Create a new criterion in the folder
-                        }
-                    }
-                }
-
-                // If there's no course spec, or there's no match in the spec:
-                // * create a new criterion in the folder
-                if (!$model) {
-                    $createInCourse = false;
-                    if ($courseSpecFolderId) {
-                        // Is the group already on the course?
-                        // Create the criterion in the course, as group names
-                        // can't conflict between the course and unit.
-                        try {
-                            GroupMapper::getInstance()->findOneForFolderByName($courseSpecFolderId, $groupName);
-                            $createInCourse = true;
-                        } catch (MapperException $e) {
-                            $createInCourse = false;
-                        }
-                    }
-                    if ($createInCourse) {
-                        $model = $criterionMapper->findOrCreateOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
-                    } else {
-                        $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $criterionName, $groupName);
-                    }
-                }
-
-                // yank those IDs
-                $groups[$groupName]['id']                             = $model->getGroup()->getId();
-                $groups[$groupName]['criteria'][$criterionName]['id'] = $model->getId();
-            }
-
-        }
+//        // ensure all given criteria exist: create new ones if necessary
+//        $criterionMapper = CriterionMapper::getInstance();
+//        foreach ($groups as $groupName => $group) {
+//            foreach ($group['criteria'] as $crit) {
+//                $criterionName = $crit['name'];
+//                $model         = null;
+//
+//                // Which criterion is used?
+//                try {
+//                    // If there's a matching criterion in the folder: use it
+//                    $model = $criterionMapper->findOneForFolderByKey($folderId, $criterionName, $groupName);
+//
+//                } catch (MapperException $e) {
+//                    // If there isn't:
+//                    // * If there's a course spec: use a matching criterion from it
+//                    if ($courseSpecFolderId) {
+//                        try {
+//                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
+//                        } catch (MapperException $e) {
+//                            // There's no match in the folder or spec.
+//                            // Create a new criterion in the folder
+//                        }
+//                    }
+//                }
+//
+//                // If there's no course spec, or there's no match in the spec:
+//                // * create a new criterion in the folder
+//                if (!$model) {
+//                    $createInCourse = false;
+//                    if ($courseSpecFolderId) {
+//                        // Is the group already on the course?
+//                        // Create the criterion in the course, as group names
+//                        // can't conflict between the course and unit.
+//                        try {
+//                            GroupMapper::getInstance()->findOneForFolderByName($courseSpecFolderId, $groupName);
+//                            $createInCourse = true;
+//                        } catch (MapperException $e) {
+//                            $createInCourse = false;
+//                        }
+//                    }
+//                    if ($createInCourse) {
+//                        $model = $criterionMapper->findOrCreateOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
+//                    } else {
+//                        $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $criterionName, $groupName);
+//                    }
+//                }
+//
+//                // yank those IDs
+//                $groups[$groupName]['id']                             = $model->getGroup()->getId();
+//                $groups[$groupName]['criteria'][$criterionName]['id'] = $model->getId();
+//            }
+//
+//        }
 
         // get a new rubric in array form
         // TODO use rubric grid instead
