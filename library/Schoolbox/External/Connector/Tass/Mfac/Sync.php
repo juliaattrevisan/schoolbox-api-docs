@@ -86,7 +86,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                 /* Split family
                  */
                 $type      = 'split';
-                $rawId     = $row['student_contact_network_login'];
+                $rawId     = substr($row['student_contact_id'], 1);
                 $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
             }
@@ -111,7 +111,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
             ]);
         }
 
-        print_r($stack['split']);
+        print_r($stack['nuclear']);
 
         die();
     }
@@ -157,15 +157,10 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                         (sf.sfa_num) IS NULL
                     THEN 'P' + RTRIM(p.par_code)
                     ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
-                END              AS student_contact_id,
-                CASE
-                    WHEN
-                        (sf.sfa_num) IS NULL
-                    THEN RTRIM(p.par_code)
-                    ELSE 'P' + RTRIM(p.par_code) + RTRIM(sf.sfa_num)
-                END              AS student_contact_network_login,
-                ''               AS student_contact_title,
-                RTRIM(p.f_name)  AS student_contact_given_name,
+                END               AS student_contact_id,
+                RTRIM(p.par_code) AS student_contact_network_login,
+                ''                AS student_contact_title,
+                RTRIM(p.f_name)   AS student_contact_given_name,
                 LEFT(p.f_name, CHARINDEX(' ', p.f_name)) AS student_contact_preferred,
                 CASE
                     WHEN
@@ -215,7 +210,7 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
                     WHEN
                         (sf.sfa_num) IS NULL
                     THEN RTRIM(p.par_code)
-                    ELSE REVERSE('S' + RTRIM(p.par_code) + RTRIM(sf.sfa_num))
+                    ELSE RTRIM(SUBSTRING(p.par_code, 4, 3)) + RTRIM(SUBSTRING(p.par_code, 1, 3))
                 END              AS student_contact_network_login,
                 ''               AS student_contact_title,
                 RTRIM(p.m_name)  AS student_contact_given_name,
