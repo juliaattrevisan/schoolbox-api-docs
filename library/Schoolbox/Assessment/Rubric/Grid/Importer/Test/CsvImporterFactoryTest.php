@@ -51,6 +51,50 @@ TEST1;
             false,
             false,
         ];
+
+
+        $test2 = <<<TEST2
+"markPerCapability: Off","useMarkRange: On",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST2;
+        yield 'mark range on' => [
+            $this->buildStream($test2),
+            5,
+            ['', '', '', '', '',],
+            [
+                [
+                    'name'     => 'Test Capability 1',
+                    'maxValue' => null,
+                ],
+            ],
+            true,
+            false,
+        ];
+
+
+        $test3= <<<TEST2
+"markPerCapability: On","useMarkRange: Off",,,,,
+"Test Capability 1","Indicator 1",a,b,c,d,e
+9,,15,10,5,1,0
+,"Indicator 2",a,b,c,d,e
+,,15,10,5,1,0
+TEST2;
+        yield 'mark-per-cap on' => [
+            $this->buildStream($test3),
+            5,
+            ['', '', '', '', '',],
+            [
+                [
+                    'name'     => 'Test Capability 1',
+                    'maxValue' => 9,
+                ],
+            ],
+            false,
+            true,
+        ];
     }
 
 
