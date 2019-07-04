@@ -358,7 +358,10 @@ class Controller extends Base
         $assessments = $this->findByFiltersWithParticipants($filters, $viewee, false);
         $markbook    = new Markbook($assessments, $this->defaultGradeGroup, $this->getUser());
 
-        // Load conversation history (this also implicitly loads folder's teachers)
+        /* Find the teachers of this particular subject */
+        $subject->loadTeachers(true);
+
+        // Load conversation history
         $conversation = new Conversation($this->getConfigLoader(), $viewee, $subject);
 
         // Show the Current Grade Average for instructors and for students if the config var is on
