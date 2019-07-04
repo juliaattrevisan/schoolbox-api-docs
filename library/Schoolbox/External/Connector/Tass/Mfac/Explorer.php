@@ -2,6 +2,9 @@
 /**
  * Explorer
  *
+ * Intended to be used with userProvision.php on the cli
+ * Allows you to investigate db tables and their contents
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -10,11 +13,17 @@
 namespace Schoolbox\External\Connector\Tass\Mfac;
 
 use Alaress\Database\Connector\IConnector;
-use External_Tass_Helper;
-
 
 class Explorer
 {
+
+    /**
+     * Show the recombined results for a particular family type
+     */
+    private const NUCLEAR = 'nuclear';
+    private const SPLIT = 'split';
+
+
     /**
      * @var null|IConnector
      */
@@ -27,12 +36,6 @@ class Explorer
      * @var string $companyCode
      */
     protected $companyCode;
-
-
-    /**
-     * @var External_Tass_Helper $helper
-     */
-    protected $helper;
 
 
     /**
@@ -90,13 +93,50 @@ class Explorer
 
 
     /**
-     * Show split families and their humans
-     * Group them up neatly
+     * Show recombined nuclear families
      *
      * @param string $query
      * @throws \Alaress\Database\Exception
      */
-    public function recombine(string $query): void
+    public function nuclear(string $query): void
+    {
+        print_r("\nNuclear Families.\n\n");
+
+        $set = $this->recombine($query);
+
+        print_r($set[self::NUCLEAR]);
+
+        die();
+    }
+
+
+    /**
+     * Show recombined split families
+     *
+     * @param string $query
+     * @throws \Alaress\Database\Exception
+     */
+    public function split(string $query): void
+    {
+        print_r("\nSplit Families.\n\n");
+
+        $set = $this->recombine($query);
+
+        print_r($set[self::SPLIT]);
+
+        die();
+    }
+
+
+    /**
+     * Show split families and their humans
+     * Group them up neatly into an identifier so you can see who belongs to who
+     *
+     * @param string $query
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function recombine(string $query): array
     {
         $statement = $this->databaseExternal->prepareQuery($query);
         $statement->execute([
@@ -111,7 +151,7 @@ class Explorer
 
                 /* Nuclear family
                  */
-                $type      = 'nuclear';
+                $type      = self::NUCLEAR;
                 $rawId     = $row['student_contact_network_login'];
                 $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
@@ -119,7 +159,7 @@ class Explorer
 
                 /* Split family
                  */
-                $type      = 'split';
+                $type      = self::SPLIT;
                 $rawId     = substr($row['student_contact_id'], 1);
                 $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
@@ -145,8 +185,6 @@ class Explorer
             ]);
         }
 
-        print_r($stack['split']);
-
-        die();
+        return $stack;
     }
 }
