@@ -13,10 +13,10 @@ namespace Alaress\WorkerCrew;
 use Alaress\Async\Listener\Stream\StreamListener;
 use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\Worker\IO\WrappedIoStream as IOStream;
 use Alaress\WorkerCrew\Worker\IO\Listener\DataIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\ErrorIOListener;
 use Alaress\WorkerCrew\Worker\IO\Listener\LogIOListener;
+use Alaress\WorkerCrew\Worker\IO\WrappedReadableResourceStream;
 use Alaress\WorkerCrew\Worker\Task;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
@@ -240,7 +240,11 @@ class Pool extends EventEmitter implements PoolInterface
         // create listenable stream objects
         foreach ($this->ioListeners as $k => $listener) {
             // @developers: look at the stream listeners for callback functionality
-            $this->streams[$pid][$k] = new IOStream($pipes[$k], $this->loop, $this->ioListeners[$k]);
+            $this->streams[$pid][$k] = new WrappedReadableResourceStream(
+                $pipes[$k],
+                $this->loop,
+                $this->ioListeners[$k]
+            );
         }
 
         return $pid;
@@ -253,7 +257,7 @@ class Pool extends EventEmitter implements PoolInterface
     protected function detachWorker($pid)
     {
         foreach ($this->streams[$pid] as $fd => $stream) {
-            /** @var IOStream $stream */
+            /** @var WrappedReadableResourceStream $stream */
             $stream->detachListener($this->ioListeners[$fd]);
             $stream->close();
         }

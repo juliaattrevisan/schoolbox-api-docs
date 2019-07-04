@@ -17,11 +17,11 @@ use React\Stream\ReadableResourceStream;
 use SplObjectStorage;
 
 /**
- * Wrapper around a DuplexResourceStream.
+ * Wrapper around a ReadableResourceStream.
  *
  * Attempts to safely encapsulate React's "looseness".
  */
-class WrappedIoStream implements Listenable
+class WrappedReadableResourceStream implements Listenable
 {
     /**
      * @var SplObjectStorage|StreamListener[]

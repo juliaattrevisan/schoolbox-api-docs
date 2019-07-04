@@ -11,8 +11,8 @@ namespace Alaress\WorkerCrew\Worker;
 
 
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\Worker\IO\WrappedIoStream as IOStream;
 use Alaress\WorkerCrew\Worker\IO\Listener\InputStreamListener;
+use Alaress\WorkerCrew\Worker\IO\WrappedReadableResourceStream;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -65,7 +65,7 @@ abstract class AbstractProcess implements WorkerInterface
 
         // listen to STDIN for commands
         $listener = new InputStreamListener($log, $loop, $strat->getProtocol(), $writer, $this);
-        new IOStream(
+        new WrappedReadableResourceStream(
             fopen('php://stdin', 'r'),
             $loop,
             $listener,
