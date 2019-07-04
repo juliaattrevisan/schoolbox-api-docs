@@ -19,18 +19,24 @@ use PHPUnit\Framework\TestCase;
 class CsvImporterTest extends TestCase
 {
     /**
-     * Data provider for testIterateIndicators.
+     * Data provider for testRetrieveCapabilitiesWithIndicators.
      *
      * @return iterable
      */
-    public function getTestIterateIndicatorsData(): iterable
+    public function getTestRetrieveCapabilitiesWithIndicatorsData(): iterable
     {
         // Set up test data: only the square passed in really matters here
         $test1 = new CsvImporter(
             [1, 2, 3,],
             [
-                ['name' => 'Cap 1'],
-                ['name' => 'Cap 2'],
+                [
+                    'name'     => 'Cap 1',
+                    'maxValue' => null,
+                ],
+                [
+                    'name'     => 'Cap 2',
+                    'maxValue' => null,
+                ],
             ],
             [
                 [
@@ -69,15 +75,34 @@ class CsvImporterTest extends TestCase
             false
         );
 
-        yield 'capability not in use' => [$test1, 'Cap 1', []];
-        yield 'indicators not in use' => [$test1, 'Cap 2', []];
+        yield 'capabilities not in use' => [
+            $test1,
+            [
+                [
+                    'name'       => 'Cap 1',
+                    'maxValue'   => null,
+                    'indicators' => [],
+                ],
+                [
+                    'name'       => 'Cap 2',
+                    'maxValue'   => null,
+                    'indicators' => [],
+                ],
+            ],
+        ];
 
 
         $test2 = new CsvImporter(
             [1, 2, 3,],
             [
-                ['name' => 'Cap 1'],
-                ['name' => 'Cap 2'],
+                [
+                    'name'     => 'Cap 1',
+                    'maxValue' => null,
+                ],
+                [
+                    'name'     => 'Cap 2',
+                    'maxValue' => null,
+                ],
             ],
             [
                 [
@@ -144,46 +169,52 @@ class CsvImporterTest extends TestCase
             false
         );
 
-        yield 'capability with one indicator' => [
+        yield 'capability with indicators' => [
             $test2,
-            'Cap 1',
             [
+
                 [
-                    'name'        => 'Ind 1',
-                    'descriptors' => [
-                        ['name' => 'Desc 1', 'value' => null,],
-                        ['name' => 'Desc 2', 'value' => null,],
-                        ['name' => 'Desc 3', 'value' => null,],
-                    ],
-                ],
-            ]
-        ];
-        yield 'capability with multiple indicators' => [
-            $test2,
-            'Cap 2',
-            [
-                [
-                    'name'        => 'Ind 1',
-                    'descriptors' => [
-                        ['name' => 'Desc 1', 'value' => 6,],
-                        ['name' => 'Desc 2', 'value' => 7,],
-                        ['name' => 'Desc 3', 'value' => 8,],
+                    'name'       => 'Cap 1',
+                    'maxValue'   => null,
+                    'indicators' => [
+                        [
+                            'name'        => 'Ind 1',
+                            'descriptors' => [
+                                ['name' => 'Desc 1', 'value' => null,],
+                                ['name' => 'Desc 2', 'value' => null,],
+                                ['name' => 'Desc 3', 'value' => null,],
+                            ],
+                        ],
                     ],
                 ],
                 [
-                    'name'        => 'Ind 2',
-                    'descriptors' => [
-                        ['name' => 'Desc 1', 'value' => 6,],
-                        null,
-                        ['name' => 'Desc 3', 'value' => 8,],
-                    ],
-                ],
-                [
-                    'name'        => 'Ind 3',
-                    'descriptors' => [
-                        ['name' => '',       'value' => 6,],
-                        ['name' => 'Desc 2', 'value' => 7,],
-                        null,
+                    'name'       => 'Cap 2',
+                    'maxValue'   => null,
+                    'indicators' => [
+                        [
+                            'name'        => 'Ind 1',
+                            'descriptors' => [
+                                ['name' => 'Desc 1', 'value' => 6,],
+                                ['name' => 'Desc 2', 'value' => 7,],
+                                ['name' => 'Desc 3', 'value' => 8,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'Ind 2',
+                            'descriptors' => [
+                                ['name' => 'Desc 1', 'value' => 6,],
+                                null,
+                                ['name' => 'Desc 3', 'value' => 8,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'Ind 3',
+                            'descriptors' => [
+                                ['name' => '',       'value' => 6,],
+                                ['name' => 'Desc 2', 'value' => 7,],
+                                null,
+                            ],
+                        ],
                     ],
                 ],
             ]
@@ -192,15 +223,16 @@ class CsvImporterTest extends TestCase
 
 
     /**
-     * @dataProvider getTestIterateIndicatorsData
-     * @covers \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter::iterateIndicators
+     * @dataProvider getTestRetrieveCapabilitiesWithIndicatorsData
+     * @covers \Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporter::retrieveCapabilitiesWithIndicators
      *
      * @param CsvImporter $importer
-     * @param string      $capability
      * @param array       $expectedIndicators
      */
-    public function testIterateIndicators(CsvImporter $importer, string $capability, array $expectedIndicators): void
-    {
-        $this->assertSame($expectedIndicators, $importer->iterateIndicators($capability));
+    public function testRetrieveCapabilitiesWithIndicators(
+        CsvImporter $importer,
+        array $expectedIndicators
+    ): void {
+        $this->assertSame($expectedIndicators, $importer->retrieveCapabilitiesWithIndicators());
     }
 }
