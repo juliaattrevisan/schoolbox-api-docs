@@ -1185,7 +1185,7 @@ class RubricMapper
         // Add to the rowset as necessary
         $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);
         $rowsetChanged = false;
-        foreach ($importer->getCapabilities() as $capability) {
+        foreach ($importer->retrieveCapabilitiesWithIndicators() as $capability) {
             // Is this capability within the rowset? If not add it
             $capName        = $capability['name'];
             $thisCapability = $rowSet->retrieveCapabilityByName($capName);
@@ -1198,7 +1198,7 @@ class RubricMapper
             }
 
 
-            foreach ($importer->iterateIndicators($capName) as $indicator) {
+            foreach ($capability['indicators'] as $indicator) {
                 // Is this indicator in the capability? If not add it
                 $indName       = $indicator['name'];
                 $thisIndicator = $thisCapability->retrieveIndicatorByName($indName);
