@@ -48,14 +48,14 @@ class Report_Parent extends Report_Abstract
      *
      * @var array
      */
-    private $sisAllYearLevels;
+    protected $sisAllYearLevels;
 
     /**
      * Allowed searchable years for parents
      *
      * @var array
      */
-    private $allowedSearchableYears;
+    protected $allowedSearchableYears;
 
     /**
      * Report_Parent constructor.
