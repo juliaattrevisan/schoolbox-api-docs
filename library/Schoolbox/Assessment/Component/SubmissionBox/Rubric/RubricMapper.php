@@ -1357,13 +1357,18 @@ class RubricMapper
         foreach ($importer->getCapabilities() as $capability) {
             $capName          = $capability['name'];
             $capInUse         = false;
+
+            // If $capabilityObject is null here, that's a problem:
+            // it should've been created
             $capabilityObject = $rubricRowSet->retrieveCapabilityByName($capability['name']);
             $capabilityUsage  = (new CapabilityUsage($capabilityObject))
                 ->setMaxValue($capability['maxValue']);
 
             foreach ($importer->iterateIndicators($capName) as $indicator) {
                 $indName         = $indicator['name'];
-                $indicatorObject = $capability->retrieveIndicatorByName($indName);
+                $indicatorObject = $capabilityObject->retrieveIndicatorByName($indName);
+
+                // Likewise if $indicatorObject is null here, that's a problem
                 $indicatorUsage  = new IndicatorUsage($indicatorObject);
                 foreach ($indicator['descriptors'] as $level => $descriptor) {
                     if ($descriptor !== null) {
