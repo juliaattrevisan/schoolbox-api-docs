@@ -23,7 +23,6 @@ use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\Model as File;
 use Url;
 
@@ -268,7 +267,6 @@ class Controller extends BaseController
             if ($assessmentId = (int)$post->get('assessmentId')) {
                 $assessment = $this->assessmentDataSource->findById($assessmentId);
             } elseif ($folderId = $post->get('folderId')) {
-                // TODO need to check if this respects presence of course specs
                 $assessment = (new DueWork())
                     ->setId(0)
                     ->setContext($this->folderMapper->findById($folderId));
