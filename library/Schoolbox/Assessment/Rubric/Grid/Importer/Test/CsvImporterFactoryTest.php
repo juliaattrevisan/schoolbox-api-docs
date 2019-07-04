@@ -40,10 +40,12 @@ TEST1;
             ['', '', '', '', '',],
             [
                 [
-                    'name' => 'cap2',
+                    'name'     => 'cap2',
+                    'maxValue' => null,
                 ],
                 [
-                    'name' => 'cap1',
+                    'name'     => 'cap1',
+                    'maxValue' => null,
                 ],
             ],
             false,
