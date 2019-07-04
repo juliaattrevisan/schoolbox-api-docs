@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Importer;
 
+use UnexpectedValueException;
+
 /**
  * Factory for building an importer out of a CSV.
  */
@@ -19,15 +21,15 @@ class CsvImporterFactory
      * @param resource $fp
      * @param int      $maxLevels The max number of levels to parse
      * @return CsvImporter
-     * @throws \Schoolbox\Resource\Exception
+     * @throws UnexpectedValueException if the header isn't parsable as a
+     *                                  rubric CSV
+     *                                  (must have at least 3 columns)
      */
     public function build($fp, int $maxLevels): CsvImporter
     {
         $headerRow = $this->readCsvLine($fp, $maxLevels);
-
-        // must be an array, and must have at least 3 "cells"
         if (!is_array($headerRow) || count($headerRow) < 3) {
-            throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
+            throw new UnexpectedValueException('Not a valid rubric CSV file');
         }
 
         // First two cells may be settings:
