@@ -1,2 +1,1 @@
-UPDATE `config` SET field_id = 16
-WHERE name ='external_cache_timeout';
+UPDATE `config` SET field_id = (SELECT id FROM `lu_config_field` WHERE field = 'number') WHERE name='external_cache_timeout';
