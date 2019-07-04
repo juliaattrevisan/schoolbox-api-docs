@@ -87,6 +87,10 @@ try {
                 $log->log($level, sprintf(self::P_OUTPUT, $key, $exp));
 
                 if ($exp === self::PERSISTED) {
+                    if (empty($redis->get($key))) {
+                        // empty message key. ignoring.
+                        continue;
+                    }
                     // this key has no TTL, extract the data so we can reverse-engineer what it should be
                     $data = unserialize(gzuncompress($redis->get($key)))->jsonSerialize();
 

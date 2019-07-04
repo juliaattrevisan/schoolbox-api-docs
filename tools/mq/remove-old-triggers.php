@@ -13,6 +13,9 @@ use Predis\Collection\Iterator\Keyspace;
 use Predis\Command\RawCommand;
 use Predis\Response\ServerException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger;
+use Alaress\Scheduler\Trigger\CancelTrigger;
+use Alaress\Scheduler\Trigger\TriggerInterface;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -67,7 +70,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $search = new Keyspace($this->redis, "msg:{$this->instanceId}:*");
         foreach ($search as $key) {
             $numKeysProcessed++;
-            $progress = round($numKeysProcessed / $numKeys * 100, 2);
+            $progress = round(($numKeysProcessed / $numKeys) * 100, 2);
             if ($progress % 10 === 0) {
                 $this->getLogger()->info("{$progress} % processed");
             }
@@ -78,17 +81,25 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $keyType = $this->redis->type($key);
             try {
                 $rawRedisData = $this->redis->get($key);
+                if (!$rawRedisData) {
+                    $this->deleteFromRedis("Empty value for key: {$key}", null, $key);
+                    continue;
+                }
                 $instance = unserialize(gzuncompress($rawRedisData));
             } catch (Exception $e) {
                 $this->getLogger()->debug("[SKIPPING] type-{$keyType} : {$key}");
                 continue;
             }
 
-            if ($instance instanceof \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger) {
+            if ($instance instanceof CompressedTrigger) {
                 // CompressedTrigger
                 try {
                     $output = $instance->extractTrigger();
-                    $this->getLogger()->info(self::triggerInfo($output, $instance));
+                    if ($output instanceof TriggerInterface) {
+                        $this->getLogger()->info(self::triggerInfo($output, $instance));
+                    } else {
+                        $this->deleteFromRedis('CompressedTrigger for unknown object', null, $key);
+                    }
                     $triggerDate = \Alaress_Date_Format::newFromTimestamp((int)$output->getTimestamp());
                     $expireTime = (clone $triggerDate)->addSeconds(Instance::DEFAULT_TTL);
 
@@ -107,7 +118,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 } catch (Exception $e) {
                     $this->deleteFromRedis('CompressedTrigger for deleted object', null, $key);
                 }
-            } elseif ($instance instanceof \Alaress\Scheduler\Trigger\CancelTrigger) {
+            } elseif ($instance instanceof CancelTrigger) {
                 // CancelTrigger
                 $this->deleteFromRedis('CancelTrigger', null, $key);
             }
@@ -139,17 +150,19 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
     /**
      * Extracts compressed trigger info
-     * @param \Alaress\Scheduler\Trigger\TriggerInterface $output
-     * @param \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger $instance
+     * @param TriggerInterface $output
+     * @param CompressedTrigger $instance
      * @return string
      */
-    private static function triggerInfo(\Alaress\Scheduler\Trigger\TriggerInterface $output,
-                                        \Schoolbox\Realtime\Schedule\Trigger\Compressed\CompressedTrigger $instance): string
+    private static function triggerInfo(TriggerInterface $output,
+                                        CompressedTrigger $instance): string
     {
-        $classname = get_class($output->getEvent()->getObject());
         $object = $output->getEvent()->getObject();
+        $classname = '';
         $withId = '';
-        if (method_exists($output, "getModuleNotifier")) {
+
+        if ($object && method_exists($output, "getModuleNotifier")) {
+            $classname = get_class($object);
             $mapper = $instance->getModuleNotifier()->getMapper();
             if ($mapper->getIdentifier()) {
                 $getIdMethod = $mapper->getGetIdentifierMethodName();
