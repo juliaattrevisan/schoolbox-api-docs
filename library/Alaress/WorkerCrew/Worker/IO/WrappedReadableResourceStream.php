@@ -14,6 +14,8 @@ use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\Async\Listener\Stream\StreamListener;
 use React\EventLoop\LoopInterface;
 use React\Stream\ReadableResourceStream;
+use React\Stream\ReadableStreamInterface;
+use React\Stream\WritableStreamInterface;
 use SplObjectStorage;
 
 /**
@@ -21,7 +23,7 @@ use SplObjectStorage;
  *
  * Attempts to safely encapsulate React's "looseness".
  */
-class WrappedReadableResourceStream implements Listenable
+class WrappedReadableResourceStream implements Listenable, ReadableStreamInterface
 {
     /**
      * @var SplObjectStorage|StreamListener[]
@@ -144,10 +146,122 @@ class WrappedReadableResourceStream implements Listenable
 
 
     /**
-     * Close the wrapped stream.
+     * Pass-through to the wrapped stream's close() method.
      */
-    public function close(): void
+    public function close()
     {
         $this->streamObject->close();
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's on() method.
+     *
+     * @param mixed    $event
+     * @param callable $listener
+     */
+    public function on($event, callable $listener)
+    {
+        $this->streamObject->on($event, $listener);
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's once() method.
+     *
+     * @param mixed    $event
+     * @param callable $listener
+     */
+    public function once($event, callable $listener)
+    {
+        $this->streamObject->once($event, $listener);
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's removeListener() method.
+     *
+     * @param mixed    $event
+     * @param callable $listener
+     */
+    public function removeListener($event, callable $listener)
+    {
+        $this->streamObject->removeListener($event, $listener);
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's removeAllListeners() method.
+     *
+     * @param mixed $event
+     */
+    public function removeAllListeners($event = null)
+    {
+        $this->streamObject->removeAllListeners($event);
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's listeners() method.
+     *
+     * @param mixed $event
+     */
+    public function listeners($event = null)
+    {
+        $this->streamObject->listeners($event);
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's emit() method.
+     *
+     * @param mixed $event
+     * @param array $arguments
+     */
+    public function emit($event, array $arguments = [])
+    {
+        $this->streamObject->emit($event, $arguments);
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's isReadable() method.
+     *
+     * @return bool
+     */
+    public function isReadable()
+    {
+        return $this->streamObject->isReadable();
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's pause() method.
+     */
+    public function pause()
+    {
+        $this->streamObject->pause();
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's resume() method.
+     */
+    public function resume()
+    {
+        $this->streamObject->resume();
+    }
+
+
+    /**
+     * Pass-through to the wrapped stream's WritableStreamInterface() method.
+     *
+     * @param WritableStreamInterface $dest
+     * @param array                   $options
+     * @return WritableStreamInterface
+     */
+    public function pipe(WritableStreamInterface $dest, array $options = [])
+    {
+        return $this->streamObject->pipe($dest, $options);
     }
 }
