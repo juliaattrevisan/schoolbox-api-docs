@@ -42,7 +42,7 @@ $userPerms = $accessMapper->findByColumnList([
 
 
 $natStrSort = function(Group $a, Group $b) {
-    return strnatcasecmp($a->getCategory()->getName(), $b->getCategory()->getName());
+    return strnatcasecmp($a->getFolder()->getName(), $b->getFolder()->getName());
 };
 
 // output free access groups
@@ -52,11 +52,11 @@ $freeGroupList = $groupMapper->findByColumn("type", Group::FREE_GROUP)->sortByCa
 $this->setVar('free_list_block', '');
 if ($freeGroupList->count()) {
     foreach ($freeGroupList as $free) {
-        $folderId = $free->getCategory()->getId();
+        $folderId = $free->getFolder()->getId();
         if (!in_array($folderId, $userWriteGroupIds)) {
             $output   = [
                 'GROUP_ID'      => $folderId,
-                'GROUP_NAME'    => Scrub::text($free->getCategory()->getName()),
+                'GROUP_NAME'    => Scrub::text($free->getFolder()->getName()),
                 'GROUP_CHECKED' => $userPerms[$folderId] ? 'checked=\'checked\'' : '',
             ];
             $this->setVar($output);
@@ -74,12 +74,12 @@ $moderatedGroupList = $groupMapper->findByColumn("type", Group::MODERATED_GROUP)
 $this->setVar('moderated_list_block', '');
 if ($moderatedGroupList->count()) {
     foreach ($moderatedGroupList as $moderated) {
-        $folderId = $moderated->getCategory()->getId();
+        $folderId = $moderated->getFolder()->getId();
         if (!in_array($folderId, $userWriteGroupIds)) {
             $group    = $moderatedGroupList[$folderId];
             $output   = [
                 'GROUP_ID'      => $folderId,
-                'GROUP_NAME'    => Scrub::text($moderated->getCategory()->getName()),
+                'GROUP_NAME'    => Scrub::text($moderated->getFolder()->getName()),
                 'GROUP_CHECKED' => $userPerms[$folderId] ? 'checked=\'checked\'' : '',
             ];
             $this->setVar($output);

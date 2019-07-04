@@ -87,7 +87,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
         // prime the global suppressor!
         $override = new RerouteOverride();
         $override->setUser($userMapper->createModel()->setId(0)); // ID 0 = global
-        $override->setRouteKey('service.1.' . $group->getCategory()->getId());
+        $override->setRouteKey('service.1.' . $group->getFolder()->getId());
         $override->setDelivery([ 'MU' ]);
 
         if ($_POST['msg']['enabled']) {
