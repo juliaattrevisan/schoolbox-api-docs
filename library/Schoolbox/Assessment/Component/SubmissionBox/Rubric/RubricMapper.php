@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
 use Schoolbox\Assessment\Rubric\Criteria;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
 use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
@@ -44,6 +45,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\User;
 use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -1286,146 +1288,40 @@ class RubricMapper
      * @param DueWork\Model $dueWork
      * @param int           $maxLevels
      *
-     * @throws \Schoolbox\Resource\Exception
+     * @throws UnexpectedValueException if the importer couldn't be built
      * @return void
      */
     public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): void
     {
-        $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), false);
-        $folderId = $rubricRowSet->getContext()->getFolder()->getId();
-        $square   = [];
-
-        // Determine if the specified folder has a UnitSpec
-        /** @var UnitSpecification $unitSpec */
-        $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
-        $courseSpecFolderId = null;
-        if ($unitSpec) {
-            // Add the Unit's Course's Folder's ID
-            $courseSpecFolderId = $unitSpec->getCourse()->getFolder()->getId();
-        }
-
-        $fp = $file->readStream();
-
-        $headerRow = $this->getcsv($fp, $maxLevels + 2);
-
-        // must be an array, and must have at least 3 "cells"
-        if (!is_array($headerRow) || count($headerRow) < 3) {
-            throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
-        }
-
-        // First two cells may be settings:
-        // useMarkRange:      On/Off
-        // markPerCapability: On/Off
-        $useMarkRange      = false;
-        $markPerCapability = false;
-        $settingCells      = [$headerRow[0], $headerRow[1]];
-        foreach ($settingCells as $settingCell) {
-            [$setting, $value] = explode(':', $settingCell);
-            switch (strtolower(trim($value))) {
-                case '1':
-                case 'yes':
-                case 'on':
-                    $boolValue = true;
-                    break;
-
-                case '0':
-                case 'no':
-                case 'off':
-                default:
-                    $boolValue = false;
-                    break;
-            }
-            switch (trim($setting)) {
-                case 'useMarkRange':
-                    $useMarkRange = $boolValue;
-                    break;
-
-                case 'markPerCapability':
-                    $markPerCapability = $boolValue;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        // Note: this used to be able to tell if the first row was actually the
-        // first group, instead of the set of levels. (This would happen if
-        // Excel saved a CSV with nothing at all in the first row.)
-        // Because the first two cells are now reserved for settings, they
-        // should never be empty anymore; however, we can't tell anymore if the
-        // spreadsheet used to have an empty first row.
-        // (This was raised in SB-12175)
-
-        $square[] = $headerRow;
-
-        // list of levels
-        $levelNames = array_slice($square[0], 2);
-
-        $workingGroupName = '';
-        $workingCritName = '';
-
-        // build the square, extracting data as we go
-        $groups            = [];
-        $isLastRowNewGroup = false;
-        while ($row = $this->getcsv($fp, $maxLevels + 2)) {
-            if ($isLastRowNewGroup) {
-                $groupMaxValue     = $row[0];
-                $isLastRowNewGroup = false;
-            } else {
-                // list of criteria, grouped by... uh, group
-                if ($row[0]) {
-                    $workingGroupName  = $row[0];
-                    $isLastRowNewGroup = true;
-                }
-            }
-
-            // copy the groupname into the row
-            $row[0] = $workingGroupName;
-
-            if ($row[1]) {
-                $workingCritName = $row[1];
-            }
-            // copy the criteria name into the row
-            $row[1] = $workingCritName;
-
-            // extract the criterion uniquely (can be blank)
-            // (The group values persist from previous rows)
-            $groups[$workingGroupName]['id']                         = null;
-            $groups[$workingGroupName]['name']                       = $workingGroupName;
-            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue !== '' ? $groupMaxValue : null;
-            $groups[$workingGroupName]['criteria'][$workingCritName] = [
-                'id'   => null,
-                'name' => $workingCritName,
-            ];
-
-            $square[] = $row;
-        }
+        // Create the factory
+        $importerFactory = new CsvImporterFactory();
+        $importer        = $importerFactory->build($file->readStream(), $maxLevels);
 
 
         // Add to the rowset as necessary
+        $rubricRowSet  = $this->retrieveRowSet($dueWork->getContext(), false);
         $rowsetChanged = false;
-        foreach ($groups as $group) {
+        foreach ($importer->getCapabilities() as $capability) {
             // Is this capability within the rowset? If not add it
-            $groupName      = $group['name'];
-            $thisCapability = $rubricRowSet->retrieveCapabilityByName($groupName);
+            $capName        = $capability['name'];
+            $thisCapability = $rubricRowSet->retrieveCapabilityByName($capName);
             if (!$thisCapability) {
                 $rowsetChanged  = true;
                 $thisCapability = (new Capability())
-                    ->setName($groupName)
+                    ->setName($capName)
                     ->setIsCourseLevel(false);
                 $rubricRowSet->getCapabilities()->add($thisCapability);
             }
 
 
-            foreach ($group['criteria'] as $crit) {
+            foreach ($importer->iterateIndicators($capName) as $indicator) {
                 // Is this indicator in the capability? If not add it
-                $critName      = $crit['name'];
-                $thisIndicator = $thisCapability->retrieveIndicatorByName($critName);
+                $indName       = $indicator['name'];
+                $thisIndicator = $thisCapability->retrieveIndicatorByName($indName);
                 if (!$thisIndicator) {
                     $rowsetChanged = true;
                     $thisIndicator = (new Indicator())
-                        ->setName($crit['name']);
+                        ->setName($indName);
                     $thisCapability->getIndicators()->add($thisIndicator);
                 }
             }
@@ -1441,201 +1337,48 @@ class RubricMapper
 
         // Now start building the grid
         $dueWork
-            ->setMarkPerCapability($markPerCapability)
-            ->setUseMarkRange($useMarkRange);
+            ->setMarkPerCapability($importer->isMarkPerCapability())
+            ->setUseMarkRange($importer->isUseMarkRange());
         $grid = new Grid($dueWork, $rubricRowSet);
 
+
         // Create levels
-        foreach ($levelNames as $i => $levelName) {
+        foreach ($importer->getLevels() as $i => $levelName) {
             $grid->getLevels()[$i] = (new \Schoolbox\Assessment\Rubric\Grid\Level())
                 ->setName($levelName);
         }
 
-//        foreach ($groups as $group) {
-//            $groupName = $group['name'];
-//
-//            // Set this criterion as in use in the grid
-//            $capability      = $rubricRowSet->retrieveCapabilityByName($groupName);
-//            $capabilityUsage = (new CapabilityUsage($capability))
-//                ->setMaxValue(filter_var($group['maxValue'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
-//
-//            foreach ($group['criteria'] as $crit) {
-//                $critName       = $crit['name'];
-//                $indicator      = $capability->retrieveIndicatorByName($crit['name']);
-//                $indicatorUsage = new IndicatorUsage($indicator);
-//
-//                // Create descriptors in these indicators
-//            }
-//            $grid->getCapabilityUsages()->add($capabilityUsage);
-//        }
 
+        // Add cap usages, ind usages, descriptors
+        foreach ($importer->getCapabilities() as $capability) {
+            $capName          = $capability['name'];
+            $capInUse         = false;
+            $capabilityObject = $rubricRowSet->retrieveCapabilityByName($capability['name']);
+            $capabilityUsage  = (new CapabilityUsage($capabilityObject))
+                ->setMaxValue($capability['maxValue']);
 
-
-//        // ensure all given criteria exist: create new ones if necessary
-//        $criterionMapper = CriterionMapper::getInstance();
-//        foreach ($groups as $groupName => $group) {
-//            foreach ($group['criteria'] as $crit) {
-//                $criterionName = $crit['name'];
-//                $model         = null;
-//
-//                // Which criterion is used?
-//                try {
-//                    // If there's a matching criterion in the folder: use it
-//                    $model = $criterionMapper->findOneForFolderByKey($folderId, $criterionName, $groupName);
-//
-//                } catch (MapperException $e) {
-//                    // If there isn't:
-//                    // * If there's a course spec: use a matching criterion from it
-//                    if ($courseSpecFolderId) {
-//                        try {
-//                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
-//                        } catch (MapperException $e) {
-//                            // There's no match in the folder or spec.
-//                            // Create a new criterion in the folder
-//                        }
-//                    }
-//                }
-//
-//                // If there's no course spec, or there's no match in the spec:
-//                // * create a new criterion in the folder
-//                if (!$model) {
-//                    $createInCourse = false;
-//                    if ($courseSpecFolderId) {
-//                        // Is the group already on the course?
-//                        // Create the criterion in the course, as group names
-//                        // can't conflict between the course and unit.
-//                        try {
-//                            GroupMapper::getInstance()->findOneForFolderByName($courseSpecFolderId, $groupName);
-//                            $createInCourse = true;
-//                        } catch (MapperException $e) {
-//                            $createInCourse = false;
-//                        }
-//                    }
-//                    if ($createInCourse) {
-//                        $model = $criterionMapper->findOrCreateOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
-//                    } else {
-//                        $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $criterionName, $groupName);
-//                    }
-//                }
-//
-//                // yank those IDs
-//                $groups[$groupName]['id']                             = $model->getGroup()->getId();
-//                $groups[$groupName]['criteria'][$criterionName]['id'] = $model->getId();
-//            }
-//
-//        }
-
-//        // get a new rubric in array form
-//        // TODO use rubric grid instead
-//        $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
-
-        // overlay descriptor and max points data
-        for ($i = 1; $i < count($square); $i += 2) {
-
-            $gLookup = $square[$i][0];
-            $cLookup = $square[$i][1];
-
-            $crit = $groups[$gLookup]['criteria'][$cLookup];
-
-            if (!$crit) {
-                // given the way we're working with data we've expressly set up just above, this should be impossible...
-                continue;
-            }
-
-            $group     = $groups[$gLookup];
-            $critInUse = false;
-
-            $capability      = $rubricRowSet->retrieveCapabilityByName($group['name']);
-            $capabilityUsage = (new CapabilityUsage($capability))
-                ->setMaxValue(filter_var($group['maxValue'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE));
-
-            $indicator       = $capability->retrieveIndicatorByName($crit['name']);
-            $indicatorUsage  = new IndicatorUsage($indicator);
-
-
-
-            // Iterate descriptors
-            for ($j = 2; $j < count($square[$i]); ++$j) {
-
-                $levelSequence = $j - 2;
-
-                $dText = trim($square[$i][$j]);
-                $dVal  = trim($square[$i + 1][$j]);
-
-
-                // Set the group's max value
-//                $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
-
-                if (strlen($dText) || strlen($dVal)) {
-                    // assign the descriptor data to the appropriate cell
-                    $critInUse = true;
-
-                    $indicatorUsage->getDescriptors()[$levelSequence] =
-                        (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
-                            ->setDescription($dText)
-                            ->setMaxValue($dVal)
-                    ;
-
-//                    $postdata['descriptor'][$critId][$levelSequence] = [
-//                        'id'     => null,
-//                        'text'   => $dText,
-//                        'points' => $dVal,
-//                    ];
+            foreach ($importer->iterateIndicators($capName) as $indicator) {
+                $indName         = $indicator['name'];
+                $indicatorObject = $capability->retrieveIndicatorByName($indName);
+                $indicatorUsage  = new IndicatorUsage($indicatorObject);
+                foreach ($indicator['descriptors'] as $level => $descriptor) {
+                    if ($descriptor !== null) {
+                        $capInUse         = true;
+                        $indicatorUsage->getDescriptors()[$level] = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                            ->setDescription($descriptor['name'])
+                            ->setMaxValue($descriptor['value']);
+                    }
                 }
-            }
-
-//            // turn this criterion on, only if it's actually in use
-            if ($critInUse) {
-                $indicatorUsage->applyDescriptorMinValues($useMarkRange);
+                $indicatorUsage->applyDescriptorMinValues($importer->isUseMarkRange());
                 $capabilityUsage->getIndicatorUsages()->add($indicatorUsage);
-                // Don't add twice
-                if (!$grid->retrieveCapabilityUsage($capability)) {
-                    $grid->getCapabilityUsages()->add($capabilityUsage);
-                }
-//                $postdata['criterion'][$critId]['on'] = true;
+            }
+
+            if ($capInUse) {
+                $grid->getCapabilityUsages()->add($capabilityUsage);
             }
         }
-
-
-//        // For each group: infer its mark-per-capability
-//        if ($markPerCapability) {
-//            foreach ($postdata['group'] as $groupId => $group) {
-//                // Only infer if it's not provided
-//                if (isset($group['maxValue'])) {
-//                    continue;
-//                }
-//
-//                // Find the criteria for this group
-//                $inferredMaxValue = 0;
-//                foreach ($postdata['criterion'] as $criterionId => $criterion) {
-//                    if ((int)$criterion['groupId'] !== $groupId) {
-//                        continue;
-//                    }
-//
-//
-//                    // Now go thru its descriptors
-//                    $criterionMaxValue = 0;
-//                    foreach ($postdata['descriptor'][$criterionId] ?? [] as $descriptor) {
-//                        $criterionMaxValue = max($criterionMaxValue, $descriptor['points']);
-//                    }
-//
-//                    $inferredMaxValue += $criterionMaxValue;
-//                }
-//
-//                $postdata['group'][$groupId]['maxValue'] = $inferredMaxValue;
-//            }
-//        }
-
-
-//        // Get rid of level IDs
-//        foreach ($postdata['level'] as &$level) {
-//            unset($level['id']);
-//        }
-//        unset($level);
-//
-//
-//        return [$postdata, $markPerCapability, $useMarkRange];
     }
+
 
     /**
      * Copies the selected descriptors from one submission return to another.
