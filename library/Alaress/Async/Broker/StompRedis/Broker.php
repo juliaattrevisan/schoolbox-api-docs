@@ -13,11 +13,11 @@ use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Broker\IConsumer;
 use Alaress\Async\Broker\PayloadBrokenException;
 use Alaress\Async\Broker\PayloadMissingException;
+use Alaress\Async\Stomp\ConnectionException;
+use Alaress\Async\Stomp\IAckResolver;
+use Alaress\Async\Stomp\IClient;
+use Alaress\Async\Stomp\IFrame;
 use Predis\ClientInterface;
-use React\Stomp\AckResolver;
-use React\Stomp\Client;
-use React\Stomp\Exception\ConnectionException;
-use React\Stomp\Protocol\Frame;
 
 
 /**
@@ -28,9 +28,7 @@ use React\Stomp\Protocol\Frame;
  */
 abstract class Broker implements IBroker
 {
-    const ACK_MODE = 'client-individual';
-
-    /** @var Client */
+    /** @var IClient */
     private $stomp;
 
     /** @var ClientInterface */
@@ -47,10 +45,10 @@ abstract class Broker implements IBroker
      * @param string          $queue   the name of the queue to deposit into in AMQP
      * @param AMQPInterface   $amqp    an instance of the AMQP client interface
      * @param ClientInterface $redis   an instance of the Predis client interface
-     * @param Client          $stomp   an instanceof the STOMP client interface
+     * @param IClient         $stomp   an instanceof the STOMP client interface
      *                                 (only needs to be supplied if attaching a consumer, otherwise can be omitted)
      */
-    public function __construct($queue, AMQPInterface $amqp, ClientInterface $redis, Client $stomp = null)
+    public function __construct($queue, AMQPInterface $amqp, ClientInterface $redis, IClient $stomp = null)
     {
         $this->queue = $queue;
         $this->redis = $redis;
@@ -64,8 +62,8 @@ abstract class Broker implements IBroker
 
     /**
      * @param IConsumer $consumer
-     * @throws \React\Stomp\Exception\ConnectionException
      * @return void
+     * @throws ConnectionException
      */
     public function registerConsumer(IConsumer $consumer)
     {
@@ -74,37 +72,39 @@ abstract class Broker implements IBroker
         }
 
         try {
-            $this->stomp->subscribeWithAck($this->queue, self::ACK_MODE, function (Frame $frame, AckResolver $resolver) use ($consumer) {
+            $this->stomp->subscribeWithAck(
+                $this->queue,
+                IClient::ACK_MODE_CLIENT_INDIVIDUAL,
+                function (IFrame $frame, IAckResolver $resolver) use ($consumer) {
+                    $resolve = new Resolver($resolver);
 
-                $resolve = new Resolver($resolver);
+                    try {
+                        [ $key, $context ] = json_decode($frame->getBody(), true);
 
-                try {
-                    [ $key, $context ] = json_decode($frame->body, true);
+                    } catch (\Throwable $e) {
+                        // if the JSON decode fails, fall back to assuming frame.body == key
+                        $key     = $frame->getBody();
+                        $context = null;
+                    }
 
-                } catch (\Throwable $e) {
-                    // if the JSON decode fails, fall back to assuming frame.body == key
-                    $key     = $frame->body;
-                    $context = null;
-                }
+                    // payload from STOMP is a key for collecting a redis payload
+                    if (!$this->redis->exists($key)) {
+                        $consumer->onException(new PayloadMissingException($key, $resolve));
+                        return;
+                    }
 
-                // payload from STOMP is a key for collecting a redis payload
-                if (!$this->redis->exists($key)) {
-                    $consumer->onException(new PayloadMissingException($key, $resolve));
-                    return;
-                }
+                    try {
+                        $gzip    = $this->redis->get($key);
+                        $serial  = gzuncompress($gzip);
+                        $payload = unserialize($serial);
 
-                try {
-                    $gzip    = $this->redis->get($key);
-                    $serial  = gzuncompress($gzip);
-                    $payload = unserialize($serial);
+                    } catch (\Throwable $e) {
+                        $consumer->onException(new PayloadBrokenException($key, $resolve, $e->getCode(), $e));
+                        return;
+                    }
 
-                } catch (\Throwable $e) {
-                    $consumer->onException(new PayloadBrokenException($key, $resolve, $e->getCode(), $e));
-                    return;
-                }
-
-                $consumer->onMessage($payload, $resolve, $context);
-            });
+                    $consumer->onMessage($payload, $resolve, $context);
+                });
 
         } catch (\Exception $e) {
             $consumer->onException($e);

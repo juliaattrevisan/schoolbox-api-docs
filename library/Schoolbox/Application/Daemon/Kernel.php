@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Application\Daemon;
 
+use Alaress\Async\Stomp\Implementation\Stream\Client;
+use Alaress\Async\Stomp\Implementation\Stream\Connection;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use ErrorException;
@@ -19,8 +21,11 @@ use RangeException;
 use React\EventLoop\Factory;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-use React\Stomp;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\IConfigLoader;
+use Stomp\Protocol\Protocol;
+use Stomp\Protocol\Version;
+use Stomp\Transport\Parser;
 
 class Kernel extends CliKernelAbstract
 {
@@ -74,7 +79,7 @@ class Kernel extends CliKernelAbstract
     /**
      * Initialise
      *
-     * @param string $name The name of this Daemon
+     * @param string $name    The name of this Daemon
      * @param array  $options Keys are one of the self::OPTION_X constants
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
@@ -109,7 +114,10 @@ class Kernel extends CliKernelAbstract
      */
     protected function getValidConstructionOptions(): array
     {
-        return \array_merge(parent::getValidConstructionOptions(), [self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS]);
+        return \array_merge(
+            parent::getValidConstructionOptions(),
+            [self::OPTION_APP_SHORT_OPTS, self::OPTION_APP_LONG_OPTS]
+        );
     }
 
 
@@ -207,10 +215,13 @@ EOL;
             $flags = \implode(' ', \array_slice($argv, 1));
             $callable($this->di, $this->loop, $this->logger(), $this->opts, $flags);
         } catch (\Schoolbox\External\Exception $e) {
-            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
             throw $e;
         } catch (Exception $e) {
-            $this->logger()->critical("{$this->name} daemon failed to launch: " . $e->getMessage(), ['exception'=>$e]);
+            $this->logger()->critical(
+                "{$this->name} daemon failed to launch: " . $e->getMessage(),
+                ['exception' => $e]
+            );
             throw $e;
         }
 
@@ -218,12 +229,19 @@ EOL;
             $this->loop->run();
             $this->logger()->notice($this->name . " daemon loop ended; preparing to terminate");
         } catch (PDOException $e) {
-            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
         } catch (\Schoolbox\External\Exception $e) {
-            $this->logger()->emergency($e->getMessage(), ['exception'=>$e]);
+            $this->logger()->emergency($e->getMessage(), ['exception' => $e]);
         } catch (Exception $e) {
-            $this->logger()->critical(sprintf("%s daemon received %s: %s", $this->name, get_class($e),
-                $e->getMessage()), ['exception'=>$e]);
+            $this->logger()->critical(
+                sprintf(
+                    "%s daemon received %s: %s",
+                    $this->name,
+                    get_class($e),
+                    $e->getMessage()
+                ),
+                ['exception' => $e]
+            );
         }
     }
 
@@ -329,7 +347,7 @@ EOL;
         }
 
         $porcelain = \array_key_exists(self::OPT_LONG_PORCELAIN, $this->opts);
-        $logger = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
+        $logger    = new Logger(STDOUT, STDERR, $level, $fields, $porcelain);
 
         $this->addRavenHandler($logger);
 
@@ -354,23 +372,20 @@ EOL;
 
         $di = $this->getDependencyInjector();
 
-        $di->set('stomp.factory', $di->lazyNew(
-            Stomp\Factory::class, [
-            'loop' => $di->lazyValue('react.loop')
-        ]));
-
         $di->set('stomp', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-
-            return $di->get('stomp.factory')->createClient(
-                [
-                    'host'     => $conf->get('amqp_host'),
-                    'port'     => $conf->get('amqp_stomp_port'),
-                    'vhost'    => $conf->get('amqp_vhost'),
-                    'login'    => $conf->get('amqp_user'),
-                    'passcode' => $conf->get('amqp_pass'),
-                ]
+            $conn = new Connection(
+                $this->loop,
+                new Protocol(null, Version::VERSION_1_1),
+                new Parser(),
+                $conf->get('amqp_host'),
+                (int)$conf->get('amqp_stomp_port'),
+                $conf->get('amqp_user'),
+                $conf->get('amqp_pass'),
+                $conf->get('amqp_vhost')
             );
+            return new Client($conn);
         }));
 
         $di->values['logger'] = $this->logger();

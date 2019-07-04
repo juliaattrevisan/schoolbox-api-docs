@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Async\Stomp\ConnectionException;
+use Alaress\Async\Stomp\IClient;
 use Alaress\Redis\Async;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Postman;
@@ -21,7 +23,6 @@ use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
-use React\Stomp\Exception\ConnectionException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Realtime\Routing;
@@ -58,7 +59,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var ClientInterface $redis */
     $redis = $di->get('redis');
 
-    /** @var React\Stomp\Client $stomp */
+    /** @var IClient $stomp */
     $stomp = $di->get('stomp');
 
     $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);

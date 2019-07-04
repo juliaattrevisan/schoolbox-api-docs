@@ -11,7 +11,6 @@ namespace Alaress\WorkerCrew;
 use Alaress\WorkerCrew\Transaction\ITransaction;
 use BadMethodCallException;
 use InvalidArgumentException;
-use React\Stomp\Protocol\Frame;
 
 /**
  * Transmit and Receive
@@ -29,8 +28,8 @@ interface TXRX
      * @param mixed        $identifier
      * @param ITransaction $tx
      * @param mixed        $payload
-     * @throws InvalidArgumentException if the payload is in an unacceptable format
      * @return void
+     * @throws InvalidArgumentException if the payload is in an unacceptable format
      */
     public function send($identifier, ITransaction $tx, $payload);
 
@@ -39,8 +38,8 @@ interface TXRX
      * Receive and process the work sent from the daemon
      *
      * @param array $args
-     * @throws BadMethodCallException if not correctly configured
      * @return int
+     * @throws BadMethodCallException if not correctly configured
      */
     public function receive(array $args);
 

@@ -7,7 +7,6 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\Stomp\Client;
 use Schoolbox\CampusMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
@@ -35,9 +34,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         /** @var IConfigLoader $conf */
         $conf = $di->get('config');
 
-        /** @var Client $stomp */
-        $stomp = $di->get('stomp');
-
         /** @var CampusMapper $campusMapper */
         $campusMapper = $di->get('mapperFactory')->get(CampusMapper::class);
 
@@ -47,7 +43,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $factory    = new TriggerFactory($clock);
         $strat      = new DefaultDispatchStrategy($flags);
 
-        new TimetableScheduler($loop, $strat, $stomp, $log, $campusList, $factory, $conf, $clock);
+        new TimetableScheduler($loop, $strat, $log, $campusList, $factory, $conf, $clock);
 
     } catch (AMQPRuntimeException $e) {
         $log->alert('Unable to connect to RabbitMQ: server is offline.');

@@ -9,13 +9,15 @@
  * @version     SVN: $Id$
  */
 
+use Alaress\Async\Stomp\IAckResolver;
+use Alaress\Async\Stomp\IClient;
+use Alaress\Async\Stomp\IFrame;
 use Alaress\Redis;
 use Alaress\Scheduler\Trigger\TriggerInterface;
 use Aura\Di\ContainerInterface;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
-use React\Stomp;
-use React\Stomp\Protocol\Frame;
+use React\EventLoop\LoopInterface;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
@@ -130,17 +132,10 @@ foreach ($sqlq as $qi) {
 }
 
 // now move onto stuff in rabbit
-$loop = \React\EventLoop\Factory::create();
-
-$stompFactory = new \React\Stomp\Factory($loop);
-
-$stomp = $stompFactory->createClient([
-    'host'      => Cfg::get('amqp_host'),
-    'port'      => Cfg::get('amqp_stomp_port'),
-    'vhost'     => Cfg::get('amqp_vhost'),
-    'login'     => Cfg::get('amqp_user'),
-    'passcode'  => Cfg::get('amqp_pass'),
-]);
+/** @var LoopInterface $loop */
+/** @var IClient $stomp */
+$loop  = $kernel->getDependencyInjector()->values['react.loop'];
+$stomp = $kernel->getDependencyInjector()->get('stomp');
 
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
 $amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
@@ -148,45 +143,45 @@ $amqpConn->bindQueue(INSTANCE_ID.'.sb.reviewsched', 'deadmessage');
 $amqpConn->closeConnection();
 unset($amqpConn);
 
-/**
- * @var $stomp \React\Stomp\Client $stomp
- */
-$stomp->connect()->then(function (Stomp\Client $stomp) use ($d, $loop, $perform, $kernel) {
+$stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $kernel) {
 
     $di = $kernel->getDependencyInjector();
 
     $timer = $loop->addTimer(4, function() { exit(0); });
 
-    $stomp->subscribeWithAck(INSTANCE_ID.'.sb.sched', 'client-individual', function (Frame $frame, Stomp\AckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
-        $loop->cancelTimer($timer);
-        $timer = $loop->addTimer(4, function() { exit(0); });
+    $stomp->subscribeWithAck(
+        INSTANCE_ID.'.sb.sched',
+        IClient::ACK_MODE_CLIENT_INDIVIDUAL,
+        function (IFrame $frame, IAckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
+            $loop->cancelTimer($timer);
+            $timer = $loop->addTimer(4, function() { exit(0); });
 
-        $date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
+            $date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
 
-        // do this for every message that comes in
-        $d->info("Processing message (arrived at $date)", [ 'char' => '>' ]);
+            // do this for every message that comes in
+            $d->info("Processing message (arrived at $date)", [ 'char' => '>' ]);
 
-        Database::reinitialise();
-        DeprecatedDatabase::reinitialise();
+            Database::reinitialise();
+            DeprecatedDatabase::reinitialise();
 
-        // if the interrogation says to dismiss the message, we do
-        if (interrogate($frame, $d, $di)) {
-            $d->error("Message broken");
+            // if the interrogation says to dismiss the message, we do
+            if (interrogate($frame, $d, $di)) {
+                $d->error("Message broken");
 
-            if ($perform) {
-                // split this message off onto a special queue
-                $amqpConn = new \Schoolbox\Notif\MQ\Connector();
-                $amqpConn->publish($frame->body, 'deadmessage');
-                $amqpConn->closeConnection();
-                unset($amqpConn);
-                $resolver->ack();
+                if ($perform) {
+                    // split this message off onto a special queue
+                    $amqpConn = new \Schoolbox\Notif\MQ\Connector();
+                    $amqpConn->publish($frame->getBody(), 'deadmessage');
+                    $amqpConn->closeConnection();
+                    unset($amqpConn);
+                    $resolver->ack();
+                }
+
+            } else {
+                $d->notice("Message retained", [ 'char' => '+' ]);
             }
-
-        } else {
-            $d->notice("Message retained", [ 'char' => '+' ]);
         }
-
-    });
+    );
 });
 
 
@@ -207,12 +202,12 @@ function extractEvent($object)
     }
 
     // extract event from frame
-    if ($object instanceof Frame) {
-        if (preg_match('`:[0-9a-f]{40}$`', $object->body)) {
-            throw new CompressionException("Payload is a redis key, {$object->body}, go look there");
+    if ($object instanceof IFrame) {
+        if (preg_match('`:[0-9a-f]{40}$`', $object->getBody())) {
+            throw new CompressionException("Payload is a redis key, {$object->getBody()}, go look there");
         }
 
-        $formatted = CompressedFormatter::uncompress($object->body);
+        $formatted = CompressedFormatter::uncompress($object->getBody());
         $event     = unserialize($formatted['message']);
 
         if ($event instanceof Event) {
@@ -226,11 +221,11 @@ function extractEvent($object)
 }
 
 /**
- * @param Frame           $input
+ * @param IFrame          $input
  * @param LoggerInterface $log
  * @return int
  */
-function verifyFrameTrigger(Frame $input, LoggerInterface $log)
+function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
 {
     $exit = 0;
 
@@ -345,7 +340,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         $log->debug($e->getMessage());
 
         // if we failed to inflate, we expect this to be a trigger
-        if ($input instanceof Frame) {
+        if ($input instanceof IFrame) {
             $exit = verifyFrameTrigger($input, $log);
         } else {
             $log->critical($e->getMessage(), [ 'exception'=>$e ]);
@@ -366,18 +361,18 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
 
 /**
- * @param \Predis\ClientInterface     $redis
- * @param \React\Stomp\Protocol\Frame $frame
+ * @param \Predis\ClientInterface $redis
+ * @param IFrame                  $frame
  * @throws InvalidArgumentException
  * @throws ErrorException
  * @return TriggerInterface
  */
-function frame2trigger(\Predis\ClientInterface $redis, \React\Stomp\Protocol\Frame $frame)
+function frame2trigger(\Predis\ClientInterface $redis, IFrame $frame)
 {
-    $content = $redis->get($frame->body);
+    $content = $redis->get($frame->getBody());
 
     if ($content === '') {
-        throw new InvalidArgumentException("Key `{$frame->body}` is not set");
+        throw new InvalidArgumentException("Key `{$frame->getBody()}` is not set");
     }
 
     // try to unserialize: depending on kernel, will either throw EE or just emit warning
