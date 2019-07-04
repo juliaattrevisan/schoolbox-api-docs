@@ -1234,7 +1234,7 @@ class RubricMapper
 
 
         // Add cap usages, ind usages, descriptors
-        foreach ($importer->getCapabilities() as $capability) {
+        foreach ($importer->retrieveCapabilitiesWithIndicators() as $capability) {
             $capInUse = false;
 
             // If $capabilityObject is null here, that's a problem:
