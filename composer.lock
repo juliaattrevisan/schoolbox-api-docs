@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a8d9d9a4f7b514f4273769125993cd0",
+    "content-hash": "4e00f75df238a004f4dd4f1cc0de600d",
     "packages": [
         {
             "name": "0x46616c6b/etherpad-lite-client",
