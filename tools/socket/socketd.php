@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
+use React\Socket\Server as SocketServer;
 use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\IConfigLoader;
@@ -68,7 +69,12 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $wss    = new Ratchet\WebSocket\WsServer($pipeManager);
     $https  = new HttpServer($wss);
-    $server = IoServer::factory($https, $port);
+
+    // IOServer::factory cannot be used because it creates a new event loop,
+    // which is never started.
+    // Create the server manually.
+    $socket = new SocketServer('0.0.0.0:' . $port, $loop);
+    $server = new IoServer($https, $socket, $loop);
 
     $log->info("Listening for incoming websockets on port {$port}...", ['char' => '+']);
     $server->run();
