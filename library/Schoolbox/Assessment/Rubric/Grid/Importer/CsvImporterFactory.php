@@ -145,7 +145,7 @@ class CsvImporterFactory
             // Normalize line values
             return array_map(
                 [$this, 'normalizeEncoding'],
-                \array_slice($line, 0, $maxLevels + 2)
+                array_slice($line, 0, $maxLevels + 2)
             );
         }
 
