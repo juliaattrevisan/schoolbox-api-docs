@@ -171,6 +171,8 @@ class RubricMapper
     /**
      * Saves this row set to the database.
      *
+     * @noinspection PhpDocMissingThrowsInspection Ignore spurious Aura\Di exception
+     *
      * @param RowSet           $rowSet
      * @param bool             $persistCurriculum    Should curriculum nodes for groups and
      *                                               criteria be updated?
@@ -181,7 +183,6 @@ class RubricMapper
      *                                               modified if it is used by no other
      *                                               assessment than this one.
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException             - If a duplicate indicator or capability exists in the folder
      *                                               - If course capability duplicates a unit capability
      *                                               - If a capability or indicator that should not be deleted has been
@@ -293,6 +294,7 @@ class RubricMapper
 
         // Forgive me...
         /** @var RosettaStone $l10n */
+        /** @noinspection PhpUnhandledExceptionInspection */
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
         $spec = new ValidRowSet(
             $l10n,
@@ -1289,6 +1291,8 @@ class RubricMapper
      * @param int           $maxLevels
      *
      * @throws UnexpectedValueException if the importer couldn't be built
+     * @throws MapperException          if something happens whilst retrieving
+     *                                  or persisting the rowset
      * @return void
      */
     public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): void
