@@ -165,7 +165,7 @@ class Explorer
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
             }
 
-            $stack[$type][$rawId]['contacts'][$contactId] = array_intersect_key($row, [
+            $stack[$type][$rawId]['contacts'][] = array_intersect_key($row, [
                 'sfa_num' => '',
                 'student_contact_id' => '',
                 'student_contact_network_login' => '',
