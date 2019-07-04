@@ -10,7 +10,6 @@
 namespace Schoolbox\Assessment\Component;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
