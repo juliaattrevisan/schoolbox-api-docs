@@ -64,7 +64,7 @@ class CachingConnectorAbstract
         if ($timeout === null) {
             // Null is fine
             $this->timeout = $timeout;
-        } elseif ($timeout === (string)(int)$timeout) {
+        } elseif (is_numeric($timeout)) {
             // Ensure the string is an int
             $this->timeout = (int)$timeout;
         } else {

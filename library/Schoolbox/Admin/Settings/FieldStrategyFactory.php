@@ -114,6 +114,8 @@ class FieldStrategyFactory
                 return new FieldType\Password\Renderer();
             case ConfigMapper::FIELD_TIME_PICKER:
                 return new FieldType\TimePicker\Renderer();
+            case ConfigMapper::FIELD_NUMBER:
+                return new FieldType\Number\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
