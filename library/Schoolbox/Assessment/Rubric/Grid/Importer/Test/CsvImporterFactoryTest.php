@@ -35,7 +35,7 @@ cap1,ind3,,,,,
 ,,0,2,4,6,8
 TEST1;
         yield 'empty descriptors' => [
-            fopen('data://text/plain,' . $test1,'rb'),
+            $this->buildStream($test1),
             5,
             ['', '', '', '', '',],
             [
@@ -79,5 +79,20 @@ TEST1;
         $this->assertSame($expectedCapabilities, $importer->getCapabilities());
         $this->assertSame($expectedUseMarkRange, $importer->isUseMarkRange());
         $this->assertSame($expectedMarkPerCapability, $importer->isMarkPerCapability());
+    }
+
+
+    /**
+     * Helper for building a stream out of a string.
+     *
+     * @param string $content
+     * @return resource
+     */
+    private function buildStream(string $content)
+    {
+        $stream = fopen('php://memory','rb+');
+        fwrite($stream, $content);
+        rewind($stream);
+        return $stream;
     }
 }
