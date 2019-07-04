@@ -1235,8 +1235,7 @@ class RubricMapper
 
         // Add cap usages, ind usages, descriptors
         foreach ($importer->getCapabilities() as $capability) {
-            $capName          = $capability['name'];
-            $capInUse         = false;
+            $capInUse = false;
 
             // If $capabilityObject is null here, that's a problem:
             // it should've been created
@@ -1245,8 +1244,7 @@ class RubricMapper
                 ->setMaxValue($capability['maxValue']);
 
             foreach ($capability['indicators'] as $indicator) {
-                $indName         = $indicator['name'];
-                $indicatorObject = $capabilityObject->retrieveIndicatorByName($indName);
+                $indicatorObject = $capabilityObject->retrieveIndicatorByName($indicator['name']);
 
                 // Likewise if $indicatorObject is null here, that's a problem
                 $indicatorUsage  = new IndicatorUsage($indicatorObject);
