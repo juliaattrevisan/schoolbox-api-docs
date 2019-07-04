@@ -39,7 +39,9 @@ class CsvImporterFactory
         $markPerCapability = false;
         $settingCells      = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
-            [$setting, $value] = explode(':', $settingCell);
+            $settingPair = explode(':', $settingCell);
+            $setting     = $setting[0] ?? '';
+            $value       = $setting[1] ?? '';
             switch (strtolower(trim($value ?? ''))) {
                 case '1':
                 case 'yes':
@@ -112,7 +114,11 @@ class CsvImporterFactory
             // (The capability values persist from previous rows)
             $capabilities[$workingCapName]['id']                          = null;
             $capabilities[$workingCapName]['name']                        = $workingCapName;
-            $capabilities[$workingCapName]['maxValue']                    = $capMaxValue !== '' ? $capMaxValue : null;
+            $capabilities[$workingCapName]['maxValue']                    = filter_var(
+                $capMaxValue ?? '',
+                FILTER_VALIDATE_INT,
+                FILTER_NULL_ON_FAILURE
+            );
             $capabilities[$workingCapName]['indicators'][$workingIndName] = [
                 'id'   => null,
                 'name' => $workingIndName,
