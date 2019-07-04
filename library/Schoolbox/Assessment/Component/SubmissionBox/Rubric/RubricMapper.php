@@ -1244,7 +1244,7 @@ class RubricMapper
             $capabilityUsage  = (new CapabilityUsage($capabilityObject))
                 ->setMaxValue($capability['maxValue']);
 
-            foreach ($importer->iterateIndicators($capName) as $indicator) {
+            foreach ($capability['indicators'] as $indicator) {
                 $indName         = $indicator['name'];
                 $indicatorObject = $capabilityObject->retrieveIndicatorByName($indName);
 
