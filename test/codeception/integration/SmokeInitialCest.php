@@ -25,7 +25,7 @@ class SmokeInitialCest {
     /**
      *
      */
-    public function SmokeNews(IntegrationTester $i){
+    public function SmokeNewsPOST(IntegrationTester $i){
 
         #GIVEN
         #The regex matches: https://vagrant,dev.echoolbox.cloud/news/<atricle_id>?returnUrl=Lw%253D%253D
@@ -98,6 +98,17 @@ class SmokeInitialCest {
         #THEN
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
+        $title = 'Smoke Test News Title Save for later';
+        $response = $i->draftNews($title);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        #WHEN
+        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
+        $i->publishNewsByID($news_id_matches[1]);
+        $response = $i->saveNewsByIDforLater($news_id_matches[1]);
+        $i->comment('Saved news article for later');
+        #THEN
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
         $title = 'Smoke Test News Title Delete, I should not exist';
         $response = $i->draftNews($title);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
@@ -113,19 +124,49 @@ class SmokeInitialCest {
     /**
      *
      */
-    public function SmokeAssessment(IntegrationTester $i){
-        $capture_homepage_id='/news\/(\d+)\?returnUrl/';
-
+    public function SmokeAssessmentPOST(IntegrationTester $i){
+        #GIVEN
+        $homepage_title='Testing Home Page for Assessment';
+        $assessment_title='Testing Assessment On Homepage';
         $i->loginAdmin();
-        $response = $i->createHomepage('Testing Assessment Home Page');
+        $i->createHomepage($homepage_title);
+        $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
+        $i->addDefaultUsersToHomepage($homePageId);
 
-        print_r($response);
+        #WHEN
+        $response = $i->createAssessemntOnHomepage($assessment_title, $homePageId);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
 
-        $title = 'Smoke Test Assignment Title';
-        $capture_new_assignment_id='/news\/(\d+)\?returnUrl/';
-        #$response = $i->createAssessemntHomepage($title, 552);
+        #THEN
+        $i->comment('Created homepage and added assessment to it');
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create an assessment.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId, $redirect_history[0], 'T expect we get redirected to the homepage our assessment is on.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        #print_r($response);
+        #WHEN
+        $assessment_title='Testing Assessment On Homepage, Edit it';
+        $i->createAssessemntOnHomepage($assessment_title, $homePageId);
+        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
+        $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
+        $update_response = $i->updateAssessemntHomepage($homePageId, $assessmentPageId, $assessment_title);
+
+        #THEN
+        $i->comment('Updated Assessment');
+        $i->assertEquals(200, $determine_mark_response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $update_response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        ##Create assessement with rubric mark.
+
+        ##Submit an assessment for marking.
+
+        ##Submit an rubric assessment for marking.
+
+        ##Mark rubric assessment.
+
+        ##Mark assessment.
+
+        ##Submit reflection on assessment.
     }
 
 

@@ -6,11 +6,13 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Cookie\CookieJar;
 use Schoolbox\Comms\News\Querystring;
+use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\User;
 
 /**
@@ -74,8 +76,20 @@ class IntegrationTester extends \Codeception\Actor
     {
         $database=Database::getInstance();
         $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
-        return FolderMapper::getInstance()->findOneByColumn('title', $title);
+        /** @var Schoolbox\Resource\Folder\Model $folder */
+        $folder = FolderMapper::getInstance()->findOneByColumn('name', $title);
+        return $folder->getId();
     }
+
+    function getFirstAssessmentIdByTitle($title)
+    {
+        $database=Database::getInstance();
+        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        /** @var Schoolbox\Resource\Folder\Model $folder */
+        $DueWork = AssessmentMapper::getInstance()->findOneByColumn('title', $title);
+        return $DueWork->getId();
+    }
+
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
         $factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
@@ -188,7 +202,46 @@ class IntegrationTester extends \Codeception\Actor
 
     }
 
-    public function createAssessemntHomepage($title, $HomePageID)
+    public function addDefaultUsersToHomepage($homepage_id)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/group/modify/'.$homepage_id;
+
+        $page='/group/modifyForm.php';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[ 'categoryID'=>$homepage_id,
+                'userID'=> [ 230, 151] ];
+
+        $allow_redirects = false;
+
+        $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+
+
+        $data=[ 'categoryID'=>$homepage_id,
+                'accessLevel[151]'=>3];
+
+        $allow_redirects = false;
+
+        $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+
+
+    }
+
+    public function createAssessemntOnHomepage($title, $HomePageID)
     {
         if (!isset($this->client))
         {
@@ -207,13 +260,13 @@ class IntegrationTester extends \Codeception\Actor
             'contextId' => $HomePageID,
             'folderId' => $HomePageID,
             'assessmentType' => 'dueWork',
-            'title' => 'A Test Assignment',
+            'title' => $title,
             'description' => '<p>This is a test assignment for automated tests</p>',
             'acceptOnline' => 0,
             'publishDate' => '01/07/2019 12:00am',
             'openDate' => '01/07/2019 12:00am',
-            'dueDate' => '02/07/2019 11:59pm',
-            'closeDate' => '02/07/2019 11:59pm',
+            'dueDate' => '10/07/2019 11:59pm',
+            'closeDate' => '10/07/2019 11:59pm',
             'weight' => 13,
             'self_reviewable'=>'none',
             'visibility'=>2,
@@ -244,7 +297,7 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    public function determineMarkInvalidation($HomePageID, $assignmentID)
+    public function determineMarkInvalidation($HomePageID, $assignmentID, $assignmentTitle)
     {
         if (!isset($this->client))
         {
@@ -252,68 +305,47 @@ class IntegrationTester extends \Codeception\Actor
         }
 
         //https://vagrant.dev.schoolbox.cloud/rubric/determineMarkInvalidation
-        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessment/'.$assignmentID.'/modify?returnUrl=';
 
-        $page='/learning/folders/'.$HomePageID.'/assessments';
+
+        $page='/rubric/determineMarkInvalidation';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
         $allow_redirects = $this->redirect_settings;
 
         /*
          *assessmentType=dueWork
-            returnUrl=L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ==
-            id=381
-            folderId=552
-            title=A+Test+Assignment
-            workType
-            description=<p>afdsgadfg</p>
-
-            acceptOnline=0
-            publishDate=01/07/2019+12:00am
-            openDate=01/07/2019+12:00am
-            dueDate=02/07/2019+11:59pm
-            closeDate=02/07/2019+11:59pm
-            weight=13
-            self_reviewable=none
-            visibility=2
-            assessmentType=dueWork
-            markType=1
-            maxMark
-            gradingScheme=1
-            resultset=1
-            formField=rb
-            rb[381][level][0][id]
-            rb[381][level][0][name]
-            rb[381][level][1][id]
-            rb[381][level][1][name]
-            curriculumCodes[]
-         *
+            'returnUrl'=L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ==     #L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ== = /learning/assessments/381/19   /assignmentID/userID
         */
 
         $data =[
-            'contextType' => 'folders',
-            'contextId' => $HomePageID,
-            'folderId' => $HomePageID,
-            'assessmentType' => 'dueWork',
-            'title' => 'A Test Assignment',
-            'description' => '<p>This is a test assignment for automated tests</p>',
-            'acceptOnline' => 0,
-            'publishDate' => '01/07/2019 12:00am',
-            'openDate' => '01/07/2019 12:00am',
-            'dueDate' => '02/07/2019 11:59pm',
-            'closeDate' => '02/07/2019 11:59pm',
-            'weight' => 13,
+            'returnUrl'=>'',
+            'id'=>$assignmentID,
+            'folderId'=>$HomePageID,
+            'title'=>$assignmentTitle,
+            'workType'=>'',
+            'description'=>'<p>This is a test assignment for automated tests</p>',
+            'acceptOnline'=>0,
+            'publishDate'=>'01/07/2019 12:00am',
+            'openDate'=>'01/07/2019 12:00am',
+            'dueDate'=>'02/07/2019 11:59pm',
+            'closeDate'=>'02/07/2019 11:59pm',
+            'weight'=>15,
             'self_reviewable'=>'none',
             'visibility'=>2,
+            'assessmentType'=>['dueWork', 'dueWork'],
             'markType'=>1,
             'maxMark'=>'',
             'gradingScheme'=>1,
             'resultset'=>1,
             'formField'=>'rb',
-            'rb[0][level][0][id]'=>'',
-            'rb[0][level][0][name]'=>'',
-            'rb[0][level][1][id]'=>'',
-            'rb[0][level][1][name]'=>'',
+            'rb['.$assignmentID.'][level][0][id]'=>'',
+            'rb['.$assignmentID.'][level][0][name]'=>'',
+            'rb['.$assignmentID.'][level][1][id]'=>'',
+            'rb['.$assignmentID.'][level][1][name]'=>'',
+            'participant-include[230]'=>1,
+            'participant-plan[230]'=>0,
+            'curriculumCodes[]'
         ];
 
         try {
@@ -330,7 +362,7 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    public function updateAssessemntHomepage($HomePageID, $assignmentID)
+    public function updateAssessemntHomepage($HomePageID, $assignmentID, $assignmentTitle)
     {
         if (!isset($this->client))
         {
@@ -338,9 +370,9 @@ class IntegrationTester extends \Codeception\Actor
         }
 
         //https://vagrant.dev.schoolbox.cloud/learning/assessments/381
-        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessment/'.$assignmentID.'/modify?returnUrl=';
 
-        $page='/learning/folders/'.$HomePageID.'/assessments';
+        $page='/learning/assessments/'.$assignmentID;
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
         $allow_redirects = $this->redirect_settings;
@@ -348,60 +380,36 @@ class IntegrationTester extends \Codeception\Actor
         /*
          *
          * assessmentType=dueWork
-            returnUrl=L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ==
-            id=381
-            folderId=552
-            title=A+Test+Assignment
-            workType
-            description=<p>afdsgadfg</p>
-
-            acceptOnline=0
-            publishDate=01/07/2019+12:00am
-            openDate=01/07/2019+12:00am
-            dueDate=02/07/2019+11:59pm
-            closeDate=02/07/2019+11:59pm
-            weight=13
-            self_reviewable=none
-            visibility=2
-            assessmentType=dueWork
-            markType=1
-            maxMark
-            gradingScheme=1
-            resultset=1
-            formField=rb
-            rb[381][level][0][id]
-            rb[381][level][0][name]
-            rb[381][level][1][id]
-            rb[381][level][1][name]
-            curriculumCodes[]
-            curriculumCodes[]
-            part-2=1
+            returnUrl=L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ== #L2xlYXJuaW5nL2Fzc2Vzc21lbnRzLzM4MS8xOQ== = /learning/assessments/381/19      /assignmentID/userID
          */
         $data =[
-            'contextType' => 'folders',
-            'contextId' => $HomePageID,
-            'folderId' => $HomePageID,
-            'assessmentType' => 'dueWork',
-            'title' => 'A Test Assignment',
-            'description' => '<p>This is a test assignment for automated tests</p>',
-            'acceptOnline' => 0,
-            'publishDate' => '01/07/2019 12:00am',
-            'openDate' => '01/07/2019 12:00am',
-            'dueDate' => '02/07/2019 11:59pm',
-            'closeDate' => '02/07/2019 11:59pm',
-            'weight' => 13,
+            'returnUrl'=>'',
+            'id'=>$assignmentID,
+            'folderId'=>$HomePageID,
+            'title'=>$assignmentTitle,
+            'workType'=>'',
+            'description'=>'<p>This is a test assignment for automated tests</p>',
+            'acceptOnline'=>0,
+            'publishDate'=>'01/07/2019 12:00am',
+            'openDate'=>'01/07/2019 12:00am',
+            'dueDate'=>'02/07/2019 11:59pm',
+            'closeDate'=>'02/07/2019 11:59pm',
+            'weight'=>15,
             'self_reviewable'=>'none',
             'visibility'=>2,
+            'assessmentType'=>['dueWork', 'dueWork'],
             'markType'=>1,
             'maxMark'=>'',
             'gradingScheme'=>1,
             'resultset'=>1,
             'formField'=>'rb',
-            'rb[0][level][0][id]'=>'',
-            'rb[0][level][0][name]'=>'',
-            'rb[0][level][1][id]'=>'',
-            'rb[0][level][1][name]'=>'',
-            'curriculumCodes'=>'',
+            'rb['.$assignmentID.'][level][0][id]'=>'',
+            'rb['.$assignmentID.'][level][0][name]'=>'',
+            'rb['.$assignmentID.'][level][1][id]'=>'',
+            'rb['.$assignmentID.'][level][1][name]'=>'',
+            'participant-include[230]'=>1,
+            'participant-plan[230]'=>0,
+            'curriculumCodes[]',
             'part-2'=>1
         ];
 
@@ -513,6 +521,37 @@ class IntegrationTester extends \Codeception\Actor
         $data =[
             'articleID' => $news_id
         ];
+
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function saveNewsByIDforLater($news_id)
+    {
+        #/saved/20/add
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/news';
+
+        $page='/news/saved/'.$news_id.'/add';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects = $this->redirect_settings;
+
+        $data =[];
 
         try {
             return $this->client->request('POST', $url, [
