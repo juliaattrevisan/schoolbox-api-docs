@@ -134,9 +134,11 @@ class CsvImporter
                 $descriptorNames  = array_slice($this->square[$i], 2);
                 $descriptorValues = array_slice($this->square[$i+1], 2);
                 $descriptors      = [];
+                $indicatorInUse   = false;
                 foreach ($descriptorNames as $level => $descriptorName) {
                     $descriptorValue = $descriptorValues[$level] ?? '';
                     if (!($descriptorName === '' && $descriptorValue === '')) {
+                        $indicatorInUse      = true;
                         $descriptors[$level] = [
                             'name'  => $descriptorName,
                             'value' => filter_var($descriptorValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
@@ -146,10 +148,13 @@ class CsvImporter
                     }
                 }
 
-                $result[] = [
-                    'name'        => $indName,
-                    'descriptors' => $descriptors,
-                ];
+                // Don't use the indicator if it has no descriptors
+                if ($indicatorInUse) {
+                    $result[] = [
+                        'name'        => $indName,
+                        'descriptors' => $descriptors,
+                    ];
+                }
             }
         }
         return $result;
