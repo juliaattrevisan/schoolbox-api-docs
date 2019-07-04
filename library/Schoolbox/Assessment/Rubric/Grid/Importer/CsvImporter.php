@@ -159,4 +159,21 @@ class CsvImporter
         }
         return $result;
     }
+
+
+    /**
+     * Retrieves the capabilities for this importer, with all their indicators
+     * and descriptors included.
+     *
+     * @return array
+     */
+    public function retrieveCapabilitiesWithIndicators(): array
+    {
+        $result = [];
+        foreach ($this->capabilities as $capability) {
+            $capability['indicators'] = $this->iterateIndicators($capability['name']);
+            $result[] = $capability;
+        }
+        return $result;
+    }
 }

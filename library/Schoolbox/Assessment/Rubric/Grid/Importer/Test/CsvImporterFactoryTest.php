@@ -40,12 +40,56 @@ TEST1;
             ['', '', '', '', '',],
             [
                 [
-                    'name'     => 'cap2',
-                    'maxValue' => null,
+                    'name'       => 'cap2',
+                    'maxValue'   => null,
+                    'indicators' => [
+                        [
+                            'name'        => 'ind1',
+                            'descriptors' => [
+                                ['name' => '', 'value' => 0,],
+                                ['name' => '', 'value' => 2,],
+                                ['name' => '', 'value' => 4,],
+                                ['name' => '', 'value' => 6,],
+                                ['name' => '', 'value' => 8,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'ind2',
+                            'descriptors' => [
+                                ['name' => '', 'value' => 0,],
+                                ['name' => '', 'value' => 2,],
+                                ['name' => '', 'value' => 4,],
+                                ['name' => '', 'value' => 6,],
+                                ['name' => '', 'value' => 8,],
+                            ],
+                        ],
+                    ],
                 ],
                 [
-                    'name'     => 'cap1',
-                    'maxValue' => null,
+                    'name'       => 'cap1',
+                    'maxValue'   => null,
+                    'indicators' => [
+                        [
+                            'name'        => 'ind3',
+                            'descriptors' => [
+                                ['name' => '', 'value' => 0,],
+                                ['name' => '', 'value' => 2,],
+                                ['name' => '', 'value' => 4,],
+                                ['name' => '', 'value' => 6,],
+                                ['name' => '', 'value' => 8,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'ind4',
+                            'descriptors' => [
+                                ['name' => '', 'value' => 0,],
+                                ['name' => '', 'value' => 2,],
+                                ['name' => '', 'value' => 4,],
+                                ['name' => '', 'value' => 6,],
+                                ['name' => '', 'value' => 8,],
+                            ],
+                        ],
+                    ],
                 ],
             ],
             false,
@@ -66,8 +110,30 @@ TEST2;
             ['', '', '', '', '',],
             [
                 [
-                    'name'     => 'Test Capability 1',
-                    'maxValue' => null,
+                    'name'       => 'Test Capability 1',
+                    'maxValue'   => null,
+                    'indicators' => [
+                        [
+                            'name'        => 'Indicator 1',
+                            'descriptors' => [
+                                ['name' => 'a', 'value' => 15,],
+                                ['name' => 'b', 'value' => 10,],
+                                ['name' => 'c', 'value' => 5,],
+                                ['name' => 'd', 'value' => 1,],
+                                ['name' => 'e', 'value' => 0,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'Indicator 2',
+                            'descriptors' => [
+                                ['name' => 'a', 'value' => 15,],
+                                ['name' => 'b', 'value' => 10,],
+                                ['name' => 'c', 'value' => 5,],
+                                ['name' => 'd', 'value' => 1,],
+                                ['name' => 'e', 'value' => 0,],
+                            ],
+                        ],
+                    ],
                 ],
             ],
             true,
@@ -88,8 +154,30 @@ TEST2;
             ['', '', '', '', '',],
             [
                 [
-                    'name'     => 'Test Capability 1',
-                    'maxValue' => 9,
+                    'name'       => 'Test Capability 1',
+                    'maxValue'   => 9,
+                    'indicators' => [
+                        [
+                            'name'        => 'Indicator 1',
+                            'descriptors' => [
+                                ['name' => 'a', 'value' => 15,],
+                                ['name' => 'b', 'value' => 10,],
+                                ['name' => 'c', 'value' => 5,],
+                                ['name' => 'd', 'value' => 1,],
+                                ['name' => 'e', 'value' => 0,],
+                            ],
+                        ],
+                        [
+                            'name'        => 'Indicator 2',
+                            'descriptors' => [
+                                ['name' => 'a', 'value' => 15,],
+                                ['name' => 'b', 'value' => 10,],
+                                ['name' => 'c', 'value' => 5,],
+                                ['name' => 'd', 'value' => 1,],
+                                ['name' => 'e', 'value' => 0,],
+                            ],
+                        ],
+                    ],
                 ],
             ],
             false,
@@ -120,7 +208,7 @@ TEST2;
         $factory  = new CsvImporterFactory();
         $importer = $factory->build($fp, $maxLevels);
         $this->assertSame($expectedLevels, $importer->getLevels());
-        $this->assertSame($expectedCapabilities, $importer->getCapabilities());
+        $this->assertSame($expectedCapabilities, $importer->retrieveCapabilitiesWithIndicators());
         $this->assertSame($expectedUseMarkRange, $importer->isUseMarkRange());
         $this->assertSame($expectedMarkPerCapability, $importer->isMarkPerCapability());
     }
