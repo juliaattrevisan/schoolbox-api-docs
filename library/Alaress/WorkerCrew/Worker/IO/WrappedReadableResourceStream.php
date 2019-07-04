@@ -30,6 +30,12 @@ class WrappedReadableResourceStream implements Listenable
 
 
     /**
+     * @var ReadableResourceStream
+     */
+    private $streamObject;
+
+
+    /**
      * Constructor
      *
      * @param resource            $stream
@@ -43,23 +49,23 @@ class WrappedReadableResourceStream implements Listenable
         StreamListener $listener = null,
         int $readChunkSize = null
     ) {
-        $streamObject        = new ReadableResourceStream($stream, $loop, $readChunkSize);
+        $this->streamObject  = new ReadableResourceStream($stream, $loop, $readChunkSize);
         $this->listenerStore = new SplObjectStorage();
 
         if ($listener) {
             $this->attachListener($listener);
         }
 
-        $streamObject->on(
+        $this->streamObject->on(
             'data',
-            function ($data) use ($streamObject, $stream) {
+            function ($data) use ($stream) {
                 /**
                  * @var string $data
                  */
 
                 // confirm valid resource
                 if (!is_resource($stream)) {
-                    $streamObject->close();
+                    $this->streamObject->close();
                     return;
                 }
 
@@ -70,7 +76,7 @@ class WrappedReadableResourceStream implements Listenable
 
                 // don't send null data down the pipe
                 if ($data === '' || $e->isStreamEnded()) {
-                    $streamObject->close();
+                    $this->streamObject->close();
                     unset($e);
                     return;
                 }
@@ -83,7 +89,7 @@ class WrappedReadableResourceStream implements Listenable
             }
         );
 
-        $streamObject->on(
+        $this->streamObject->on(
             'close',
             function () use ($stream) {
                 foreach ($this->listenerStore as $listener) {
@@ -93,7 +99,7 @@ class WrappedReadableResourceStream implements Listenable
             }
         );
 
-        $streamObject->on(
+        $this->streamObject->on(
             'error',
             function ($error) use ($stream) {
                 foreach ($this->listenerStore as $listener) {
@@ -103,7 +109,7 @@ class WrappedReadableResourceStream implements Listenable
             }
         );
 
-        $streamObject->on(
+        $this->streamObject->on(
             'drain',
             function () {
                 foreach ($this->listenerStore as $listener) {
@@ -134,5 +140,14 @@ class WrappedReadableResourceStream implements Listenable
     public function detachListener(EventListener $listener): void
     {
         $this->listenerStore->detach($listener);
+    }
+
+
+    /**
+     * Close the wrapped stream.
+     */
+    public function close(): void
+    {
+        $this->streamObject->close();
     }
 }
