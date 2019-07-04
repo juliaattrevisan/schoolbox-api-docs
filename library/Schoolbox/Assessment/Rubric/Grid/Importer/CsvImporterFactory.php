@@ -67,7 +67,7 @@ class CsvImporterFactory
         }
 
         // Note: this used to be able to tell if the first row was actually the
-        // first group, instead of the set of levels. (This would happen if
+        // first capability, instead of the set of levels. (This would happen if
         // Excel saved a CSV with nothing at all in the first row.)
         // Because the first two cells are now reserved for settings, they
         // should never be empty anymore; however, we can't tell anymore if the
@@ -79,46 +79,46 @@ class CsvImporterFactory
         // list of levels
         $levels = array_slice($square[0], 2);
 
-        $workingGroupName = '';
-        $workingCritName = '';
+        $workingCapName = '';
+        $workingIndName = '';
 
         // build the square, extracting data as we go
-        $groups            = [];
-        $isLastRowNewGroup = false;
+        $capabilities    = [];
+        $isLastRowNewCap = false;
         while ($row = $this->readCsvLine($fp, $maxLevels)) {
-            if ($isLastRowNewGroup) {
-                $groupMaxValue     = $row[0];
-                $isLastRowNewGroup = false;
+            if ($isLastRowNewCap) {
+                $capMaxValue     = $row[0];
+                $isLastRowNewCap = false;
             } else {
-                // list of criteria, grouped by... uh, group
+                // list of indicators, grouped by capability
                 if ($row[0]) {
-                    $workingGroupName  = $row[0];
-                    $isLastRowNewGroup = true;
+                    $workingCapName  = $row[0];
+                    $isLastRowNewCap = true;
                 }
             }
 
-            // copy the groupname into the row
-            $row[0] = $workingGroupName;
+            // copy the capability name into the row
+            $row[0] = $workingCapName;
 
             if ($row[1]) {
-                $workingCritName = $row[1];
+                $workingIndName = $row[1];
             }
-            // copy the criteria name into the row
-            $row[1] = $workingCritName;
+            // copy the indicator name into the row
+            $row[1] = $workingIndName;
 
-            // extract the criterion uniquely (can be blank)
-            // (The group values persist from previous rows)
-            $groups[$workingGroupName]['id']                           = null;
-            $groups[$workingGroupName]['name']                         = $workingGroupName;
-            $groups[$workingGroupName]['maxValue']                     = $groupMaxValue !== '' ? $groupMaxValue : null;
-            $groups[$workingGroupName]['indicators'][$workingCritName] = [
+            // extract the indicator uniquely (can be blank)
+            // (The capability values persist from previous rows)
+            $capabilities[$workingCapName]['id']                          = null;
+            $capabilities[$workingCapName]['name']                        = $workingCapName;
+            $capabilities[$workingCapName]['maxValue']                    = $capMaxValue !== '' ? $capMaxValue : null;
+            $capabilities[$workingCapName]['indicators'][$workingIndName] = [
                 'id'   => null,
-                'name' => $workingCritName,
+                'name' => $workingIndName,
             ];
 
             $square[] = $row;
         }
-        return new CsvImporter($levels, array_values($groups), $square, $useMarkRange, $markPerCapability);
+        return new CsvImporter($levels, array_values($capabilities), $square, $useMarkRange, $markPerCapability);
     }
 
 
