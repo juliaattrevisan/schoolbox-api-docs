@@ -39,6 +39,7 @@ class IntegrationTester extends \Codeception\Actor
      */
     const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
 
+    /** @var $client = GuzzleHttp\Client */
     public $client;
     public $client_cookie_jar;
     public $guzzle_headers=[];
@@ -85,11 +86,10 @@ class IntegrationTester extends \Codeception\Actor
     {
         $database=Database::getInstance();
         $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
-        /** @var Schoolbox\Resource\Folder\Model $folder */
+        /** @var Schoolbox\Learning\Assessment\DataModel\Mapper $DueWork */
         $DueWork = AssessmentMapper::getInstance()->findOneByColumn('title', $title);
         return $DueWork->getId();
     }
-
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
         $factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
@@ -425,6 +425,256 @@ class IntegrationTester extends \Codeception\Actor
             print($e->getResponse()->getBody()->getContents());
             throw $e;
         }
+    }
+
+    public function createAssessementForHomepageWithRubric($title, $HomePageID)
+    {
+        /*
+         *
+         * https://vagrant.dev.schoolbox.cloud/learning/assessments/733/modify?returnUrl=L2hvbWVwYWdlLzExMA%3D%3D
+         *
+         * https://vagrant.dev.schoolbox.cloud/rubric
+
+
+
+        $data = [ 'contextType'=>'folders'
+            'contextType' => 'folders',
+            'contextId' => $HomePageID,
+            'folderId' => $HomePageID,
+            'assessmentType' => 'dueWork',
+            'title' => $title,
+            'description' => '<p>This is a test assignment for automated tests</p>',
+            'acceptOnline' => 0,
+            'publishDate' => '01/07/2019 12:00am',
+            'openDate' => '01/07/2019 12:00am',
+            'dueDate' => '10/07/2019 11:59pm',
+            'closeDate' => '10/07/2019 11:59pm',
+            'weight' => 13,
+            'self_reviewable'=>'none',
+            'visibility'=>2,
+            'markType'=>1,
+            'maxMark'=>'',
+            'gradingScheme'=>1,
+            'resultset'=>1,
+            'useRubric'='on',
+            'formField'=>'rb',
+'rb[0][level][0][id]'    #$rb[$assessmentID] = ['level' => [],
+                                                'group' => [],
+                                                'criterion' => [$criteriionID => [ 'id' => $criteriionID,
+                                                                                   'groupId'=> $groupID]
+                                                                ]
+                                                ]
+
+         */
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/new?returnUrl=';
+
+        $page='/rubric';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects=false;
+
+        $capture_criterion_group_id='/rb\[0\]\[criterion\]\[(\d+)]\[groupId\]" value="(\d+)/';
+        #So that we can loop through getting the ID's for components create a skelleton to allow us to get it done. Need to update all the - values with real values.
+        $rubySkeleton[0] = ['group' => [['groupId' => -1],
+                                        ['groupId' => -2],
+                                        ['groupId' => -3]],
+                            'criterion' => ['-1' => [ 'id' => -1,
+                                                        'groupId'=> -1],
+                                            '-2' => [ 'id' => -2,
+                                                        'groupId'=> -1],
+                                            '-3' => [ 'id' => -3,
+                                                        'groupId'=> -1]
+                                            ]
+                            ];
+
+        $copySkeletonForItteration = $rubySkeleton;
+        $counter=0;
+        foreach ($copySkeletonForItteration[0]['group'] as $group)
+        {
+            $data1 =[
+                'type'=>'group',
+                'rubricId'=>0,
+                'groupId'=>'',
+                'groupIndex'=>$counter,
+                'name'=>'I'.$counter,
+                'levelCount'=>3,
+                'folderId'=>$HomePageID,
+                'markPerCapability'=>true
+            ];
+
+            try {
+                $response = $this->client->request('POST', $url, [
+                    'headers' => $this->guzzle_headers,
+                    'allow_redirects' => $allow_redirects,
+                    'cookies'=>$this->client_cookie_jar,
+                    'form_params'=>$data1
+                ]);
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                print($e->getMessage());
+                print($e->getResponse()->getBody()->getContents());
+                throw $e;
+            }
+
+            $counterCriterion=0;
+
+            ##This is a pain but I need to walk through so that I hit all the end point posts for each criterion and group id for rubrics
+            foreach ($copySkeletonForItteration[0]['criterion'] as $criterion)
+            {
+                $data2 =[
+                    'type'=>'criterion',
+                    'rubricId'=>0,
+                    'groupId'=>'',
+                    'groupIndex'=>0,
+                    'name'=>'a'.$counterCriterion,
+                    'levelCount'=>3,
+                    'folderId'=>110,
+                    'markPerCapability'=>true,
+                    'groupName'=>$data1['name']
+                ];
+
+                try {
+                    $response = $this->client->request('POST', $url, [
+                        'headers' => $this->guzzle_headers,
+                        'allow_redirects' => $allow_redirects,
+                        'cookies'=>$this->client_cookie_jar,
+                        'form_params'=>$data2
+                    ]);
+                } catch (\GuzzleHttp\Exception\ClientException $e) {
+                    print($e->getMessage());
+                    print($e->getResponse()->getBody()->getContents());
+                    throw $e;
+                }
+                $criterion_group_id_matches=[];
+                preg_match($capture_criterion_group_id, $response->getBody(),$criterion_group_id_matches);
+                $rubySkeleton[0]['group'][$counter]=['id' => $criterion_group_id_matches[2]];
+                $rubySkeleton[0]['criterion'][$criterion_group_id_matches[1]]['groupId']=$criterion_group_id_matches[2];
+                $rubySkeleton[0]['criterion'][$criterion_group_id_matches[1]]['id']=$criterion_group_id_matches[1];
+                $rubySkeleton[0]['criterion'][$criterion_group_id_matches[1]]['on']=1;
+                $rubySkeleton[0]['criterion'][$criterion_group_id_matches[1]]['name']=''.$counterCriterion;
+
+                $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][0]['id']='';
+                $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][1]['id']='';
+                $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][2]['id']='';
+                $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][0]['text']='A'.$counterCriterion;
+                $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][1]['text']='B'.$counterCriterion;
+                $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][2]['text']='C'.$counterCriterion;
+                if($counterCriterion==2){
+                    $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][0]['points']='';
+                    $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][1]['points']='';
+                    $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][2]['points']='';
+                } else {
+                    $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][0]['points']=1;
+                    $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][1]['points']=2;
+                    $rubySkeleton[0]['descriptor'][$criterion_group_id_matches[1]][2]['points']=3;
+                }
+                unset($rubySkeleton[0]['criterion'][$criterion['id']]);
+
+                $counterCriterion++;
+            }
+
+            $counter++;
+        }
+
+        $rubySkeleton[0]['level'][0]['id']='';
+        $rubySkeleton[0]['level'][0]['name']='A';
+        $rubySkeleton[0]['level'][1]['id']='';
+        $rubySkeleton[0]['level'][1]['name']='B';
+        $rubySkeleton[0]['level'][2]['id']='';
+        $rubySkeleton[0]['level'][2]['name']='C';
+        $rubySkeleton[0]['group'][0]['name']='I';
+        $rubySkeleton[0]['group'][1]['name']='II';
+        $rubySkeleton[0]['group'][2]['name']='III';
+
+        //$rubricsData=[];
+
+        $counterForDataInsert = 0;
+        foreach($rubySkeleton[0]['level'] as $level)
+        {
+            #$rubricsData['rb[0][level]['.$counterForDataInsert.'][id]']=$level['id'];
+            $rubricsData['rb[0][level]['.$counterForDataInsert.'][name]']=$level['name'];
+            $counterForDataInsert++;
+        }
+
+        $counterForDataInsert = 0;
+        foreach($rubySkeleton[0]['group'] as $group)
+        {
+            $rubricsData['rb[0][group]['.$counterForDataInsert.'][id]']=$group['id'];
+            $rubricsData['rb[0][group]['.$counterForDataInsert.'][name]']=$group['name'];
+            $counterForDataInsert++;
+        }
+
+        foreach($rubySkeleton[0]['criterion'] as $criterion)
+        {
+            $rubricsData['rb[0][criterion]['.$criterion['id'].'][id]']=$criterion['id'];
+            $rubricsData['rb[0][criterion]['.$criterion['id'].'][groupId]']=$criterion['groupId'];
+            $rubricsData['rb[0][criterion]['.$criterion['id'].'][on]']=$criterion['on'];
+            $rubricsData['rb[0][criterion]['.$criterion['id'].'][name]']=$criterion['name'];
+
+            $counterForDataInsert = 0;
+            foreach($rubySkeleton[0]['descriptor'][$criterion['id']] as $descriptor)
+            {
+                #$rubricsData['rb[0][descriptor]['.$criterion['id'].']['.$counterForDataInsert.'][id]']=$descriptor['id'];
+                $rubricsData['rb[0][descriptor]['.$criterion['id'].']['.$counterForDataInsert.'][text]']=$descriptor['text'];
+                $rubricsData['rb[0][descriptor]['.$criterion['id'].']['.$counterForDataInsert.'][points]']=$descriptor['points'];
+                $counterForDataInsert++;
+            }
+        }
+
+        $data= [ 'contextType'=>'folders',
+            'contextId' => $HomePageID,
+            'folderId' => $HomePageID,
+            'assessmentType' => 'dueWork',
+            'title' => $title,
+            'description' => '<p>This is a test assignment for automated tests</p>',
+            'acceptOnline' => 0,
+            'publishDate' => '01/07/2019 12:00am',
+            'openDate' => '01/07/2019 12:00am',
+            'dueDate' => '10/07/2019 11:59pm',
+            'closeDate' => '10/07/2019 11:59pm',
+            'weight' => 13,
+            'self_reviewable'=>'none',
+            'visibility'=>2,
+            'markType'=>1,
+            'maxMark'=>9,
+            'gradingScheme'=>1,
+            'resultset'=>1,
+            'useRubric'=>'on',
+            'formField'=>'rb',
+            'curriculumCodes'=>[],
+            'participant-include[230]'=>1,
+            'participant-plan[230]'=>0,
+            'part-2'=>1
+        ];
+
+        $data = array_merge($data, $rubricsData);
+
+        print_r($data);
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
+
+        $page='/learning/folders/'.$HomePageID.'/assessments';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects=$this->redirect_settings;
+
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+
     }
 
     public function draftNews($title)
