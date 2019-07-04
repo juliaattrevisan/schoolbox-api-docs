@@ -19,12 +19,11 @@ use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
-//use React\Socket\ConnectionException;
+use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Pipe\HttpServer;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
-use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -52,18 +51,26 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $delim = \array_key_exists(Daemon\Kernel::OPT_LONG_PORCELAIN, $opts) ? ' ' : "\n    ";
 
-    $log->info(implode($delim, [ 'Using strategy:' ] + $stratBuilder->summarise()), [ 'char' => '+' ]);
+    $log->info(implode($delim, ['Using strategy:'] + $stratBuilder->summarise()), ['char' => '+']);
 
     $pipeManager = (new PipeManagerFactory(
-        $loop, new PhpHandler(), $log, $redis, $asyncRedis, $config->get('session_length'),
-        $db, INSTANCE_ID, $stratBuilder->build($flags), $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
+        $loop,
+        new PhpHandler(),
+        $log,
+        $redis,
+        $asyncRedis,
+        $config->get('session_length'),
+        $db,
+        INSTANCE_ID,
+        $stratBuilder->build($flags),
+        $kernel->getHardLimit(Kernel::RLIMIT_FILE_DESCRIPTORS)
     ))->build();
 
     $wss    = new Ratchet\WebSocket\WsServer($pipeManager);
     $https  = new HttpServer($wss);
     $server = IoServer::factory($https, $port);
 
-    $log->info("Listening for incoming websockets on port {$port}...", [ 'char' => '+' ]);
+    $log->info("Listening for incoming websockets on port {$port}...", ['char' => '+']);
     $server->run();
 //    try {
 //        $server->run();
