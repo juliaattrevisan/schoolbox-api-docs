@@ -112,17 +112,12 @@ class CsvImporterFactory
 
             // extract the indicator uniquely (can be blank)
             // (The capability values persist from previous rows)
-            $capabilities[$workingCapName]['id']                          = null;
-            $capabilities[$workingCapName]['name']                        = $workingCapName;
-            $capabilities[$workingCapName]['maxValue']                    = filter_var(
+            $capabilities[$workingCapName]['name']     = $workingCapName;
+            $capabilities[$workingCapName]['maxValue'] = filter_var(
                 $capMaxValue ?? '',
                 FILTER_VALIDATE_INT,
                 FILTER_NULL_ON_FAILURE
             );
-            $capabilities[$workingCapName]['indicators'][$workingIndName] = [
-                'id'   => null,
-                'name' => $workingIndName,
-            ];
 
             $square[] = $row;
         }
