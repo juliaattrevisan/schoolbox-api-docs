@@ -1303,18 +1303,18 @@ class RubricMapper
 
 
         // Add to the rowset as necessary
-        $rubricRowSet  = $this->retrieveRowSet($dueWork->getContext(), false);
+        $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);
         $rowsetChanged = false;
         foreach ($importer->getCapabilities() as $capability) {
             // Is this capability within the rowset? If not add it
             $capName        = $capability['name'];
-            $thisCapability = $rubricRowSet->retrieveCapabilityByName($capName);
+            $thisCapability = $rowSet->retrieveCapabilityByName($capName);
             if (!$thisCapability) {
                 $rowsetChanged  = true;
                 $thisCapability = (new Capability())
                     ->setName($capName)
                     ->setIsCourseLevel(false);
-                $rubricRowSet->getCapabilities()->add($thisCapability);
+                $rowSet->getCapabilities()->add($thisCapability);
             }
 
 
@@ -1333,9 +1333,9 @@ class RubricMapper
 
         // Was the rowset changed? Preserve it if so
         if ($rowsetChanged) {
-            $this->persistRowSet($rubricRowSet, true, false);
+            $this->persistRowSet($rowSet, true, false);
             // Reload it?
-            $rubricRowSet = $this->retrieveRowSet($dueWork->getContext(), false);
+            $rowSet = $this->retrieveRowSet($dueWork->getContext(), false);
         }
 
 
@@ -1343,7 +1343,7 @@ class RubricMapper
         $dueWork
             ->setMarkPerCapability($importer->isMarkPerCapability())
             ->setUseMarkRange($importer->isUseMarkRange());
-        $grid = new Grid($dueWork, $rubricRowSet);
+        $grid = new Grid($dueWork, $rowSet);
 
 
         // Create levels
@@ -1360,7 +1360,7 @@ class RubricMapper
 
             // If $capabilityObject is null here, that's a problem:
             // it should've been created
-            $capabilityObject = $rubricRowSet->retrieveCapabilityByName($capability['name']);
+            $capabilityObject = $rowSet->retrieveCapabilityByName($capability['name']);
             $capabilityUsage  = (new CapabilityUsage($capabilityObject))
                 ->setMaxValue($capability['maxValue']);
 
@@ -1386,6 +1386,8 @@ class RubricMapper
                 $grid->getCapabilityUsages()->add($capabilityUsage);
             }
         }
+
+        $dueWork->setRubricGrid($grid);
     }
 
 
