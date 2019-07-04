@@ -99,28 +99,20 @@ class CsvImporter
 
 
     /**
-     * Iterate over the levels supplied to this importer.
-     *
-     * @return iterable|string[]
+     * @return string[]
      */
-    public function iterateLevels(): iterable
+    public function getLevels(): array
     {
-        foreach ($this->levels as $i => $level) {
-            yield $i => $level;
-        }
+        return $this->levels;
     }
 
 
     /**
-     * Iterate over the capabilities supplied to this importer.
-     *
-     * @return iterable|array[]
+     * @return array[]
      */
-    public function iterateCapabilities(): iterable
+    public function getCapabilities(): array
     {
-        foreach ($this->capabilities as $i => $capability) {
-            yield $i => $capability;
-        }
+        return $this->capabilities;
     }
 
 
@@ -129,10 +121,11 @@ class CsvImporter
      * capability.
      *
      * @param string $capabilityName
-     * @return iterable
+     * @return array[]
      */
-    public function iterateIndicators(string $capabilityName): iterable
+    public function iterateIndicators(string $capabilityName): array
     {
+        $result      = [];
         $squareCount = count($this->square);
         for ($i = 1; $i < $squareCount; $i += 2) {
             [$capName, $indName] = $this->square[$i];
@@ -148,14 +141,17 @@ class CsvImporter
                             'name'  => $descriptorName,
                             'value' => filter_var($descriptorValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
                         ];
+                    } else {
+                        $descriptors[$level] = null;
                     }
                 }
 
-                yield [
+                $result[] = [
                     'name'        => $indName,
                     'descriptors' => $descriptors,
                 ];
             }
         }
+        return $result;
     }
 }
