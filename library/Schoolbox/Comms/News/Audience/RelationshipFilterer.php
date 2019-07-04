@@ -96,6 +96,9 @@ class RelationshipFilterer
         $users             = $this->userMapper->findByPredicates($pb);
         $parentExternalIds = [];
         foreach ($users as $user) {
+            if (!$user->getExternalId()) {
+                continue;
+            }
             $userContacts = $this->externalUser->getStudentContactList($user->getExternalId());
             foreach ($userContacts as $userContact) {
                 if ($userContact['StudentContactID']) {
@@ -138,7 +141,7 @@ class RelationshipFilterer
      */
     public function getChildren(User $user): Collection
     {
-        if (!$user->getRole()->isParent()) {
+        if (!$user->getRole()->isParent() || !$user->getExternalId()) {
             return $this->userMapper->createCollection();
         }
 
