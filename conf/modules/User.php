@@ -12,6 +12,8 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Aura\Di\ContainerInterface as DependencyInjector;
 use Schoolbox\User\Module as UserModule;
+use Schoolbox\User\Password\Change\Module as ChangePasswordModule;
+use Schoolbox\User\Password\Reset\Module as ResetPasswordModule;
 use Schoolbox\User\Profile\DocumentManagement\Module as UserProfileDocumentManagementModule;
 
 class User implements ModuleConfigInterface
@@ -22,8 +24,9 @@ class User implements ModuleConfigInterface
      * @param Kernel $kernel
      *
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function configure($kernel)
+    public function configure($kernel): void
     {
         /** @var DependencyInjector $di */
         $di = $kernel->getDependencyInjector();
@@ -37,5 +40,15 @@ class User implements ModuleConfigInterface
             $documentReportModule = new UserProfileDocumentManagementModule($di);
             $documentReportModule->init('/user/profile/documents/reports');
         }
+
+        /* Change Password
+         */
+        $module = new ChangePasswordModule($di);
+        $module->init('/passwordChange');
+
+        /* Reset Password
+         */
+        $module = new ResetPasswordModule($di);
+        $module->init('/passwordReset');
     }
 }

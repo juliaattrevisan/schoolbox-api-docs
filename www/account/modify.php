@@ -1,25 +1,15 @@
 <?php
 /**
- * This allows users to change their own passwords
- * @deprecated this has been replaced by Schoolbox\User\Password\Reset\Controller
+ * Redirect to the new Change Password controller
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
-$this->setFile(TEMPLATE_content, 'account/modify.html');
-$this->setBlock(TEMPLATE_content, 'success', 'success_block');
-$this->setBlock(TEMPLATE_content, 'portal_password_not_set', 'portal_password_not_set_block');
-$this->setTitle('Change Password');
 
-$groupHandler = new Group();
+use Schoolbox\Application\WebRequest\Kernel;
 
-if (!in_array($_SESSION['gid'], $groupHandler->canChangePassword()) && !$_SESSION['su']) {
-    error(19);
-}
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new Kernel();
 
-$this->setVar('success_block', '');
-$this->setVar('portal_password_not_set_block', '');
-
-if ($this->arg[0] == 'success') {
-    $this->parse('success_block', 'success');
-}
-if ($this->arg[1] == 'portalPasswordNotSet') {
-    $this->parse('portal_password_not_set_block', 'portal_password_not_set');
-}
+SitePage::localRedir('/passwordChange', false, 301);
