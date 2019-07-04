@@ -166,7 +166,7 @@ class Dispatcher implements DispatcherInterface
      * @param TimerInterface $timer
      * @throws PDOException
      */
-    public function dispatch($timer)
+    public function dispatch(TimerInterface $timer)
     {
 
         // there's nothing in the queue
