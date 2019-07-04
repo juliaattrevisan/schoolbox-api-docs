@@ -60,6 +60,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const FIELD_FILE_MULTI    = 13;
     public const FIELD_PASSWORD      = 14;
     public const FIELD_TIME_PICKER   = 15;
+    public const FIELD_NUMBER        = 16;
 
     // Type enum
     public const TYPE_SITE          =  1;
