@@ -146,6 +146,7 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_COLOUR:
             case ConfigMapper::FIELD_PASSWORD:
             case ConfigMapper::FIELD_TIME_PICKER:
+            case ConfigMapper::FIELD_NUMBER:
                 return new FieldValueSerializerBase();
             // Note that no default implicitly requires explicit registration to avoid logic errors.
         }
