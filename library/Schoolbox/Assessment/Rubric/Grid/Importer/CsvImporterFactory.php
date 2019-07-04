@@ -38,7 +38,7 @@ class CsvImporterFactory
         $settingCells      = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
             [$setting, $value] = explode(':', $settingCell);
-            switch (strtolower(trim($value))) {
+            switch (strtolower(trim($value ?? ''))) {
                 case '1':
                 case 'yes':
                 case 'on':
@@ -118,7 +118,7 @@ class CsvImporterFactory
 
             $square[] = $row;
         }
-        return new CsvImporter($levels, $groups, $square, $useMarkRange, $markPerCapability);
+        return new CsvImporter($levels, array_values($groups), $square, $useMarkRange, $markPerCapability);
     }
 
 
