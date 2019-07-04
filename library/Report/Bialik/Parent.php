@@ -20,11 +20,15 @@ class Report_Bialik_Parent extends \Report_Parent
     public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
         $this->setGroupHandler(new Group());
 
-        // Must provide an int or be empty
+        $this->setExternalUserHandler(new External_User());
+
         $yearLevel = trim($yearLevel);
+        $this->sisAllYearLevels = $this->getExternalUserHandler()->getAllYearLevels();
+        $this->allowedSearchableYears = $this->filterToStudentYearLevels($this->getChildrensYears(), $this->sisAllYearLevels);
+        $yearColumn = array_column($this->allowedSearchableYears, 'Code');
 
         // Parents may only search in their student's year level
-        if ($this->isYearsRestricted() && !( in_array($yearLevel, $this->getChildrensYears()) || $yearLevel == '')) {
+        if ($this->isYearsRestricted() && !(in_array($yearLevel, $yearColumn) || $yearLevel == '')) {
             error(155);
         }
 

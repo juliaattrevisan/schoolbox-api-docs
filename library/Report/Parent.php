@@ -48,14 +48,14 @@ class Report_Parent extends Report_Abstract
      *
      * @var array
      */
-    private $sisAllYearLevels;
+    protected $sisAllYearLevels;
 
     /**
      * Allowed searchable years for parents
      *
      * @var array
      */
-    private $allowedSearchableYears;
+    protected $allowedSearchableYears;
 
     /**
      * Report_Parent constructor.
@@ -311,7 +311,7 @@ class Report_Parent extends Report_Abstract
     protected function getChildrensYears()
     {
         $allYears = array();
-        if (is_array($_SESSION['children']) && !empty($_SESSION['children'])) {
+        if (is_array($_SESSION['children']) && count($_SESSION['children'])) {
             foreach ($_SESSION['children'] as $currentChild) {
                 $student = $this->getExternalUserHandler()->getStudent($currentChild['sid']);
                 $allYears[$student['StudentYearLevel']] = true;
