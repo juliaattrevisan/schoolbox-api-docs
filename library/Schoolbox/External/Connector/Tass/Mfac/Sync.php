@@ -91,12 +91,12 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
             
             SELECT DISTINCT
                 sf.sfa_num,
-                'P' + RTRIM(p.par_code) AS student_contact_id,
+                'S' + RTRIM(p.par_code) AS student_contact_id,
                 CASE
                     WHEN
                         (sf.sfa_num) IS NULL
                     THEN RTRIM(p.par_code)
-                    ELSE RTRIM(SUBSTRING(p.par_code, 4, 3)) + RTRIM(SUBSTRING(p.par_code, 1, 3))
+                    ELSE RTRIM(SUBSTRING(p.par_code, 4, 3)) + RTRIM(SUBSTRING(p.par_code, 1, 3)) + '-X'
                 END              AS student_contact_network_login,
                 ''                AS student_contact_title,
                 RTRIM(p.f_name)   AS student_contact_given_name,
