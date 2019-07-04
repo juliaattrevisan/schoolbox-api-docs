@@ -40,8 +40,8 @@ class CsvImporterFactory
         $settingCells      = [$headerRow[0], $headerRow[1]];
         foreach ($settingCells as $settingCell) {
             $settingPair = explode(':', $settingCell);
-            $setting     = $setting[0] ?? '';
-            $value       = $setting[1] ?? '';
+            $setting     = $settingPair[0] ?? '';
+            $value       = $settingPair[1] ?? '';
             switch (strtolower(trim($value ?? ''))) {
                 case '1':
                 case 'yes':
