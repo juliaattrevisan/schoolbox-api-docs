@@ -24,13 +24,6 @@ use Schoolbox\User;
  */
 class Conversation
 {
-
-    /** @var User $student */
-    protected $student;
-
-    /** @var FolderModel $category */
-    protected $category;
-
     /** @var Collection[User] $participants */
     protected $participants;
 
@@ -45,23 +38,17 @@ class Conversation
      *
      * @param IConfigLoader $config
      * @param User $student
-     * @param FolderModel $category
+     * @param FolderModel $subject
      * @throws \InvalidArgumentException
      */
-    public function __construct(IConfigLoader $config, User $student, FolderModel $category)
+    public function __construct(IConfigLoader $config, User $student, FolderModel $subject)
     {
         $this->participants = new Collection();
 
         if($config->get('grade_comments_enable')) {
             /* Find the parents of this particular student
              */
-            $this->student = $student;
-            $this->student->loadParents();
-
-            /* FInd the teachers of this particular category
-             */
-            $this->category = $category;
-            $this->category->loadTeachers(true);
+            $student->loadParents();
 
             /* Generate participants: the student, their parent(s), and the category teacher(s)
              *
@@ -72,11 +59,11 @@ class Conversation
             
             $this->participants = $this->participants->add($student)
                 ->merge($student->getParents())
-                ->merge($category->getTeachers());
+                ->merge($subject->getTeachers());
         }
 
         // retrieve the comments in this conversation
-        $this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $category->getId());
+        $this->comments = CommentMapper::getInstance()->findByStudentAndCategory($student->getId(), $subject->getId());
     }
 
     /**
