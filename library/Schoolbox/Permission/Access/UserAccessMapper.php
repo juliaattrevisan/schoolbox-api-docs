@@ -4,7 +4,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 namespace Schoolbox\Permission\Access;
 
@@ -28,6 +27,7 @@ use Alaress\Database\Predicate;
 use PDOException;
 use UnderflowException;
 use InvalidArgumentException;
+use UnexpectedValueException;
 
 /**
  * Class UserAccessMapper
@@ -186,27 +186,33 @@ class UserAccessMapper extends Mapper
         }
 
         foreach ($extSubjs as $extSubj) {
+            // If, for some reason, code is not set, skip it.
+            if (!isset($extSubj['code']) || empty($extSubj['code'])) {
+                continue;
+            }
             try {
-                if(!isset($extSubj['code'])) {
-                    $catId = FolderMapper::getInstance()->findByCode($extSubj['code'])->getId();
+                // If campus code is set, find the code within the campus.
+                $campusCode = (isset($extSubj['campusCode']) && !empty($extSubj['campusCode'])) ? $extSubj['campusCode'] : '';
+                $catId = FolderMapper::getInstance()->findByCode($extSubj['code'], $campusCode)->getId();
 
-                    $ua = new UserAccess();
+                $ua = new UserAccess();
 
-                    $ua->setService(UserAccess::SERVICE_HOMEPAGE)
-                        ->setServiceIdentifier($catId)
-                        ->setUser($user);
+                $ua->setService(UserAccess::SERVICE_HOMEPAGE)
+                    ->setServiceIdentifier($catId)
+                    ->setUser($user);
 
-                    //Teachers automatically get write access to their class pages
-                    if ($user->getRole()->isStaff()) {
-                        $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
-                    } else {
-                        $ua->setAccessLevel(UserAccess::ACCESS_READ);
-                    }
-
-                    $external->add($ua);
+                //Teachers automatically get write access to their class pages
+                if ($user->getRole()->isStaff()) {
+                    $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+                } else {
+                    $ua->setAccessLevel(UserAccess::ACCESS_READ);
                 }
 
+                $external->add($ua);
+
             } catch (Mapper\Exception $e) {
+                // noop
+            } catch (UnexpectedValueException $e) {
                 // noop
             }
         }
