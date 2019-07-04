@@ -134,7 +134,7 @@ class Mapper extends AbstractUnitMapper
             $course->getUnits()[$model->getId()] = $model;
 
             // Add to list
-            $modelList->add($model);
+            $modelList->setOffset($model->getId(), $model);
         }
         return $modelList;
     }
