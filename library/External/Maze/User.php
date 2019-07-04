@@ -725,6 +725,9 @@ class External_Maze_User implements External_UserInterface
                 /* Don't display these timetable items as part of Subject List
                  * (Not Available, Faculty Meetings, Gate Duty, etc)
                  */
+                if (!$currentSubject['ClassCode']) {
+                    continue;
+                }
                 $match = preg_match('#^NOT|^FACUL|^MEET|^TSHOP|^FRONT|^STAFF|\d?A/F|^QUAD#', $currentSubject['ClassCode']);
 
                 if (!$match) {
