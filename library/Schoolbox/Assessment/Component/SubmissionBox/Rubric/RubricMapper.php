@@ -96,10 +96,12 @@ class RubricMapper
      *
      * @param AssessmentContext $context
      * @param bool              $getUsages
+     * @param bool              $useCache If false, bypass cache for fetch of
+     *                                    capabilities+indicators
      * @return RowSet
      * @throws MapperException
      */
-    public function retrieveRowSet(AssessmentContext $context, bool $getUsages): RowSet
+    public function retrieveRowSet(AssessmentContext $context, bool $getUsages, bool $useCache = true): RowSet
     {
         $rowSet = new RowSet($context);
 
@@ -109,13 +111,13 @@ class RubricMapper
         // Capability contains indicators too: inside-out them
         /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
         $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
+        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId(), $useCache);
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
+            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
                                                                 ->merge($indicatorModels);
         }
 
@@ -1214,8 +1216,8 @@ class RubricMapper
         // Was the rowset changed? Preserve it if so
         if ($rowsetChanged) {
             $this->persistRowSet($rowSet, true, false);
-            // Reload it?
-            $rowSet = $this->retrieveRowSet($dueWork->getContext(), false);
+            // Reload it, bypassing the caches created by the last load I did
+            $rowSet = $this->retrieveRowSet($dueWork->getContext(), false, false);
         }
 
 
