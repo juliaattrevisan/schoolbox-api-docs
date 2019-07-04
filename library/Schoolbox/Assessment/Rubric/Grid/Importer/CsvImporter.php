@@ -117,13 +117,30 @@ class CsvImporter
 
 
     /**
+     * Retrieves the capabilities for this importer, with all their indicators
+     * and descriptors included.
+     *
+     * @return array
+     */
+    public function retrieveCapabilitiesWithIndicators(): array
+    {
+        $result = [];
+        foreach ($this->capabilities as $capability) {
+            $capability['indicators'] = $this->iterateIndicators($capability['name']);
+            $result[] = $capability;
+        }
+        return $result;
+    }
+
+
+    /**
      * Iterate over the indicators supplied to this importer for the given
      * capability.
      *
      * @param string $capabilityName
      * @return array[]
      */
-    public function iterateIndicators(string $capabilityName): array
+    private function iterateIndicators(string $capabilityName): array
     {
         $result      = [];
         $squareCount = count($this->square);
@@ -156,23 +173,6 @@ class CsvImporter
                     ];
                 }
             }
-        }
-        return $result;
-    }
-
-
-    /**
-     * Retrieves the capabilities for this importer, with all their indicators
-     * and descriptors included.
-     *
-     * @return array
-     */
-    public function retrieveCapabilitiesWithIndicators(): array
-    {
-        $result = [];
-        foreach ($this->capabilities as $capability) {
-            $capability['indicators'] = $this->iterateIndicators($capability['name']);
-            $result[] = $capability;
         }
         return $result;
     }
