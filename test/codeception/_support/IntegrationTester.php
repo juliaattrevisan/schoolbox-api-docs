@@ -5,6 +5,7 @@ use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Psr7\Response;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\MessageList\ListFactory;
@@ -13,6 +14,10 @@ use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\LevelMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\User;
 
 /**
@@ -39,7 +44,6 @@ class IntegrationTester extends \Codeception\Actor
      */
     const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
 
-    /** @var $client = GuzzleHttp\Client */
     public $client;
     public $client_cookie_jar;
     public $guzzle_headers=[];
@@ -73,6 +77,16 @@ class IntegrationTester extends \Codeception\Actor
         return NewsMapper::getInstance()->findOneByColumn('title', $title);
     }
 
+    ##might not even work.
+    function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $userID)
+    {
+        $database=Database::getInstance();
+        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        $box_id=\Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$userID])->getID();
+        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$userID]);
+        return $submission->getId();
+    }
+
     function getFirstHomepageIdByTitle($title)
     {
         $database=Database::getInstance();
@@ -87,8 +101,17 @@ class IntegrationTester extends \Codeception\Actor
         $database=Database::getInstance();
         $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
         /** @var Schoolbox\Learning\Assessment\DataModel\Mapper $DueWork */
-        $DueWork = AssessmentMapper::getInstance()->findOneByColumn('title', $title);
-        return $DueWork->getId();
+        $assessment = AssessmentMapper::getInstance()->findOneByColumn('title', $title);
+        return $assessment->getId();
+    }
+
+    function getFirstRubricByAsessessmentID($assessmentID)
+    {
+        $database=Database::getInstance();
+        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        $box_id=\Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$userID])->getID();
+        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$userID]);
+        return RubricMapper::getInstance()->findBySubmissionBox($submission);
     }
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
@@ -429,43 +452,7 @@ class IntegrationTester extends \Codeception\Actor
 
     public function createAssessementForHomepageWithRubric($title, $HomePageID)
     {
-        /*
-         *
-         * https://vagrant.dev.schoolbox.cloud/learning/assessments/733/modify?returnUrl=L2hvbWVwYWdlLzExMA%3D%3D
-         *
-         * https://vagrant.dev.schoolbox.cloud/rubric
 
-
-
-        $data = [ 'contextType'=>'folders'
-            'contextType' => 'folders',
-            'contextId' => $HomePageID,
-            'folderId' => $HomePageID,
-            'assessmentType' => 'dueWork',
-            'title' => $title,
-            'description' => '<p>This is a test assignment for automated tests</p>',
-            'acceptOnline' => 0,
-            'publishDate' => '01/07/2019 12:00am',
-            'openDate' => '01/07/2019 12:00am',
-            'dueDate' => '10/07/2019 11:59pm',
-            'closeDate' => '10/07/2019 11:59pm',
-            'weight' => 13,
-            'self_reviewable'=>'none',
-            'visibility'=>2,
-            'markType'=>1,
-            'maxMark'=>'',
-            'gradingScheme'=>1,
-            'resultset'=>1,
-            'useRubric'='on',
-            'formField'=>'rb',
-'rb[0][level][0][id]'    #$rb[$assessmentID] = ['level' => [],
-                                                'group' => [],
-                                                'criterion' => [$criteriionID => [ 'id' => $criteriionID,
-                                                                                   'groupId'=> $groupID]
-                                                                ]
-                                                ]
-
-         */
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
@@ -532,7 +519,7 @@ class IntegrationTester extends \Codeception\Actor
                     'groupIndex'=>0,
                     'name'=>'a'.$counterCriterion,
                     'levelCount'=>3,
-                    'folderId'=>110,
+                    'folderId'=>$HomePageID,
                     'markPerCapability'=>true,
                     'groupName'=>$data1['name']
                 ];
@@ -590,40 +577,6 @@ class IntegrationTester extends \Codeception\Actor
         $rubySkeleton[0]['group'][1]['name']='II';
         $rubySkeleton[0]['group'][2]['name']='III';
 
-        //$rubricsData=[];
-
-        $counterForDataInsert = 0;
-        foreach($rubySkeleton[0]['level'] as $level)
-        {
-            #$rubricsData['rb[0][level]['.$counterForDataInsert.'][id]']=$level['id'];
-            $rubricsData['rb[0][level]['.$counterForDataInsert.'][name]']=$level['name'];
-            $counterForDataInsert++;
-        }
-
-        $counterForDataInsert = 0;
-        foreach($rubySkeleton[0]['group'] as $group)
-        {
-            $rubricsData['rb[0][group]['.$counterForDataInsert.'][id]']=$group['id'];
-            $rubricsData['rb[0][group]['.$counterForDataInsert.'][name]']=$group['name'];
-            $counterForDataInsert++;
-        }
-
-        foreach($rubySkeleton[0]['criterion'] as $criterion)
-        {
-            $rubricsData['rb[0][criterion]['.$criterion['id'].'][id]']=$criterion['id'];
-            $rubricsData['rb[0][criterion]['.$criterion['id'].'][groupId]']=$criterion['groupId'];
-            $rubricsData['rb[0][criterion]['.$criterion['id'].'][on]']=$criterion['on'];
-            $rubricsData['rb[0][criterion]['.$criterion['id'].'][name]']=$criterion['name'];
-
-            $counterForDataInsert = 0;
-            foreach($rubySkeleton[0]['descriptor'][$criterion['id']] as $descriptor)
-            {
-                #$rubricsData['rb[0][descriptor]['.$criterion['id'].']['.$counterForDataInsert.'][id]']=$descriptor['id'];
-                $rubricsData['rb[0][descriptor]['.$criterion['id'].']['.$counterForDataInsert.'][text]']=$descriptor['text'];
-                $rubricsData['rb[0][descriptor]['.$criterion['id'].']['.$counterForDataInsert.'][points]']=$descriptor['points'];
-                $counterForDataInsert++;
-            }
-        }
 
         $data= [ 'contextType'=>'folders',
             'contextId' => $HomePageID,
@@ -645,15 +598,12 @@ class IntegrationTester extends \Codeception\Actor
             'resultset'=>1,
             'useRubric'=>'on',
             'formField'=>'rb',
+            'rb'=>$rubySkeleton,
             'curriculumCodes'=>[],
             'participant-include[230]'=>1,
             'participant-plan[230]'=>0,
             'part-2'=>1
         ];
-
-        $data = array_merge($data, $rubricsData);
-
-        print_r($data);
 
         $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
 
@@ -675,6 +625,123 @@ class IntegrationTester extends \Codeception\Actor
             throw $e;
         }
 
+    }
+
+    public function submitAssessment($assessementID, $user_id)
+    {
+        //https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$assignmentID.'/'.$user_id.'/submit
+        //https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$assignmentID.'/'.$user_id.'/submit
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$user_id.'/submit';
+
+        $page='/learning/assessments/'.$assessementID.'/'.$user_id.'/submit';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects = $this->redirect_settings;
+
+        $data = [
+            'responseId'=>'',
+            'submitted_in_person' => 'on'
+        ];
+
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function markAssessment($assessementID, $user_id)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_id);
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$user_id.'/responses';
+
+        $page='/learning/assessments/'.$assessementID.'/'.$user_id.'/'.$submissionID.'/feedback';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects = $this->redirect_settings;
+
+        $data = [
+            'responseId'=>$submissionID,
+            'fromInlineGrader' => true,
+            'mark' => '55',
+            'comment' => 'Some Feedback for Student',
+            'publish' => 1
+        ];
+
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function markAssessmentWithRubric($assessementID, $user_id)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_id);
+        $rubric = $this->getFirstRubricByAsessessmentID($assessementID);
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$user_id.'/responses';
+
+        $page='/learning/assessments/'.$assessementID.'/'.$user_id.'/'.$submissionID.'/feedback';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $allow_redirects = $this->redirect_settings;
+
+        $descriptors = $rubric->getAllDescriptors();
+
+        print_r($descriptors);
+
+        $data = [
+            'responseId'=>$submissionID,
+            'fromInlineGrader' => true,
+            'mark' => '55',
+            'comment' => 'Some Feedback for Student',
+            'publish' => 1
+        ];
+
+        /*try {
+            return $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }*/
     }
 
     public function draftNews($title)
