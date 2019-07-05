@@ -103,26 +103,26 @@ class TimetableClassIterator implements Iterator
     {
         $students = [];
 
-//        /* Class identifier
-//         */
-//        $setId = (string)$set->xpath('@Id')[0];
-//
-//        /* Find the subject's students by looking elsewhere in the xml
-//         */
-//        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[@SetId='{$setId}']");
-//
-//        foreach ($setListNodes as $current) {
-//            $studentId = (string)$current->xpath('@PupilId')[0];
-//
-//            $student = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
-//
-//            $students[] = [
-//                'id' => (string)$student->SchoolCode,
-//                'username' => (string)$student->UserName,
-//                'preferredName' => (string)$student->Preferredname,
-//                'surname' => (string)$student->Surname
-//            ];
-//        }
+        /* Class identifier
+         */
+        $setId = (string)$set->xpath('@Id')[0];
+
+        /* Find the subject's students by looking elsewhere in the xml
+         */
+        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[@SetId='{$setId}']");
+
+        foreach ($setListNodes as $current) {
+            $studentId = (string)$current->xpath('@PupilId')[0];
+
+            $student = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+            $students[] = [
+                'id' => (string)$student->SchoolCode,
+                'username' => (string)$student->UserName,
+                'preferredName' => (string)$student->Preferredname,
+                'surname' => (string)$student->Surname
+            ];
+        }
 
         return $students;
     }
