@@ -278,25 +278,31 @@ class Markbook
             }
         }
 
-        // Exclude null values of students' marks
-        $notNullMarks = array_values(array_filter($normMarks));
-        $quartile2 = $this->quartile($notNullMarks);
-        $quartilesArray = array();
-        if (count($notNullMarks) > 1) {
-            // split up marks into 2 arrays to find the 1st and 3rd quartiles
-            foreach ($notNullMarks as $key => $mark) {
-                if ($mark > $quartile2) {
-                    $quartilesArray['third'][] = $mark;
-                } elseif ($mark < $quartile2) {
-                    $quartilesArray['first'][] = $mark;
+        // Exclude null marks
+        $marks = array_values(array_filter($normMarks));
+        if (isset($marks) && !empty($marks)) {
+            $quartile2 = $this->quartile($marks);
+            $quartilesArray = array();
+            if (count($marks) > 1) {
+                // split up marks into 2 arrays to find the 1st and 3rd quartiles
+                foreach ($marks as $key => $mark) {
+                    if ($mark > $quartile2) {
+                        $quartilesArray['third'][] = $mark;
+                    } elseif ($mark < $quartile2) {
+                        $quartilesArray['first'][] = $mark;
+                    }
                 }
+            } else {
+                $quartilesArray['first'][] = $marks[0];
+                $quartilesArray['third'][] = $marks[0];
             }
+            count($quartilesArray['first']) > 1 ? $quartile1 = $this->quartile($quartilesArray['first']) : $quartile1 = $quartilesArray['first'][0] / 2;
+            count($quartilesArray['third']) > 1 ? $quartile3 = $this->quartile($quartilesArray['third']) : $quartile3 = $quartilesArray['third'][0] / 2;
+
         } else {
-            $quartilesArray['first'][] = $notNullMarks[0];
-            $quartilesArray['third'][] = $notNullMarks[0];
+            $quartile1 = null;
+            $quartile3 = null;
         }
-        count($quartilesArray['first']) > 1 ? $quartile1 = $this->quartile($quartilesArray['first']) : $quartile1 = $quartilesArray['first'][0] / 2;
-        count($quartilesArray['third']) > 1 ? $quartile3 = $this->quartile($quartilesArray['third']) : $quartile3 = $quartilesArray['third'][0] / 2;
 
         $statistics = [
             'mean'              => null,
@@ -390,19 +396,16 @@ class Markbook
      */
     public function quartile($marksArr)
     {
-        if (!empty($marksArr)) {
-            $count = count($marksArr);
-            $midleval = (int)floor(($count - 1) / 2); // find the middle value, or the lowest middle value
-            $midleval < 0 ? 0 : $midleval;
-            if ($count % 2) { // odd number, middle is the median
-                $median = $marksArr[$midleval];
-            } else { // even number, calculate average of 2 medians
-                $low = $marksArr[$midleval];
-                $high = $marksArr[$midleval + 1];
-                $median = (($low + $high) / 2);
-            }
-            return $median;
+        $count = count($marksArr);
+        $middleVal = (int)floor(($count - 1) / 2); // find the middle value, or the lowest middle value
+        $middleVal < 0 ? 0 : $middleVal;
+        if ($count % 2) { // odd number, middle is the median
+            $median = $marksArr[$middleVal];
+        } else { // even number, calculate average of 2 medians
+            $low = $marksArr[$middleVal];
+            $high = $marksArr[$middleVal + 1];
+            $median = (($low + $high) / 2);
         }
-        return null;
+        return $median;
     }
 }
