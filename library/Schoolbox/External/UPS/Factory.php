@@ -12,7 +12,7 @@ namespace Schoolbox\External\UPS;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\Loader;
-use Schoolbox\External\Connector\Isams\Base\Api;
+use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 
@@ -77,7 +77,7 @@ class Factory
              */
             if ($providerName === self::PROVIDER_ISAMS_BATCH_XML) {
                 $config = new Loader();
-                $api = new Api($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
+                $api = new MockApi($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
 
                 return new Batchxml($api);
             }
