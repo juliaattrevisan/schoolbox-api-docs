@@ -340,12 +340,14 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
     $isRelatedToStudent = false;
     $isPrimaryCarer     = false;
     if (!$isParentOfStudent) {
-        $studentList = $synUserHandler->getEnrolledStudents($sessionUser->getExternalId());
-        if (is_array($studentList)) {
-            foreach ($studentList as $enrolledStudentId) {
-                if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
-                    $isRelatedToStudent = true;
-                    break;
+        if($sessionUser->getExternalId()) {
+            $studentList = $synUserHandler->getEnrolledStudents($sessionUser->getExternalId());
+            if (is_array($studentList)) {
+                foreach ($studentList as $enrolledStudentId) {
+                    if ($enrolledStudentId['RelatedID'] == $student->getExternalId()) {
+                        $isRelatedToStudent = true;
+                        break;
+                    }
                 }
             }
         }
