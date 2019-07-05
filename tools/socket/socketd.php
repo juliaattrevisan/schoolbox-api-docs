@@ -42,8 +42,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var IConfigLoader $config */
     $config = $di->get('config');
 
-    // TODO put this in DI
-    $asyncRedis = new Async\Client($config->get('redis_url'), $loop);
+    /** @var Async\Client $asyncRedis */
+    $asyncRedis = $di->get('redis.async');
 
     /** @var IConnector $db */
     $db = $di->get('databaseInternal');

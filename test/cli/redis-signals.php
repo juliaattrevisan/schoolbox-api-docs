@@ -85,7 +85,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 
-    $client = new Redis\Async\Client($di->get('config')->get('redis_url'), $loop);
-
+    /** @var Redis\Async\Client $client */
+    $client = $di->get('redis.async');
     $client->subscribe($daemon, new TestListener($log));
 });

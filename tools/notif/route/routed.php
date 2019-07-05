@@ -48,8 +48,9 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
             $amqp = $di->get('amqp');
 
             // also listen for signals
-            $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
-            $dispatcher  = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
+            /** @var Async\Client $asyncRedis */
+            $asyncRedis = $di->get('redis.async');
+            $dispatcher = new Dispatcher($loop, new DispatchResponder($log), $log, new DispatchStrategy($flags));
 
             $cache = new Routing\Cache\Redis\ReadCache($redis, $log);
 
