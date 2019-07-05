@@ -9,10 +9,10 @@
 
 namespace Schoolbox\Application\Daemon;
 
-use Alaress\Async\Stomp\Implementation\Stream\Client;
-use Alaress\Async\Stomp\Implementation\Stream\Connection;
+use Alaress\Async\Stomp\Implementation\Stream as Stomp;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
+use Alaress\Redis\Async\Client as AsyncRedisClient;
 use ErrorException;
 use Exception;
 use PDOException;
@@ -375,7 +375,7 @@ EOL;
         $di->set('stomp', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            $conn = new Connection(
+            $conn = new Stomp\Connection(
                 $this->loop,
                 new Protocol(null, Version::VERSION_1_1),
                 new Parser(),
@@ -385,7 +385,13 @@ EOL;
                 $conf->get('amqp_pass'),
                 $conf->get('amqp_vhost')
             );
-            return new Client($conn);
+            return new Stomp\Client($conn);
+        }));
+
+        $di->set('redis.async', $di->lazy(function () use ($di) {
+            /** @var IConfigLoader $conf */
+            $conf = $di->get('config');
+            return new AsyncRedisClient($conf->get('redis_url'), $this->loop);
         }));
 
         $di->values['logger'] = $this->logger();
