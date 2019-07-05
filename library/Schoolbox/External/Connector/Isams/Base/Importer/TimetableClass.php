@@ -155,7 +155,7 @@ class TimetableClass
         $classes = new TimetableClassIterator($this->batchxml);
 
         foreach ($classes as $class) {
-print_r($class);
+
 //            /* Process class entry
 //             */
 //            /** @var ClassEntry $timetableClass */

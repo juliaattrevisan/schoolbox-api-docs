@@ -67,23 +67,19 @@ class TimetableClassIterator implements Iterator
     {
         $teachers = [];
 
-        /* TODO: Look in the PeriodList/Periods to find out which teachers are there
-         * This is different than TPS
+        /* Find the subject's teachers by looking elsewhere in the xml
          */
-//
-//        /* Find the subject's teachers by looking elsewhere in the xml
-//         */
-//        foreach ($set->xpath('Teachers/Teacher') as $current) {
-//            $teacherId = (string)$current->xpath('@StaffId')[0]->StaffId;
-//
-//            $teacher = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$teacherId}']")[0];
-//
-//            $teachers[] = [
-//                'username' => (string)$teacher->UserName,
-//                'preferredName' => (string)$teacher->PreferredName,
-//                'surname' => (string)$teacher->Surname,
-//            ];
-//        }
+        foreach ($set->xpath('Teachers/Teacher') as $current) {
+            $teacherId = (string)$current->xpath('@StaffId')[0]->StaffId;
+
+            $teacher = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[@Id='{$teacherId}']")[0];
+
+            $teachers[] = [
+                'username' => (string)$teacher->UserName,
+                'preferredName' => (string)$teacher->Forename,
+                'surname' => (string)$teacher->Surname,
+            ];
+        }
 
         return $teachers;
     }
