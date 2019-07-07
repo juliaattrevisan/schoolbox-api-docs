@@ -86,7 +86,8 @@ class StudentAttributes
      * @param User          $user
      * @param string|null   $ibFlag
      * @param string|null   $reportDateOverride
-     * @param string|null   $nowOverride
+     * @param string|null   $nowOverride            Overrides system time to enable consistent unit tests around deriving a user's year level.
+     *                                              eg $reportYearLevel = $currentYearLevel - $nowYear + $reportYear
      * @throws InvalidArgumentException
      */
     public function __construct(
