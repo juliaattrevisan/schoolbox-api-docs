@@ -188,7 +188,7 @@ class External_Isams_User implements External_UserInterface
             WHERE           StaffID = :external_user_id
         ";
 
-        return $this->getConnector()->executeQuery($staff, ['external_user_id' => $externalUserId])->fetch();
+        return $this->getConnector()->executeQuery($staff, ['external_user_id' => $externalUserId])->fetch() ?: [];
     }
 
 

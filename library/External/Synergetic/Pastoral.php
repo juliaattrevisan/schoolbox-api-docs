@@ -232,7 +232,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     {
         $query = "{$this->getSqlPastoralSelect()} WHERE dbo.tPastoralCare.PastoralCareSeq = :externalId";
 
-        return $this->connector->executeQuery($query)->fetch();
+        return $this->connector->executeQuery($query)->fetch() ?: [];
     }
 
     /**
