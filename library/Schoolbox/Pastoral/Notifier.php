@@ -120,7 +120,7 @@ class Notifier extends AbstractModuleNotifier
         $timestamp = md5(date("YmdHis"));
 
         $href = "/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}";
-        $severity = $pastoral->getSeverity() ? strtolower($pastoral->getSeverity()->getName()) . ' severity' : 'pastoral';
+        $severity = $pastoral->getSeverity() ? strtolower($pastoral->getSeverity()->getName()) . ' severity' : '';
         $type = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
 
         $builder = new Builder();
