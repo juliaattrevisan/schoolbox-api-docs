@@ -162,7 +162,7 @@ var jsSrc = {
         'node_modules/@fullcalendar/moment/main.js',
         'node_modules/@fullcalendar/timegrid/main.js',
         // Consider removing the below
-        'www/javascript/shared/calendar/jquery.fullcalendar.js'
+        // 'www/javascript/shared/calendar/jquery.fullcalendar.js'
     ],
     fullcalendarResource: [
         // System for displaying resource calendars
