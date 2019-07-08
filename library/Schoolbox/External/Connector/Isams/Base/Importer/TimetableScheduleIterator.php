@@ -66,7 +66,6 @@ class TimetableScheduleIterator implements Iterator
          */
 //        $periodId = (string)$class->PeriodId;
 //        $roomId = (string)$class->RoomId;
-//        $setId = (string)$schedule->
 
         /* Find the subject's actual name by looking elsewhere in the xml
          */
@@ -93,22 +92,6 @@ class TimetableScheduleIterator implements Iterator
 
 //        print_r($schedule);
         print_r($class);
-
-//        $set = $this->sets[$this->position];
-//
-//        /* Find the subject's actual name by looking elsewhere in the xml
-//         */
-//        $subjectId = (string)$set->SubjectId;
-//        $subject = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Departments/Department/Subjects/Subject[@Id='{$subjectId}']")[0];
-//
-//        /* Basic TimetableClass data
-//         */
-//        $class = [
-//            'name' => (string)$subject->Name,
-//            'code' => (string)$set->SetCode,
-//            'teachers' => $this->findTeachers($set),
-//            'students' => $this->findStudents($set)
-//        ];
 
         return $class;
     }
