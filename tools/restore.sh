@@ -7,7 +7,7 @@
 #       Remote sources as defined in /root/.ssh/config
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   2014 Alaress Pty Ltd
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        http://www.alaress.com.au
 #
 

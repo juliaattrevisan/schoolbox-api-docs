@@ -5,7 +5,7 @@
 # Standard Disclaimer: If it breaks your world, don't come crying!
 #
 # @author      Damian Sloane <damian.sloane@alaress.com.au>
-# @copyright   Copyright 2017, Alaress Pty Ltd
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        http://www.alaress.com.au
 
 echo

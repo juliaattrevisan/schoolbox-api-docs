@@ -8,7 +8,7 @@
 #	generate-data-dir-sql.sh [base data dir] [base template dir] (optional)
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   2013 Alaress Pty Ltd
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        http://www.alaress.com.au
 #
 

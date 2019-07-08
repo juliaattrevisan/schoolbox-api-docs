@@ -3,7 +3,7 @@
 # Grunt check script - checks if grunt-cli is installed
 #
 # @author      Amri Sannang <amri.sannang@alaress.com.au>
-# @copyright   2013 Alaress Pty Ltd
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        http://www.alaress.com.au
 
 # Go to parent directory of this file, and run Bower from there.

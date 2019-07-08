@@ -11,7 +11,7 @@
 #       sets it to whatever value is provided.
 #
 # @author      Amri Sannang <amri.sannang@alaress.com.au>
-# @copyright   2013 Alaress Pty Ltd
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        http://www.alaress.com.au
 
 

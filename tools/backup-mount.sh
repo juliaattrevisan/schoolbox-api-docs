@@ -9,7 +9,7 @@
 #	Returns exit code 0 on success, 1 on failure
 # 
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   2012 Alaress Pty Ltd
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        http://www.alaress.com.au
 #
 #
