@@ -596,24 +596,32 @@ then
     ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/cli/conf.d/20-xdebug.ini >/dev/null 2>&1;
     ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/cli/conf.d/20-tideways.ini >/dev/null 2>&1;
 
-    # If not yet configured, add environment vars for 'vagrant' and 'root' users
-    # Vagrant and Root users require XDEBUG_CONFIG to be specified
-    if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' /home/vagrant/.bashrc` ]];
-    then
-        echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> /home/vagrant/.bashrc;
-    fi
-    if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' /root/.bashrc` ]];
-    then
-        echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> /root/.bashrc;
-    fi
+    # If not yet configured, add XDEBUG_CONFIG and PHP_IDE_CONFIG environment vars for 'vagrant' and 'root' users
+    for bashrcFile in /home/vagrant/.bashrc /root/.bashrc; do
+        if [[ -z `grep -E '^export\s+XDEBUG_CONFIG\s*=\s*"idekey=[^"]+"' ${bashrcFile}` ]];
+        then
+            echo "export XDEBUG_CONFIG=\"idekey=PHPSTORM\"" >> ${bashrcFile};
+        fi
 
-    # Root also requires PHP_IDE_CONFIG to be specified
-    if [[ -z `grep -E '^export\s+PHP_IDE_CONFIG\s*=\s*"serverName=[^"]+"' /root/.bashrc` ]];
-    then
-        # Requires PHPStorm to have a server configured with Name: "10.0.2.15" (this is the default)
-        # See "Settings > Languages & Frameworks > PHP > Servers"
-        echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> /root/.bashrc;
-    fi
+        if [[ -z `grep -E '^export\s+PHP_IDE_CONFIG\s*=\s*"serverName=[^"]+"' ${bashrcFile}` ]];
+        then
+            # Requires PHPStorm to have a server configured with Name: "10.0.2.15" (this is the default)
+            # See "Settings > Languages & Frameworks > PHP > Servers"
+            # Technically this is redundant for 'vagrant' sessions, but it required for vagrant sudo and root session
+            echo "export PHP_IDE_CONFIG=\"serverName=10.0.2.15\"" >> ${bashrcFile};
+        fi
+    done
+
+    # Need to preserve these ENV vars for vagrant's sudo session
+    for envVar in XDEBUG_CONFIG PHP_IDE_CONFIG; do
+        if [[ -z `grep -E "^Defaults\s+env_keep\s*\+=\s*\".*$envVar" /etc/sudoers.d/vagrant` ]];
+        then
+            chmod a+w /etc/sudoers.d/vagrant;
+            echo "Defaults env_keep += \"$envVar\"" >> /etc/sudoers.d/vagrant;
+            chmod a-w /etc/sudoers.d/vagrant;
+        fi
+    done
+
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
     rm -f /etc/php/7.1/apache2/conf.d/20-xdebug.ini;
