@@ -111,18 +111,51 @@ class TimetableScheduleIterator implements Iterator
     {
         $periodId = (string)$schedule->PeriodId;
 
-        $node = $this->batchxml->fetchXml("/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id='{$periodId}']");
+        $periodPath = "/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id='{$periodId}']";
 
+        $node = $this->batchxml->fetchXml($periodPath);
+
+        /* Unknown period
+         */
         if (empty($node)) {
-            return 'unknown period';
+            return [
+                'day' => '',
+                'ordinal' => '',
+                'name' => '(unknown period)',
+                'abbrev' => '',
+                'start' => '',
+                'end' => '',
+            ];
         }
 
+        /* Find out what day this was in
+         */
+        $dayPath = "{$periodPath}/ancestor::*[position()=2]";
+
+        $day = $this->batchxml->fetchXml($dayPath);
+
+        /* Unknown day
+         */
+        if (empty($day)) {
+            return [
+                'day' => '(unknown day)',
+                'ordinal' => '',
+                'name' => '',
+                'abbrev' => '',
+                'start' => '',
+                'end' => '',
+            ];
+        }
+
+        /* Otherwise we knew when this happened and what was in it
+         */
         return [
-            'ordinal' => (string)$node[0]->Ordinal,
+            'day' => (string)$day[0]->Day,
             'name' => (string)$node[0]->Name,
             'abbrev' => (string)$node[0]->ShortName,
             'start' => (string)$node[0]->StartTime,
             'end' => (string)$node[0]->EndTime,
+            'sequence' => (string)$node[0]->Ordinal,
         ];
     }
 
