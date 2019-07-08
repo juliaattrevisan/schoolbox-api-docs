@@ -709,7 +709,7 @@ class IntegrationTester extends \Codeception\Actor
         }
 
         $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_marking_id, $student_submitting_id);
-        $rubric = $this->getFirstRubricByAsessessmentID($assessementID, $user_marking_id);
+        $rubric = $this->getFirstRubricByAsessessmentID($assessementID, $user_marking_id); ## Has been deprecated needs a recode.
 
         $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$student_submitting_id.'/responses';
 
