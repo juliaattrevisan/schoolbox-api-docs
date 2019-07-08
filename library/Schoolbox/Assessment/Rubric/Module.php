@@ -70,14 +70,14 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class),
+            $injector->lazyNew(Controller::class,
             [
                 'mapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'groupMapper'          => $this->getMapperFactory()->getLazy(GroupMapper::class),
                 'criterionMapper'      => $this->getMapperFactory()->getLazy(CriterionMapper::class),
-            ]
+            ])
         );
     }
 }

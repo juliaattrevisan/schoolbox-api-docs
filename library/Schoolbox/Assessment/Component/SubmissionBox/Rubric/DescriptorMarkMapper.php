@@ -13,9 +13,7 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
-use Schoolbox\User;
 
 /**
  * Class DescriptorMarkMapper

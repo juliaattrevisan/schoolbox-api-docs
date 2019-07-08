@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use Schoolbox\Assessment\Rubric\Grid\ValidDescriptor;
-use \Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use PHPUnit\Framework\TestCase;
 
 class ValidDescriptorTest extends TestCase

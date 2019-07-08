@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment;
 
 use \Alaress_Date_Format;
 use Schoolbox\User;
-use Schoolbox\Resource;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox;

@@ -14,7 +14,6 @@ use Alaress_Date_Format;
 use Aura\Di\Exception\ServiceNotFound;
 use OutOfRangeException;
 use Psr\Log\LoggerInterface as Logger;
-use RuntimeException;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
