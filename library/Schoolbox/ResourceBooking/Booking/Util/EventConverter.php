@@ -7,7 +7,6 @@
  * @author      Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$ Why is this even here?
  * @stolenFrom  Steve Chan <steve.chan@alaress.com.au>
  */
 

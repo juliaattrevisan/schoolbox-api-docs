@@ -8,7 +8,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 abstract class Synchronise_Synergetic_StMichaels_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract {
 	protected $verboseFilter = null;

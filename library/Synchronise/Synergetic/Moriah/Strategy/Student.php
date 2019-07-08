@@ -8,7 +8,6 @@
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 class Synchronise_Synergetic_Moriah_Strategy_Student extends Synchronise_Synergetic_Moriah_Strategy_Abstract {
 	protected $strategyTitle = "Student Synchronisation";

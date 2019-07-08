@@ -5,7 +5,6 @@
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  *
  * This component is deprecated, it was previously used to display a school's campus calendar on a homepage
  *

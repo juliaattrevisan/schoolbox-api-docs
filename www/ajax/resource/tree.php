@@ -11,7 +11,6 @@ use Schoolbox\Resource\Browser\Resources\Node;
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 if (empty($this)) {

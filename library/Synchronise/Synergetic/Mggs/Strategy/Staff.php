@@ -8,7 +8,6 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 class Synchronise_Synergetic_Mggs_Strategy_Staff extends Synchronise_Synergetic_Mggs_Strategy_Abstract {
 	protected $strategyTitle = "Update Schoolbox Staff Details Synchronisation";

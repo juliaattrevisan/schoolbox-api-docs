@@ -5,7 +5,6 @@ use Schoolbox\User;
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
 

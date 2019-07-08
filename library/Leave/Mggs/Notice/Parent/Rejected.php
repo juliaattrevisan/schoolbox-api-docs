@@ -5,7 +5,6 @@
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
  */
 class Leave_Mggs_Notice_Parent_Rejected extends Leave_Mggs_Notice_Parent_Abstract {
 

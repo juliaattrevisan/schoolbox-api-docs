@@ -11,7 +11,6 @@ use Schoolbox\User;
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface
 {
