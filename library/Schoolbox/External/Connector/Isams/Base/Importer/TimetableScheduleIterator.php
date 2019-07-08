@@ -66,13 +66,19 @@ class TimetableScheduleIterator implements Iterator
          */
 //        $periodId = (string)$class->PeriodId;
 //        $roomId = (string)$class->RoomId;
-        $teachers = [];
+//        $setId = (string)$schedule->
+
         $students = [];
 
         /* Find the subject's actual name by looking elsewhere in the xml
          */
         $setCode = (string)$schedule->Code;
         $setName = $this->findSubjectName($setCode);
+
+        /* Teacher
+         *(I've only seen one per class in the xml so far...but there could be many?)
+         */
+        $teachers = [$this->findTeacher((string)$schedule->Teacher)];
 
         /* Basic TimetableClass data
          */
@@ -82,6 +88,9 @@ class TimetableScheduleIterator implements Iterator
             'teachers' => $teachers,
             'students' => $students
         ];
+
+        print_r($schedule);
+        print_r($class);
 
 //        $set = $this->sets[$this->position];
 //
@@ -124,6 +133,41 @@ class TimetableScheduleIterator implements Iterator
         }
 
         return (string)$node[0]->Name;
+    }
+
+
+    /**
+     * Find a teacher's details from its $teacherCode
+     *
+     * @param string $teacherCode
+     * @return array
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findTeacher(string $teacherCode): array
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/HRManager/CurrentStaff/StaffMember[contains(UserCode, '{$teacherCode}')]");
+
+        /* Unknown teacher: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return [
+                'title' => '',
+                'firstname' => '(unknown teacher)',
+                'surname' => '',
+                'username' => '',
+            ];
+        }
+
+        $teacher = $node[0];
+
+        return [
+            'title' => (string)$teacher->Title,
+            'firstname' => (string)$teacher->Forename,
+            'surname' => (string)$teacher->Surname,
+            'username' => (string)$teacher->xpath('@PersonId')[0]->PersonId,
+        ];
     }
 
 
