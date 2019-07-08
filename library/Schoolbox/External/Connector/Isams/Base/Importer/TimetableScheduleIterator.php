@@ -68,17 +68,19 @@ class TimetableScheduleIterator implements Iterator
 //        $roomId = (string)$class->RoomId;
 //        $setId = (string)$schedule->
 
-        $students = [];
-
         /* Find the subject's actual name by looking elsewhere in the xml
          */
         $setCode = (string)$schedule->Code;
         $setName = $this->findSubjectName($setCode);
 
         /* Teacher
-         *(I've only seen one per class in the xml so far...but there could be many?)
+         * (I've only seen one per class in the xml so far...but there could be many?)
          */
         $teachers = [$this->findTeacher((string)$schedule->Teacher)];
+
+        /* Students
+         */
+        $students = $this->findStudents($setCode);
 
         /* Basic TimetableClass data
          */
@@ -89,7 +91,7 @@ class TimetableScheduleIterator implements Iterator
             'students' => $students
         ];
 
-        print_r($schedule);
+//        print_r($schedule);
         print_r($class);
 
 //        $set = $this->sets[$this->position];
@@ -168,6 +170,56 @@ class TimetableScheduleIterator implements Iterator
             'surname' => (string)$teacher->Surname,
             'username' => (string)$teacher->xpath('@PersonId')[0]->PersonId,
         ];
+    }
+
+
+    /**
+     * Find the students who were in subject $setCode
+     *
+     * @param string $setCode
+     * @return array
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findStudents(string $setCode): array
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+
+        /* Unknown subject: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return [];
+        }
+
+        /* Otherwise continue digging
+         */
+        $students = [];
+
+        $setId = (string)$node[0]->xpath('@Id')[0]->Id;
+
+        $setListNodes = $this->batchxml->fetchXml("/iSAMS/TeachingManager/SetLists/SetList[contains(SetId, '{$setId}')]");
+
+        foreach ($setListNodes as $current) {
+            $studentId = (string)$current->xpath('@PupilId')[0];
+
+            $student = $this->batchxml->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+            /* Unknown student; can't find it via its studentId
+             */
+            if (empty($student)) {
+                continue;
+            }
+
+            $students[] = [
+                'title' => (string)$student->Title,
+                'firstname' => (string)$student->Forename,
+                'surname' => (string)$student->Surname,
+                'username' => (string)$student->SchoolCode,
+            ];
+        }
+
+        return $students;
     }
 
 
