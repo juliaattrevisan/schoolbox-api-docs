@@ -4,7 +4,7 @@
 #
 # @author      Amri Sannang <amri.sannang@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
-# @link        http://www.alaress.com.au
+# @link        https://schoolbox.com.au/
 
 # Go to parent directory of this file, and run Bower from there.
 cd $(dirname $(dirname $(readlink -f $0)))

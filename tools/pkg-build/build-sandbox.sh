@@ -5,7 +5,7 @@
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
-# @link        http://www.alaress.com.au
+# @link        https://schoolbox.com.au/
 #
 
 echo "Schoolbox v14.0+ Sandbox Pre-builder";
