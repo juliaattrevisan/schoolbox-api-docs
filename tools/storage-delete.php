@@ -12,45 +12,42 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Alaress\Lumberjack\Logger;
-use Schoolbox\Application\Daemon;
+use Monolog\Logger;
+use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
-$errors  = [];
-$opts    = getopt('pvn:', ['hash:']);
-$performDelete = !isset($opts['p']);
-$hash = $opts['hash'] ?? null;
-
 require_once __DIR__ . '/../conf/core/require.php';
-new Daemon\Kernel(
-    'Storage Garbage Collection',
-    [
-        Daemon\Kernel::OPTION_ERRORS => E_ALL
-    ]
-);
 
-$threshold = 0;
-if(isset($opts['v'])) {
-    $threshold = 1;
-    if(is_array($opts['v'])) {
-        $threshold = min(3, count($opts['v']));
+$kernel = new CliTool\Kernel(new class extends CliTool\App
+{
+    private const HASH = 'hash:';
+
+    private $hash;
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::HASH
+        ];
     }
-}
 
-$limits = [
-    0 => 500, // nil verbosity: exceptional behaviour only
-    1 => 250, // min verbosity: significant events
-    2 => 200, // mod verbosity: most things
-    3 => 100  // max verbosity: EV-ER-Y-THING...
-];
+    public function run(): void
+    {
+        $this->hash = $this->getOpt(self::HASH);
 
-$log = new Logger(STDOUT, STDERR, $limits[$threshold]);
+        $this->getLogger()->info('Starting storage delete tool...');
 
-if (!$hash) {
-    $log->error('[ERROR]: Hash cannot be empty...');
-    die();
-}
+        if (!$this->hash) {
+            $this->getLogger()->error('[ERROR]: Hash cannot be empty...');
+            die();
+        }
 
-(new RelationalDelete($log))->remove($hash, $performDelete);
+        (new RelationalDelete($this->getLogger()))->remove($this->hash, !$this->perform());
 
-exit(0);
+        exit(0);
+    }
+
+}, null, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+
+$kernel->runApp();
