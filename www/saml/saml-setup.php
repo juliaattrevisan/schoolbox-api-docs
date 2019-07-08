@@ -1,6 +1,9 @@
 <?php
 
 use BrowscapPHP\Browscap;
+use Doctrine\Common\Cache\FilesystemCache;
+use Psr\Log\NullLogger;
+use Roave\DoctrineSimpleCache\SimpleCacheAdapter;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -123,10 +126,13 @@ function useSAMLKerberos() {
      * Errs on the side of kerberos than non-kerberos
      */
     SAMLDebugLog("IP in kerberos whitelist, attempting browser/platform check");
-    $bc = new Browscap();
-    $cacheDir = __DIR__.'/../../tools/browscap';
-    $adapter = new \WurflCache\Adapter\File([\WurflCache\Adapter\File::DIR => $cacheDir, 'readonly'=>true]);
-    $bc->setCache($adapter);
+
+    $bc = new Browscap(
+        new SimpleCacheAdapter(
+            new FilesystemCache(__DIR__ . '/../../tools/browscap')
+        ),
+        new NullLogger()
+    );
 
     // Don't attempt to update
     $bc->doAutoUpdate = false;
