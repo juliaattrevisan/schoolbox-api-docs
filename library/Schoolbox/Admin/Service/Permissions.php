@@ -68,7 +68,7 @@ class Permissions
             'tutorialConst' => self::SERVICE_TUTORIAL
         ]);
 
-        while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $services[$row['name']] = $this->userAccessMapper->findUsersForService($row['id'])->getUnique('id')->indexBy('id');
         }
 
