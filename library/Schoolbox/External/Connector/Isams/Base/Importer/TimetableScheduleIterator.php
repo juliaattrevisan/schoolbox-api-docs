@@ -63,6 +63,25 @@ class TimetableScheduleIterator implements Iterator
     {
         $class = $this->schedules[$this->position];
 
+        /* TODO: Find out class details by looking elsewhere in the xml
+         */
+        $name = '';
+        $periodId = (string)$class->PeriodId;
+        $roomId = (string)$class->RoomId;
+        $teachers = [];
+        $students = [];
+
+
+        /* Basic TimetableClass data
+         */
+        $class = [
+            'name' => $name,
+            'code' => (string)$class->Code,
+            'teachers' => $teachers,
+            'students' => $students
+        ];
+
+
 //        $set = $this->sets[$this->position];
 //
 //        /* Find the subject's actual name by looking elsewhere in the xml
