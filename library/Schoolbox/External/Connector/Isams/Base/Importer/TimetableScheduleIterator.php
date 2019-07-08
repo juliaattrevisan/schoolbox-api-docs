@@ -12,8 +12,6 @@ use Iterator;
 use RuntimeException;
 use Schoolbox\External\UPS\Batchxml;
 use SimpleXMLElement;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 class TimetableScheduleIterator implements Iterator
 {
@@ -44,8 +42,9 @@ class TimetableScheduleIterator implements Iterator
     public function __construct(Batchxml $batchxml, SimpleXMLElement $timetable)
     {
         $this->batchxml = $batchxml;
-        $this->schedules = $timetable->xpath('Schedules');
+        $this->schedules = $timetable->xpath('Schedules')[0]->Schedule;
     }
+
 
     /**
      * Return the current element
@@ -55,32 +54,34 @@ class TimetableScheduleIterator implements Iterator
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @throws RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
      * @since 5.0.0
      */
     public function current()
     {
-        $class = $this->schedules[$this->position];
+        $schedule = $this->schedules[$this->position];
 
         /* TODO: Find out class details by looking elsewhere in the xml
          */
-        $name = '';
-        $periodId = (string)$class->PeriodId;
-        $roomId = (string)$class->RoomId;
+//        $periodId = (string)$class->PeriodId;
+//        $roomId = (string)$class->RoomId;
         $teachers = [];
         $students = [];
 
+        /* Find the subject's actual name by looking elsewhere in the xml
+         */
+        $setCode = (string)$schedule->Code;
+        $setName = $this->findSubjectName($setCode);
 
         /* Basic TimetableClass data
          */
         $class = [
-            'name' => $name,
-            'code' => (string)$class->Code,
+            'code' => $setCode,
+            'name' => $setName,
             'teachers' => $teachers,
             'students' => $students
         ];
-
 
 //        $set = $this->sets[$this->position];
 //
@@ -99,6 +100,30 @@ class TimetableScheduleIterator implements Iterator
 //        ];
 
         return $class;
+    }
+
+
+    /**
+     * Find a subject's name from its $setCode (that's its subject code equivalent)
+     *
+     *
+     * @param string $setCode
+     * @return string
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findSubjectName(string $setCode): string
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+
+        /* Unknown subject: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return '(unknown subject)';
+        }
+
+        return (string)$node[0]->Name;
     }
 
 

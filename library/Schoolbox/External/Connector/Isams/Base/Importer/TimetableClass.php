@@ -159,7 +159,7 @@ class TimetableClass
         $classes = new TimetableScheduleIterator($this->batchxml, $currentTimetable);
 
         foreach ($classes as $class) {
-            print_r($class);
+//            print_r($class);
         }
 
 
