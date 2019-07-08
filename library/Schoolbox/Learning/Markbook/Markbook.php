@@ -280,25 +280,16 @@ class Markbook
 
         // Exclude null marks
         $marks = array_values(array_filter($normMarks));
+        sort($marks);
+        $countAllMarks = count($marks);
         if (isset($marks) && !empty($marks)) {
-            $quartile2 = $this->quartile($marks);
-            $quartilesArray = array();
-            if (count($marks) > 1) {
-                // split up marks into 2 arrays to find the 1st and 3rd quartiles
-                foreach ($marks as $key => $mark) {
-                    if ($mark > $quartile2) {
-                        $quartilesArray['third'][] = $mark;
-                    } elseif ($mark < $quartile2) {
-                        $quartilesArray['first'][] = $mark;
-                    }
-                }
+            if ($countAllMarks > 1) {
+                $quartile1 = $this->findMedian($this->setupFirstQuartile($marks));
+                $quartile3 = $this->findMedian($this->setupThirdQuartile($marks));
             } else {
-                $quartilesArray['first'][] = $marks[0];
-                $quartilesArray['third'][] = $marks[0];
+                $quartile1 = $marks[0] / 2;
+                $quartile3 = $marks[0] / 2;
             }
-            count($quartilesArray['first']) > 1 ? $quartile1 = $this->quartile($quartilesArray['first']) : $quartile1 = $quartilesArray['first'][0] / 2;
-            count($quartilesArray['third']) > 1 ? $quartile3 = $this->quartile($quartilesArray['third']) : $quartile3 = $quartilesArray['third'][0] / 2;
-
         } else {
             $quartile1 = null;
             $quartile3 = null;
@@ -389,23 +380,53 @@ class Markbook
     }
 
     /**
-     * Returns quartile
-     *
-     * @param $marksArr
-     * @return float|int|null
+     * Find the values used to calculate first quartile
      */
-    public function quartile($marksArr)
+    public function setupFirstQuartile(array $values)
     {
-        $count = count($marksArr);
-        $middleVal = (int)floor(($count - 1) / 2); // find the middle value, or the lowest middle value
-        $middleVal < 0 ? 0 : $middleVal;
-        if ($count % 2) { // odd number, middle is the median
-            $median = $marksArr[$middleVal];
-        } else { // even number, calculate average of 2 medians
-            $low = $marksArr[$middleVal];
-            $high = $marksArr[$middleVal + 1];
-            $median = (($low + $high) / 2);
+        return array_slice($values, 0, floor(count($values) / 2));
+    }
+
+    /**
+     * Find the values used to calculate third quartile
+     *
+     * Even number of items: split down the middle
+     * Odd number of items: ignore the median value
+     */
+    public function setupThirdQuartile(array $values)
+    {
+        $even = !(count($values) % 2);
+
+        if ($even) {
+            return array_slice($values, floor(count($values) / 2), count($values));
         }
-        return $median;
+
+        return array_slice($values, ceil(count($values) / 2), count($values));
+    }
+
+    /**
+     * Calculates quartiles
+     *
+     * @param array $values
+     * @return float
+     */
+    function findMedian(array $values)
+    {
+        $median = null;
+        /* Figure out medians in different ways depending
+         * on even or odd number of elements
+         */
+        $halfway = floor(count($values) / 2);
+
+        $even = !(count($values) % 2);
+
+        /* Careful of these offsets */
+        if ($even) {
+            $median = ($values[$halfway - 1] + $values[$halfway]) / 2.0;
+        } else {
+            $median = $values[$halfway];
+        }
+
+        return (float)$median;
     }
 }
