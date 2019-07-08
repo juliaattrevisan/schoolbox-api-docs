@@ -12,7 +12,7 @@ use Schoolbox\IConfigLoader;
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calendar_Api_EventType_Abstract
 {

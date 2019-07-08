@@ -4,7 +4,7 @@
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 interface Synchronise_Synergetic_Moriah_Strategy_Interface {
 	public function setupUserDetails($newUser);

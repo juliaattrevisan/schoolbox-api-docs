@@ -6,7 +6,7 @@
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice
 {

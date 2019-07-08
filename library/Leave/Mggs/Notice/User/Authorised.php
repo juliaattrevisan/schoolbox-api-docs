@@ -4,7 +4,7 @@
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
+ * @link		https://schoolbox.com.au/
  */
 class Leave_Mggs_Notice_User_Authorised extends Leave_Mggs_Notice_User_Abstract {
 

@@ -6,7 +6,7 @@
  *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @link        https://schoolbox.com.au/
  */
 class Survey_Answer_Rating_Satisfied extends Evaluation_Answer_Rating_Satisfied {
 

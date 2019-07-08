@@ -2,7 +2,7 @@
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 ;
 // It's dangerous to go alone. Take this.

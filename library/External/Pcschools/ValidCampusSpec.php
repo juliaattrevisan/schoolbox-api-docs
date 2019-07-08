@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * @copyright Copyright 2018, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 
 use Schoolbox\Campus;

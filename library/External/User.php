@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright Copyright 2011, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 
 use Alaress\Redis;

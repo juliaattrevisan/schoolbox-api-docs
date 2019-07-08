@@ -7,7 +7,7 @@
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
 {

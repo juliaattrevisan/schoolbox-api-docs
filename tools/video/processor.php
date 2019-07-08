@@ -8,7 +8,7 @@
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   2017 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @link        https://schoolbox.com.au/
  */
 
 use Aura\Di\Container as Injector;

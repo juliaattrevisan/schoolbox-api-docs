@@ -4,7 +4,7 @@ use Schoolbox\Resource\Attachment\Zone;
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Component_Homepage_SocialStreamController extends Component_Homepage_ControllerAbstract
 {

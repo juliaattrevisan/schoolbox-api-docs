@@ -4,7 +4,7 @@
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   2010 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @link        https://schoolbox.com.au/
  */
 
 $surveyHandler = new Survey_Main();

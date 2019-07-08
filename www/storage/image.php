@@ -4,7 +4,7 @@
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2012 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @link        https://schoolbox.com.au/
  */
 
 require_once __DIR__ . '/../../conf/core/require.php';

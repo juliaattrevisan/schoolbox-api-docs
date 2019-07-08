@@ -9,7 +9,7 @@
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @link        https://schoolbox.com.au/
  */
 
 use Aura\Di\Container as Injector;

@@ -4,7 +4,7 @@
  *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Synchronise_Synergetic_Kings_Hydrator_ParentUserName implements Synchronise_Base_IHydrator
 {

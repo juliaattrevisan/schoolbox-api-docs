@@ -7,7 +7,7 @@ use Schoolbox\Campus;
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
 */
 
 class External_Offline_Timetable implements External_TimetableInterface, IOfflineConnector

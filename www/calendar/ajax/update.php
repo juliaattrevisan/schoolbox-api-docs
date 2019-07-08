@@ -1,7 +1,7 @@
 <?php
 /**
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 use Calendar\Event\Type\Day\Renderer\Javascript;

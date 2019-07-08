@@ -6,7 +6,7 @@
  *
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Database\Connector\IConnector;

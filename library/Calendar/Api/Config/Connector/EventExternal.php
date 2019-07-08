@@ -4,7 +4,7 @@
  *
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2017, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 class Calendar_Api_Config_Connector_EventExternal extends Calendar_Api_Config_Connector_Abstract
 {

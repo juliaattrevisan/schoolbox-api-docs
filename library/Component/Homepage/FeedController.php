@@ -6,7 +6,7 @@ use Schoolbox\Feed\StandardFeed;
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract
 {

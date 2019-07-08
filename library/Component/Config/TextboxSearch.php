@@ -3,7 +3,7 @@
  *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 use Schoolbox\Collection;
 use Schoolbox\Resource\Textbox\Model as Textbox;

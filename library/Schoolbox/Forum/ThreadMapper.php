@@ -5,7 +5,7 @@
  *
  * @author    James Leckie <jleckie@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Forum;

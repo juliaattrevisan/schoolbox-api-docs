@@ -4,7 +4,7 @@
  *
  * @author     Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright  Copyright 2014, Alaress Pty Ltd
- * @link       http://www.alaress.com.au/
+ * @link       https://schoolbox.com.au/
  * @copiedfrom Steve Chan <steve.chan@alaress.com.au>
  */
 class Leave_Mggs_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory {

@@ -4,7 +4,7 @@
  *
  * @author      Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright   Copyright 2018, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 ;(function ($, window, document, undefined) {

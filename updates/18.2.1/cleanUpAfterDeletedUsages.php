@@ -28,7 +28,7 @@
  * (this is the symptom our schools have been observing).
  *
  * @copyright Copyright 2019, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 
 declare(strict_types=1);

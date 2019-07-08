@@ -4,7 +4,7 @@
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Date\Test;

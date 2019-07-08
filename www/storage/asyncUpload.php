@@ -7,7 +7,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 
 require_once __DIR__ . '/../../conf/core/require.php';

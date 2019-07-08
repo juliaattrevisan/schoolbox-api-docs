@@ -11,7 +11,7 @@
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
+ * @link		https://schoolbox.com.au/
  */
 class Leave_Notice_Factory {
 	private $requestData = null;

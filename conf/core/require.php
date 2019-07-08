@@ -3,7 +3,7 @@
  * Schoolbox global dependencies
  *
  * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 // TODO move this block to 'www/conf/conf.php'
 if (PHP_SAPI === 'cli') {

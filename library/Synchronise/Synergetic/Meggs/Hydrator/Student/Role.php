@@ -4,7 +4,7 @@
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 class Synchronise_Synergetic_Meggs_Hydrator_Student_Role implements Synchronise_Base_IHydrator
 {

@@ -8,7 +8,7 @@
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_Synergetic_Strategy_Interface {
     /**

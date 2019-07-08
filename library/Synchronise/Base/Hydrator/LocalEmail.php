@@ -5,7 +5,7 @@
  *
  * @author    James Leckie <jleckie@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 class Synchronise_Base_Hydrator_LocalEmail implements Synchronise_Base_IHydrator {
     /**

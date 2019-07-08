@@ -8,7 +8,7 @@
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  */
 class Calendar_Api_EventType_ResourceBooking_Booking_Default
     extends Calendar_Api_EventType_ResourceBooking_Booking_ForUser {

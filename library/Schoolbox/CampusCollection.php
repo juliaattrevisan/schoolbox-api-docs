@@ -4,7 +4,7 @@
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   2013 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox;
 use Schoolbox;

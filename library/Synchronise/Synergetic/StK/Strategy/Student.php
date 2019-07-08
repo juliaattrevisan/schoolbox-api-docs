@@ -9,7 +9,7 @@
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @link      https://schoolbox.com.au/
  * @shamelessly_pilfered_from <steve.chan@alaress.com.au>, <matt.day@alaress.com.au>
  */
 class Synchronise_Synergetic_StK_Strategy_Student extends Synchronise_Synergetic_StK_Strategy_Abstract {

@@ -7,7 +7,7 @@ use Schoolbox\Realtime\Notification\Decorator;
  * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 /** @var SitePage $this */
