@@ -11,7 +11,7 @@ namespace Alaress\WorkerCrew\Transaction;
 
 
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 class Transaction extends AbstractTransaction
 {
@@ -37,11 +37,12 @@ class Transaction extends AbstractTransaction
 
     /**
      * @param TimerInterface $timer
+     * @param mixed          $data
      * @return void
      */
-    protected function execute(TimerInterface $timer)
+    protected function execute(TimerInterface $timer, $data)
     {
-        call_user_func($this->callback, $timer);
+        call_user_func($this->callback, $data);
     }
 
 }

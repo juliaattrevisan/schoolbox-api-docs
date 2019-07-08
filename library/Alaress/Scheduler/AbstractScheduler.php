@@ -21,7 +21,7 @@ use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
@@ -114,21 +114,18 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
             return;
         }
 
-        $this->schedule($trigger, $this->timerCallback());
+        $this->schedule($trigger, $this->timerCallback($trigger));
     }
 
 
     /**
-     * @throws InvalidArgumentException
+     * @param TriggerInterface $trigger
      * @return callable
      */
-    protected function timerCallback()
+    protected function timerCallback(TriggerInterface $trigger): callable
     {
-        return function (TimerInterface $timer) {
-            if (!$timer->getData() instanceof TriggerInterface) {
-                throw new InvalidArgumentException('Trigger must be provided to publish data');
-            }
-            $this->dispatchTrigger($timer->getData());
+        return function () use ($trigger) {
+            $this->dispatchTrigger($trigger);
         };
     }
 
@@ -195,7 +192,6 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         /** @var TimerInterface $timer */
         $interval = $interval ?: ($trigger->getTimestamp() - $this->clock->time());
         $timer = $this->loop->addTimer($interval, $callable);
-        $timer->setData($trigger);
         $this->putTimer($model, $label, $timer);
 
         $this->log->info(
@@ -326,7 +322,7 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         // SIS connector outage. Hence, rescheduling it.
         if ($identifier instanceof TriggerInterface && $command === DefaultDispatchStrategy::TASK_PUBLISH) {
             $this->log->warning("[AbstractScheduler] Rescheduling '{$identifier->getEventObjectId()} - {$identifier->getLabel()}' in " . self::RETRY_TIME, array('char' => '-'));
-            $this->schedule($identifier, $this->timerCallback(), true, self::RETRY_TIME);
+            $this->schedule($identifier, $this->timerCallback($identifier), true, self::RETRY_TIME);
         }
     }
 

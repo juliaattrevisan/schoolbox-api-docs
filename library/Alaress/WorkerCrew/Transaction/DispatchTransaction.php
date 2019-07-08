@@ -10,7 +10,7 @@ namespace Alaress\WorkerCrew\Transaction;
 
 use Alaress\WorkerCrew\DispatcherInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 class DispatchTransaction extends AbstractTransaction
 {
@@ -43,11 +43,12 @@ class DispatchTransaction extends AbstractTransaction
      * Transaction is ready to go. Execute.
      *
      * @param TimerInterface $timer
+     * @param mixed          $data
      * @return void
      */
-    protected function execute(TimerInterface $timer)
+    protected function execute(TimerInterface $timer, $data)
     {
-        $this->dispatcher->enqueue($timer, $this->command, $timer->getData());
+        $this->dispatcher->enqueue($timer, $this->command, $data);
     }
 
 }

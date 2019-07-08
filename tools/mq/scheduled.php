@@ -62,7 +62,8 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var IClient $stomp */
     $stomp = $di->get('stomp');
 
-    $asyncRedis  = new Async\Client($di->get('config')->get('redis_url'), $loop);
+    /** @var Async\Client $asyncRedis */
+    $asyncRedis = $di->get('redis.async');
 
     try {
         /** @var AMQPInterface $amqp */

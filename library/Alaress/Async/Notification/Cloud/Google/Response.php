@@ -11,8 +11,8 @@ namespace Alaress\Async\Notification\Cloud\Google;
 
 
 use Alaress\Async\Notification\Cloud\ResponseInterface;
-use Guzzle\Http\Message\Response as HttpResponse;
 use OutOfBoundsException;
+use Psr\Http\Message\ResponseInterface as HttpResponse;
 use RangeException;
 
 /**
@@ -57,7 +57,7 @@ class Response implements ResponseInterface
 
         if ($statusCode == 200) {
             // process successful request
-            $data = $response->json();
+            $data = json_decode($response->getBody()->getContents());
 
             $this->successes += $data['success'];
             $this->failures += $data['failure'];
@@ -73,13 +73,13 @@ class Response implements ResponseInterface
                     if (isset($result['registration_id'])) {
                         $this->replacements[$registrationIds[$i]] = $result['registration_id'];
                     }
-                } elseif (isset($response['error'])) {
-                    $this->errors[$registrationIds[$i]] = $response['error'];
+                } elseif (isset($result['error'])) {
+                    $this->errors[$registrationIds[$i]] = $result['error'];
                 }
             }
 
         } elseif ($statusCode == 400) {
-            throw new OutOfBoundsException("Bad request: ".$response->getBody(true), 400);
+            throw new OutOfBoundsException("Bad request: ".$response->getBody()->getContents(), 400);
 
         } elseif ($statusCode == 401) {
             throw new OutOfBoundsException("The given GCM API key is not valid.", 401);
@@ -145,4 +145,4 @@ class Response implements ResponseInterface
         return $this->errors;
     }
 
-} 
+}

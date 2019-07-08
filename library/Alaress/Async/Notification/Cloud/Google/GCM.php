@@ -10,7 +10,7 @@
 namespace Alaress\Async\Notification\Cloud\Google;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Monolog\Logger;
 use OverflowException;
 use RuntimeException;
@@ -105,16 +105,20 @@ class GCM extends AbstractService
                 'data'             => $data
             ));
 
-            $rq = $client->post($apiUri, $headers, $payload);
-
             try {
-                $rs = $rq->send();
+                $rs = $client->post(
+                    $apiUri, [
+                        'headers' => $headers,
+                        'body'    => $payload,
+                    ]
+                );
 
-                if ($rs->getStatusCode() < 200 || $rs->getStatusCode() >= 300) {
-                    throw new RuntimeException("Non-200 response from GCM: {$rs->getStatusCode()}");
+                $statusCode = $rs->getStatusCode();
+                if ($statusCode < 200 || $statusCode >= 300) {
+                    throw new RuntimeException("Non-200 response from GCM: {$statusCode}");
                 }
 
-                $body = json_decode($rs->getBody(true), true);
+                $body = json_decode($rs->getBody()->getContents(), true);
 
                 foreach ($body['results'] as $i => $result) {
                     $regId = $registrationIds[$i];

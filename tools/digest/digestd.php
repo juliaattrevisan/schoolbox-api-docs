@@ -52,7 +52,9 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     $roleMapper = $di->get('mapperFactory')->get(RoleMapper::class);
     $userMapper = $di->get('mapperFactory')->get(UserMapper::class);
-    $asyncRedis = new Async\Client($di->get('config')->get('redis_url'), $loop);
+
+    /** @var Async\Client $asyncRedis */
+    $asyncRedis = $di->get('redis.async');
     $strat      = new DefaultDispatchStrategy($flags);
     $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $conf, $log );
     $factory    = new DigestTriggerFactory($notifier, $clock, $debugInterval);

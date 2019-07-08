@@ -16,12 +16,13 @@ use Alaress\WorkerCrew\Transaction\Transaction;
 use ErrorException;
 use InvalidArgumentException;
 use Predis\CommunicationException;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
-use React\Socket\ConnectionException;
+use React\EventLoop\TimerInterface;
+//use React\Socket\ConnectionException;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Pipe\Action\IAction;
 use Schoolbox\Realtime\Pipe\Action;
@@ -30,7 +31,6 @@ use Schoolbox\Realtime\SessionException;
 use Alaress\WorkerCrew\Dispatcher;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
-use Ratchet\WebSocket\Version\RFC6455;
 use Schoolbox\Realtime\Subscription\ISubscriptionManager;
 
 /**
@@ -136,13 +136,6 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     public function onOpen(ConnectionInterface $conn)
     {
         // receive new connection, register a pipe based on it
-        if (!$conn instanceof RFC6455\Connection) {
-            $this->log->warning('Socket does not conform to RFC6455, cannot handle');
-
-            $this->closeConnectionWithReason($conn, 400);
-            return;
-        }
-
         $fdOpen = open_fd_count();
 
         if ($fdOpen >= $this->fdLimit) {
@@ -206,18 +199,16 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onClose(ConnectionInterface $conn)
     {
-        if (isset($conn->WebSocket)) {
+        if ($conn->httpRequest instanceof RequestInterface) {
             // Explicitly close the descriptor to the temporary-file associated with the request that initiated this
             // connection.  Before this fix, we were running out of file descriptors because they were never being
             // released due to a bug in the vendor implementation.
-            $conn->WebSocket->request->getBody()->close();
+            $conn->httpRequest->getBody()->close();
         }
 
-        if ($conn instanceof RFC6455\Connection) {
-            // if it's an RFC6455, we can safely assume there's a pipe to unregister
-            $key = Pipe::getSocketKeyForConnection($conn);
-            $this->pipes->unregisterPipe($key);
-        }
+        // all WS are RFC6455, we can safely assume there's a pipe to unregister
+        $key = Pipe::getSocketKeyForConnection($conn);
+        $this->pipes->unregisterPipe($key);
     }
 
 
@@ -233,10 +224,11 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
      */
     public function onError(ConnectionInterface $conn, \Exception $e)
     {
-        if ($e instanceof ConnectionException) {
-            $this->log->warning("Connection to client lost, terminating");
-        }
-        else if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
+//        if ($e instanceof ConnectionException) {
+//            $this->log->warning("Connection to client lost, terminating");
+//        }
+//        else
+        if (preg_match('`fwrite\(\): send of (\d+) bytes failed with errno=(\d+) (.+)`', $e->getMessage(), $matches)) {
             $this->log->warning("IOException: {$matches[3]} [{$matches[2]}] ({$matches[1]} bytes dropped)");
         } else {
             $this->log->critical(
@@ -255,8 +247,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     /**
      * Triggered when a client sends data through the socket
      *
-     * @param  \Ratchet\ConnectionInterface $from The socket/connection that sent the message to your application
-     * @param  string                       $msg  The message received
+     * @param  ConnectionInterface $from The socket/connection that sent the message to your application
+     * @param  string              $msg  The message received
      * @throws \Exception
      * @return void
      */
@@ -459,14 +451,14 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         if (empty($this->pushTransactions[$userId][$pipeId])) {
             $this->pushTransactions[$userId][$pipeId] = new Transaction(
                 $this->reactLoop,
-                function (TimerInterface $timer) use ($pipe, $userId) {
+                function ($data) use ($pipe, $userId) {
 
                     // the timer contains the data to be processed
                     $this->log->info("Pushing cached messages to user $userId", [ 'char' => '<' ]);
 
                     try {
                         // enqueue to be dispatched
-                        $this->enqueueInstances($pipe, $timer->getData());
+                        $this->enqueueInstances($pipe, $data);
 
                     } catch (QueueingException $e) {
                         $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
@@ -657,19 +649,21 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             unset($this->userTimeouts[$userId]);
         }
 
-        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(self::INACTIVE_TIMEOUT, [ $this, 'onTimeout' ]);
-
-        $this->userTimeouts[$userId]->setData($userId);
+        $this->userTimeouts[$userId] = $this->reactLoop->addTimer(
+            self::INACTIVE_TIMEOUT,
+            function () use ($userId) {
+                $this->onTimeout($userId);
+            }
+        );
     }
 
 
     /**
-     * @param TimerInterface $timer
+     * @param int $userId
      * @return void
      */
-    public function onTimeout(TimerInterface $timer)
+    private function onTimeout($userId)
     {
-        $userId  = $timer->getData();
         $success = $this->subscriptionManager->removeSubscription($userId);
         $this->log->info("User $userId has timed out, " . ($success ? 'unsubscribed' : 'failed to unsubscribe'));
 

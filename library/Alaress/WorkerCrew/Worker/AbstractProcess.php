@@ -11,13 +11,13 @@ namespace Alaress\WorkerCrew\Worker;
 
 
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
-use Alaress\WorkerCrew\Worker\IO\IOStream;
 use Alaress\WorkerCrew\Worker\IO\Listener\InputStreamListener;
+use Alaress\WorkerCrew\Worker\IO\WrappedReadableResourceStream;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
-use React\Stream\Stream;
+use React\EventLoop\TimerInterface;
+use React\Stream\DuplexResourceStream as Stream;
 use RuntimeException;
 
 abstract class AbstractProcess implements WorkerInterface
@@ -64,10 +64,13 @@ abstract class AbstractProcess implements WorkerInterface
         $this->strat = $strat;
 
         // listen to STDIN for commands
-        $listener           = new InputStreamListener($log, $loop, $strat->getProtocol(), $writer, $this);
-        $stream             = new IOStream(fopen('php://stdin', 'r'), $loop, $listener);
-        $stream->bufferSize = $this->strat->getProtocol()
-                                          ->chunkLength();
+        $listener = new InputStreamListener($log, $loop, $strat->getProtocol(), $writer, $this);
+        new WrappedReadableResourceStream(
+            fopen('php://stdin', 'r'),
+            $loop,
+            $listener,
+            $this->strat->getProtocol()->chunkLength()
+        );
 
         $this->loop->addPeriodicTimer(0.1, array($this, 'signalDispatch'));
 

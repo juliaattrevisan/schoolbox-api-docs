@@ -9,10 +9,8 @@
 
 namespace Schoolbox\Realtime\Pipe;
 
-use Guzzle\Http\Message\EntityEnclosingRequest;
-use Guzzle\Http\Message\Header;
+use Psr\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
-use Ratchet\WebSocket\Version\RFC6455;
 
 
 /**
@@ -29,18 +27,14 @@ class Pipe implements PipeInterface
 	 */
 	public static function getSocketKeyForConnection(ConnectionInterface $conn)
     {
-        if ($conn instanceof RFC6455\Connection) {
-            return static::getHeader($conn, 'sec-websocket-key');
-        }
-        // don't attempt to handle non-RFC6455 sockets
-        return '';
+        return static::getHeader($conn, 'sec-websocket-key');
 	}
 
 
     /** @var string */
     private $commandLock;
 
-    /** @var \Ratchet\ConnectionInterface */
+    /** @var ConnectionInterface */
 	protected $socketConnection;
 
 	/** @var int */
@@ -50,9 +44,9 @@ class Pipe implements PipeInterface
 	protected $cookies;
 
 	/**
-	 * @param RFC6455\Connection $conn
+	 * @param ConnectionInterface $conn
 	 */
-	public function __construct(RFC6455\Connection $conn) {
+	public function __construct(ConnectionInterface $conn) {
 		$this->socketConnection = $conn;
 	}
 
@@ -100,6 +94,7 @@ class Pipe implements PipeInterface
 	 * @return string
 	 */
 	public function getRemoteAddress() {
+        // kosher according to http://socketo.me/docs/migration-3
 		return $this->socketConnection->remoteAddress ?: '0.0.0.0';
 	}
 
@@ -135,18 +130,17 @@ class Pipe implements PipeInterface
 	}
 
     /**
-     * @param RFC6455\Connection $conn
+     * @param ConnectionInterface $conn
      * @param string $header
      * @return string
      */
-	protected static function getHeader(RFC6455\Connection $conn, $header)
+	protected static function getHeader(ConnectionInterface $conn, $header)
     {
 		$rq = self::extractWebSocketRequest($conn);
 
         $value = $rq->getHeader($header);
 
-        if ($value instanceof Header) {
-            $value = $value->toArray();
+        if (count($value) > 0) {
 			return (string)reset($value);
 		}
 		// otherwise header not found
@@ -154,12 +148,13 @@ class Pipe implements PipeInterface
 	}
 
     /**
-     * @param RFC6455\Connection $conn
-     * @return EntityEnclosingRequest
+     * @param ConnectionInterface $conn
+     * @return RequestInterface
      */
-	protected static function extractWebSocketRequest(RFC6455\Connection $conn)
+	protected static function extractWebSocketRequest(ConnectionInterface $conn)
     {
-        return $conn->WebSocket->request;
+        // kosher according to http://socketo.me/docs/migration-3
+        return $conn->httpRequest;
     }
 
     /**

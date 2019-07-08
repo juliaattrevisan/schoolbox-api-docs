@@ -9,7 +9,7 @@
 namespace Alaress\WorkerCrew\Transaction;
 
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 
 abstract class AbstractTransaction implements ITransaction
 {
@@ -25,6 +25,9 @@ abstract class AbstractTransaction implements ITransaction
 
     /** @var int */
     private $size = 0;
+
+    /** @var array */
+    private $data = [];
 
     /**
      * Create a new Transaction
@@ -74,12 +77,13 @@ abstract class AbstractTransaction implements ITransaction
         if(!$this->isTicking()) {
             $this->resetTimer();
         }
-        $data = $this->timer->getData() ?: [];
-        $data[$key] = $value;
-        $this->timer->setData($data);
+//        $data = $this->timer->getData() ?: [];
+//        $data[$key] = $value;
+//        $this->timer->setData($data);
+        $this->data[$key] = $value;
 
         // if we've reached our caching limit, fire and reset
-        if($this->size && count($data) >= $this->size) {
+        if($this->size && count($this->data) >= $this->size) {
             $this->flush();
         }
 
@@ -92,10 +96,12 @@ abstract class AbstractTransaction implements ITransaction
      */
     private function resetTimer() {
         if(isset($this->timer)) {
-            $this->timer->cancel();
+            $this->loop->cancelTimer($this->timer);
         }
         $this->timer = $this->loop->addTimer($this->cacheInterval, function (TimerInterface $timer) {
-            $this->execute($timer);
+            $this->execute($timer, $this->data);
+            $this->timer = null;
+            $this->data  = [];
         });
     }
 
@@ -106,14 +112,14 @@ abstract class AbstractTransaction implements ITransaction
      * @return bool
      */
     private function isTicking() {
-        return isset($this->timer) && $this->timer->isActive();
+        return isset($this->timer);
     }
 
     /**
      * @return int
      */
     public function getCount() {
-        return count($this->timer->getData());
+        return count($this->data);
     }
 
     /**
@@ -124,9 +130,10 @@ abstract class AbstractTransaction implements ITransaction
     public function flush()
     {
         if (isset($this->timer)) {
-            $this->execute($this->timer);
-            $this->timer->cancel();
+            $this->execute($this->timer, $this->data);
+            $this->loop->cancelTimer($this->timer);
             $this->timer = null;
+            $this->data  = [];
         }
 
         return $this;
@@ -136,8 +143,9 @@ abstract class AbstractTransaction implements ITransaction
      * Transaction is ready to go. Execute.
      *
      * @param TimerInterface $timer
+     * @param mixed          $data
      * @return void
      */
-    protected abstract function execute(TimerInterface $timer);
+    protected abstract function execute(TimerInterface $timer, $data);
 
 }

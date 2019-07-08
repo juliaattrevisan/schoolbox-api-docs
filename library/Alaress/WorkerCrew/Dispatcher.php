@@ -17,7 +17,7 @@ use Exception;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 use RuntimeException;
 use SplQueue;
 
@@ -166,7 +166,7 @@ class Dispatcher implements DispatcherInterface
      * @param TimerInterface $timer
      * @throws PDOException
      */
-    public function dispatch($timer)
+    public function dispatch(TimerInterface $timer)
     {
 
         // there's nothing in the queue
