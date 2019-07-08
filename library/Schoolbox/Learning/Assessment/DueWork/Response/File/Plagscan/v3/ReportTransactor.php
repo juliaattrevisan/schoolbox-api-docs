@@ -6,8 +6,8 @@
  * order to generate a storage file containing the plagscan report's html
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 

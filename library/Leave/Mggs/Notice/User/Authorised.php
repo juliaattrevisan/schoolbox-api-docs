@@ -3,9 +3,8 @@
  * Leave_Mggs_Notice_User_Authorised
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link		https://schoolbox.com.au/
  */
 class Leave_Mggs_Notice_User_Authorised extends Leave_Mggs_Notice_User_Abstract {
 

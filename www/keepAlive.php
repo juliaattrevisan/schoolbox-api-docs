@@ -6,8 +6,8 @@
  * at an answer for a long time, and if their session times out it will be lost.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 // Won't work if not a sitepage

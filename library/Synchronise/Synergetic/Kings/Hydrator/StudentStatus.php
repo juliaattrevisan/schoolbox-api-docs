@@ -3,8 +3,8 @@
  * Hydrator for user status for Kings users.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 class Synchronise_Synergetic_Kings_Hydrator_StudentStatus implements Synchronise_Base_IHydrator {
     public function hydrate($externalUser, $newUser) {

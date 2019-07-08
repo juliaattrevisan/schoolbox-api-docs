@@ -5,8 +5,8 @@
  * Spawns search results for all minions
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();

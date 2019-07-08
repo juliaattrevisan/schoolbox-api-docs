@@ -6,7 +6,7 @@
  * plagscan so they can be processed.  Use this if you have lots of files in the queued state.
  *
  * @author           James Leckie <jleckie@alaress.com.au>
- * @copyright        Copyright 2015, Alaress Pty Ltd
+ * @copyright        Copyright 2019, Schoolbox Pty Ltd
  *
  */
 

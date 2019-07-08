@@ -6,8 +6,8 @@
  * it did, the steps would be defined multiple times)
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 use Behat\Mink\Element;

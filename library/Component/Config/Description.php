@@ -5,9 +5,8 @@
  * This allows you to add an arbitrary input for a component
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 class Component_Config_Description extends Component_Config_Abstract

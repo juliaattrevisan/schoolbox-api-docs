@@ -4,8 +4,8 @@
  * it provides support functions for determining how to render a day event
  *
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
- * @copyright Copyright 2017, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Calendar\Event\Type\External\Renderer;

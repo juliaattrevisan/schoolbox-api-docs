@@ -4,8 +4,8 @@
 #       Builds mailcatcher with it's specific gem dependencies
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   2014 Alaress Pty Ltd
-# @link        http://www.alaress.com.au
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
 #
 filepath=`readlink -f $0`;
 fullpath=${filepath%/*};

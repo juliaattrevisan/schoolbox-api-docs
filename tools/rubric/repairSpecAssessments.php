@@ -13,8 +13,8 @@
  * The solution is to migrate conflicting capabilities from the unit up into
  * the course spec, and move their usage up into the course spec.
  *
- * @copyright Copyright 2019, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 declare(strict_types=1);

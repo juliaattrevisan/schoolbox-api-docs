@@ -5,9 +5,8 @@
  * @todo move this somewhere out of the booking module
  *
  * @author      Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright   Copyright 2014, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$ Why is this even here?
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  * @stolenFrom  Steve Chan <steve.chan@alaress.com.au>
  */
 

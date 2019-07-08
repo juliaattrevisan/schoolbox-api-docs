@@ -3,8 +3,8 @@
  * Determine if parent access is allowed in Schoolbox instances config
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Pastoral\Authorizer\Rule;

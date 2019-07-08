@@ -2,8 +2,8 @@
 /**
  *
  * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 class Component_Config_Video extends Component_Config_Abstract
 {

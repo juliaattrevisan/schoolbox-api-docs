@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright Copyright 2019, Alaress Pty Ltd
- * @link      https://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Comms\News;

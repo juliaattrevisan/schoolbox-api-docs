@@ -12,8 +12,8 @@ use Schoolbox\User;
  * This shouldn't be used as a calendar connector.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstract
 {

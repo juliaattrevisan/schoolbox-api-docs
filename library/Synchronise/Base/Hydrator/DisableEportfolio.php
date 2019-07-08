@@ -3,8 +3,8 @@
  * Disable ePortfolio
  *
  * @author    James Leckie <jleckie@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 class Synchronise_Base_Hydrator_DisableEportfolio implements Synchronise_Base_IHydrator {
 

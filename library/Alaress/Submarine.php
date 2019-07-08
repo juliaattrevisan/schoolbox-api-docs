@@ -7,9 +7,8 @@
  * Silently output dump to a hidden div so you can discreetly diagnose
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link		https://schoolbox.com.au/
  */
 
 use Alaress\DebugBar\Instance as DebugBar;

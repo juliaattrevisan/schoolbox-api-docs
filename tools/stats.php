@@ -4,8 +4,8 @@
  * This data is used to populate our engagement database in influxDB and populate the graphs in monitor.schoolbox.com.au
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   Copyright 2019, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Database\Connector\IConnector;

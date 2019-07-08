@@ -4,9 +4,8 @@
  * various details. This is loaded for each Section in the Assessment.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 use Schoolbox\Error;

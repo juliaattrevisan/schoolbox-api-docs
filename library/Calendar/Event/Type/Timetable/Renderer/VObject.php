@@ -4,7 +4,7 @@
  * it provides support functions for determining how to render a day event
  *
  * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
 
 namespace Calendar\Event\Type\Timetable\Renderer;

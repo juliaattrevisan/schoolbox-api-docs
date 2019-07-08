@@ -7,9 +7,8 @@
  * defines shared Strategy methods and shouldn't be instantiated, only extended
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 abstract class Synchronise_Synergetic_Strategy_Abstract implements Synchronise_Synergetic_Strategy_Interface {
     /**

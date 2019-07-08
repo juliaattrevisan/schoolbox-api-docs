@@ -5,8 +5,8 @@
  * A list of all the transformations used throughout the site
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Image\Transformation;

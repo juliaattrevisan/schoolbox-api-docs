@@ -4,8 +4,8 @@
 #       This script will switch the version of PHP running on the current host between 7.1 and 5.5
 #
 # @author      James Leckie <james.leckie@alaress.com.au>
-# @copyright   2017 Alaress Pty Ltd
-# @link        http://www.alaress.com.au
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
 #
 
 phpversion=`php -v | head -n1 | awk '{print $2}' | cut -c1-3`;

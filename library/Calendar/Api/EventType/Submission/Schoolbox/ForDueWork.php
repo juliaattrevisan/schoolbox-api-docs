@@ -5,8 +5,8 @@
  * Differs from the base source in that its colors come from the color list.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 use Schoolbox\Learning\Assessment\DataModel as Assessment;

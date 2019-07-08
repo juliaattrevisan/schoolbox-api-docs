@@ -5,8 +5,8 @@
  * Don't try this for anyone other than St Michaels - it will fail miserably.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard_ControllerAbstract
 {

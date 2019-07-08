@@ -1,8 +1,8 @@
 <?php
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 declare(strict_types=1);
 

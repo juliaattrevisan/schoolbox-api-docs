@@ -3,8 +3,8 @@
  * Reroute filter: throws away all messages if messaging is not enabled.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Routing\Filter;

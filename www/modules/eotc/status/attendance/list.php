@@ -5,8 +5,8 @@
  * A read-only version of list.php which shows you who is attending
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 use EOTC\Authenticator;
 use EOTC\EventMapper;

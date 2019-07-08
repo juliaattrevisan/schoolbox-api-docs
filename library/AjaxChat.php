@@ -7,8 +7,8 @@ use Schoolbox\Role;
  * Moved from www/ajax/chat.php to here.
  *
  * @author    probably Matt Day <matt.day@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 class AjaxChat {

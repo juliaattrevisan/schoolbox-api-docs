@@ -4,9 +4,8 @@
  * Loads images from the storage engine.
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Image\Cache;

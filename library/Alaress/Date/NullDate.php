@@ -6,8 +6,8 @@ use Alaress\Date\IClock;
  * Null date class - this represents a null date object.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  * @deprecated Please just use scalar null
  */
 class Alaress_Date_NullDate extends Alaress_Date_Format

@@ -9,8 +9,8 @@
  *  - broadcast a SIGHUP (which advises `routed` instances to reload from cache)
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 use Aura\Di;

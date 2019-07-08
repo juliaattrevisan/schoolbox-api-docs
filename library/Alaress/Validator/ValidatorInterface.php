@@ -5,9 +5,8 @@
  * Defines the minimum interface that all validator classes must implement.
  *
  * @author      Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 interface Alaress_Validator_ValidatorInterface {
 	/**

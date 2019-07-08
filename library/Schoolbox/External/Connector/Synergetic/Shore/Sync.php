@@ -3,8 +3,8 @@
  * Synergetic implementation of sync connector for Shore
  *
  * @author    Sam Bailey <sam.bailey@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\External\Connector\Synergetic\Shore;

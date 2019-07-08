@@ -5,9 +5,8 @@
  * The base class for user notifications.
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link		https://schoolbox.com.au/
  */
 abstract class Leave_Kings_Notice_User_Abstract extends Leave_Notice_Abstract_Notice {
 	protected $email = null;

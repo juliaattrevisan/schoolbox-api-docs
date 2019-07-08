@@ -1,8 +1,8 @@
 <?php
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
- * @copyright Copyright 2018, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 class External_Synergetic_Scc_Class extends External_Synergetic_Class

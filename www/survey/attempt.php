@@ -4,8 +4,8 @@
  * various details. This is loaded for each Section in the Survey.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 use Schoolbox\Permission\Access\UserAccess;
 

@@ -10,9 +10,8 @@
  * If your canvas is larger than the resized image, the excess canvas space is kept
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Image\Implementation\Imagine\Processor\Strategy;

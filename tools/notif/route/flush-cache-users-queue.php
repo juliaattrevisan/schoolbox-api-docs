@@ -12,8 +12,8 @@
  *
  * Use this script to flush that queue manually.
  *
- * @copyright Copyright 2017, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 use Aura\Di;

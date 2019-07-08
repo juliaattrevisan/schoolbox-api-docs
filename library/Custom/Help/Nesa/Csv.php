@@ -8,8 +8,8 @@
  * Generates a temp file, then streams it to the browzer which eats it as a file
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Custom\Help\Nesa;

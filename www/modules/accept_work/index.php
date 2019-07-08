@@ -5,7 +5,7 @@
  * This script is called using ajax on the submissionHistory page.
  *
  * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  *
  * CREATE TABLE `seda_accept_work`( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `uid` INT, `box_id` INT, `accepted` DATETIME, PRIMARY KEY (`id`) );
  *

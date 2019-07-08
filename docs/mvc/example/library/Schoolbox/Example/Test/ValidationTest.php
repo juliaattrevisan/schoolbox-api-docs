@@ -5,8 +5,8 @@
  * See SD-10 for usages
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 // All new classes should use strict typing.

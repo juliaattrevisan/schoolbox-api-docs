@@ -3,8 +3,8 @@
  * CSV Export method for the House Report
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
 {

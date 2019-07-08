@@ -6,8 +6,8 @@
 #	Automatically run by cron from /etc/cron.d/
 #
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   2013 Alaress Pty Ltd
-# @link        http://www.alaress.com.au
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
 #
 # m h dom mon dow user command
 MAILTO="support@schoolbox.com.au"

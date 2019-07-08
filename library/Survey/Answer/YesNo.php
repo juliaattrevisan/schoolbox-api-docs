@@ -5,9 +5,8 @@
  * Handler for rating questions.
  *
  * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 class Survey_Answer_YesNo extends Evaluation_Answer_YesNo {
 

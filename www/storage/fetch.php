@@ -3,8 +3,8 @@
  * Returns objects from the storage engine as plain files
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   2012 Alaress Pty Ltd
- * @link        http://www.alaress.com.au
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 

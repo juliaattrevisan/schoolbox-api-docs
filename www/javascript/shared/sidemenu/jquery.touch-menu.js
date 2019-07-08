@@ -3,8 +3,8 @@
  *
  * Relies on styles for class "hover" mirroring pseudo-selector :hover exactly.
  *
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 (function($) {
     "use strict";

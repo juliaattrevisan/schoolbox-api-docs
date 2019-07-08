@@ -3,8 +3,8 @@
  * Synergetic implementation of External_TimetableInterface
  *
  * @author    Alaress Pty Ltd
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 use Alaress\Cache;

@@ -3,8 +3,8 @@
  * Create dashboard feature tour
  *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
- * @copyright Copyright 2018, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 use Psr\Log\LoggerInterface;

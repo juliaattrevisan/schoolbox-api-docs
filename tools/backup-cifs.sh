@@ -8,8 +8,8 @@
 #       To be run nightly via crontab as root
 # 
 # @author      Sam Bailey <sam.bailey@alaress.com.au>
-# @copyright   2012 Alaress Pty Ltd
-# @link        http://www.alaress.com.au
+# @copyright   Copyright 2019, Schoolbox Pty Ltd
+# @link        https://schoolbox.com.au/
 #
 #
 

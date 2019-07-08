@@ -6,8 +6,8 @@
  * We can combine some data here; this class focuses on obtaining the correct data in a convenient structure
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Custom\Help\Hero;

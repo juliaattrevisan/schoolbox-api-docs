@@ -4,8 +4,8 @@
  * Finds all docs with the a status of 'error' and optional 'error_message' and puts them back into the queue for re-uploading.
  *
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
- * @copyright Copyright 2018, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 declare(strict_types=1);
 

@@ -3,8 +3,8 @@
  * Component for outputting a student's subject list.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 class Component_Dashboard_SubjectController extends Component_Dashboard_ControllerAbstract {
 

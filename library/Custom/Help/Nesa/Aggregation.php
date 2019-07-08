@@ -5,8 +5,8 @@
  * Combine all the results on a per-user basis across all their assessments' rubrics
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 namespace Custom\Help\Nesa;

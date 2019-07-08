@@ -5,8 +5,8 @@ use Alaress\Database\Iterator\IIterator;
  * External_Schoolpro_Timetable
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 class External_Schoolpro_Timetable implements External_TimetableInterface
 {

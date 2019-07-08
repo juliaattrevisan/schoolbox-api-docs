@@ -4,8 +4,8 @@
  * External Timetable Connection Interface.  Interface for timetable data to be fetched from external database systems
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   Copyright 2015, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Redis;

@@ -10,9 +10,8 @@
  * This factory encapsulates site/domain detection, taking it out of the controller.
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link		https://schoolbox.com.au/
  */
 class Leave_Notice_Factory {
 	private $requestData = null;

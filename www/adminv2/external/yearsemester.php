@@ -3,9 +3,8 @@
  * External DB (Synergetic) - Current Semester and Year check
  *
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 if (!$_SESSION['user']->isSuperuser()) {

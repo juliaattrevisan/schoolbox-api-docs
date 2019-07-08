@@ -3,8 +3,8 @@
  * A singleton DebugBar instance. Anyone have any better idea on how to do this?
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Alaress\DebugBar;

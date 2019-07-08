@@ -3,9 +3,8 @@
  * Evaluation_Prototype_Attempt_Container
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 class Evaluation_Prototype_Attempt_Container extends DeprecatedModel {
 	private $evaluation_id = null;

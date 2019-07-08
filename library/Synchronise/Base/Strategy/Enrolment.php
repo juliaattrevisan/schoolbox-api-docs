@@ -5,8 +5,8 @@
  * Syncs data from the external database or CSV file into the enrolment tables.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 abstract class Synchronise_Base_Strategy_Enrolment extends Synchronise_Base_Strategy {

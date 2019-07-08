@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 /**
- * @copyright Copyright 2018, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 use Schoolbox\Campus;

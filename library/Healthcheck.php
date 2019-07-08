@@ -5,9 +5,8 @@
  * Notes: hacked from the sync->diagnose() configuration by Matt Day
  *
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Database\Connector\IConnector;

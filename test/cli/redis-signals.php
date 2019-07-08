@@ -4,8 +4,8 @@
  * The intent of this script is to test signal handling based on Redis pubsub.
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 use Alaress\Redis;

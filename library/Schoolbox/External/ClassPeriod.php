@@ -3,8 +3,8 @@
  * Class period object for the Schoolbox connector.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright 2013 Alaress Pty Ltd
- * @link      http://www.alaress.com.au
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\External;

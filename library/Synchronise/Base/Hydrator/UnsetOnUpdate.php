@@ -6,8 +6,8 @@
  * default is unset if the user is created.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 class Synchronise_Base_Hydrator_UnsetOnUpdate extends Synchronise_Base_Hydrator_CreateUpdate
 {
