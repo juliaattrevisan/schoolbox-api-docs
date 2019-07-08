@@ -14,7 +14,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;

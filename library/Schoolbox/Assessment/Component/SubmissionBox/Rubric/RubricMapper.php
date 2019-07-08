@@ -13,13 +13,15 @@ use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\Competency\Level as CompetencyLevel;
-use Schoolbox\Assessment\Rubric\Criteria;
-use Schoolbox\Assessment\Rubric\Factory;
+use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
+use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
+use Schoolbox\Assessment\Rubric\Grid\IndicatorUsage;
 use Schoolbox\Assessment\Rubric\MarkedGrid\CapabilityMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
+use Schoolbox\Assessment\Rubric\RowSet\Capability;
+use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
@@ -30,7 +32,6 @@ use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -41,6 +42,7 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\User;
 use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
@@ -77,14 +79,10 @@ class RubricMapper
     /** @var Database */
     protected $database;
 
-    /** @var Factory */
-    protected $factory;
-
     /** */
     public function __construct()
     {
         $this->database = Database::getInstance();
-        $this->factory  = new Factory(new Rubric());
     }
 
 
@@ -95,10 +93,12 @@ class RubricMapper
      *
      * @param AssessmentContext $context
      * @param bool              $getUsages
+     * @param bool              $useCache If false, bypass cache for fetch of
+     *                                    capabilities+indicators
      * @return RowSet
      * @throws MapperException
      */
-    public function retrieveRowSet(AssessmentContext $context, bool $getUsages): RowSet
+    public function retrieveRowSet(AssessmentContext $context, bool $getUsages, bool $useCache = true): RowSet
     {
         $rowSet = new RowSet($context);
 
@@ -108,13 +108,13 @@ class RubricMapper
         // Capability contains indicators too: inside-out them
         /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
         $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId());
+        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId(), $useCache);
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId)
+            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
                                                                 ->merge($indicatorModels);
         }
 
@@ -170,6 +170,8 @@ class RubricMapper
     /**
      * Saves this row set to the database.
      *
+     * @noinspection PhpDocMissingThrowsInspection Ignore spurious Aura\Di exception
+     *
      * @param RowSet           $rowSet
      * @param bool             $persistCurriculum    Should curriculum nodes for groups and
      *                                               criteria be updated?
@@ -180,7 +182,6 @@ class RubricMapper
      *                                               modified if it is used by no other
      *                                               assessment than this one.
      * @throws MapperException
-     * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \UnexpectedValueException             - If a duplicate indicator or capability exists in the folder
      *                                               - If course capability duplicates a unit capability
      *                                               - If a capability or indicator that should not be deleted has been
@@ -292,6 +293,7 @@ class RubricMapper
 
         // Forgive me...
         /** @var RosettaStone $l10n */
+        /** @noinspection PhpUnhandledExceptionInspection */
         $l10n = \Schoolbox\Mapper::getDi()->get('l10n');
         $spec = new ValidRowSet(
             $l10n,
@@ -872,201 +874,6 @@ class RubricMapper
         return $validCapMarkCount > 0;
     }
 
-
-    /**
-     * @param AssessmentContext $context
-     * @param string[]          $levelNames
-     *
-     * @return Rubric
-     */
-    public function createForContext(AssessmentContext $context, array $levelNames = [])
-    {
-        // Go one deeper to get unit and course
-        if ($context instanceof Project) {
-            return $this->createForContext($context->getBaseContext(), $levelNames);
-        }
-
-        $folderId       = $context->getFolder()->getId();
-        $parentFolderId = null;
-
-        if ($context instanceof UnitSpecification) {
-            $parentFolderId = $context->getFolder()->getParent()->getId();
-        }
-
-        return $this->createForFolder($folderId, $parentFolderId, $levelNames);
-    }
-
-    /**
-     * Generate a base rubric with Indicators (aka Criteria) taken from the specified Folder[/s]
-     *
-     * @deprecated use of ::createForContext() is preferable
-     *
-     * @param int      $folderId
-     * @param int|null $parentFolderId
-     * @param string[] $levelNames
-     *
-     * @return Rubric
-     */
-    public function createForFolder($folderId, $parentFolderId = null, array $levelNames = [])
-    {
-        /**
-         * Indexed by normalised Capability name
-         *
-         * @var Criteria\Group[] $capabilityCache
-         */
-        $capabilityCache = [];
-
-        /**
-         * Indexed by normalised Capability name, then normalised Indicator name
-         *
-         * @var Criteria\Criterion $indicatorCache
-         */
-        $indicatorCache = [];
-
-        $rubric = new Rubric();
-
-        if (!count($levelNames)) {
-            // default to 2 blank levels
-            $levelNames = ['', ''];
-        }
-
-        // inject the levels
-        foreach ($levelNames as $i => $level) {
-            $rubric->putLevel(new CompetencyLevel($i, $level));
-        }
-
-        $args = [
-            'folderId'   => $folderId,
-            'parentType' => Group::PARENT_TYPE_CATEGORY,
-        ];
-        $in = ['folderId',];
-        if ($parentFolderId) {
-            $in[] = 'parentFolderId';
-            $args['parentFolderId'] = $parentFolderId;
-        }
-        $in = implode(', :', $in);
-
-        $stmt = $this->database->query("
-            SELECT
-                rc.id,
-                rg.id AS group_id,
-                rg.name AS grouping,
-                rc.name,
-                COUNT(a.id) AS usage_count,
-                rg.parent_id
-            FROM rubric_criterion rc
-            INNER JOIN rubric_group           rg ON rg.id = rc.rubric_group_id
-            LEFT JOIN  rubric_criterion_usage ru ON rc.id = ru.criterion_id
-            LEFT JOIN  submission_box          b ON ru.submission_box_id = b.id
-            LEFT JOIN  assessment              a ON b.assessment_id = a.id AND a.deleted_at IS NULL
-            WHERE rg.parent_type = :parentType
-            AND rg.parent_id IN (:$in)
-            AND rc.deleted_at IS NULL
-            AND rg.deleted_at IS NULL
-            GROUP BY rc.id
-        ", $args);
-
-        // De-duplicate into caches, prioritising parent if duplicate between
-        // folder + parentFolder (eg UnitSpec vs CourseSpec)
-        while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-
-            // Trim + collapse internal whitespace
-            $capabilityNormalisedName = $this->normaliseForComparison($r['grouping']);
-
-            // If first instance of Capability
-            if (!array_key_exists($capabilityNormalisedName, $capabilityCache)) {
-                // Save the Capability
-                $capabilityCache[$capabilityNormalisedName] = new Criteria\Group(
-                    $r['group_id'],
-                    $this->normalizeSpace($r['grouping']),
-                    null
-                );
-
-                // Instantiate Indicator cache for the Capability
-                $indicatorCache[$capabilityNormalisedName] = [];
-            }
-
-            $indicatorNormalisedName = $this->normaliseForComparison($r['name']);
-
-            // First time we've seen this Capability + Indicator, or Indicator
-            // is from the parentFolder (higher priority) ?
-            if (!isset($indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName])
-                || ($parentFolderId && $parentFolderId == $r['parent_id'])
-            ) {
-                $indicator = new Criteria\Criterion($r['id'], $this->normalizeSpace($r['name']));
-                $indicator->setReadOnly($r['usage_count'] > 0);
-                $indicatorCache[$capabilityNormalisedName][$indicatorNormalisedName] = $indicator;
-            }
-        }
-
-        // For each group of Indicators
-        foreach ($indicatorCache as $capabilityNormalisedName => $indicators) {
-
-            // For each Indicator in the Capability
-            foreach ($indicators as $indicatorNormalisedName => $indicator) {
-                /** @var Criteria\Criterion $indicator */
-                // cascade the read-onlyness up to the Capability
-                if ($indicator->isReadOnly()) {
-                    $capabilityCache[$capabilityNormalisedName]->setReadOnly(true);
-                }
-                $rubric->putCriterion($capabilityCache[$capabilityNormalisedName], $indicator);
-            }
-        }
-
-        return $rubric;
-    }
-
-    /**
-     * Given a box ID, return the rubric assigned to it, if any
-     *
-     * Unlike createForContext(), this is a data-level method (ie it works on data models).
-     *
-     * @param SubmissionBox $box
-     * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
-     * @param bool          $editMode          - whether to include criteria not in use on box
-     *
-     * @return Rubric
-     */
-    public function findBySubmissionBox(SubmissionBox $box, $getParentCriteria = false, $editMode = false)
-    {
-        list ($groups, $criteria) = $this->findCriteria($box, $getParentCriteria);
-        $descriptors = $this->findDescriptors($box);
-        $levelList   = $this->generateLevelList($box);
-
-        // setup the data structure to match what the factory expects
-        $postdata = [
-            $box->getId() => [
-                'level'      => $levelList,
-                'group'      => $groups,
-                'criterion'  => $criteria,
-                'descriptor' => $descriptors,
-            ],
-        ];
-
-        // use the factory to produce the rubric object
-        /** @var Rubric $rubric */
-        $rubric = $this->factory->buildFromPostData($postdata, $box->isMarkedPerRubricGroup(), $box->isMarkedUsingRange(), $getParentCriteria || $editMode);
-
-        return $rubric->setSubmissionBox($box);
-    }
-
-    /**
-     * Given a DueWork, return the rubric assigned to it, if any
-     *
-     * @param DueWork\Model $dueWork
-     * @param bool          $getParentCriteria - whether to include box's folder's parent's criteria
-     * @param bool          $editMode          - whether to include criteria not in use on box
-     *
-     * @return Rubric
-     */
-    public function findByDueWork(DueWork\Model $dueWork, $getParentCriteria = false, $editMode = false)
-    {
-        /** @var SubmissionBox $box */
-        $box = SubmissionBoxMapper::getInstance()->findOneByColumn('assessment_id', $dueWork->getId());
-
-        return $this->findBySubmissionBox($box, $getParentCriteria, $editMode);
-    }
-
     /**
      * Find all criteria that are available or in use by the $box.
      *
@@ -1274,21 +1081,6 @@ class RubricMapper
     }
 
     /**
-     * Convenience (or safety) method wrapping grid fetch and mark application
-     *
-     * @param SubmissionBox $box
-     * @param User          $student
-     *
-     * @return Rubric
-     */
-    public function findBySubmissionBoxAndStudent(SubmissionBox $box, User $student)
-    {
-        $grid = $this->findBySubmissionBox($box);
-
-        return (new GridGenerator($this, $grid, $student))->applyInstructorGivenMark(true);
-    }
-
-    /**
      * Normalises spaces.
      *
      * Trims trailing/leading space, and replaces multiple spaces/newlines/etc.
@@ -1371,270 +1163,110 @@ class RubricMapper
     }
 
     /**
-     * @param IStorage $file
-     * @param int      $folderId
-     * @param int      $maxLevels
+     * Imports a rubric grid from a CSV into the given due work.
      *
-     * @throws \Schoolbox\Resource\Exception
-     * @return array 0: rubric POST data used to build a rubric grid
-     *               1: bool: does the rubric have customised max mark per group values?
-     *                        (required as the rubric object doesn't store this separately
-     *                         from their actual value)
-     *               2: bool: does the rubric have mark ranges switched on?
+     * @param IStorage      $file
+     * @param DueWork\Model $dueWork
+     * @param int           $maxLevels
+     *
+     * @throws UnexpectedValueException if the importer couldn't be built
+     * @throws MapperException          if something happens whilst retrieving
+     *                                  or persisting the rowset
+     * @return void
      */
-    public function buildFromCSV(IStorage $file, $folderId, $maxLevels): array
+    public function importGridFromCsv(IStorage $file, DueWork\Model $dueWork, $maxLevels): void
     {
-        $square = [];
+        // Create the factory
+        $importerFactory = new CsvImporterFactory();
+        $importer        = $importerFactory->build($file->readStream(), $maxLevels);
 
-        // Determine if the specified folder has a UnitSpec
-        /** @var UnitSpecification $unitSpec */
-        $unitSpec = UnitSpecificationMapper::getInstance()->findByColumn('folder_id', $folderId)->first();
-        $courseSpecFolderId = null;
-        if ($unitSpec) {
-            // Add the Unit's Course's Folder's ID
-            $courseSpecFolderId = $unitSpec->getCourse()->getFolder()->getId();
-        }
 
-        $fp = $file->readStream();
-
-        $headerRow = $this->getcsv($fp, $maxLevels + 2);
-
-        // must be an array, and must have at least 3 "cells"
-        if (!is_array($headerRow) || count($headerRow) < 3) {
-            throw new \Schoolbox\Resource\Exception("Not a valid rubric CSV file");
-        }
-
-        // First two cells may be settings:
-        // useMarkRange:      On/Off
-        // markPerCapability: On/Off
-        $useMarkRange      = false;
-        $markPerCapability = false;
-        $settingCells      = [$headerRow[0], $headerRow[1]];
-        foreach ($settingCells as $settingCell) {
-            [$setting, $value] = explode(':', $settingCell);
-            switch (strtolower(trim($value))) {
-                case '1':
-                case 'yes':
-                case 'on':
-                    $boolValue = true;
-                    break;
-
-                case '0':
-                case 'no':
-                case 'off':
-                default:
-                    $boolValue = false;
-                    break;
+        // Add to the rowset as necessary
+        $rowSet        = $this->retrieveRowSet($dueWork->getContext(), false);
+        $rowsetChanged = false;
+        foreach ($importer->retrieveCapabilitiesWithIndicators() as $capability) {
+            // Is this capability within the rowset? If not add it
+            $capName        = $capability['name'];
+            $thisCapability = $rowSet->retrieveCapabilityByName($capName);
+            if (!$thisCapability) {
+                $rowsetChanged  = true;
+                $thisCapability = (new Capability())
+                    ->setName($capName)
+                    ->setIsCourseLevel(false);
+                $rowSet->getCapabilities()->add($thisCapability);
             }
-            switch (trim($setting)) {
-                case 'useMarkRange':
-                    $useMarkRange = $boolValue;
-                    break;
 
-                case 'markPerCapability':
-                    $markPerCapability = $boolValue;
-                    break;
 
-                default:
-                    break;
-            }
-        }
-
-        // Note: this used to be able to tell if the first row was actually the
-        // first group, instead of the set of levels. (This would happen if
-        // Excel saved a CSV with nothing at all in the first row.)
-        // Because the first two cells are now reserved for settings, they
-        // should never be empty anymore; however, we can't tell anymore if the
-        // spreadsheet used to have an empty first row.
-        // (This was raised in SB-12175)
-
-        $square[] = $headerRow;
-
-        // list of levels
-        $levelNames = array_slice($square[0], 2);
-
-        $workingGroupName = '';
-        $workingCritName = '';
-
-        // build the square, extracting data as we go
-        $groups            = [];
-        $isLastRowNewGroup = false;
-        while ($row = $this->getcsv($fp, $maxLevels + 2)) {
-            if ($isLastRowNewGroup) {
-                $groupMaxValue     = $row[0];
-                $isLastRowNewGroup = false;
-            } else {
-                // list of criteria, grouped by... uh, group
-                if ($row[0]) {
-                    $workingGroupName  = $row[0];
-                    $isLastRowNewGroup = true;
+            foreach ($capability['indicators'] as $indicator) {
+                // Is this indicator in the capability? If not add it
+                $indName       = $indicator['name'];
+                $thisIndicator = $thisCapability->retrieveIndicatorByName($indName);
+                if (!$thisIndicator) {
+                    $rowsetChanged = true;
+                    $thisIndicator = (new Indicator())
+                        ->setName($indName);
+                    $thisCapability->getIndicators()->add($thisIndicator);
                 }
             }
-
-            // copy the groupname into the row
-            $row[0] = $workingGroupName;
-
-            if ($row[1]) {
-                $workingCritName = $row[1];
-            }
-            // copy the criteria name into the row
-            $row[1] = $workingCritName;
-
-            // extract the criterion uniquely (can be blank)
-            // (The group values persist from previous rows)
-            $groups[$workingGroupName]['id']                         = null;
-            $groups[$workingGroupName]['name']                       = $workingGroupName;
-            $groups[$workingGroupName]['maxValue']                   = $groupMaxValue !== '' ? $groupMaxValue : null;
-            $groups[$workingGroupName]['criteria'][$workingCritName] = [
-                'id'   => null,
-                'name' => $workingCritName,
-            ];
-
-            $square[] = $row;
         }
 
-        // ensure all given criteria exist: create new ones if necessary
-        $criterionMapper = CriterionMapper::getInstance();
-        foreach ($groups as $groupName => $group) {
-            foreach ($group['criteria'] as $crit) {
-                $criterionName = $crit['name'];
-                $model         = null;
+        // Was the rowset changed? Preserve it if so
+        if ($rowsetChanged) {
+            $this->persistRowSet($rowSet, true, false);
+            // Reload it, bypassing the caches created by the last load I did
+            $rowSet = $this->retrieveRowSet($dueWork->getContext(), false, false);
+        }
 
-                // Which criterion is used?
-                try {
-                    // If there's a matching criterion in the folder: use it
-                    $model = $criterionMapper->findOneForFolderByKey($folderId, $criterionName, $groupName);
 
-                } catch (MapperException $e) {
-                    // If there isn't:
-                    // * If there's a course spec: use a matching criterion from it
-                    if ($courseSpecFolderId) {
-                        try {
-                            $model = $criterionMapper->findOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
-                        } catch (MapperException $e) {
-                            // There's no match in the folder or spec.
-                            // Create a new criterion in the folder
-                        }
+        // Now start building the grid
+        $dueWork
+            ->setMarkPerCapability($importer->isMarkPerCapability())
+            ->setUseMarkRange($importer->isUseMarkRange());
+        $grid = new Grid($dueWork, $rowSet);
+
+
+        // Create levels
+        foreach ($importer->getLevels() as $i => $levelName) {
+            $grid->getLevels()[$i] = (new \Schoolbox\Assessment\Rubric\Grid\Level())
+                ->setName($levelName);
+        }
+
+
+        // Add cap usages, ind usages, descriptors
+        foreach ($importer->retrieveCapabilitiesWithIndicators() as $capability) {
+            $capInUse = false;
+
+            // If $capabilityObject is null here, that's a problem:
+            // it should've been created
+            $capabilityObject = $rowSet->retrieveCapabilityByName($capability['name']);
+            $capabilityUsage  = (new CapabilityUsage($capabilityObject))
+                ->setMaxValue($capability['maxValue']);
+
+            foreach ($capability['indicators'] as $indicator) {
+                $indicatorObject = $capabilityObject->retrieveIndicatorByName($indicator['name']);
+
+                // Likewise if $indicatorObject is null here, that's a problem
+                $indicatorUsage  = new IndicatorUsage($indicatorObject);
+                foreach ($indicator['descriptors'] as $level => $descriptor) {
+                    if ($descriptor !== null) {
+                        $capInUse         = true;
+                        $indicatorUsage->getDescriptors()[$level] = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
+                            ->setDescription($descriptor['name'])
+                            ->setMaxValue($descriptor['value']);
                     }
                 }
-
-                // If there's no course spec, or there's no match in the spec:
-                // * create a new criterion in the folder
-                if (!$model) {
-                    $createInCourse = false;
-                    if ($courseSpecFolderId) {
-                        // Is the group already on the course?
-                        // Create the criterion in the course, as group names
-                        // can't conflict between the course and unit.
-                        try {
-                            GroupMapper::getInstance()->findOneForFolderByName($courseSpecFolderId, $groupName);
-                            $createInCourse = true;
-                        } catch (MapperException $e) {
-                            $createInCourse = false;
-                        }
-                    }
-                    if ($createInCourse) {
-                        $model = $criterionMapper->findOrCreateOneForFolderByKey($courseSpecFolderId, $criterionName, $groupName);
-                    } else {
-                        $model = $criterionMapper->findOrCreateOneForFolderByKey($folderId, $criterionName, $groupName);
-                    }
-                }
-
-                // yank those IDs
-                $groups[$groupName]['id']                             = $model->getGroup()->getId();
-                $groups[$groupName]['criteria'][$criterionName]['id'] = $model->getId();
+                $indicatorUsage->applyDescriptorMinValues($importer->isUseMarkRange());
+                $capabilityUsage->getIndicatorUsages()->add($indicatorUsage);
             }
 
-        }
-
-        // get a new rubric in array form
-        $postdata = $this->createForFolder($folderId, $courseSpecFolderId, $levelNames)->toPostData();
-
-        // overlay descriptor and max points data
-        for ($i = 1; $i < count($square); $i += 2) {
-
-            $gLookup = $square[$i][0];
-            $cLookup = $square[$i][1];
-
-            $crit = $groups[$gLookup]['criteria'][$cLookup];
-
-            if (!$crit) {
-                // given the way we're working with data we've expressly set up just above, this should be impossible...
-                continue;
-            }
-
-            $groupId   = $groups[$gLookup]['id'];
-            $critId    = $crit['id'];
-            $critInUse = false;
-
-            for ($j = 2; $j < count($square[$i]); ++$j) {
-
-                $levelSequence = $j - 2;
-
-                $dText = trim($square[$i][$j]);
-                $dVal  = trim($square[$i + 1][$j]);
-
-
-                // Set the group's max value
-                $postdata['group'][$groupId]['maxValue'] = $groups[$gLookup]['maxValue'];
-
-                if (strlen($dText) || strlen($dVal)) {
-                    // assign the descriptor data to the appropriate cell
-                    $critInUse = true;
-                    $postdata['descriptor'][$critId][$levelSequence] = [
-                        'id'     => null,
-                        'text'   => $dText,
-                        'points' => $dVal,
-                    ];
-                }
-            }
-
-            // turn this criterion on, only if it's actually in use
-            if ($critInUse) {
-                $postdata['criterion'][$critId]['on'] = true;
+            if ($capInUse) {
+                $grid->getCapabilityUsages()->add($capabilityUsage);
             }
         }
 
-
-        // For each group: infer its mark-per-capability
-        if ($markPerCapability) {
-            foreach ($postdata['group'] as $groupId => $group) {
-                // Only infer if it's not provided
-                if (isset($group['maxValue'])) {
-                    continue;
-                }
-
-                // Find the criteria for this group
-                $inferredMaxValue = 0;
-                foreach ($postdata['criterion'] as $criterionId => $criterion) {
-                    if ((int)$criterion['groupId'] !== $groupId) {
-                        continue;
-                    }
-
-
-                    // Now go thru its descriptors
-                    $criterionMaxValue = 0;
-                    foreach ($postdata['descriptor'][$criterionId] ?? [] as $descriptor) {
-                        $criterionMaxValue = max($criterionMaxValue, $descriptor['points']);
-                    }
-
-                    $inferredMaxValue += $criterionMaxValue;
-                }
-
-                $postdata['group'][$groupId]['maxValue'] = $inferredMaxValue;
-            }
-        }
-
-
-        // Get rid of level IDs
-        foreach ($postdata['level'] as &$level) {
-            unset($level['id']);
-        }
-        unset($level);
-
-
-        return [$postdata, $markPerCapability, $useMarkRange];
+        $dueWork->setRubricGrid($grid);
     }
+
 
     /**
      * Copies the selected descriptors from one submission return to another.
@@ -1681,63 +1313,6 @@ class RubricMapper
         }
         $groupMarkMapper->save($destinationGroupMarks);
         $descriptorMarkMapper->save($destinationDescriptorMarks);
-    }
-
-    /**
-     * @deprecated use `persistGrid` instead
-     *
-     * @param Rubric        $rubric
-     * @param SubmissionBox $submissionBox
-     */
-    public function save(Rubric $rubric, SubmissionBox $submissionBox)
-    {
-        // Commented out for now so that Atlas import doesn't break
-        // TODO make Atlas import not use this (SA-7796)
-//        trigger_error('This method is deprecated; use "persistGrid" instead', E_USER_DEPRECATED);
-
-        // juuust in case
-        $rubric->setSubmissionBox($submissionBox);
-
-        // TODO some way to wrap all this in a transaction would be nice... -_-;
-        $existingLevelIds    = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId());
-        $existingDescriptors = DescriptorMapper::getInstance()->findByColumn('level_id', $existingLevelIds);
-        $existingDescriptors = $existingDescriptors->map(function (Descriptor $d) {
-            return clone $d;
-        });
-
-        // first, persist the row and column headers (criteria and levels, respectively)
-        GroupMapper::getInstance()->save($rubric->getORMGroups());
-        CriterionMapper::getInstance()->save($criteria = $rubric->getORMCriteria());
-        LevelMapper::getInstance()->save($levels = $rubric->getORMLevels());
-
-        // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
-        // TODO consider removing submission_box_id, associating with group ID instead
-        CriterionUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        CriterionUsageMapper::getInstance()->save($usages = $rubric->getORMCriterionUsages());
-
-        // ditto group usages
-        GroupUsageMapper::getInstance()->deleteByColumn('submission_box_id', $submissionBox->getId());
-        GroupUsageMapper::getInstance()->save($rubric->getORMGroupUsages());
-
-        // finally, now that everything else is saved, save the descriptors
-        $descIds = DescriptorMapper::getInstance()->save($descs = $rubric->getORMDescriptors());
-
-        $this->checkDescriptorValueChanges($existingDescriptors, $descs);
-
-        // wash up before dinner, kids
-
-        // remove all levels that have zero descriptors attached - extract from the descriptors
-        $seenLevels = [];
-        foreach ($descs as $desc) {
-            $seenLevels[$desc->getLevel()->getId()] = true;
-        }
-        $seenLevels = array_keys($seenLevels);
-
-        $this->tidyUp(LevelMapper::getInstance(), ['box_id' => $submissionBox->getId()], $seenLevels);
-
-        // remove all descriptors that are on this box, but are not among the descriptors we just saved (it indicates blankness / unused-ness)
-        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $submissionBox->getId(), ['deleted' => true]);
-        $this->tidyUp(DescriptorMapper::getInstance(), ['level_id' => $levelIds], $descIds);
     }
 
     /**

@@ -8,7 +8,6 @@
 namespace Schoolbox\Learning\Authorizer\Rule;
 
 use Schoolbox\Learning\Assessment\IFeedback;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork\Response;
 use InvalidArgumentException;

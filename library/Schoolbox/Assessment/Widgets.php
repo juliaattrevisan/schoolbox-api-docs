@@ -10,8 +10,6 @@
  */
 
 namespace Schoolbox\Assessment;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 
 class Widgets {

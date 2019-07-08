@@ -14,7 +14,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -422,19 +421,20 @@ class Factory
                     // Load rubrics into assessment whilst here
                     $rubric = [];
                     if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
-                        $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
-                        $rubric = (new RubricContext($this->rubricMapper))
-                                       ->generate(
-                                           $assessment,
-                                           $student,
-                                           $this->currentUser,
-                                           $this->access
-                                       )['rubric'];
+                        $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
+//                        $rubric = (new RubricContext($this->rubricMapper))
+//                                       ->generate(
+//                                           $assessment,
+//                                           $student,
+//                                           $this->currentUser,
+//                                           $this->access
+//                                       )['rubric'];
                     }
 
+                    // TODO update template to query rubric in assessment instead
                     $allGrades['a' . $assessment->getId()] = [
                         'assessment'  => $assessment,
-                        'rubric'      => $rubric,
+                        'rubric'      => null,
                         'pretty_mark' => $feedback->getHumanReadableMark(),
                         'mark'        => $feedback->getNormalisedMark(),
                         'comment'     => $feedback->getComment(),

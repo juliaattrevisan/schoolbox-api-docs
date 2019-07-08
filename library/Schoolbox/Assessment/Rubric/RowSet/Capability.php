@@ -80,6 +80,19 @@ class Capability
 
 
     /**
+     * Retrieves an indicator by its name.
+     *
+     * @param string $name
+     * @return Indicator|null
+     */
+    public function retrieveIndicatorByName(string $name): ?Indicator
+    {
+        // TODO consider if normalized capability names should be used
+        return $this->indicators->getBy('name', $name);
+    }
+
+
+    /**
      * Retrieve the ID of all indicators in this capability.
      *
      * @return array|int[]

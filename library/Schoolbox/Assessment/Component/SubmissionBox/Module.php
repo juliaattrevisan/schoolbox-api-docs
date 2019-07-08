@@ -17,8 +17,6 @@ use Aura\Router\Router;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as SubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Role;
-use Twig_Error_Loader;
-use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule

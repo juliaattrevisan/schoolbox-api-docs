@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Jitter\IJitter;
 use GuzzleHttp\Exception\ConnectException;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Learning\InlineGrader\Kami\Exception\ApiException;
 use Schoolbox\Learning\InlineGrader\Kami\Exception\IKamiException;
 use Throwable;
 

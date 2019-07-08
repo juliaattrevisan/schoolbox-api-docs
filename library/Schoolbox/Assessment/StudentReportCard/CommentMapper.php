@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -10,130 +10,159 @@ namespace Schoolbox\Assessment\StudentReportCard;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\User;
 
-class CommentMapper extends Mapper {
+class CommentMapper extends Mapper
+{
 
-	protected function mapping() {
+    protected function mapping()
+    {
 
-		// register table and model
-		$this->hasTable('reportcard_comment');
-		$this->hasModel(Comment::class);
+        // register table and model
+        $this->hasTable('reportcard_comment');
+        $this->hasModel(Comment::class);
 
-		// register mapping
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'category_id',
-			'property'   => 'category',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'category',
-		));
-		$this->hasMap(array(
-			'column'     => 'commenter_id',
-			'property'   => 'commenter',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'commenter',
-		));
-		$this->hasMap(array(
-			'column'     => 'student_id',
-			'property'   => 'student',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'student',
-		));
-		$this->hasMap(array(
-			'column'     => 'body',
-			'property'   => 'body',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'created',
-			'property'   => 'created',
-			'type'       => self::TYPE_DATETIME,
-			'created_timestamp' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'modified',
-			'property'   => 'modified',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'deleted',
-			'property'   => 'deleted',
-			'type'       => self::TYPE_DATETIME,
-		));
-		$this->hasMap(array(
-			'column'     => 'student_visibility',
-			'property'   => 'studentVisibility',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'parent_visibility',
-			'property'   => 'parentVisibility',
-			'type'       => self::TYPE_BOOLEAN,
-		));
+        // register mapping
+        $this->hasMap(
+            array(
+                'column'     => 'id',
+                'property'   => 'id',
+                'type'       => self::TYPE_INTEGER,
+                'identifier' => true,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'category_id',
+                'property' => 'category',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'category',
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'commenter_id',
+                'property' => 'commenter',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'commenter',
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'student_id',
+                'property' => 'student',
+                'type'     => self::TYPE_MODEL,
+                'join'     => 'student',
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'body',
+                'property' => 'body',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'            => 'created',
+                'property'          => 'created',
+                'type'              => self::TYPE_DATETIME,
+                'created_timestamp' => true,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'modified',
+                'property' => 'modified',
+                'type'     => self::TYPE_DATETIME,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'deleted',
+                'property' => 'deleted',
+                'type'     => self::TYPE_DATETIME,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'student_visibility',
+                'property' => 'studentVisibility',
+                'type'     => self::TYPE_BOOLEAN,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'parent_visibility',
+                'property' => 'parentVisibility',
+                'type'     => self::TYPE_BOOLEAN,
+            )
+        );
 
-		// register joins
-		$this->hasJoin('category', array(
-			'mapper'            => '\\Schoolbox\\Resource\\Folder\\Mapper',
-			'this_key'          => 'category_id',
-			'other_key'         => 'id',
-			'this_property'     => 'category',
-			'other_property'    => 'id'
-		));
-		$this->hasJoin('commenter', array(
-			'mapper'            => '\\Schoolbox\\UserMapper',
-			'this_key'          => 'commenter_id',
-			'other_key'         => 'id',
-			'this_property'     => 'commenter',
-			'other_property'    => 'id'
-		));
-		$this->hasJoin('student', array(
-			'mapper'            => '\\Schoolbox\\UserMapper',
-			'this_key'          => 'student_id',
-			'other_key'         => 'id',
-			'this_property'     => 'student',
-			'other_property'    => 'id'
-		));
+        // register joins
+        $this->hasJoin(
+            'category', array(
+            'mapper'         => '\\Schoolbox\\Resource\\Folder\\Mapper',
+            'this_key'       => 'category_id',
+            'other_key'      => 'id',
+            'this_property'  => 'category',
+            'other_property' => 'id'
+        )
+        );
+        $this->hasJoin(
+            'commenter', array(
+            'mapper'         => '\\Schoolbox\\UserMapper',
+            'this_key'       => 'commenter_id',
+            'other_key'      => 'id',
+            'this_property'  => 'commenter',
+            'other_property' => 'id'
+        )
+        );
+        $this->hasJoin(
+            'student', array(
+            'mapper'         => '\\Schoolbox\\UserMapper',
+            'this_key'       => 'student_id',
+            'other_key'      => 'id',
+            'this_property'  => 'student',
+            'other_property' => 'id'
+        )
+        );
 
-		$this->hasSoftDeleteDateField('deleted');
+        $this->hasSoftDeleteDateField('deleted');
 
-	}
+    }
 
-	public function findByColumn($columnName, $columnValue, $options = array()) {
-		$commentCollection = parent::findByColumn($columnName, $columnValue, $options);
+    public function findByColumn($columnName, $columnValue, $options = array())
+    {
+        $commentCollection = parent::findByColumn($columnName, $columnValue, $options);
 
-		$categoryMapper = $this->getJoinMapper('category');
-		$studentMapper = $this->getJoinMapper('student');
-		$commenterMapper = $this->getJoinMapper('commenter');
+        $categoryMapper = $this->getJoinMapper('category');
+        $studentMapper = $this->getJoinMapper('student');
+        $commenterMapper = $this->getJoinMapper('commenter');
 
-		foreach($commentCollection as &$comment) {
-			/** @var Comment $comment */
-			$comment->setCategory($categoryMapper->findById($comment->getCategory()->getId()));
-			$comment->setStudent($studentMapper->findById($comment->getStudent()->getId()));
-			$comment->setCommenter($commenterMapper->findById($comment->getCommenter()->getId()));
-		}
+        foreach ($commentCollection as &$comment) {
+            /** @var Comment $comment */
+            $comment->setCategory($categoryMapper->findById($comment->getCategory()->getId()));
+            $comment->setStudent($studentMapper->findById($comment->getStudent()->getId()));
+            $comment->setCommenter($commenterMapper->findById($comment->getCommenter()->getId()));
+        }
 
-		return $commentCollection;
-	}
+        return $commentCollection;
+    }
 
-	public function findById($identifierValue) {
-		return $this->findByColumn('id', $identifierValue)->first();
-	}
+    public function findById($identifierValue)
+    {
+        return $this->findByColumn('id', $identifierValue)->first();
+    }
 
 
-	public function findByStudentAndCategory($studentId, $categoryId, $includeDeletions = false) {
-		$categoryMapper = $this->getJoinMapper('category');
-		$studentMapper = $this->getJoinMapper('student');
-		$commenterMapper = $this->getJoinMapper('commenter');
-		$roleMapper = $commenterMapper->getJoinMapper('role');
+    public function findByStudentAndCategory($studentId, $categoryId, $includeDeletions = false)
+    {
+        $categoryMapper = $this->getJoinMapper('category');
+        $studentMapper = $this->getJoinMapper('student');
+        $commenterMapper = $this->getJoinMapper('commenter');
+        $roleMapper = $commenterMapper->getJoinMapper('role');
 
-		$query = "
+        $query = "
 			SELECT
 				{$this->getColumnString('com')},
 				{$categoryMapper->getColumnString('cat')},
@@ -149,28 +178,28 @@ class CommentMapper extends Mapper {
 			AND com.category_id = ?
 		";
 
-		if(!$includeDeletions) {
-			$query .= 'AND com.deleted IS NULL';
-		}
+        if (!$includeDeletions) {
+            $query .= 'AND com.deleted IS NULL';
+        }
 
-		$query .= ' ORDER BY created DESC';
+        $query .= ' ORDER BY created DESC';
 
-		$stmt = $this->database->prepare($query);
-		$stmt->execute(array($studentId, $categoryId));
+        $stmt = $this->database->prepare($query);
+        $stmt->execute(array($studentId, $categoryId));
 
-		$commentCollection = new Collection();
+        $commentCollection = new Collection();
 
-		while($record = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-			/** @var $commentObject Comment */
-			$commentObject = $this->hydrate($record, 'com');
-			$commentObject->setCategory($categoryMapper->hydrate($record, 'cat'));
-			$commentObject->setStudent($studentMapper->hydrate($record, 'su'));
-			$commentObject->setCommenter($commenterMapper->hydrate($record, 'cu'));
-			$commentObject->getCommenter()->setRole($roleMapper->hydrate($record, 'r'));
-			$commentCollection->add($commentObject);
-		}
+        while ($record = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            /** @var $commentObject Comment */
+            $commentObject = $this->hydrate($record, 'com');
+            $commentObject->setCategory($categoryMapper->hydrate($record, 'cat'));
+            $commentObject->setStudent($studentMapper->hydrate($record, 'su'));
+            $commentObject->setCommenter($commenterMapper->hydrate($record, 'cu'));
+            $commentObject->getCommenter()->setRole($roleMapper->hydrate($record, 'r'));
+            $commentCollection->add($commentObject);
+        }
 
-		return $commentCollection;
+        return $commentCollection;
 
-	}
+    }
 }

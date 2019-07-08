@@ -16,10 +16,6 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\AbstractResponse;
-use \Schoolbox\Learning\Assessment\Participant;
 
 class Minimum extends AbstractSummator
 {

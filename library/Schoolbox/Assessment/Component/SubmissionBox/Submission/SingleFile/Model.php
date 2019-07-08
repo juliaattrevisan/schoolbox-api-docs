@@ -21,7 +21,6 @@ use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\InlineGrader\Kami;
-use Alaress_Date_Format;
 
 /**
  * A single file within a student's submission to a due work.

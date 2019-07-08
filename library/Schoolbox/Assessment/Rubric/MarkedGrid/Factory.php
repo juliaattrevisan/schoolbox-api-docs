@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
 
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark;
 
 /**
  * Factory for building `MarkedGrid` objects.

@@ -12,8 +12,6 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use PDO;
 use PDOStatement;
 use Schoolbox;
-use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 

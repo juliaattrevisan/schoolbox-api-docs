@@ -11,10 +11,8 @@ use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Participant\Plan;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 
 /**
  * @method Model hydrate(array $row, $alias = '', $callback = null)

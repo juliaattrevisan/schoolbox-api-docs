@@ -13,9 +13,6 @@ namespace Schoolbox\Learning\Assessment\Test;
 use PHPUnit\Framework\TestCase;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
-
-use \Schoolbox\Learning\Assessment\Participant;
-
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;

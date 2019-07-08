@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Course\Import;
 use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Component_Instance;
-use Schoolbox\Assessment\Course\Import\Destinations;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -20,7 +19,6 @@ use Schoolbox\Learning\Course;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
@@ -36,7 +34,6 @@ use Component_ConfigDefinitionMapper;
 use Component_ConfigMapper;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
 
 class Controller extends Base\Base
 {
@@ -93,7 +90,6 @@ class Controller extends Base\Base
         Component_InstanceMapper $componentInstanceMapper,
         Component_ConfigDefinitionMapper $componentConfigDefinitionMapper,
         Component_ConfigMapper $componentConfigInstanceMapper,
-        UserAccessMapper $userAccessMapper,
         Access $access,
         ImportFactory $importFactory,
         Replicator $replicator,

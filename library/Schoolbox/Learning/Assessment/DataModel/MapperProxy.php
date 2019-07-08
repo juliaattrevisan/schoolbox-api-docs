@@ -833,9 +833,6 @@ class MapperProxy
 
                 if ($dueWork->getRubricGrid()) {
                     $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
-                } elseif ($dueWork->getRubric()) {
-                    $dueWork->getRubric()->setSubmissionBox($subObject);
-                    $rubricMapper->save($dueWork->getRubric(), $subObject);
                 }
             } else {
                 // No rubric? Just save the due work

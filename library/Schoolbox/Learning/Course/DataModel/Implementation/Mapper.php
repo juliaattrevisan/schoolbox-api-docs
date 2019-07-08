@@ -11,7 +11,6 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\AbstractCourseMapper;
-use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;

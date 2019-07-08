@@ -15,7 +15,6 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\RubricContext;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -313,19 +312,17 @@ class Acquisition
                 /* Summon rubrics
                  */
                 if ($assessment instanceof DueWork && $assessment->getUseRubric()) {
-                    $assessment->setRubric($this->rubricMapper->findByDueWork($assessment));
+                    $assessment->setRubricGrid($this->rubricMapper->retrieveGrid($assessment, false));
                 }
 
                 foreach ($people as $person) {
-                    $context = (new RubricContext($this->rubricMapper))->generateMarkable($assessment, $person);
-
                     /* Investigate the context for the user and assessment and find the chosen descriptors that
                      * exist in the set of rubric groups and criteria.
                      */
                     $raw['stack'][] = $this->investigate(
                         $person,
                         $assessment,
-                        $context['rubric'],
+                        [],
                         $this->indicators
                     );
                 }
@@ -345,6 +342,8 @@ class Acquisition
     /**
      * Investigate a particular participant and find out what they got for a particular assessment
      * Store the ultra-basics in an array and return that for future rendering
+     *
+     * TODO update this method to use `$assessment->getRubricGrid`
      *
      * @param User        $user
      * @param IAssessable $assessment

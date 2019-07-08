@@ -18,7 +18,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;

@@ -152,7 +152,7 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getMarkVisibility() || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
         null === $dataModel->getSelfReviewability() || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
 
-        // Has Rubric?
+        // Has Rubric? (actual rubric must be loaded outside of this method)
         if ($dataModel->getUseRubric()) {
             $domainObject->setUseRubric(true);
 
@@ -163,8 +163,6 @@ class DueWork implements IAssessmentTypeTranslator
             if ($dataModel->isMarkedUsingRange()) {
                 $domainObject->setUseMarkRange(true);
             }
-
-            $domainObject->setRubric($dataModel->getRubric());
         } else {
             $domainObject->setUseRubric(false);
             $domainObject->setMarkPerCapability(false);
@@ -200,8 +198,5 @@ class DueWork implements IAssessmentTypeTranslator
         if (null !== $dataModel->getMarkType()) {
             $domainObject->setMarkType($dataModel->getMarkType());
         }
-
-        // Attach a (possibly empty) Rubric
-        $domainObject->setRubric($dataModel->getRubric());
     }
 }

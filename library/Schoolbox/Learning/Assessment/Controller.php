@@ -23,9 +23,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
 use Aura\Di\Exception\ServiceNotFound;
-use Aura\Router\Exception\RouteNotFound;
-use Schoolbox\Application\Exception as ApplicationException;
-use Aura\Web\Exception\InvalidStatusCode;
 
 abstract class Controller extends ListController implements IAssessmentController
 {
