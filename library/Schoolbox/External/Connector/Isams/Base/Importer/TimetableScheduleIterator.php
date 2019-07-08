@@ -64,13 +64,7 @@ class TimetableScheduleIterator implements Iterator
 
         /* TODO: Find out class details by looking elsewhere in the xml
          */
-//        $periodId = (string)$class->PeriodId;
 //        $roomId = (string)$class->RoomId;
-
-        /* Find the subject's actual name by looking elsewhere in the xml
-         */
-        $setCode = (string)$schedule->Code;
-        $setName = $this->findSubjectName($setCode);
 
         /* Teacher
          * (I've only seen one per class in the xml so far...but there could be many?)
@@ -79,13 +73,20 @@ class TimetableScheduleIterator implements Iterator
 
         /* Students
          */
-        $students = $this->findStudents($setCode);
+        $students = $this->findStudents((string)$schedule->Code);
+
+        /* Find out when this happens in the grand design of the timetable
+         */
+        $period = $this->findPeriod($schedule);
 
         /* Basic TimetableClass data
          */
         $class = [
-            'code' => $setCode,
-            'name' => $setName,
+            'class' => [
+                'code' => (string)$schedule->Code,
+                'name' => $this->findSubjectName((string)$schedule->Code),
+            ],
+            'period' => $period,
             'teachers' => $teachers,
             'students' => $students
         ];
@@ -98,8 +99,36 @@ class TimetableScheduleIterator implements Iterator
 
 
     /**
-     * Find a subject's name from its $setCode (that's its subject code equivalent)
+     * Find period data for a given $periodId
      *
+     * @param SimpleXMLElement $schedule
+     * @return array|SimpleXMLElement[]|string
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findPeriod(SimpleXMLElement $schedule)
+    {
+        $periodId = (string)$schedule->PeriodId;
+
+        $node = $this->batchxml->fetchXml("/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id='{$periodId}']");
+
+        if (empty($node)) {
+            return 'unknown period';
+        }
+
+        return [
+            'ordinal' => (string)$node[0]->Ordinal,
+            'name' => (string)$node[0]->Name,
+            'abbrev' => (string)$node[0]->ShortName,
+            'start' => (string)$node[0]->StartTime,
+            'end' => (string)$node[0]->EndTime,
+        ];
+    }
+
+
+    /**
+     * Find a subject's name from its $setCode (that's its subject code equivalent)
      *
      * @param string $setCode
      * @return string
@@ -208,6 +237,7 @@ class TimetableScheduleIterator implements Iterator
 
     /**
      * Move forward to next element
+     *
      * @link  https://php.net/manual/en/iterator.next.php
      * @return void Any returned value is ignored.
      * @since 5.0.0
