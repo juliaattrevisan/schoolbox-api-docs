@@ -98,16 +98,16 @@ if ($_GET) {
 
         case "oxford_classic":
             $form              = "form";
-            $action            = "http://classics.oxfordre.com/LOGIN";
+            $action            = "http://oxfordre.com/LOGIN";
             $method            = "POST";
-            $formArray['dest'] = '/';
+            $formArray['dest'] = '/classics';
             $formArray['user'] = 'melbgirls';
             $formArray['pass'] = 'mggs1893';
             break;
 
         case "oxford_greek":
             $form              = "form";
-            $action            = "http://www.oxfordreference.com/LOGIN";
+            $action            = "https://www.oxfordreference.com/LOGIN";
             $method            = "POST";
             $formArray['dest'] = '/view/10.1093/acref/9780195170726.001.0001/acref-9780195170726';
             $formArray['user'] = 'melbgirls';
@@ -116,7 +116,7 @@ if ($_GET) {
 
         case "oxford_shakespeare":
             $form              = "form";
-            $action            = "http://www.oxfordreference.com/LOGIN";
+            $action            = "https://www.oxfordreference.com/LOGIN";
             $method            = "POST";
             $formArray['dest'] = '/view/10.1093/acref/9780198117353.001.0001/acref-9780198117353';
             $formArray['user'] = 'melbgirls';
@@ -125,7 +125,7 @@ if ($_GET) {
 
         case "oxford_dictionary":
             $form              = "form";
-            $action            = "http://www.oed.com/LOGIN";
+            $action            = "https://www.oed.com/LOGIN";
             $method            = "POST";
             $formArray['dest'] = '/';
             $formArray['user'] = 'melbgirls';
