@@ -143,11 +143,11 @@ class TimetableScheduleIterator implements Iterator
 
         $periodPath = "/iSAMS/TimetableManager/Structure/Week/Days/Day/Periods/Period[@Id='{$periodId}']";
 
-        $node = $this->batchxml->fetchXml($periodPath);
+        $period = $this->batchxml->fetchXml($periodPath);
 
         /* Unknown period
          */
-        if (empty($node)) {
+        if (empty($period)) {
             return [
                 'day' => '',
                 'ordinal' => '',
@@ -155,6 +155,7 @@ class TimetableScheduleIterator implements Iterator
                 'abbrev' => '',
                 'start' => '',
                 'end' => '',
+                'room' => []
             ];
         }
 
@@ -174,7 +175,7 @@ class TimetableScheduleIterator implements Iterator
                 'abbrev' => '',
                 'start' => '',
                 'end' => '',
-                'room' => '',
+                'room' => []
             ];
         }
 
@@ -182,11 +183,11 @@ class TimetableScheduleIterator implements Iterator
          */
         return [
             'day' => (string)$day[0]->Day,
-            'name' => (string)$node[0]->Name,
-            'abbrev' => (string)$node[0]->ShortName,
-            'start' => (string)$node[0]->StartTime,
-            'end' => (string)$node[0]->EndTime,
-            'sequence' => (string)$node[0]->Ordinal,
+            'name' => (string)$period[0]->Name,
+            'abbrev' => (string)$period[0]->ShortName,
+            'start' => (string)$period[0]->StartTime,
+            'end' => (string)$period[0]->EndTime,
+            'sequence' => (string)$period[0]->Ordinal,
             'room' => $this->findRoom((string)$schedule->RoomId)
         ];
     }
