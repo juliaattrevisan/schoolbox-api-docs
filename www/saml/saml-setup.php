@@ -134,13 +134,6 @@ function useSAMLKerberos() {
         new NullLogger()
     );
 
-    // Don't attempt to update
-    $bc->doAutoUpdate = false;
-    // Use local version of the browscap.ini file
-    $bc->updateMethod = 'local';
-    // really ensure we don't attemp to update the browscap.ini file (1 year)
-    $bc->updateInterval = '31536000';
-
     $current_browser = $bc->getBrowser();
     SAMLDebugLog(json_encode($current_browser));
     if ($current_browser->device_type == 'Desktop' || $current_browser->device_type == 'Tablet') {
