@@ -17,7 +17,6 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
-use Schoolbox\Learning\Quiz\Attempt\Model as QuizAttemptModel;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswerModel;
 use Schoolbox\Learning\Quiz\Section\Mapper as QuizSectionMapper;

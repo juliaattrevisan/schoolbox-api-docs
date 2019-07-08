@@ -11,11 +11,6 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\IFeedback;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\AbstractResponse;
-use \Schoolbox\Learning\Assessment\Participant;
 
 class Maximum extends AbstractSummator
 {

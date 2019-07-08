@@ -7,7 +7,6 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
-use \Schoolbox\User;
 
 /**
  * Count Summator

@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
-use Schoolbox\Assessment\Rubric\RowSet\ValidUniqueRowSetForFolder;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
 use \Schoolbox\Learning\Assessment\DecoratorInterface;

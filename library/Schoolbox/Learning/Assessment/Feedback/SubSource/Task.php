@@ -12,7 +12,6 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Task\Feedback\MapperProxy;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
-use Schoolbox\User;
 
 /**
  * Sub-source for task responses.

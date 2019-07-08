@@ -45,16 +45,6 @@ class ValidFiles
     }
 
     /**
-     * @param array $validDocuments
-     * @return $this
-     */
-    private function setValidDocuments($validDocuments)
-    {
-        $this->validDocuments = $validDocuments;
-        return $this;
-    }
-
-    /**
      * Determine whether filename $documentName is allowed to be sent
      * to plagscan for plagscannage
      *

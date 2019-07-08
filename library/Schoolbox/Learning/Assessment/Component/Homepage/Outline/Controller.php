@@ -14,7 +14,6 @@
 namespace Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 
 use Component_Instance;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
 use Schoolbox\Learning\Assessment\Visibility;

@@ -332,13 +332,6 @@ class Gateway
     /* Getters/Setters
      */
 
-    /**
-     * @return string
-     */
-    private function getUsername()
-    {
-        return $this->username;
-    }
 
     /**
      * @param string $username
@@ -350,13 +343,6 @@ class Gateway
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    private function getApiKey()
-    {
-        return $this->apiKey;
-    }
 
     /**
      * @param string $apiKey
@@ -365,60 +351,6 @@ class Gateway
     private function setApiKey($apiKey)
     {
         $this->apiKey = $apiKey;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param mixed $response
-     * @return $this
-     */
-    private function setResponse($response)
-    {
-        $this->response = $response;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getErrorCode()
-    {
-        return $this->errorCode;
-    }
-
-    /**
-     * @param mixed $errorCode
-     * @return $this
-     */
-    private function setErrorCode($errorCode)
-    {
-        $this->errorCode = $errorCode;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getErrorMessage()
-    {
-        return $this->errorMessage;
-    }
-
-    /**
-     * @param mixed $errorMessage
-     * @return $this
-     */
-    private function setErrorMessage($errorMessage)
-    {
-        $this->errorMessage = $errorMessage;
         return $this;
     }
 

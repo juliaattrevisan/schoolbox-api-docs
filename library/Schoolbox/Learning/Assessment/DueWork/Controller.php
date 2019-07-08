@@ -265,28 +265,6 @@ class Controller extends Assessment\Controller
     }
 
     /**
-     * Recursive directory delete
-     * @param $dir
-     */
-    private function deleteDirectory($dir)
-    {
-        if (is_dir($dir)) {
-            $objects = scandir($dir);
-            foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    if (filetype($dir . "/" . $object) == "dir") {
-                        $this->deleteDirectory($dir . "/" . $object);
-                    } else {
-                        unlink($dir . "/" . $object);
-                    }
-                }
-            }
-            reset($objects);
-            rmdir($dir);
-        }
-    }
-
-    /**
      * Sanitize a string for use in filename
      *
      * @param string $string

@@ -12,7 +12,6 @@
  */
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use \Schoolbox\User;
 use \Schoolbox\Video\ResourceVideoMapper;

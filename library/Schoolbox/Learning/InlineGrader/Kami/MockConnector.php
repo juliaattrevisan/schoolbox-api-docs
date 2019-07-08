@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\InlineGrader\Kami;
 
 use GuzzleHttp\ClientInterface;
-use Schoolbox\Config\TestLoader;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
