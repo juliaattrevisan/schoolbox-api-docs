@@ -832,7 +832,7 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    public function publishNewsByID($news_id)
+    public function publishModeratedNewsByID($news_id)
     {
         if (!isset($this->client))
         {

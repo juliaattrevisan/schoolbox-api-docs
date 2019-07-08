@@ -54,8 +54,8 @@ class SmokeInitialCest {
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published.');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft to be moderated.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just pushed to moderation.');
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
         $title = 'Smoke Test News Title Publish Form Path';
@@ -68,22 +68,22 @@ class SmokeInitialCest {
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published.');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft directly.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published the draft directly.');
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        $title = 'Smoke Test News Title Publish ID article Path';
+        $title = 'Smoke Test News Title Publish Moderate Path';
         $response = $i->draftNews($title);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         #WHEN
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $response = $i->publishNewsByID($news_id_matches[1]);
+        $response = $i->publishModeratedNewsByID($news_id_matches[1]);
         $i->comment('Publish Draft with the ID');
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published.');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish via moderate.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published via moderate.');
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
         $title = 'Smoke Test News Title Reject By ID';
@@ -96,29 +96,29 @@ class SmokeInitialCest {
         $response = $i->rejectNewsByID($news_id_matches[1]);
         $i->comment('Rejected a Moderation waiting News Article');
         #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get 200 after rejection of article.');
 
         $title = 'Smoke Test News Title Save for later';
         $response = $i->draftNews($title);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         #WHEN
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $i->publishNewsByID($news_id_matches[1]);
+        $i->publishModeratedNewsByID($news_id_matches[1]);
         $response = $i->saveNewsByIDforLater($news_id_matches[1]);
         $i->comment('Saved news article for later');
         #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after save news for later.');
 
         $title = 'Smoke Test News Title Delete, I should not exist';
         $response = $i->draftNews($title);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         #WHEN
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $i->publishNewsByID($news_id_matches[1]);
+        $i->publishModeratedNewsByID($news_id_matches[1]);
         $response = $i->deleteNewsByID($news_id_matches[1]);
         $i->comment('Deleted a News Article');
         #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after delete news executed on "'.$title.'".');
     }
 
     /**
@@ -126,15 +126,14 @@ class SmokeInitialCest {
      */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
-        $homepage_title='Testing Home Page for Assessment5';
-        $i->loginAdmin();
+        $homepage_title='Testing Home Page for Assessment6';
+        $i->loginAdmin(); #we logged in as alaress
         $i->createHomepage($homepage_title);
         $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
-
         $i->addDefaultUsersToHomepage($homePageId);
         $student = $i->getUser('drhodes');
         $admin = $i->getUser('alaress');
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
 
         #WHEN
         $response = $i->createAssessemntOnHomepage($assessment_title,$homePageId);
@@ -156,8 +155,8 @@ class SmokeInitialCest {
 
         #THEN
         $i->comment('Updated Assessment');
-        $i->assertEquals(200, $determine_mark_response->getStatusCode(), 'I expect that we get a 200 after redirection.');
-        $i->assertEquals(200, $update_response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $determine_mark_response->getStatusCode(), 'I expect that we get a 200 after mark validation on assessment update.');
+        $i->assertEquals(200, $update_response->getStatusCode(), 'I expect that we get a 200 after updating assessment.');
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
@@ -165,7 +164,7 @@ class SmokeInitialCest {
 
         #THEN
         $i->comment('Create Assessment with rubric for a homepage');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after creating an assessment with rubric.');
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
@@ -174,27 +173,18 @@ class SmokeInitialCest {
 
         #THEN
         $i->comment('Submit assessment on behalf of student');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after submitting assessment on behalf of student.');
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
         $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $response = $i->submitAssessment($assessmentPageId, $student->getId());
-
-        #THEN
-        $i->comment('Submit assessment witrh rubric on behalf of student');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
-
-
-        #WHEN
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
+        $i->submitAssessment($assessmentPageId, $student->getId());
 
         #THEN
         $response = $i->markAssessmentWithRubric($assessmentPageId, $admin->getId(), $student->getId());
         $i->comment('Mark assessment with rubric');
 
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after marking assessement with rubric');
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
@@ -203,7 +193,7 @@ class SmokeInitialCest {
 
         #THEN
         $i->comment('Mark normal assessment');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after marking assesssment.');
 
         ##To Do - Submit reflection on assessment.
 
