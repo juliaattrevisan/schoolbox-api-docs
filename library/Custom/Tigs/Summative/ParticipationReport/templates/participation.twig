@@ -19,7 +19,7 @@ Data:
     subjects[idx].folderId  int
     subjects[idx].teachers  User[]
     explanation             null|string         - Explanation of the student's grades
-    nowOverride             null|string
+    reportDate              null|string
 #}
 {% import '@tigsSubjectReport/student-attributes-macro.twig' as macro %}
 <div class="tigs-crp continuous-report {{ macro.cssClasses(attributes) }}">
@@ -128,8 +128,8 @@ Data:
                 {% for subject in subjects %}
                     <ul class="subject-list group">
                         <li class="subject-group">
-                            {% set href = routeLookup('tigsSubjectReport.getReport', {userId: user.id, folderId: subject.folderId, now: nowOverride}) %}
-                            <a href="{{ href }}{{ nowSuffix }}"
+                            {% set href = routeLookup('tigsSubjectReport.getReport', {userId: user.id, folderId: subject.folderId, reportDate: reportDate}) %}
+                            <a href="{{ href }}"
                                class="link-row" title="Subject Report">
                                 <div class="small-12 content sibling">
                                     <h3 class="no-margin">

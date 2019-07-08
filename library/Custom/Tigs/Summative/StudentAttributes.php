@@ -8,29 +8,39 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative;
 
 use Alaress_Date_Format;
+use function in_array;
+use function is_numeric;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use InvalidArgumentException;
+use function strtotime;
 
 /**
  * Encapsulates relevant student attributes to help determine which report components are relevant
+ *
+ * Business rules / assumptions:
+ * * Only term 4 will ever wrap around the end of the calendar year
+ * * A student's year level is updated in Synergetic on the first day of Term 1
+ * * The UPS is running nightly, so we can assume the Schoolbox user year level matches the synergetic value
+ * * When generating a historical report, we assume students always graduate to the next year's curriculum
+ * * The year 7-10 curriculum semesters 1 and 2 run for terms 1/2 and 3/4, respectively
+ * * The year 11 curriculum semester 1 runs for terms 1/2, semester 2 runs for term 3 only
+ * * The year 12 curriculum semester 1 runs from the previous year's term 4 into term 1
+ * * The year 12 curriculum semester 2 runs for terms 2/3/4
+ * * Technically nothing should be due in Yr 12 Term 4, but we include it in Sem2 so the report will continue to show at this time.
+ *
+ * In the client data, Year12 students are soft-deleted at the end of year 12, and stay as year 12 in the DB.
+ * In our test data, we don't delete students, and keep incrementing their year levels so we don't need to keep updating the test data
  */
 class StudentAttributes
 {
+    private const YEAR_LEVEL_MIN = 7;  // Reports are not relevant for students with year level less than this
 
-    /** @var string */
-    private $firstDateTerm1Relative;
-
-    /** @var string */
-    private $firstDateTerm2Relative;
-
-    /** @var string */
-    private $firstDateTerm3Relative;
-
-    /** @var string */
-    private $firstDateTerm4Relative;
-
-    /** @var int */
+    /**
+     * The student's year level at the time of the report
+     *
+     * @var int
+     */
     private $yearLevel;
 
     /** @var bool */
@@ -40,9 +50,15 @@ class StudentAttributes
     private $term;
 
     /** @var int */
-    private $nowYear;
+    private $reportDateYear;
 
-    /** @var int */
+    /**
+     * What yearLevel curriculum is/was the student performing.
+     *
+     * eg a Year11 student in Term 4 is performing the Year12 curriculum
+     *
+     * @var int
+     */
     private $curriculumYearLevel;
 
     /**
@@ -69,100 +85,40 @@ class StudentAttributes
      * @param IConfigLoader $config
      * @param User          $user
      * @param string|null   $ibFlag
-     * @param string|null   $nowOverride Enable now() simulation for testing
+     * @param string|null   $reportDateOverride
+     * @param string|null   $nowOverride            Overrides system time to enable consistent unit tests around deriving a user's year level.
+     *                                              eg $reportYearLevel = $currentYearLevel - $nowYear + $reportYear
      * @throws InvalidArgumentException
      */
     public function __construct(
         IConfigLoader $config,
         User $user,
         ?string $ibFlag = null,
+        ?string $reportDateOverride = null,
         ?string $nowOverride = null
     ) {
-        $now = $nowOverride
-            ? new Alaress_Date_Format(\strtotime($nowOverride), Alaress_Date_Format::TIMESTAMP)
+        $reportDate = $reportDateOverride
+            ? new Alaress_Date_Format(strtotime($reportDateOverride), Alaress_Date_Format::TIMESTAMP)
+            : Alaress_Date_Format::now();
+        $now        = $nowOverride
+            ? new Alaress_Date_Format(strtotime($nowOverride), Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now();
 
-        $this->firstDateTerm1Relative   = $config->get(Config::_TIGS_START_TERM_1);
-        $this->firstDateTerm2Relative   = $config->get(Config::_TIGS_START_TERM_2);
-        $this->firstDateTerm3Relative   = $config->get(Config::_TIGS_START_TERM_3);
-        $this->firstDateTerm4Relative   = $config->get(Config::_TIGS_START_TERM_4);
-        $this->yearLevel                = $this->deriveUserYearLevel($user);
-        $this->isIb                     = (bool)$ibFlag; // If unknown (NULL), assume FALSE
-        $this->nowYear                  = (int)$now->getUsingFormat('Y');
-        $this->term                     = $this->deriveTerm($now);
-        $this->curriculumYearLevel      = ($this->yearLevel === 11 && $this->term === 4) ? 12 : $this->yearLevel;
-        $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
-        $this->curriculumSemesterStart  = $this->deriveCurriculumSemesterStartDate($this->yearLevel, $this->term);
-        $this->curriculumSemesterFinish = $this->deriveCurriculumSemesterFinishDate($this->yearLevel, $this->term);
-        $this->curriculumYearStart      = $this->deriveCurriculumYearStartDate($this->yearLevel, $this->term);
-        $this->curriculumYearFinish     = $this->deriveCurriculumYearFinishDate($this->yearLevel, $this->term);
+        // No business need to produce future reports, so limit the logic paths.
+        if ($reportDate->gt($now)) {
+            throw new InvalidArgumentException('Cannot generate a report for the future.');
+        }
+
+        $this->validateTermDates($config);
+        $this->validateUser($user);
+
+        // If unknown (NULL), assume $ibFlag is FALSE
+        $this->isIb           = (bool)$ibFlag;
+        $this->reportDateYear = (int)$reportDate->getYear();
+
+        $this->calculateDerivedAttributes($config, (int)$user->getYear(), $reportDate, $now);
     }
 
-
-    /**
-     * @param User $user
-     * @return int
-     * @throws InvalidArgumentException
-     */
-    private function deriveUserYearLevel(User $user): int
-    {
-        $userYear = $user->getYear();
-        if ('' === $userYear || null === $userYear) {
-            throw new InvalidArgumentException("User must have a year level set");
-        }
-        if (!\is_numeric($userYear)) {
-            throw new InvalidArgumentException("User must have a numeric year. Found '{$userYear}'");
-        }
-
-        return (int)$userYear;
-    }
-
-
-    /**
-     * Returns the term we are currently in.
-     *
-     * @param Alaress_Date_Format $now
-     * @return int
-     * @throws InvalidArgumentException
-     */
-    private function deriveTerm(Alaress_Date_Format $now): int
-    {
-        // Current Term + Semester
-        $nowYear = $this->nowYear;
-        $firstDayTerm2 = new Alaress_Date_Format(\strtotime($this->firstDateTerm2Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
-        $firstDayTerm3 = new Alaress_Date_Format(\strtotime($this->firstDateTerm3Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
-        $firstDayTerm4 = new Alaress_Date_Format(\strtotime($this->firstDateTerm4Relative . " $nowYear"), Alaress_Date_Format::TIMESTAMP);
-        if ($now->lt($firstDayTerm2)) {
-            return 1;
-        }
-        if ($now->lt($firstDayTerm3)) {
-            return 2;
-        }
-        if ($now->lt($firstDayTerm4)) {
-            return 3;
-        }
-        return 4;
-    }
-
-
-    /**
-     * Returns the student's Curriculum Semester
-     *
-     * @param int $userYearLevel
-     * @param int $term
-     * @return int
-     */
-    private function deriveCurriculumSemester(int $userYearLevel, int $term): int
-    {
-        // Apply SB to Curriculum mapping
-        if (($userYearLevel === 11 && $term === 4) || ($userYearLevel === 12 && $term === 1)) {
-            return 1;
-        }
-        if ($userYearLevel === 12 && $term === 2) {
-            return 2;
-        }
-        return \in_array($term, [1, 2], true) ? 1 : 2;
-    }
 
 
     /**
@@ -213,130 +169,6 @@ class StudentAttributes
 
 
     /**
-     * Derive the date that the student's curriculum semester logically starts at.
-     *
-     * @param int                 $yearLevel
-     * @param int                 $term
-     * @return Alaress_Date_Format
-     * @throws InvalidArgumentException
-     */
-    private function deriveCurriculumSemesterStartDate(int $yearLevel, int $term): Alaress_Date_Format
-    {
-        $nowYear = $this->nowYear;
-
-        if ($yearLevel === 11 && $term === 4) {
-            $start = $this->firstDateTerm4Relative . " $nowYear";
-        } elseif ($yearLevel === 12) {
-            if ($term === 1) {
-                $nowYear--;
-                $start = $this->firstDateTerm4Relative . " $nowYear";
-            } else {
-                $start = $this->firstDateTerm2Relative . " $nowYear";
-            }
-        } elseif (\in_array($term, [1, 2], true)) {
-            $start = $this->firstDateTerm1Relative . " $nowYear";
-        } else {
-            // Terms 3+4
-            $start = $this->firstDateTerm3Relative . " $nowYear";
-        }
-
-        return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
-    }
-
-
-    /**
-     * Derive the date that the student's curriculum semester logically finishes at.
-     *
-     * @param int                 $yearLevel
-     * @param int                 $term
-     * @return Alaress_Date_Format
-     * @throws InvalidArgumentException
-     */
-    private function deriveCurriculumSemesterFinishDate(int $yearLevel, int $term): Alaress_Date_Format
-    {
-        $isYear11 = $yearLevel === 11;
-        $isYear12 = $yearLevel === 12;
-        $nowYear  = $this->nowYear;
-
-        if ($isYear11 && $term === 3) {
-            $end = $this->firstDateTerm4Relative . " $nowYear";
-        } elseif ($isYear11 && $term === 4) {
-            $nowYear++;
-            $end = $this->firstDateTerm2Relative  . " $nowYear";
-        } elseif ($isYear12 && $term === 1) {
-            $end = $this->firstDateTerm2Relative . " $nowYear";
-        } elseif (($isYear12 && $term === 2 )|| \in_array($term, [3, 4], true)) {
-            $nowYear++;
-            $end = $this->firstDateTerm1Relative . " $nowYear";
-        } else {
-            $end = $this->firstDateTerm3Relative . " $nowYear";
-        }
-
-        return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
-    }
-
-
-    /**
-     * Derive the date that the student's curriculum year logically starts at.
-     *
-     * @param int                 $yearLevel
-     * @param int                 $term
-     * @return Alaress_Date_Format
-     * @throws InvalidArgumentException
-     */
-    private function deriveCurriculumYearStartDate(int $yearLevel, int $term): Alaress_Date_Format
-    {
-        $nowYear = $this->nowYear;
-
-        if ($yearLevel >= 7 && $yearLevel <= 10) {
-            $start = $this->firstDateTerm1Relative . " $nowYear";
-        } elseif ($yearLevel === 11) {
-            if ($term !== 4) {
-                $start = $this->firstDateTerm1Relative . " $nowYear";
-            } else {
-                $start = $this->firstDateTerm4Relative . " $nowYear";
-            }
-        } else {
-            $nowYear--;
-            $start = $this->firstDateTerm4Relative . " $nowYear";
-        }
-
-        return new Alaress_Date_Format(\strtotime($start), Alaress_Date_Format::TIMESTAMP);
-    }
-
-
-    /**
-     * Derive the date that the student's curriculum year logically finishes at.
-     *
-     * @param int                 $yearLevel
-     * @param int                 $term
-     * @return Alaress_Date_Format
-     * @throws InvalidArgumentException
-     */
-    private function deriveCurriculumYearFinishDate(int $yearLevel, int $term): Alaress_Date_Format
-    {
-        $nowYear = $this->nowYear;
-
-        if ($yearLevel === 11) {
-            if (4 !== $term) {
-                $end = $this->firstDateTerm4Relative . " $nowYear";
-            } else {
-                $nowYear += 2;
-                $end = $this->firstDateTerm1Relative . " $nowYear";
-            }
-        } else {
-            $nowYear++;
-            $end = $this->firstDateTerm1Relative . " $nowYear";
-        }
-
-        return (new Alaress_Date_Format(\strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
-    }
-
-
-    // Getters
-
-
-    /**
      * @return int
      */
     public function getYearLevel(): int
@@ -368,7 +200,7 @@ class StudentAttributes
      */
     public function getCalendarYear(): int
     {
-        return $this->nowYear;
+        return $this->reportDateYear;
     }
 
 
@@ -454,5 +286,384 @@ class StudentAttributes
             1 => new Semester(1, $semesters[1]['start'], $semesters[1]['finish']),
             2 => new Semester(2, $semesters[2]['start'], $semesters[2]['finish']),
         ];
+    }
+
+
+
+    /**
+     * Ensure that term dates are set, and we can construct an ADF from them
+     *
+     * @param IConfigLoader $config
+     * @throws InvalidArgumentException
+     */
+    private function validateTermDates(IConfigLoader $config): void
+    {
+        $termConfigs = [
+            Config::_TIGS_START_TERM_1,
+            Config::_TIGS_START_TERM_2,
+            Config::_TIGS_START_TERM_3,
+            Config::_TIGS_START_TERM_4,
+        ];
+        foreach ($termConfigs as $configName) {
+            $firstDayOfTerm = $config->get($configName);
+            if ($firstDayOfTerm === null || empty(trim($firstDayOfTerm))) {
+                throw new InvalidArgumentException("Term start date not set for config '$configName'");
+            }
+            new Alaress_Date_Format(strtotime($firstDayOfTerm), Alaress_Date_Format::TIMESTAMP);
+        }
+    }
+
+
+    /**
+     * Ensure user is/was not deleted at time of report and has a supported year level
+     *
+     * @param User $user
+     * @throws InvalidArgumentException
+     */
+    private function validateUser(User $user): void
+    {
+        // No business need to produce reports for deleted users
+        // This avoids needing to consider deletedAt date when producing historical reports
+        if ($user->isDeleted()) {
+            throw new InvalidArgumentException("User was deleted at '{$user->getDeletedAt()->getDatabase()}'");
+        }
+
+        // Year level must be between
+        $userYear = $user->getYear();
+        if ('' === $userYear || null === $userYear) {
+            throw new InvalidArgumentException("User must have a year level set");
+        }
+        if (!is_numeric($userYear)) {
+            throw new InvalidArgumentException("User must have a numeric year. Found '{$userYear}'");
+        }
+        if ($userYear < self::YEAR_LEVEL_MIN) {
+            throw new InvalidArgumentException(sprintf(
+                "User year must be greater than %d Found '%s'",
+                self::YEAR_LEVEL_MIN,
+                $userYear
+            ));
+        }
+    }
+
+
+    /**
+     * Calculate derived values
+     *
+     * @param IConfigLoader       $config
+     * @param int                 $currentYearLevel
+     * @param Alaress_Date_Format $reportDate
+     * @param Alaress_Date_Format $now
+     * @throws InvalidArgumentException
+     */
+    private function calculateDerivedAttributes(
+        IConfigLoader $config,
+        int $currentYearLevel,
+        Alaress_Date_Format $reportDate,
+        Alaress_Date_Format $now
+    ): void {
+        $this->yearLevel                = $this->deriveUserYearLevel($config, $currentYearLevel, $reportDate, $now);
+        $this->term                     = $this->deriveTerm($config, $reportDate);
+        $this->curriculumYearLevel      = $this->deriveCurriculumYearLevel($this->yearLevel, $this->term);
+        $this->curriculumSemester       = $this->deriveCurriculumSemester($this->yearLevel, $this->term);
+        $this->curriculumSemesterStart  = $this->deriveCurriculumSemesterStartDate($config, $reportDate, $this->yearLevel, $this->term);
+        $this->curriculumSemesterFinish = $this->deriveCurriculumSemesterFinishDate($config, $reportDate, $this->yearLevel, $this->term);
+        $this->curriculumYearStart      = $this->deriveCurriculumYearStartDate($config, $reportDate, $this->yearLevel, $this->term);
+        $this->curriculumYearFinish     = $this->deriveCurriculumYearFinishDate($config, $reportDate, $this->yearLevel, $this->term);
+    }
+
+
+    /**
+     * Derive the date that the student's curriculum semester logically starts at.
+     *
+     * @param IConfigLoader       $config
+     * @param Alaress_Date_Format $reportDate
+     * @param int                 $yearLevel Student's year level at time of report, eg 11
+     * @param int                 $term      The report's term, eg 3
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function deriveCurriculumSemesterStartDate(
+        IConfigLoader $config,
+        Alaress_Date_Format $reportDate,
+        int $yearLevel,
+        int $term
+    ): Alaress_Date_Format {
+        $reportYear = (int)$reportDate->getYear();
+
+        // Is report for Term 4 from previous year?
+        if ($reportDate->lt($this->getYearLevelIncrementDate($config, $reportYear))) {
+            $reportYear--;
+        }
+
+        if ($yearLevel === 11 && $term === 4) {
+            $start = $config->get(Config::_TIGS_START_TERM_4) . " $reportYear";
+        } elseif ($yearLevel === 12) {
+            if ($term === 1) {
+                $reportYear--;
+                $start = $config->get(Config::_TIGS_START_TERM_4) . " $reportYear";
+            } else {
+                $start = $config->get(Config::_TIGS_START_TERM_2) . " $reportYear";
+            }
+        } elseif (in_array($term, [1, 2], true)) {
+            $start = $config->get(Config::_TIGS_START_TERM_1) . " $reportYear";
+        } else {
+            // Terms 3+4
+            $start = $config->get(Config::_TIGS_START_TERM_3) . " $reportYear";
+        }
+
+        return $this->buildDate($start);
+    }
+
+
+    /**
+     * Derive the date that the student's curriculum semester logically finishes at.
+     *
+     * @param IConfigLoader       $config
+     * @param Alaress_Date_Format $reportDate
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function deriveCurriculumSemesterFinishDate(
+        IConfigLoader $config,
+        Alaress_Date_Format $reportDate,
+        int $yearLevel,
+        int $term
+    ): Alaress_Date_Format {
+        $isYear11       = $yearLevel === 11;
+        $isYear12       = $yearLevel === 12;
+        $reportDateYear = (int)$reportDate->getYear();
+
+        // Is report for Term 4 from previous year?
+        if ($reportDate->lt($this->getYearLevelIncrementDate($config, $reportDateYear))) {
+            $reportDateYear--;
+        }
+
+        if ($isYear11 && $term === 3) {
+            $end = $config->get(Config::_TIGS_START_TERM_4) . " $reportDateYear";
+        } elseif ($isYear11 && $term === 4) {
+            $reportDateYear++;
+            $end = $config->get(Config::_TIGS_START_TERM_2) . " $reportDateYear";
+        } elseif ($isYear12 && $term === 1) {
+            $end = $config->get(Config::_TIGS_START_TERM_2) . " $reportDateYear";
+        } elseif (($isYear12 && $term === 2) || in_array($term, [3, 4], true)) {
+            $reportDateYear++;
+            $end = $config->get(Config::_TIGS_START_TERM_1) . " $reportDateYear";
+        } else {
+            $end = $config->get(Config::_TIGS_START_TERM_3) . " $reportDateYear";
+        }
+
+        return (new Alaress_Date_Format(strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
+    }
+
+
+    /**
+     * Derive the date that the student's curriculum year logically starts at.
+     *
+     * @param IConfigLoader       $config
+     * @param Alaress_Date_Format $reportDate
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function deriveCurriculumYearStartDate(
+        IConfigLoader $config,
+        Alaress_Date_Format $reportDate,
+        int $yearLevel,
+        int $term
+    ): Alaress_Date_Format {
+        $reportDateYear = (int)$reportDate->getYear();
+
+        // Is report for Term 4 from previous year?
+        if ($reportDate->lt($this->getYearLevelIncrementDate($config, $reportDateYear))) {
+            $reportDateYear--;
+        }
+
+        if ($yearLevel >= 7 && $yearLevel <= 10) {
+            $start = $config->get(Config::_TIGS_START_TERM_1) . " $reportDateYear";
+        } elseif ($yearLevel === 11) {
+            if ($term !== 4) {
+                $start = $config->get(Config::_TIGS_START_TERM_1) . " $reportDateYear";
+            } else {
+                $start = $config->get(Config::_TIGS_START_TERM_4) . " $reportDateYear";
+            }
+        } else {
+            $reportDateYear--;
+            $start = $config->get(Config::_TIGS_START_TERM_4) . " $reportDateYear";
+        }
+
+        return new Alaress_Date_Format(strtotime($start), Alaress_Date_Format::TIMESTAMP);
+    }
+
+
+    /**
+     * Derive the date that the student's curriculum year logically finishes at.
+     *
+     * @param IConfigLoader       $config
+     * @param Alaress_Date_Format $reportDate
+     * @param int                 $yearLevel
+     * @param int                 $term
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function deriveCurriculumYearFinishDate(
+        IConfigLoader $config,
+        Alaress_Date_Format $reportDate,
+        int $yearLevel,
+        int $term
+    ): Alaress_Date_Format {
+        $reportDateYear = (int)$reportDate->getYear();
+
+        // Is report for Term 4 from previous year?
+        if ($reportDate->lt($this->getYearLevelIncrementDate($config, $reportDateYear))) {
+            $reportDateYear--;
+        }
+
+        if ($yearLevel === 11) {
+            if (4 !== $term) {
+                $end = $config->get(Config::_TIGS_START_TERM_4) . " $reportDateYear";
+            } else {
+                $reportDateYear += 2;
+                $end            = $config->get(Config::_TIGS_START_TERM_1) . " $reportDateYear";
+            }
+        } else {
+            $reportDateYear++;
+            $end = $config->get(Config::_TIGS_START_TERM_1) . " $reportDateYear";
+        }
+
+        return (new Alaress_Date_Format(strtotime($end), Alaress_Date_Format::TIMESTAMP))->addDays(-1)->endOfDay();
+    }
+
+
+    /**
+     * Return's the user's year level at the time of the report
+     *
+     * @param IConfigLoader       $config
+     * @param int                 $currentYearLevel
+     * @param Alaress_Date_Format $reportDate
+     * @param Alaress_Date_Format $now
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    private function deriveUserYearLevel(IConfigLoader $config, int $currentYearLevel, Alaress_Date_Format $reportDate, Alaress_Date_Format $now): int
+    {
+        // Assume student graduated every calendar year
+        $reportYearLevel = $currentYearLevel + $reportDate->getYear() - $now->getYear();
+
+        // Is reportDate and nowDate on different sides of the yearLevel change boundary?
+        $isReportPriorToYearChange = $reportDate->lt($this->getYearLevelIncrementDate($config, (int)$reportDate->getYear()));
+        $isNowPriorToYearChange    = $now->lt($this->getYearLevelIncrementDate($config, (int)$now->getYear()));
+
+        if ($isReportPriorToYearChange && !$isNowPriorToYearChange) {
+            // Need to undo the year level increment
+            $reportYearLevel--;
+        } elseif (!$isReportPriorToYearChange && $isNowPriorToYearChange) {
+            // Need to simulate the year level increment
+            $reportYearLevel++;
+        }
+
+        // Are we trying to generate a report for too far in the past?
+        if ($reportYearLevel < self::YEAR_LEVEL_MIN) {
+            throw new InvalidArgumentException("Cannot generate a report for student with derived year level: $reportYearLevel");
+        }
+
+        return $reportYearLevel;
+    }
+
+
+    /**
+     * Returns the date when a student's yearLevel was incremented
+     *
+     * @param IConfigLoader $config
+     * @param int           $year
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function getYearLevelIncrementDate(IConfigLoader $config, int $year): Alaress_Date_Format
+    {
+        // Student year levels are incremented on the first day of Term 1
+        return $this->buildDate($config->get(Config::_TIGS_START_TERM_1) . " {$year}");
+    }
+
+
+    /**
+     * Returns an ADF object from a human-readable date string
+     *
+     * @param string $date
+     * @return Alaress_Date_Format
+     * @throws InvalidArgumentException
+     */
+    private function buildDate(string $date): Alaress_Date_Format
+    {
+        return new Alaress_Date_Format(strtotime($date), Alaress_Date_Format::TIMESTAMP);
+    }
+
+
+    /**
+     * Returns the term that the specified date falls in
+     *
+     * Assumes that term 4 is the only term that will ever wrap around the end of year
+     *
+     * @param IConfigLoader       $config
+     * @param Alaress_Date_Format $date
+     * @return int
+     * @throws InvalidArgumentException
+     */
+    private function deriveTerm(IConfigLoader $config, Alaress_Date_Format $date): int
+    {
+        $year = (int)$date->getUsingFormat('Y');
+
+        if ($date->lt($this->buildDate($config->get(Config::_TIGS_START_TERM_1) . " $year"))) {
+            // We're in term 4 of the previous year
+            return 4;
+        }
+        if ($date->lt($this->buildDate($config->get(Config::_TIGS_START_TERM_2) . " $year"))) {
+            return 1;
+        }
+        if ($date->lt($this->buildDate($config->get(Config::_TIGS_START_TERM_3) . " $year"))) {
+            return 2;
+        }
+        if ($date->lt($this->buildDate($config->get(Config::_TIGS_START_TERM_4) . " $year"))) {
+            return 3;
+        }
+        // We're in term 4 of this year
+        return 4;
+    }
+
+
+    /**
+     * Returns a Curriculum Year the specified yearLevel and term
+     *
+     * @param int $yearLevel
+     * @param int $term
+     * @return int
+     */
+    private function deriveCurriculumYearLevel(int $yearLevel, int $term): int
+    {
+        return ($yearLevel === 11 && $term === 4) ? 12 : $yearLevel;
+    }
+
+
+    /**
+     * Returns the student's Curriculum Semester
+     *
+     * @param int $yearLevel
+     * @param int $term
+     * @return int
+     */
+    private function deriveCurriculumSemester(int $yearLevel, int $term): int
+    {
+        // Special case: Year12 Sem1 curriculum runs from Term4 of prior year to Term1
+        if (($yearLevel === 11 && $term === 4) || ($yearLevel === 12 && $term === 1)) {
+            return 1;
+        }
+        // Special case: Year12 Sem2 starts in Term2
+        if ($yearLevel === 12 && $term === 2) {
+            return 2;
+        }
+        // Normal case: Terms 1,2 => Sem1, Terms 3,4 => Sem2
+        return in_array($term, [1, 2], true) ? 1 : 2;
     }
 }

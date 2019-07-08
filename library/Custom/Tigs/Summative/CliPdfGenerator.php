@@ -45,7 +45,7 @@ class CliPdfGenerator extends CliTool\App
     private const OPT_LONG_CURRICULUM       = 'curriculum:';       // curriculum
     private const OPT_LONG_MAX_FAILS        = 'max-fails:';        // Number of consecutive fails after which to abort the script's execution.
     private const OPT_LONG_JS_DELAY         = 'js-delay:';         // How many milliseconds to let JS run before attempting to print page
-    private const OPT_LONG_NOW              = 'now:';              // to simulate time
+    private const OPT_LONG_REPORT_DATE      = 'report-date:';      // to generate a report for some point in time
     private const OPT_LONG_USER_STYLE_SHEET = 'user-style-sheet:'; // user style sheet
     private const OPT_LONG_ROLE_TYPE        = 'role-type:';        // role-type override
 
@@ -74,7 +74,7 @@ class CliPdfGenerator extends CliTool\App
     private $curriculum;
 
     /** @var null|string */
-    private $nowOverride;
+    private $reportDateOverride;
 
     /** @var UserMapper */
     private $userMapper;
@@ -157,7 +157,7 @@ class CliPdfGenerator extends CliTool\App
             self::OPT_LONG_CURRICULUM,
             self::OPT_LONG_MAX_FAILS,
             self::OPT_LONG_JS_DELAY,
-            self::OPT_LONG_NOW,
+            self::OPT_LONG_REPORT_DATE,
             self::OPT_LONG_USER_STYLE_SHEET,
             self::OPT_LONG_ROLE_TYPE,
         ];
@@ -218,7 +218,7 @@ class CliPdfGenerator extends CliTool\App
         $this->studentExternalId    = $this->getOpt(self::OPT_LONG_STUDENT_ID);
         $this->yearLevel            = $this->getOpt(self::OPT_LONG_YEAR_LEVEL);
         $this->curriculum           = $this->getOpt(self::OPT_LONG_CURRICULUM);
-        $this->nowOverride          = $this->getOpt(self::OPT_LONG_NOW);
+        $this->reportDateOverride   = $this->getOpt(self::OPT_LONG_REPORT_DATE);
         $maxFailures                = $this->getOpt(self::OPT_LONG_MAX_FAILS);
         $jsDelay                    = $this->getOpt(self::OPT_LONG_JS_DELAY);
         $userStyleSheet             = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
@@ -265,8 +265,8 @@ class CliPdfGenerator extends CliTool\App
             $valid = false;
         }
 
-        if ($this->nowOverride && false === \strtotime($this->nowOverride)) {
-            $this->getLogger()->alert("Invalid 'now' option: '$this->nowOverride'");
+        if ($this->reportDateOverride && false === \strtotime($this->reportDateOverride)) {
+            $this->getLogger()->alert("Invalid 'report-date' option: '$this->reportDateOverride'");
             $valid = false;
         }
 
@@ -313,7 +313,7 @@ class CliPdfGenerator extends CliTool\App
         $this->getLogger()->debug("    curriculum: {$this->curriculum}");
         $this->getLogger()->debug("    max-fails: {$this->maxFailures}");
         $this->getLogger()->debug("    js-delay: {$this->jsDelay}");
-        $this->getLogger()->debug("    now: {$this->nowOverride}");
+        $this->getLogger()->debug("    report-date: {$this->reportDateOverride}");
         $this->getLogger()->debug("    user-style-sheet: {$this->userStyleSheet}");
         $this->getLogger()->debug("    role-type: {$this->roleTypeOverride}");
 
@@ -646,7 +646,7 @@ class CliPdfGenerator extends CliTool\App
      */
     private function generateUrlsForStudent(User $student, array $externalStudent, ?string $excludedClassCodes): array
     {
-        $data                   = ['userId' => $student->getId(), 'now' => $this->nowOverride,];
+        $data                   = ['userId' => $student->getId(), 'reportDate' => $this->reportDateOverride,];
         $participationReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsParticipationReport.getReport', $data) . '?inline=1';
         $this->getLogger()->debug("Adding url '$participationReportUrl' to list");
         $urls = [new Uri($participationReportUrl)];
@@ -656,9 +656,9 @@ class CliPdfGenerator extends CliTool\App
 
         foreach ($classFolders as $folder) {
             $data = [
-                'userId'   => $student->getId(),
-                'folderId' => $folder->getId(),
-                'now'      => $this->nowOverride,
+                'userId'     => $student->getId(),
+                'folderId'   => $folder->getId(),
+                'reportDate' => $this->reportDateOverride,
             ];
             $subjectReportUrl = 'https://' . $this->fqdn . $this->router->generate('tigsSubjectReport.getReport', $data) . $queryArgs;
             $this->getLogger()->debug("Adding url '$subjectReportUrl' to list");
@@ -681,8 +681,8 @@ class CliPdfGenerator extends CliTool\App
      */
     private function getClassFolders(User $student, array $externalStudent, ?string $excludedClassCodes): Collection
     {
-        $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->nowOverride);
-        return $this->folderFetcher->findForStudent($student, $attributes, $this->nowOverride, $excludedClassCodes);
+        $attributes = new StudentAttributes($this->getConfig(), $student, $externalStudent['StudentIBFlag'], $this->reportDateOverride);
+        return $this->folderFetcher->findForStudent($student, $attributes, $this->reportDateOverride, $excludedClassCodes);
     }
 
 
@@ -975,7 +975,7 @@ DESCRIPTION
          Number of milliseconds to wait before printing a page to allow javascript to execute.
          Defaults to $defaultJsDelay.
          
-    $yellow--now=NOW$white
+    $yellow--report-date=REPORT_DATE$white
          Attempt to produce a report for some specific point in time.
          Supports any format accepted by PHP's strtotime()
          
