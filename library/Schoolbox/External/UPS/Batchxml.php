@@ -194,7 +194,7 @@ class Batchxml implements ISync
             $staff = new User\Staff();
 
             $staff
-                ->setId((string)$currentResult->UserCode)
+                ->setId((string)$currentResult->xpath('@PersonId')[0]->PersonId)
                 ->setTitle((string)$currentResult->Title)
                 ->setPreferredName((string)$currentResult->PreferredName)
                 ->setGivenName((string)$currentResult->Forename)
