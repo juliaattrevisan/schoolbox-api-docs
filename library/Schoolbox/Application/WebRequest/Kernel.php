@@ -274,6 +274,7 @@ class Kernel extends WebKernelAbstract
                 ]);
             } else {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
+                return;
             }
         } catch (Forbidden $e) {
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
