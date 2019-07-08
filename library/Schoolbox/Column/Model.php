@@ -43,7 +43,11 @@ class Model implements IColumnType {
                 : $mapper->getSetIdentifierMethodName();
 
             // Hydrate the identifier before setting it, if possible
-            $identifier         = $mapper->getIdentifier();
+            // Prefer this column's configured identifier, fall back to mapper's configured identifier
+            $identifier = isset($id_property)
+                ? $mapper->getMap()[$id_property]
+                : $mapper->getIdentifier();
+
             $identifierHydrator = $identifier['hydrator'] ?? null;
             if ($identifierHydrator instanceof IColumnType) {
                 $identifierJoin       = $identifier['join'] ?? null;
