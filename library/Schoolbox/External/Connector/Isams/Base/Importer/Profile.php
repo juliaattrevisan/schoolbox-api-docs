@@ -111,7 +111,7 @@ class Profile implements ImporterInterface
             try {
                 $profile = $this->userProfileMapper->findById($user->getId());
             } catch (Mapper\Exception $e) {
-                $profile = $this->userProfileMapper->createModel()->setUserId($user->getId());
+                $profile = $this->userProfileMapper->createModel()->setUser($user);
             }
 
             /* Thirdly populate the profile instance with relevant data

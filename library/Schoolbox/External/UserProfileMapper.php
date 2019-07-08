@@ -32,7 +32,15 @@ class UserProfileMapper extends Schoolbox\Mapper
     {
         $this->hasTable('user_profile');
         $this->hasModel(UserProfile::class);
-        $this->uses('user_id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins(
+            'user_id',
+            UserMapper::class,
+            'id',
+            null,
+            self::COLUMN_IDENTIFIER,
+            'user',
+            'user'
+        );
         $this->uses('dob', self::TYPE_DATE);
         $this->uses('level', self::TYPE_STRING);
         $this->uses('homegroup', self::TYPE_STRING);
@@ -53,14 +61,6 @@ class UserProfileMapper extends Schoolbox\Mapper
         $this->uses('last_name', self::TYPE_STRING);
         $this->uses('gender', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
-        $this->hasJoin(
-            'user',
-            [
-                'mapper'    => UserMapper::class,
-                'this_key'  => 'user_id',
-                'other_key' => 'id',
-            ]
-        );
     }
 
     /**

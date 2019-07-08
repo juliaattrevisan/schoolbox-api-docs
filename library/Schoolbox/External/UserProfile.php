@@ -18,11 +18,6 @@ use Schoolbox\User;
 class UserProfile
 {
     /**
-     * @var int
-     */
-    private $user_id;
-
-    /**
      * @var User
      */
     private $user;
@@ -126,24 +121,6 @@ class UserProfile
      * @var string|null
      */
     private $email;
-
-    /**
-     * @return int|null
-     */
-    public function getUserId(): ?int
-    {
-        return $this->user_id;
-    }
-
-    /**
-     * @param int $user_id
-     * @return static
-     */
-    public function setUserId(int $user_id): self
-    {
-        $this->user_id = $user_id;
-        return $this;
-    }
 
     /**
      * @return User|null

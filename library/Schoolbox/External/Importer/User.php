@@ -563,7 +563,7 @@ class User extends AbstractImporter
         $diff        = $this->userProfileMapper->diff($userResult->getOriginalUserProfile(), $userProfile);
         if ($this->performUpdate) {
             try {
-                $userProfile->setUserId($user->getId());
+                $userProfile->setUser($user);
                 if (!$this->userProfileMapper->save($userProfile)) {
                     $this->log->error('Could not update user profile!');
                 }
