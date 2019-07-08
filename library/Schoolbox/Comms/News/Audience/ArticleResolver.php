@@ -191,8 +191,8 @@ class ArticleResolver implements IArticleResolver
             GROUP BY comms_news_audience.parent_id
             HAVING COUNT(comms_news_audience.parent_id) = 2;
         ";
-
-        return $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN);
+        $hydrator = News\Audience\Mapper::getInstance()->getColumnScalarHydrator('comms_news_article_id');
+        return array_map([$hydrator, 'hydrate'], $this->db->executeQuery($query, $parameters)->fetchAll(PDO::FETCH_COLUMN));
     }
 
 

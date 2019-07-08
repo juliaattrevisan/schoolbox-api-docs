@@ -49,7 +49,7 @@ class IsMemberOfArticleAudience extends ArticleAttribute
         // TODO this is too crudely implemented. We have a hydrated article and user. See SA-7431
         $usersInAudience = $this->userResolver->findUsersForArticle($article);
 
-        if (!\in_array($user->getId(), $usersInAudience, false)) {
+        if (!\in_array($user->getId(), $usersInAudience, true)) {
             throw new Unauthorized("User {$user->getId()} is not in the audience of article {$article->getId()}");
         }
     }

@@ -398,7 +398,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        return $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $hydrator = $this->getColumnScalarHydrator('id');
+        return array_map([$hydrator, 'hydrate'], $statement->fetchAll(\PDO::FETCH_COLUMN));
     }
 
 

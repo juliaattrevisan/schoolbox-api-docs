@@ -63,6 +63,8 @@ class UserResolver implements IUserResolver
         $superuserIds = $this->db->executeQuery(
             'SELECT u.id FROM user u JOIN superusers su ON u.id = su.id AND u.deleted_at IS NULL')
             ->fetchAll(PDO::FETCH_COLUMN);
+
+        $superuserIds = array_map('intval', $superuserIds);
         $moderators = array_unique(array_merge($superuserIds, $this->findModeratorIds()));
 
         if (!$includeFolderWriteUsers) {

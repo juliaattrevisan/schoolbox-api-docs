@@ -94,7 +94,7 @@ class UserResolver implements IUserResolver
             /** @noinspection SlowArrayOperationsInLoopInspection */
             $userIds = \array_merge($userIds, $this->findUsersForAudienceSegment($rootAudienceSegment, $excludeMuted, $authorId));
         }
-        return \array_unique($userIds);
+        return array_map('intval', \array_unique($userIds));
     }
 
 
