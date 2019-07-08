@@ -174,6 +174,7 @@ class TimetableScheduleIterator implements Iterator
                 'abbrev' => '',
                 'start' => '',
                 'end' => '',
+                'room' => '',
             ];
         }
 
@@ -186,8 +187,39 @@ class TimetableScheduleIterator implements Iterator
             'start' => (string)$node[0]->StartTime,
             'end' => (string)$node[0]->EndTime,
             'sequence' => (string)$node[0]->Ordinal,
+            'room' => $this->findRoom((string)$schedule->RoomId)
         ];
     }
+
+
+    /**
+     * Find room data for a given $roomId
+     *
+     * @param string $roomId
+     * @return array
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findRoom(string $roomId): array
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/EstateManager/Buildings/Building/Classrooms/Classroom[@Id='{$roomId}']");
+
+        if (empty($node)) {
+            return [
+                'name' => '(unknown room)',
+                'initials' => '',
+                'code' => '',
+            ];
+        }
+
+        return [
+            'name' => (string)$node[0]->Name,
+            'initials' => (string)$node[0]->Initials,
+            'code' => (string)$node[0]->Code,
+        ];
+    }
+
 
     /**
      * Find a teacher's details from its $teacherCode
