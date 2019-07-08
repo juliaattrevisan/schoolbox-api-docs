@@ -226,12 +226,14 @@ class RelationalDelete implements IRelationalDelete
             // Socialstream
             new Nullable(
                 \SocialStream\PostMapper::getInstance(),
-                $this->logger, ['cacheHash'],
+                $this->logger,
+                ['cacheHash'],
                 'cache_hash'
             ),
             new Nullable(
                 \SocialStream\PostMapper::getInstance(),
-                $this->logger, ['thumbnail'],
+                $this->logger,
+                ['thumbnail'],
                 'thumbnail',
                 '/storage/image.php?size=maxsize&hash='
             ),
