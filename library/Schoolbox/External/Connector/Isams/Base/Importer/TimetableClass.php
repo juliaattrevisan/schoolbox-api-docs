@@ -159,85 +159,85 @@ class TimetableClass
         $classes = new TimetableScheduleIterator($this->batchxml, $currentTimetable);
 
         foreach ($classes as $class) {
-//            print_r($class);
+
+            /* Process class entry
+             */
+            /** @var ClassEntry $timetableClass */
+            $timetableClass = $this->classEntryMapper->createModel()
+                ->setCode($class['class']['code'])
+                ->setName($class['class']['name'])
+                ->setDescription($class['class']['name']);
+
+            $this->log->info(sprintf(
+                'Creating class %s %s',
+                $timetableClass->getName(),
+                $timetableClass->getCode()
+            ));
+
+            if ($this->perform) {
+                $this->classEntryMapper->save($timetableClass);
+            }
+
+            /* Process students
+             */
+            foreach ($class['students'] as $student) {
+
+                /* If we have no record of this student id existing then we
+                 * we can't assign them to any classes - they don't have a
+                 * schoolbox user account
+                 */
+                if (!isset($users[$student['username']])) {
+                    $this->log->warning(sprintf(
+                        'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
+                        $student['username'],
+                        $timetableClass->getName(),
+                        $timetableClass->getCode()
+                    ));
+
+                    continue;
+                }
+
+                /* Minimum user
+                 */
+                $user = $this->userMapper->createModel()
+                    ->setId($users[$student['username']]);
+
+                /** @var ClassInvolvement $timetableClassInvolvement */
+                $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
+                    ->setUser($user)
+                    ->setClass($timetableClass);
+
+                $this->log->info(sprintf(
+                    'Creating class involvement %s %s for user %s (user %s)',
+                    $timetableClass->getName(),
+                    $timetableClass->getCode(),
+                    $student['firstname'] . ' ' . $student['surname'],
+                    $timetableClassInvolvement->getUser()->getId()
+                ));
+
+                if ($this->perform) {
+                    $this->classInvolvementMapper->save($timetableClassInvolvement);
+                }
+
+                /* TODO: Assign class (set) to period
+                 * TODO: Assign teacher via their identifier
+                 * TODO: Assign room via EstateManager I guess
+                 */
+
+                /* create record for class_period - should have all the data from $class iterator output
+                 * so you can look up individual pieces of the puzzle
+                 *
+                 * - room comes from $class['room']['name']
+                 * - teacherId is a schoolbox user id via a lookup on their external_id
+                 * - period_id is a schoolbox timetable_period via lookup of Day and Period Name
+                 * - class_id comes from $timetableClass->getId()
+                 */
+
+            }
         }
 
-
-
-//        $classes = new TimetableClassIterator($this->batchxml);
-//
-//        foreach ($classes as $class) {
-//
-//            /* Process class entry
-//             */
-//            /** @var ClassEntry $timetableClass */
-//            $timetableClass = $this->classEntryMapper->createModel()
-//                ->setCode($class['code'])
-//                ->setName($class['name'])
-//                ->setDescription($class['name']);
-//
-//            $this->log->info(sprintf(
-//                'Creating class %s %s',
-//                $timetableClass->getName(),
-//                $timetableClass->getCode()
-//            ));
-//
-//            if ($this->perform) {
-//                $this->classEntryMapper->save($timetableClass);
-//            }
-//
-//            /* Process students
-//             */
-//            foreach ($class['students'] as $student) {
-//
-//                /* If we have no record of this student id existing then we
-//                 * we can't assign them to any classes - they don't have a
-//                 * schoolbox user account
-//                 */
-//                if (!isset($users[$student['id']])) {
-//                    $this->log->warning(sprintf(
-//                        'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
-//                        $student['id'],
-//                        $timetableClass->getName(),
-//                        $timetableClass->getCode()
-//                    ));
-//
-//                    continue;
-//                }
-//
-//                /* Minimum user
-//                 */
-//                $user = $this->userMapper->createModel()
-//                    ->setId($users[$student['id']]);
-//
-//                /** @var ClassInvolvement $timetableClassInvolvement */
-//                $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-//                    ->setUser($user)
-//                    ->setClass($timetableClass);
-//
-//                $this->log->info(sprintf(
-//                    'Creating class involvement %s %s for user %s (user %s)',
-//                    $timetableClass->getName(),
-//                    $timetableClass->getCode(),
-//                    $student['preferredName'] . ' ' . $student['surname'],
-//                    $timetableClassInvolvement->getUser()->getId()
-//                ));
-//
-//                if ($this->perform) {
-//                    $this->classInvolvementMapper->save($timetableClassInvolvement);
-//                }
-//
-//                /* TODO: Assign class (set) to period
-//                 * TODO: Assign teacher via their identifier
-//                 * TODO: Assign room via EstateManager I guess
-//                 */
-//                print_r($timetableClass);
-//                 print_r($timetableClassInvolvement);
-//            }
-//        }
-//
-//        if (!$this->perform) {
-//            $this->log->info('Planning finished.');
-//        }
+        if (!$this->perform) {
+            $this->log->info('Planning finished.');
+        }
     }
 }
