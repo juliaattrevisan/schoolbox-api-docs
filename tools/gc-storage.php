@@ -21,10 +21,9 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Application\Daemon;
 
 $errors  = [];
-$opts    = getopt('pvn:', ['hash:']);
+$opts    = getopt('pvn:');
 $limit   = isset($opts['n']) ? $opts['n'] : 1000;
 $perform = isset($opts['p']);
-$hash = isset($opts['hash']) ? $opts['hash'] : null;
 
 require_once __DIR__ . '/../conf/core/require.php';
 new Daemon\Kernel(
@@ -62,7 +61,7 @@ $gc  = new GC\GarbageCollector(
     $sm, $log, $limit, $perform
 );
 
-$deleted = $gc->purge($hash);
+$deleted = $gc->purge();
 
 // if nothing was deleted, consider that an error case
 exit($deleted ? 0 : 1);
