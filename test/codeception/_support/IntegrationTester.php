@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\LevelMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\User;
 
 /**
@@ -78,12 +79,12 @@ class IntegrationTester extends \Codeception\Actor
     }
 
     ##might not even work.
-    function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $userID)
+    function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $assessment_ownderID, $submission_ownderID)
     {
         $database=Database::getInstance();
         $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
-        $box_id=\Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$userID])->getID();
-        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$userID]);
+        $box_id=SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$assessment_ownderID])->getID();
+        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$submission_ownderID]);
         return $submission->getId();
     }
 
@@ -105,13 +106,12 @@ class IntegrationTester extends \Codeception\Actor
         return $assessment->getId();
     }
 
-    function getFirstRubricByAsessessmentID($assessmentID)
+    function getFirstRubricByAsessessmentID($assessmentID, $assessment_ownderID)
     {
         $database=Database::getInstance();
         $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
-        $box_id=\Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$userID])->getID();
-        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$userID]);
-        return RubricMapper::getInstance()->findBySubmissionBox($submission);
+        $box=SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$assessment_ownderID]);
+        return RubricMapper::getInstance()->findBySubmissionBox($box);
     }
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
@@ -385,7 +385,7 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    public function updateAssessemntHomepage($HomePageID, $assignmentID, $assignmentTitle)
+    public function updateAssessemntOnHomepage($HomePageID, $assignmentID, $assignmentTitle)
     {
         if (!isset($this->client))
         {
@@ -663,18 +663,18 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    public function markAssessment($assessementID, $user_id)
+    public function markAssessment($assessementID, $user_marking_id, $student_submitting_id)
     {
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
         }
 
-        $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_id);
+        $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_marking_id, $student_submitting_id);
 
-        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$user_id.'/responses';
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$student_submitting_id.'/responses';
 
-        $page='/learning/assessments/'.$assessementID.'/'.$user_id.'/'.$submissionID.'/feedback';
+        $page='/learning/assessments/'.$assessementID.'/'.$student_submitting_id.'/'.$submissionID.'/feedback';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
         $allow_redirects = $this->redirect_settings;
@@ -701,36 +701,47 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    public function markAssessmentWithRubric($assessementID, $user_id)
+    public function markAssessmentWithRubric($assessementID, $user_marking_id, $student_submitting_id)
     {
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
         }
 
-        $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_id);
-        $rubric = $this->getFirstRubricByAsessessmentID($assessementID);
+        $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_marking_id, $student_submitting_id);
+        $rubric = $this->getFirstRubricByAsessessmentID($assessementID, $user_marking_id);
 
-        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$user_id.'/responses';
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$student_submitting_id.'/responses';
 
-        $page='/learning/assessments/'.$assessementID.'/'.$user_id.'/'.$submissionID.'/feedback';
+        $page='/learning/assessments/'.$assessementID.'/'.$student_submitting_id.'/'.$submissionID.'/feedback';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
         $allow_redirects = $this->redirect_settings;
 
-        $descriptors = $rubric->getAllDescriptors();
+        $criterions_for_rubric = $rubric->getORMCriteria();
 
-        print_r($descriptors);
+        $rubric_data=[];
+
+        foreach ($criterions_for_rubric as $one_criterion)
+        {
+            //rubric[descriptors][desc_id][selected]: 1
+
+            $descriptors = DescriptorMapper::getInstance()->findByColumnList(['criterion_id' => $one_criterion->getId()]);
+            $descriptors_ids=$descriptors->keys();
+            $levelToPick=rand(0,2);
+            $rubric_data['descriptors'][$descriptors_ids[$levelToPick]]['selected']= 1;
+        }
 
         $data = [
             'responseId'=>$submissionID,
             'fromInlineGrader' => true,
             'mark' => '55',
             'comment' => 'Some Feedback for Student',
+            'rubric' => $rubric_data,
             'publish' => 1
         ];
 
-        /*try {
+        try {
             return $this->client->request('POST', $url, [
                 'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
@@ -741,7 +752,7 @@ class IntegrationTester extends \Codeception\Actor
             print($e->getMessage());
             print($e->getResponse()->getBody()->getContents());
             throw $e;
-        }*/
+        }
     }
 
     public function draftNews($title)

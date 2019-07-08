@@ -126,13 +126,15 @@ class SmokeInitialCest {
      */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
-        $homepage_title='Testing Home Page for Assessment';
-        $assessment_title='Testing Assessment On Homepage';
+        $homepage_title='Testing Home Page for Assessment5';
         $i->loginAdmin();
         $i->createHomepage($homepage_title);
         $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
+
         $i->addDefaultUsersToHomepage($homePageId);
         $student = $i->getUser('drhodes');
+        $admin = $i->getUser('alaress');
 
         #WHEN
         $response = $i->createAssessemntOnHomepage($assessment_title,$homePageId);
@@ -146,46 +148,66 @@ class SmokeInitialCest {
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
         #WHEN
-        $assessment_title='Testing Assessment On Homepage, Edit it';
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' Edit it';
         $i->createAssessemntOnHomepage($assessment_title, $homePageId);
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
+        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title, $homePageId);
         $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
-        $update_response = $i->updateAssessemntHomepage($homePageId, $assessmentPageId, $assessment_title);
+        $update_response = $i->updateAssessemntOnHomepage($homePageId, $assessmentPageId, $assessment_title);
 
         #THEN
         $i->comment('Updated Assessment');
         $i->assertEquals(200, $determine_mark_response->getStatusCode(), 'I expect that we get a 200 after redirection.');
         $i->assertEquals(200, $update_response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        ##Create assessement with rubric mark.
-        $assessment_title='Testing Assessment On Homepage With Rubric';
+        #WHEN
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
         $response = $i->createAssessementForHomepageWithRubric($assessment_title,$homePageId);
+
+        #THEN
         $i->comment('Create Assessment with rubric for a homepage');
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        ##Submit an assessment for marking.
-        $assessment_title='Testing Assessment On Homepage';
+        #WHEN
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
         $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $i->submitAssessment($assessmentPageId, $student->getId());
+        $response = $i->submitAssessment($assessmentPageId, $student->getId());
+
+        #THEN
         $i->comment('Submit assessment on behalf of student');
-
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        ##Submit an rubric assessment for marking.
-        $assessment_title='Testing Assessment On Homepage With Rubric';
+        #WHEN
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
         $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $i->submitAssessment($assessmentPageId, $student->getId());
+        $response = $i->submitAssessment($assessmentPageId, $student->getId());
+
+        #THEN
         $i->comment('Submit assessment witrh rubric on behalf of student');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+
+        #WHEN
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
+        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
+
+        #THEN
+        $response = $i->markAssessmentWithRubric($assessmentPageId, $admin->getId(), $student->getId());
+        $i->comment('Mark assessment with rubric');
 
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        ##Mark rubric assessment.
+        #WHEN
+        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
+        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
+        $response = $i->markAssessment($assessmentPageId, $admin->getId(), $student->getId());
 
-        $i->markAssessmentWithRubric($assessmentPageId, $student->getId());
+        #THEN
+        $i->comment('Mark normal assessment');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
-        ##Mark assessment.
+        ##To Do - Submit reflection on assessment.
 
-        ##Submit reflection on assessment.
+
     }
 
 
