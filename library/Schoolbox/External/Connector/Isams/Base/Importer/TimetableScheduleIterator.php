@@ -66,6 +66,10 @@ class TimetableScheduleIterator implements Iterator
          */
 //        $roomId = (string)$class->RoomId;
 
+        /* Class
+         */
+        $subject = $this->findSubject((string)$schedule->Code);
+
         /* Teacher
          * (I've only seen one per class in the xml so far...but there could be many?)
          */
@@ -82,10 +86,7 @@ class TimetableScheduleIterator implements Iterator
         /* Basic TimetableClass data
          */
         $class = [
-            'class' => [
-                'code' => (string)$schedule->Code,
-                'name' => $this->findSubjectName((string)$schedule->Code),
-            ],
+            'class' => $subject,
             'period' => $period,
             'teachers' => $teachers,
             'students' => $students
@@ -95,6 +96,35 @@ class TimetableScheduleIterator implements Iterator
         print_r($class);
 
         return $class;
+    }
+
+
+    /**
+     * Find a subject's name from its $setCode (that's its subject code equivalent)
+     *
+     * @param string $setCode
+     * @return array
+     * @throws RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    private function findSubject(string $setCode): array
+    {
+        $node = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
+
+        /* Unknown subject: can't find it via its setCode
+         */
+        if (empty($node)) {
+            return [
+                'code' => '',
+                'name' => '(unknown subject)',
+            ];
+        }
+
+        return [
+            'code' => $setCode,
+            'name' => (string)$node[0]->Name,
+        ];
     }
 
 
@@ -158,30 +188,6 @@ class TimetableScheduleIterator implements Iterator
             'sequence' => (string)$node[0]->Ordinal,
         ];
     }
-
-
-    /**
-     * Find a subject's name from its $setCode (that's its subject code equivalent)
-     *
-     * @param string $setCode
-     * @return string
-     * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidUriPartException
-     */
-    private function findSubjectName(string $setCode): string
-    {
-        $node = $this->batchxml->fetchXml("/iSAMS/TeachingManager/Sets/Set[contains(SetCode, '{$setCode}')]");
-
-        /* Unknown subject: can't find it via its setCode
-         */
-        if (empty($node)) {
-            return '(unknown subject)';
-        }
-
-        return (string)$node[0]->Name;
-    }
-
 
     /**
      * Find a teacher's details from its $teacherCode
