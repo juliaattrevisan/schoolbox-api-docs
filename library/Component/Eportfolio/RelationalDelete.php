@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Component\Eportfolio;
 
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\RelationalDelete\Deletable;
 use Schoolbox\Resource\Storage\RelationalDelete\IRelationalDelete;
 
@@ -30,7 +31,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
                     try {
                         $fileListItemMapper->hardDelete($file);
                     } catch (\Exception $exception) {
-                        throw new Mapper\Exception($exception->getMessage());
+                        throw new Exception($exception->getMessage());
                     }
                 }
                 $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
