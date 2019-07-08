@@ -6,7 +6,7 @@
  * Get a list of potential Heroes, and also a list of existing Heroes
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

@@ -5,7 +5,7 @@
  * Standard verbosity reporting upon create/update/delete actions within Synchronise
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link		https://schoolbox.com.au/
  */
 abstract class Synchronise_Synergetic_Verbose_Abstract {

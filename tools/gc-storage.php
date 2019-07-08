@@ -10,7 +10,7 @@
  *  -n{limit}   the number of storage records to check, in ascending order of `last_accessed`
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

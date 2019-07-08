@@ -4,7 +4,7 @@
  * This is generally used to check if a config variable is true
  *
  * @author    James Leckie james.leckie@alaress.com.au
- * @copyright Copyright 2017, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 

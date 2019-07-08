@@ -3,7 +3,7 @@
  * Provides the common connection functionality to the Edumate connection classes
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

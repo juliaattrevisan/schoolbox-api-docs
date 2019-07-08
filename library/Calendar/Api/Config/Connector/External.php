@@ -5,7 +5,7 @@
  * Currently, the timetable is the only event type that matches this.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Calendar_Api_Config_Connector_External extends Calendar_Api_Config_Connector_Abstract

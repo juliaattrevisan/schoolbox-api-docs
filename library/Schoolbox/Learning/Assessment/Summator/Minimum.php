@@ -10,7 +10,7 @@
  * contain a mix of nulls and non-nulls should never be null.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace Schoolbox\Learning\Assessment\Summator;

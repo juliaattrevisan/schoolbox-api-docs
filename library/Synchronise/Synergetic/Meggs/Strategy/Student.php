@@ -3,7 +3,7 @@
  * Synchronise_Synergetic_Meggs_Strategy_Student
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Synchronise_Synergetic_Meggs_Strategy_Student extends Synchronise_Base_Strategy_Student

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
 
 use \Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;

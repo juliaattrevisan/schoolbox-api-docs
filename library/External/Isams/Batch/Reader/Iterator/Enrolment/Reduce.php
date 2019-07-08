@@ -3,7 +3,7 @@
  * Reduces results for `External_Isams_Batch_Reader_Enrolment->parse()`.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce

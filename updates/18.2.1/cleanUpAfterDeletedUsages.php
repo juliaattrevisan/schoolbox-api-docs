@@ -27,7 +27,7 @@
  * because specs with this kind of invalid data cannot be imported to classes
  * (this is the symptom our schools have been observing).
  *
- * @copyright Copyright 2019, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 

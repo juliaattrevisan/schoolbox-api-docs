@@ -5,7 +5,7 @@
  * Localisation for date formats used in Alaress_Date_Format and its subclasses
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Interface {

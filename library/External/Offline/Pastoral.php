@@ -6,7 +6,7 @@
  * At the time of writing this is only implemented for Synergetic so this version will be used for all other systems
  *
  * @author      Damian Sloane <sloane@alaress.com.au>
- * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
 
 use External\IOfflineConnector;

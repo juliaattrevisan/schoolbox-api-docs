@@ -8,7 +8,7 @@
  * is usable with Schoolbox error() function
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link		https://schoolbox.com.au/
  */
 class DAV_Error {

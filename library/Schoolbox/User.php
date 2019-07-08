@@ -4,7 +4,7 @@
  * Generic user object for Schoolbox
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   2013 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

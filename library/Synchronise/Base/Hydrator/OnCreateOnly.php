@@ -3,7 +3,7 @@
  * A hydrator that runs a wrapped hydrator on create only.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Synchronise_Base_Hydrator_OnCreateOnly extends Synchronise_Base_Hydrator_CreateUpdate

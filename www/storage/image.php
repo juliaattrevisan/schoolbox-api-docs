@@ -3,7 +3,7 @@
  * Handles image resizing and caching on images from storage engine
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   2012 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

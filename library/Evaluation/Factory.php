@@ -6,7 +6,7 @@
  * AnswerType models (handlers) depending on a type_id.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Evaluation_Factory extends DeprecatedModel

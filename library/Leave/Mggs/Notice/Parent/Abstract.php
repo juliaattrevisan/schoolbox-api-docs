@@ -5,7 +5,7 @@
  * The base class for parent notifications.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Leave_Mggs_Notice_Parent_Abstract extends Leave_Notice_Abstract_Notice

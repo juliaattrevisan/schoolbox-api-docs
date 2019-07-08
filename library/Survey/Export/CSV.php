@@ -3,7 +3,7 @@
  * Survey_Export_CSV
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link		https://schoolbox.com.au/
  */
 class Survey_Export_CSV extends Evaluation_Export_CSV {

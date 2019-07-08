@@ -5,7 +5,7 @@
  * If so, updates the document's status in Schoolbox
  *
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 declare(strict_types=1);

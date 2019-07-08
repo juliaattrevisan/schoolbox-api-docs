@@ -2,7 +2,7 @@
 /**
  * @author     Amri Sannang <amri.sannang@alaress.com.au>
  * @copiedFrom Matt Day <matt.day@alaress.com.au>
- * @copyright  Copyright 2015, Alaress Pty Ltd
+ * @copyright  Copyright 2019, Schoolbox Pty Ltd
  * @link       https://schoolbox.com.au/
  */
 declare(strict_types=1);

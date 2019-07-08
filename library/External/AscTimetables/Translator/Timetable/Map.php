@@ -6,7 +6,7 @@
  * Mapped values are used in the creation of the timetable.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2015, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class External_AscTimetables_Translator_Timetable_Map extends IteratorIterator

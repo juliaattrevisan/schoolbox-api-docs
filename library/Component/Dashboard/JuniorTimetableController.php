@@ -6,7 +6,7 @@
  * A custom component for Arden SB-6491
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_TimetableController

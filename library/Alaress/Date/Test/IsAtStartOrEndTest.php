@@ -3,7 +3,7 @@
  * Tests for verifying that checks that a date is at the start of a timespan work as expected.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright 2015 Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 

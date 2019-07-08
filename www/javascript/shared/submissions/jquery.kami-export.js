@@ -2,7 +2,7 @@
  * Generates a Kami document export, then downloads it
  *
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
- * @copyright   Copyright 2017, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 ;(function ($, window, document, undefined) {

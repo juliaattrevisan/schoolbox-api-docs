@@ -4,7 +4,7 @@
  * AllowCreate checkbox for wiki components
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 class Component_Config_AllowCreate extends Component_Config_Abstract

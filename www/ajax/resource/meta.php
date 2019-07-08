@@ -3,7 +3,7 @@
  * Ajax callback for retrieving metadata about a folder / file (or files) in the resource browser view
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 use Schoolbox\Application\WebRequest\Kernel;

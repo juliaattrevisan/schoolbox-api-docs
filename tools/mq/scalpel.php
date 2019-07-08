@@ -5,7 +5,7 @@
  * Search for messages that match the given pattern(s) and blast from existence.
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

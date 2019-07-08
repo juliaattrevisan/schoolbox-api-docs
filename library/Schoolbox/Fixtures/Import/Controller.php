@@ -1,7 +1,7 @@
 <?php
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
  * We allow the user to upload everything in either a single file, or separate files- thus we iterate over all attached

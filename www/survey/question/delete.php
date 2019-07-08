@@ -4,7 +4,7 @@
  * questions that get soft-deleted also have their answers soft-deleted.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 use Schoolbox\Permission\Access\UserAccess;

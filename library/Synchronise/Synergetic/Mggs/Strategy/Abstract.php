@@ -8,7 +8,7 @@
  * to provide unique methods to your synchronisation strategies.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Synchronise_Synergetic_Mggs_Strategy_Abstract extends Synchronise_Synergetic_Strategy_Abstract

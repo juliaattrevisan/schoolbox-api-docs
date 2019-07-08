@@ -6,7 +6,7 @@
  * Should be added as late in the chain of hydrators as possible.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Synchronise_Base_Hydrator_CreateUpdate implements Synchronise_Base_IHydrator

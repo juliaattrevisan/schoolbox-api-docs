@@ -6,7 +6,7 @@
  * It's the same as Short Answer, except with a unique UI
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {

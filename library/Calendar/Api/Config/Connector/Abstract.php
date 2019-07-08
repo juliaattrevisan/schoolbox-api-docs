@@ -4,7 +4,7 @@
  * Calendar_Api_Config_Connector_Abstract
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Config_Connector_Interface

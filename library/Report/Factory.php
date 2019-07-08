@@ -3,7 +3,7 @@
  * Report Factory for generating concrete instances of reports.
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

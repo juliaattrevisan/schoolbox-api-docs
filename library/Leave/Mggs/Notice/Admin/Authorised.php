@@ -7,7 +7,7 @@
  * they took themselves - take note JPC.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Leave_Mggs_Notice_Admin_Authorised extends Leave_Mggs_Notice_Admin_Abstract {

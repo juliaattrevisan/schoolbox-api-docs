@@ -5,7 +5,7 @@
  * Ask a help.schoolbox.com.au endpoint to tell me answers
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

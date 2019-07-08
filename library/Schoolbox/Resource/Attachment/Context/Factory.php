@@ -9,7 +9,7 @@ use Schoolbox\Resource\Attachment\Internal;
  * Factory
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 class Factory {

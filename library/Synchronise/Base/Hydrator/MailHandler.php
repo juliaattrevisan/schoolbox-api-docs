@@ -3,7 +3,7 @@
  * Hydrator for mail_handler.
  *
  * @author    Steve Chan <steve.chan@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Synchronise_Base_Hydrator_MailHandler implements Synchronise_Base_IHydrator {

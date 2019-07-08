@@ -2,7 +2,7 @@
 
 /**
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
  * This component will just output a standard set of HTML. Can be used in any scenario you need to output HTML without any processing.

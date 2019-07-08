@@ -5,7 +5,7 @@
  * Abstract Factory Method. This used by the _User and _Parent factories for notifications
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link		https://schoolbox.com.au/
  */
 abstract class Leave_Notice_Abstract_Factory {

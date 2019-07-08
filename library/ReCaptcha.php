@@ -5,7 +5,7 @@
  * https://developers.google.com/recaptcha/intro
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   2018 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
  */

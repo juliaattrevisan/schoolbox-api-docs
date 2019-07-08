@@ -5,7 +5,7 @@
  * This allows the user to audience a pastoral care record to individual users, roles and user defined pastoral groups
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

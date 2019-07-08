@@ -1,7 +1,7 @@
 <?php
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 namespace Custom\Mggs\Learning\Upcoming;

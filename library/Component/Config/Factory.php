@@ -2,7 +2,7 @@
 /**
  * Abstract so that it can't be instantiated, so only its static method(s) can be used
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 use Schoolbox\Resource\Folder\Model as Folder;

@@ -8,7 +8,7 @@
  * the external pastoral care system, if one is configured.
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

@@ -3,7 +3,7 @@
  * Hydrator for house for Kings users.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 class Synchronise_Synergetic_Kings_Hydrator_House implements Synchronise_Base_IHydrator {

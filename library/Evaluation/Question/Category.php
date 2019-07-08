@@ -5,7 +5,7 @@
  * Abstract interface for all question bank categories
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Evaluation_Question_Category extends DeprecatedModel

@@ -5,7 +5,7 @@
  * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2013, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
 
  */

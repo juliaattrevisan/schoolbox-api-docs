@@ -4,7 +4,7 @@
  * Calculates the direction of descriptor values for a single criterion, and defers to DescriptorMetadata for range calculation
  *
  * @author      Dorothea Baker <dorothea.baker@alaress.com.au>
- * @copyright   Copyright 2018, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

@@ -3,7 +3,7 @@
  * Show a list of the users groups on the dashboard
  *
  * @author    James Leckie <jleckie@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 

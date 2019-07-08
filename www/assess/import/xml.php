@@ -5,7 +5,7 @@
  * Uses the handlers to import from a Moodle-compatible format.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   2010 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

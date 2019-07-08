@@ -3,7 +3,7 @@
  * Interface for Homepage cleanable components
  *
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
- * @copyright   2016 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

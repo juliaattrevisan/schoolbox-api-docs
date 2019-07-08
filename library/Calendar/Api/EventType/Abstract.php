@@ -9,7 +9,7 @@ use Schoolbox\User;
  * the Mobile version of the calendar (in Desktop, event details are rendered inline)
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface

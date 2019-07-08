@@ -3,7 +3,7 @@
  * Leave_Report_Catering_Web
  *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link		https://schoolbox.com.au/
  */
 class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract

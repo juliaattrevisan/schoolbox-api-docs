@@ -4,7 +4,7 @@
  * Script to migrate existing thumbnails, posters and transcodes across to OTFS storage
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   2017 Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

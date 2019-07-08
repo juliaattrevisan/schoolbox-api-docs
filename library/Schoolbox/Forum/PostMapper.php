@@ -4,7 +4,7 @@
  * with posts below the thread.  The users post into a thread using this mapper.
  *
  * @author    James Leckie <jleckie@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 

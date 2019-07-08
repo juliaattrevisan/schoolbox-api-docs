@@ -4,7 +4,7 @@
  * Perform Schoolbox User/Synergetic synchronisations
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 require_once __DIR__ . '/../../../conf/core/require.php';

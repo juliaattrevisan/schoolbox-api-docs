@@ -3,7 +3,7 @@
  * Outputs an icon from a spritesheet at a given size, or with a given transform
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2014, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

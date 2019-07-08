@@ -5,7 +5,7 @@
  * IF the schedule queue ALREADY exists in RabbitMQ, this script is to do nothing.
  *
  * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2015, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 

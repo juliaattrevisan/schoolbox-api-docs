@@ -6,7 +6,7 @@
  * Export an entire survey (including sections, questions + solutions) into xml format
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2012, Alaress Pty Ltd
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 class Survey_Export_Xml extends Evaluation_Export_Xml
