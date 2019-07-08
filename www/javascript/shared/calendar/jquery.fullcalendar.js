@@ -185,7 +185,7 @@ function Calendar(id, bubbleId, opts) {
                 try {
                     if (calEvent.data.links.category.id > 0) {
                         data.homepageLink =
-                            $('<a class="button">Homepage</a>')
+                            $('<a class="button">Go to homepage</a>')
                                 .attr('href', '/homepage/' + String(calEvent.data.links.category.id));
                     }
                 }
