@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
+use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -60,14 +61,12 @@ class Criterion implements ISoftDeletable
     /**
      * Retrieves a normalized form of this object's name, for comparison with
      * other objects.
-     * * Leading and trailing spaces are stripped
-     * * Multiple consecutive spaces are converted to single spaces
      *
      * @return string
      */
     public function retrieveNormalizedName(): string
     {
-        return preg_replace('`\s+`', ' ', trim($this->name));
+        return Util::normalizeName($this->name);
     }
 
     /**

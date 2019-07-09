@@ -15,7 +15,9 @@ namespace Schoolbox\Assessment\Rubric;
 class Util
 {
     /**
-     * Normalizes a name.
+     * Normalizes a name:
+     * * Leading and trailing spaces are stripped
+     * * Multiple consecutive spaces are converted to single spaces
      *
      * Before saving a rubric capability or indicator, this method is called on
      * its name. This attempts to ensure that meaningless differences in white
