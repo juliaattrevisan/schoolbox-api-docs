@@ -134,8 +134,8 @@ class Definition implements ImporterInterface
                 $timetableCampus = $this->timetableCampusMapper->createModel()
                     ->setCycle($timetableCycle)
                     ->setCampus($campus)
-                    ->setStart(\Alaress_Date_Format::newDatabaseDate('2020-01-01 00:00:00'))
-                    ->setFinish(\Alaress_Date_Format::newDatabaseDate('2120-01-01 00:00:00'))
+                    ->setStart(\Alaress_Date_Format::newDatabaseDate('2000-01-01 00:00:00'))
+                    ->setFinish(\Alaress_Date_Format::newDatabaseDate('2999-01-01 00:00:00'))
                     ->setStartDay(1);
 
                 $this->log->info(sprintf(
