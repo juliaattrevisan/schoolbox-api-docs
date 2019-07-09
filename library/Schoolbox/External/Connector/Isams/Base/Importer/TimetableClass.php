@@ -16,6 +16,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\Mapper\Exception;
@@ -153,6 +154,27 @@ class TimetableClass
 
 
     /**
+     * Find the period instance corresponding to $day, $periodName
+     *
+     * The timetable data in the feed may try to reference periods
+     * that don't exist in Timetable Structure for some reason
+     *
+     * @param array  $periods
+     * @param string $day
+     * @param string $periodName
+     * @return TimetablePeriod|null
+     */
+    private function findPeriod(array $periods, string $day, string $periodName): ?TimetablePeriod
+    {
+        if (isset($periods['day'][$day]['period'][$periodName])) {
+            return $periods['day'][$day]['period'][$periodName];
+        }
+
+        return null;
+    }
+
+
+    /**
      * Import data from xml into local schema
      *
      * @throws \RuntimeException
@@ -216,13 +238,20 @@ class TimetableClass
 
             /* Look up the period instance by (name, day)
              */
-            // $timetablePeriod = $periods['day'][$class['period']['day']]['period'][$class['period']['name']];
+            $timetablePeriod = $this->findPeriod($periods, $class['period']['day'], $class['period']['name']);
 
+            if (null === $timetablePeriod) {
+                $this->log->warning(sprintf(
+                    'The period named %s on day %s does not exist in timetable structure',
+                    $class['period']['name'],
+                    $class['period']['day']
+                ));
+
+                continue;
+            }
 
             /** @var ClassPeriod $timetableClassPeriod */
-            $timetableClassPeriod = $this->classPeriodMapper->createModel();
-
-            $timetableClassPeriod
+            $timetableClassPeriod = $this->classPeriodMapper->createModel()
                 ->setClass($timetableClass)
                 ->setTeacher($teacher)
                 ->setRoom($class['period']['room']['name']);
