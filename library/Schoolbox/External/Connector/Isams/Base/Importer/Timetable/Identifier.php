@@ -1,19 +1,20 @@
 <?php
 /**
- * TimetableIdentifier
+ * Identifier
+ *
+ * Get a quick list of all the timetable ids that you need to shank into ext_timetable_code
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
 use Schoolbox\External\UPS\Batchxml;
 
-
-class TimetableIdentifier implements ImporterInterface
+class Identifier implements ImporterInterface
 {
 
     /**

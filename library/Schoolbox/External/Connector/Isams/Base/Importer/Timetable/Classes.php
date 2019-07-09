@@ -1,13 +1,14 @@
 <?php
 /**
- * TimetableClass
+ * Classes
+ *
+ * Import all the classes and their involvements for all the timetables in the xml
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
@@ -20,12 +21,11 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
-class TimetableClass
+class Classes
 {
 
     /**
@@ -233,7 +233,7 @@ class TimetableClass
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            $classes = new TimetableScheduleIterator($this->batchxml, $currentTimetable);
+            $classes = new ScheduleIterator($this->batchxml, $currentTimetable);
 
             foreach ($classes as $class) {
 

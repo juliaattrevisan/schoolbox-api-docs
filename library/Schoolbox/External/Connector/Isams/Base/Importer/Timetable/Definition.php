@@ -7,10 +7,11 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\External\Connector\Isams\Base\Importer;
+namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\CampusMapper;
+use Schoolbox\External\Connector\Isams\Base\Importer\ImporterInterface;
 use Schoolbox\External\TimetableCampus;
 use Schoolbox\External\TimetableCampusMapper;
 use Schoolbox\External\TimetableCycle;
@@ -19,7 +20,7 @@ use Schoolbox\External\TimetablePeriod;
 use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 
-class Timetable implements ImporterInterface
+class Definition implements ImporterInterface
 {
 
     /**
@@ -173,12 +174,13 @@ class Timetable implements ImporterInterface
                         $period->setCycle($timetableCycle);
 
                         $this->log->info(sprintf(
-                            'Creating period %s (%s-%s) in timetable cycle %s (%s)',
+                            'Creating period %s (%s-%s) in timetable cycle %s (%s) for campus %s',
                             $period->getTitle(),
                             $period->getStart(),
                             $period->getFinish(),
                             $timetableCycle->getId(),
-                            $timetableCycle->getTitle()
+                            $timetableCycle->getTitle(),
+                            $campus->getName()
                         ));
 
                         if ($this->perform) {
