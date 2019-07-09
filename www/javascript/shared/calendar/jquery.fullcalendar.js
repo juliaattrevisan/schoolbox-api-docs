@@ -145,24 +145,25 @@ function Calendar(id, bubbleId, opts) {
                 data.title = data.note;
 
                 // Format the date of this event
-                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma';
-                var start = moment(calEvent.start).format(format);
-                var end   = null;
+                var format      = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma',
+                    momentStart = FullCalendarMoment.toMoment(calEvent.start, self.fullCalendar),
+                    start       = momentStart.format(format),
+                    momentEnd   = null,
+                    end         = null;
                 if (calEvent.end != null) {
+                    momentEnd = FullCalendarMoment.toMoment(calEvent.end, self.fullCalendar);
                     if (calEvent.allDay) {
-                        end = moment(calEvent.end).subtract(1, 'd').format(format);
+                        end = momentEnd.subtract(1, 'd').format(format);
                     } else {
-                        end = moment(calEvent.end).format(format);
+                        end = momentEnd.format(format);
                     }
                 }
 
-                if (end && start != end) {
+                if (momentEnd && !momentStart.isSame(momentEnd)) {
                     // Start and end aren't the same - stitch them together.
-                    if (!calEvent.allDay
-                        && moment(calEvent.start).format('YYYYMMDD') === moment(calEvent.end).format('YYYYMMDD')
-                    ) {
+                    if (!calEvent.allDay && momentStart.isSame(momentEnd, 'day')) {
                         // Between two times on the same day - show the timespan but only one date
-                        data.date = start + " – " + moment(calEvent.end).format('h:mma');
+                        data.date = start + " – " + momentEnd.format('h:mma');
                     } else {
                         // Between two different days - show the whole timespan
                         data.date = start + " – " + end;
