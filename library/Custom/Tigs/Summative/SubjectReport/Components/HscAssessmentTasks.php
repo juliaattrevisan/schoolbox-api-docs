@@ -125,16 +125,19 @@ class HscAssessmentTasks extends BaseComponent
             }
         }
 
-        // Does the set include an assessment imported to this class?
+        // Does the set include an assessment imported to this class and in which the student is participating?
         $classAssessment = null;
         foreach ($cohortAssessments as $assessment) {
-            if ((int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()) {
+            if (
+                $assessment->isParticipant($this->student) &&
+                (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
+            ) {
                 $classAssessment = $assessment;
                 break;
             }
         }
         if (!$classAssessment || !$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->getViewer(), true, null, false)) {
-            // Not imported to this class within report window, or not visible?
+            // No assessment found, or found but not visible?
             return null;
         }
 
