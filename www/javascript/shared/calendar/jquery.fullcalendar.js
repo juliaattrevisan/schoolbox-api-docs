@@ -512,6 +512,7 @@ Calendar.prototype.init = function() {
         this.dom[0],
         this.options.fullCalendar
     );
+    this.fullCalendar.render();
 
     if (this.options.filter.enabled) {
         this.filters.interaction(this)
