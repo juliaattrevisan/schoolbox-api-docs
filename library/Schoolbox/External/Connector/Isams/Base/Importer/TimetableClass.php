@@ -16,6 +16,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Role;
@@ -47,6 +48,12 @@ class TimetableClass
 
 
     /**
+     * @var TimetablePeriodMapper
+     */
+    private $timetablePeriodMapper;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private $classEntryMapper;
@@ -75,6 +82,7 @@ class TimetableClass
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Batchxml               $batchxml
+     * @param TimetablePeriodMapper  $timetablePeriodMapper
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -84,6 +92,7 @@ class TimetableClass
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
+        TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper,
@@ -92,6 +101,7 @@ class TimetableClass
         $this->log = $log;
         $this->perform = $perform;
         $this->batchxml = $batchxml;
+        $this->timetablePeriodMapper = $timetablePeriodMapper;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -124,6 +134,25 @@ class TimetableClass
 
 
     /**
+     * Get a list of (day, period) tuples
+     *
+     * @return array
+     */
+    private function findPeriodLookup(): array
+    {
+        $periods = $this->timetablePeriodMapper->findAll();
+
+        $stack = [];
+
+        foreach ($periods as $period) {
+            $stack['day'][$period->getDay()]['period'][$period->getTitle()] = $period;
+        }
+
+        return $stack;
+    }
+
+
+    /**
      * Import data from xml into local schema
      *
      * @throws \RuntimeException
@@ -143,6 +172,10 @@ class TimetableClass
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          */
         $users = $this->findUserLookup();
+
+        /* Cache a flat key-value array of (day, period)
+         */
+        $periods = $this->findPeriodLookup();
 
         /* Find all the classes and their details as best we can
          *
@@ -181,8 +214,10 @@ class TimetableClass
             $teacher = $this->userMapper->createModel()
                 ->setId($users[$class['teachers']['username']]);
 
-            /* TODO: Look up the period instance by (name, day)
+            /* Look up the period instance by (name, day)
              */
+            // $timetablePeriod = $periods['day'][$class['period']['day']]['period'][$class['period']['name']];
+
 
             /** @var ClassPeriod $timetableClassPeriod */
             $timetableClassPeriod = $this->classPeriodMapper->createModel();
