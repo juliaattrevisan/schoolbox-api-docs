@@ -218,63 +218,68 @@ class TimetableClass
          */
         $periods = $this->initPeriodLookup();
 
-        /* Find all the classes and their details as best we can
-         *
-         * Some parts will rely on data to have already been imported into local schema,
-         * such as period ids, user ids, etc. so we try to get those and assemble them into
-         * a convenient struct which we can then just ram home
-         *
-         * TODO: There could be multiple PublishedTimetables/Timetable instances so we need an Iterator Iterator
+        /* Get a list of all the timetables to process
          */
-        $cycleId = 14;
-        $currentTimetable = $this->batchxml->fetchXml("/iSAMS/TimetableManager/PublishedTimetables/Timetable[@Id='{$cycleId}']")[0];
+        $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
-        $classes = new TimetableScheduleIterator($this->batchxml, $currentTimetable);
+        foreach ($timetables as $timetable) {
+            $cycleId = (string)$timetable->xpath('@Id')[0]->Id;
 
-        foreach ($classes as $class) {
+            $currentTimetable = $this->batchxml->fetchXml("/iSAMS/TimetableManager/PublishedTimetables/Timetable[@Id='{$cycleId}']")[0];
 
-            /* Look up the period instance by (name, day)
+            /* Find all the classes and their details as best we can
              *
-             * If the period doesn't correspond to something in our timetable definition,
-             * we can't process it anyway, so skip it
+             * Some parts will rely on data to have already been imported into local schema,
+             * such as period ids, user ids, etc. so we try to get those and assemble them into
+             * a convenient struct which we can then just ram home
              */
-            $timetablePeriod = $this->findPeriod($cycleId, $periods, $class['period']['day'], $class['period']['name']);
+            $classes = new TimetableScheduleIterator($this->batchxml, $currentTimetable);
 
-            if (null === $timetablePeriod) {
-                $this->log->warning(sprintf(
-                    'The period named %s on day %s does not exist in timetable structure',
-                    $class['period']['name'],
-                    $class['period']['day']
-                ));
+            foreach ($classes as $class) {
 
-                continue;
-            }
-
-            /* Assemble the pieces
-             */
-            $timetableClass = $this->createTimetableClass($class);
-            $this->createTimetableClassPeriod($users, $class, $cycleId, $timetablePeriod, $timetableClass);
-
-            /* Process students
-             */
-            foreach ($class['students'] as $student) {
-
-                /* If we have no record of this student id existing then we
-                 * we can't assign them to any classes - they don't have a
-                 * schoolbox user account
+                /* Look up the period instance by (name, day)
+                 *
+                 * If the period doesn't correspond to something in our timetable definition,
+                 * we can't process it anyway, so skip it
                  */
-                if (!isset($users[$student['username']])) {
+                $timetablePeriod = $this->findPeriod($cycleId, $periods, $class['period']['day'], $class['period']['name']);
+
+                if (null === $timetablePeriod) {
                     $this->log->warning(sprintf(
-                        'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
-                        $student['username'],
-                        $timetableClass->getName(),
-                        $timetableClass->getCode()
+                        'The period named %s on day %s does not exist in timetable structure',
+                        $class['period']['name'],
+                        $class['period']['day']
                     ));
 
                     continue;
                 }
 
-                $this->createTimetableClassInvolvement($users, $student, $timetableClass);
+                /* Assemble the pieces
+                 */
+                $timetableClass = $this->createTimetableClass($class);
+                $this->createTimetableClassPeriod($users, $class, $cycleId, $timetablePeriod, $timetableClass);
+
+                /* Process students
+                 */
+                foreach ($class['students'] as $student) {
+
+                    /* If we have no record of this student id existing then we
+                     * we can't assign them to any classes - they don't have a
+                     * schoolbox user account
+                     */
+                    if (!isset($users[$student['username']])) {
+                        $this->log->warning(sprintf(
+                            'Tried to assign nonexistent schoolbox account %s to class %s %s; skipping',
+                            $student['username'],
+                            $timetableClass->getName(),
+                            $timetableClass->getCode()
+                        ));
+
+                        continue;
+                    }
+
+                    $this->createTimetableClassInvolvement($users, $student, $timetableClass);
+                }
             }
         }
 
