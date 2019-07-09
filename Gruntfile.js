@@ -198,8 +198,7 @@ module.exports = function(grunt) {
         sass: { // Only used for development, skips the skin build process
             dist: {
                 files: {
-                    'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss',
-                    'www/css/demo/fullcalendar.css': 'node_modules/@fullcalendar/core/main.css'
+                    'www/css/demo/chrome-foundation.css': 'www/css/foundation/chrome-foundation.scss'
                 }
             }
         },
@@ -222,6 +221,15 @@ module.exports = function(grunt) {
             fullCalendarResource: {
                 src: jsSrc.fullCalendarResource,
                 dest: jsDest.fullCalendarResource
+            },
+            fullCalendarCss: {
+                src: [
+                    'node_modules/@fullcalendar/core/main.css',
+                    'node_modules/@fullcalendar/daygrid/main.css',
+                    'node_modules/@fullcalendar/list/main.css',
+                    'node_modules/@fullcalendar/timegrid/main.css'
+                ],
+                dest: 'www/css/demo/fullcalendar.css'
             },
             vue: {
                 src: jsSrc.vue,
