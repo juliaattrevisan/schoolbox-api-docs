@@ -20,6 +20,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
@@ -75,6 +76,7 @@ HELP;
             $this->getLogger(),
             $this->perform(),
             new Batchxml($api),
+            CampusMapper::getInstance(),
             UserMapper::getInstance(),
             UserProfileMapper::getInstance(),
             UserRelationMapper::getInstance(),
