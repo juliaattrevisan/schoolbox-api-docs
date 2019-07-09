@@ -7,7 +7,7 @@
 // http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
 String.prototype.capitalise = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 /**
  * Calendar object constructor
@@ -22,6 +22,12 @@ function Calendar(id, bubbleId, opts) {
     var self = this;
     this.id = id;
     this.dom = $('#'+id);
+
+    /**
+     * The FullCalendar instance.
+     *
+     * @type {FullCalendar}
+     */
     this.fullCalendar = null;
     this.bubble = new Bubble(this, bubbleId);
     this.suppress = false;
@@ -59,6 +65,7 @@ function Calendar(id, bubbleId, opts) {
             viewSettingsOptionsSelector: '.fc-month-button, .fc-agendaWeek-button, .fc-agendaDay-button'
         },
         fullCalendar: {
+            plugins: ['interaction', 'daygrid', 'list', 'moment', 'timegrid'],
             views: {
                 day: {
                     titleFormat: dateDisplayFormats.momentJsDateLong
@@ -283,8 +290,7 @@ function Calendar(id, bubbleId, opts) {
             dateFormat: 'dd-mm-yy',
             onSelect: function(dateText, inst) {
                 // Use fullcalendar to load events instead of redirecting to a new page.
-                self.dom.fullCalendar(
-                    'gotoDate',
+                self.fullCalendar.gotoDate(
                     moment().year(inst.currentYear).month(inst.currentMonth).date(inst.currentDay)
                 )
             },
@@ -401,7 +407,7 @@ function Calendar(id, bubbleId, opts) {
 
             //
             // Get events, put an 'is_rendered' field on them.
-            var events = cal.dom.fullCalendar('clientEvents');
+            var events = cal.fullCalendar.getEvents();
             $.each(events, function(event_no, event) {
                 var isRendered = true;
 
@@ -466,12 +472,12 @@ function Calendar(id, bubbleId, opts) {
                 );
             }
             else {
-                cal.dom.fullCalendar('rerenderEvents');
+                cal.fullCalendar.rerenderEvents();
             }
 
             // only send data to the server if we actually need to
             if(performAjax && cal.options.filter.ajax) {
-                var view = cal.dom.fullCalendar('getView').name;
+                var view = cal.fullCalendar.view.name;
                 if (view) {
                     cal.post(cal.options.filter.ajax, {fList: flist, view: view}, null, false);
                 }
@@ -506,7 +512,11 @@ function Calendar(id, bubbleId, opts) {
  */
 Calendar.prototype.init = function() {
     var c = this;
-    this.dom.fullCalendar(this.options.fullCalendar);
+    this.fullCalendar = new FullCalendar(
+        $this.dom[0],
+        this.options.fullCalendar
+    );
+    // this.dom.fullCalendar(this.options.fullCalendar);
     /* Button for list view
      */
     var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
@@ -561,7 +571,7 @@ Calendar.prototype.init = function() {
      */
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + c.options.userId + '/' + c.dom.fullCalendar('getDate').format('DD-MM-YYYY');
+        window.location.href = '/calendar/list/' + c.options.userId + '/' + c.fullCalendar.getDate().format('DD-MM-YYYY');
     });
 
     // mash in the datepicker
@@ -591,13 +601,14 @@ Calendar.prototype.init = function() {
                         placeholderEvent.start = moment(form.find('input[name="date"]').val(), "DD-MM-YYYY HH:mm");
                         placeholderEvent.end   = moment(placeholderEvent.start).add(1, 'h');
                     }
-                    c.dom.fullCalendar('renderEvent', placeholderEvent);
+                    c.fullCalendar.addEvent(placeholderEvent);
 
                     c.ccreate(data, function(responseText) {
                         if (responseText.length) {
                             // Remove the placeholder and render the actual event
-                            c.dom.fullCalendar('removeEvents', 'placeholder');
-                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true);
+                            // TODO use placeholderEvent.remove()
+                            c.fullCalendar.remove(placeholderEvent);
+                            c.fullCalendar.addEvent(JSON.parse(responseText));
                         }
                         c.bubble.hide();
                     });
@@ -625,8 +636,12 @@ Calendar.prototype.init = function() {
                             // instead of adding a new one.
                             var newEvent = JSON.parse(responseText);
                             var eventId  = newEvent.data.meta.eventId;
-                            c.dom.fullCalendar('removeEvents', matchEvents(eventId));
-                            c.dom.fullCalendar('renderEvent', newEvent);
+
+
+                            // TODO call event.remove instead
+                            // c.fullCalendar.remove(placeholderEvent);
+                            // c.dom.fullCalendar('removeEvents', matchEvents(eventId));
+                            c.fullCalendar.addEvent(newEvent);
                         }
                         c.bubble.hide();
                     })
