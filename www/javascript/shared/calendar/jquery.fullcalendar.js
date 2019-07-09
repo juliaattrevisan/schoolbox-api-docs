@@ -26,7 +26,7 @@ function Calendar(id, bubbleId, opts) {
     /**
      * The FullCalendar instance.
      *
-     * @type {FullCalendar}
+     * @type {FullCalendar.Calendar}
      */
     this.fullCalendar = null;
     this.bubble = new Bubble(this, bubbleId);
@@ -500,10 +500,6 @@ function Calendar(id, bubbleId, opts) {
     this.options.datepicker   = datepicker;
     this.options.bubble = bubble;
 
-    if(this.options.filter.enabled) {
-        this.filters.interaction(this)
-    }
-
     return this;
 }
 
@@ -512,10 +508,15 @@ function Calendar(id, bubbleId, opts) {
  */
 Calendar.prototype.init = function() {
     var c = this;
-    this.fullCalendar = new FullCalendar(
-        $this.dom[0],
+    this.fullCalendar = new FullCalendar.Calendar(
+        this.dom[0],
         this.options.fullCalendar
     );
+
+    if (this.options.filter.enabled) {
+        this.filters.interaction(this)
+    }
+
     // this.dom.fullCalendar(this.options.fullCalendar);
     /* Button for list view
      */
