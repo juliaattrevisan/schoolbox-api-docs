@@ -339,6 +339,30 @@ select.letter-grade-select {
 @media #{$medium-down} {
 
     table.rb {
+        thead {
+            position: absolute;
+            clip: rect(1px, 1px, 1px, 1px);
+            padding: 0;
+            border: 0;
+            height: 1px;
+            width: 1px;
+            overflow: hidden;
+        }
+        tbody,
+        tr,
+        th,
+        td {
+            display: block;
+            white-space: normal;
+        }
+        tr td,
+        tr th {
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            white-space: normal;
+        }
+
         tbody th {
             &:last-of-type {
                 border-right-width: 0;
@@ -348,25 +372,47 @@ select.letter-grade-select {
                 border-bottom-width: 2px;
             }
         }
-        td {
-            padding-left: 2rem;
+        .capability {
+            background-color: $snow;
+        }
+        th[scope="row"] {
+            display: block;
+            font-size: rem-calc(($base-font-size - 2));
+            text-align: center;
+            width: 100%;
+        }
+        td[data-header]:before {
+            content: attr(data-header);
+            display: block;
+            float: left;
+            width: 50%;
+            font-weight: bold;
+            text-align: left;
+        }
+        td[data-header] > * {
+            display: block;
+            width: 50%;
+            float: right;
+            clear: right;
+        }
+        td[data-header]:after {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50%;
+            padding-bottom: 200%;
+            display: block;
         }
         .hide-v,
         .rb-blank,
         th:empty{
-            visibility: hidden;
-            height: 0;
-            padding: 0;
+            display: none;
         }
         thead {
             display: block;
         }
         tr {
-            &:hover {
-                th, td {
-                    background-color: $container-bg;
-                }
-            }
             .rb-group-header {
                 label {
                     font-weight: bold;

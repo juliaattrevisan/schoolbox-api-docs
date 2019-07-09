@@ -19,7 +19,7 @@
 {% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
 {% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.markPerCapability %}
 <div class="scrollable">
-<table class="rb stack-for-medium-down">
+<table class="rb">
     {% set hasLevels = '' %}
     {% for level in rubricGrid.levels %}
         {% set hasLevels = hasLevels ~ level.name %}
@@ -27,9 +27,9 @@
     {% if hasLevels | length %}
     <thead>
     <tr>
-        <th colspan="2" class="rb-no-cell">&nbsp;</th>
+        <th colspan="2" class="rb-no-cell" scope="row">&nbsp;</th>
         {% for level in rubricGrid.levels %}
-        <th>{{ level.name }}</th>
+        <th scope="col">{{ level.name }}</th>
         {% endfor %}
     </tr>
     </thead>
@@ -47,11 +47,11 @@
             <tr>
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                    <th rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
+                    <th class="capability" scope="row" rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
                     {% set rowspan = 0 %}
                 {% endif %}
 
-                <th>{{ critUsage.indicator.name }}</th>
+                <th scope="row">{{ critUsage.indicator.name }}</th>
 
                 {% set indicatorMark = rubricMarkedGrid
                     ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
@@ -73,7 +73,7 @@
                         {% set isDescriptorSelected = indicatorMarkDescriptor == descriptor %}
                         {% set isMarkDisplayed      = isDescriptorSelected and rubricGrid.assessment.isFeedbackVisibleToUser(USER) %}
 
-                        <td {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
+                        <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
                                 <p>
                                     {{- descriptor.description|nl2br -}}
