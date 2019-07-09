@@ -1,11 +1,14 @@
 <?php
 /**
- * Timetable
+ * Definition
+ *
+ * Timetable definition of days and periods
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
@@ -22,6 +25,13 @@ use Schoolbox\External\UPS\Batchxml;
 
 class Definition implements ImporterInterface
 {
+
+    /**
+     * Temporarily here to denote the start and end of cycles
+     * There appears to be no equivalent concept in isams
+     */
+    private const CYCLE_START = '2000-01-01 00:00:00';
+    private const CYCLE_END = '2999-01-01 00:00:00';
 
     /**
      * @var LoggerInterface
@@ -112,6 +122,8 @@ class Definition implements ImporterInterface
         /* MASSIVE CAVEAT
          * Assign the same timetable definition to every campus because there's no obvious
          * correlation between Timetable/Structure/Week and PublishedTimetables/Timetable
+         * Also, we haven't seen any evidence that they have multiple timetables or multiple
+         * timetable definitions; their xml, however, suggests that it possible in theory
          */
         $campuses = $this->campusMapper->findAll();
 
@@ -134,8 +146,8 @@ class Definition implements ImporterInterface
                 $timetableCampus = $this->timetableCampusMapper->createModel()
                     ->setCycle($timetableCycle)
                     ->setCampus($campus)
-                    ->setStart(\Alaress_Date_Format::newDatabaseDate('2000-01-01 00:00:00'))
-                    ->setFinish(\Alaress_Date_Format::newDatabaseDate('2999-01-01 00:00:00'))
+                    ->setStart(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_START))
+                    ->setFinish(\Alaress_Date_Format::newDatabaseDate(self::CYCLE_END))
                     ->setStartDay(1);
 
                 $this->log->info(sprintf(
@@ -246,9 +258,6 @@ class Definition implements ImporterInterface
                     ->setTitle((string)$period->Name)
                     ->setDay($dayIndex)
                     ->setSequence((string)$period->Ordinal)
-
-                    /* Is this 12 or 24 hour time? Only seen morning values so far
-                     */
                     ->setStart((string)$period->StartTime . ':00')
                     ->setFinish((string)$period->EndTime . ':00');
 

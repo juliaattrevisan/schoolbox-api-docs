@@ -3,11 +3,14 @@
  * Identifier
  *
  * Get a quick list of all the timetable ids that you need to shank into ext_timetable_code
+ * This is used to bridge the gap between isams and schoolbox concepts of campus-specific timetables
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;

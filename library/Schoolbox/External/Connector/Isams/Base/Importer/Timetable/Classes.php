@@ -8,6 +8,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\External\Connector\Isams\Base\Importer\Timetable;
 
 use Psr\Log\LoggerInterface;
@@ -245,7 +247,7 @@ class Classes
                  */
                 $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-                $this->log->warning(sprintf(
+                $this->log->info(sprintf(
                     'Looking for ext_timetable_code %s, day %s, period %s',
                     $ext,
                     $class['period']['day'],

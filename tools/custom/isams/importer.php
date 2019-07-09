@@ -4,14 +4,14 @@
  * ISAMS Importer
  *
  * Imports from an xml file and populates the following tables:
- *  user_profile
- *  user_relation
- *  class
- *  class_period
- *  class_user
- *  timetable_campus
- *  timetable_cycle
- *  timetable_period
+ *   user_profile
+ *   user_relation
+ *   class
+ *   class_period
+ *   class_user
+ *   timetable_campus
+ *   timetable_cycle
+ *   timetable_period
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd

@@ -2,10 +2,13 @@
 /**
  * Composite
  *
+ * Strategy executor
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
@@ -174,11 +177,9 @@ class Composite implements ImporterInterface
      */
     public function import(): void
     {
-        /* TODO: Reactivate all strategies when ready
-         */
         $this->registry
-//            ->add(new Importer\Profile($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userProfileMapper))
-//            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper))
+            ->add(new Importer\Profile($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userProfileMapper))
+            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper))
             ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
             ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
             ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));

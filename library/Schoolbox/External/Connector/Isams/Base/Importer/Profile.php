@@ -8,6 +8,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
+
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use Psr\Log\LoggerInterface;
@@ -132,7 +134,7 @@ class Profile implements ImporterInterface
                 ->setDob($student->getDob());
 
             $profile
-                ->setLevel($student->getYear()->getLevel())
+                ->setLevel((string)$student->getYear()->getLevel())
                 ->setHomegroup($student->getForm()->getDescription())
                 ->setHouse($student->getHouse()->getName());
 
