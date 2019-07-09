@@ -385,18 +385,18 @@ select.letter-grade-select {
             content: attr(data-header);
             display: block;
             float: left;
-            width: 50%;
             font-weight: bold;
             text-align: left;
+            width: 50%;
         }
         td[data-header] > * {
-            display: block;
-            width: 50%;
-            float: right;
             clear: right;
+            display: block;
+            float: right;
+            width: 50%;
         }
         td[data-header]:after {
-            content: "";
+            content: '';
             position: absolute;
             left: 0;
             top: 0;
