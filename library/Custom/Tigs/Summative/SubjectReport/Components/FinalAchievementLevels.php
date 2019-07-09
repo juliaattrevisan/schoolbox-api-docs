@@ -118,10 +118,10 @@ class FinalAchievementLevels extends BaseComponent
             return $this->isDueWithinReportWindow($assessable) && $assessable->isParticipant($this->student);
         });
 
-        // Did we find 2+ FAL assessments in this class?
+        // Did we find 2+ FAL assessments in this class where the student is participating?
         $countFal = \count($falAssessables);
         if ($countFal >= 2) {
-            return ['error' => "A class may have 0 or 1 'Final Achievement Levels' assessments. Found {$countFal}."];
+            return ['error' => "A student may only participate in 0 or 1 'Final Achievement Levels' assessments. Found {$countFal}."];
         }
 
         // Did we find no data?
