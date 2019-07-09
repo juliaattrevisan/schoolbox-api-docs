@@ -62,6 +62,12 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Retrieving latest Data files";
 echo "[SB][`date +%Y-%m-%d\ %X`] Cleaning up zero byte files";
 find $cachedir -type f -empty -delete;
 
+
+# TODO remove this, add Composer to base box
+echo "[SB][`date +%Y-%m-%d\ %X`] Installing Composer";
+apt-get install -y composer
+
+
 # function to retrieve latest files from S3, needs $S3file set first
 S3file_short='';
 getS3file() {

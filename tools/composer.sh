@@ -7,12 +7,7 @@
 
 # Go to parent directory of this file, and run Composer from there.
 cd $(dirname $(dirname $(readlink -f $0)))
-if [ ! -f composer.phar ];
-then
-	curl -s http://getcomposer.org/installer | php;
-	chmod a+x composer.phar;
-fi
-php composer.phar install --no-progress -o $*
+composer install --no-progress -o $*
 checkexit=`echo $?`;
 if [ $checkexit -eq 0 ];
 then
