@@ -176,6 +176,37 @@ class TimetableClass
                 $this->classEntryMapper->save($timetableClass);
             }
 
+            /* Minimum user
+             */
+            $teacher = $this->userMapper->createModel()
+                ->setId($users[$class['teachers']['username']]);
+
+            /* TODO: Look up the period instance by (name, day)
+             */
+
+            /** @var ClassPeriod $timetableClassPeriod */
+            $timetableClassPeriod = $this->classPeriodMapper->createModel();
+
+            $timetableClassPeriod
+                ->setClass($timetableClass)
+                ->setTeacher($teacher)
+                ->setRoom($class['period']['room']['name']);
+
+            $this->log->info(sprintf(
+                'Creating class period relation for teacher %s %s in room %s, Day %s (sequence %s) %s-%s',
+                $class['teachers']['firstname'],
+                $class['teachers']['surname'],
+                $class['period']['room']['name'],
+                $class['period']['day'],
+                $class['period']['sequence'],
+                $class['period']['start'],
+                $class['period']['end']
+            ));
+
+            if ($this->perform) {
+                $this->classPeriodMapper->save($timetableClassPeriod);
+            }
+
             /* Process students
              */
             foreach ($class['students'] as $student) {
@@ -206,7 +237,7 @@ class TimetableClass
                     ->setClass($timetableClass);
 
                 $this->log->info(sprintf(
-                    'Creating class involvement %s %s for user %s (user %s)',
+                    'Creating class involvement %s %s for student %s (user %s)',
                     $timetableClass->getName(),
                     $timetableClass->getCode(),
                     $student['firstname'] . ' ' . $student['surname'],
@@ -216,11 +247,6 @@ class TimetableClass
                 if ($this->perform) {
                     $this->classInvolvementMapper->save($timetableClassInvolvement);
                 }
-
-                /* TODO: Assign class (set) to period
-                 * TODO: Assign teacher via their identifier
-                 * TODO: Assign room via EstateManager I guess
-                 */
 
                 /* create record for class_period - should have all the data from $class iterator output
                  * so you can look up individual pieces of the puzzle
@@ -244,33 +270,6 @@ class TimetableClass
                     ));
 
                     continue;
-                }
-
-                /* Minimum user
-                 */
-                $teacher = $this->userMapper->createModel()
-                    ->setId($users[$class['teachers']['username']]);
-
-                /** @var ClassPeriod $timetableClassPeriod */
-                $timetableClassPeriod = $this->classPeriodMapper->createModel();
-
-                $timetableClassPeriod
-                    ->setTeacher($teacher)
-                    ->setRoom($class['period']['room']['name']);
-
-                $this->log->info(sprintf(
-                    'Creating class period relation for teacher %s %s in room %s, Day %s (sequence %s) %s-%s',
-                    $class['teachers']['firstname'],
-                    $class['teachers']['surname'],
-                    $class['period']['room']['name'],
-                    $class['period']['day'],
-                    $class['period']['sequence'],
-                    $class['period']['start'],
-                    $class['period']['end']
-                ));
-
-                if ($this->perform) {
-                    $this->classPeriodMapper->save($timetableClassPeriod);
                 }
             }
         }
