@@ -93,61 +93,61 @@
                 eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
                 firstDay: Number('{CALENDAR_START_DAY}'),
 
-                /**
-                 * When an event is drawn on the calendar
-                 * @param calEvent
-                 * @param jsEvent
-                 * @param view
-                 */
-                eventRender: function(calEvent, jsEvent, view) {
-                    // Always render placeholders in the most basic manner
-                    if (calEvent.id === 'placeholder') {
-                        return true;
-                    }
-
-                    // Ignore the phantom event that the API puts there
-                    if (!calEvent.data) {
-                        return false;
-                    }
-
-                    // Don't render me if I'm marked as do not render
-                    if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
-                        return false;
-                    }
-
-                    var inner = jsEvent.find('.fc-content')
-                    var title = jsEvent.find('.fc-title')
-
-                    // We no longer escape title
-                    title.text(calEvent.title);
-
-                    // If appropriate, indicate this event can be attended
-                    var span = '<span class="att">(A)</span>';
-
-                    if (calEvent.data.attendance.icon.toString() == 'true') {
-                        if((content = jsEvent.find('.fc-event-content')).length == 1) {
-                            content.append(span)
-                        }
-                        else {
-                            inner.append(span)
-                        }
-                    }
-
-                    // If this event is a task, alter the state of the checkbox accordingly
-                    if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
-                        inner.prepend(
-                                $('<input type="checkbox" name="completed" class="plain" />')
-                                        .attr('id', 't'+ calEvent.data.meta.eventId)
-                        );
-                        if (calEvent.data.meta.completed == '1') {
-                            title.addClass('strike')
-                            inner.find(':checkbox').prop('checked', true)
-                        }
-                    }
-
-                    $(jsEvent).addClass(calEvent.data.styles.visible);
-
-                },
+                // /**
+                //  * When an event is drawn on the calendar
+                //  * @param calEvent
+                //  * @param jsEvent
+                //  * @param view
+                //  */
+                // eventRender: function(calEvent, jsEvent, view) {
+                //     // Always render placeholders in the most basic manner
+                //     if (calEvent.id === 'placeholder') {
+                //         return true;
+                //     }
+                //
+                //     // Ignore the phantom event that the API puts there
+                //     if (!calEvent.data) {
+                //         return false;
+                //     }
+                //
+                //     // Don't render me if I'm marked as do not render
+                //     if ('is_rendered' in calEvent && !(calEvent.is_rendered)) {
+                //         return false;
+                //     }
+                //
+                //     var inner = jsEvent.find('.fc-content')
+                //     var title = jsEvent.find('.fc-title')
+                //
+                //     // We no longer escape title
+                //     title.text(calEvent.title);
+                //
+                //     // If appropriate, indicate this event can be attended
+                //     var span = '<span class="att">(A)</span>';
+                //
+                //     if (calEvent.data.attendance.icon.toString() == 'true') {
+                //         if((content = jsEvent.find('.fc-event-content')).length == 1) {
+                //             content.append(span)
+                //         }
+                //         else {
+                //             inner.append(span)
+                //         }
+                //     }
+                //
+                //     // If this event is a task, alter the state of the checkbox accordingly
+                //     if (calEvent.data.meta.eventTypeId == c.options.taskTypeId) {
+                //         inner.prepend(
+                //                 $('<input type="checkbox" name="completed" class="plain" />')
+                //                         .attr('id', 't'+ calEvent.data.meta.eventId)
+                //         );
+                //         if (calEvent.data.meta.completed == '1') {
+                //             title.addClass('strike')
+                //             inner.find(':checkbox').prop('checked', true)
+                //         }
+                //     }
+                //
+                //     $(jsEvent).addClass(calEvent.data.styles.visible);
+                //
+                // },
 
                 /**
                  * When you finish resizing an event, update it
