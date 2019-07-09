@@ -115,7 +115,7 @@ class TimetableClass
      *
      * @return array
      */
-    private function findUserLookup(): array
+    private function initUserLookup(): array
     {
         $userStatement = $this->userMapper->getDatabase()->query("
             SELECT u.`id`, synergy_id
@@ -139,7 +139,7 @@ class TimetableClass
      *
      * @return array
      */
-    private function findPeriodLookup(): array
+    private function initPeriodLookup(): array
     {
         $periods = $this->timetablePeriodMapper->findAll();
 
@@ -193,11 +193,11 @@ class TimetableClass
         /* Cache a flat key-value array of (user.id, user.synergy_id)
          * The alternative would be to iterate findById() in a loop which probably costs more at scale
          */
-        $users = $this->findUserLookup();
+        $users = $this->initUserLookup();
 
         /* Cache a flat key-value array of (day, period)
          */
-        $periods = $this->findPeriodLookup();
+        $periods = $this->initPeriodLookup();
 
         /* Find all the classes and their details as best we can
          *
@@ -213,30 +213,10 @@ class TimetableClass
 
         foreach ($classes as $class) {
 
-            /* Process class entry
-             */
-            /** @var ClassEntry $timetableClass */
-            $timetableClass = $this->classEntryMapper->createModel()
-                ->setCode($class['class']['code'])
-                ->setName($class['class']['name'])
-                ->setDescription($class['class']['name']);
-
-            $this->log->info(sprintf(
-                'Creating class %s %s',
-                $timetableClass->getName(),
-                $timetableClass->getCode()
-            ));
-
-            if ($this->perform) {
-                $this->classEntryMapper->save($timetableClass);
-            }
-
-            /* Minimum user
-             */
-            $teacher = $this->userMapper->createModel()
-                ->setId($users[$class['teachers']['username']]);
-
             /* Look up the period instance by (name, day)
+             *
+             * If the period doesn't correspond to something in our timetable definition,
+             * we can't process it anyway, so skip it
              */
             $timetablePeriod = $this->findPeriod($periods, $class['period']['day'], $class['period']['name']);
 
@@ -250,26 +230,10 @@ class TimetableClass
                 continue;
             }
 
-            /** @var ClassPeriod $timetableClassPeriod */
-            $timetableClassPeriod = $this->classPeriodMapper->createModel()
-                ->setClass($timetableClass)
-                ->setTeacher($teacher)
-                ->setRoom($class['period']['room']['name']);
-
-            $this->log->info(sprintf(
-                'Creating class period relation for teacher %s %s in room %s, Day %s (sequence %s) %s-%s',
-                $class['teachers']['firstname'],
-                $class['teachers']['surname'],
-                $class['period']['room']['name'],
-                $class['period']['day'],
-                $class['period']['sequence'],
-                $class['period']['start'],
-                $class['period']['end']
-            ));
-
-            if ($this->perform) {
-                $this->classPeriodMapper->save($timetableClassPeriod);
-            }
+            /* Assemble the pieces
+             */
+            $timetableClass = $this->createTimetableClass($class);
+            $this->createTimetableClassPeriod($users, $class, $timetableClass);
 
             /* Process students
              */
@@ -290,56 +254,147 @@ class TimetableClass
                     continue;
                 }
 
-                /* Minimum user
-                 */
-                $user = $this->userMapper->createModel()
-                    ->setId($users[$student['username']]);
-
-                /** @var ClassInvolvement $timetableClassInvolvement */
-                $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
-                    ->setUser($user)
-                    ->setClass($timetableClass);
-
-                $this->log->info(sprintf(
-                    'Creating class involvement %s %s for student %s (user %s)',
-                    $timetableClass->getName(),
-                    $timetableClass->getCode(),
-                    $student['firstname'] . ' ' . $student['surname'],
-                    $timetableClassInvolvement->getUser()->getId()
-                ));
-
-                if ($this->perform) {
-                    $this->classInvolvementMapper->save($timetableClassInvolvement);
-                }
-
-                /* create record for class_period - should have all the data from $class iterator output
-                 * so you can look up individual pieces of the puzzle
-                 *
-                 * - room comes from $class['period']['room']['name']
-                 * - teacherId is a schoolbox user id via a lookup on their external_id
-                 * - period_id is a schoolbox timetable_period via lookup of Day and Period Name
-                 * - class_id comes from $timetableClass->getId()
-                 */
-
-                /* If we have no record of this teacher id existing then we
-                 * we can't assign them to any classes - they don't have a
-                 * schoolbox user account
-                 */
-                if (!isset($users[$class['teachers']['username']])) {
-                    $this->log->warning(sprintf(
-                        'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; skipping',
-                        $class['teachers']['username'],
-                        $timetableClass->getName(),
-                        $timetableClass->getCode()
-                    ));
-
-                    continue;
-                }
+                $this->createTimetableClassInvolvement($users, $student, $timetableClass);
             }
         }
 
         if (!$this->perform) {
             $this->log->info('Planning finished.');
         }
+    }
+
+
+    /**
+     * Create a Timetable Class
+     *
+     * @param array $class
+     * @return ClassEntry
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createTimetableClass(array $class): ClassEntry
+    {
+        /** @var ClassEntry $timetableClass */
+        $timetableClass = $this->classEntryMapper->createModel()
+            ->setCode($class['class']['code'])
+            ->setName($class['class']['name'])
+            ->setDescription($class['class']['name']);
+
+        $this->log->info(sprintf(
+            'Creating class %s %s',
+            $timetableClass->getName(),
+            $timetableClass->getCode()
+        ));
+
+        if ($this->perform) {
+            $this->classEntryMapper->save($timetableClass);
+        }
+
+        return $timetableClass;
+    }
+
+
+    /**
+     * Create a Timetable Class Period
+     *
+     * @param array      $users
+     * @param array      $class
+     * @param ClassEntry $timetableClass
+     * @return ClassPeriod
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createTimetableClassPeriod(array $users, array $class, ClassEntry $timetableClass): ClassPeriod
+    {
+        /* create record for class_period - should have all the data from $class iterator output
+         * so you can look up individual pieces of the puzzle
+         *
+         * - room comes from $class['period']['room']['name']
+         * - teacherId is a schoolbox user id via a lookup on their external_id
+         * - period_id is a schoolbox timetable_period via lookup of Day and Period Name
+         * - class_id comes from $timetableClass->getId()
+         */
+
+        /* If we have no record of this teacher id existing then we
+         * we can't assign them to any classes - they don't have a
+         * schoolbox user account
+         */
+        if (!isset($users[$class['teachers']['username']])) {
+            $this->log->warning(sprintf(
+                'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; skipping',
+                $class['teachers']['username'],
+                $timetableClass->getName(),
+                $timetableClass->getCode()
+            ));
+        }
+
+        /* Minimum user
+         */
+        $teacher = $this->userMapper->createModel()
+            ->setId($users[$class['teachers']['username']]);
+
+        /** @var ClassPeriod $timetableClassPeriod */
+        $timetableClassPeriod = $this->classPeriodMapper->createModel()
+            ->setClass($timetableClass)
+            ->setTeacher($teacher)
+            ->setRoom($class['period']['room']['name']);
+
+        $this->log->info(sprintf(
+            'Creating class period relation for teacher %s %s in room %s, Day %s (sequence %s) %s-%s',
+            $class['teachers']['firstname'],
+            $class['teachers']['surname'],
+            $class['period']['room']['name'],
+            $class['period']['day'],
+            $class['period']['sequence'],
+            $class['period']['start'],
+            $class['period']['end']
+        ));
+
+        if ($this->perform) {
+            $this->classPeriodMapper->save($timetableClassPeriod);
+        }
+
+        return $timetableClassPeriod;
+    }
+
+
+    /**
+     * Create a Timetable Class Involvement
+     *
+     * @param array      $users
+     * @param array      $student
+     * @param ClassEntry $timetableClass
+     * @return ClassInvolvement
+     * @throws Exception
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
+     */
+    private function createTimetableClassInvolvement(array $users, array $student, ClassEntry $timetableClass): ClassInvolvement
+    {
+        /* Minimum user
+         */
+        $user = $this->userMapper->createModel()
+            ->setId($users[$student['username']]);
+
+        /** @var ClassInvolvement $timetableClassInvolvement */
+        $timetableClassInvolvement = $this->classInvolvementMapper->createModel()
+            ->setUser($user)
+            ->setClass($timetableClass);
+
+        $this->log->info(sprintf(
+            'Creating class involvement %s %s for student %s (user %s)',
+            $timetableClass->getName(),
+            $timetableClass->getCode(),
+            $student['firstname'] . ' ' . $student['surname'],
+            $timetableClassInvolvement->getUser()->getId()
+        ));
+
+        if ($this->perform) {
+            $this->classInvolvementMapper->save($timetableClassInvolvement);
+        }
+
+        return $timetableClassInvolvement;
     }
 }
