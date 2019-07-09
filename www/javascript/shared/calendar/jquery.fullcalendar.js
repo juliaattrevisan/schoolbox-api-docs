@@ -65,7 +65,7 @@ function Calendar(id, bubbleId, opts) {
             viewSettingsOptionsSelector: '.fc-month-button, .fc-agendaWeek-button, .fc-agendaDay-button'
         },
         fullCalendar: {
-            plugins: ['interaction', 'daygrid', 'list', 'moment', 'timegrid'],
+            plugins: ['interaction', 'dayGrid', 'list', 'moment', 'timeGrid'],
             views: {
                 day: {
                     titleFormat: dateDisplayFormats.momentJsDateLong
@@ -90,7 +90,7 @@ function Calendar(id, bubbleId, opts) {
                 week:     'week',
                 day:      'day'
             },
-            date: null,
+            // date: null,
             month: null,
             year: null,
             eventLimit: true,
@@ -146,23 +146,23 @@ function Calendar(id, bubbleId, opts) {
 
                 // Format the date of this event
                 var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma';
-                var start = calEvent.start.format(format);
+                var start = moment(calEvent.start).format(format);
                 var end   = null;
                 if (calEvent.end != null) {
                     if (calEvent.allDay) {
                         end = moment(calEvent.end).subtract(1, 'd').format(format);
                     } else {
-                        end = calEvent.end.format(format);
+                        end = moment(calEvent.end).format(format);
                     }
                 }
 
                 if (end && start != end) {
                     // Start and end aren't the same - stitch them together.
                     if (!calEvent.allDay
-                        && calEvent.start.format('YYYYMMDD') === calEvent.end.format('YYYYMMDD')
+                        && moment(calEvent.start).format('YYYYMMDD') === moment(calEvent.end).format('YYYYMMDD')
                     ) {
                         // Between two times on the same day - show the timespan but only one date
-                        data.date = start + " – " + calEvent.end.format('h:mma');
+                        data.date = start + " – " + moment(calEvent.end).format('h:mma');
                     } else {
                         // Between two different days - show the whole timespan
                         data.date = start + " – " + end;
@@ -415,8 +415,8 @@ function Calendar(id, bubbleId, opts) {
                 // (type is the string prefix of the class: for "group14"
                 //  it will be "group".)
                 var groupedClasses = {};
-                if (event.className.forEach) {
-                    event.className.forEach(function(className) {
+                if (event.classNames.forEach) {
+                    event.classNames.forEach(function(className) {
                         var prefix = className.replace(/^([a-z]+).*/i, '$1');
                         if (!groupedClasses[prefix]) {
                             groupedClasses[prefix] = []
@@ -477,10 +477,10 @@ function Calendar(id, bubbleId, opts) {
 
             // only send data to the server if we actually need to
             if(performAjax && cal.options.filter.ajax) {
-                var view = cal.fullCalendar.view.name;
-                if (view) {
-                    cal.post(cal.options.filter.ajax, {fList: flist, view: view}, null, false);
-                }
+                // var view = cal.fullCalendar.view.type;
+                // if (view) {
+                //     cal.post(cal.options.filter.ajax, {fList: flist, view: view}, null, false);
+                // }
             }
         }
     };
@@ -572,7 +572,7 @@ Calendar.prototype.init = function() {
      */
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + c.options.userId + '/' + c.fullCalendar.getDate().format('DD-MM-YYYY');
+        window.location.href = '/calendar/list/' + c.options.userId + '/' + moment(c.fullCalendar.getDate()).format('DD-MM-YYYY');
     });
 
     // mash in the datepicker
@@ -1000,7 +1000,7 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    return datetime.format('ddd, Do MMM')
+    return moment(datetime).format('ddd, Do MMM')
     //return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
@@ -1010,6 +1010,6 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    return datetime.format('h:mma')
+    return moment(datetime).format('h:mma')
     //return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
 }

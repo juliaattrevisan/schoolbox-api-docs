@@ -31,7 +31,7 @@
             if (!returnData) {
                 revertFunc();
             }
-            c.dom.fullCalendar('rerenderEvents');
+            c.fullCalendar.rerenderEvents();
         });
     };
 
@@ -46,21 +46,21 @@
             anchor = parts[1];
             switch (anchor) {
                 case 'month':
-                    anchor = 'month';
+                    anchor = 'dayGridMonth';
                     break;
                 case 'week':
                 case 'agendaWeek':
-                    anchor = 'agendaWeek';
+                    anchor = 'timeGridWeek';
                     break;
                 case 'day':
                 case 'agendaDay':
-                    anchor = 'agendaDay';
+                    anchor = 'timeGridDay';
                     break;
                 case 'basicWeek':
-                    anchor = 'basicWeek';
+                    anchor = 'dayGridWeek';
                     break;
                 case 'basicDay':
-                    anchor = 'basicDay';
+                    anchor = 'dayGridDay';
                     break;
                 default:
                     anchor = '';
@@ -83,8 +83,10 @@
                 ajax: '/calendar/ajax/filter'
             },
             fullCalendar: {
-                defaultDate: moment('{SELECTED_DATE}'),
-                defaultView: anchor || '{CALENDAR_VIEW}',
+                defaultDate: '{SELECTED_DATE}',
+                // defaultView: anchor || '{CALENDAR_VIEW}',
+                // TODO restore calendar view
+                defaultView: anchor || 'dayGridMonth',
                 scrollTime: dateDisplayFormats.calendarStartTime,
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
@@ -157,8 +159,8 @@
                     var data = {
                         eventId: event.data.meta.eventId,
                         resize: true,
-                        start: event.start.format(),
-                        end: event.end.format()
+                        start: moment(event.start).format(),
+                        end: moment(event.end).format()
                     };
                     updateWrapper(event, data, revertFunc);
                 },
@@ -185,6 +187,7 @@
                  * @param view
                  */
                 dayClick: function(date, jsEvent, view) {
+                    date = moment(date);
                     var allDay = !date.hasTime();
                     var eventData = { allDay: allDay ? 1 : 0 };
                     if (allDay) {
@@ -241,9 +244,9 @@
                         c.filters.organise(c, ["campus", "groups", "sources"], false)
 
                         // update datepicker
-                        var d = c.dom.fullCalendar('getDate')
+                        var d = c.fullCalendar.getDate();
 
-                        $('#datepicker').datepicker('setDate', d.format('DD-MM-YYYY'))
+                        $('#datepicker').datepicker('setDate', moment(d).format('DD-MM-YYYY'))
                     }
                 },
 
@@ -259,14 +262,14 @@
                 },
 
                 // Stream location
-                events: function(start, end, timezone, callback) {
+                events: function(fetchInfo, callback) {
                     var self = this;
                     $.ajax({
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
                         data: {
-                            start: Calendar.reOffsetTimestamp(start.unix()),
-                            end:   Calendar.reOffsetTimestamp(end.unix()),
+                            start: Calendar.reOffsetTimestamp((Number)((fetchInfo.start.getTime()/1000).toFixed(0))),
+                            end:   Calendar.reOffsetTimestamp((Number)((fetchInfo.end.getTime()/1000).toFixed(0))),
                             userId: {CALENDAR_USER_ID}
                         },
                         success: function(data) {
@@ -275,7 +278,8 @@
                             }));
                             /* Save state to the db every time you change tabs
                              */
-                            $.post('/calendar/changeState', {calendarView: self.getView().type });
+                            // TODO restore this
+                            // $.post('/calendar/changeState', {calendarView: self.view.type });
                         },
                         cache: false
                     });
@@ -283,7 +287,7 @@
             },
 
             x: false
-        }).init()
+        }).init();
 
 
         /* LISTENERS */
@@ -291,7 +295,7 @@
         /* Save state to the db every time you change tabs
          */
         $('.fc-agendaWeek-button, .fc-agendaDay-button, .fc-month-button').on('click', function(event) {
-            $.post('/calendar/changeState', {calendarView: c.dom.fullCalendar('getView').type });
+            $.post('/calendar/changeState', {calendarView: c.fullCalendar.view.type });
         });
 
         /**
@@ -441,7 +445,7 @@
                 var href     = this.href
                 var callback = function(data) {
                     $.ajax(href, {data: data}).done(function() {
-                        c.dom.fullCalendar('refetchEvents')
+                        c.fullCalendar.refetchEvents()
                     })
                 }
                 var seriesId = $(this).data('seriesId')
