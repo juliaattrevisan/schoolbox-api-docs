@@ -14,6 +14,7 @@ use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\UPS\Batchxml;
 use Schoolbox\Mapper\Exception;
@@ -105,14 +106,11 @@ class TimetableClass
      */
     private function findUserLookup(): array
     {
-        $groupType = Role::STUDENT;
-
         $userStatement = $this->userMapper->getDatabase()->query("
             SELECT u.`id`, synergy_id
             FROM {$this->userMapper->getTable()} u
             INNER JOIN `groups` g ON u.`group_id` = g.id
             WHERE synergy_id IS NOT NULL
-            AND g.group_type = '{$groupType}'
         ");
 
         $users = [];
@@ -227,12 +225,53 @@ class TimetableClass
                 /* create record for class_period - should have all the data from $class iterator output
                  * so you can look up individual pieces of the puzzle
                  *
-                 * - room comes from $class['room']['name']
+                 * - room comes from $class['period']['room']['name']
                  * - teacherId is a schoolbox user id via a lookup on their external_id
                  * - period_id is a schoolbox timetable_period via lookup of Day and Period Name
                  * - class_id comes from $timetableClass->getId()
                  */
 
+                /* If we have no record of this teacher id existing then we
+                 * we can't assign them to any classes - they don't have a
+                 * schoolbox user account
+                 */
+                if (!isset($users[$class['teachers']['username']])) {
+                    $this->log->warning(sprintf(
+                        'Tried to assign nonexistent schoolbox account %s as teacher to class %s %s; skipping',
+                        $class['teachers']['username'],
+                        $timetableClass->getName(),
+                        $timetableClass->getCode()
+                    ));
+
+                    continue;
+                }
+
+                /* Minimum user
+                 */
+                $teacher = $this->userMapper->createModel()
+                    ->setId($users[$class['teachers']['username']]);
+
+                /** @var ClassPeriod $timetableClassPeriod */
+                $timetableClassPeriod = $this->classPeriodMapper->createModel();
+
+                $timetableClassPeriod
+                    ->setTeacher($teacher)
+                    ->setRoom($class['period']['room']['name']);
+
+                $this->log->info(sprintf(
+                    'Creating class period relation for teacher %s %s in room %s, Day %s (sequence %s) %s-%s',
+                    $class['teachers']['firstname'],
+                    $class['teachers']['surname'],
+                    $class['period']['room']['name'],
+                    $class['period']['day'],
+                    $class['period']['sequence'],
+                    $class['period']['start'],
+                    $class['period']['end']
+                ));
+
+                if ($this->perform) {
+                    $this->classPeriodMapper->save($timetableClassPeriod);
+                }
             }
         }
 

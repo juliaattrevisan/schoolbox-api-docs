@@ -69,7 +69,7 @@ class TimetableScheduleIterator implements Iterator
         /* Teacher
          * (I've only seen one per class in the xml so far...but there could be many?)
          */
-        $teachers = [$this->findTeacher((string)$schedule->Teacher)];
+        $teachers = $this->findTeacher((string)$schedule->Teacher);
 
         /* Students
          */
@@ -143,7 +143,7 @@ class TimetableScheduleIterator implements Iterator
         if (empty($period)) {
             return [
                 'day' => '',
-                'ordinal' => '',
+                'sequence' => '',
                 'name' => '(unknown period)',
                 'abbrev' => '',
                 'start' => '',
@@ -163,7 +163,7 @@ class TimetableScheduleIterator implements Iterator
         if (empty($day)) {
             return [
                 'day' => '(unknown day)',
-                'ordinal' => '',
+                'sequence' => '',
                 'name' => '',
                 'abbrev' => '',
                 'start' => '',
