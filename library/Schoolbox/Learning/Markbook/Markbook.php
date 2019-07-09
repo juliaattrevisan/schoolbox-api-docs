@@ -281,11 +281,12 @@ class Markbook
         // Exclude null marks
         $marks = array_values(array_filter($normMarks));
         sort($marks);
+        $quartile2 = $this->findMedian($marks);
         $countAllMarks = count($marks);
         if (isset($marks) && !empty($marks)) {
             if ($countAllMarks > 1) {
-                $quartile1 = $this->findMedian($this->setupFirstQuartile($marks));
-                $quartile3 = $this->findMedian($this->setupThirdQuartile($marks));
+                $quartile1 = $this->findMedian($this->setupFirstQuartile($marks, $quartile2));
+                $quartile3 = $this->findMedian($this->setupThirdQuartile($marks, $quartile2));
             } else {
                 $quartile1 = $marks[0] / 2;
                 $quartile3 = $marks[0] / 2;
@@ -316,7 +317,7 @@ class Markbook
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
             $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
-            $statistics['meanNormalized']   = $meanSummator->summateList($normMarks);
+            $statistics['meanNormalized'] = $quartile2;
             $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }
@@ -380,20 +381,31 @@ class Markbook
     }
 
     /**
-     * Find the values used to calculate first quartile
+     * Find the values used to calculate first quartile. The
+     * 2nd quartile is used to calculate the 1st quartile
+     *
+     * @param array $values
+     * @param $quartile2
+     * @return array
      */
-    public function setupFirstQuartile(array $values)
+    public function setupFirstQuartile(array $values, $quartile2)
     {
-        return array_slice($values, 0, floor(count($values) / 2));
+        $firstHalve = array_slice($values, 0, floor(count($values) / 2));
+        if (count($firstHalve) > 1) {
+            $firstHalve[] = $quartile2;
+        }
+        return $firstHalve;
     }
 
     /**
-     * Find the values used to calculate third quartile
+     * Find the values used to calculate third quartile - The
+     * 2nd quartile is used to calculate the 3rd quartile
      *
-     * Even number of items: split down the middle
-     * Odd number of items: ignore the median value
+     * @param array $values
+     * @param $quartile2
+     * @return array
      */
-    public function setupThirdQuartile(array $values)
+    public function setupThirdQuartile(array $values, $quartile2)
     {
         $even = !(count($values) % 2);
 
@@ -401,11 +413,15 @@ class Markbook
             return array_slice($values, floor(count($values) / 2), count($values));
         }
 
-        return array_slice($values, ceil(count($values) / 2), count($values));
+        $secondHalve = array_slice($values, ceil(count($values) / 2), count($values));
+        if (count($secondHalve) > 1) {
+            array_unshift($secondHalve, $quartile2);
+        }
+        return $secondHalve;
     }
 
     /**
-     * Calculates quartiles
+     * Calculates medians
      *
      * @param array $values
      * @return float
