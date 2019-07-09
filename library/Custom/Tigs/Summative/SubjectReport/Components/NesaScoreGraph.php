@@ -94,7 +94,7 @@ class NesaScoreGraph extends BaseComponent
         $markData      = self::BASE_MARKS;
         $studentMark   = null;
         $error         = null;
-        $showComponent = false; // Show if we error out
+        $showComponent = true; // If exceptions occur, we need to show component so we can see those errors
         try {
             [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables());
         } catch (UnexpectedValueException $e) {

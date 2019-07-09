@@ -365,36 +365,6 @@ class InternationalBaccalaureateGraph extends BaseComponent
 
 
     /**
-     * Returns whether we should render the component.
-     *
-     * Component visibility is derived from the assessment which:
-     * * belongs to the current class, and
-     * * where the student is participating
-     *
-     * Component is visible if:
-     * * Assessment is visible (ignoring SIVO), and
-     * * Assessment feedback is visible to user
-     *
-     * @param array         $ibAssessments
-     * @return bool
-     * @var Folder\Model    $ibAssessments [folderId]['folder']
-     * @var DueWork\Model[] $ibAssessments [folderId]['assessments']
-     * @var array           $ibAssessments [folderId]
-     */
-    private function deriveComponentVisibility(array $ibAssessments): bool
-    {
-        /** @var DueWork\Model $assessment */
-        foreach ($ibAssessments[$this->folder->getId()]['assessments'] ?? [] as $assessment) {
-            if (!$assessment->isParticipant($this->student)) {
-                continue;
-            }
-            return $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false);
-        }
-        return false;
-    }
-
-
-    /**
      * Ensures the assessments have been configured correctly
      * * Cohort students may only participate in 0:1 IB assessment per Folder per ReportPeriod
      * * This class must have at least 1 IB assessment
@@ -432,9 +402,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
         // Build participation count error messages
         $participationCountErrors = [];
         foreach ($participationCountsPerFolder as $folderId => $participationCounts) {
-            /** @var IAssessable $firstAssessment */
-            $firstAssessment = current($ibAssessments[$folderId]);
-            $folder          = $firstAssessment->getBaseContext()->getFolder();
+            $folder          = $ibAssessments[$folderId]['folder'];
             $folderLink      = sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
             foreach ($participationCounts as $studentId => $count) {
                 if ($count >= 2) {
@@ -443,22 +411,50 @@ class InternationalBaccalaureateGraph extends BaseComponent
             }
         }
 
-        // Check this folder has at least 1 IB Graph assessment
-        $classAssessmentsFound = count($ibAssessments[$this->folder->getId()]['assessments'] ?? []) > 0;
-
         $errorMessage = '';
         if (count($participationCountErrors)) {
             $errorMessage .= "Invalid data. Students may only participate in 1 <strong>IB Graph</strong> assessment per class per report period.<br>\n";
             $errorMessage .= implode("<br>\n", $participationCountErrors);
         }
 
-        if (!$classAssessmentsFound) {
+        // Check this folder has at least 1 IB Graph assessment
+         if (!count($ibAssessments[$this->folder->getId()]['assessments'])) {
             $folderLink   = sprintf('<a href="/homepage/%d">%s</a>', $this->folder->getId(), $this->folder->getName());
             $errorMessage .= "No IB Graph assessment found for folder $folderLink\n";
         }
         if ($errorMessage) {
             throw new UnexpectedValueException($errorMessage);
         }
+    }
+
+
+    /**
+     * Returns whether we should render the component.
+     *
+     * Component visibility is derived from the assessment which:
+     * * belongs to the current class, and
+     * * where the student is participating
+     *
+     * Component is visible if:
+     * * Assessment is visible (ignoring SIVO), and
+     * * Assessment feedback is visible to user
+     *
+     * @param array         $ibAssessments
+     * @return bool
+     * @var Folder\Model    $ibAssessments [folderId]['folder']
+     * @var DueWork\Model[] $ibAssessments [folderId]['assessments']
+     * @var array           $ibAssessments [folderId]
+     */
+    private function deriveComponentVisibility(array $ibAssessments): bool
+    {
+        /** @var DueWork\Model $assessment */
+        foreach ($ibAssessments[$this->folder->getId()]['assessments'] ?? [] as $assessment) {
+            if (!$assessment->isParticipant($this->student)) {
+                continue;
+            }
+            return $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false);
+        }
+        return false;
     }
 
 
