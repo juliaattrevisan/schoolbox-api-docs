@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
+use function array_key_exists;
+use function count;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\GenericCollection;
@@ -19,6 +21,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use function sprintf;
 use UnexpectedValueException;
 
 class HscAssessmentTasks extends BaseComponent
@@ -146,28 +149,53 @@ class HscAssessmentTasks extends BaseComponent
             return null;
         }
 
-        // Ensure there is only 1 such assessment per UnitSpec imported to a class
-        $cohortAssessmentsPerFolder = $cohortAssessments->groupByCallback(function (IAssessable $assessable) {
+        // Ensure students participate 0:1 times per Folder per UnitSpec per ReportPeriod
+        // (Note we are already in the context of a single UnitSpec and single ReportPeriod)
+        $cohortAssessmentsPerFolder = $cohortAssessments->groupByCallback(static function (IAssessable $assessable) {
             return $assessable->getBaseContext()->getFolder()->getId();
         });
+        /** @var int[][] $studentCountsPerFolder Indexed by folder.id, user.id */
+        $studentCountsPerFolder = [];
         foreach ($cohortAssessmentsPerFolder as $folderId => $assessments) {
-            $count = $assessments->count();
-            if ($count !== 1) {
-                /** @var IAssessable $firstAssessment */
-                $firstAssessment = $assessments->first();
-                $folder          = $firstAssessment->getBaseContext()->getFolder();
-                $folderLink      = \sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
-                $unitName        = $unitSpec->getTitle();
-                $msg             = "There must be only 1 'HSC Task Marks' assessments per class unit. Found {$count} in class '{$folderLink}' for unit '{$unitName}'";
-                throw new UnexpectedValueException($msg);
+            $studentCountsPerFolder[$folderId] = [];
+            foreach ($assessments as $assessment) {
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    if ($participant->isExcluded()) {
+                        continue;
+                    }
+                    $studentId = $participant->getUser()->getId();
+                    if (!array_key_exists($studentId, $studentCountsPerFolder[$folderId])) {
+                        $studentCountsPerFolder[$folderId][$studentId] = 0;
+                    }
+                    $studentCountsPerFolder[$folderId][$studentId]++;
+                }
             }
+        }
+
+        $errors = [];
+        foreach ($studentCountsPerFolder as $folderId => $folderStudentCounts) {
+            /** @var IAssessable $firstAssessment */
+            $firstAssessment = $cohortAssessmentsPerFolder[$folderId]->first();
+            $folder          = $firstAssessment->getBaseContext()->getFolder();
+            $folderLink      = sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
+            foreach ($folderStudentCounts as $studentId => $count) {
+                if ($count >= 2) {
+                    $errors[] = "$folderLink: Student: $studentId, Count: $count";
+                }
+            }
+        }
+        if (count($errors)) {
+            $msg = "Invalid data. Students may only participate in 1 <strong>HSC Task Marks</strong> assessment per unit per class per report period.<br>\n" .
+                "Unit: <strong>{$unitSpec->getFolder()->getName()}</strong> has invalid participation across cohort.<br>\n" .
+                implode("<br>\n", $errors);
+            throw new UnexpectedValueException($msg);
         }
 
         $feedback       = $this->findStudentFeedback($classAssessment);
         $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
         $cohortMarks    = $this->deriveCohortMarks($cohortAssessments);
         $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
-        $countCohort    = \count($cohortMarks);
+        $countCohort    = count($cohortMarks);
         $cohortAverage  = $this->deriveCohortAverage($cohortMarks);
 
         return [
@@ -262,9 +290,9 @@ class HscAssessmentTasks extends BaseComponent
      */
     private function deriveCohortAverage(array $cohortMarks, int $precision = 2): ?float
     {
-        if (!\count($cohortMarks)) {
+        if (!count($cohortMarks)) {
             return null;
         }
-        return \round(\array_sum($cohortMarks) / \count($cohortMarks), $precision);
+        return \round(\array_sum($cohortMarks) / count($cohortMarks), $precision);
     }
 }
