@@ -11,15 +11,20 @@ String.prototype.capitalise = function() {
 
 /**
  * Calendar object constructor
+ *
  * @param id
+ * @param bubbleId
+ * @param opts
+ * @returns {Calendar}
  * @constructor
  */
 function Calendar(id, bubbleId, opts) {
-    var self = this
-    this.id = id
-    this.dom = $('#'+id)
-    this.bubble = new Bubble(this, bubbleId)
-    this.suppress = false
+    var self = this;
+    this.id = id;
+    this.dom = $('#'+id);
+    this.fullCalendar = null;
+    this.bubble = new Bubble(this, bubbleId);
+    this.suppress = false;
 
     // default options
     this.options = {
@@ -116,7 +121,7 @@ function Calendar(id, bubbleId, opts) {
                 }
 
                 // setup data to be displayed
-                var data = $.extend(true, {}, calEvent.data.meta)
+                var data = $.extend(true, {}, calEvent.data.meta);
 
                 // Prefix booking status for bookings
                 if (calEvent.data.booking) {
@@ -133,7 +138,7 @@ function Calendar(id, bubbleId, opts) {
                 data.title = data.note;
 
                 // Format the date of this event
-                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'
+                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma';
                 var start = calEvent.start.format(format);
                 var end   = null;
                 if (calEvent.end != null) {
@@ -295,19 +300,19 @@ function Calendar(id, bubbleId, opts) {
             showAnim: 'slideDown'
         },
         x: true
-    }
+    };
     this.filters = {
 
         interaction: function(cal) {
 
             // Only set up interactions that actually exist
-            var calendarControls = $(cal.options.filter.parentSelector)
-            var exportControls   = $(cal.options.filter.exportSelector)
+            var calendarControls = $(cal.options.filter.parentSelector);
+            var exportControls   = $(cal.options.filter.exportSelector);
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
                 return false
-            })
+            });
 
             // Show the export filter, if it exists
             if (cal.options.filter.exportButtonSelector) {
@@ -339,8 +344,8 @@ function Calendar(id, bubbleId, opts) {
 
             if (cal.options.filter.viewSettingsOptionsSelector) {
                 cal.dom.on('click', cal.options.filter.viewSettingsOptionsSelector, function() {
-                    cal.filters.organise(cal, ["campus", "groups", "sources"])
-                    
+                    cal.filters.organise(cal, ["campus", "groups", "sources"]);
+
                     return false
                 })
             }
@@ -475,33 +480,33 @@ function Calendar(id, bubbleId, opts) {
     };
 
     // preserve the filter and fullCalendar specs
-    var filter = $.extend({}, this.options.filter, opts.filter)
-    var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar)
-    var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker)
-    var bubble = $.extend({}, this.options.bubble, opts.bubble)
+    var filter = $.extend({}, this.options.filter, opts.filter);
+    var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar);
+    var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker);
+    var bubble = $.extend({}, this.options.bubble, opts.bubble);
 
     // perform the merge
-    $.extend(this.options,opts)
+    $.extend(this.options,opts);
 
     // rewrite the preserved submerge back into the options
-    this.options.filter = filter
-    this.options.fullCalendar = fullCalendar
-    this.options.datepicker   = datepicker
-    this.options.bubble = bubble
+    this.options.filter = filter;
+    this.options.fullCalendar = fullCalendar;
+    this.options.datepicker   = datepicker;
+    this.options.bubble = bubble;
 
     if(this.options.filter.enabled) {
         this.filters.interaction(this)
     }
 
-    return this
+    return this;
 }
 
 /**
  * Initialise the calendar
  */
 Calendar.prototype.init = function() {
-    var c = this
-    this.dom.fullCalendar(this.options.fullCalendar)
+    var c = this;
+    this.dom.fullCalendar(this.options.fullCalendar);
     /* Button for list view
      */
     var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
@@ -540,16 +545,16 @@ Calendar.prototype.init = function() {
         }
     }
     // and now make all the buttons on the header look the way they're meant to
-    var header = this.dom.find('.fc-toolbar')
-    header.addClass('calendar-controls')
+    var header = this.dom.find('.fc-toolbar');
+    header.addClass('calendar-controls');
     header.find('.fc-button').each(function() {
-        var self = $(this)
+        var self = $(this);
         self.addClass('filter-change');
-    })
+    });
     header.find('.fc-right .fc-button').each(function() {
-        var self = $(this)
+        var self = $(this);
         self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
-    })
+    });
 
 
     /* Special case for list view, it's the only button with an anchor
@@ -560,8 +565,8 @@ Calendar.prototype.init = function() {
     });
 
     // mash in the datepicker
-    var headerCenter = header.find('.fc-center')
-    headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
+    var headerCenter = header.find('.fc-center');
+    headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>');
 
     // Event creation form listeners
     $.each(this.getForms(), function(k, v) {
@@ -570,7 +575,7 @@ Calendar.prototype.init = function() {
                 this.submit(function(event) {
                     event.preventDefault();
                     var form = $(this);
-                    var data = form.serialize()
+                    var data = form.serialize();
 
                     // Create and render a placeholder event
                     var placeholderEvent = {
@@ -628,14 +633,14 @@ Calendar.prototype.init = function() {
                 })
             }
         }
-    })
+    });
 
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
     $('#datepicker').datepicker(c.options.datepicker);
 
-    return this
-}
+    return this;
+};
 
 /**
  * A more sementically-correct version of getForm({no args})
