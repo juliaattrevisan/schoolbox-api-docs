@@ -121,7 +121,7 @@ class Definition implements ImporterInterface
 
                 /** @var TimetableCycle $timetableCycle */
                 $timetableCycle = $this->timetableCycleMapper->createModel()
-                    ->setId((string)$cycle->xpath('@Id')[0])
+                    ->setId($campus->getId())
                     ->setTitle((string)$cycle->Name)
                     ->setCycleLength(\count($cycle->xpath('Days/Day')))
                     ->setDayLength($dayData['maxPeriods'])

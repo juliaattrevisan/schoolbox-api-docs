@@ -146,16 +146,17 @@ class Classes
             SELECT 
                 luCampus.ext_timetable_code,
                 period.day, period.id, period.title
-            FROM timetable_period period
-            INNER JOIN timetable_cycle cycle ON period.cycle_id = cycle.id
-            INNER JOIN timetable_campus campus ON campus.cycle_id = cycle.id
-            INNER JOIN luCampus ON campus.campus_id = luCampus.id
+            FROM luCampus 
+            LEFT JOIN timetable_campus campus ON luCampus.id = campus.campus_id
+            LEFT JOIN timetable_cycle cycle ON campus.cycle_id = cycle.id
+            LEFT JOIN timetable_period period ON cycle.id = period.cycle_id
+                        
         ');
 
         $periods = [];
 
         foreach ($periodStatement as $row) {
-            $cycleId = $row['ext_timetable_code'];
+            $ext = $row['ext_timetable_code'];
             $day = $row['day'];
             $periodName = $row['title'];
 
@@ -164,7 +165,7 @@ class Classes
             $period = $this->timetablePeriodMapper->createModel()
                 ->setId($row['id']);
 
-            $periods['cycle'][$cycleId]['day'][$day]['period'][$periodName] = $period;
+            $periods['ext'][$ext]['day'][$day]['period'][$periodName] = $period;
         }
 
         return $periods;
@@ -177,16 +178,16 @@ class Classes
      * The timetable data in the feed may try to reference periods
      * that don't exist in Timetable Structure for some reason
      *
-     * @param string $cycleId
+     * @param string $ext
      * @param array  $periods
      * @param string $day
      * @param string $periodName
      * @return TimetablePeriod|null
      */
-    private function findPeriod(string $cycleId, array $periods, string $day, string $periodName): ?TimetablePeriod
+    private function findPeriod(string $ext, array $periods, string $day, string $periodName): ?TimetablePeriod
     {
-        if (isset($periods['cycle'][$cycleId]['day'][$day]['period'][$periodName])) {
-            return $periods['cycle'][$cycleId]['day'][$day]['period'][$periodName];
+        if (isset($periods['ext'][$ext]['day'][$day]['period'][$periodName])) {
+            return $periods['ext'][$ext]['day'][$day]['period'][$periodName];
         }
 
         return null;
@@ -223,9 +224,9 @@ class Classes
         $timetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
         foreach ($timetables as $timetable) {
-            $cycleId = (string)$timetable->xpath('@Id')[0]->Id;
+            $ext = (string)$timetable->xpath('@Id')[0]->Id;
 
-            $currentTimetable = $this->batchxml->fetchXml("/iSAMS/TimetableManager/PublishedTimetables/Timetable[@Id='{$cycleId}']")[0];
+            $currentTimetable = $this->batchxml->fetchXml("/iSAMS/TimetableManager/PublishedTimetables/Timetable[@Id='{$ext}']")[0];
 
             /* Find all the classes and their details as best we can
              *
@@ -242,13 +243,21 @@ class Classes
                  * If the period doesn't correspond to something in our timetable definition,
                  * we can't process it anyway, so skip it
                  */
-                $timetablePeriod = $this->findPeriod($cycleId, $periods, $class['period']['day'], $class['period']['name']);
+                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+
+                $this->log->warning(sprintf(
+                    'Looking for ext_timetable_code %s, day %s, period %s',
+                    $ext,
+                    $class['period']['day'],
+                    $class['period']['name']
+                ));
 
                 if (null === $timetablePeriod) {
                     $this->log->warning(sprintf(
-                        'The period named %s on day %s does not exist in timetable structure',
+                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
                         $class['period']['name'],
-                        $class['period']['day']
+                        $class['period']['day'],
+                        $ext
                     ));
 
                     continue;
@@ -257,7 +266,7 @@ class Classes
                 /* Assemble the pieces
                  */
                 $timetableClass = $this->createTimetableClass($class);
-                $this->createTimetableClassPeriod($users, $class, $cycleId, $timetablePeriod, $timetableClass);
+                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
 
                 /* Process students
                  */
@@ -325,7 +334,7 @@ class Classes
      *
      * @param array           $users
      * @param array           $class
-     * @param string          $cycleId
+     * @param string          $ext
      * @param TimetablePeriod $period
      * @param ClassEntry      $timetableClass
      * @return ClassPeriod
@@ -333,7 +342,7 @@ class Classes
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function createTimetableClassPeriod(array $users, array $class, string $cycleId, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
+    private function createTimetableClassPeriod(array $users, array $class, string $ext, TimetablePeriod $period, ClassEntry $timetableClass): ClassPeriod
     {
         /* create record for class_period - should have all the data from $class iterator output
          * so you can look up individual pieces of the puzzle
@@ -382,7 +391,7 @@ class Classes
             $class['period']['sequence'],
             $class['period']['start'],
             $class['period']['end'],
-            $cycleId
+            $ext
         ));
 
         if ($this->perform) {
