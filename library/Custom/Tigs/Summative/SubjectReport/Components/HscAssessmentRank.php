@@ -24,7 +24,11 @@ use UnexpectedValueException;
 class HscAssessmentRank extends BaseComponent
 {
 
-    /** @var GenericCollection|IAssessable[] */
+    /**
+     * 'HscAssessmentRank' assessments across the cohort
+     *
+     * @var GenericCollection|IAssessable[]
+     */
     private $cohortAssessments;
 
     /** @var User */
@@ -40,7 +44,7 @@ class HscAssessmentRank extends BaseComponent
     /**
      * Constructor
      *
-     * @param GenericCollection|IAssessable[] $cohortAssessments
+     * @param GenericCollection|IAssessable[] $cohortAssessments Must only contain 'HscAssessmentRank' assessments
      * @param User                            $student
      * @param StudentAttributes               $attributes
      * @param Visibility                      $visibility
@@ -81,20 +85,7 @@ class HscAssessmentRank extends BaseComponent
             return $assessable->getBaseContext()->getFolder()->getId();
         });
 
-        // Check that this class has an instance of the expected work type
-        $classAssessments = $cohortAssessmentsPerClass[$this->folder->getId()] ?? null;
-        if (!$classAssessments) {
-            throw new UnexpectedValueException("No 'HSC Assessment Rank' assessment found for class");
-        }
-
         foreach ($cohortAssessmentsPerClass as $folderId => $classAssessments) {
-            // Check each class has only a single instance
-            if ($classAssessments->count() !== 1) {
-                /** @var IAssessable $classAssessment */
-                $classAssessment = $classAssessments->first();
-                $classFolder     = $classAssessment->getBaseContext()->getFolder();
-                throw new UnexpectedValueException("A class may only have 1 'HSC Assessment Rank' assessment. {$classFolder->getTitle()} has {$classAssessments->count()}");
-            }
             // Check all instances of the configured work type are of correct IAssessable type, and Mark Type
             foreach ($classAssessments as $classAssessment) {
                 if (!$classAssessment instanceof DueWork\Model) {
@@ -107,20 +98,54 @@ class HscAssessmentRank extends BaseComponent
             }
         }
 
-        /** @var IAssessable $classAssessment */
-        $classAssessment = $cohortAssessmentsPerClass[$this->folder->getId()]->first();
+        // Check that students only participate in max 1 HscAssessmentRank assessment per Folder per ReportPeriod
+        // (Note we are already in the context of a single ReportPeriod)
+        /** @var int[][] $participationCountsPerFolder Indexed by folderId, studentId */
+        $participationCountsPerFolder = [];
+        foreach ($cohortAssessmentsPerClass as $folderId => $classAssessments) {
+            $participationCountsPerFolder[$folderId] = [];
+            foreach ($classAssessments as $classAssessment) {
+                foreach ($classAssessment->getAllParticipants() as $participant) {
+                    if ($participant->isExcluded()) {
+                        continue;
+                    }
+                    $studentId = $participant->getUser()->getId();
+                    if (!array_key_exists($studentId, $participationCountsPerFolder[$folderId])) {
+                        $participationCountsPerFolder[$folderId][$studentId] = 0;
+                    }
+                    $participationCountsPerFolder[$folderId][$studentId]++;
+                }
+            }
+        }
+        $errors = [];
+        foreach ($participationCountsPerFolder as $folderId => $participationCounts) {
+            /** @var IAssessable $firstAssessment */
+            $firstAssessment = $cohortAssessmentsPerClass[$folderId]->first();
+            $folder          = $firstAssessment->getBaseContext()->getFolder();
+            $folderLink      = sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
+            foreach ($participationCounts as $studentId => $count) {
+                if ($count >= 2) {
+                    $errors[] = "$folderLink: Student: $studentId, Count: $count";
+                }
+            }
+        }
+        if (count($errors)) {
+            $msg = "Invalid data. Students may only participate in 1 <strong>HSC Assessment Rank</strong> assessment per class per report period.<br>\n" .
+                implode("<br>\n", $errors);
+            throw new UnexpectedValueException($msg);
+        }
 
-        // Did we find an assessment, but it shouldn't be visible to the current viewer?
-        if (!$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->getViewer(), true, null, false)) {
+        // Check that this class has an instance of the expected work type
+        if (!$cohortAssessmentsPerClass->keyExists($this->folder->getId()) || !$cohortAssessmentsPerClass[$this->folder->getId()]->count()) {
+            throw new UnexpectedValueException("No 'HSC Assessment Rank' assessment found for class and report period");
+        }
+
+        // Check whether the component should be visible
+        if(!$this->deriveComponentVisibility($cohortAssessmentsPerClass[$this->folder->getId()])){
             return null;
         }
 
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($classAssessment)) {
-            return null;
-        }
-
-        $feedback       = $this->findStudentFeedback($classAssessment);
+        $feedback       = $this->findStudentFeedback($cohortAssessmentsPerClass[$this->folder->getId()]);
         $normalisedMark = $feedback ? $feedback->getNormalisedMark() : null;
         $cohortMarks    = $this->deriveCohortMarks($this->cohortAssessments);
         $cohortRank     = $this->deriveCohortRank($normalisedMark, $cohortMarks);
@@ -142,20 +167,48 @@ class HscAssessmentRank extends BaseComponent
 
 
     /**
+     * Returns whether we should show this component.
+     *
+     * Visibility derived from class assessment where student is participating
+     *
+     * Visible if:
+     * * Assessment is visible to user (ignoring SIVO), and
+     * * Assessment feedback visible to viewer's RoleType
+     *
+     * @param GenericCollection|DueWork\Model[] $classDueWorks
+     * @return bool
+     */
+    private function deriveComponentVisibility(GenericCollection $classDueWorks): bool
+    {
+        foreach ($classDueWorks as $dueWork) {
+            if (!$dueWork->isParticipant($this->student)) {
+                continue;
+            }
+            return
+                $this->isFeedbackVisibleToUser($dueWork) &&
+                $this->visibility->isVisibleToUserOrChildOfUser($dueWork, $this->getViewer(), true, null, false);
+        }
+        return false;
+    }
+
+
+    /**
      * Returns the student's authoritative feedback for the assessment.
      *
-     * Returns NULL if assessment or feedback is not visible.
+     * Returns NULL if student not participating or does not have feedback
      *
-     * @param IAssessable $assessable
+     * @param GenericCollection|DueWork\Model[] $classDueWorks
      * @return IFeedback|null
      */
-    private function findStudentFeedback(IAssessable $assessable): ?IFeedback
+    private function findStudentFeedback(GenericCollection $classDueWorks): ?IFeedback
     {
-        $participant = $assessable->getParticipantIfExtant($this->student);
-        if (!$participant) {
-            return null;
+        foreach ($classDueWorks as $dueWork) {
+            $participant = $dueWork->getParticipantIfExtant($this->student);
+            if ($participant && !$participant->isExcluded()) {
+                return $participant->getAuthoritativeFeedback(true);
+            }
         }
-        return $participant->getAuthoritativeFeedback(true);
+        return null;
     }
 
 
