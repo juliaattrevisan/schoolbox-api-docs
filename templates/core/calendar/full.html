@@ -24,15 +24,20 @@
      *                   Sets event back to original state.
      */
     var updateWrapper = function(event, data, revertFunc) {
-        event.className.push('loading');
+        // Srsly?
+        var oldClassNames = Array.from(event.classNames),
+            newClassNames = Array.from(event.classNames);
+        newClassNames.push('loading');
+        event.setProp('classNames', newClassNames);
         c.cupdate(data, function (returnData) {
-            event.className = event.className.filter(function (value) {
-                return value != 'loading';
-            });
+            event.setProp('classNames', oldClassNames);
+            // event.classNames = event.classNames.filter(function (value) {
+            //     return value != 'loading';
+            // });
             if (!returnData) {
                 revertFunc();
             }
-            c.fullCalendar.rerenderEvents();
+            // c.fullCalendar.rerenderEvents();
         });
     };
 
@@ -171,33 +176,34 @@
                 /**
                  * When you finish resizing an event, update it
                  * Note the difference between eventResize() and eventResizeStop()
-                 * @param event
-                 * @param delta
-                 * @param revertFunc
+                 * @param eventResizeInfo
                  */
-                eventResize: function(event, delta, revertFunc) {
-                    var data = {
-                        eventId: event.data.meta.eventId,
-                        resize: true,
-                        start: moment(event.start).format(),
-                        end: moment(event.end).format()
-                    };
-                    updateWrapper(event, data, revertFunc);
+                eventResize: function(eventResizeInfo) {
+                    var event = eventResizeInfo.event,
+                        start = FullCalendarMoment.toMoment(event.start, c.fullCalendar),
+                        end   = FullCalendarMoment.toMoment(event.end, c.fullCalendar),
+                        data  = {
+                            eventId: event.extendedProps.data.meta.eventId,
+                            resize:  true,
+                            start:   start.format(),
+                            end:     end.format()
+                        };
+                    updateWrapper(event, data, eventResizeInfo.revert);
                 },
 
                 /**
                  * When you finish dragging an event to its new home
-                 * @param event
-                 * @param delta
-                 * @param revertFunc
+                 * @param eventDropInfo
                  */
-                eventDrop: function(event, delta, revertFunc) {
-                    var data = {
-                        eventId: event.data.meta.eventId,
-                        minuteDelta: delta.asMinutes(),
-                        allDay: !event.start.hasTime()
-                    };
-                    updateWrapper(event, data, revertFunc);
+                eventDrop: function(eventDropInfo) {
+                    var event = eventDropInfo.event,
+                        delta = FullCalendarMoment.toDuration(eventDropInfo.delta),
+                        data  = {
+                            eventId:     event.extendedProps.data.meta.eventId,
+                            minuteDelta: delta.asMinutes(),
+                            allDay:      event.allDay
+                        };
+                    updateWrapper(event, data, eventDropInfo.revert);
                 },
 
                 /**
