@@ -78,7 +78,7 @@ function Calendar(id, bubbleId, opts) {
             header: {
                 left: 'prev,today,next',
                 center: 'title',
-                right: 'month,agendaWeek,agendaDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             buttonText: {
                 prev:     '', // ◀
