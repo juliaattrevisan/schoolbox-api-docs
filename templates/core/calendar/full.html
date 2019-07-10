@@ -202,14 +202,14 @@
 
                 /**
                  * When you click on a day to add a new event
-                 * @param date
-                 * @param jsEvent
-                 * @param view
+                 * @param dateClickInfo
                  */
-                dayClick: function(date, jsEvent, view) {
-                    date = moment(date);
-                    var allDay = !date.hasTime();
-                    var eventData = { allDay: allDay ? 1 : 0 };
+                dateClick: function(dateClickInfo) {
+                    var date   = FullCalendarMoment.toMoment(dateClickInfo.date, c.fullCalendar),
+                        allDay = dateClickInfo.allDay,
+                        eventData = {
+                            allDay: allDay ? 1 : 0
+                        };
                     if (allDay) {
                         eventData.date        = date.format('DD-MM-YYYY');
                         eventData.displayDate = date.format('ddd, Do MMMM')
@@ -221,7 +221,7 @@
                     $('#calendar-create').foundation('reveal','open');
 
 
-                    c.bubble.display('create', eventData, jsEvent, this);
+                    c.bubble.display('create', eventData, dateClickInfo.jsEvent, this);
 
                     // Apply whether the submit button is enabled or not
                     toggleFormState(c.getForm('createEvent'));
