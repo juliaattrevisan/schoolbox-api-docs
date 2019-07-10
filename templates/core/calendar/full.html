@@ -31,13 +31,9 @@
         event.setProp('classNames', newClassNames);
         c.cupdate(data, function (returnData) {
             event.setProp('classNames', oldClassNames);
-            // event.classNames = event.classNames.filter(function (value) {
-            //     return value != 'loading';
-            // });
             if (!returnData) {
                 revertFunc();
             }
-            // c.fullCalendar.rerenderEvents();
         });
     };
 
@@ -278,18 +274,17 @@
 
                 /**
                  * Whenever the view is changes
-                 * @param view
+                 * @param info
                  */
-                viewDisplay: function(view) {
+                viewSkeletonRender: function(info) {
                     // apply filters, which will also ajax the change of view to store in the db
-                    if(c !== undefined) {
+                    if (c !== undefined) {
                         c.filters.organise(c, ["campus", "groups", "sources"])
                     }
                 },
 
                 // Stream location
                 events: function(fetchInfo, callback) {
-                    var self = this;
                     $.ajax({
                         dataType: 'json',
                         url:      '/calendar/ajax/full',
@@ -305,7 +300,7 @@
                             /* Save state to the db every time you change tabs
                              */
                             // TODO restore this
-                            // $.post('/calendar/changeState', {calendarView: self.view.type });
+                            $.post('/calendar/changeState', {calendarView: c.fullCalendar.view.type });
                         },
                         cache: false
                     });
