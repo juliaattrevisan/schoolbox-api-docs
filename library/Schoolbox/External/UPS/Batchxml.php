@@ -184,6 +184,37 @@ class Batchxml implements ISync
 
 
     /**
+     * Used in UPS to identify students who belong to a particular parent according to the xml nodes
+     *
+     * @param string $externalId
+     * @return Collection
+     * @throws \RuntimeException
+     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Zend\Uri\Exception\InvalidUriPartException
+     */
+    public function findStudentsOfParent(string $externalId): Collection
+    {
+        $collection = new Collection();
+
+        $studentNodes = $this->fetchXml("/iSAMS/PupilManager/Contacts/Contact[@PersonId='{$externalId}']/Pupils/Pupil");
+
+        /* Find the full details of each student
+         */
+        foreach ($studentNodes as $studentNode) {
+            $studentId = (string)$studentNode->xpath('@Id')[0]->Id;
+
+            $node = $this->fetchXml("/iSAMS/PupilManager/CurrentPupils/Pupil[@Id='{$studentId}']")[0];
+
+            if ($node) {
+                $collection->add($this->hydrateStudent($node));
+            }
+        }
+
+        return $collection;
+    }
+
+
+    /**
      * {@inheritDoc}
      */
     public function findAllStaff()
