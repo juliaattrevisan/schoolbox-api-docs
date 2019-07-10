@@ -222,10 +222,10 @@
 
                     $('#calendar-create').foundation('reveal', 'open');
 
-                    c.bubble.display('create', eventData, dateClickInfo.jsEvent, this);
-
-                    // Apply whether the submit button is enabled or not
-                    toggleFormState(c.getForm('createEvent'));
+                    // c.bubble.display('create', eventData, dateClickInfo.jsEvent, this);
+                    //
+                    // // Apply whether the submit button is enabled or not
+                    // toggleFormState(c.getForm('createEvent'));
                 },
 
                 /**
@@ -261,43 +261,46 @@
                             }
                         });
 
-                        // reapply filters
-                        c.filters.organise(c, ["campus", "groups", "sources"], false);
+                        // // reapply filters
+                        // c.filters.organise(c, ["campus", "groups", "sources"], false);
 
                         // update datepicker
                         $('#datepicker').datepicker('setDate', FullCalendarMoment.toMoment(this.getDate(), this).format('DD-MM-YYYY'))
                     }
                 },
 
-                /**
-                 * Whenever the view is changes
-                 * @param info
-                 */
-                viewSkeletonRender: function (info) {
-                    // apply filters, which will also ajax the change of view to store in the db
-                    if (c !== undefined) {
-                        c.filters.organise(c, ["campus", "groups", "sources"])
-                    }
-                },
+                // /**
+                //  * Whenever the view is changes
+                //  * @param info
+                //  */
+                // viewSkeletonRender: function (info) {
+                //     // apply filters, which will also ajax the change of view to store in the db
+                //     if (c !== undefined) {
+                //         c.filters.organise(c, ["campus", "groups", "sources"])
+                //     }
+                // },
 
                 // Stream location
                 events: function (fetchInfo, callback) {
+                    // var fc = this;
                     $.ajax({
                         dataType: 'json',
                         url: '/calendar/ajax/full',
                         data: {
-                            start: Calendar.reOffsetTimestamp((Number)((fetchInfo.start.getTime() / 1000).toFixed(0))),
-                            end: Calendar.reOffsetTimestamp((Number)((fetchInfo.end.getTime() / 1000).toFixed(0))),
+                            start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                            end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                             userId: userId
                         },
                         success: function (data) {
                             callback(data.filter(function (v) {
                                 return 'start' in v;
                             }));
-                            /* Save state to the db every time you change tabs
-                             */
-                            // TODO restore this
-                            $.post('/calendar/changeState', {calendarView: this.view.type});
+
+                            // There should be no need to preserve state change on loading events
+                            // /* Save state to the db every time you change tabs
+                            //  */
+                            // // TODO restore this
+                            // $.post('/calendar/changeState', {calendarView: fc.view.type});
                         },
                         cache: false
                     });
@@ -305,35 +308,6 @@
             }
         );
         fc.render();
-
-        var anchor = '';
-        var parts  = location.href.split('#');
-
-        if (parts.length > 1) {
-            anchor = parts[1];
-            switch (anchor) {
-                case 'month':
-                    anchor = 'dayGridMonth';
-                    break;
-                case 'week':
-                case 'agendaWeek':
-                    anchor = 'timeGridWeek';
-                    break;
-                case 'day':
-                case 'agendaDay':
-                    anchor = 'timeGridDay';
-                    break;
-                case 'basicWeek':
-                    anchor = 'dayGridWeek';
-                    break;
-                case 'basicDay':
-                    anchor = 'dayGridDay';
-                    break;
-                default:
-                    anchor = '';
-                    break;
-            }
-        }
 
         // c = new Calendar('calendar', 'calendar-bubble', {
         //     userId: '{CALENDAR_USER_ID}',
@@ -574,261 +548,261 @@
         //
         //     x: false
         // }).init();
-
-
-        /* LISTENERS */
-
-        /* Save state to the db every time you change tabs
-         */
-        $('.fc-agendaWeek-button, .fc-agendaDay-button, .fc-month-button').on('click', function(event) {
-            $.post('/calendar/changeState', {calendarView: c.fullCalendar.view.type });
-        });
-
-        /**
-         * Change event for create task and event title.
-         * Prevent creation of a calendar event if the input is empty.
-         *
-         * @param form  jQuery wrapped form element
-         */
-        var toggleFormState = function(form) {
-            var trimmedTitle = form.find('input[name="title"]').val().replace(/^\s+|\s+$/g, '');
-            var submit       = form.find(':submit');
-            submit.prop('disabled', trimmedTitle === '');
-        };
-        var toggleCreateButtonState = function(event) {
-            toggleFormState($(this).closest('form'));
-        };
-        var disableSubmitButton = function(event) {
-            // Find the submit button for the form that triggered this event
-            $(this).find("[data-modal-submit]").prop('disabled', true);
-        };
-
-        var forms = ['createEvent', 'createTask', 'editTask'];
-        forms.forEach(function (formId) {
-            c.getForm(formId).find('input[name="title"]')
-                .on('change', toggleCreateButtonState)
-                .on('keyup', toggleCreateButtonState)
-            ;
-            c.getForm(formId).on('submit', disableSubmitButton);
-        });
-
-        /* When you switch panels, preserve some data
-         */
-        $('[data-tab]').on('toggled', function (event, tab) {
-
-            /* Copy from task panel to event panel
-             */
-            if ($(tab).attr('id') == 'createTaskPanel') {
-                cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
-            }
-            /* Copy from event panel to task panel
-             */
-            else {
-                cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
-            }
-
-            /* Update button state when switching tabs
-             */
-            toggleFormState(c.getForm('createEvent'));
-            toggleFormState(c.getForm('createTask'));
-        });
-
-        // click 'Edit Event' and push data through to main form page
-        $('#edit-full').click(function(e) {
-            var getstring = $(this).closest('form').serialize();
-            window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
-        })
-
-        // hide bubbles if any header buttons are clicked
-        $('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
-            c.bubble.hide()
-        });
-
-        /* Process attendances
-         * NB May not be necessary to use custom getFormData();
-         */
-        $('#editEvent').calendarAttendance({
-            getFormData: function() {
-                return {
-                    event: {
-                        id: c.getForm('editEvent').find('input[name="eventId"]').val()
-                    }
-                }
-            }
-        });
-
-        // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
-        c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
-            var self = $(this)
-            var eventId = self.closest('form').find('input[name=eventId]').val()
-            var chk = c.dom.find('#t'+eventId)
-            chk.prop('checked', self.prop('checked'))
-            chk.trigger('change')
-        })
-
-        c.getForm('editTask').on('click', '[data-interaction="delete"]', function(e) {
-                // Do delete stuff
-                var element = $(this);
-                event.preventDefault();
-                c.getForm('editTask').closest('[data-reveal]')
-                    .one('closed.fndtn.reveal', function() {
-                            // confirmy-dialogy
-                            element.confirmDialog({
-                                text: 'Are you sure you wish to delete this task?'
-                            });
-                            c.bubble.hide();
-                    })
-                    .foundation('reveal', 'close');
-        });
-
-        // Dialog for use when clicking an item that is in a series
-        var updateSeriesDialog = $('#dialog-booking-bulk-update');
-        updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
-            e.preventDefault();
-            updateSeriesDialog.foundation('reveal', 'close');
-            updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
-        });
-
-        $('#download-calendar-export').click(function(event) {
-            event.preventDefault();
-            var form = $(event.target).closest('form');
-            window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
-        });
-
-        /* Export calendar
-         */
-        $.fn.clipboardSelector({
-            exportActivator: '#open-calendar-export-dialog',
-            onReady: function() {
-                var form = $('#calendar-export-form');
-                var url = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
-
-                var dialog = $('#calendar-export-dialog');
-                var dialogUrl = $('#calendar-export-dialog-url');
-
-                /* Bypass foundation bug
-                 * https://github.com/zurb/foundation/issues/4746
-                 */
-                dialogUrl.text(url);
-                dialog.foundation('reveal', 'open');
-
-                dialog.on('opened.fndtn.reveal', function() {
-                    dialogUrl.select();
-                });
-            },
-            onZeroClipboardReady: function() {
-                $('#copy-button').show();
-            }
-        });
-
-        // Copypasted code for updating booking in series
-        var editEventForm = $('#calendar-bubble').find('#editEvent');
-        editEventForm.on(
-            'click',
-            '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
-            function(event) {
-                event.preventDefault()
-                var href     = this.href
-                var callback = function(data) {
-                    $.ajax(href, {data: data}).done(function() {
-                        c.fullCalendar.refetchEvents()
-                    })
-                }
-                var seriesId = $(this).data('seriesId')
-                if (seriesId) {
-                    // Remove all previous change status events, and reapply to this
-                    // dialog box.
-                    updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
-                    updateSeriesDialog.html(updateSeriesDialog.html().replace(/event/g, 'booking'));
-                    updateSeriesDialog.foundation('reveal', 'open');
-                    updateSeriesDialog.off('click', '[data-efficacy="self"]');
-                    updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
-                        e.preventDefault();
-                        updateSeriesDialog.foundation('reveal', 'close');
-                        callback({efficacy: 'self'});
-                    });
-                    updateSeriesDialog.off('click', '[data-efficacy="series"]');
-                    updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
-                        e.preventDefault();
-                        updateSeriesDialog.foundation('reveal', 'close');
-                        updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
-                        callback({efficacy: 'series', seriesId: seriesId});
-                    });
-                }
-                else {
-                    c.bubble.hide()
-                    callback()
-                }
-            }
-        );
-        editEventForm.on(
-            'click',
-            '[data-interaction="delete"]',
-            function(event) {
-                // Do delete stuff
-                var href    = this.href;
-                var element = $(this);
-                event.preventDefault();
-                editEventForm.closest('[data-reveal]')
-                    .one('closed.fndtn.reveal', function() {
-                        var eventId  = editEventForm.find('input[name="eventId"]').val();
-                        var seriesId = editEventForm.find('input[name="seriesId"]').val();
-                        if (seriesId) {
-                            // triple treat!
-                            updateSeriesDialog.find('[data-booking-action-text]').text('delete');
-                            updateSeriesDialog.foundation('reveal', 'open');
-                            updateSeriesDialog.off('click', '[data-efficacy="self"]');
-                            updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
-                                e.preventDefault();
-                                updateSeriesDialog.foundation('reveal', 'close');
-                                window.location.href = href + '&efficacy=self';
-                            });
-                            updateSeriesDialog.off('click', '[data-efficacy="series"]');
-                            updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
-                                e.preventDefault();
-                                updateSeriesDialog.foundation('reveal', 'close');
-                                window.location.href = href + '&efficacy=series&seriesId='+seriesId;
-                            });
-                        } else {
-                            // confirmy-dialogy
-                            element.confirmDialog({
-                                text: 'Are you sure you wish to delete this event?',
-                            });
-                        }
-                        c.bubble.hide();
-                    })
-                    .foundation('reveal', 'close');
-
-            }
-        );
-
-        // if a checkbox on the calendar is interacted, ajax
-        c.dom.on('change', 'input[type=checkbox]', function(e) {
-
-            var self = $(this)
-            var ttl = self.siblings('.fc-title')
-            if(self.prop('checked')) {
-                ttl.addClass('strike')
-            }
-            else {
-                ttl.removeClass('strike')
-            }
-            data = {
-                eventId: self.attr('id').slice(1),
-                completed: self.prop('checked') ? 1 : 0
-            }
-            c.cupdate(data)
-            c.bubble.hide()
-            c.suppressOne()
-            e.stopPropagation()
-            e.preventDefault()
-            return false
-        })
-
-        //select all clicked
-        $('#calendar-controls').on('change','.select_all', function(e) {
-            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
-        })
+        //
+        //
+        // /* LISTENERS */
+        //
+        // /* Save state to the db every time you change tabs
+        //  */
+        // $('.fc-agendaWeek-button, .fc-agendaDay-button, .fc-month-button').on('click', function(event) {
+        //     $.post('/calendar/changeState', {calendarView: c.fullCalendar.view.type });
+        // });
+        //
+        // /**
+        //  * Change event for create task and event title.
+        //  * Prevent creation of a calendar event if the input is empty.
+        //  *
+        //  * @param form  jQuery wrapped form element
+        //  */
+        // var toggleFormState = function(form) {
+        //     var trimmedTitle = form.find('input[name="title"]').val().replace(/^\s+|\s+$/g, '');
+        //     var submit       = form.find(':submit');
+        //     submit.prop('disabled', trimmedTitle === '');
+        // };
+        // var toggleCreateButtonState = function(event) {
+        //     toggleFormState($(this).closest('form'));
+        // };
+        // var disableSubmitButton = function(event) {
+        //     // Find the submit button for the form that triggered this event
+        //     $(this).find("[data-modal-submit]").prop('disabled', true);
+        // };
+        //
+        // var forms = ['createEvent', 'createTask', 'editTask'];
+        // forms.forEach(function (formId) {
+        //     c.getForm(formId).find('input[name="title"]')
+        //         .on('change', toggleCreateButtonState)
+        //         .on('keyup', toggleCreateButtonState)
+        //     ;
+        //     c.getForm(formId).on('submit', disableSubmitButton);
+        // });
+        //
+        // /* When you switch panels, preserve some data
+        //  */
+        // $('[data-tab]').on('toggled', function (event, tab) {
+        //
+        //     /* Copy from task panel to event panel
+        //      */
+        //     if ($(tab).attr('id') == 'createTaskPanel') {
+        //         cp('event', 'task', ['date', 'displayDate', 'title', 'allDay'])
+        //     }
+        //     /* Copy from event panel to task panel
+        //      */
+        //     else {
+        //         cp('task', 'event', ['date', 'displayDate', 'title', 'allDay'])
+        //     }
+        //
+        //     /* Update button state when switching tabs
+        //      */
+        //     toggleFormState(c.getForm('createEvent'));
+        //     toggleFormState(c.getForm('createTask'));
+        // });
+        //
+        // // click 'Edit Event' and push data through to main form page
+        // $('#edit-full').click(function(e) {
+        //     var getstring = $(this).closest('form').serialize();
+        //     window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + getstring
+        // })
+        //
+        // // hide bubbles if any header buttons are clicked
+        // $('#calendar .fc-header').on('click', 'span.fc-button', function(e) {
+        //     c.bubble.hide()
+        // });
+        //
+        // /* Process attendances
+        //  * NB May not be necessary to use custom getFormData();
+        //  */
+        // $('#editEvent').calendarAttendance({
+        //     getFormData: function() {
+        //         return {
+        //             event: {
+        //                 id: c.getForm('editEvent').find('input[name="eventId"]').val()
+        //             }
+        //         }
+        //     }
+        // });
+        //
+        // // if a checkbox on the editTask form is interacted, update the appropriate event on the calendar
+        // c.getForm('editTask').on('change', 'input[name=completed]', function(e) {
+        //     var self = $(this)
+        //     var eventId = self.closest('form').find('input[name=eventId]').val()
+        //     var chk = c.dom.find('#t'+eventId)
+        //     chk.prop('checked', self.prop('checked'))
+        //     chk.trigger('change')
+        // })
+        //
+        // c.getForm('editTask').on('click', '[data-interaction="delete"]', function(e) {
+        //         // Do delete stuff
+        //         var element = $(this);
+        //         event.preventDefault();
+        //         c.getForm('editTask').closest('[data-reveal]')
+        //             .one('closed.fndtn.reveal', function() {
+        //                     // confirmy-dialogy
+        //                     element.confirmDialog({
+        //                         text: 'Are you sure you wish to delete this task?'
+        //                     });
+        //                     c.bubble.hide();
+        //             })
+        //             .foundation('reveal', 'close');
+        // });
+        //
+        // // Dialog for use when clicking an item that is in a series
+        // var updateSeriesDialog = $('#dialog-booking-bulk-update');
+        // updateSeriesDialog.on('click', '[data-interaction="close"]', function(e) {
+        //     e.preventDefault();
+        //     updateSeriesDialog.foundation('reveal', 'close');
+        //     updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
+        // });
+        //
+        // $('#download-calendar-export').click(function(event) {
+        //     event.preventDefault();
+        //     var form = $(event.target).closest('form');
+        //     window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
+        // });
+        //
+        // /* Export calendar
+        //  */
+        // $.fn.clipboardSelector({
+        //     exportActivator: '#open-calendar-export-dialog',
+        //     onReady: function() {
+        //         var form = $('#calendar-export-form');
+        //         var url = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray());
+        //
+        //         var dialog = $('#calendar-export-dialog');
+        //         var dialogUrl = $('#calendar-export-dialog-url');
+        //
+        //         /* Bypass foundation bug
+        //          * https://github.com/zurb/foundation/issues/4746
+        //          */
+        //         dialogUrl.text(url);
+        //         dialog.foundation('reveal', 'open');
+        //
+        //         dialog.on('opened.fndtn.reveal', function() {
+        //             dialogUrl.select();
+        //         });
+        //     },
+        //     onZeroClipboardReady: function() {
+        //         $('#copy-button').show();
+        //     }
+        // });
+        //
+        // // Copypasted code for updating booking in series
+        // var editEventForm = $('#calendar-bubble').find('#editEvent');
+        // editEventForm.on(
+        //     'click',
+        //     '[data-booking-button=booking-approve], [data-booking-button=booking-reject], [data-booking-button=booking-cancel]',
+        //     function(event) {
+        //         event.preventDefault()
+        //         var href     = this.href
+        //         var callback = function(data) {
+        //             $.ajax(href, {data: data}).done(function() {
+        //                 c.fullCalendar.refetchEvents()
+        //             })
+        //         }
+        //         var seriesId = $(this).data('seriesId')
+        //         if (seriesId) {
+        //             // Remove all previous change status events, and reapply to this
+        //             // dialog box.
+        //             updateSeriesDialog.find('[data-booking-action-text]').text($(this).text().toLowerCase());
+        //             updateSeriesDialog.html(updateSeriesDialog.html().replace(/event/g, 'booking'));
+        //             updateSeriesDialog.foundation('reveal', 'open');
+        //             updateSeriesDialog.off('click', '[data-efficacy="self"]');
+        //             updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+        //                 e.preventDefault();
+        //                 updateSeriesDialog.foundation('reveal', 'close');
+        //                 callback({efficacy: 'self'});
+        //             });
+        //             updateSeriesDialog.off('click', '[data-efficacy="series"]');
+        //             updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+        //                 e.preventDefault();
+        //                 updateSeriesDialog.foundation('reveal', 'close');
+        //                 updateSeriesDialog.html(updateSeriesDialog.html().replace(/booking/g, 'event'));
+        //                 callback({efficacy: 'series', seriesId: seriesId});
+        //             });
+        //         }
+        //         else {
+        //             c.bubble.hide()
+        //             callback()
+        //         }
+        //     }
+        // );
+        // editEventForm.on(
+        //     'click',
+        //     '[data-interaction="delete"]',
+        //     function(event) {
+        //         // Do delete stuff
+        //         var href    = this.href;
+        //         var element = $(this);
+        //         event.preventDefault();
+        //         editEventForm.closest('[data-reveal]')
+        //             .one('closed.fndtn.reveal', function() {
+        //                 var eventId  = editEventForm.find('input[name="eventId"]').val();
+        //                 var seriesId = editEventForm.find('input[name="seriesId"]').val();
+        //                 if (seriesId) {
+        //                     // triple treat!
+        //                     updateSeriesDialog.find('[data-booking-action-text]').text('delete');
+        //                     updateSeriesDialog.foundation('reveal', 'open');
+        //                     updateSeriesDialog.off('click', '[data-efficacy="self"]');
+        //                     updateSeriesDialog.on('click', '[data-efficacy="self"]', function(e) {
+        //                         e.preventDefault();
+        //                         updateSeriesDialog.foundation('reveal', 'close');
+        //                         window.location.href = href + '&efficacy=self';
+        //                     });
+        //                     updateSeriesDialog.off('click', '[data-efficacy="series"]');
+        //                     updateSeriesDialog.on('click', '[data-efficacy="series"]', function(e) {
+        //                         e.preventDefault();
+        //                         updateSeriesDialog.foundation('reveal', 'close');
+        //                         window.location.href = href + '&efficacy=series&seriesId='+seriesId;
+        //                     });
+        //                 } else {
+        //                     // confirmy-dialogy
+        //                     element.confirmDialog({
+        //                         text: 'Are you sure you wish to delete this event?',
+        //                     });
+        //                 }
+        //                 c.bubble.hide();
+        //             })
+        //             .foundation('reveal', 'close');
+        //
+        //     }
+        // );
+        //
+        // // if a checkbox on the calendar is interacted, ajax
+        // c.dom.on('change', 'input[type=checkbox]', function(e) {
+        //
+        //     var self = $(this)
+        //     var ttl = self.siblings('.fc-title')
+        //     if(self.prop('checked')) {
+        //         ttl.addClass('strike')
+        //     }
+        //     else {
+        //         ttl.removeClass('strike')
+        //     }
+        //     data = {
+        //         eventId: self.attr('id').slice(1),
+        //         completed: self.prop('checked') ? 1 : 0
+        //     }
+        //     c.cupdate(data)
+        //     c.bubble.hide()
+        //     c.suppressOne()
+        //     e.stopPropagation()
+        //     e.preventDefault()
+        //     return false
+        // })
+        //
+        // //select all clicked
+        // $('#calendar-controls').on('change','.select_all', function(e) {
+        //     $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+        // })
 
         //$('#calendar').foundation('reveal','reflow'); this should work but foundation is buggy
         // $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
