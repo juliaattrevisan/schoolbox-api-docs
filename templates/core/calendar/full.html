@@ -37,18 +37,57 @@
         });
     };
 
+
+    // Which view gets shown?
+    var anchorView = '',
+        parts      = location.href.split('#');
+
+    if (parts.length > 1) {
+        anchorView = parts[1];
+        switch (anchorView) {
+            case 'month':
+                anchorView = 'dayGridMonth';
+                break;
+            case 'week':
+            case 'agendaWeek':
+            case 'basicWeek':
+                anchorView = 'timeGridWeek';
+                break;
+            case 'day':
+            case 'agendaDay':
+            case 'basicDay':
+                anchorView = 'timeGridDay';
+                break;
+            default:
+                anchorView = '';
+                break;
+        }
+    }
+
+
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
         // PHPLib calendar vars
-        var userId      = Number('{CALENDAR_USER_ID}'),
-            taskTypeId  = Number('{TASK_TYPE_ID}'),
-            defaultDate = '{SELECTED_DATE}',
-            eventLimit  = Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
-            firstDay    = Number('{CALENDAR_START_DAY}');
+        var userId       = Number('{CALENDAR_USER_ID}'),
+            taskTypeId   = Number('{TASK_TYPE_ID}'),
+            defaultDate  = '{SELECTED_DATE}',
+            eventLimit   = Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+            firstDay     = Number('{CALENDAR_START_DAY}'),
+            calendarView = '{CALENDAR_VIEW}';
 
         var fc = new FullCalendar.Calendar(
             document.getElementById('calendar'),
             {
+                plugins: ['interaction', 'dayGrid', 'list', 'moment', 'timeGrid'],
+                views: {
+                    timeGridDay: {
+                        titleFormat: dateDisplayFormats.momentJsDateLong
+                    },
+                    timeGridWeek: {
+                        columnFormat: 'ddd D/M'
+                    }
+                },
+                timeFormat: 'h(:mm)a',
                 customButtons: {
                     customExport: {
                         text: 'export',
@@ -69,9 +108,7 @@
                     right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
                 },
                 defaultDate: defaultDate,
-                // defaultView: anchor || '{CALENDAR_VIEW}',
-                // TODO restore calendar view
-                defaultView: anchor || 'dayGridMonth',
+                defaultView: anchorView || 'dayGridMonth',
                 scrollTime: dateDisplayFormats.calendarStartTime,
                 // Event limit: could be configured from session but leave global for now
                 eventLimit: eventLimit,
