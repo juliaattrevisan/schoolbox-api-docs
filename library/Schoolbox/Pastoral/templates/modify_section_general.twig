@@ -2,17 +2,19 @@
 <section>
     <fieldset class="content">
         <div class="small-12 columns">
-            <label> Title <input a type="text" class="required" name="heading" size="35" maxlength="100" value="{{ record.heading }}"/> </label>
+            <label class="required" for="heading">Title</label>
+            <input type="text" name="heading" id="heading" size="35" maxlength="100" value="{{ record.heading }}" required />
         </div>
     </fieldset>
     <fieldset class="content">
         <div class="small-12 medium-6 columns">
-            <label> Type <select class="required" name="typeId" id="typeId">
+            <label for="typeId">Type</label>
+                <select name="typeId" id="typeId">
                     {% for type in types %}
                         <option {% if type.id == record.type.id %}selected{% endif %}
                                 value="{{ type.id }}">{{ type.name }}</option>
                     {% endfor %}
-                </select> </label>
+                </select>
         </div>
         <div class="small-12 medium-6 columns">
             <label> Sub-Type <select name="subtypeId" id="subtypeId">
@@ -23,13 +25,12 @@
         </div>
         <div class="small-12 medium-6 columns">
             {% if severities | length %}
-                <label>
-                    {{ locale.severity.proper }}
-                    <select class="required" name="severityId">
+                <label for="severityId">{{ locale.severity.proper }}</label>
+                    <select name="severityId" id="severityId">
                         {% for severity in severities %}
                             <option {% if severity.id == record.severity.id %}selected{% endif %} value="{{ severity.id }}">{{ severity.name }}</option>
                         {% endfor %}
-                    </select> </label>
+                    </select>
             {% endif %}
         </div>
         <div class="small-12 medium-6 columns">
