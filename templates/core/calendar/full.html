@@ -71,7 +71,7 @@
         }
 
         c = new Calendar('calendar', 'calendar-bubble', {
-			userId: '{CALENDAR_USER_ID}',
+            userId: '{CALENDAR_USER_ID}',
 
             // overrides and callbacks
             taskTypeId: '{TASK_TYPE_ID}',
@@ -145,8 +145,8 @@
                     // If appropriate, indicate this event can be attended
                     var span = '<span class="att">(A)</span>';
 
-                    if (calEvent.extendedProps.data.attendance.icon.toString() == 'true') {
-                        if((content = $element.find('.fc-event-content')).length == 1) {
+                    if (Boolean(calEvent.extendedProps.data.attendance.icon)) {
+                        if((content = $element.find('.fc-event-content')).length === 1) {
                             content.append(span)
                         }
                         else {
@@ -155,12 +155,12 @@
                     }
 
                     // If this event is a task, alter the state of the checkbox accordingly
-                    if (calEvent.extendedProps.data.meta.eventTypeId == c.options.taskTypeId) {
+                    if (Number(calEvent.extendedProps.data.meta.eventTypeId) === Number(c.options.taskTypeId)) {
                         inner.prepend(
                                 $('<input type="checkbox" name="completed" class="plain" />')
                                         .attr('id', 't'+ calEvent.extendedProps.data.meta.eventId)
                         );
-                        if (calEvent.extendedProps.data.meta.completed == '1') {
+                        if (Boolean(calEvent.extendedProps.data.meta.completed)) {
                             title.addClass('strike');
                             inner.find(':checkbox').prop('checked', true)
                         }
@@ -255,12 +255,12 @@
 
                         // update any tasks that have been completed by strikethrough-ing them
                         $(this).find('input[type=checkbox]').each(function() {
-                            var self = $(this)
+                            var self = $(this);
 
                             if(self.prop('checked')) {
                                 self.siblings('.fc-title').addClass('strike')
                             }
-                        })
+                        });
 
                         // reapply filters
                         c.filters.organise(c, ["campus", "groups", "sources"], false)
