@@ -1,16 +1,15 @@
 <?php
+/**
+ * Outputs form to get users mail details and processes the information
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 use Alaress\Mail\AbstractMailer;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Alaress\Mail\AttachmentStream;
 use Schoolbox\Error\Mapper as ErrorMapper;
-
-/************************************************************
-*                                                           *
-*         Copyright (c) 2013 Alaress Pty Ltd                *
-*                                                           *
-************************************************************/
-//outputs form to get users mail details and processes the information
 
 require_once __DIR__ . "/../../conf/core/require.php";
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();

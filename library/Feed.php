@@ -1,13 +1,11 @@
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\Access;
-
-/************************************************************
- *                                                           *
- *         Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- ************************************************************/
 
 class Feed {
 

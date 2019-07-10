@@ -1,12 +1,14 @@
 <?php
-// Copyright 2012 Alaress Pty Ltd. http://alaress.com.au
-use Schoolbox\Permission\Access\UserAccess;
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * Puts all resources from a folder into a zip
  */
-
 class ZipFolder
 {
     function __construct($folder)

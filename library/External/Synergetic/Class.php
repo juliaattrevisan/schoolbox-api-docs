@@ -1,11 +1,10 @@
 <?php
-/************************************************************
- *                                                           *
- *         Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- *    This file provides access to synergetic class info        *
- *                                                           *
- ************************************************************/
+/**
+ * This file provides access to synergetic class info
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 class External_Synergetic_Class implements External_ClassInterface
 {

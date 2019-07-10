@@ -1,4 +1,4 @@
-/*! google api loader | (c) 2014 Alaress Pty Ltd | http://www.alaress.com.au
+/*! google api loader | (c) 2019 Schoolbox Pty Ltd | https://schoolbox.com.au/
  */
 ;
 (function ($, window, document, undefined) {

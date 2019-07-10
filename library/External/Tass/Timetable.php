@@ -1,12 +1,11 @@
 <?php
+/**
+ * This file provides access to TASS timetable info
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
-/************************************************************
- *                                                           *
- *         Copyright (c) 2013 Alaress Pty Ltd                *
- *                                                           *
- *    This file provides access to TASS timetable info    *
- *                                                           *
- ************************************************************/
 class External_Tass_Timetable implements External_TimetableInterface
 {
 
