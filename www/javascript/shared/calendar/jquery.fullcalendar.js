@@ -607,13 +607,14 @@ Calendar.prototype.init = function() {
                         placeholderEvent.start = moment(form.find('input[name="date"]').val(), "DD-MM-YYYY HH:mm");
                         placeholderEvent.end   = moment(placeholderEvent.start).add(1, 'h');
                     }
-                    c.fullCalendar.addEvent(placeholderEvent);
+                    placeholderEvent.start = placeholderEvent.start.toDate();
+                    placeholderEvent.end   = placeholderEvent.end.toDate();
+                    var eventObject = c.fullCalendar.addEvent(placeholderEvent);
 
                     c.ccreate(data, function(responseText) {
                         if (responseText.length) {
                             // Remove the placeholder and render the actual event
-                            // TODO use placeholderEvent.remove()
-                            c.fullCalendar.remove(placeholderEvent);
+                            eventObject.remove();
                             c.fullCalendar.addEvent(JSON.parse(responseText));
                         }
                         c.bubble.hide();
