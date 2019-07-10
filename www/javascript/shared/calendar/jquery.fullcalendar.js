@@ -520,55 +520,57 @@ Calendar.prototype.init = function() {
         this.filters.interaction(this)
     }
 
-    // this.dom.fullCalendar(this.options.fullCalendar);
-    /* Button for list view
-     */
-    var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
-    var baseButton  = headerRight.find('.fc-button').first();
-    if (this.options.filter.listViewButton) {
-        headerRight.prepend(
-            baseButton.clone()
-                .html('list')
-                .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
-                .addClass(' fc-corner-left')
-                .attr('id','fc-button-list')
-        );
-    }
-
-    if(this.options.filter.enabled) {
-        // mash the filters in (if they're enabled)
-        if (this.options.filter.btnSelector) {
-            headerRight.prepend(
-                baseButton.clone()
-                    .html('filters')
-                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
-                    .attr('id','fc-button-filter')
-                    .attr('data-reveal-id',this.options.filter.parentSelector.substr(1))
-            );
-        }
-        if (this.options.filter.exportButtonSelector) {
-            headerRight.append(
-                baseButton.clone()
-                    .html('export')
-                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
-                    .attr('id','fc-button-export')
-                    .attr('data-reveal-id',this.options.filter.exportSelector.substr(1))
-            );
-        }
-    }
-    // and now make all the buttons on the header look the way they're meant to
-    var header = this.dom.find('.fc-toolbar');
-    header.addClass('calendar-controls');
-    header.find('.fc-button').each(function() {
-        var self = $(this);
-        self.addClass('filter-change');
-    });
-    header.find('.fc-right .fc-button').each(function() {
-        var self = $(this);
-        self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
-    });
+    // // this.dom.fullCalendar(this.options.fullCalendar);
+    // /* Button for list view
+    //  * TODO use Fullcalendar's list view instead
+    //  */
+    // var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
+    // var baseButton  = headerRight.find('.fc-button').first();
+    // if (this.options.filter.listViewButton) {
+    //     headerRight.prepend(
+    //         baseButton.clone()
+    //             .html('list')
+    //             .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
+    //             .addClass(' fc-corner-left')
+    //             .attr('id','fc-button-list')
+    //     );
+    // }
+    // Do this using custom buttons instead
+    // if (this.options.filter.enabled) {
+    //     // mash the filters in (if they're enabled)
+    //     if (this.options.filter.btnSelector) {
+    //         headerRight.prepend(
+    //             baseButton.clone()
+    //                 .html('filters')
+    //                 .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
+    //                 .addClass('fc-button-filter fc-corner-left fc-corner-right')
+    //                 .attr('id','fc-button-filter')
+    //                 .attr('data-reveal-id',this.options.filter.parentSelector.substr(1))
+    //         );
+    //     }
+    //     if (this.options.filter.exportButtonSelector) {
+    //         headerRight.append(
+    //             baseButton.clone()
+    //                 .html('export')
+    //                 .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
+    //                 .addClass('fc-button-filter fc-corner-left fc-corner-right')
+    //                 .attr('id','fc-button-export')
+    //                 .attr('data-reveal-id',this.options.filter.exportSelector.substr(1))
+    //         );
+    //     }
+    // }
+    //
+    // // and now make all the buttons on the header look the way they're meant to
+    // var header = this.dom.find('.fc-toolbar');
+    // header.addClass('calendar-controls');
+    // header.find('.fc-button').each(function() {
+    //     var self = $(this);
+    //     self.addClass('filter-change');
+    // });
+    // header.find('.fc-right .fc-button').each(function() {
+    //     var self = $(this);
+    //     self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
+    // });
 
 
     /* Special case for list view, it's the only button with an anchor
@@ -578,9 +580,9 @@ Calendar.prototype.init = function() {
         window.location.href = '/calendar/list/' + c.options.userId + '/' + moment(c.fullCalendar.getDate()).format('DD-MM-YYYY');
     });
 
-    // mash in the datepicker
-    var headerCenter = header.find('.fc-center');
-    headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>');
+    // // mash in the datepicker
+    // var headerCenter = header.find('.fc-center');
+    // headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>');
 
     // Event creation form listeners
     $.each(this.getForms(), function(k, v) {

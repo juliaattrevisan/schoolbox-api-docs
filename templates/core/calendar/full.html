@@ -84,6 +84,25 @@
                 ajax: '/calendar/ajax/filter'
             },
             fullCalendar: {
+                customButtons: {
+                    customExport: {
+                        text: 'export',
+                        click: function() {
+                            $('#calendar-export').foundation('reveal', 'open');
+                        }
+                    },
+                    customFilters: {
+                        text: 'filters',
+                        click: function() {
+                            $('#calendar-controls').foundation('reveal', 'open');
+                        }
+                    },
+                },
+                header: {
+                    left: 'prev,today,next',
+                    center: 'title',
+                    right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                },
                 defaultDate: '{SELECTED_DATE}',
                 // defaultView: anchor || '{CALENDAR_VIEW}',
                 // TODO restore calendar view
@@ -546,8 +565,8 @@
         })
 
         //$('#calendar').foundation('reveal','reflow'); this should work but foundation is buggy
-        $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
-        $('#fc-button-export').click(function() { $('#calendar-export').foundation('reveal','open') });
+        // $('#fc-button-filter').click(function() { $('#calendar-controls').foundation('reveal','open') });
+        // $('#fc-button-export').click(function() { $('#calendar-export').foundation('reveal','open') });
     })
 </script>
 <!-- END custom_head -->
