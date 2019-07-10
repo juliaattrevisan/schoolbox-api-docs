@@ -1,4 +1,4 @@
-/*! jquery.gpick.js | (c) 2014 Alaress Pty Ltd | http://www.alaress.com.au
+/*! jquery.gpick.js | (c) 2019 Schoolbox Pty Ltd | https://schoolbox.com.au/
  */
 ;
 (function ($, window, document, auth, picker, undefined) {

@@ -1,10 +1,8 @@
 <?php
-
-/************************************************************
- *                                                           *
- *         Copyright (c) 2013 Alaress Pty Ltd               *
- *                                                           *
- ************************************************************/
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 require_once(dirname(__FILE__) . '/../www/conf/conf.php');
 

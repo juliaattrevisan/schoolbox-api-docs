@@ -1,11 +1,10 @@
 <?php
-/************************************************************
-*                                                           *
-* 		Copyright (c) 2013 Alaress Pty Ltd			    	*
-*                                                           *
-*	This file provides access to TASS user info		        *
-*                                                           *
-************************************************************/
+/**
+ * This file provides access to TASS user info
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;

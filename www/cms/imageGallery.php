@@ -1,9 +1,8 @@
 <?php
-/************************************************************
- *                                                          *
- *         Copyright (c) 2013 Alaress Pty Ltd               *
- *                                                          *
- ************************************************************/
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 use \Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;

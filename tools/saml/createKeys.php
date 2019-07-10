@@ -1,5 +1,9 @@
 #!/usr/bin/php
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 use Aura\Di;
 
@@ -26,7 +30,7 @@ $kernel->run(function (Di\Container $di, $loop, $log, $opts) {
         "countryName" => "AU",
         "stateOrProvinceName" => "Victoria",
         "localityName" => "Melbourne",
-        "organizationName" => "Alaress Pty Ltd",
+        "organizationName" => "Schoolbox Pty Ltd",
         "organizationalUnitName" => "Schoolbox",
         "commonName" =>    $conf->get('site_hostname').'.'.$conf->get('site_domain'),
         "emailAddress" => "support@schoolbox.com.au",

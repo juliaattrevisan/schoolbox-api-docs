@@ -1,15 +1,14 @@
 <?php
-/************************************************************
- *                                                           *
- *       Copyright (c) 2013  Alaress Pty Ltd                 *
- *                                                           *
- *   This file provides abstraction of the database.         *
- *   This implements MySQL connections.  All standard        *
- *   functions are accessible plus some incapsulated         *
- *   functions like getSingleRow and getAllRows.             *
- *   It also includes error handling and a debug mode.       *
- *                                                           *
- ************************************************************/
+/**
+ * This file provides abstraction of the database.
+ *
+ * This implements MySQL connections. All standard functions are accessible plus
+ * some encapsulated functions like getSingleRow and getAllRows.
+ * It also includes error handling and a debug mode.
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 /**
  * @deprecated

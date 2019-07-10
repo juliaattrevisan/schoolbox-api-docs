@@ -1,15 +1,10 @@
 <?php
-
-/************************************************************
-*                                                           *
-*         Copyright (c) 2013 Alaress Pty Ltd                *
-*                                                           *
-*							                                *
-*  Script to put all resources from a folder into a zip     *
-*  and send to client.                                      *
-*         				                                    *
-*							                                *
-/************************************************************/
+/**
+ * Script to put all resources from a folder into a zip and send to client.
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 

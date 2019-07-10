@@ -2,7 +2,6 @@
 /**
  * Synergetic implementation of External_TimetableInterface
  *
- * @author    Alaress Pty Ltd
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
