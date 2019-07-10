@@ -67,10 +67,10 @@ function Calendar(id, bubbleId, opts) {
         fullCalendar: {
             plugins: ['interaction', 'dayGrid', 'list', 'moment', 'timeGrid'],
             views: {
-                day: {
+                timeGridDay: {
                     titleFormat: dateDisplayFormats.momentJsDateLong
                 },
-                week: {
+                timeGridWeek: {
                     columnFormat: 'ddd D/M'
                 }
             },
