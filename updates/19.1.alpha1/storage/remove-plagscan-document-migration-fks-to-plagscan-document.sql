@@ -1,2 +1,0 @@
-ALTER TABLE plagscan_document_migration
-  DROP FOREIGN KEY plagscan_document_migration_plagscan_document_id_fk;
