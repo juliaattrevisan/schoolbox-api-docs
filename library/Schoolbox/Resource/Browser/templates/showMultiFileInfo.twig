@@ -1,18 +1,16 @@
 <div class="row">
-    <div class="small-6 medium-4 column text-center meta-preview">
-        <div class="icon-files size-64"></div>
-    </div>
-    <div class="small-6 medium-8 column">
+    <div class="card small-12 column meta-preview">
+        <div class="icon-files size-32"></div>
         <h3>{{ files|length }} files selected</h3>
+    </div>
+    <div class="small-12 column">
         {% if access >= 2 and files|length %}
             {% set fileActionList %}
                 <li>
                     <a class="icon-delete" data-action="delete" href="/cms/fileForm.php?fileList={{ files|join(',') }}&deleteList=1">Delete</a>
                 </li>
             {% endset %}
-
             {% include '@resourceBrowser/actionBar.twig' with { id: 'file-actions', list: fileActionList, sizing: { small: 1, medium: 2, large: 2, xlarge: 4, xxlarge: 4 } } %}
         {% endif %}
-
     </div>
 </div>

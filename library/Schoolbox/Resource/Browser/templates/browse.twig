@@ -315,16 +315,18 @@
     });
 </script>
 {# /HEAD #}
-
+<div class="row">
+    <div class="small-12 columns"><h1>Resources</h1></div>
+</div>
 <div class="resource-browser row">
-    <div class="small-12 island">
+    <div class="small-12 xlarge-7 island">
         <section>
             <div class="scroller" id="resources">
                 <div id="tree" class="resource-tree"></div>
             </div>
         </section>
     </div>
-    <div class="small-12 island">
+    <div class="small-12 xlarge-5 island">
         <section class="dropzone-wrap">
             <form id="async" class="dropzone overlay" action="/cms/{{ fileController }}Form.php?ajax=1" method="post"></form>
             <div class="hide" id="preview-container"></div>
