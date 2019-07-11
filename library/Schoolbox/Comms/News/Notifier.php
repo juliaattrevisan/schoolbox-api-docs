@@ -436,7 +436,7 @@ class Notifier extends AbstractModuleNotifier
 
         if (!$article->isApproved()) {
             // magical meta to delete messages related to object first.
-            $bob->setMeta(['retractFirst' => true]);
+            $bob->setRetractFirst(true);
         }
 
         $envelope->targetToUser($author, $bob->build());
