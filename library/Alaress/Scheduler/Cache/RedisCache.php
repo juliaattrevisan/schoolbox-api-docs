@@ -71,19 +71,19 @@ class RedisCache implements ICache
         $i = 0;
 
         foreach ($itemKeys as $itemKey) {
-            try {
-                $this->log->debug("Restoring $itemKey");
+            $this->log->debug("Restoring $itemKey");
 
-                /** @var CrudEventInterface $event */
-                $event = unserialize(gzuncompress($this->redis->get($itemKey)), []);
+            /** @var CrudEventInterface $event */
+            $event = unserialize(gzuncompress($this->redis->get($itemKey)), []);
 
-                /** @var IPropagator $propagator */
+            /** @var IPropagator $propagator */
+            if($event instanceof CrudEventInterface) {
                 $propagator->propagateEvent($event);
 
                 ++$i;
-
-            } catch (ErrorException $e) {
-                $this->log->error("Error decompressing cached data", ['exception'=>$e]);
+            }
+            else {
+                $this->log->error("Error decompressing cached data");
             }
         }
 
