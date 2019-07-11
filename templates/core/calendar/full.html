@@ -245,11 +245,11 @@
                     }
 
                     // setup data to be displayed
-                    var data = $.extend(true, {}, calEvent.extendedProps.data.meta);
+                    var data = $.extend(true, {}, calEvent.extendedProps.data);
 
                     // Prefix booking status for bookings
-                    if (calEvent.extendedProps.data.booking) {
-                        data.bookingStatus = calEvent.extendedProps.data.booking.status.name;
+                    if (data.booking) {
+                        data.bookingStatus = data.booking.status.name;
                         $('[data-event-modal-field="bookingStatus"]').show();
 
                         data.note = calEvent.title
@@ -293,7 +293,7 @@
                     // Links to Modify Screen
                     if (calEvent.editable == true) {
                         var url = '';
-                        if ((calEvent.extendedProps.data.custom != undefined) && (calEvent.extendedProps.data.custom.modifyLink != undefined) && (calEvent.extendedProps.data.custom.modifyLink.length)) {
+                        if ((data.custom != undefined) && (data.custom.modifyLink != undefined) && (data.custom.modifyLink.length)) {
                             url = calEvent.extendedProps.data.custom.modifyLink;
                             data.deleteLink = '';
                         }
@@ -313,10 +313,10 @@
                     // Group events: have a go to homepage link
                     data.homepageLink = '';
                     try {
-                        if (calEvent.extendedProps.data.links.category.id > 0) {
+                        if (data.links.category.id > 0) {
                             data.homepageLink =
                                 $('<a class="button icon-home">Homepage</a>')
-                                    .attr('href', '/homepage/' + String(calEvent.extendedProps.data.links.category.id));
+                                    .attr('href', '/homepage/' + String(data.links.category.id));
                         }
                     }
                     catch (e) {}
@@ -324,24 +324,25 @@
                     // Submission History Link
                     data.moreDetailsLink = '';
                     try {
-                        if(calEvent.extendedProps.data.custom.moreDetailsLink.length > 0) {
+                        if(data.custom.moreDetailsLink.length > 0) {
                             data.moreDetailsLink =
                                 $('<a class="button icon-due-work">View More Details</a>')
-                                    .attr('href', calEvent.extendedProps.data.custom.moreDetailsLink);
+                                    .attr('href', data.custom.moreDetailsLink);
                         }
                     }
                     catch (e) {}
 
                     if ('attendance' in calEvent.extendedProps.data) {
-                        $.each(calEvent.extendedProps.data.attendance, function(k, v) {
-                            data['attendance' + k] = v
+                        $.each(data.attendance, function(k, v) {
+                            // replace String.prototype.capitalise (WTF?)
+                            data['attendance' + k.charAt(0).toUpperCase() + k.substring(1)] = v
                         });
 
                         // Attendance List butonye
                         if (data.attendanceListButton.toString() == 'true') {
                             data.attendanceIcon = '';
                             data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
-                                + calEvent.extendedProps.data.meta.eventId + '">Attendees</a>'
+                                + data.meta.eventId + '">Attendees</a>'
                         }
                         // Attend/Unattend butonye
                         if (data.attendanceRequestButton.toString() != 'false') {
@@ -351,14 +352,14 @@
 
                     data.bookingActions = [];
                     data.relatedBookings = [];
-                    if (calEvent.extendedProps.data.booking) {
+                    if (data.booking) {
                         // Booking butonyes (if available)
-                        if (calEvent.extendedProps.data.booking.buttons) {
-                            $.each(calEvent.extendedProps.data.booking.buttons, function() {
+                        if (data.booking.buttons) {
+                            $.each(data.booking.buttons, function() {
                                 if (this.href) {
                                     data.bookingActions.push(
                                         $('<a class="button" />')
-                                            .data('seriesId', calEvent.extendedProps.data.meta.seriesId)
+                                            .data('seriesId', data.meta.seriesId)
                                             .addClass(this.class)
                                             .attr('data-booking-button', 'booking-'+this.action)
                                             .attr('href', this.href)
@@ -374,18 +375,18 @@
                         }
 
                         // Booking reviewer (if available)
-                        if (calEvent.extendedProps.data.booking.reviewer) {
-                            data.reviewer   = calEvent.extendedProps.data.booking.reviewer.name;
-                            data.reviewerId = calEvent.extendedProps.data.booking.reviewer.id;
+                        if (data.booking.reviewer) {
+                            data.reviewer   = data.booking.reviewer.name;
+                            data.reviewerId = data.booking.reviewer.id;
                         }
 
                         // Related bookings
-                        data.relatedBookings = calEvent.extendedProps.data.booking.related;
+                        data.relatedBookings = data.booking.related;
                     }
 
                     data.start = calEvent.start;
                     data.end   = calEvent.end;
-                    if ('placeholder' in calEvent.extendedProps.data) {
+                    if ('placeholder' in data) {
                         data.placeholder = true;
                     }
 
