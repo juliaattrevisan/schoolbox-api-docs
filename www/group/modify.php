@@ -134,7 +134,7 @@ if (is_numeric($this->arg[0])) {
     }
 
     // Get collection of group members (including admin)
-    $memberList = $userAccessMapper->findUsersInCategory($folder);
+    $memberList = $userAccessMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false);
     $hasMembers = false;
     $hasAdmin   = false;
 

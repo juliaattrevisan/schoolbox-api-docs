@@ -166,7 +166,7 @@ if (isset($_POST['userID'])) {
     $ua->setServiceIdentifier($categoryId);
     /** @var Collection|User[] $userList */
     $userList = $userMapper->findByColumn('id', $_POST['userID']);
-    $memberList = $uaMapper->findUsersInCategory($folder);
+    $memberList = $uaMapper->findUsersInCategory($folder, null, UserAccess::ACCESS_READ, false);
 
     // Do not attempt to add existing members
     $newMemberList = $userList->diff($memberList);
