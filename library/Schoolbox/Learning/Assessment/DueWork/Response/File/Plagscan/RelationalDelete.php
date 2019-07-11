@@ -39,7 +39,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
         $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
         if ($performDryRun) {
-            $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
+            $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
         } else {
             $query = 'DELETE pd FROM plagscan_document pd 
                     INNER JOIN student_submission_file ssf ON pd.student_submission_file_id = ssf.id 

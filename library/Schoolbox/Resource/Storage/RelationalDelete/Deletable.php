@@ -53,7 +53,7 @@ class Deletable implements IRelationalDelete
 
         if ($records->count() > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable());
+                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
             } else {
                 foreach ($records as $record) {
                     try {

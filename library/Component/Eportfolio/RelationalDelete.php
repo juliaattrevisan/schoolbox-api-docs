@@ -24,7 +24,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
 
         if ($records->count() > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $fileListItemMapper->getTable());
+                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $fileListItemMapper->getTable(), ['char' => '-']);
             } else {
                 foreach ($records as $record) {
                     $file = $fileListItemMapper->findByColumn('file_id', $record->getId(), ['deleted' => true]);

@@ -71,7 +71,7 @@ class Nullable implements IRelationalDelete
 
         if (\count($records) > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will unlink [' . \count($records) . '] record(s) in: ' . $this->mapper->getTable());
+                $this->logger->notice('Will unlink [' . \count($records) . '] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
             } else {
                 foreach ($records as $record) {
                     $obj = $this->mapper->findByIdWithFallback($record);
