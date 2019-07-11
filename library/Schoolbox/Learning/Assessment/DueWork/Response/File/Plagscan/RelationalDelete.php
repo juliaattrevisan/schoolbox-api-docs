@@ -38,20 +38,22 @@ class RelationalDelete extends Deletable implements IRelationalDelete
     {
         $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
-        if ($performDryRun) {
-            $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
-        } else {
-            $query = 'DELETE pd FROM plagscan_document pd 
+        if ($records->count() > 0) {
+            if ($performDryRun) {
+                $this->logger->notice('Will delete [' . $records->count() . '] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
+            } else {
+                $query = 'DELETE pd FROM plagscan_document pd 
                     INNER JOIN student_submission_file ssf ON pd.student_submission_file_id = ssf.id 
                     WHERE ssf.hash = :hash';
 
-            $statement = $this->database->prepare($query);
-            $statement->execute(['hash' => $hash]);
+                $statement = $this->database->prepare($query);
+                $statement->execute(['hash' => $hash]);
 
-            if ($statement->rowCount()) {
-                $this->logger->notice('['. $statement->rowCount() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
-            } else {
-                parent::remove($hash, $performDryRun);
+                if ($statement->rowCount()) {
+                    $this->logger->notice('[' . $statement->rowCount() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
+                } else {
+                    parent::remove($hash, $performDryRun);
+                }
             }
         }
     }

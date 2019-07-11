@@ -36,7 +36,10 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     {
         $this->hash = $this->getOpt(self::HASH);
 
-        $this->getLogger()->info('Starting storage delete tool...');
+        $loggerMessageSufix = !$this->perform() ? '[Dry run mode]' : '[Delete mode]';
+
+        $this->getLogger()->info('Starting storage delete tool on: ' . $loggerMessageSufix);
+
 
         if (!$this->hash) {
             $this->getLogger()->error('[ERROR]: Hash cannot be empty...');
