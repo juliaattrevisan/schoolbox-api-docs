@@ -77,7 +77,6 @@
         "react/promise": "^2.7",
         "react/event-loop": "^1.1.0",
         "laravie/predis-async": "^0.3.0"
-
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
@@ -86,6 +85,8 @@
         "fzaninotto/faker": "^1.8",
         "phpstan/phpstan": "^0.12.0",
         "roave/security-advisories": "dev-master",
-        "brianium/paratest": "1.*"
+        "brianium/paratest": "1.*",
+        "facebook/webdriver": "^1.7",
+        "vaimo/binary-chromedriver": "^5.0"
     }
 }
