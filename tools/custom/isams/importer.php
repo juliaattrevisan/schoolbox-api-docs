@@ -24,6 +24,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\TimetableCampusMapper;
@@ -70,7 +71,7 @@ HELP;
         /* Spawn api
          * TODO: Swap with actual live connection when ready
          */
-        $api = new MockApi($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+        $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 
         $composite = new Composite(
             $this->getLogger(),
