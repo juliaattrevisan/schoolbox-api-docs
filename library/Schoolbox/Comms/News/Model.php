@@ -21,7 +21,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\News\Topic;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -164,7 +164,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     /**
      * A set of News\Topic instances - there used to be only one, but now there are zero or many
      *
-     * @var Collection|Topic[]
+     * @var Collection|Topic/Model[]
      */
     private $topics;
 
@@ -880,7 +880,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return Collection|Topic[]
+     * @return Collection|Topic\Model[]
      */
     public function getTopics()
     {

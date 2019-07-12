@@ -120,22 +120,20 @@ switch ($this->arg[0]) {
             ->build()
         );
 
-        $articles = \Schoolbox\News\ArticleMapper::getInstance()->findAll(array(
+        $articles = \Schoolbox\Comms\News\Mapper::getInstance()->findAll(array(
             'limit' => 3,
             'order' => array(
-                'item_datetime_published' => 'DESC'
+                'publish_at' => 'DESC'
             )
         ));
 
         foreach ($articles as $article) {
-            /** @var \Schoolbox\News\Article $article */
-            $article = \Schoolbox\News\ArticleMapper::getInstance()->findById($article->getId());
-
+            /** @var \Schoolbox\Comms\News\Model $article */
             try {
-                if (!$article->getImage()) {
+                if (!$article->getFeatureImage()) {
                     throw new \Schoolbox\Mapper\Exception("No image");
                 }
-                $hash = $article->getImage()->getHash();
+                $hash = $article->getFeatureImage()->getHash();
                 if (!$hash) {
                     throw new \Schoolbox\Mapper\Exception("No hash");
                 }
@@ -149,22 +147,21 @@ switch ($this->arg[0]) {
             $decorator->appendInstance($bob
                 ->setTitle(":user posted :name under :topic")
                 ->setParams(array(
-                    'user'  => new Param($article->getOwner()->formatName()),
-                    'name'  => new Param($article->getHeading(), '/news/item/' . $article->getId()),
-                    'topic' => new Param($article->getTopic()->getName())
+                    'user'  => new Param($article->getAuthor()->formatName()),
+                    'name'  => new Param($article->getTitle(), '/news/item/' . $article->getId())
                 ))
                 ->setHref('/news/item/' . $article->getId())
                 ->setIcon($image)
                 ->setMeta(array(
-                    'title'  => $article->getHeading(),
-                    'author' => $article->getOwner()->formatName(),
-                    'date'   => $article->getPostDate()->getLong(),
+                    'title'  => $article->getTitle(),
+                    'author' => $article->getAuthor()->formatName(),
+                    'date'   => $article->getPublishAt()->getLong(),
                     'thumb'  => $thumb,
                     'blurb'  => $article->getBlurb(),
                 ))
                 ->setBody($article->getBody())
-                ->setByline("{$article->getPostDate()->getDateOnly()} by {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")
-                ->setTimestamp($article->getPostDate()->getUnixTimeStamp())
+                ->setByline("{$article->getPublishAt()->getDateOnly()} by {$article->getAuthor()->formatName()}")
+                ->setTimestamp($article->getPublishAt()->getUnixTimeStamp())
                 ->setNamespace(NSMapper::NS_NEWS)
                 ->build()
             );

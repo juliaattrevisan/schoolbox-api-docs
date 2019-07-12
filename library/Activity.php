@@ -30,15 +30,22 @@ class Activity {
         $lastcatvisit = $this->lastCatVisit($id);
 
         //check if any new news has been submitted
-        $query = "SELECT COUNT(*) AS newscount FROM subject_news WHERE deleted = 0 AND code = $id AND
-			datetime_posted >= '$lastcatvisit' AND datetime_expires >= NOW()";
+        $query = "
+            SELECT COUNT(DISTINCT comms_news_article.id) AS newscount
+            FROM comms_news_article
+            JOIN comms_news_audience cna on comms_news_article.id = cna.comms_news_article_id AND entity_type = 'folder'
+            WHERE deleted_at IS NULL
+            AND   entity_value = '$id'
+            AND   publish_at >= '$lastcatvisit'
+            AND   publish_at <= NOW()
+        ";
         $result = $this->db->getRow($query);
 
         $count['news'] = $result['newscount'];
 
         //check if any new blogs has been submitted
-        $query = "SELECT COUNT(*) AS blogcount FROM blog WHERE deleted_at IS NULL AND folder_id = $id AND
-			created_at >= '$lastcatvisit'";
+        $query = "SELECT COUNT(*) AS blogcount FROM blog 
+                  WHERE deleted_at IS NULL AND folder_id = $id AND created_at >= '$lastcatvisit'";
         $result = $this->db->getRow($query);
 
         $count['blog'] = $result['blogcount'];

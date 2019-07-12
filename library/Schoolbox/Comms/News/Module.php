@@ -22,7 +22,7 @@ use Schoolbox\Comms\News\Discussion\Permission\CanModerateThread;
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
@@ -245,7 +245,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'newsMapper'                 => $this->getMapperFactory()->getLazy(Mapper::class),
-            'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'topicMapper'                => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
             'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(SaveForLater\Mapper::class),
             'statisticsMapper'           => $this->getMapperFactory()->getLazy(Statistics\Mapper::class),
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(Statistics\Cumulative\Mapper::class),

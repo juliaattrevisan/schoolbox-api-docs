@@ -12,7 +12,7 @@ use Alaress\Web\Controller\ConfigController;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
@@ -22,7 +22,7 @@ class Controller extends ConfigController
     /** @var UserAccessMapper */
     private $userAccessMapper;
 
-    /** @var TopicMapper */
+    /** @var Topic\Mapper */
     private $topicMapper;
 
 
@@ -30,13 +30,13 @@ class Controller extends ConfigController
      * @param ConfigMapper         $configMapper
      * @param FieldStrategyFactory $fieldStrategyFactory
      * @param UserAccessMapper     $userAccessMapper
-     * @param TopicMapper          $topicMapper
+     * @param Topic\Mapper         $topicMapper
      */
     public function __construct(
         ConfigMapper $configMapper,
         FieldStrategyFactory $fieldStrategyFactory,
         UserAccessMapper $userAccessMapper,
-        TopicMapper $topicMapper
+        Topic\Mapper $topicMapper
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory);
 

@@ -7,12 +7,12 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\News;
+namespace Schoolbox\Comms\News\Topic;
 
 use Alaress\Json\SerializeTrait;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Topic implements \Alaress\Json\Serializable
+class Model implements \Alaress\Json\Serializable
 {
     use Id;
     use SerializeTrait;
@@ -28,7 +28,7 @@ class Topic implements \Alaress\Json\Serializable
 
     /**
      * @param $name
-     * @return Topic
+     * @return Model
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */

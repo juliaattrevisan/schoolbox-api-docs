@@ -11,7 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\Access;
@@ -28,7 +28,7 @@ class Controller extends Base
 
 
     /**
-     * @var TopicMapper
+     * @var Topic\Mapper
      */
     private $topicMapper;
 
@@ -84,7 +84,7 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param News\Mapper                       $newsMapper
-     * @param TopicMapper                       $topicMapper
+     * @param Topic\Mapper                      $topicMapper
      * @param News\SaveForLater\Mapper          $saveForLaterMapper
      * @param News\Statistics\Mapper            $statisticsMapper
      * @param News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper
@@ -96,7 +96,7 @@ class Controller extends Base
      */
     public function __construct(
         News\Mapper $newsMapper,
-        TopicMapper $topicMapper,
+        Topic\Mapper $topicMapper,
         News\SaveForLater\Mapper $saveForLaterMapper,
         News\Statistics\Mapper $statisticsMapper,
         News\Statistics\Cumulative\Mapper $statisticsCumulativeMapper,

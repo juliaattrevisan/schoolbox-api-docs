@@ -14,7 +14,7 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
@@ -70,7 +70,7 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'configMapper'         => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             'userAccessMapper'     => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
-            'topicMapper'          => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'topicMapper'          => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
             'fieldStrategyFactory' => $injector->lazy(function () {
                 return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
             }),

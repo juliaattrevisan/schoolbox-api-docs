@@ -31,8 +31,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\News\Topic;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -54,7 +53,7 @@ class Controller extends Base
     private $newsMapper;
 
     /**
-     * @var TopicMapper
+     * @var Topic\Mapper
      */
     private $topicMapper;
 
@@ -123,7 +122,7 @@ class Controller extends Base
 
     /**
      * @param Mapper                           $newsMapper
-     * @param TopicMapper                      $topicMapper
+     * @param Topic\Mapper                     $topicMapper
      * @param SaveForLater\Mapper              $saveForLaterMapper
      * @param Statistics\Mapper                $statisticsMapper
      * @param Statistics\Cumulative\Mapper     $statisticsCumulativeMapper
@@ -139,7 +138,7 @@ class Controller extends Base
      */
     public function __construct(
         Mapper $newsMapper,
-        TopicMapper $topicMapper,
+        Topic\Mapper $topicMapper,
         SaveForLater\Mapper $saveForLaterMapper,
         Statistics\Mapper $statisticsMapper,
         Statistics\Cumulative\Mapper $statisticsCumulativeMapper,

@@ -6,7 +6,6 @@
  */
 namespace Schoolbox\Comms\News\Feed;
 
-use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
@@ -17,9 +16,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Comms\News;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\News\TopicMapper;
-use Schoolbox\Permission\Access;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
@@ -104,7 +101,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'newsMapper'                 => $this->getMapperFactory()->getLazy(News\Mapper::class),
-            'topicMapper'                => $this->getMapperFactory()->getLazy(TopicMapper::class),
+            'topicMapper'                => $this->getMapperFactory()->getLazy(Topic\Mapper::class),
             'saveForLaterMapper'         => $this->getMapperFactory()->getLazy(News\SaveForLater\Mapper::class),
             'statisticsMapper'           => $this->getMapperFactory()->getLazy(News\Statistics\Mapper::class),
             'statisticsCumulativeMapper' => $this->getMapperFactory()->getLazy(News\Statistics\Cumulative\Mapper::class),

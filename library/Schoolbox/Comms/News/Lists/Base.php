@@ -25,8 +25,7 @@ use Schoolbox\Comms\News\Statistics;
 use Schoolbox\Comms\News\Statistics\ImpressionsConversionsOpens;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
-use Schoolbox\News\Topic;
-use Schoolbox\News\TopicMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\User;
 
 abstract class Base
@@ -48,7 +47,7 @@ abstract class Base
 
 
     /**
-     * @var TopicMapper
+     * @var Topic\Mapper
      */
     protected $topicMapper;
 
@@ -117,7 +116,7 @@ abstract class Base
      * Lists constructor.
      *
      * @param int                          $defaultLimit
-     * @param TopicMapper                  $topicMapper
+     * @param Topic\Mapper                 $topicMapper
      * @param Mapper                       $newsMapper
      * @param string                       $readMoreText
      * @param bool                         $saveForLaterEnabled
@@ -132,7 +131,7 @@ abstract class Base
      */
     public function __construct(
         int $defaultLimit,
-        TopicMapper $topicMapper,
+        Topic\Mapper $topicMapper,
         Mapper $newsMapper,
         string $readMoreText,
         bool $saveForLaterEnabled,
@@ -282,7 +281,7 @@ abstract class Base
      * By default, select the All tab...
      * but try to find the topic whose slug matches the url param
      *
-     * @param Collection|Topic[]  $topics
+     * @param Collection|Topic\Model[]  $topics
      * @param null|string         $slug
      * @return int
      */
