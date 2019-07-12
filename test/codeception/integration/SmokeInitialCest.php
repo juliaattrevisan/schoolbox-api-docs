@@ -1,8 +1,9 @@
 <?php
-
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Client;
+/**
+ * @author    Alexamder Tsuru <alexander.simonov@alaress.com.au>
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 class SmokeInitialCest {
 
@@ -126,7 +127,7 @@ class SmokeInitialCest {
      */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
-        $homepage_title='Testing Home Page for Assessment6';
+        $homepage_title='Testing Home Page for Assessment';
         $i->loginAdmin(); #we logged in as alaress
         $i->createHomepage($homepage_title);
         $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);

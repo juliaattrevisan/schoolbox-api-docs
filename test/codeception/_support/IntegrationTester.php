@@ -1,25 +1,26 @@
 <?php
+/**
+ * @author    Alexamder Tsuru <alexander.simonov@alaress.com.au>
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
 use Alaress\Redis;
-use Aura\Di\ContainerInterface;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Psr7\Response;
 use Schoolbox\Comms\News\Querystring;
-use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\UserMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\LevelMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\User;
+use Schoolbox\Application\CliTool\Kernel;
+use Schoolbox\Application\CliTool\App;
 
 /**
  * Inherited Methods
@@ -46,9 +47,11 @@ class IntegrationTester extends \Codeception\Actor
     const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
 
     public $client;
+    public $cli_kernel;
     public $client_cookie_jar;
     public $guzzle_headers=[];
     public $redirect_settings;
+    public $database;
 
     function initGuzzleClient()
     {
@@ -65,24 +68,44 @@ class IntegrationTester extends \Codeception\Actor
         $this->client_cookie_jar = new CookieJar();
     }
 
+    function initDatabase()
+    {
+        $this->database=Database::getInstance();
+        $this->database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+    }
+
+    function initCliKernel()
+    {
+
+        $app_class = new class () extends App {
+            public function run() : void{}
+        };
+
+        $this->cli_kernel = new Kernel($app_class, false);
+    }
+
     function getUser($username){
 
-        $database=Database::getInstance();
-        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
         return UserMapper::getInstance()->findOneByColumn('username', $username);
     }
 
     function getNewsArticle($title, $latest_id=true){
-        $database=Database::getInstance();
-        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
         return NewsMapper::getInstance()->findOneByColumn('title', $title);
     }
 
     ##might not even work.
     function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $assessment_ownderID, $submission_ownderID)
     {
-        $database=Database::getInstance();
-        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
         $box_id=SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$assessment_ownderID])->getID();
         $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$submission_ownderID]);
         return $submission->getId();
@@ -90,8 +113,9 @@ class IntegrationTester extends \Codeception\Actor
 
     function getFirstHomepageIdByTitle($title)
     {
-        $database=Database::getInstance();
-        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
         /** @var Schoolbox\Resource\Folder\Model $folder */
         $folder = FolderMapper::getInstance()->findOneByColumn('name', $title);
         return $folder->getId();
@@ -99,19 +123,27 @@ class IntegrationTester extends \Codeception\Actor
 
     function getFirstAssessmentIdByTitle($title)
     {
-        $database=Database::getInstance();
-        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
         /** @var Schoolbox\Learning\Assessment\DataModel\Mapper $DueWork */
         $assessment = AssessmentMapper::getInstance()->findOneByColumn('title', $title);
         return $assessment->getId();
     }
 
-    function getFirstRubricByAsessessmentID($assessmentID, $assessment_ownderID)
+    function getAssessmentRubricGrid($assessmentID)
     {
-        $database=Database::getInstance();
-        $database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
-        $box=SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$assessment_ownderID]);
-        return RubricMapper::getInstance()->findBySubmissionBox($box);
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        if(!isset($this->cli_kernel)) {
+            $this->initCliKernel();
+        }
+
+        /** @var IAssessable $assessment */
+        $assessment = $this->cli_kernel->get('assessmentDataSource')->findById($assessmentID);
+
+        return RubricMapper::getInstance()->retrieveGrid($assessment, true);
     }
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
@@ -709,7 +741,7 @@ class IntegrationTester extends \Codeception\Actor
         }
 
         $submissionID = $this->getFirstSubmissionIdByOwnerAndAssessmentID($assessementID, $user_marking_id, $student_submitting_id);
-        $rubric = $this->getFirstRubricByAsessessmentID($assessementID, $user_marking_id); ## Has been deprecated needs a recode.
+        $markGrid = $this->getAssessmentRubricGrid($assessementID); ## Has been deprecated needs a recode.
 
         $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/assessments/'.$assessementID.'/'.$student_submitting_id.'/responses';
 
@@ -718,18 +750,15 @@ class IntegrationTester extends \Codeception\Actor
 
         $allow_redirects = $this->redirect_settings;
 
-        $criterions_for_rubric = $rubric->getORMCriteria();
-
         $rubric_data=[];
 
-        foreach ($criterions_for_rubric as $one_criterion)
-        {
-            //rubric[descriptors][desc_id][selected]: 1
-
-            $descriptors = DescriptorMapper::getInstance()->findByColumnList(['criterion_id' => $one_criterion->getId()]);
-            $descriptors_ids=$descriptors->keys();
-            $levelToPick=rand(0,2);
-            $rubric_data['descriptors'][$descriptors_ids[$levelToPick]]['selected']= 1;
+        foreach ($markGrid->getCapabilityUsages() as $group_capability) {
+            foreach ($group_capability->getIndicatorUsages() as $capability_indicator)
+            {
+                $decriptors = $capability_indicator->getDescriptors();
+                $levelToPick=rand(0,2);
+                $rubric_data['descriptors'][$decriptors[$levelToPick]->getId()]['selected']= 1;
+            }
         }
 
         $data = [
