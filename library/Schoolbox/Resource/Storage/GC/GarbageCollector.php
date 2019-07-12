@@ -14,7 +14,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
-
 class GarbageCollector 
 {
 
@@ -73,12 +72,26 @@ class GarbageCollector
     /**
      * Returns a list of hashes that are considered stale.
      * Main class logic.
-     *
+     * @var string $hash       If set, target this specific hash for cleanup
      * @return array
      */
-    public function getStale()
+    public function getStale($hash = null)
     {
-        $statement  = $this->mapper->getDatabase()->query("SELECT `hash` FROM `storage` WHERE `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, $this->limit");
+        $query = 'SELECT `hash` FROM `storage` WHERE';
+
+        if ($hash) {
+            $query .= ' `hash` = :hash';
+            $statement = $this->mapper->getDatabase()->prepare($query);
+            $statement->bindValue(':hash', $hash);
+        }
+        else {
+            $query .= ' `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, :limit';
+            $statement = $this->mapper->getDatabase()->prepare($query);
+            $statement->bindValue(':limit', $this->limit, \PDO::PARAM_INT);
+        }
+
+        $statement->execute();
+
         $this->list = [];
 
         // start by populating with all hashes
@@ -93,22 +106,22 @@ class GarbageCollector
         // iterate the checks, and retain the intersection each time
         foreach ($this->checks as $check) {
             $this->log->notice('Applying '.get_class($check), ['char' => '+']);
-            $hashes = $check->getStale($hashes);
-            $this->log->info('Retained '.count($hashes). ' stale');
+            $staleHashes = $check->getStale($hashes);
+            $this->log->info('Retained '.count($staleHashes). ' stale');
         }
 
-        return $hashes;
+        return $this->list;
     }
 
 
     /**
      * Delete all stale hashes
+     * @var string $hash       If set, target this specific hash for cleanup
      * @return int
      */
-    public function purge()
+    public function purge($hash = null)
     {
-        $purge = $this->getStale();
-
+        $purge = $this->getStale($hash);
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
