@@ -79,10 +79,6 @@
                 $projectAssessments = $subAssessmentList.find('[data-parent-project=' + assessmentId + ']'),
                 $countSelectedElem  = $unit.find('[data-show-count]');
 
-            // Update display of how many assessments are currently selected in this unit
-            // Includes sub-assessments inside projects
-            $countSelectedElem.attr('data-show-count', $unit.find(':checked').length);
-
             // Show/Hide assessment's dates
             if ($input.prop('checked')) {
                 $dates.show();
@@ -114,6 +110,10 @@
                 // Disable everything
                 $subAssessmentList.find('input').prop('disabled', true);
             }
+
+            // Update display of how many assessments are currently selected in this unit
+            // Includes sub-assessments inside projects if project is selected
+            $countSelectedElem.attr('data-show-count', $unit.find(':checked:not(:disabled)').length);
         });
     });
 </script>
