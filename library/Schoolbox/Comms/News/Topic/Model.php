@@ -28,7 +28,7 @@ class Model implements \Alaress\Json\Serializable
 
     /**
      * @param $name
-     * @return Topic
+     * @return Model
      * @throws \DomainException
      * @throws \InvalidArgumentException
      */
