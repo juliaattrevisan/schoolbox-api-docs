@@ -216,7 +216,7 @@ class CampusReassignment extends AbstractNotificationTest
                 ->setExpiresAt(Alaress_Date_Format::now()->addYears(100));
 
 
-        $am->setSessionData([ 'user' => $article->getOwner() ]);
+        $am->setSessionData([ 'user' => $article->getAuthor() ]);
         $am->create($article);
     }
 
