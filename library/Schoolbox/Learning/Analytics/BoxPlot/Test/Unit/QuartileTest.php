@@ -4,21 +4,20 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Markbook\Test\Unit;
+namespace Schoolbox\Learning\Analytics\BoxPlot\Test\Unit;
 
 use PHPUnit\Framework\TestCase;
-
-use Schoolbox\Learning\Markbook\Markbook;
+use Schoolbox\Learning\Analytics\BoxPlot\Quartile;
 
 
 /**
- * Tests for Markbook methods
+ * Tests for Quartile methods
  */
-class MarkbookTest extends TestCase
+class QuartileTest extends TestCase
 {
+
     /**
      * Data provider for `setupFirstQuartile`.
-     * Dataset should already be sorted and cannot be null
      *
      * @return array
      */
@@ -26,8 +25,20 @@ class MarkbookTest extends TestCase
     {
         return [
             [
-                'marks' => [3, 5, 7, 8, 12],
-                'expected' => [3, 5]
+                'marks' => [],
+                'expected' => [],
+            ],
+            [
+                'marks' => [null],
+                'expected' => [],
+            ],
+            [
+                'marks' => [null, null, null, 'null', 'sadf', '234', '23.234'],
+                'expected' => [],
+            ],
+            [
+                'marks' => [null, 'null', 1.3, 2, 3, 4, 5, '234', null, 0, '1e3'],
+                'expected' => [0, 1.3, 2],
             ],
             [
                 'marks' => [1, 2, 3, 4, 5, 60, 70, 85, 91, 91, 92, 93, 94, 95, 100],
@@ -58,10 +69,17 @@ class MarkbookTest extends TestCase
             [
                 'marks' => [0, 0, 3, 50, 53, 61, 80, 83],
                 'expected' => [0, 0, 3, 50]
-            ]
+            ],
+            [
+                'marks' => [3.343, 5.2, 0, 0, null, null, 1000, 3, 50, 53, 61, 80, 83],
+                'expected' => [0, 0, 3, 3.343, 5.2]
+            ],
+            [
+                'marks' => [9.3],
+                'expected' => [9.3]
+            ],
         ];
     }
-
 
     /**
      * @dataProvider providerForTestSetupFirstQuartile
@@ -71,14 +89,13 @@ class MarkbookTest extends TestCase
      */
     public function testSetupFirstQuartile($marks, $expected)
     {
-        $median = Markbook::findMedian($marks);
-        $firstHalve = Markbook::setupFirstQuartile($marks, $median);
+        $quartile = new Quartile();
+        $firstHalve = $quartile->setupFirstQuartile($marks);
         $this->assertEquals($firstHalve, $expected);
     }
 
     /**
      * Data provider for `setupThirdQuartile`.
-     * Dataset should already be sorted and cannot be null
      *
      * @return array
      */
@@ -86,17 +103,33 @@ class MarkbookTest extends TestCase
     {
         return [
             [
+                'marks' => [],
+                'expected' => [],
+            ],
+            [
+                'marks' => [null],
+                'expected' => [],
+            ],
+            [
+                'marks' => [null, null, null, 'null', 'sadf', '234', '23.234'],
+                'expected' => [],
+            ],
+            [
+                'marks' => [null, 'null', 1.3, 2, 3, 4, 5, '234', null, 0, '1e3'],
+                'expected' => [3, 4, 5],
+            ],
+            [
                 'marks' => [3, 5, 7, 8, 12],
                 'expected' => [8, 12]
             ],
             [
-                'marks' => [1, 2, 3, 4, 5, 60, 70, 85, 91, 92, 93, 94, 95, 100],
-                'expected' => [85, 91, 92, 93, 94, 95, 100]
+                'marks' => [1, 2, 3, 4, 5, 60, 70, 85, 91, 91, 92, 93, 94, 95, 100],
+                'expected' => [91, 91, 92, 93, 94, 95, 100]
 
             ],
             [
-                'marks' => [1, 2, 3, 4, 5, 60, 70, 85, 91, 91, 92, 93, 94, 95, 100],
-                'expected' => [91, 91, 92, 93, 94, 95, 100]
+                'marks' => [1, 2, 3, 4, 5, 60, 70, 85, 91, 92, 93, 94, 95, 100],
+                'expected' => [85, 91, 92, 93, 94, 95, 100]
 
             ],
             [
@@ -116,9 +149,13 @@ class MarkbookTest extends TestCase
                 'expected' => [85]
             ],
             [
-                'marks' => [0, 0, 3, 50, 53, 61, 80, 83],
-                'expected' => [53, 61, 80, 83]
-            ]
+                'marks' => [3.343, 5.2, 0, 0, null, null, 1000, 3, 50, 53, 61, 80, 83],
+                'expected' => [53, 61, 80, 83, 1000]
+            ],
+            [
+                'marks' => [9.3],
+                'expected' => [9.3]
+            ],
         ];
     }
 
@@ -130,20 +167,43 @@ class MarkbookTest extends TestCase
      */
     public function testSetupThirdQuartile($marks, $expected)
     {
-        $median = Markbook::findMedian($marks);
-        $secondHalve = Markbook::setupThirdQuartile($marks, $median);
+        $quartile = new Quartile();
+        $secondHalve = $quartile->setupThirdQuartile($marks);
         $this->assertEquals($secondHalve, $expected);
     }
 
     /**
      * Data provider for `findMedian`.
-     * Dataset should already be sorted and cannot be null
      *
      * @return array
      */
     public function providerForFindMedian()
     {
         return [
+            [
+                'marks' => [],
+                'expectedQuartile1' => null,
+                'expectedQuartile2' => null,
+                'expectedQuartile3' => null,
+            ],
+            [
+                'marks' => [null],
+                'expectedQuartile1' => null,
+                'expectedQuartile2' => null,
+                'expectedQuartile3' => null,
+            ],
+            [
+                'marks' => [null, null, null, 'null', 'sadf', '234', '23.234'],
+                'expectedQuartile1' => null,
+                'expectedQuartile2' => null,
+                'expectedQuartile3' => null,
+            ],
+            [
+                'marks' => [null, 'null', 1.3, 2, 3, 4, 5, '234', null, 0, '1e3'],
+                'expectedQuartile1' => 1.3,
+                'expectedQuartile2' => 2.5,
+                'expectedQuartile3' => 4,
+            ],
             [
                 'marks' => [3, 5, 7, 8, 12],
                 'expectedQuartile1' => 4,
@@ -189,11 +249,17 @@ class MarkbookTest extends TestCase
                 'expectedQuartile3' => 85,
             ],
             [
-                'marks' => [0, 0, 3, 50, 53, 61, 80, 83],
-                'expectedQuartile1' => 1.5,
-                'expectedQuartile2' => 51.5,
-                'expectedQuartile3' => 70.5,
-            ]
+                'marks' => [3.343, 5.2, 0, 0, null, null, 1000, 3, 50, 53, 61, 80, 83],
+                'expectedQuartile1' => 3,
+                'expectedQuartile2' => 50,
+                'expectedQuartile3' => 80,
+            ],
+            [
+                'marks' => [9.3],
+                'expectedQuartile1' => 9.3,
+                'expectedQuartile2' => 9.3,
+                'expectedQuartile3' => 9.3,
+            ],
         ];
     }
 
@@ -207,9 +273,10 @@ class MarkbookTest extends TestCase
      */
     public function testFindMedian($marks, $expectedQuartile1, $expectedQuartile2, $expectedQuartile3)
     {
+        $quartile = new Quartile();
 
-        $this->assertEquals(Markbook::findMedian($marks), $expectedQuartile2);
-        $this->assertEquals(Markbook::findMedian(Markbook::setupFirstQuartile($marks)), $expectedQuartile1);
-        $this->assertEquals(Markbook::findMedian(Markbook::setupThirdQuartile($marks)), $expectedQuartile3);
+        $this->assertEquals($quartile->findMedian($marks), $expectedQuartile2);
+        $this->assertEquals($quartile->findMedian($quartile->setupFirstQuartile($marks)), $expectedQuartile1);
+        $this->assertEquals($quartile->findMedian($quartile->setupThirdQuartile($marks)), $expectedQuartile3);
     }
 }

@@ -593,7 +593,7 @@ class Controller extends Base
                         [
                             'info'  => null,
                             'uid'   => null,
-                            'value' => $statistics[$assessment->getId()]['meanNormalized'],
+                            'value' => $statistics[$assessment->getId()]['quartile2'],
                         ],
                         // 3rd Quartile
                         [

@@ -22,6 +22,7 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User;
+use Schoolbox\Learning\Analytics\BoxPlot\Quartile;
 
 /**
  * Class Markbook
@@ -263,6 +264,7 @@ class Markbook
         $minSummator   = new Minimum();
         $maxSummator   = new Maximum();
         $countSummator = new Count();
+        $quartile      = new Quartile();
 
         // Summate assessment statistics for all users for each assessment
         // Render all stats as percentages for now?
@@ -277,25 +279,6 @@ class Markbook
                 $normMarks[] = $participant->getNormalisedMark(true);
             }
         }
-
-        // Exclude null marks
-        $marks = array_values(array_filter($normMarks));
-        sort($marks);
-        $quartile2 = $this->findMedian($marks);
-        $countAllMarks = count($marks);
-        if (isset($marks) && !empty($marks)) {
-            if ($countAllMarks > 1) {
-                $quartile1 = $this->findMedian($this->setupFirstQuartile($marks));
-                $quartile3 = $this->findMedian($this->setupThirdQuartile($marks));
-            } else {
-                $quartile1 = $marks[0];
-                $quartile3 = $marks[0];
-            }
-        } else {
-            $quartile1 = null;
-            $quartile3 = null;
-        }
-
         $statistics = [
             'mean'              => null,
             'sd'                => null,
@@ -304,8 +287,9 @@ class Markbook
             'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
             'maxNormalized'     => $maxSummator->summateList($normMarks),
             'count'             => $countSummator->summateList($normMarks),
-            'quartile1'         => $quartile1,
-            'quartile3'         => $quartile3,
+            'quartile1'         => $quartile->findMedian($quartile->setupFirstQuartile($normMarks)),
+            'quartile2'         => $quartile->findMedian($normMarks),
+            'quartile3'         => $quartile->findMedian($quartile->setupThirdQuartile($normMarks)),
         ];
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
@@ -317,7 +301,6 @@ class Markbook
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
             $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
-            $statistics['meanNormalized']   = $quartile2;
             $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }
@@ -378,63 +361,5 @@ class Markbook
         }
         $this->assessments->sortByCallback($comparator->getCallable());
         return $this;
-    }
-
-    /**
-     * https://www.purplemath.com/modules/boxwhisk.htm
-     * Find the values used to calculate first quartile.
-     *
-     * @param array $values
-     * @return array
-     */
-    public function setupFirstQuartile(array $values)
-    {
-        return array_slice($values, 0, floor(count($values) / 2));
-    }
-
-    /**
-     * https://www.purplemath.com/modules/boxwhisk.htm
-     * Find the values used to calculate third quartile.
-     *
-     * @param array $values
-     * @return array
-     */
-    public function setupThirdQuartile(array $values)
-    {
-        $even = !(count($values) % 2);
-
-        if ($even) {
-            $secondHalve = array_slice($values, floor(count($values) / 2), count($values));
-        }else {
-            $secondHalve = array_slice($values, ceil(count($values) / 2), count($values));
-        }
-        return $secondHalve;
-    }
-
-    /**
-     * https://www.purplemath.com/modules/boxwhisk.htm
-     * Calculates medians
-     *
-     * @param array $values
-     * @return float
-     */
-    function findMedian(array $values)
-    {
-        $median = null;
-        /* Figure out medians in different ways depending
-         * on even or odd number of elements
-         */
-        $halfway = floor(count($values) / 2);
-
-        $even = !(count($values) % 2);
-
-        /* Careful of these offsets */
-        if ($even) {
-            $median = ($values[$halfway - 1] + $values[$halfway]) / 2.0;
-        } else {
-            $median = $values[$halfway];
-        }
-
-        return (float)$median;
     }
 }
