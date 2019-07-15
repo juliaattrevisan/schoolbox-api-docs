@@ -233,6 +233,9 @@
      */
     fullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
 
+        // The only reference to suppress I see is in the old calendar:
+        // it has to do with some ancient work whose purpose I no longer know
+
         // // check that this isn't being suppressed?
         // if (this.calendar.suppress === true) {
         //     this.calendar.suppress = false;
@@ -242,33 +245,26 @@
         /* Hide "Posted By" if there is no author
          * (This happens on subscribed vcals for example)
          */
-        if (!data.authorId || Number(data.authorId) === -1) {
-            bubbleElement.find('[data-event-modal-field="post-by"]').hide();
-        }
-        else {
-            bubbleElement.find('[data-event-modal-field="post-by"]').show();
-        }
+        bubbleElement.find('[data-event-modal-field="post-by"]').toggle(
+            data.authorId && Number(data.authorId) !== -1
+        );
 
         // Hide reviewed by as well
-        if (!data.reviewerId || Number(data.reviewerId) === -1) {
-            bubbleElement.find('[data-event-modal-field="reviewedBy"]').hide();
-        }
-        else {
-            bubbleElement.find('[data-event-modal-field="reviewedBy"]').show();
-        }
+        bubbleElement.find('[data-event-modal-field="reviewedBy"]').toggle(
+            data.reviewerId && Number(data.reviewerId) !== -1
+        );
 
         // Show/hide location?
-        if (!data.location || !data.location.length) {
-            bubbleElement.find('[data-event-modal-field="location"]').hide();
-        }
-        else {
-            bubbleElement.find('[data-event-modal-field="location"]').show();
-        }
+        bubbleElement.find('[data-event-modal-field="location"]').toggle(
+            data.location && data.location.length > 0
+        );
 
         // // Fill in form inputs?
         // this.fillForm(method+'Event', data);
         // this.fillForm(method+'Task', data);
-        //
+
+        // onOpen is used by the MGGS PBL custom work:
+        // see library/Custom/Mggs/Learning/Upcoming/templates/upcoming.twig
         // // There's some "onOpen" callback?
         // // Is this required? Would I ever NOT open a bubble on click?
         // if (this.calendar.options.bubble.onOpen) {
