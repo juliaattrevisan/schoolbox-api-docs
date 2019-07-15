@@ -115,7 +115,7 @@ class BatchxmlParentCampuses extends AbstractLoggableHydrator
 
                         /* If we previously found this campus, don't worry - continue
                          */
-                        if (isset($parentCampus[$studentCampus->getName()])) {
+                        if (isset($newCampuses[$studentCampus->getName()])) {
                             continue;
                         }
 
