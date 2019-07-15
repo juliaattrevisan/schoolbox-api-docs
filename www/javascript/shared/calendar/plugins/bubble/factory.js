@@ -54,7 +54,7 @@
 
         // Does this have a booking?
         if (data.booking) {
-            return new ResourceFullCalendarBubble(this.fullCalendar, event, this.taskTypeId, this.$viewEventBubble);
+            return new FullCalendarViewBookingBubble(this.fullCalendar, event, this.taskTypeId, this.$viewEventBubble);
         }
 
 
@@ -65,7 +65,7 @@
 
 
         // Otherwise...
-        return new FullCalendarBubble(this.fullCalendar, event, this.taskTypeId, this.$viewEventBubble);
+        return new FullCalendarViewEventBubble(this.fullCalendar, event, this.taskTypeId, this.$viewEventBubble);
     };
 
 
@@ -78,7 +78,7 @@
      */
     fullCalendarBubbleFactory.prototype.buildForNewEvent = function(date, allDay) {
         // The create event bubble needs special handling
-        return new FullCalendarBubble(
+        return new FullCalendarViewEventBubble(
             this.fullCalendar,
             {
                 allDay: allDay,

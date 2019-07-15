@@ -5,6 +5,8 @@
     /**
      * Calendar bubble plugin: simply show a calendar event bubble.
      *
+     * More specialised types of bubble extend from this one.
+     *
      * @param fullCalendar   The FullCalendar in which this bubble shows
      * @param event          A FullCalendar event object
      * @param taskTypeId     The ID of the task type within the calendar?
@@ -257,6 +259,6 @@
 
 
     // expose the plugin in the window the plugin
-    window.FullCalendarBubble = fullCalendarBubble;
+    window.FullCalendarViewEventBubble = fullCalendarBubble;
 
 })(jQuery, FullCalendarMoment);

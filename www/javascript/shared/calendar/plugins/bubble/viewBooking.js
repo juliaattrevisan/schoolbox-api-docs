@@ -4,19 +4,19 @@
     // Resource booking variant of the bubble.
     var resourceFullCalendarBubble = function(fullCalendar, event, taskTypeId) {
         // Inherit from the base calendar bubble
-        FullCalendarBubble.call(this, fullCalendar, event, taskTypeId);
+        FullCalendarViewEventBubble.call(this, fullCalendar, event, taskTypeId);
     };
 
 
     // Inherit methods
-    resourceFullCalendarBubble.prototype = Object.create(FullCalendarBubble.prototype);
+    resourceFullCalendarBubble.prototype = Object.create(FullCalendarViewEventBubble.prototype);
 
 
     /**
      * formatData override: render resource booking actions
      */
     resourceFullCalendarBubble.prototype.formatData = function () {
-        var data = FullCalendarBubble.prototype.formatData.call(this);
+        var data = FullCalendarViewEventBubble.prototype.formatData.call(this);
 
 
         // // Resource booking variant only:
@@ -73,7 +73,7 @@
      * @return {*}
      */
     resourceFullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
-        FullCalendarBubble.prototype.renderBubble.call(this, bubbleElement, data);
+        FullCalendarViewEventBubble.prototype.renderBubble.call(this, bubbleElement, data);
 
         // Render status
 
@@ -92,5 +92,5 @@
     };
 
     // expose the plugin in the window the plugin
-    window.ResourceFullCalendarBubble = resourceFullCalendarBubble;
-})(jQuery, FullCalendarBubble);
+    window.FullCalendarViewBookingBubble = resourceFullCalendarBubble;
+})(jQuery, FullCalendarViewEventBubble);
