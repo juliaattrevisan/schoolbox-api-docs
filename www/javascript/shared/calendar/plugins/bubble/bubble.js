@@ -231,7 +231,7 @@
      * @param data          The data to render into the element.
      * @return {*}
      */
-    fullCalendarBubble.renderBubble = function (bubbleElement, data) {
+    fullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
         return bubbleElement;
     };
 
