@@ -218,6 +218,40 @@ class IntegrationTester extends \Codeception\Actor
             ]);
     }
 
+    public function loginForgotPasswordUsername($username, $redirect=true)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/passwordReset';
+
+        $page='/passwordReset/createRequest';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data =[
+            'email' => $username
+        ];
+
+        if ($redirect) {
+            $allow_redirects = $this->redirect_settings;
+        } else {
+            $allow_redirects=false;
+        }
+
+        return $this->client->request('POST', $url, [
+            'headers'=>$this->guzzle_headers,
+            'form_params' => $data,
+            'cookies' => $this->client_cookie_jar,
+            'allow_redirects' => $allow_redirects
+        ]);
+    }
+
+    public function loginForgotPasswordEmail($email, $redirect=true)
+    {
+        return $this->loginForgotPasswordUsername($email);
+    }
+
     public function createHomepage($title)
     {
 
