@@ -48,6 +48,25 @@
     };
 
 
+    /**
+     * Build a bubble for a form for a new event.
+     *
+     * @param date   A date object
+     * @param allDay Is the event to be created as an all-day event?
+     * @return object A bubble object
+     */
+    fullCalendarBubbleFactory.prototype.buildForNewEvent = function(date, allDay) {
+        return new FullCalendarBubble(
+            this.fullCalendar,
+            {
+                allDay: allDay,
+                start:  date
+            },
+            this.taskTypeId
+        );
+    };
+
+
     // expose the plugin in the window the plugin
     window.FullCalendarBubbleFactory = fullCalendarBubbleFactory;
 

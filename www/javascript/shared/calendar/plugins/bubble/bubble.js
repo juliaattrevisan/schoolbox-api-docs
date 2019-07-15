@@ -47,7 +47,10 @@
     fullCalendarBubble.prototype.formatData = function() {
 
         // setup data to be displayed
-        var data = $.extend(true, {}, this.event.extendedProps.data);
+        var data = {};
+        if (this.event.extendedProps && this.event.extendedProps.data) {
+            data = $.extend(true, {}, this.event.extendedProps.data);
+        }
 
 
         // Normalize note and title

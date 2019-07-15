@@ -210,21 +210,27 @@
                  * @param dateClickInfo
                  */
                 dateClick: function (dateClickInfo) {
-                    var date = FullCalendarMoment.toMoment(dateClickInfo.date, this),
-                        allDay = dateClickInfo.allDay,
-                        eventData = {
-                            allDay: allDay ? 1 : 0
-                        };
-                    if (allDay) {
-                        eventData.date = date.format('DD-MM-YYYY');
-                        eventData.displayDate = date.format('ddd, Do MMMM')
-                    } else {
-                        eventData.date = date.format('DD-MM-YYYY HH:mm');
-                        eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
-                    }
+                    var bubbleFactory = new FullCalendarBubbleFactory(this, taskTypeId);
+                    bubbleFactory
+                        .buildForNewEvent(dateClickInfo.date, dateClickInfo.allDay)
+                        .display();
 
-                    $('#calendar-create').foundation('reveal', 'open');
 
+                    // var date = FullCalendarMoment.toMoment(dateClickInfo.date, this),
+                    //     allDay = dateClickInfo.allDay,
+                    //     eventData = {
+                    //         allDay: allDay ? 1 : 0
+                    //     };
+                    // if (allDay) {
+                    //     eventData.date = date.format('DD-MM-YYYY');
+                    //     eventData.displayDate = date.format('ddd, Do MMMM')
+                    // } else {
+                    //     eventData.date = date.format('DD-MM-YYYY HH:mm');
+                    //     eventData.displayDate = date.format('ddd, Do MMMM, h(:mm)a')
+                    // }
+                    //
+                    // $('#calendar-create').foundation('reveal', 'open');
+                    //
                     // c.bubble.display('create', eventData, dateClickInfo.jsEvent, this);
                     //
                     // // Apply whether the submit button is enabled or not
