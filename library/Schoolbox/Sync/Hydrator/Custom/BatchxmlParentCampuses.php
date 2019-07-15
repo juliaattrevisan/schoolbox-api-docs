@@ -137,7 +137,7 @@ class BatchxmlParentCampuses extends AbstractLoggableHydrator
              * into an illegal state which has no campuses at all
              */
             if (\count($newCampuses)) {
-                $oldCampuses = $previous->getCampusCollection()->getColumnValues('id');
+                $oldCampuses = $previous->getCampusCollection()->getPropertyValues('id');
                 $newCampuses = new GenericCollection(Campus::class, array_values($newCampuses));
 
                 $previous->setCampusCollection($newCampuses);
