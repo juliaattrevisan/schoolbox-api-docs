@@ -249,7 +249,9 @@
 
 
                     var bubbleFactory = new FullCalendarBubbleFactory(this, taskTypeId);
-                    bubbleFactory.build(calEvent).display();
+                    bubbleFactory
+                        .build(calEvent)
+                        .display();
                 },
 
                 /**

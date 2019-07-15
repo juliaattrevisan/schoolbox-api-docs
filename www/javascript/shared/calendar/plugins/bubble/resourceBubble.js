@@ -12,8 +12,57 @@
     resourceFullCalendarBubble.prototype = Object.create(FullCalendarBubble.prototype);
 
 
-    resourceFullCalendarBubble.prototype.display = function () {
-        FullCalendarBubble.prototype.display.call(this);
+    /**
+     * formatData override: render resource booking actions
+     */
+    resourceFullCalendarBubble.prototype.formatData = function () {
+        var data = FullCalendarBubble.prototype.formatData.call(this);
+
+
+        // // Resource booking variant only:
+        // // Prefix booking status for bookings
+        // if (data.booking) {
+        //     data.bookingStatus = data.booking.status.name;
+        // }
+
+
+        // Resource booking variant only: render all of this stuff
+        data.bookingActions = [];
+        data.relatedBookings = [];
+        if (data.booking) {
+            // Booking butonyes (if available)
+            if (data.booking.buttons) {
+                $.each(data.booking.buttons, function() {
+                    if (this.href) {
+                        data.bookingActions.push(
+                            $('<a class="button" />')
+                                .data('seriesId', data.meta.seriesId)
+                                .addClass(this.class)
+                                .attr('data-booking-button', 'booking-'+this.action)
+                                .attr('href', this.href)
+                                .text(this.label)
+                                .prepend('<span />')
+                        );
+
+                        // Sigh. Hack to insert whitespace to mimic standard button HTML.
+                        // (A pure CSS margin solution would require the parent element to have font-size=0)
+                        data.bookingActions.push(' ');
+                    }
+                })
+            }
+
+            // Booking reviewer (if available)
+            if (data.booking.reviewer) {
+                data.reviewer   = data.booking.reviewer.name;
+                data.reviewerId = data.booking.reviewer.id;
+            }
+
+            // Related bookings
+            data.relatedBookings = data.booking.related;
+        }
+
+
+        return data;
     };
 
     /**
@@ -25,6 +74,8 @@
      */
     resourceFullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
         FullCalendarBubble.prototype.renderBubble.call(this, bubbleElement, data);
+
+        // Render status
 
         // Do stuff with related bookings
         var $relatedBookings = bubbleElement.find('ul.relatedBookings').empty();

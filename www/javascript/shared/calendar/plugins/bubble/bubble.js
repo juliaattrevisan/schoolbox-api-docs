@@ -31,15 +31,23 @@
      * Actually render the bubble we've created.
      */
     fullCalendarBubble.prototype.display = function() {
+        // Finally build the DOM for the bubble
+        // (The actual DOM element needs to be configurable)
+        this.renderBubble($('#calendar-bubble'), this.formatData())
+            .foundation('reveal', 'open');
+    };
+
+
+    /**
+     * Massage data from the event into a format which can be rendered in
+     * renderBubble.
+     *
+     * @return object
+     */
+    fullCalendarBubble.prototype.formatData = function() {
+
         // setup data to be displayed
         var data = $.extend(true, {}, this.event.extendedProps.data);
-
-
-        // // Resource booking variant only:
-        // // Prefix booking status for bookings
-        // if (data.booking) {
-        //     data.bookingStatus = data.booking.status.name;
-        // }
 
 
         // Normalize note and title
@@ -69,7 +77,7 @@
         }
 
 
-        // Group events:
+        // All variants:
         // have a go to homepage link
         // (All of these fall under the banner of links on the bubble. Put them in a buildLinks function)
         data.homepageLink = '';
@@ -92,7 +100,7 @@
 
         // Standard variant only:
         // Attendance info
-        if ('attendance' in data) {
+        if (data.attendance) {
             $.each(data.attendance, function(k, v) {
                 // replace String.prototype.capitalise (WTF?)
                 data['attendance' + k.charAt(0).toUpperCase() + k.substring(1)] = v
@@ -110,43 +118,6 @@
             }
         }
 
-
-        // Resource booking variant only: render all of this stuff
-        data.bookingActions = [];
-        data.relatedBookings = [];
-        if (data.booking) {
-            // Booking butonyes (if available)
-            if (data.booking.buttons) {
-                $.each(data.booking.buttons, function() {
-                    if (this.href) {
-                        data.bookingActions.push(
-                            $('<a class="button" />')
-                                .data('seriesId', data.meta.seriesId)
-                                .addClass(this.class)
-                                .attr('data-booking-button', 'booking-'+this.action)
-                                .attr('href', this.href)
-                                .text(this.label)
-                                .prepend('<span />')
-                        );
-
-                        // Sigh. Hack to insert whitespace to mimic standard button HTML.
-                        // (A pure CSS margin solution would require the parent element to have font-size=0)
-                        data.bookingActions.push(' ');
-                    }
-                })
-            }
-
-            // Booking reviewer (if available)
-            if (data.booking.reviewer) {
-                data.reviewer   = data.booking.reviewer.name;
-                data.reviewerId = data.booking.reviewer.id;
-            }
-
-            // Related bookings
-            data.relatedBookings = data.booking.related;
-        }
-
-
         // // Start and end of event?
         // data.start = this.event.start;
         // data.end   = this.event.end;
@@ -158,12 +129,9 @@
         // Standard event only:
         // Hide task/non-task data
         data.isTask = Number(data.eventTypeId) === this.taskTypeId;
-
-
-        // Finally build the DOM for the bubble
-        // (The actual DOM element needs to be configurable)
-        this.renderBubble($('#calendar-bubble'), data);
+        return data;
     };
+
 
 
     /**
@@ -265,7 +233,7 @@
         //     return this.calendar.options.bubble.onOpen.call(this, method, data);
         // }
 
-        return bubbleElement.foundation('reveal', 'open');
+        return bubbleElement;
     };
 
 
