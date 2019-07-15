@@ -2,7 +2,7 @@
 suites:
     acceptance:
         actor: AcceptanceTester
-        path: .
+        path: acceptance
         modules:
             enabled:
                 - WebDriver:
@@ -27,6 +27,19 @@ suites:
                     0: '/usr/lib/chromium-browser/chromedriver --url-base=/wd/hub'
                     sleep: 5
 
+    integration:
+        actor: IntegrationTester
+        path: integration
+        modules:
+            enabled:
+                - \Helper\Integration
+                - Asserts
+                - Db:
+                      dsn: "mysql:host=localhost;dbname=schoolbox"
+                      user: "root"
+                      password: "tnp879"
+                      # dump goes here
+
 extensions:
     enabled:
         - Codeception\Extension\Logger
@@ -42,11 +55,11 @@ gherkin: []
 
 # additional paths
 paths:
-    tests: test/acceptance
-    output: test/acceptance/_output
-    data: test/acceptance/_data
-    support: test/acceptance/_support
-    envs: test/acceptance/_envs
+    tests: test/codeception
+    output: test/codeception/_output
+    data: test/codeception/_data
+    support: test/codeception/_support
+    envs: test/codeception/_envs
 
 settings:
     shuffle: false
