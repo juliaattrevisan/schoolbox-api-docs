@@ -180,7 +180,7 @@
      *
      * @param bubbleElement A jQuery object pointing to the bubble's DOM node.
      * @param data          The data to render into the element.
-     * @return {*}
+     * @return object bubbleElement
      */
     bubble.prototype.renderBubble = function (bubbleElement, data) {
 
@@ -255,6 +255,86 @@
         // }
 
         return bubbleElement;
+    };
+
+
+    /**
+     * Populate the bubble's text and form inputs with the data supplied.
+     *
+     * @param bubbleElement A jQuery object pointing to the bubble's DOM node.
+     * @param data          The data to render into the element.
+     * @return object bubbleElement
+     */
+    bubble.prototype.fillForm = function(bubbleElement, data) {
+        /**
+         * Fill element helper: if the element that is getting filled has a
+         * 'is-html' data element, then it gets filled with HTML - otherwise
+         * with text.
+         *
+         * @param element The DOM node that is getting updated
+         * @param key     The key that is getting updated
+         * @param value   The value that is added
+         * @param allVars All variables that are getting updated
+         */
+        var fillElement = function(element, key, value, allVars) {
+            if (element.length && value && value.length) {
+                // Fill in text or HTML
+                if (element.data('is-html')) {
+                    element.html(value);
+                } else {
+                    element.text(value);
+                }
+
+                // Maybe this element is a link to a user?
+                // If so, fill its URL in too
+                if (element.data('is-user-link')) {
+                    if (key + 'Id' in allVars) {
+                        element.attr('href', '/search/user/'+allVars[key+'Id']).prop('disabled', false);
+                    } else {
+                        element.attr('href', '#').prop('disabled', true);
+                    }
+                }
+            } else {
+                element.text('');
+            }
+        };
+
+        // iterate across the variables supplied, and insert them into the appropriate form elements
+        $.each(data, function(k, v) {
+            // first test if it's an input with the name we're after
+            var element = bubbleElement.find('[name=' + k + ']');
+
+            if(element.length) {
+                var type = element.attr('type');
+                // textboxes and textareas get filled with text...
+                if(type == 'text' || element.is('textarea')) {
+                    element.val(v);
+                }
+                // ...and if hidden, also populate its associated span...
+                else if(type == 'hidden') {
+                    element.attr('value', v);
+                    fillElement(form.find('.'+k), v);
+                }
+                // ...and checkboxes get checked or unchecked
+                else if(type == 'checkbox') {
+                    element.prop('checked', v == 1);
+                }
+            }
+            // if no form input element found, try for an element with the right class
+            else {
+                /* Check for data attribute first
+                 */
+                var dataSelector = $('[data-event-modal-field="'+k+'"]');
+                if (dataSelector.length) {
+                    fillElement(dataSelector, k, v, data)
+                }
+                /* Otherwise assume classes
+                 */
+                else {
+                    fillElement(form.find('.'+k), k, v, data)
+                }
+            }
+        })
     };
 
 
