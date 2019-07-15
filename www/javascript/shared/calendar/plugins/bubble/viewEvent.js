@@ -12,7 +12,7 @@
      * @param taskTypeId     The ID of the task type within the calendar?
      * @param $bubbleDomNode a jQuery object pointing to the bubble's DOM node
      */
-    var fullCalendarBubble = function(fullCalendar, event, taskTypeId, $bubbleDomNode) {
+    var bubble = function(fullCalendar, event, taskTypeId, $bubbleDomNode) {
         this.fullCalendar   = fullCalendar;
         this.event          = event;
         this.taskTypeId     = taskTypeId;
@@ -26,7 +26,7 @@
      * @param date
      * @return object date as a Moment object
      */
-    fullCalendarBubble.prototype.toMoment = function(date) {
+    bubble.prototype.toMoment = function(date) {
         return FullCalendarMoment.toMoment(date, this.fullCalendar);
     };
 
@@ -34,7 +34,7 @@
     /**
      * Actually render the bubble we've created.
      */
-    fullCalendarBubble.prototype.display = function() {
+    bubble.prototype.display = function() {
         this.renderBubble(this.$bubbleDomNode, this.formatData())
             .foundation('reveal', 'open');
     };
@@ -46,7 +46,7 @@
      *
      * @return object
      */
-    fullCalendarBubble.prototype.formatData = function() {
+    bubble.prototype.formatData = function() {
 
         // setup data to be displayed
         var data = {};
@@ -143,7 +143,7 @@
      * @param allDay    Is the event an all-day event or not?
      * @return {string}
      */
-    fullCalendarBubble.prototype.determineDateSpan = function (startDate, endDate, allDay) {
+    bubble.prototype.determineDateSpan = function (startDate, endDate, allDay) {
         var format      = allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma',
             momentStart = this.toMoment(startDate),
             start       = momentStart.format(format),
@@ -182,7 +182,7 @@
      * @param data          The data to render into the element.
      * @return {*}
      */
-    fullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
+    bubble.prototype.renderBubble = function (bubbleElement, data) {
 
         // The only reference to suppress I see is in the old calendar:
         // it has to do with some ancient work whose purpose I no longer know
@@ -258,7 +258,7 @@
     };
 
 
-    // expose the plugin in the window the plugin
-    window.FullCalendarViewEventBubble = fullCalendarBubble;
+    // expose the plugin to the window
+    window.FullCalendarViewEventBubble = bubble;
 
 })(jQuery, FullCalendarMoment);

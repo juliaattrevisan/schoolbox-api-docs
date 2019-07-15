@@ -1,21 +1,27 @@
-(function($, FullCalendarBubble) {
+(function($, FullCalendarViewEventBubble) {
     "use strict";
 
-    // Resource booking variant of the bubble.
-    var resourceFullCalendarBubble = function(fullCalendar, event, taskTypeId) {
-        // Inherit from the base calendar bubble
-        FullCalendarViewEventBubble.call(this, fullCalendar, event, taskTypeId);
+    /**
+     * Resource booking variant of the bubble.
+     *
+     * @param fullCalendar   The FullCalendar in which this bubble shows
+     * @param event          A FullCalendar event object
+     * @param taskTypeId     The ID of the task type within the calendar?
+     * @param $bubbleDomNode a jQuery object pointing to the bubble's DOM node
+     */
+    var bubble = function(fullCalendar, event, taskTypeId, $bubbleDomNode) {
+        FullCalendarViewEventBubble.call(this, fullCalendar, event, taskTypeId, $bubbleDomNode);
     };
 
 
     // Inherit methods
-    resourceFullCalendarBubble.prototype = Object.create(FullCalendarViewEventBubble.prototype);
+    bubble.prototype = Object.create(FullCalendarViewEventBubble.prototype);
 
 
     /**
      * formatData override: render resource booking actions
      */
-    resourceFullCalendarBubble.prototype.formatData = function () {
+    bubble.prototype.formatData = function () {
         var data = FullCalendarViewEventBubble.prototype.formatData.call(this);
 
 
@@ -72,7 +78,7 @@
      * @param data          The data to render into the element.
      * @return {*}
      */
-    resourceFullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
+    bubble.prototype.renderBubble = function (bubbleElement, data) {
         FullCalendarViewEventBubble.prototype.renderBubble.call(this, bubbleElement, data);
 
         // Render status
@@ -91,6 +97,7 @@
         return bubbleElement;
     };
 
-    // expose the plugin in the window the plugin
-    window.FullCalendarViewBookingBubble = resourceFullCalendarBubble;
+
+    // expose the plugin to the window
+    window.FullCalendarViewBookingBubble = bubble;
 })(jQuery, FullCalendarViewEventBubble);

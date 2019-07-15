@@ -78,7 +78,7 @@
      */
     fullCalendarBubbleFactory.prototype.buildForNewEvent = function(date, allDay) {
         // The create event bubble needs special handling
-        return new FullCalendarViewEventBubble(
+        return new FullCalendarCreateEventBubble(
             this.fullCalendar,
             {
                 allDay: allDay,
