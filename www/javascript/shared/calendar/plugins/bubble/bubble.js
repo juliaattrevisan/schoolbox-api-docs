@@ -5,14 +5,16 @@
     /**
      * Calendar bubble plugin: simply show a calendar event bubble.
      *
-     * @param fullCalendar The FullCalendar in which this bubble shows
-     * @param event        A FullCalendar event object
-     * @param taskTypeId   The ID of the task type within the calendar?
+     * @param fullCalendar   The FullCalendar in which this bubble shows
+     * @param event          A FullCalendar event object
+     * @param taskTypeId     The ID of the task type within the calendar?
+     * @param $bubbleDomNode a jQuery object pointing to the bubble's DOM node
      */
-    var fullCalendarBubble = function(fullCalendar, event, taskTypeId) {
-        this.fullCalendar = fullCalendar;
-        this.event        = event;
-        this.taskTypeId   = taskTypeId;
+    var fullCalendarBubble = function(fullCalendar, event, taskTypeId, $bubbleDomNode) {
+        this.fullCalendar   = fullCalendar;
+        this.event          = event;
+        this.taskTypeId     = taskTypeId;
+        this.$bubbleDomNode = $bubbleDomNode;
     };
 
 
@@ -31,9 +33,7 @@
      * Actually render the bubble we've created.
      */
     fullCalendarBubble.prototype.display = function() {
-        // Finally build the DOM for the bubble
-        // (The actual DOM element needs to be configurable)
-        this.renderBubble($('#calendar-bubble'), this.formatData())
+        this.renderBubble(this.$bubbleDomNode, this.formatData())
             .foundation('reveal', 'open');
     };
 

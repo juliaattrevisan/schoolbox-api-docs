@@ -71,12 +71,13 @@
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
         // PHPLib calendar vars
-        var userId       = Number('{CALENDAR_USER_ID}'),
-            taskTypeId   = Number('{TASK_TYPE_ID}'),
-            defaultDate  = '{SELECTED_DATE}',
-            eventLimit   = Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
-            firstDay     = Number('{CALENDAR_START_DAY}'),
-            calendarView = '{CALENDAR_VIEW}';
+        var userId        = Number('{CALENDAR_USER_ID}'),
+            taskTypeId    = Number('{TASK_TYPE_ID}'),
+            defaultDate   = '{SELECTED_DATE}',
+            eventLimit    = Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+            firstDay      = Number('{CALENDAR_START_DAY}'),
+            calendarView  = '{CALENDAR_VIEW}',
+            bubbleFactory;
 
         var fc = new FullCalendar.Calendar(
             document.getElementById('calendar'),
@@ -210,7 +211,6 @@
                  * @param dateClickInfo
                  */
                 dateClick: function (dateClickInfo) {
-                    var bubbleFactory = new FullCalendarBubbleFactory(this, taskTypeId);
                     bubbleFactory
                         .buildForNewEvent(dateClickInfo.date, dateClickInfo.allDay)
                         .display();
@@ -253,8 +253,6 @@
                         return;
                     }
 
-
-                    var bubbleFactory = new FullCalendarBubbleFactory(this, taskTypeId);
                     bubbleFactory
                         .build(calEvent)
                         .display();
@@ -338,6 +336,13 @@
                     });
                 }
             }
+        );
+        bubbleFactory = new FullCalendarBubbleFactory(
+            fc,
+            taskTypeId,
+            $('#calendar-create'),
+            $('#calendar-bubble'),
+            $('#calendar-create')
         );
         fc.render();
 

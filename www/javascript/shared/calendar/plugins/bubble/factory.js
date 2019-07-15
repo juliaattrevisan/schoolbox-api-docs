@@ -14,17 +14,32 @@
      *
      * Figure out which kind of bubble to show, and how to show it.
      *
-     * @param fullCalendar The FullCalendar in which this bubble shows
-     * @param taskTypeId   The ID of the task type within the calendar?
+     * @param fullCalendar       The FullCalendar in which this bubble shows
+     * @param taskTypeId         The ID of the task type within the calendar?
+     * @param $createEventBubble a jQuery object pointing to the create event
+     *                           bubble's DOM node
+     * @param $viewEventBubble   a jQuery object pointing to the view event
+     *                           bubble's DOM node
+     * @param $editTaskBubble    a jQuery object pointing to the edit task
+     *                           bubble's DOM node
      */
-    var fullCalendarBubbleFactory = function(fullCalendar, taskTypeId) {
-        this.fullCalendar = fullCalendar;
-        this.taskTypeId   = taskTypeId;
+    var fullCalendarBubbleFactory = function(
+        fullCalendar,
+        taskTypeId,
+        $createEventBubble,
+        $viewEventBubble,
+        $editTaskBubble
+    ) {
+        this.fullCalendar       = fullCalendar;
+        this.taskTypeId         = taskTypeId;
+        this.$createEventBubble = $createEventBubble;
+        this.$viewEventBubble   = $viewEventBubble;
+        this.$editTaskBubble   = $editTaskBubble;
     };
 
 
     /**
-     * Build a bubble.
+     * Build a bubble for viewing an existing event.
      *
      * @param event A FullCalendar event object
      * @return object A bubble object
@@ -39,12 +54,18 @@
 
         // Does this have a booking?
         if (data.booking) {
-            return new ResourceFullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
+            return new ResourceFullCalendarBubble(this.fullCalendar, event, this.taskTypeId, this.$viewEventBubble);
+        }
+
+
+        // Is this a task?
+        if (Number(data.eventTypeId) === this.taskTypeId) {
+            // Show the edit task bubble
         }
 
 
         // Otherwise...
-        return new FullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
+        return new FullCalendarBubble(this.fullCalendar, event, this.taskTypeId, this.$viewEventBubble);
     };
 
 
@@ -56,13 +77,15 @@
      * @return object A bubble object
      */
     fullCalendarBubbleFactory.prototype.buildForNewEvent = function(date, allDay) {
+        // The create event bubble needs special handling
         return new FullCalendarBubble(
             this.fullCalendar,
             {
                 allDay: allDay,
                 start:  date
             },
-            this.taskTypeId
+            this.taskTypeId,
+            this.$createEventBubble
         );
     };
 
