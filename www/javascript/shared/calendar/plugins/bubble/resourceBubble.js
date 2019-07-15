@@ -12,6 +12,10 @@
     resourceFullCalendarBubble.prototype = Object.create(FullCalendarBubble.prototype);
 
 
+    resourceFullCalendarBubble.prototype.display = function () {
+        FullCalendarBubble.prototype.display.call(this);
+    };
+
     /**
      * Render the resource booking's calendar bubble.
      *

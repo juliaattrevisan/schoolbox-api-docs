@@ -35,22 +35,15 @@
         var data = $.extend(true, {}, this.event.extendedProps.data);
 
 
-        // Resource booking variant only:
-        // Prefix booking status for bookings
-        if (data.booking) {
-            data.bookingStatus = data.booking.status.name;
-            $('[data-event-modal-field="bookingStatus"]').show();
-
-            data.note = this.event.title
-        }
-        else {
-            data.note = this.event.title;
-            $('[data-event-modal-field="bookingStatus"]').hide();
-        }
+        // // Resource booking variant only:
+        // // Prefix booking status for bookings
+        // if (data.booking) {
+        //     data.bookingStatus = data.booking.status.name;
+        // }
 
 
         // Normalize note and title
-        data.title = data.note;
+        data.title = data.note = this.event.title;
         data.date  = this.determineDateSpan(this.event.start, this.event.end, this.event.allDay);
 
 
@@ -90,14 +83,11 @@
         // Assessment variant only:
         // Submission History Link
         data.moreDetailsLink = '';
-        try {
-            if(data.custom.moreDetailsLink.length > 0) {
-                data.moreDetailsLink =
-                    $('<a class="button icon-due-work">View More Details</a>')
-                        .attr('href', data.custom.moreDetailsLink);
-            }
+        if (data.custom && data.custom.moreDetailsLink && data.custom.moreDetailsLink.length > 0) {
+            data.moreDetailsLink =
+                $('<a class="button icon-due-work">View More Details</a>')
+                    .attr('href', data.custom.moreDetailsLink);
         }
-        catch (e) {}
 
 
         // Standard variant only:
@@ -156,31 +146,23 @@
             data.relatedBookings = data.booking.related;
         }
 
-        data.start = this.event.start;
-        data.end   = this.event.end;
-        if ('placeholder' in data) {
-            data.placeholder = true;
-        }
 
-        // var doDisplay = self.bubble.display('edit', data, jsEvent, this);
-        //
-        // if (doDisplay === false) {
-        //     // if explicit false is given, proceed no further
-        //     return;
+        // // Start and end of event?
+        // data.start = this.event.start;
+        // data.end   = this.event.end;
+        // if ('placeholder' in data) {
+        //     data.placeholder = true;
         // }
 
 
         // Standard event only:
-        // Hide event types in the bubble
+        // Hide task/non-task data
         data.isTask = Number(data.eventTypeId) === this.taskTypeId;
-        // bubble.find('#editTask').toggleClass('hide', !isTask);
-        // bubble.find('#editEvent').toggleClass('hide', isTask);
 
 
         // Finally build the DOM for the bubble
         // (The actual DOM element needs to be configurable)
-        var bubbleElement = $('#calendar-bubble');
-        this.renderBubble(bubbleElement, data).foundation('reveal', 'open');
+        this.renderBubble($('#calendar-bubble'), data);
     };
 
 
@@ -242,6 +224,14 @@
         //     return;
         // }
 
+        // Modal fields: may be revealed later?
+        bubbleElement.find('[data-event-modal-field]').hide();
+
+
+        // Show the date at least
+        bubbleElement.find('[data-event-modal-field="displayDate"]').show().text(data.date);
+
+
         /* Hide "Posted By" if there is no author
          * (This happens on subscribed vcals for example)
          */
@@ -259,6 +249,10 @@
             data.location && data.location.length > 0
         );
 
+        // Task display
+        bubbleElement.find('#editTask').toggleClass('hide', !data.isTask);
+        bubbleElement.find('#editEvent').toggleClass('hide', data.isTask);
+
         // // Fill in form inputs?
         // this.fillForm(method+'Event', data);
         // this.fillForm(method+'Task', data);
@@ -271,7 +265,7 @@
         //     return this.calendar.options.bubble.onOpen.call(this, method, data);
         // }
 
-        return bubbleElement;
+        return bubbleElement.foundation('reveal', 'open');
     };
 
 
