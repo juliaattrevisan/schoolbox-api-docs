@@ -4,14 +4,14 @@
  * ISAMS Importer
  *
  * Imports from an xml file and populates the following tables:
- *  user_profile
- *  user_relation
- *  class
- *  class_period
- *  class_user
- *  timetable_campus
- *  timetable_cycle
- *  timetable_period
+ *   user_profile
+ *   user_relation
+ *   class
+ *   class_period
+ *   class_user
+ *   timetable_campus
+ *   timetable_cycle
+ *   timetable_period
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -20,9 +20,11 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\CampusMapper;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\Importer\Composite;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\TimetableCampusMapper;
@@ -69,12 +71,13 @@ HELP;
         /* Spawn api
          * TODO: Swap with actual live connection when ready
          */
-        $api = new MockApi($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
+        $api = new Api($this->getConfig()->get('external_ups_provider_batchxml_host'), $this->getConfig()->get('external_ups_provider_batchxml_key'));
 
         $composite = new Composite(
             $this->getLogger(),
             $this->perform(),
             new Batchxml($api),
+            CampusMapper::getInstance(),
             UserMapper::getInstance(),
             UserProfileMapper::getInstance(),
             UserRelationMapper::getInstance(),
@@ -89,11 +92,11 @@ HELP;
         try {
             $composite->import();
         } catch (\RuntimeException $e) {
-            $this->getLogger()->critical('Cannot access api endpoint.');
+            $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
         } catch (InvalidUriPartException $e) {
-            $this->getLogger()->critical('Cannot access api endpoint: bad url');
+            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
         } catch (InvalidArgumentException $e) {
-            $this->getLogger()->critical('Cannot access api endpoint: bad url');
+            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
         }
     }
 };

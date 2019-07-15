@@ -13,6 +13,7 @@ namespace Schoolbox\External\UPS;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\Isams\Base\Api;
+use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\IConfigLoader;
 use UnexpectedValueException;
 

@@ -2,15 +2,19 @@
 /**
  * Composite
  *
+ * Strategy executor
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Importer;
 
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
@@ -34,6 +38,13 @@ class Composite implements ImporterInterface
      */
     private $registry;
 
+    /**
+     * The "perform" flag from the cli tool
+     *
+     * @var bool
+     */
+    private $perform;
+
 
     /**
      * @var Batchxml
@@ -42,11 +53,9 @@ class Composite implements ImporterInterface
 
 
     /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
+     * @var CampusMapper
      */
-    private $perform;
+    private $campusMapper;
 
 
     /**
@@ -115,6 +124,7 @@ class Composite implements ImporterInterface
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Batchxml               $batchxml
+     * @param CampusMapper           $campusMapper
      * @param UserMapper             $userMapper
      * @param UserProfileMapper      $userProfileMapper
      * @param UserRelationMapper     $userRelationMapper
@@ -129,6 +139,7 @@ class Composite implements ImporterInterface
         LoggerInterface $log,
         bool $perform,
         Batchxml $batchxml,
+        CampusMapper $campusMapper,
         UserMapper $userMapper,
         UserProfileMapper $userProfileMapper,
         UserRelationMapper $userRelationMapper,
@@ -143,6 +154,7 @@ class Composite implements ImporterInterface
         $this->perform = $perform;
         $this->registry = new Collection();
         $this->batchxml = $batchxml;
+        $this->campusMapper = $campusMapper;
         $this->userMapper = $userMapper;
         $this->userProfileMapper = $userProfileMapper;
         $this->userRelationMapper = $userRelationMapper;
@@ -165,13 +177,12 @@ class Composite implements ImporterInterface
      */
     public function import(): void
     {
-        /* TODO: Reactivate all strategies when ready
-         */
         $this->registry
-//            ->add(new Importer\Profile($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userProfileMapper))
-//            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper))
-            ->add(new Importer\Timetable($this->log, $this->perform, $this->batchxml, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
-            ->add(new Importer\TimetableClass($this->log, $this->perform, $this->batchxml, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
+            ->add(new Importer\Profile($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userProfileMapper))
+            ->add(new Importer\Relations($this->log, $this->perform, $this->batchxml, $this->userMapper, $this->userRelationMapper))
+            ->add(new Importer\Timetable\Identifier($this->log, $this->perform, $this->batchxml))
+            ->add(new Importer\Timetable\Definition($this->log, $this->perform, $this->batchxml, $this->campusMapper, $this->timetableCampusMapper, $this->timetableCycleMapper, $this->timetablePeriodMapper))
+            ->add(new Importer\Timetable\Classes($this->log, $this->perform, $this->batchxml, $this->timetablePeriodMapper, $this->classEntryMapper, $this->classInvolvementMapper, $this->classPeriodMapper, $this->userMapper));
 
         foreach ($this->registry as $strategy) {
             $strategy->import();
