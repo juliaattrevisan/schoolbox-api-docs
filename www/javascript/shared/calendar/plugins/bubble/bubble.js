@@ -232,6 +232,49 @@
      * @return {*}
      */
     fullCalendarBubble.prototype.renderBubble = function (bubbleElement, data) {
+
+        // // check that this isn't being suppressed?
+        // if (this.calendar.suppress === true) {
+        //     this.calendar.suppress = false;
+        //     return;
+        // }
+
+        /* Hide "Posted By" if there is no author
+         * (This happens on subscribed vcals for example)
+         */
+        if (!data.authorId || Number(data.authorId) === -1) {
+            bubbleElement.find('[data-event-modal-field="post-by"]').hide();
+        }
+        else {
+            bubbleElement.find('[data-event-modal-field="post-by"]').show();
+        }
+
+        // Hide reviewed by as well
+        if (!data.reviewerId || Number(data.reviewerId) === -1) {
+            bubbleElement.find('[data-event-modal-field="reviewedBy"]').hide();
+        }
+        else {
+            bubbleElement.find('[data-event-modal-field="reviewedBy"]').show();
+        }
+
+        // Show/hide location?
+        if (!data.location || !data.location.length) {
+            bubbleElement.find('[data-event-modal-field="location"]').hide();
+        }
+        else {
+            bubbleElement.find('[data-event-modal-field="location"]').show();
+        }
+
+        // // Fill in form inputs?
+        // this.fillForm(method+'Event', data);
+        // this.fillForm(method+'Task', data);
+        //
+        // // There's some "onOpen" callback?
+        // // Is this required? Would I ever NOT open a bubble on click?
+        // if (this.calendar.options.bubble.onOpen) {
+        //     return this.calendar.options.bubble.onOpen.call(this, method, data);
+        // }
+
         return bubbleElement;
     };
 

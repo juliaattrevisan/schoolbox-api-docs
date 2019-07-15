@@ -49,8 +49,8 @@
         // Does it support attendance?
 
 
-        // Return some kind of...
-        return new FullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
+        // Return some kind of bubble
+        return new ResourceFullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
     };
 
 
