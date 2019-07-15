@@ -147,7 +147,7 @@ class BatchxmlParentCampuses extends AbstractLoggableHydrator
                 $context = [
                     'diff' => [
                         'old' => $oldCampuses,
-                        'new' => $newCampuses
+                        'new' => $newCampuses->getPropertyValues('id'),
                     ]
                 ];
             } else {
