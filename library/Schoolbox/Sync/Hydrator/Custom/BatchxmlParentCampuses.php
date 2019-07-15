@@ -17,6 +17,7 @@ use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\Loader;
+use Schoolbox\External\Connector\Isams\Base\Api;
 use Schoolbox\External\Connector\Isams\Base\MockApi;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
@@ -48,7 +49,7 @@ class BatchxmlParentCampuses extends AbstractLoggableHydrator
     {
         $config = new Loader();
 
-        $api = new MockApi($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
+        $api = new Api($config->get('external_ups_provider_batchxml_host'), $config->get('external_ups_provider_batchxml_key'));
 
         $this->batchxml = new Batchxml($api);
 
