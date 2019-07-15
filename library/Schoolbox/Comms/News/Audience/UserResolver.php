@@ -279,12 +279,13 @@ class UserResolver implements IUserResolver
                                 ->fetchAll(PDO::FETCH_COLUMN);
             case Segment\Strategy\Folder::getEntityType():
                 // Get group users, regardless of whether they have read/write/mod perms. (but not deny)
-                $innerPbGroup = (new Database\Predicate\Builder($this->db, 'user'))
+                $groupPb = (new Database\Predicate\Builder($this->db, 'user'))
                     ->equals('ua.service', UserAccess::SERVICE_HOMEPAGE)
                     ->equals('ua.sid', $entityValue)
                     ->notEquals('ua.type', UserAccess::ACCESS_DENY);
-                $outerPb      = (new Database\Predicate\Builder($this->db, 'user'))
-                    ->all($innerPbGroup);
+                $params      = $groupPb->getParams();
+                $whereClause = implode(' AND ', $groupPb->getWhere());
+                $sql         = "SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE {$whereClause} AND u.deleted_at IS NULL";
 
                 // Associated with the class, regardless of role type.
                 // For students/teachers you'd need to use a composite segment that intersects the desired roleType.
@@ -300,12 +301,13 @@ class UserResolver implements IUserResolver
                         $externalIds[] = $teacherExternalId;
                     }
                     if (\count($externalIds)) {
-                        $outerPb->in('u.synergy_id', $externalIds);
+                        $classPb = (new Database\Predicate\Builder($this->db, 'user'))
+                            ->in('u.synergy_id', $externalIds);
+                        $sql .= " UNION SELECT u.id FROM user u WHERE {$classPb->getWhere()[0]}  AND u.deleted_at IS NULL";
+                        $params = \array_merge($params, $classPb->getParams());
                     }
                 }
-                $whereClause = \implode(' OR ', $outerPb->getWhere());
-                $sql         = "SELECT u.id FROM user u JOIN userAccess ua on u.id = ua.uid WHERE {$whereClause}  AND u.deleted_at IS NULL";
-                return $this->db->executeQuery($sql, $outerPb->getParams())->fetchAll(PDO::FETCH_COLUMN);
+                return $this->db->executeQuery($sql, $params)->fetchAll(PDO::FETCH_COLUMN);
             default:
                 throw new UnexpectedValueException("Entity type not recognised: {$entityType}");
         }
