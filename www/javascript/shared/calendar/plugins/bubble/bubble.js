@@ -101,20 +101,16 @@
         // Standard variant only:
         // Attendance info
         if (data.attendance) {
-            $.each(data.attendance, function(k, v) {
-                // replace String.prototype.capitalise (WTF?)
-                data['attendance' + k.charAt(0).toUpperCase() + k.substring(1)] = v
-            });
-
-            // Attendance List butonye
-            if (data.attendanceListButton) {
-                data.attendanceIcon = '';
-                data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
+            // Attendance List button
+            if (data.attendance.listButton) {
+                data.attendance.icon = '';
+                data.attendance.listButton = '<a class="button icon-group" href="/calendar/attendance/list/'
                     + data.meta.eventId + '">Attendees</a>'
             }
-            // Attend/Unattend butonye
-            if (data.attendanceRequestButton) {
-                data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
+            // Attend/Unattend button
+            if (data.attendance.requestButton) {
+                data.attendance.requestButton = '<a class="button icon-reply" href="#" data-attendance-request>'
+                    + data.attendance.requestButton.toString() + '</a>'
             }
         }
 
