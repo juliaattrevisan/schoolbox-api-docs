@@ -36,21 +36,15 @@
         // * Assessments
         var data = event.extendedProps.data || {};
 
-        // Figure out subclassing in JS
 
         // Does this have a booking?
-
-        // Can I modify it?
-
-        // Does it have a homepage link?
-
-        // Is it an assessment (i.e. does it have a more details link)?
-
-        // Does it support attendance?
+        if (data.booking) {
+            return new ResourceFullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
+        }
 
 
-        // Return some kind of bubble
-        return new ResourceFullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
+        // Otherwise...
+        return new FullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
     };
 
 
