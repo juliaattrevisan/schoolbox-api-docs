@@ -15,9 +15,11 @@
      * Figure out which kind of bubble to show, and how to show it.
      *
      * @param fullCalendar The FullCalendar in which this bubble shows
+     * @param taskTypeId   The ID of the task type within the calendar?
      */
-    var fullCalendarBubbleFactory = function(fullCalendar) {
+    var fullCalendarBubbleFactory = function(fullCalendar, taskTypeId) {
         this.fullCalendar = fullCalendar;
+        this.taskTypeId   = taskTypeId;
     };
 
 
@@ -46,7 +48,9 @@
 
         // Does it support attendance?
 
-        return new FullCalendarBubble(this.fullCalendar, event, 11);
+
+        // Return some kind of...
+        return new FullCalendarBubble(this.fullCalendar, event, this.taskTypeId);
     };
 
 
