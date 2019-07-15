@@ -193,33 +193,53 @@
         // }
 
         // Modal fields: may be revealed later?
-        bubbleElement.find('[data-event-modal-field]').hide();
+        bubbleElement.find('[data-event-modal-field]')
+            .hide()
+            .addClass('hide');
 
 
-        // Show the date at least
-        bubbleElement.find('[data-event-modal-field="displayDate"]').show().text(data.date);
+        // Show the date and title at least
+        bubbleElement.find('[data-event-modal-field="displayDate"]')
+            .show()
+            .removeClass('hide')
+            .text(data.date);
+        bubbleElement.find('[data-event-modal-field="title"]')
+            .show()
+            .removeClass('hide')
+            .text(data.title);
 
 
-        /* Hide "Posted By" if there is no author
-         * (This happens on subscribed vcals for example)
-         */
-        bubbleElement.find('[data-event-modal-field="post-by"]').toggle(
-            data.authorId && Number(data.authorId) !== -1
-        );
+        // Hide "Posted By" if there is no author
+        // (This happens on subscribed vcals for example)
+        var showAuthor = data.authorId && Number(data.authorId) !== -1;
+        bubbleElement.find('[data-event-modal-field="post-by"]')
+            .toggle(showAuthor)
+            .toggleClass('hide', !showAuthor);
+
 
         // Hide reviewed by as well
-        bubbleElement.find('[data-event-modal-field="reviewedBy"]').toggle(
-            data.reviewerId && Number(data.reviewerId) !== -1
-        );
+        var showReviewer = data.authorId && Number(data.authorId) !== -1;
+        bubbleElement.find('[data-event-modal-field="reviewedBy"]')
+            .toggle(showReviewer)
+            .toggleClass('hide', !showReviewer);
+
 
         // Show/hide location?
-        bubbleElement.find('[data-event-modal-field="location"]').toggle(
-            data.location && data.location.length > 0
-        );
+        var showLocation = data.location && data.location.length > 0;
+        bubbleElement.find('[data-event-modal-field="location"]')
+            .toggle(showLocation)
+            .toggleClass('hide', !showLocation);
 
-        // Task display
-        bubbleElement.find('#editTask').toggleClass('hide', !data.isTask);
-        bubbleElement.find('#editEvent').toggleClass('hide', data.isTask);
+
+        // Task display (or not)
+        var showTask = data.isTask;
+        bubbleElement.find('#editTask')
+            .toggle(showTask)
+            .toggleClass('hide', !showTask);
+        bubbleElement.find('#editEvent')
+            .toggle(!showTask)
+            .toggleClass('hide', showTask);
+
 
         // // Fill in form inputs?
         // this.fillForm(method+'Event', data);
