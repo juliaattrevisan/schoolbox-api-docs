@@ -92,11 +92,11 @@ HELP;
         try {
             $composite->import();
         } catch (\RuntimeException $e) {
-            $this->getLogger()->critical('Cannot access api endpoint.');
+            $this->getLogger()->critical("Cannot access api endpoint: {$e->getMessage()}");
         } catch (InvalidUriPartException $e) {
-            $this->getLogger()->critical('Cannot access api endpoint: bad url');
+            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
         } catch (InvalidArgumentException $e) {
-            $this->getLogger()->critical('Cannot access api endpoint: bad url');
+            $this->getLogger()->critical("Cannot access api endpoint, bad url: {$e->getMessage()}");
         }
     }
 };
