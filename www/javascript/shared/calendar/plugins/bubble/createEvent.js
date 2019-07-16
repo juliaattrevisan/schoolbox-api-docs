@@ -40,7 +40,8 @@
      * @return {*}
      */
     bubble.prototype.renderBubble = function (bubbleElement, data) {
-        var element = FullCalendarViewEventBubble.prototype.renderBubble.call(this, bubbleElement, data);
+        var element = FullCalendarViewEventBubble.prototype.renderBubble.call(this, bubbleElement, data),
+            self    = this;
 
 
         // Add event listeners
@@ -58,8 +59,25 @@
         bubbleElement.on('change, keyup', ':input', function () {
             toggleFormState($(this).closest('form'));
         });
-        bubbleElement.on('submit', 'form', function () {
+        bubbleElement.on('submit', 'form', function (event) {
+            event.preventDefault();
             submitButton.prop('disabled', true);
+
+            // The old implementation created a placeholder here.
+            // I won't bother for now, you don't even see it
+
+            // And submit
+            $.ajax({
+                url:    this.action,
+                data:   $(this).serializeArray(),
+                method: this.method,
+                dataType: 'json',
+            }).done(function (data) {
+                // Add this event to the calendar
+                self.fullCalendar.addEvent(data);
+            }).always(function () {
+                bubbleElement.foundation('reveal', 'close');
+            });
         });
 
 

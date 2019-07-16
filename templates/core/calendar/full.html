@@ -836,7 +836,7 @@
     </dl>
     <div class="tabs-content">
         <div class="content active" id="createEventPanel" aria-hidden="false">
-            <form id="createEvent" method="post" action="#" class="top">
+            <form id="createEvent" method="post" action="/calendar/ajax/create" class="top">
                 <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
                 <input name="allDay" type="hidden" value="" />
                 <input name="date" type="hidden" value="" />
@@ -865,7 +865,7 @@
             </form>
         </div>
         <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
-            <form id="createTask" method="post" action="#">
+            <form id="createTask" method="post" action="/calendar/ajax/create">
                 <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
                 <input name="date" type="hidden" value="" />
                 <input name="allDay" type="hidden" value="" />
@@ -897,7 +897,7 @@
 
 <div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
     <!-- Edit Event Form -->
-    <form id="editEvent">
+    <form id="editEvent" method="post" action="/calendar/ajax/update">
         <input type="hidden" name="eventId" />
         <input type="hidden" name="seriesId" />
 
@@ -935,7 +935,7 @@
         </div>
     </form>
 
-    <form id="editTask">
+    <form id="editTask" method="post" action="/calendar/ajax/update">
         <input type="hidden" name="eventId" />
         <h3>Task</h3>
 
