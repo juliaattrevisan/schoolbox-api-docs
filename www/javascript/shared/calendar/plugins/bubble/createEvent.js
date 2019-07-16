@@ -19,6 +19,20 @@
 
 
     /**
+     * Extends the base event bubble's formatData to include allDay and date
+     * fields.
+     */
+    bubble.prototype.formatData = function() {
+        var data    = FullCalendarViewEventBubble.prototype.formatData.call(this);
+        data.allDay = this.event.allDay;
+        data.date   = this.toMoment(this.event.start).format(
+            data.allDay ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm'
+        );
+        return data;
+    };
+
+
+    /**
      * Render the create event bubble.
      *
      * @param bubbleElement A jQuery object pointing to the bubble's DOM node.
