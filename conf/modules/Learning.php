@@ -9,18 +9,19 @@ namespace Config\Modules;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Schoolbox\Learning\Module as LearningModule;
-use Schoolbox\Learning\Grades;
-use Schoolbox\Learning\Markbook\Module as MarkbookModule;
+use Schoolbox\Assessment\Course;
+use Schoolbox\Learning\Assessment\Calendar\Module as AssessmentCalendarModule;
+use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
+use Schoolbox\Learning\Grades;
+use Schoolbox\Learning\Markbook\Module as MarkbookModule;
+use Schoolbox\Learning\MarkScheme;
+use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Upcoming;
-use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
-use Schoolbox\Learning\MarkScheme;
-use Schoolbox\Assessment\Course;
 
 class Learning extends ModuleLoader
 {
@@ -48,5 +49,6 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, Upcoming\Module::class,              "/{$namespace}/due");
         $this->loadModule($kernel, AssessmentExporterModule::class,     "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class,            "/{$namespace}/markscheme");
+        $this->loadModule($kernel, AssessmentCalendarModule::class,     "/{$namespace}/assessment/calendar");
     }
 }
