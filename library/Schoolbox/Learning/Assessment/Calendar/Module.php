@@ -15,8 +15,6 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -79,15 +77,5 @@ class Module extends BaseModule
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'rosettaStone' => $injector->lazyGet('l10n'),
         ];
-    }
-
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }
