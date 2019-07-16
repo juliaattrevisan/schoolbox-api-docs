@@ -294,13 +294,8 @@
                 } else {
                     switch ($element.attr('type')) {
                         case 'text':
-                            $element.val(value);
-                            break;
-
                         case 'hidden':
                             $element.val(value);
-                            // $element.attr('value', value);
-                            self.fillElement(bubbleElement.find('.'+searchKey), value);
                             break;
 
                         case 'checkbox':
@@ -311,36 +306,22 @@
                             break;
                     }
                 }
-                // var type = $element.attr('type');
-                // // textboxes and textareas get filled with text...
-                // switch (type) {
-                //     case
-                // }
-                // if(type == 'text' || $element.is('textarea')) {
-                //     $element.val(value);
-                // }
-                // // ...and if hidden, also populate its associated span...
-                // else if(type == 'hidden') {
-                //     $element.attr('value', value);
-                //     fillElement(form.find('.'+key), value);
-                // }
-                // // ...and checkboxes get checked or unchecked
-                // else if(type == 'checkbox') {
-                //     $element.prop('checked', value == 1);
-                // }
+            }
+
+            // Find something by name
+            // Check for data attribute first: update that if it's found
+            var dataSelector = bubbleElement.find('[data-event-modal-field="'+searchKey+'"]');
+            if (dataSelector.length) {
+                // Also show it
+                dataSelector.show().removeClass('hide');
+                self.fillElement(dataSelector, key, value, data)
             } else {
-                // Check for data attribute first: update that if it's found
-                var dataSelector = bubbleElement.find('[data-event-modal-field="'+searchKey+'"]');
-                if (dataSelector.length) {
-                    // Also show it
-                    dataSelector.show().removeClass('hide');
-                    self.fillElement(dataSelector, key, value, data)
-                } else {
-                    // if no form input element found, try for an element with the right class
-                    self.fillElement(bubbleElement.find('.'+searchKey), key, value, data)
-                }
+                // if no form input element found, try for an element with the right class
+                self.fillElement(bubbleElement.find('.'+searchKey), key, value, data)
             }
         });
+
+        return bubbleElement;
     };
 
 
