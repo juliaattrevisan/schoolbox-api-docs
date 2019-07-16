@@ -21,6 +21,13 @@
 
 
     /**
+     * Constant namespace for events raised as part of a calendar bubble.
+     * @type {string}
+     */
+    bubble.EVENT_NAMESPACE = 'fullCalendarBubble';
+
+
+    /**
      * Wrapper around FullCalendar's Moment plugin.
      *
      * @param date
@@ -219,6 +226,14 @@
         // if (this.calendar.options.bubble.onOpen) {
         //     return this.calendar.options.bubble.onOpen.call(this, method, data);
         // }
+
+
+        // Set up a close event for the bubble:
+        // detach all events
+        bubbleElement.on('close.fndtn.reveal.' + bubble.EVENT_NAMESPACE, function () {
+            $(this).off('.' + bubble.EVENT_NAMESPACE);
+        });
+
 
         return bubbleElement;
     };

@@ -40,8 +40,9 @@
      * @return {*}
      */
     bubble.prototype.renderBubble = function (bubbleElement, data) {
-        var element = FullCalendarViewEventBubble.prototype.renderBubble.call(this, bubbleElement, data),
-            self    = this;
+        var element   = FullCalendarViewEventBubble.prototype.renderBubble.call(this, bubbleElement, data),
+            self      = this,
+            namespace = FullCalendarViewEventBubble.EVENT_NAMESPACE;
 
 
         // Add event listeners
@@ -56,10 +57,10 @@
 
         // Control submit button
         var submitButton = bubbleElement.find(':submit');
-        bubbleElement.on('change, keyup', ':input', function () {
+        bubbleElement.on('change.'+namespace+', keyup.'+namespace, ':input', function () {
             toggleFormState($(this).closest('form'));
         });
-        bubbleElement.on('submit', 'form', function (event) {
+        bubbleElement.on('submit.'+namespace, 'form', function (event) {
             event.preventDefault();
             submitButton.prop('disabled', true);
 
@@ -83,7 +84,7 @@
 
         // Listener for tab switching:
         // When you switch panels, preserve some data
-        bubbleElement.find('[data-tab]').on('toggled', function (event, tab) {
+        bubbleElement.find('[data-tab]').on('toggled.'+namespace, function (event, tab) {
 
             // Copy title between event and task panel
             // Then determine if it should be enabled or not
