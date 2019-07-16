@@ -194,9 +194,16 @@ $app = new class extends App
         foreach ($components as $componentId => $component) {
             // Ensure layout ID and tile source are ints
             $this->log->notice(sprintf('Checking tile component #%d', $componentId));
-            if ($component['tileSource']) {
+
+            $tileSourceId = filter_var($component['tileSource'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            $layoutId     = filter_var($component['layoutId'], FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+            if ($tileSourceId === $componentId) {
+                $this->log->notice(self::indent(1) . 'component\'s tile source is itself: ignoring and associating with layout ID');
+                $this->attachLayoutToLocation($component);
+                $this->updateTileLayoutHeading($component);
+            } elseif ($tileSourceId) {
                 $this->attachLayoutToComponent($component, $components);
-            } elseif ($component['layoutId']) {
+            } elseif ($layoutId) {
                 $this->attachLayoutToLocation($component);
                 $this->updateTileLayoutHeading($component);
             } else {
