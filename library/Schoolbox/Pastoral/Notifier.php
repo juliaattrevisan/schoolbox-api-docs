@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
