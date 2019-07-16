@@ -276,8 +276,13 @@
         // iterate across the variables supplied, and insert them into the appropriate form elements
         Object.keys(data).forEach(function(key) {
             var value     = data[key],
-                searchKey = baseKey + key,
-                $element  = bubbleElement.find('[name=' + searchKey + ']');
+                searchKey = key;
+
+            // Capitalize first char of key for creating the search key?
+            if (baseKey && baseKey.length > 0) {
+                searchKey = baseKey + key.charAt(0).toUpperCase() + key.substr(1);
+            }
+            var $element = bubbleElement.find('[name="' + searchKey + '"]');
 
             // As we're no longer capitalizing and flattening sub-keys:
             // call this recursively
