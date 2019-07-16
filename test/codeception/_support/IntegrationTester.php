@@ -342,9 +342,9 @@ class IntegrationTester extends \Codeception\Actor
             throw new Exception('Must have user ids to add to the group.');
         }
 
-        $allow_redirects = false;
+        $allow_redirects = $this->redirect_settings;
 
-        $this->client->request('POST', $url, [
+        return $this->client->request('POST', $url, [
             'headers' => $this->guzzle_headers,
             'allow_redirects' => $allow_redirects,
             'cookies'=>$this->client_cookie_jar,
@@ -370,9 +370,9 @@ class IntegrationTester extends \Codeception\Actor
             $data['accessLevel['.$key.']']=$permission;
         }
 
-        $allow_redirects = false;
+        $allow_redirects = $this->redirect_settings;
 
-        $this->client->request('POST', $url, [
+        return $this->client->request('POST', $url, [
             'headers' => $this->guzzle_headers,
             'allow_redirects' => $allow_redirects,
             'cookies'=>$this->client_cookie_jar,
@@ -462,12 +462,13 @@ class IntegrationTester extends \Codeception\Actor
         $allow_redirects = $this->redirect_settings;
 
         /** @var \GuzzleHttp\Psr7\Response $response */
-        $response = $this->client->request('POST', $url, [
+        return $this->client->request('POST', $url, [
             'headers' => $this->guzzle_headers,
             'allow_redirects' => $allow_redirects,
             'cookies'=>$this->client_cookie_jar,
             'form_params' => $data
         ]);
+
     }
 
     public function deleteTextBoxToTextComponent($homepage_id, $heading)
@@ -492,7 +493,7 @@ class IntegrationTester extends \Codeception\Actor
         $allow_redirects = $this->redirect_settings;
 
         /** @var \GuzzleHttp\Psr7\Response $response */
-        $response = $this->client->request('GET', $url, [
+        return $this->client->request('GET', $url, [
             'headers' => $this->guzzle_headers,
             'allow_redirects' => $allow_redirects,
             'cookies'=>$this->client_cookie_jar,
