@@ -187,12 +187,6 @@ class RelationalDelete implements IRelationalDelete
         return [
             // News - The first line may be deleted when the old news has been deprecated
             new Nullable(
-                \Schoolbox\News\ArticleMapper::getInstance(),
-                $this->logger,
-                ['image'],
-                'item_image'
-            ),
-            new Nullable(
                 \Schoolbox\Comms\News\Mapper::getInstance(),
                 $this->logger,
                 ['featureImage'],
