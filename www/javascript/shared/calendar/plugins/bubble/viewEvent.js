@@ -282,7 +282,8 @@
             // As we're no longer capitalizing and flattening sub-keys:
             // call this recursively
             if (typeof value === 'object') {
-                self.fillForm(bubbleElement, value, searchKey)
+                self.fillForm(bubbleElement, value, searchKey);
+                return;
             }
 
 
