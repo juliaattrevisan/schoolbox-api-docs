@@ -56,8 +56,8 @@
 
 
         // Normalize note and title
-        data.title = data.note = this.event.title;
-        data.date  = this.determineDateSpan(this.event.start, this.event.end, this.event.allDay);
+        data.title       = data.note = this.event.title;
+        data.displayDate = this.determineDateSpan(this.event.start, this.event.end, this.event.allDay);
 
 
         // All variants:
