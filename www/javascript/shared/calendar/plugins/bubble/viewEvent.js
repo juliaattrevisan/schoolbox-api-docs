@@ -199,37 +199,40 @@
             .addClass('hide');
 
 
-        // Show the date and title at least
-        bubbleElement.find('[data-event-modal-field="displayDate"]')
-            .show()
-            .removeClass('hide')
-            .text(data.date);
-        bubbleElement.find('[data-event-modal-field="title"]')
-            .show()
-            .removeClass('hide')
-            .text(data.title);
+        // // Show the date and title at least
+        // bubbleElement.find('[data-event-modal-field="displayDate"]')
+        //     .show()
+        //     .removeClass('hide')
+        //     .text(data.date);
+        // bubbleElement.find('[data-event-modal-field="title"]')
+        //     .show()
+        //     .removeClass('hide')
+        //     .text(data.title);
+        //
+        //
+        // // Hide "Posted By" if there is no author
+        // // (This happens on subscribed vcals for example)
+        // var showAuthor = data.authorId && Number(data.authorId) !== -1;
+        // bubbleElement.find('[data-event-modal-field="post-by"]')
+        //     .toggle(showAuthor)
+        //     .toggleClass('hide', !showAuthor);
+        //
+        //
+        // // Hide reviewed by as well
+        // var showReviewer = data.authorId && Number(data.authorId) !== -1;
+        // bubbleElement.find('[data-event-modal-field="reviewedBy"]')
+        //     .toggle(showReviewer)
+        //     .toggleClass('hide', !showReviewer);
+        //
+        //
+        // // Show/hide location?
+        // var showLocation = data.location && data.location.length > 0;
+        // bubbleElement.find('[data-event-modal-field="location"]')
+        //     .toggle(showLocation)
+        //     .toggleClass('hide', !showLocation);
 
 
-        // Hide "Posted By" if there is no author
-        // (This happens on subscribed vcals for example)
-        var showAuthor = data.authorId && Number(data.authorId) !== -1;
-        bubbleElement.find('[data-event-modal-field="post-by"]')
-            .toggle(showAuthor)
-            .toggleClass('hide', !showAuthor);
-
-
-        // Hide reviewed by as well
-        var showReviewer = data.authorId && Number(data.authorId) !== -1;
-        bubbleElement.find('[data-event-modal-field="reviewedBy"]')
-            .toggle(showReviewer)
-            .toggleClass('hide', !showReviewer);
-
-
-        // Show/hide location?
-        var showLocation = data.location && data.location.length > 0;
-        bubbleElement.find('[data-event-modal-field="location"]')
-            .toggle(showLocation)
-            .toggleClass('hide', !showLocation);
+        this.fillForm(bubbleElement, data);
 
 
         // Task display (or not)
@@ -263,49 +266,25 @@
      *
      * @param bubbleElement A jQuery object pointing to the bubble's DOM node.
      * @param data          The data to render into the element.
+     * @param baseKey       If this is called recursively:
      * @return object bubbleElement
      */
-    bubble.prototype.fillForm = function(bubbleElement, data) {
-        /**
-         * Fill element helper: if the element that is getting filled has a
-         * 'is-html' data element, then it gets filled with HTML - otherwise
-         * with text.
-         *
-         * @param element The DOM node that is getting updated
-         * @param key     The key that is getting updated
-         * @param value   The value that is added
-         * @param allVars All variables that are getting updated
-         */
-        var fillElement = function(element, key, value, allVars) {
-            if (element.length && value && value.length) {
-                // Fill in text or HTML
-                if (element.data('is-html')) {
-                    element.html(value);
-                } else {
-                    element.text(value);
-                }
-
-                // Maybe this element is a link to a user?
-                // If so, fill its URL in too
-                if (element.data('is-user-link')) {
-                    if (key + 'Id' in allVars) {
-                        element.attr('href', '/search/user/'+allVars[key+'Id']).prop('disabled', false);
-                    } else {
-                        element.attr('href', '#').prop('disabled', true);
-                    }
-                }
-            } else {
-                element.text('');
-            }
-        };
+    bubble.prototype.fillForm = function(bubbleElement, data, baseKey) {
+        var self = this;
+        baseKey = baseKey || '';
 
         // iterate across the variables supplied, and insert them into the appropriate form elements
         Object.keys(data).forEach(function(key) {
-            var value    = data[key],
-                $element = bubbleElement.find('[name=' + key + ']');
+            var value     = data[key],
+                searchKey = baseKey + key,
+                $element  = bubbleElement.find('[name=' + searchKey + ']');
 
             // As we're no longer capitalizing and flattening sub-keys:
             // call this recursively
+            if (typeof value === 'object') {
+                self.fillForm(bubbleElement, value, searchKey)
+            }
+
 
             // first test if it's an input with the name we're after
             if ($element.length) {
@@ -320,7 +299,7 @@
                         case 'hidden':
                             $element.val(value);
                             // $element.attr('value', value);
-                            fillElement(form.find('.'+key), value);
+                            self.fillElement(bubbleElement.find('.'+searchKey), value);
                             break;
 
                         case 'checkbox':
@@ -350,15 +329,51 @@
                 // }
             } else {
                 // Check for data attribute first: update that if it's found
-                var dataSelector = bubbleElement.find('[data-event-modal-field="'+key+'"]');
+                var dataSelector = bubbleElement.find('[data-event-modal-field="'+searchKey+'"]');
                 if (dataSelector.length) {
-                    fillElement(dataSelector, key, value, data)
+                    // Also show it
+                    dataSelector.show().removeClass('hide');
+                    self.fillElement(dataSelector, key, value, data)
                 } else {
                     // if no form input element found, try for an element with the right class
-                    fillElement(bubbleElement.find('.'+key), key, value, data)
+                    self.fillElement(bubbleElement.find('.'+searchKey), key, value, data)
                 }
             }
         });
+    };
+
+
+    /**
+     * Fill element helper: if the element that is getting filled has a
+     * 'is-html' data element, then it gets filled with HTML - otherwise with
+     * text.
+     *
+     * @param element The DOM node that is getting updated
+     * @param key     The key that is getting updated
+     * @param value   The value that is added
+     * @param allVars All variables that are getting updated
+     */
+    bubble.prototype.fillElement = function(element, key, value, allVars) {
+        if (element.length && value && value.length) {
+            // Fill in text or HTML
+            if (element.data('is-html')) {
+                element.html(value);
+            } else {
+                element.text(value);
+            }
+
+            // Maybe this element is a link to a user?
+            // If so, fill its URL in too
+            if (element.data('is-user-link')) {
+                if (key + 'Id' in allVars) {
+                    element.attr('href', '/search/user/'+allVars[key+'Id']).prop('disabled', false);
+                } else {
+                    element.attr('href', '#').prop('disabled', true);
+                }
+            }
+        } else {
+            element.text('');
+        }
     };
 
 
