@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -44,7 +45,8 @@ class IntegrationTester extends \Codeception\Actor
     /**
      * Define custom actions here
      */
-    const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
+    private const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
+    public const HOMEPAGE_COMPONENT_POSITION = ['left'=>'1','right'=>'2','top'=>'3'];
 
     public $client;
     public $cli_kernel;
@@ -92,6 +94,33 @@ class IntegrationTester extends \Codeception\Actor
         return UserMapper::getInstance()->findOneByColumn('username', $username);
     }
 
+    public function getComponentByClass($element_class)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return Component_DefinitionMapper::getInstance()->findOneByColumn('class',$element_class);
+    }
+
+    public function getComponentOnHomepage($homepage_id, $component, $position)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return Component_InstanceMapper::getInstance()->findOneByColumnList(['component_definition_id'=>$component->getId(),
+                                                                            'module'=>'homepage',
+                                                                            'identifier'=>$homepage_id,
+                                                                            'position'=>$position]);
+    }
+
+    public function getTextBoxByHeading($title)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return TextBoxMapper::getInstance()->findOneByColumnList(['heading'=>$title, 'deleted' => null]);
+    }
+
     function getNewsArticle($title, $latest_id=true){
 
         if(!isset($this->database)) {
@@ -100,7 +129,6 @@ class IntegrationTester extends \Codeception\Actor
         return NewsMapper::getInstance()->findOneByColumn('title', $title);
     }
 
-    ##might not even work.
     function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $assessment_ownderID, $submission_ownderID)
     {
         if(!isset($this->database)) {
@@ -291,7 +319,7 @@ class IntegrationTester extends \Codeception\Actor
 
     }
 
-    public function addDefaultUsersToHomepage($homepage_id)
+    public function addUsersToHomepageGroup($homepage_id, $user_ids)
     {
         if (!isset($this->client))
         {
@@ -302,8 +330,17 @@ class IntegrationTester extends \Codeception\Actor
 
         $page='/group/modifyForm.php';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
-        $data=[ 'categoryID'=>$homepage_id,
-                'userID'=> [ 230, 151] ];
+        $data['categoryID']=$homepage_id;
+        if (is_array($user_ids))
+        {
+            $data['userID']=$user_ids;
+        }
+        elseif (isset($user_ids))
+        {
+            $data['userID']=[$user_ids];
+        } else {
+            throw new Exception('Must have user ids to add to the group.');
+        }
 
         $allow_redirects = false;
 
@@ -313,10 +350,25 @@ class IntegrationTester extends \Codeception\Actor
             'cookies'=>$this->client_cookie_jar,
             'form_params'=>$data
         ]);
+    }
 
+    public function setHomepageGroupUserPermission($homepage_id, $user_id_permission_array)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
-        $data=[ 'categoryID'=>$homepage_id,
-                'accessLevel[151]'=>3];
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/group/modify/'.$homepage_id;
+
+        $page='/group/modifyForm.php';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $data['categoryID']=$homepage_id;
+        foreach ($user_id_permission_array as $key => $permission)
+        {
+            $data['accessLevel['.$key.']']=$permission;
+        }
 
         $allow_redirects = false;
 
@@ -326,8 +378,126 @@ class IntegrationTester extends \Codeception\Actor
             'cookies'=>$this->client_cookie_jar,
             'form_params'=>$data
         ]);
+    }
 
+    public function addDefaultUsersToHomepage($homepage_id)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
 
+        $this->addUsersToHomepageGroup($homepage_id, [230, 151]);
+        $this->setHomepageGroupUserPermission($homepage_id, ['151'=>3]);
+    }
+
+    public function addComponentToHomepage($element_id, $homepage_id, $location)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/homepage/'.$homepage_id;
+
+        $page='/homepage/configForm.php';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $data =[
+            'add' => $element_id,
+            'cid' => $homepage_id
+            ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+
+        $capture_new_component_id='/div id=\'component(\d+)\'/';
+        preg_match($capture_new_component_id, $response->getBody(), $new_component_id_matches);
+
+        $data['type']='components';
+        $data['column'.$location]=$new_component_id_matches[1];
+        $data['cid']=$homepage_id;
+
+        $allow_redirects = $this->redirect_settings;
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function addTextBoxToTextComponent($homepage_id, $text_component, $text, $heading)
+    {
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        //https://vagrant.dev.schoolbox.cloud/homepage/560/textBoxCreate/3679
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/homepage/'.$homepage_id.'/textBoxCreate/'.$text_component->getId();
+
+        $page='/textbox/textBoxForm.php';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $data =[
+            'originID'=>$homepage_id,
+            'categoryID'=>$homepage_id,
+            'textBoxID'=>'',
+            'componentID'=>$text_component->getId(),
+            'textBoxHeading'=>$heading,
+            'textBoxBody'=>$text
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params' => $data
+        ]);
+    }
+
+    public function deleteTextBoxToTextComponent($homepage_id, $heading)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $textBox = $this->getTextBoxByHeading($heading);
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/homepage/'.$homepage_id;
+
+        $page='/textbox/textBoxForm.php';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+
+        $query_string =[
+            'delete' => $textBox->getId(),
+            'originID' => $homepage_id
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $this->client->request('GET', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'query' => $query_string
+        ]);
     }
 
     public function createAssessemntOnHomepage($title, $HomePageID)

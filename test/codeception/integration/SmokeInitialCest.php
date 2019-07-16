@@ -155,6 +155,32 @@ class SmokeInitialCest {
     /**
      *
      */
+    public function SmokeHomepagePOST(IntegrationTester $i){
+        $homepage_title='Testing Home Page for Assessment 11';
+        $i->loginAdmin(); #we logged in as alaress
+        $i->createHomepage($homepage_title);
+        $student = $i->getUser('drhodes');
+        $teacher = $i->getUser('zsmith');
+        $admin = $i->getUser('alaress');
+        $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
+        $i->addUsersToHomepageGroup($homePageId, [$student->getId(), $admin->getId(), $teacher->getId()]);
+        $i->setHomepageGroupUserPermission($homePageId, [$student->getId()=>1, $teacher->getId()=>2, $admin->getId()=>3]);
+        $text_component_class=$i->getComponentByClass('Component_Homepage_TextBoxController');
+        $text='<p>This is test Text</p>';
+
+        $i->addComponentToHomepage($text_component_class->getId(), $homePageId, IntegrationTester::HOMEPAGE_COMPONENT_POSITION['top']);
+        $homepage_text_component = $i->getComponentOnHomepage($homePageId, $text_component_class, 'top');
+        $heading='Heading Component Test - Delete me';
+        $i->addTextBoxToTextComponent($homePageId, $homepage_text_component, $text, $heading);
+        $i->deleteTextBoxToTextComponent($homePageId, $heading);
+        $heading='Heading Component Test';
+        $i->addTextBoxToTextComponent($homePageId, $homepage_text_component, $text, $heading);
+
+    }
+
+    /**
+     *
+     */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
         $homepage_title='Testing Home Page for Assessment';
