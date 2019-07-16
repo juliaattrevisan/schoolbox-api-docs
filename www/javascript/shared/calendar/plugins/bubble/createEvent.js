@@ -107,8 +107,14 @@
         });
 
 
+        // Unbind the tab switch event once the bubble closes
+        bubbleElement.on('close.fndtn.reveal.' + namespace, function () {
+            bubbleElement.find('[data-tab]').off('toggled.'+namespace);
+        });
+
+
         // click 'Edit Event' and push data through to main form page
-        bubbleElement.on('click', '#edit-full', function() {
+        bubbleElement.on('click.'+namespace, '#edit-full', function() {
             var queryString      = $(this).closest('form').serialize();
             window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + queryString;
         });
