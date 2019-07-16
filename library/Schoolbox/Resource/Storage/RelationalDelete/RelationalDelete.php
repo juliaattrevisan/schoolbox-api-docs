@@ -185,7 +185,6 @@ class RelationalDelete implements IRelationalDelete
     private function generateNullables()
     {
         return [
-            // News - The first line may be deleted when the old news has been deprecated
             new Nullable(
                 \Schoolbox\Comms\News\Mapper::getInstance(),
                 $this->logger,
