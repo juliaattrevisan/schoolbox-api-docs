@@ -199,55 +199,18 @@
             .addClass('hide');
 
 
-        // // Show the date and title at least
-        // bubbleElement.find('[data-event-modal-field="displayDate"]')
-        //     .show()
-        //     .removeClass('hide')
-        //     .text(data.date);
-        // bubbleElement.find('[data-event-modal-field="title"]')
-        //     .show()
-        //     .removeClass('hide')
-        //     .text(data.title);
-        //
-        //
-        // // Hide "Posted By" if there is no author
-        // // (This happens on subscribed vcals for example)
-        // var showAuthor = data.authorId && Number(data.authorId) !== -1;
-        // bubbleElement.find('[data-event-modal-field="post-by"]')
-        //     .toggle(showAuthor)
-        //     .toggleClass('hide', !showAuthor);
-        //
-        //
-        // // Hide reviewed by as well
-        // var showReviewer = data.authorId && Number(data.authorId) !== -1;
-        // bubbleElement.find('[data-event-modal-field="reviewedBy"]')
-        //     .toggle(showReviewer)
-        //     .toggleClass('hide', !showReviewer);
-        //
-        //
-        // // Show/hide location?
-        // var showLocation = data.location && data.location.length > 0;
-        // bubbleElement.find('[data-event-modal-field="location"]')
-        //     .toggle(showLocation)
-        //     .toggleClass('hide', !showLocation);
-
-
         this.fillForm(bubbleElement, data);
 
 
-        // Task display (or not)
-        var showTask = data.isTask;
-        bubbleElement.find('#editTask')
-            .toggle(showTask)
-            .toggleClass('hide', !showTask);
-        bubbleElement.find('#editEvent')
-            .toggle(!showTask)
-            .toggleClass('hide', showTask);
+        // // Task display (or not)
+        // var showTask = data.isTask;
+        // bubbleElement.find('#editTask')
+        //     .toggle(showTask)
+        //     .toggleClass('hide', !showTask);
+        // bubbleElement.find('#editEvent')
+        //     .toggle(!showTask)
+        //     .toggleClass('hide', showTask);
 
-
-        // // Fill in form inputs?
-        // this.fillForm(method+'Event', data);
-        // this.fillForm(method+'Task', data);
 
         // onOpen is used by the MGGS PBL custom work:
         // see library/Custom/Mggs/Learning/Upcoming/templates/upcoming.twig
