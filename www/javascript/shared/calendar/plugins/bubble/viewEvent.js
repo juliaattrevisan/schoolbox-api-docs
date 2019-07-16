@@ -300,41 +300,65 @@
         };
 
         // iterate across the variables supplied, and insert them into the appropriate form elements
-        $.each(data, function(k, v) {
-            // first test if it's an input with the name we're after
-            var element = bubbleElement.find('[name=' + k + ']');
+        Object.keys(data).forEach(function(key) {
+            var value    = data[key],
+                $element = bubbleElement.find('[name=' + key + ']');
 
-            if(element.length) {
-                var type = element.attr('type');
-                // textboxes and textareas get filled with text...
-                if(type == 'text' || element.is('textarea')) {
-                    element.val(v);
+            // As we're no longer capitalizing and flattening sub-keys:
+            // call this recursively
+
+            // first test if it's an input with the name we're after
+            if ($element.length) {
+                if ($element.is('textarea')) {
+                    $element.val(value);
+                } else {
+                    switch ($element.attr('type')) {
+                        case 'text':
+                            $element.val(value);
+                            break;
+
+                        case 'hidden':
+                            $element.val(value);
+                            // $element.attr('value', value);
+                            fillElement(form.find('.'+key), value);
+                            break;
+
+                        case 'checkbox':
+                            $element.prop('checked', Boolean(value));
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-                // ...and if hidden, also populate its associated span...
-                else if(type == 'hidden') {
-                    element.attr('value', v);
-                    fillElement(form.find('.'+k), v);
-                }
-                // ...and checkboxes get checked or unchecked
-                else if(type == 'checkbox') {
-                    element.prop('checked', v == 1);
-                }
-            }
-            // if no form input element found, try for an element with the right class
-            else {
-                /* Check for data attribute first
-                 */
-                var dataSelector = $('[data-event-modal-field="'+k+'"]');
+                // var type = $element.attr('type');
+                // // textboxes and textareas get filled with text...
+                // switch (type) {
+                //     case
+                // }
+                // if(type == 'text' || $element.is('textarea')) {
+                //     $element.val(value);
+                // }
+                // // ...and if hidden, also populate its associated span...
+                // else if(type == 'hidden') {
+                //     $element.attr('value', value);
+                //     fillElement(form.find('.'+key), value);
+                // }
+                // // ...and checkboxes get checked or unchecked
+                // else if(type == 'checkbox') {
+                //     $element.prop('checked', value == 1);
+                // }
+            } else {
+                // Check for data attribute first: update that if it's found
+                var dataSelector = bubbleElement.find('[data-event-modal-field="'+key+'"]');
                 if (dataSelector.length) {
-                    fillElement(dataSelector, k, v, data)
-                }
-                /* Otherwise assume classes
-                 */
-                else {
-                    fillElement(form.find('.'+k), k, v, data)
+                    fillElement(dataSelector, key, value, data)
+                } else {
+                    // if no form input element found, try for an element with the right class
+                    fillElement(bubbleElement.find('.'+key), key, value, data)
                 }
             }
-        })
+        });
     };
 
 
