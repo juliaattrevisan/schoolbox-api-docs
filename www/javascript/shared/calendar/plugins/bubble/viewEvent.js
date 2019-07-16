@@ -247,6 +247,13 @@
             }
             var $element = bubbleElement.find('[name="' + searchKey + '"]');
 
+
+            // Number-cast boolean for injecting into a field
+            if (typeof value === 'boolean') {
+                value = Number(value);
+            }
+
+
             // As we're no longer capitalizing and flattening sub-keys:
             // call this recursively
             if (typeof value === 'object') {
