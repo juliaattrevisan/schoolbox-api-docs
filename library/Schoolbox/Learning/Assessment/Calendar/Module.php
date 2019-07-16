@@ -14,10 +14,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -42,40 +40,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn()
         );
 
-        /* Only superusers can receive data from the form
-         */
-        $postPerms = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
-        );
-
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
-
-        $this->register('GET', '/user/{id}', 'getExample', $getPerms, $preloadUser);
-        $this->register('POST', '/user', 'postExample', $postPerms, null);
-    }
-
-
-    /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params): array
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['id']);
-        }
-        catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'user' => $user,
-        ];
+        $this->register('GET', '', 'getReport', $getPerms);
     }
 
 
@@ -112,7 +77,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
+            'rosettaStone' => $injector->lazyGet('l10n'),
         ];
     }
 

@@ -10,17 +10,10 @@ namespace Schoolbox\Learning\Assessment\Calendar;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
+use Schoolbox\L10n\RosettaStone;
 
 class Controller extends Base
 {
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
 
     /**
      * @var ErrorMapper
@@ -29,47 +22,34 @@ class Controller extends Base
 
 
     /**
+     * @var RosettaStone
+     */
+    private $rosettaStone;
+
+
+    /**
      * Controller constructor.
      *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
+     * @param ErrorMapper  $errorMapper
+     * @param RosettaStone $rosettaStone
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(ErrorMapper $errorMapper, RosettaStone $rosettaStone)
     {
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
+        $this->rosettaStone = $rosettaStone;
     }
 
 
     /**
-     * Provide form
+     * Display the calendar itself
      *
-     * @param User $user
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getExample(User $user)
+    public function getReport()
     {
+        $pageTitle = sprintf('%s Calendar', $this->rosettaStone->translate('assessment',false, true));
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessmentCalendar/index.twig', [
-            'user' => $user
-        ])->setTitle('Example'));
-    }
-
-
-    /**
-     * Process the form vars
-     */
-    public function postExample()
-    {
-        try {
-            $user = $this->userMapper->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessmentCalendar/submit.twig', [
-            'user' => $user,
-            'var1' => $this->getRequest()->post['var1']
-        ])->setTitle('Example Form Output'));
+        ])->setTitle($pageTitle));
     }
 }
