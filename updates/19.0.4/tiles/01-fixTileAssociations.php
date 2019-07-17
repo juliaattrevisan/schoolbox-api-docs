@@ -45,6 +45,11 @@ $app = new class extends Daemon\App
     /**
      * @var IQuery
      */
+    private $updateTileLayoutHeadingQuery;
+
+    /**
+     * @var IQuery
+     */
     private $attachToFolderQuery;
 
     /**
@@ -58,6 +63,21 @@ $app = new class extends Daemon\App
     private $attachToHomepageTemplateQuery;
 
     private const INDENT = '  ';
+
+
+    private const UPDATE_TILE_LAYOUT_HEADING_QUERY = "
+        UPDATE tile_layout
+        SET    heading = (
+            SELECT cci.value
+            FROM       component_instance ci
+            INNER JOIN component_config_instance   cci ON  ci.id   = cci.component_instance_id
+            INNER JOIN component_config_definition ccd ON  ccd.id  = cci.component_config_definition_id
+                                                       AND ccd.key = 'componentname'
+            WHERE ci.id = :componentId
+            LIMIT 1
+        ) WHERE id = :tileLayoutId
+    ";
+
 
     private const FIND_UNASSOCIATED_TILE_LAYOUTS_QUERY = "
         SELECT tl.id
@@ -130,6 +150,7 @@ $app = new class extends Daemon\App
         $this->log                           = $log;
         $this->db                            = $di->get('databaseInternal');
         $this->findComponentQuery            = $this->db->prepareQuery(self::FIND_COMPONENT_QUERY);
+        $this->updateTileLayoutHeadingQuery  = $this->db->prepareQuery(self::UPDATE_TILE_LAYOUT_HEADING_QUERY);
         $this->attachToFolderQuery           = $this->db->prepareQuery(self::ATTACH_TO_FOLDER_QUERY);
         $this->attachToDashboardQuery        = $this->db->prepareQuery(self::ATTACH_TO_DASHBOARD_QUERY);
         $this->attachToHomepageTemplateQuery = $this->db->prepareQuery(self::ATTACH_TO_HOMEPAGE_TEMPLATE_QUERY);
@@ -151,6 +172,14 @@ $app = new class extends Daemon\App
                 $this->log->notice(self::indent(1) . 'No component uses this layout: skipping');
                 continue;
             }
+
+            // Set the component's heading regardless
+            $componentId = (int)$layout['componentId'];
+            $this->log->notice(self::indent(1) . sprintf('Setting name from component #%d to layout', $componentId));
+            $this->updateTileLayoutHeadingQuery->execute([
+                'tileLayoutId' => $layoutId,
+                'componentId'  => $componentId,
+            ]);
 
             $identifier   = (int)$layout['identifier'];
             $attachParams = [
