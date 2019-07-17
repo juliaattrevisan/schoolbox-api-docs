@@ -19,9 +19,8 @@ class Util
      * * Leading and trailing spaces are stripped
      * * Multiple consecutive spaces are converted to single spaces
      *
-     * Before saving a rubric capability or indicator, this method is called on
-     * its name. This attempts to ensure that meaningless differences in white
-     * space don't cause a new capability or indicator to be created.
+     * This is used to ensure that a capability or indicator with a similar name
+     * to an existing one in the same place cannot be created.
      *
      * @param string $name
      * @return string
