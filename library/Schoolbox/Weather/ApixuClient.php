@@ -7,7 +7,7 @@
  */
 
 namespace Schoolbox\Weather;
-use GuzzleHttp;
+use Weather_Cache;
 
 /**
  * Class ApixuClient
@@ -50,14 +50,15 @@ class ApixuClient
      * @param string $location     City to get weather for - configurable in component settings
      *
      * @return mixed
-     * @throws GuzzleHttp\Exception\GuzzleException
      * @throws \DomainException
      */
     private function makeRequest(int $forecastLimit, string $location) {
         $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
-        // TODO cache me
-        $client = new GuzzleHttp\Client(['base_uri' => self::API_BASE_URL]);
-        $response = $client->request('GET', $requestUrl);
+
+        // Cache the request
+        $cache = new Weather_Cache();
+        $cache->init(self::API_BASE_URL . $requestUrl);
+        $response = $cache->getStreamContents();
 
         // Attempt to json decode the response body
         try{
