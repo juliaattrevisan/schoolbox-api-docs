@@ -170,10 +170,10 @@ function Calendar(id, bubbleId, opts) {
                     else {
                         url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
                         var deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        data.deleteLink = '<a class="button" data-interaction="delete" href="' + deleteUrl + '">Delete</a>';
+                        data.deleteLink = '<a class="button icon-delete" data-interaction="delete" href="' + deleteUrl + '">Delete</a>';
                     }
 
-                    data.modifyLink = '<a class="button" href="' + url + '">Modify</a>';
+                    data.modifyLink = '<a class="button icon-modify" href="' + url + '">Modify</a>';
                 }
                 else {
                     data.modifyLink = '';
@@ -185,7 +185,7 @@ function Calendar(id, bubbleId, opts) {
                 try {
                     if (calEvent.data.links.category.id > 0) {
                         data.homepageLink =
-                            $('<a class="button">Go to homepage</a>')
+                            $('<a class="button icon-home">Go to homepage</a>')
                                 .attr('href', '/homepage/' + String(calEvent.data.links.category.id));
                     }
                 }
@@ -196,7 +196,7 @@ function Calendar(id, bubbleId, opts) {
                 try {
                     if(calEvent.data.custom.moreDetailsLink.length > 0) {
                         data.moreDetailsLink =
-                            $('<a class="button">View More Details</a>')
+                            $('<a class="button icon-due-work">View More Details</a>')
                                 .attr('href', calEvent.data.custom.moreDetailsLink);
                     }
                 }
@@ -210,12 +210,12 @@ function Calendar(id, bubbleId, opts) {
                     // Attendance List butonye
                     if (data.attendanceListButton.toString() == 'true') {
                         data.attendanceIcon = ''
-                        data.attendanceListButton = '<a class="button" href="/calendar/attendance/list/'
+                        data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
                             + calEvent.data.meta.eventId + '">Attendees</a>'
                     }
                     // Attend/Unattend butonye
                     if (data.attendanceRequestButton.toString() != 'false') {
-                        data.attendanceRequestButton = '<a class="button" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
+                        data.attendanceRequestButton = '<a class="button icon-reply" href="#" data-attendance-request>' + data.attendanceRequestButton.toString() + '</a>'
                     }
                 }
 
