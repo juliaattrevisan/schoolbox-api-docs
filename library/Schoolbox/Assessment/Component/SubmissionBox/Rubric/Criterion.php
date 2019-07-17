@@ -9,7 +9,6 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -56,17 +55,6 @@ class Criterion implements ISoftDeletable
     public function __construct()
     {
         $this->curriculumNodes = new GenericCollection(NodeModel::class);
-    }
-
-    /**
-     * Retrieves a normalized form of this object's name, for comparison with
-     * other objects.
-     *
-     * @return string
-     */
-    public function retrieveNormalizedName(): string
-    {
-        return Util::normalizeName($this->name);
     }
 
     /**

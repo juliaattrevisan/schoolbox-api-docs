@@ -7,7 +7,6 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use DomainException;
-use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -85,17 +84,6 @@ class Group implements ISoftDeletable
     {
         $this->curriculumNodes = new GenericCollection(NodeModel::class);
         $this->indicators      = new GenericCollection(Criterion::class);
-    }
-
-    /**
-     * Retrieves a normalized form of this object's name, for comparison with
-     * other objects.
-     *
-     * @return string
-     */
-    public function retrieveNormalizedName(): string
-    {
-        return Util::normalizeName($this->name);
     }
 
     /**

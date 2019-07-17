@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
-use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -88,9 +87,8 @@ class Capability
      */
     public function retrieveIndicatorByName(string $name): ?Indicator
     {
-        $normalizedName = Util::normalizeName($name);
         foreach ($this->indicators as $indicator) {
-            if (Util::normalizeName($indicator->getName()) === $normalizedName) {
+            if ($indicator->getName() === $name) {
                 return $indicator;
             }
         }
