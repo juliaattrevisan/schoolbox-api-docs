@@ -16,7 +16,8 @@ namespace Schoolbox\Weather;
  */
 class ApixuClient
 {
-    // TODO store this in the DB and get it from there?
+    // TODO these are just test API details, a key will be stored in the DB for each school
+    // there is already a ticket and PR to support that, see SA-7950
     private const API_KEY = '93cc4486b7ba4afdafe44837182011';
     private const API_BASE_URL = 'http://api.apixu.com/v1/';
 
