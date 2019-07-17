@@ -241,16 +241,32 @@ class SmokeInitialCest {
     public function SmokeCoursesPOST(IntegrationTester $i){
         #GIVEN
         $i->loginAdmin(); #we logged in as alaress
-        $folder_title='Test Folder For Courses 12';
+        $folder_title='Test Folder For Courses 123';
         $faculty_folder=$i->getFirstFolderByTitle('Faculties');
         $i->createFolder($folder_title, -1, $faculty_folder);
         $course_folder=$i->getFirstFolderByTitle($folder_title);
 
         #WHEN
-        $folder_title='Course with empty Unit 12';
-        $i->createCourseWithEmptyUnit($folder_title, $course_folder);
-        $folder_title='Course with Unit with assessment 12';
-        $i->createCourseWithTestUnits($folder_title, $course_folder);
+        $title='Course with empty Unit 123';
+        $i->createNewCourseSpec($title, $course_folder);
+        $course_spec = $i->getFirstCourseByTitle($title);
+        $unit_name=$title.' EmptyUnit';
+        $i->createNewUnitSpec($unit_name, $course_spec);
+        $unit = $i->getFirstUnitByTitle($unit_name);
+        $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
+        
+        $title='Course with Unit with assessment 123';
+        $i->createNewCourseSpec($title, $course_folder);
+        $course_spec = $i->getFirstCourseByTitle($title);
+        $unit_name=$title.' UnitWithAssessments';
+        $i->createNewUnitSpec($unit_name, $course_spec);
+        $unit_folder = $i->getFirstFolderByTitle($unit_name);
+        $unit = $i->getFirstUnitByTitle($unit_name);
+        $i->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
+        $i->createAssessemntProjectOnCourseUnitSpec('Assessment for course project 77', $unit->getId(), $unit_folder->getId());
+        $project_assessment_id=$i->getFirstAssessmentIdByTitle('Assessment for course project 77');
+        $i->createAssessemntOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
+        $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
     }
 
     /**

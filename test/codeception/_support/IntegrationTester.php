@@ -312,7 +312,7 @@ class IntegrationTester extends \Codeception\Actor
         return $this->loginForgotPasswordUsername($email);
     }
 
-    private function createNewCourseSpec($name, $parent_folder)
+    public function createNewCourseSpec($name, $parent_folder)
     {
         if (!isset($this->client))
         {
@@ -340,7 +340,7 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
-    private function createNewUnitSpec($name, $course)
+    public function createNewUnitSpec($name, $course)
     {
         if (!isset($this->client))
         {
@@ -371,7 +371,7 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
-    private function saveCourseSpec($course_name, $unit_name, $parentId, $course_spec, $unit){
+    public function saveCourseSpec($course_name, $unit_name, $parentId, $course_spec, $unit){
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
