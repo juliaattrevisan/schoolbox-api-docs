@@ -7,6 +7,7 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use PDOStatement;
+use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -93,9 +94,10 @@ class GroupMapper extends BaseMapper
 
 
     /**
-     * Pre-save callback - if a group with the same name already exists in its
-     * parent, then set its ID to the existing one (thus updating the existing
-     * record) instead of saving a new one.
+     * Pre-save callback.
+     *
+     * If a group with the same name already exists in its context, then block
+     * saving.
      *
      * This replaces the unique index on this table, which had to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
@@ -103,22 +105,28 @@ class GroupMapper extends BaseMapper
      *
      * @param  Group $object
      * @return bool  Always true
+     * @throws MapperException if the name isn't unique
      */
     public function verifyUniqueness(Group $object): bool
     {
-        // normalize object's name for saving
-        $object->setName($object->retrieveNormalizedName());
+        $pb = $this->getPredicateBuilder()
+                   ->equals('parent_id', $object->getParentId())
+                   ->equals('parent_type', $object->getParentType());
 
-        // Lookup existing IDs
-        $existingIds = $this->findIdsByColumnList([
-            'parent_id'   => $object->getParentId(),
-            'parent_type' => $object->getParentType(),
-            'name'        => $object->getName(),
-        ]);
+        // Don't compare this object with itself
+        if ($object->getId()) {
+            $pb->notEquals('id', $object->getId());
+        }
 
-        // found something? assign that ID if so
-        if ($existingIds) {
-            $object->setId(array_shift($existingIds));
+        // Check this name isn't in use
+        $existingNames  = $this->findScalarByPredicates('name', $pb);
+        $normalizedName = Util::normalizeName($object->getName());
+        foreach ($existingNames as $existingName) {
+            if (Util::normalizeName($existingName) === $normalizedName) {
+                throw new MapperException(
+                    sprintf('Rubric capability name "%s" is in use in its context', $normalizedName)
+                );
+            }
         }
 
         return true;
