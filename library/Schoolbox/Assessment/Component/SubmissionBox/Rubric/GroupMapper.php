@@ -96,8 +96,8 @@ class GroupMapper extends BaseMapper
     /**
      * Pre-save callback.
      *
-     * If a group with the same name already exists in its context, then block
-     * saving.
+     * If a capability with the same name already exists within its parent,
+     * then block saving.
      *
      * This replaces the unique index on this table, which had to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8

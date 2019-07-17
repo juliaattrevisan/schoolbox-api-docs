@@ -201,8 +201,8 @@ class CriterionMapper extends BaseMapper {
     /**
      * Pre-save callback.
      *
-     * If a criterion with the same name already exists in its group, then block
-     * saving.
+     * If a capability with the same name already exists in its indicator, then
+     * block saving.
      *
      * This replaces the unique index on this table, which had to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
