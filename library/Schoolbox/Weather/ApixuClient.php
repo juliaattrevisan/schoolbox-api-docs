@@ -35,10 +35,7 @@ class ApixuClient
             $response = $this->makeRequest($forecastLimit, $location);
             $twigData = $this->parseWeatherData($response);
         } catch (\Exception $e) {
-            // TODO errors are for debugging only. Remove in production as they may contain the API key!
-            return ['error' => $e->getMessage(), 'weatherUnavailable' => true];
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            return ['error' => $e->getMessage(), 'weatherUnavailable' => true];
+            return ['weatherUnavailable' => true];
         }
 
         return $twigData;
