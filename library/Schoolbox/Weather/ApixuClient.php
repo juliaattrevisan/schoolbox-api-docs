@@ -28,6 +28,9 @@ class ApixuClient
     /**
      * Get the data from the API in a JSON format usable by Twig
      *
+     * @param int $forecastLimit   How many days to forecast - configurable in component settings
+     * @param string $location     City to get weather for - configurable in component settings
+     *
      * @return array
      */
     public function getForecast(int $forecastLimit, string $location) : array
