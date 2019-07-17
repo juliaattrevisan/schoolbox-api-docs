@@ -47,7 +47,7 @@ class Controller extends Base
      */
     public function getReport()
     {
-        $pageTitle = sprintf('%s Calendar', $this->rosettaStone->translate('assessment',false, true));
+        $pageTitle = sprintf('%s Calendar', $this->rosettaStone->translate('assessment', false, true));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessmentCalendar/index.twig', [
         ])->setTitle($pageTitle));

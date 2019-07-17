@@ -36,19 +36,19 @@ class Learning extends ModuleLoader
         $namespace  = 'learning';
 
         // TODO - split 'LearningModule' into ClassModule + PendingModule
-        $this->loadModule($kernel, LearningModule::class,               "/{$namespace}");
+        $this->loadModule($kernel, LearningModule::class, "/{$namespace}");
 
-        $this->loadModule($kernel, Grades\Module::class,                "/{$namespace}/grades");
-        $this->loadModule($kernel, AssessmentModule::class,             "/{$namespace}");
-        $this->loadModule($kernel, DueworkFeedbackModule::class,        "/{$namespace}");
-        $this->loadModule($kernel, DueworkFeedbackFileModule::class,    "/{$namespace}/feedback");
-        $this->loadModule($kernel, DueworkResponseModule::class,        "/{$namespace}");
-        $this->loadModule($kernel, QuizModule::class,                   "/{$namespace}");
-        $this->loadModule($kernel, MarkbookModule::class,               "/{$namespace}/markbook");
-        $this->loadModule($kernel, Course\Markbook\Module::class,       "/{$namespace}/courseMarkbook");
-        $this->loadModule($kernel, Upcoming\Module::class,              "/{$namespace}/due");
-        $this->loadModule($kernel, AssessmentExporterModule::class,     "/{$namespace}/export");
-        $this->loadModule($kernel, MarkScheme\Module::class,            "/{$namespace}/markscheme");
-        $this->loadModule($kernel, AssessmentCalendarModule::class,     "/{$namespace}/assessment/calendar");
+        $this->loadModule($kernel, Grades\Module::class, "/{$namespace}/grades");
+        $this->loadModule($kernel, AssessmentModule::class, "/{$namespace}");
+        $this->loadModule($kernel, DueworkFeedbackModule::class, "/{$namespace}");
+        $this->loadModule($kernel, DueworkFeedbackFileModule::class, "/{$namespace}/feedback");
+        $this->loadModule($kernel, DueworkResponseModule::class, "/{$namespace}");
+        $this->loadModule($kernel, QuizModule::class, "/{$namespace}");
+        $this->loadModule($kernel, MarkbookModule::class, "/{$namespace}/markbook");
+        $this->loadModule($kernel, Course\Markbook\Module::class, "/{$namespace}/courseMarkbook");
+        $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
+        $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
+        $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
+        $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
     }
 }
