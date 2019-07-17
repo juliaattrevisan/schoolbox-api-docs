@@ -3,7 +3,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Weather_Cache extends Alaress_Cache_Abstract {
+class Alaress_Weather_Cache extends Alaress_Cache_Abstract {
 
     /**
      * A prefix for cached filenames

@@ -7,7 +7,6 @@
  */
 
 namespace Schoolbox\Weather;
-use Weather_Cache;
 
 /**
  * Class ApixuClient
@@ -56,16 +55,17 @@ class ApixuClient
         $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
 
         // Cache the request
-        $cache = new Weather_Cache();
+        $cache = new \Alaress_Weather_Cache();
         $cache->init(self::API_BASE_URL . $requestUrl);
         $response = $cache->getStreamContents();
 
         // Attempt to json decode the response body
-        try{
-            $decoded_response = json_decode($response->getBody()->getContents(), true);
-        } catch (\RuntimeException $e){
-            throw new \DomainException('Unable to read Weather API response', $response, $e);
-        }
+        // TODO this bit is no longer applicable, since the cache un-json-ifies the response; need to convert back to json
+//        try{
+//            $decoded_response = json_decode($response->getBody()->getContents(), true);
+//        } catch (\RuntimeException $e){
+//            throw new \DomainException('Unable to read Weather API response', $response, $e);
+//        }
 
         // If this is an array, we can assume we got some data back
         if (\is_array($decoded_response)) {
