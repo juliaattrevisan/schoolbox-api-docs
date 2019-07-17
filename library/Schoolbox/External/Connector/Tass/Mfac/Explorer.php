@@ -5,6 +5,9 @@
  * Intended to be used with userProvision.php on the cli
  * Allows you to investigate db tables and their contents
  *
+ * Methods nuclear() and split() show you hierarchical nukular
+ * families and hierarchical split families contents
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -153,7 +156,6 @@ class Explorer
                  */
                 $type      = self::NUCLEAR;
                 $rawId     = $row['student_contact_network_login'];
-                $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
             } else {
 
@@ -161,7 +163,6 @@ class Explorer
                  */
                 $type      = self::SPLIT;
                 $rawId     = substr($row['student_contact_id'], 1);
-                $contactId = $row['student_contact_id'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
             }
 

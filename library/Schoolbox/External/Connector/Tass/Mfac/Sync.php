@@ -138,12 +138,8 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
             ORDER BY student_contact_id ASC
         ";
 
-//        (new Explorer($this->databaseExternal, $this->companyCode))->nuclear($query);
-
         // Single Tuple contains data for [P]arent and [S]pouse
-        $iterator = $this->databaseExternal->getQueryIterator
-        (
-            $query,
+        $iterator = $this->databaseExternal->getQueryIterator($query,
             [
                 'companyCode' => $this->companyCode,
                 'companyCode2' => $this->companyCode
