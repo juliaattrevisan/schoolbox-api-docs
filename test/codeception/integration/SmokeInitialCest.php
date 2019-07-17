@@ -59,11 +59,11 @@ class SmokeInitialCest {
     public function SmokeNewsPOST(IntegrationTester $i){
 
         #GIVEN
+        $i->loginAdmin();
         #The regex matches: https://vagrant,dev.echoolbox.cloud/news/<atricle_id>?returnUrl=Lw%253D%253D
         $return_page_url_regex_pattern='/https:\/\/vagrant\.dev\.schoolbox\.cloud\/news\/\d+\?returnUrl=Lw%253D%253D/';
         $capture_new_news_id='/news\/(\d+)\?returnUrl/';
         $title = 'Smoke Test News Title Draft';
-        $i->loginAdmin();
         #WHEN
         /** @var GuzzleHttp\Psr7\Response $response */
         $response = $i->draftNews($title);
@@ -157,8 +157,8 @@ class SmokeInitialCest {
      */
     public function SmokeHomepagePOST(IntegrationTester $i){
         #GIVEN
-        $homepage_title='Testing Home Page for Homepage Smoke 2';
         $i->loginAdmin(); #we logged in as alaress
+        $homepage_title='Testing Home Page for Homepage Smoke 2';
         $student = $i->getUser('drhodes');
         $teacher = $i->getUser('zsmith');
         $admin = $i->getUser('alaress');
@@ -238,10 +238,28 @@ class SmokeInitialCest {
     /**
      *
      */
+    public function SmokeCoursesPOST(IntegrationTester $i){
+        #GIVEN
+        $i->loginAdmin(); #we logged in as alaress
+        $folder_title='Test Folder For Courses 12';
+        $faculty_folder=$i->getFirstFolderByTitle('Faculties');
+        $i->createFolder($folder_title, -1, $faculty_folder);
+        $course_folder=$i->getFirstFolderByTitle($folder_title);
+
+        #WHEN
+        $folder_title='Course with empty Unit 12';
+        $i->createCourseWithEmptyUnit($folder_title, $course_folder);
+        $folder_title='Course with Unit with assessment 12';
+        $i->createCourseWithTestUnits($folder_title, $course_folder);
+    }
+
+    /**
+     *
+     */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
-        $homepage_title='Testing Home Page for Assessment';
         $i->loginAdmin(); #we logged in as alaress
+        $homepage_title='Testing Home Page for Assessment';
         $i->createHomepage($homepage_title);
         $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
         $i->addDefaultUsersToHomepage($homePageId);

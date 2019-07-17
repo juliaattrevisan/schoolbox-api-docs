@@ -16,6 +16,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
@@ -141,12 +143,42 @@ class IntegrationTester extends \Codeception\Actor
 
     function getFirstHomepageIdByTitle($title)
     {
+        return $this->getFirstFolderIdByTitle($title)->getId();
+    }
+
+    function getFirstFolderByTitle($title)
+    {
         if(!isset($this->database)) {
             $this->initDatabase();
         }
         /** @var Schoolbox\Resource\Folder\Model $folder */
-        $folder = FolderMapper::getInstance()->findOneByColumn('name', $title);
-        return $folder->getId();
+        return FolderMapper::getInstance()->findOneByColumn('name', $title);
+    }
+
+    function getFirstCourseByTitle($title)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        $course_folder = $this->getFirstFolderByTitle($title);
+        return CourseSpecificationMapper::getInstance()->findOneByColumn('folder_id', $course_folder->getId());
+    }
+
+    function getFirstUnitByTitle($title)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        $unit_folder = $this->getFirstFolderByTitle($title);
+        return UnitMapper::getInstance()->findOneByColumn('folder_id', $unit_folder->getId());
+    }
+
+    function getFirstAssessmentByTitle($title)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return AssessmentMapper::getInstance()->findOneByColumn('title', $title);
     }
 
     function getFirstAssessmentIdByTitle($title)
@@ -155,7 +187,7 @@ class IntegrationTester extends \Codeception\Actor
             $this->initDatabase();
         }
         /** @var Schoolbox\Learning\Assessment\DataModel\Mapper $DueWork */
-        $assessment = AssessmentMapper::getInstance()->findOneByColumn('title', $title);
+        $assessment = $this->getFirstAssessmentByTitle($title);
         return $assessment->getId();
     }
 
@@ -280,7 +312,126 @@ class IntegrationTester extends \Codeception\Actor
         return $this->loginForgotPasswordUsername($email);
     }
 
+    private function createNewCourseSpec($name, $parent_folder)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/course/new';
+
+        $page='/course/new';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data =[
+            'name' => $name,
+            'parent' => $parent_folder->getId(),
+            'curriculumCodes' => [''],
+            'part1'=> 1
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    private function createNewUnitSpec($name, $course)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/course/modify/'.$course->getId();
+
+        $page='/course/'.$course->getId().'/unitspecs/new';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data =[
+            'name' => $name
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        try {
+            $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    private function saveCourseSpec($course_name, $unit_name, $parentId, $course_spec, $unit){
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/course/modify/'.$course_spec->getId();
+
+        $page='/course/modify/'.$course_spec->getId();
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data =[
+            'name' => $course_name,
+            'parent' => $parentId,
+            'curriculumCodes' => '',
+            'unit['.$unit->getId().'][name]' => $unit_name,
+            'newUnitName' => '',
+            'submit' => 'Save Course',
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function createCourseWithEmptyUnit($title, $parent_folder)
+    {
+        $this->createNewCourseSpec($title, $parent_folder);
+        $course_spec = $this->getFirstCourseByTitle($title);
+        $unit_name=$title.' EmptyUnit';
+        $this->createNewUnitSpec($unit_name, $course_spec);
+        $unit = $this->getFirstUnitByTitle($unit_name);
+        return $this->saveCourseSpec($title, $unit_name, $parent_folder->getId(), $course_spec, $unit);
+    }
+
+    public function createCourseWithTestUnits($title, $parent_folder)
+    {
+        $this->createNewCourseSpec($title, $parent_folder);
+        $course_spec = $this->getFirstCourseByTitle($title);
+        $unit_name=$title.' UnitWithAssessments';
+        $this->createNewUnitSpec($unit_name, $course_spec);
+        $unit_folder = $this->getFirstFolderByTitle($unit_name);
+        $unit = $this->getFirstUnitByTitle($unit_name);
+        $this->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
+        # TODO Project name after first test run through is not unique, might need to rework what is used to fetch it.
+        $this->createAssessemntProjectOnCourseUnitSpec('Assessment for course project', $unit->getId(), $unit_folder->getId());
+        $project_assessment_id=$this->getFirstAssessmentIdByTitle('Assessment for course project');
+        $this->createAssessemntOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
+        return $this->saveCourseSpec($title, $unit_name, $parent_folder->getId(), $course_spec, $unit);
+    }
+
     public function createHomepage($title)
+    {
+        return $this->createFolder($title, 9);
+    }
+
+    public function createFolder($title, $template=-1, $parent_folder=null)
     {
 
         if (!isset($this->client))
@@ -288,25 +439,36 @@ class IntegrationTester extends \Codeception\Actor
             $this->initGuzzleClient();
         }
 
+        $parent_id=0;
 
-        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/resource/folder/create/0';
+        if (isset($parent_folder))
+        {
+            $parent_id=$parent_folder->getId();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/resource/folder/create/'.$parent_id;
 
         $page='/resource/folder/update';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
-        $data = [   'parent'=>0,
-                    'categoryID'=>null,
-                    'name'=>$title,
-                    'template'=>9,
-                    'colour'=>'',
-                    'group[1]'=>2,
-                    'group[2]'=>1,
-                    'group[3]'=>1,
-                    'group[4]'=>1,
-                    'group[5]'=>1,
-                    'group[6]'=>0,
-                    'code'=>'',
-                    'curriculumCodes[]'=>''];
+        $data = [   'parent'=>$parent_id,
+            'categoryID'=>null,
+            'name'=>$title,
+            'template'=>$template,
+            'colour'=>'',
+            'group[1]'=>2,
+            'group[2]'=>1,
+            'group[3]'=>1,
+            'group[4]'=>1,
+            'group[5]'=>1,
+            'group[6]'=>0,
+            'code'=>'',
+            'curriculumCodes[]'=>''];
+
+        if ($parent_id != 0)
+        {
+            $data['inherit']=1;
+        }
 
         $allow_redirects = $this->redirect_settings;
 
@@ -318,6 +480,7 @@ class IntegrationTester extends \Codeception\Actor
         ]);
 
     }
+
 
     public function addUsersToHomepageGroup($homepage_id, $user_ids)
     {
@@ -501,25 +664,25 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
-    public function createAssessemntOnHomepage($title, $HomePageID)
+    public function createAssessemnt($contexttype, $contextId, $folderId, $title, $assessmentType)
     {
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
         }
 
-        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/assessments/new?type=dueWork';
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/learning/'.$contexttype.'/'.$contextId.'/assessments/new?type=='.$assessmentType;
 
-        $page='/learning/folders/'.$HomePageID.'/assessments';
+        $page='/learning/'.$contexttype.'/'.$contextId.'/assessments';
         $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
 
         $allow_redirects = $this->redirect_settings;
 
         $data =[
-            'contextType' => 'folders',
-            'contextId' => $HomePageID,
-            'folderId' => $HomePageID,
-            'assessmentType' => 'dueWork',
+            'contextType' => $contexttype,
+            'contextId' => $contextId,
+            'folderId' => $folderId,
+            'assessmentType' => $assessmentType,
             'title' => $title,
             'description' => '<p>This is a test assignment for automated tests</p>',
             'acceptOnline' => 0,
@@ -527,7 +690,7 @@ class IntegrationTester extends \Codeception\Actor
             'openDate' => '01/07/2019 12:00am',
             'dueDate' => '10/07/2019 11:59pm',
             'closeDate' => '10/07/2019 11:59pm',
-            'weight' => 13,
+            'weight' => 14,
             'self_reviewable'=>'none',
             'visibility'=>2,
             'markType'=>1,
@@ -543,6 +706,11 @@ class IntegrationTester extends \Codeception\Actor
             'part-2'=>1
         ];
 
+        if ($assessmentType == 'project')
+        {
+            $data['summator']='weighted';
+        }
+
         try {
             return $this->client->request('POST', $url, [
                 'headers' => $this->guzzle_headers,
@@ -555,6 +723,26 @@ class IntegrationTester extends \Codeception\Actor
             print($e->getResponse()->getBody()->getContents());
             throw $e;
         }
+    }
+
+    public function createAssessemntOnHomepage($title, $HomePageID)
+    {
+        return $this->createAssessemnt('folders', $HomePageID, $HomePageID, $title, 'dueWork');
+    }
+
+    public function createAssessemntOnCourseUnitSpec($title, $unit_id, $unit_folder_id)
+    {
+        return $this->createAssessemnt('unitspecs', $unit_id, $unit_folder_id, $title, 'dueWork');
+    }
+
+    public function createAssessemntProjectOnCourseUnitSpec($title, $unit_id, $unit_folder_id)
+    {
+        return $this->createAssessemnt('unitspecs', $unit_id, $unit_folder_id, $title, 'project');
+    }
+
+    public function createAssessemntOnProject($title, $project_id, $unit_folder_id)
+    {
+        return $this->createAssessemnt('projects', $project_id, $unit_folder_id, $title, 'dueWork');
     }
 
     public function determineMarkInvalidation($HomePageID, $assignmentID, $assignmentTitle)
