@@ -163,7 +163,7 @@ class Controller extends Base
             /* Get all the articles for the homepage
              */
             $articleData = (new News\Lists\Homepage(
-                0,
+                (int)$this->getConfigLoader()->get('search_type_limit'),
                 $this->topicMapper,
                 $this->newsMapper,
                 $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
