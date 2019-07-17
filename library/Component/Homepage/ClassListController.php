@@ -4,10 +4,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Alaress\Mail\AbstractMailer;
-use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
@@ -17,7 +17,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute()
+    public function execute(): bool
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
@@ -34,8 +34,10 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
      *
      * @param String $templateHandle
      * @return boolean
+     * @throws InvalidArgumentException
+     * @throws LogicException
      */
-    public function renderTemplate($templateHandle)
+    public function renderTemplate($templateHandle): bool
     {
         if (!parent::loadTemplate($templateHandle, 'classList')) {
             return false;
@@ -146,7 +148,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
                 foreach ($allStudents as $currentStudent) {
 
                     try {
-                        $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
+                        $user = $userMapper->findByExternalId($currentStudent['synergy_id'], Role::STUDENT);
                     } catch (MapperException $e) {
                         // Ok to silently ignore. This just means the SIS has students who are not in SB
                         continue;
