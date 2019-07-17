@@ -66,7 +66,7 @@ class Index extends Base
         return $this->newsMapper->findArticleIdsForTopic(
             $relevantArticles,
             $topicId,
-            $params->getLimit(),
+            0,
             $params->getPageNum(),
             null,
             null,

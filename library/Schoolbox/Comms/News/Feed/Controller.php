@@ -197,7 +197,7 @@ class Controller extends Base
             /* Get all the articles across all topics
              */
             $articleIds = (new News\Lists\Index(
-                (int)$this->getConfigLoader()->get('search_type_limit'),
+                0,
                 $this->topicMapper,
                 $this->newsMapper,
                 $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
