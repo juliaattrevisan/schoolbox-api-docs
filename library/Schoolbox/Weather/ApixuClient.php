@@ -55,6 +55,7 @@ class ApixuClient
      */
     private function makeRequest(int $forecastLimit, string $location) {
         $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key=" . self::API_KEY;
+        // TODO cache me
         $client = new GuzzleHttp\Client(['base_uri' => self::API_BASE_URL]);
         $response = $client->request('GET', $requestUrl);
 
