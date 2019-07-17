@@ -1,9 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
-{% set showMedicalAlert = not config.protect_medicalspecial_profile %}
-{% set showSpecialAlert = not config.protect_medicalspecial_profile %}
-{% set showContactsAlert = config.synergetic_community_alerts and showContacts %}
-
 {% block buttons %}
     {{ parent() }}
     {% if isParentOfStudent %}
