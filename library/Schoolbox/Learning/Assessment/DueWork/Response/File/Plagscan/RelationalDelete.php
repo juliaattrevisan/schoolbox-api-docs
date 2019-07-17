@@ -38,7 +38,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
     {
         $records = $this->mapper->findByColumn($this->hashColumn, $hash, ['deleted' => true]);
 
-        if ($records->count() > 0) {
+        if ($records->count() > 0 || $this->hasStudentSubmissionRecord($hash)) {
             if ($performDryRun) {
                 $this->logger->notice('Will delete [' . $records->count() . '] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
             } else {
@@ -56,5 +56,22 @@ class RelationalDelete extends Deletable implements IRelationalDelete
                 }
             }
         }
+    }
+
+    /**
+     * Check if there's a record that needs to be purged in student_submission_file
+     *
+     * @param $hash
+     *
+     * @return int
+     */
+    private function hasStudentSubmissionRecord($hash): int
+    {
+        $query = 'SELECT COUNT(*) FROM student_submission_file WHERE hash = :hash';
+
+        $statement = $this->database->prepare($query);
+        $statement->execute(['hash' => $hash]);
+
+        return (int) $statement->fetchColumn();
     }
 }
