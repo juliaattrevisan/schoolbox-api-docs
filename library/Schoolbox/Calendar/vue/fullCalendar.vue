@@ -15,6 +15,9 @@
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ]
             }
+        },
+        computed: {
+            window: function () { return window; }
         }
     }
 
@@ -23,6 +26,20 @@
 <template>
     <div>
         <FullCalendar defaultView="dayGridMonth"
+                      :views="{
+                        timeGridDay: {
+                            // dateDisplayFormats.momentJsDateLong: figure out how to inject this
+                            titleFormat: window.dateDisplayFormats.momentJsDateLong
+                        },
+                        timeGridWeek: {
+                            columnFormat: 'ddd D/M'
+                        }
+                      }"
+                      :header="{
+                        left: 'prev,today,next',
+                        center: 'title',
+                        right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                      }"
                       :plugins="calendarPlugins"
         />
     </div>
