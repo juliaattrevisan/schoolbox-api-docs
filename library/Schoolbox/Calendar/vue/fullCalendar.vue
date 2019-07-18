@@ -25,22 +25,38 @@
 
 <template>
     <div>
-        <FullCalendar defaultView="dayGridMonth"
-                      :views="{
-                        timeGridDay: {
-                            // dateDisplayFormats.momentJsDateLong: figure out how to inject this
-                            titleFormat: window.dateDisplayFormats.momentJsDateLong
-                        },
-                        timeGridWeek: {
-                            columnFormat: 'ddd D/M'
-                        }
-                      }"
-                      :header="{
-                        left: 'prev,today,next',
-                        center: 'title',
-                        right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
-                      }"
-                      :plugins="calendarPlugins"
+        <FullCalendar
+            default-view="dayGridMonth"
+            :views="{
+                timeGridDay: {
+                    // dateDisplayFormats.momentJsDateLong: figure out how to inject this
+                    titleFormat: window.dateDisplayFormats.momentJsDateLong
+                },
+                timeGridWeek: {
+                    columnFormat: 'ddd D/M'
+                }
+            }"
+            event-time-format="h(:mm)a"
+            :custom-buttons="{
+                customExport: {
+                    text: 'export',
+                    click: function () {
+                        window.$('#calendar-export').foundation('reveal', 'open');
+                    }
+                },
+                customFilters: {
+                    text: 'filters',
+                    click: function () {
+                        window.$('#calendar-controls').foundation('reveal', 'open');
+                    }
+                },
+            }"
+            :header="{
+                left: 'prev,today,next',
+                center: 'title',
+                right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+            }"
+            :plugins="calendarPlugins"
         />
     </div>
 </template>
