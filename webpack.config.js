@@ -31,6 +31,6 @@ module.exports = {
     extensions: ['*', '.js', '.vue', '.json']
   },
   plugins: [
-      new VueLoaderPlugin()
+    new VueLoaderPlugin()
   ]
 };
