@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use UnexpectedValueException;
 use function preg_match;

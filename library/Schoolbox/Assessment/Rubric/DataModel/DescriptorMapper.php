@@ -13,6 +13,8 @@ use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 

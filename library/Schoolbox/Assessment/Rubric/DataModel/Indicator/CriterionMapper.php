@@ -7,10 +7,12 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use PDOStatement;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\CriterionUsageMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;

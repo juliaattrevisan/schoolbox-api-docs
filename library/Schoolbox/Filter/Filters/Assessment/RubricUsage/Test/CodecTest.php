@@ -10,7 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 

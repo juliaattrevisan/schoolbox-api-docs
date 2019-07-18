@@ -95,7 +95,7 @@ class Controller extends Base
         $selector = new Selector(
             Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
-            DataModel\CriterionMapper::getInstance(),
+            DataModel\Indicator\CriterionMapper::getInstance(),
             DataModel\DescriptorMapper::getInstance()
         );
 

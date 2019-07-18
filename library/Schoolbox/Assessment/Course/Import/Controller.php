@@ -16,7 +16,7 @@ use Component_ConfigMapper;
 use Component_Definition;
 use Component_Instance;
 use Component_InstanceMapper;
-use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;

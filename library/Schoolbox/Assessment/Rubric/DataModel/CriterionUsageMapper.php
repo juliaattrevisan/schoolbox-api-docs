@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
 
 /**
  * Class CriterionUsageMapper

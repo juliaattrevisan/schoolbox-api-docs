@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;

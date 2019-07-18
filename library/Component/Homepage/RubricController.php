@@ -7,14 +7,14 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Schoolbox\Assessment\Rubric\DataModel\Criterion;
-use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * @var Criterion[]
+     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion[]
      */
     protected $criteria = [];
 

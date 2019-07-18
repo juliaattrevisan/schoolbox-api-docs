@@ -7,7 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Curriculum\Node\Model as NodeModel;

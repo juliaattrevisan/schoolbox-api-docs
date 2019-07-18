@@ -12,8 +12,8 @@
 namespace Custom\Help\Nesa;
 
 use Schoolbox\Assessment\Rubric\DataModel;
-use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 class Selector

@@ -7,8 +7,8 @@
  */
 
 
-//use Schoolbox\Assessment\Rubric\DataModel\Criterion;
-//use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
+//use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+//use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
 //use Schoolbox\Assessment\Rubric\DataModel\UsageMapper;
 //use Schoolbox\L10n\RosettaStone;
 //use Schoolbox\Permission\Access\Access;
@@ -97,7 +97,7 @@ exit;
 //    foreach ($criteriaList as $critGroup) {
 //        /** @var \Schoolbox\Assessment\Rubric\DataModel\Group $group */
 //        $group = $critGroup['group'];
-//        /** @var \Schoolbox\Assessment\Rubric\DataModel\Criterion[] $crits */
+//        /** @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion[] $crits */
 //        $crits = $critGroup['criteria'];
 //        $this->setVar([
 //            'criterion_block'    => '',

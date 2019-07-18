@@ -13,7 +13,7 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricGroupMapper;
-use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper as RubricCriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper as RubricCriterionMapper;
 use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;

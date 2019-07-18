@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
 
 class CriterionUsage
 {

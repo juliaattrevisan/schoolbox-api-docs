@@ -7,8 +7,8 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use PDOStatement;
-use Schoolbox\Assessment\Rubric\DataModel\Criterion;
 use Schoolbox\Assessment\Rubric\DataModel\GroupUsageMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
@@ -177,7 +177,7 @@ class Mapper extends BaseMapper
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
-     * @return GenericCollection|Criterion[]
+     * @return GenericCollection|\Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion[]
      * @throws MapperException
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection

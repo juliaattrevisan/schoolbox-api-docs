@@ -7,7 +7,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use DomainException;
-use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
