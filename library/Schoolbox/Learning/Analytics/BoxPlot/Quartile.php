@@ -31,7 +31,7 @@ class Quartile
         if (count($values) === 1) {
             return $values;
         }
-        return array_slice($values, 0, floor(count($values) / 2));
+        return array_slice($values, 0, (int)floor(count($values) / 2));
     }
 
     /**
@@ -58,9 +58,9 @@ class Quartile
         $even = !(count($values) % 2);
 
         if ($even) {
-            $secondHalve = array_slice($values, floor(count($values) / 2), count($values));
+            $secondHalve = array_slice($values, (int)floor(count($values) / 2), count($values));
         } else {
-            $secondHalve = array_slice($values, ceil(count($values) / 2), count($values));
+            $secondHalve = array_slice($values, (int)ceil(count($values) / 2), count($values));
         }
         return $secondHalve;
     }
@@ -93,7 +93,7 @@ class Quartile
         /* Figure out medians in different ways depending
          * on even or odd number of elements
          */
-        $halfway = floor(count($values) / 2);
+        $halfway = (int)floor(count($values) / 2);
 
         $even = !(count($values) % 2);
 
