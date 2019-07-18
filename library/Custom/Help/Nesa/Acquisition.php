@@ -12,8 +12,7 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -52,7 +51,7 @@ class Acquisition
     private $indicators;
 
     /**
-     * @var Rubric\RubricMapper
+     * @var DataModel\RubricMapper
      */
     private $rubricMapper;
 
@@ -77,12 +76,12 @@ class Acquisition
      *
      * $involvement limits the number of Participants and Folders to hydrate
      *
-     * @param array                 $states     The Chosen States
-     * @param int                   $unaccreditedOnly
-     * @param array                 $indicators An array of indicator text
-     * @param Rubric\RubricMapper   $rubricMapper
-     * @param DataModel\MapperProxy $assessmentMapperProxy
-     * @param UserMapper            $userMapper
+     * @param array                  $states     The Chosen States
+     * @param int                    $unaccreditedOnly
+     * @param array                  $indicators An array of indicator text
+     * @param DataModel\RubricMapper $rubricMapper
+     * @param DataModel\MapperProxy  $assessmentMapperProxy
+     * @param UserMapper             $userMapper
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
@@ -90,7 +89,7 @@ class Acquisition
         array $states,
         int $unaccreditedOnly,
         array $indicators,
-        Rubric\RubricMapper $rubricMapper,
+        DataModel\RubricMapper $rubricMapper,
         DataModel\MapperProxy $assessmentMapperProxy,
         UserMapper $userMapper
     ) {
@@ -182,7 +181,7 @@ class Acquisition
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
-            'parentType'      => Rubric\Group::PARENT_TYPE_CATEGORY,
+            'parentType'      => DataModel\Group::PARENT_TYPE_CATEGORY,
         ], $pb->getParams()));
 
         $hierarchy = [];

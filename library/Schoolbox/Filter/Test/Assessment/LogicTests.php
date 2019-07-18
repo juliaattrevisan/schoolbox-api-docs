@@ -7,18 +7,17 @@
 namespace Schoolbox\Filter\Test\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
-use function array_merge;
 use InvalidArgumentException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
-use Schoolbox\Filter;
+use Schoolbox\Assessment\Rubric\DataModel\Group;
 use Schoolbox\Collection;
+use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
-use Schoolbox\Filter\Test\Assessment\TestableIdFinder;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnderflowException;
 use UnexpectedValueException;
+use function array_merge;
 
 class LogicTests extends TestCase
 {

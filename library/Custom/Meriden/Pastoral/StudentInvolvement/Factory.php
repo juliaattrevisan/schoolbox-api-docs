@@ -10,7 +10,7 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Alaress\Statistics\Statistics;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;

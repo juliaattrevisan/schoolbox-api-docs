@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -17,7 +17,7 @@ use Schoolbox\Mapper;
 /**
  * Class LevelMapper
  *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Level hydrate(array $row, $alias = '', $callback = null)
  * @method Level createModel($idValue = null)
  * @method Level findById($id)

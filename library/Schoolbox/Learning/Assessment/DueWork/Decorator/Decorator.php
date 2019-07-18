@@ -17,9 +17,9 @@ use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
 use Schoolbox\Collection;
 use Schoolbox\L10n\RosettaStone;
-use \Schoolbox\Learning\Assessment\DecoratorInterface;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DecoratorInterface;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
@@ -108,7 +108,7 @@ class Decorator implements DecoratorInterface
 
 
         if ($this->getUseRubric()) {
-            $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
+            $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\RubricMapper::getInstance();
             $gridFactory  = new GridFactory();
             $existingGrid = new Grid(
                 $assessment,

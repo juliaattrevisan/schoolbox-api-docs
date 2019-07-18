@@ -8,7 +8,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox;
 use Schoolbox\GenericCollection;

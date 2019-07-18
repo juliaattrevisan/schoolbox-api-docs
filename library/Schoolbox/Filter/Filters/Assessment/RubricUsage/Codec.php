@@ -8,11 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
-use function preg_match;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Group;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use UnexpectedValueException;
+use function preg_match;
 
 /**
  * Responsible for mapping between a filter selection key and a capability id and optional indicator id

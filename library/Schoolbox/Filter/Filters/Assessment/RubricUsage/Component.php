@@ -7,13 +7,13 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
-use function array_merge;
 use InvalidArgumentException;
 use ReflectionException;
+use Schoolbox\Assessment\Rubric\DataModel\Group;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use function array_merge;
 
 class Component extends Filter\BaseComponent
 {

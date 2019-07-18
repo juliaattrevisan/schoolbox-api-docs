@@ -7,9 +7,9 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
 {

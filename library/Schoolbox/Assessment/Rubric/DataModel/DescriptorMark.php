@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -17,7 +17,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
  * Semantically, this class should really be named Selection or similar, but for the sake of matching the db table,
  * mark it is...
  *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @package Schoolbox\Assessment\Rubric\DataModel
  */
 class DescriptorMark
 {

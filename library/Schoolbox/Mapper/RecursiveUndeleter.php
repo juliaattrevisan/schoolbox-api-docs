@@ -32,12 +32,12 @@ use Eportfolio;
 use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile as StudentSubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Rubric\DataModel;
 use Schoolbox\Collection;
 use Schoolbox\Discussion;
 use Schoolbox\GenericCollection;
@@ -171,69 +171,69 @@ class RecursiveUndeleter extends CliTool\App
         ],
         File\Mapper::class              => [],
         LinkMapper::class               => [],
-        Assessment\Mapper::class        => [
+        Assessment\Mapper::class            => [
             Quiz\Mapper::class,
             SubmissionBoxMapper::class,
             TaskMapper::class,
             Project\Mapper::class,
         ],
-        UnitImpl\Mapper::class          => [
+        UnitImpl\Mapper::class              => [
             Assessment\Mapper::class => 'v_ui.course_unit_implementation_id',
         ],
-        Quiz\Mapper::class              => [
+        Quiz\Mapper::class                  => [
             QuizSection\Mapper::class => 'assess_id',
             QuizAttempt\Mapper::class => 'assess_id',
         ],
-        SubmissionBoxMapper::class      => [
-            SubmissionMapper::class   => 'box_id',
-            ReturnedWorkMapper::class => 'box_id',
-            Rubric\LevelMapper::class => 'box_id',
+        SubmissionBoxMapper::class          => [
+            SubmissionMapper::class      => 'box_id',
+            ReturnedWorkMapper::class    => 'box_id',
+            DataModel\LevelMapper::class => 'box_id',
             Eportfolio\ShowcaseMapper::class,
         ],
-        TaskMapper::class               => [
+        TaskMapper::class                   => [
             Task\CompletionMapper::class,
         ],
-        Task\CompletionMapper::class    => [],
-        Project\Mapper::class           => [
+        Task\CompletionMapper::class        => [],
+        Project\Mapper::class               => [
             Assessment\Mapper::class => 'v_pa.project_id',
         ],
-        QuizSection\Mapper::class       => [
+        QuizSection\Mapper::class           => [
             QuizQuestion\Mapper::class => 'section_id',
         ],
-        QuizAttempt\Mapper::class       => [
+        QuizAttempt\Mapper::class           => [
             QuizAnswer\Mapper::class => 'attempt_id',
         ],
-        SubmissionMapper::class         => [
+        SubmissionMapper::class             => [
             StudentSubmissionFile\Mapper::class,
         ],
-        ReturnedWorkMapper::class       => [
+        ReturnedWorkMapper::class           => [
             ReturnedWorkFile\Mapper::class,
         ],
-        Rubric\LevelMapper::class       => [
-            Rubric\DescriptorMapper::class => 'rubric_descriptor.level_id',
+        DataModel\LevelMapper::class        => [
+            DataModel\DescriptorMapper::class => 'rubric_descriptor.level_id',
         ],
-        Eportfolio\ShowcaseMapper::class => [],
-        QuizQuestion\Mapper::class      => [
+        Eportfolio\ShowcaseMapper::class    => [],
+        QuizQuestion\Mapper::class          => [
             QuizSolution\Mapper::class => 'question_id',
         ],
-        QuizAnswer\Mapper::class        => [],
-        QuizSolution\Mapper::class      => [],
+        QuizAnswer\Mapper::class            => [],
+        QuizSolution\Mapper::class          => [],
         StudentSubmissionFile\Mapper::class => [
             Plagscan\Mapper::class,
             Kami\Mapper::class,
         ],
-        ReturnedWorkFile\Mapper::class  => [],
-        Rubric\DescriptorMapper::class  => [],
-        Plagscan\Mapper::class          => [],
-        Kami\Mapper::class              => [],
-        Rubric\CriterionMapper::class   => [
-            Rubric\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
+        ReturnedWorkFile\Mapper::class      => [],
+        DataModel\DescriptorMapper::class   => [],
+        Plagscan\Mapper::class              => [],
+        Kami\Mapper::class                  => [],
+        DataModel\CriterionMapper::class    => [
+            DataModel\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
         ],
-        UserMapper::class               => [
+        UserMapper::class                   => [
             Pastoral\Access\Mapper::class,
             Pastoral\Audience\Mapper::class,
         ],
-        RoleMapper::class               => [
+        RoleMapper::class                   => [
             Pastoral\Access\Mapper::class => 'role_id',
             Pastoral\Audience\Mapper::class => 'role_id',
         ],

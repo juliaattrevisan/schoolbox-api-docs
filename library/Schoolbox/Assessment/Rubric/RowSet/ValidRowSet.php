@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet;
 use Alaress\Specification\Base;
 use Alaress\Specification\Conjunction;
 use Alaress\Specification\ISpecification;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;

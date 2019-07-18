@@ -9,8 +9,9 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use ReflectionException;
-use Schoolbox\Filter\AbstractFactory;
+use Schoolbox\Assessment\Rubric\DataModel;
 use Schoolbox\Filter;
+use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\IComponent;
 use Schoolbox\Filter\IDefinition;
 use Schoolbox\Filter\Page;
@@ -18,9 +19,8 @@ use Schoolbox\Filter\Selection;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper;
-use Schoolbox\User;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\User;
 use UnexpectedValueException;
 
 /**
@@ -128,10 +128,10 @@ class Factory extends AbstractFactory
         // If fetching just capabilities, just get them
 
         if ($showCapabilities && !$showIndicators) {
-            $capabilities = Rubric\GroupMapper::getInstance()->findForFolder($folders->getPropertyValues('id'));
+            $capabilities = DataModel\GroupMapper::getInstance()->findForFolder($folders->getPropertyValues('id'));
         } elseif ($showIndicators) {
-            $capabilities = Rubric\GroupMapper::getInstance()->createCollection();
-            foreach (Rubric\CriterionMapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
+            $capabilities = DataModel\GroupMapper::getInstance()->createCollection();
+            foreach (DataModel\CriterionMapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
                 $capability                                       = $indicator->getGroup();
                 $capability->getIndicators()[$indicator->getId()] = $indicator;
                 if (!$capabilities->offsetExists($capability->getId())) {

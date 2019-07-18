@@ -7,11 +7,14 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
+use Alaress\Authorizer\Authorizer;
+use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
+use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -23,9 +26,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
-use Alaress\Authorizer\Authorizer;
-use Aura\Router;
-use LogicException;
 
 /**
  * Builds a suitable data structure for rendering the MYP/DP Graph component.

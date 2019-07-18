@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\Assessment\Rubric\RowSet\Factory;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;

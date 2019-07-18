@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AttachmentSpecification;
+use Schoolbox\Assessment\Rubric\DataModel;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -94,19 +94,19 @@ class Importer
 
 
     /**
-     * @var Rubric\RubricMapper
+     * @var DataModel\RubricMapper
      */
     private $rubricMapper;
 
 
     /**
-     * @var Rubric\GroupMapper
+     * @var DataModel\GroupMapper
      */
     private $rubricCapabilityMapper;
 
 
     /**
-     * @var Rubric\CriterionMapper
+     * @var DataModel\CriterionMapper
      */
     private $rubricIndicatorMapper;
 
@@ -154,21 +154,21 @@ class Importer
     /**
      * Constructor
      *
-     * @param User                   $currentUser
-     * @param IConfigLoader          $config
-     * @param FolderMapper           $folderMapper
-     * @param HomepageConfigMapper   $homepageConfigMapper
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @param CourseConfigMapper     $courseConfigMapper
-     * @param CourseSpecMapper       $courseSpecMapper
-     * @param UnitSpecMapper         $unitSpecMapper
-     * @param RoleAccessMapper       $roleAccessMapper
-     * @param Rubric\RubricMapper    $rubricMapper
-     * @param Rubric\GroupMapper     $rubricCapabilityMapper
-     * @param Rubric\CriterionMapper $rubricIndicatorMapper
-     * @param AssessmentDataSource   $assessmentDataSource
-     * @param NodeMapper             $nodeMapper
-     * @param ErrorMapper            $errorMapper
+     * @param User                      $currentUser
+     * @param IConfigLoader             $config
+     * @param FolderMapper              $folderMapper
+     * @param HomepageConfigMapper      $homepageConfigMapper
+     * @param HomepageTemplateMapper    $homepageTemplateMapper
+     * @param CourseConfigMapper        $courseConfigMapper
+     * @param CourseSpecMapper          $courseSpecMapper
+     * @param UnitSpecMapper            $unitSpecMapper
+     * @param RoleAccessMapper          $roleAccessMapper
+     * @param DataModel\RubricMapper    $rubricMapper
+     * @param DataModel\GroupMapper     $rubricCapabilityMapper
+     * @param DataModel\CriterionMapper $rubricIndicatorMapper
+     * @param AssessmentDataSource      $assessmentDataSource
+     * @param NodeMapper                $nodeMapper
+     * @param ErrorMapper               $errorMapper
      */
     public function __construct(
         User $currentUser,
@@ -180,9 +180,9 @@ class Importer
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
-        Rubric\RubricMapper $rubricMapper,
-        Rubric\GroupMapper $rubricCapabilityMapper,
-        Rubric\CriterionMapper $rubricIndicatorMapper,
+        DataModel\RubricMapper $rubricMapper,
+        DataModel\GroupMapper $rubricCapabilityMapper,
+        DataModel\CriterionMapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper,
         ErrorMapper $errorMapper

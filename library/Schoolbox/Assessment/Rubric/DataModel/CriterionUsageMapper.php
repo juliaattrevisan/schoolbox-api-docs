@@ -7,7 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use PDOStatement;
 use Schoolbox;
@@ -16,7 +16,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 /**
  * Class CriterionUsageMapper
  *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @package Schoolbox\Assessment\Rubric\DataModel
  * @method CriterionUsage hydrate(array $row, $alias = '', $callback = null)
  * @method CriterionUsage createModel($idValue = null)
  * @method CriterionUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])

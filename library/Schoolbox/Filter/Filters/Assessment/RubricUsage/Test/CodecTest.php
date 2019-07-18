@@ -9,8 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Group;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 

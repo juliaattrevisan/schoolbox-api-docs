@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Alaress\Database\Predicate\Builder;
 use Database;
@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
+use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
@@ -38,7 +39,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;

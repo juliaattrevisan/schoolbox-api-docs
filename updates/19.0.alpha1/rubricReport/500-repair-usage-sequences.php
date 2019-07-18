@@ -6,10 +6,10 @@
  */
 declare(strict_types=1);
 
-use Schoolbox\Application\CliTool;
 use Alaress\Database;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionUsage;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupUsage;
+use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Rubric\DataModel\CriterionUsage;
+use Schoolbox\Assessment\Rubric\DataModel\GroupUsage;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 

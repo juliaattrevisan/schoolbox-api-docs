@@ -7,7 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -18,7 +18,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 /**
  * Class CriterionMapper
  *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Criterion createModel($idValue = null)
  * @method Criterion findById($id)
  * @method Criterion[] findByColumnList($columnList, $options = array())

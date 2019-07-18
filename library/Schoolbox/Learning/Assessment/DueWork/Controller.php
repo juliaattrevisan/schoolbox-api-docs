@@ -15,28 +15,30 @@ use DomainException;
 use DueWork_ErrorMapper;
 use Raven_Client;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
+use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\DataModel;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
-use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Error;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
+use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
-use Schoolbox\Learning\Assessment\Transactor;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
-use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
-use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Timeline\Full as FullTimeline;
+use Schoolbox\Learning\Assessment\Transactor;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -45,15 +47,13 @@ use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Zip\Zip;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Assessment\Term;
-use Schoolbox\Learning\InlineGrader\Kami;
 
 class Controller extends Assessment\Controller
 {
-    /** @var Rubric\ResultMapper */
+    /** @var DataModel\ResultMapper */
     private $resultSetMapper;
 
-    /** @var Rubric\RubricMapper */
+    /** @var DataModel\RubricMapper */
     private $rubricMapper;
 
     /** @var DueWorkResponseMapper */
@@ -79,8 +79,8 @@ class Controller extends Assessment\Controller
      * @param Access                        $access
      * @param Transactor                    $transactor
      * @param Assessment\Breadcrumb\Factory $bakery
-     * @param Rubric\RubricMapper           $rubricMapper
-     * @param Rubric\ResultMapper           $resultSetMapper
+     * @param DataModel\RubricMapper        $rubricMapper
+     * @param DataModel\ResultMapper        $resultSetMapper
      * @param DueWorkResponseMapper         $dueWorkResponseMapper
      * @param ParticipantMapper             $participantMapper
      * @param Term\Mapper                   $termMapper
@@ -97,8 +97,8 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        Rubric\RubricMapper $rubricMapper,
-        Rubric\ResultMapper $resultSetMapper,
+        DataModel\RubricMapper $rubricMapper,
+        DataModel\ResultMapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
@@ -166,7 +166,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'download'       => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'    => Rubric\DescriptorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'rubricMarks'    => DataModel\DescriptorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
         ];
 
@@ -1159,9 +1159,9 @@ class Controller extends Assessment\Controller
         $data['rubricResultSets'] = $rs;
 
         // Do any students have marks for this rubric?
-        $levelIds      = Rubric\LevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
-        $descriptorIds = Rubric\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $countMarkIds  = Rubric\DescriptorMarkMapper::getInstance()->countByColumnList([
+        $levelIds      = DataModel\LevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+        $descriptorIds = DataModel\DescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
+        $countMarkIds  = DataModel\DescriptorMarkMapper::getInstance()->countByColumnList([
             'descriptor_id' => $descriptorIds,
             'valid'         => true
         ]);

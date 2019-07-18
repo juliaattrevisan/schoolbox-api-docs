@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Component_InstanceMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
+use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper as RubricCriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\GroupMapper as RubricGroupMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;

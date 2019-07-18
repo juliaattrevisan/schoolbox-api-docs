@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use PDO;
 use PDOStatement;
@@ -18,7 +18,7 @@ use Schoolbox\Mapper;
 /**
  * Class DescriptorMarkMapper
  *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @package Schoolbox\Assessment\Rubric\DataModel
  * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
  * @method DescriptorMark createModel($idValue = null)
  * @method GenericCollection|DescriptorMark[] createCollection($contents = [])

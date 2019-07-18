@@ -10,9 +10,8 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Rubric\DataModel;
 use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ProfessionalDevelopment;
@@ -34,7 +33,7 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
-     * @var Rubric\RubricMapper
+     * @var DataModel\RubricMapper
      */
     private $rubricMapper;
 
@@ -53,14 +52,14 @@ class Controller extends Base
      *
      * @param Error\Mapper                   $errorMapper
      * @param Specification\Mapper           $courseSpecificationMapper
-     * @param Rubric\RubricMapper            $rubricMapper
+     * @param DataModel\RubricMapper         $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
      * @param UserMapper                     $userMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         Specification\Mapper $courseSpecificationMapper,
-        Rubric\RubricMapper $rubricMapper,
+        DataModel\RubricMapper $rubricMapper,
         ProfessionalDevelopment\Mapper $pdMapper,
         UserMapper $userMapper
     ) {
@@ -96,8 +95,8 @@ class Controller extends Base
         $selector = new Selector(
             Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
-            Rubric\CriterionMapper::getInstance(),
-            Rubric\DescriptorMapper::getInstance()
+            DataModel\CriterionMapper::getInstance(),
+            DataModel\DescriptorMapper::getInstance()
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [

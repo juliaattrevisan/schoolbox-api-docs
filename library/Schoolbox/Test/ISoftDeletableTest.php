@@ -8,25 +8,25 @@ declare(strict_types=1);
 
 namespace Schoolbox\Test;
 
+use Alaress_Byte_Format;
+use Component_InstanceMapper;
 use League\Flysystem\Adapter\NullAdapter;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\Config\TestLoader;
+use Schoolbox\External\SubjectMapper;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
-use SplFileInfo;
-use Schoolbox\External\SubjectMapper;
-use Schoolbox\TagCloud;
-use Schoolbox\Resource;
-use Alaress_Byte_Format;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
-use Component_InstanceMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Resource;
+use Schoolbox\TagCloud;
 use Schoolbox\Video;
+use SplFileInfo;
 
 class ISoftDeletableTest extends TestCase
 {

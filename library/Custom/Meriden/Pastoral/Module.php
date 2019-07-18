@@ -12,19 +12,19 @@ namespace Custom\Meriden\Pastoral;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use House;
 use HouseMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {

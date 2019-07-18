@@ -7,10 +7,10 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
-use Schoolbox\Assessment\Term;
 
 class AllRubrics
 {

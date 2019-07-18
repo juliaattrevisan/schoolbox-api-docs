@@ -7,7 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use PDO;
 use PDOStatement;
@@ -18,7 +18,7 @@ use Schoolbox\GenericCollection;
 /**
  * Class DescriptorMapper
  *
- * @package Schoolbox\Assessment\Component\SubmissionBox\Rubric
+ * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Descriptor createModel($idValue = null)
  * @method Descriptor findById($identifierValue)
  * @method Descriptor[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())

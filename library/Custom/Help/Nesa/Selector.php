@@ -11,11 +11,10 @@
 
 namespace Custom\Help\Nesa;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class Selector
 {
@@ -62,7 +61,7 @@ class Selector
     /**
      * Generate a list of descriptors that were specified in the course $courseSpecificationId
      *
-     * @return Rubric\Descriptor[]|\Schoolbox\GenericCollection
+     * @return DataModel\Descriptor[]|\Schoolbox\GenericCollection
      */
     public function generate()
     {
