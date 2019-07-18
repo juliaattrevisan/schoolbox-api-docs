@@ -158,6 +158,18 @@ class RouteTXRX implements TXRX
                 case self::TYPE_USER:
                     // this is the payload from $tx->put() above
                     $user = $this->mapper->findById($userId);
+                    // if need to retract existing messages first, do so.
+                    if ($instance->retractFirst()) {
+                        // no need to clone, but just in case
+                        $retractInstance = clone $instance;
+                        $retractInstance->setAction(Instance::ACTION_RETRACT_ALL);
+                        $this->sorter->processRetract($retractInstance);
+                        // process after retracting
+                        $count += $this->sorter->process($user, $instance) ? 1 : 0;
+                        // re-add to object list, so that this can be retracted next time
+                        $this->sorter->processEventObjectList($instance);
+                        break;
+                    }
                     $count += $this->sorter->process($user, $instance) ? 1 : 0;
                     break;
                 case self::TYPE_RETRACT:

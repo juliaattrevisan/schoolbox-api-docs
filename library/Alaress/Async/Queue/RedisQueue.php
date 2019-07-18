@@ -80,11 +80,13 @@ abstract class RedisQueue implements QueueInterface
         $id    = $this->getRedisMsgKey($instance);
         $data  = $this->deflate($instance);
 
-        $this->redis->transaction(function (MultiExec $tx) use ($id, $data) {
+        $this->redis->transaction(function (MultiExec $tx) use ($id, $data, $instance) {
+            $ttl = $instance->getTTL() > 0 ? $instance->getTTL() : Instance::DEFAULT_TTL;
             // insert the msg payload ONLY if it doesn't already exist
             $tx->setnx($id, $data)
                 // insert the msg reference into this 'queue'
-               ->sadd($this->getRedisSetKey(), [ $id ]);
+               ->sadd($this->getRedisSetKey(), [$id]);
+            $tx->expire($id, $ttl);
         });
     }
 

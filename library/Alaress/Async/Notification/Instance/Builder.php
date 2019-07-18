@@ -287,6 +287,17 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * Set to TRUE if you wish to retract existing related messages first and then send this message.
+     * @param bool $retractFirst
+     * @return Builder
+     */
+    public function setRetractFirst(bool $retractFirst): self
+    {
+        $this->meta['retractFirst'] = $retractFirst;
+        return $this;
+    }
+
+    /**
      * Explicitly specify the folder id which this message involves
      * @param int $folderId
      * @return Builder

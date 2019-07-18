@@ -289,18 +289,6 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Retracts a given article.
-     *
-     * @param Envelope $envelope
-     * @param Article $article
-     * @return Envelope
-     */
-    private function retractSubmitted(Envelope $envelope, Article $article): Envelope
-    {
-        return $this->retractEventObject($envelope, $article);
-    }
-
-    /**
      * Retracts an expired article.
      *
      * @param Article $article
@@ -310,26 +298,6 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         return $this->retractPosted($envelope, $article);
-    }
-
-    /**
-     * Retracts a rejected/unpublished article.
-     *
-     * @param Article $article
-     * @return Envelope
-     */
-    public function notifySystemModerated(Article $article): Envelope
-    {
-        $envelope = new Envelope();
-        // Retract when rejected or unpublished (in rejected status for now).
-        // Article is unlikely to be in draft status, at this point. However, we should probably retract it, if it is.
-        if ($article->isDraft() || $article->isRejected()) {
-            // Retracting submit notification for rejected article
-            // to increase visibility of when the article is re-submitted.
-            $envelope = $this->retractSubmitted($envelope, $article);
-            return $this->retractPosted($envelope, $article);
-        }
-        return $envelope;
     }
 
     /**
@@ -366,8 +334,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
                 'user'  => new UserParam($effector, Param::STACKING_REPLACE),
-                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_APPEND),
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()), Param::STACKING_APPEND),
             ])
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size={$this->iconSize}")
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_SUBMITTED);
@@ -463,10 +430,14 @@ class Notifier extends AbstractModuleNotifier
             ->setHref(sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()))
             ->setParams([
                 'user' => new UserParam($effector, Param::STACKING_REPLACE),
-                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()),
-                    Param::STACKING_APPEND)
+                'title' => new Param($article->getTitle(), sprintf(self::PATTERN_ARTICLE_HREF, $article->getId()), Param::STACKING_REPLACE)
             ])
             ->addTopic("news.{$article->getId()}." . self::TRIGGER_MODERATED);
+
+        if (!$article->isApproved()) {
+            // magical meta to delete messages related to object first.
+            $bob->setRetractFirst(true);
+        }
 
         $envelope->targetToUser($author, $bob->build());
 
