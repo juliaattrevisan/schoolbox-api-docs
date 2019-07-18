@@ -10,7 +10,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
 use InvalidArgumentException;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\DataModel\Group;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
@@ -827,7 +827,7 @@ class LogicTests extends TestCase
         // RubricUsage keys
         $noRubricUsageKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
         $codec      = new AssessmentFilters\RubricUsage\Codec();
-        $aRubricUsageKey = $codec->encodeCapability((new Group())->setId(1));
+        $aRubricUsageKey = $codec->encodeCapability((new Model())->setId(1));
 
         // MarkPerCap keys
         $noMarkPerCapKey = AssessmentFilters\MarkPerCap\Definition::KEY_NONE;
@@ -1142,7 +1142,7 @@ class LogicTests extends TestCase
         // RubricUsage keys
         $noRubricUsageKey    = AssessmentFilters\RubricUsage\Definition::KEY_NONE;
         $codec      = new AssessmentFilters\RubricUsage\Codec();
-        $aRubricUsageKey = $codec->encodeCapability((new Group())->setId(1));
+        $aRubricUsageKey = $codec->encodeCapability((new Model())->setId(1));
 
         // MarkPerCap keys
         $noMarkPerCapKey = AssessmentFilters\MarkPerCap\Definition::KEY_NONE;

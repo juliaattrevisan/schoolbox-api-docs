@@ -4,9 +4,10 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use DomainException;
+use Schoolbox\Assessment\Rubric\DataModel\Criterion;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -15,9 +16,9 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
- * Model for rubric groups.
+ * Model for rubric capabilities.
  */
-class Group implements ISoftDeletable
+class Model implements ISoftDeletable
 {
     use Id;
     use DeletedAtDate;

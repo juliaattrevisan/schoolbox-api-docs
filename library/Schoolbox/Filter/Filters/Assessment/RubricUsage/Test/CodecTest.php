@@ -9,8 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Assessment\Rubric\DataModel\Criterion;
-use Schoolbox\Assessment\Rubric\DataModel\Group;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 
@@ -38,23 +38,23 @@ class CodecTest extends TestCase
 
 
     /**
-     * @param Group $capability
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $capability
      * @dataProvider providerEncodeInvalidCapability
      * @expectedException InvalidArgumentException
      */
-    public function testEncodeInvalidCapability(Group $capability): void
+    public function testEncodeInvalidCapability(Model $capability): void
     {
         self::$codec->encodeCapability($capability);
     }
 
 
     /**
-     * @param Group  $capability
+     * @param Model  $capability
      * @param string $expected
      * @dataProvider providerEncodeCapability
      * @throws InvalidArgumentException
      */
-    public function testEncodeCapability(Group $capability, string $expected): void
+    public function testEncodeCapability(Model $capability, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeCapability($capability));
     }
@@ -141,9 +141,9 @@ class CodecTest extends TestCase
     public function providerEncodeCapability(): array
     {
         return [
-            [(new Group())->setId(1), 'c1',],
-            [(new Group())->setId(100), 'c100',],
-            [(new Group())->setId('999'), 'c999',],
+            [(new Model())->setId(1), 'c1',],
+            [(new Model())->setId(100), 'c100',],
+            [(new Model())->setId('999'), 'c999',],
         ];
     }
 
@@ -180,11 +180,11 @@ class CodecTest extends TestCase
     public function providerEncodeIndicator(): array
     {
         return [
-            [(new Criterion())->setGroup((new Group())->setId(1))->setId(1), 'c1i1',],
-            [(new Criterion())->setGroup((new Group())->setId(1))->setId(100), 'c1i100',],
-            [(new Criterion())->setGroup((new Group())->setId(1))->setId(999), 'c1i999',],
-            [(new Criterion())->setGroup((new Group())->setId(100))->setId(100), 'c100i100',],
-            [(new Criterion())->setGroup((new Group())->setId(999))->setId(999), 'c999i999',],
+            [(new Criterion())->setGroup((new Model())->setId(1))->setId(1), 'c1i1',],
+            [(new Criterion())->setGroup((new Model())->setId(1))->setId(100), 'c1i100',],
+            [(new Criterion())->setGroup((new Model())->setId(1))->setId(999), 'c1i999',],
+            [(new Criterion())->setGroup((new Model())->setId(100))->setId(100), 'c100i100',],
+            [(new Criterion())->setGroup((new Model())->setId(999))->setId(999), 'c999i999',],
         ];
     }
 
@@ -241,26 +241,26 @@ class CodecTest extends TestCase
 
 
     /**
-     * @return Group[]
+     * @return Model[]
      */
     private function invalidCapabilities(): array
     {
         return [
-            new Group(),
-            (new Group())->setId(null),
+            new Model(),
+            (new Model())->setId(null),
         ];
     }
 
 
     /**
-     * @return Group[]
+     * @return Model[]
      */
     private function validCapabilities(): array
     {
         return [
-            (new Group())->setId(1),
-            (new Group())->setId(100),
-            (new Group())->setId('999'),
+            (new Model())->setId(1),
+            (new Model())->setId(100),
+            (new Model())->setId('999'),
         ];
     }
 

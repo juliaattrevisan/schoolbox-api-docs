@@ -13,6 +13,7 @@ use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -196,7 +197,7 @@ class RubricMapper
         $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
         // Required mappers
-        $capabilityMapper         = GroupMapper::getInstance();
+        $capabilityMapper         = Mapper::getInstance();
         $indicatorMapper          = CriterionMapper::getInstance();
 
         // Existing data
@@ -233,7 +234,7 @@ class RubricMapper
                 $capabilityModel = $capabilityMapper->createModel()
                     ->setId($capabilityId)
                     ->setParentId($folder->getId())
-                    ->setParentType(Group::PARENT_TYPE_CATEGORY);
+                    ->setParentType(Capability::PARENT_TYPE_CATEGORY);
             }
 
             // Validate whether name can be changed
@@ -487,7 +488,7 @@ class RubricMapper
         $levelMapper      = LevelMapper::getInstance();
         $descriptorMapper = DescriptorMapper::getInstance();
         $indicatorMapper  = CriterionMapper::getInstance();
-        $capabilityMapper = GroupMapper::getInstance();
+        $capabilityMapper = Mapper::getInstance();
 
 
         // First, persist the levels
@@ -753,7 +754,7 @@ class RubricMapper
     public function persistMarkedGrid(MarkedGrid $markedGrid): void
     {
         // Required mappers
-        $capabilityMapper     = GroupMapper::getInstance();
+        $capabilityMapper     = Mapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
         $capabilityMarkMapper = GroupMarkMapper::getInstance();
@@ -1249,7 +1250,7 @@ class RubricMapper
         $boxMapper            = SubmissionBoxMapper::getInstance();
         $levelMapper          = LevelMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
-        $groupMapper          = GroupMapper::getInstance();
+        $groupMapper          = Mapper::getInstance();
         $criterionMapper      = CriterionMapper::getInstance();
         $groupUsageMapper     = GroupUsageMapper::getInstance();
         $criterionUsageMapper = CriterionUsageMapper::getInstance();
@@ -1272,11 +1273,11 @@ class RubricMapper
         $dstLevels = $levelMapper->createCollection();
         /** @var Descriptor[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
-        /** @var Group[]|GenericCollection $dstGroups */
+        /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroups = $groupMapper->createCollection();
         /** @var Criterion[]|GenericCollection $dstCriteria */
         $dstCriteria = $criterionMapper->createCollection();
-        /** @var Group[]|GenericCollection $dstGroups */
+        /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroupUsages = $groupUsageMapper->createCollection();
         /** @var CriterionUsage[]|GenericCollection $dstCriterionUsages */
         $dstCriterionUsages = $criterionUsageMapper->createCollection();
@@ -1314,7 +1315,7 @@ class RubricMapper
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
         /** @var Criterion[][] $existingCriterionMap */
         $existingCriterionMap = [];
-        /** @var Group[] $existingGroupMap */
+        /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[] $existingGroupMap */
         $existingGroupMap = [];
         foreach ($existingCriteria as $existingCriterion) {
             $groupName                           = $this->normaliseForComparison($existingCriterion->getGroup()->getName());
@@ -1411,7 +1412,7 @@ class RubricMapper
         foreach ($srcGroupUsages as $srcGroupUsage) {
             $dstGroupUsage = clone $srcGroupUsage;
 
-            /** @var Group $dstGroup */
+            /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $dstGroup */
             $dstGroup = $dstGroups->getOffset($srcGroupUsage->getGroup()->getId());
 
             $dstGroupUsage->setGroup($dstGroup);
@@ -1477,7 +1478,7 @@ class RubricMapper
         // Step 1: figure out the due works in the term for the given folders
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
+           ->equals('rg.parent_type', Capability::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
            ->isNull('a.deleted_at')
@@ -1531,7 +1532,7 @@ class RubricMapper
         $results = [];
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', Group::PARENT_TYPE_CATEGORY)
+           ->equals('rg.parent_type', Capability::PARENT_TYPE_CATEGORY)
            ->greaterThan('rd.max_value', 0.0);
 
         $where             = implode(' AND ', $pb->getWhere());
@@ -1627,7 +1628,7 @@ class RubricMapper
      * @var string   $criteria [rc.id]['grouping']
      * @var string   $criteria [rc.id]['name']
      */
-    public function getAvailableCriteria(array $parentIds, $parentType = Group::PARENT_TYPE_CATEGORY)
+    public function getAvailableCriteria(array $parentIds, $parentType = Capability::PARENT_TYPE_CATEGORY)
     {
         if (!count($parentIds)) {
             return [];

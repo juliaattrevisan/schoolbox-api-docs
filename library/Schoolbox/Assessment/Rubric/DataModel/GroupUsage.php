@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 
 /**
  * Model for usage of a rubric group on a due work.
@@ -20,7 +21,7 @@ class GroupUsage
     public const SEQUENCE_BASE = 1; // Capability sequence is 1-based, not 0-based
 
     /**
-     * @var Group
+     * @var Model
      */
     private $group;
 
@@ -44,19 +45,19 @@ class GroupUsage
 
 
     /**
-     * @return Group
+     * @return Model
      */
-    public function getGroup(): Group
+    public function getGroup(): Model
     {
         return $this->group;
     }
 
 
     /**
-     * @param Group $group
+     * @param Model $group
      * @return static
      */
-    public function setGroup(Group $group): self
+    public function setGroup(Model $group): self
     {
         $this->group = $group;
         return $this;

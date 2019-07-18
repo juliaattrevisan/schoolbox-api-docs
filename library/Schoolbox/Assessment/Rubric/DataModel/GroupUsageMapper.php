@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 
 /**
  * Mapper for usage of a rubric group on a due work.
@@ -32,7 +33,7 @@ class GroupUsageMapper extends Schoolbox\Mapper
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins(
             'rubric_group_id',
-            GroupMapper::class,
+            Mapper::class,
             'id',
             null,
             null,

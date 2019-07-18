@@ -9,6 +9,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 
@@ -42,7 +43,7 @@ class GroupMarkMapper extends Mapper
         );
         $this->joins(
             'rubric_group_id',
-            GroupMapper::class,
+            Mapper::class,
             'id',
             null,
             null,

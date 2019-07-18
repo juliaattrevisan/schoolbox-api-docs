@@ -8,8 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Assessment\Rubric\DataModel\Criterion;
-use Schoolbox\Assessment\Rubric\DataModel\Group;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use UnexpectedValueException;
 use function preg_match;
@@ -37,11 +37,11 @@ class Codec
 
 
     /**
-     * @param Group $capability
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $capability
      * @return string
      * @throws InvalidArgumentException If capability ID not set
      */
-    public function encodeCapability(Group $capability): string
+    public function encodeCapability(Model $capability): string
     {
         if (!$capability->getId()) {
             throw new InvalidArgumentException('Capability ID must be set');

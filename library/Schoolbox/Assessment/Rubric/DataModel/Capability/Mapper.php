@@ -4,9 +4,11 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use PDOStatement;
+use Schoolbox\Assessment\Rubric\DataModel\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\GroupUsageMapper;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
@@ -14,15 +16,15 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * Mapper for rubric groups.
+ * Mapper for rubric capabilities.
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
- * @method Group createModel($idValue = null)
- * @method Group findById($id)
- * @method Group[] findByColumnList($columnList, $options = [])
- * @method Group findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model createModel($idValue = null)
+ * @method Model findById($id)
+ * @method Model[] findByColumnList($columnList, $options = [])
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  */
-class GroupMapper extends BaseMapper
+class Mapper extends BaseMapper
 {
     /**
      * @inheritdoc
@@ -30,7 +32,7 @@ class GroupMapper extends BaseMapper
     protected function mapping(): void
     {
         $this->hasTable('rubric_group');
-        $this->hasModel(Group::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
@@ -72,7 +74,7 @@ class GroupMapper extends BaseMapper
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_group');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
-            /** @var Group $group */
+            /** @var Model $group */
             $group                       = $this->hydrate($row);
             $collection[$group->getId()] = $group;
         }
@@ -103,11 +105,11 @@ class GroupMapper extends BaseMapper
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
      * characters.
      *
-     * @param  Group $object
+     * @param  Model $object
      * @return bool  Always true
      * @throws MapperException if the name isn't unique
      */
-    public function verifyUniqueness(Group $object): bool
+    public function verifyUniqueness(Model $object): bool
     {
         $pb = $this->getPredicateBuilder()
                    ->equals('parent_id', $object->getParentId())
@@ -138,9 +140,9 @@ class GroupMapper extends BaseMapper
      *
      * Soft-deleting a group (hard) deletes all of its usages.
      *
-     * @param Group $group
+     * @param Model $group
      */
-    public function deleteUsages(Group $group): void
+    public function deleteUsages(Model $group): void
     {
         GroupUsageMapper::getInstance()->deleteByColumn('rubric_group_id', $group->getId());
     }
@@ -152,7 +154,7 @@ class GroupMapper extends BaseMapper
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
      * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
-     * @return GenericCollection|Group[]
+     * @return GenericCollection|Model[]
      * @throws MapperException
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
@@ -180,7 +182,7 @@ class GroupMapper extends BaseMapper
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
-        return $this->findForParent($folderId, Group::PARENT_TYPE_CATEGORY, $cache);
+        return $this->findForParent($folderId, Model::PARENT_TYPE_CATEGORY, $cache);
     }
 
 
@@ -191,7 +193,7 @@ class GroupMapper extends BaseMapper
      * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
      * @param string $name       The name of the criterion
      * @param bool   $cache      If false, bypass result cache
-     * @return Group
+     * @return Model
      * @throws MapperException
      */
     public function findOneForParentByName(
@@ -199,7 +201,7 @@ class GroupMapper extends BaseMapper
         string $parentType,
         string $name,
         bool $cache = true
-    ): Group
+    ): Model
     {
         return $this->findOneByColumnList(
             [
@@ -219,12 +221,12 @@ class GroupMapper extends BaseMapper
      * @param int    $folderId  The folder ID to find for
      * @param string $name      The name of the group
      * @param bool   $cache     If false, bypass result cache
-     * @return Group
+     * @return Model
      * @throws MapperException
      */
-    public function findOneForFolderByName(int $folderId, string $name, bool $cache = true): Group
+    public function findOneForFolderByName(int $folderId, string $name, bool $cache = true): Model
     {
-        return $this->findOneForParentByName($folderId, Group::PARENT_TYPE_CATEGORY, $name, $cache);
+        return $this->findOneForParentByName($folderId, Model::PARENT_TYPE_CATEGORY, $name, $cache);
     }
 
 
@@ -236,7 +238,7 @@ class GroupMapper extends BaseMapper
      * @param string $parentType
      * @param string $name
      * @param bool   $cache
-     * @return Group
+     * @return Model
      * @throws MapperException if for some reason it can't be created
      */
     public function findOrCreateOneForParentByName(
@@ -244,7 +246,7 @@ class GroupMapper extends BaseMapper
         string $parentType,
         string $name,
         bool $cache = true
-    ): Group
+    ): Model
     {
         try {
             return $this->findOneForParentByName($parentId, $parentType, $name, $cache);
@@ -273,12 +275,12 @@ class GroupMapper extends BaseMapper
      * @param int    $folderId
      * @param string $name
      * @param bool   $cache
-     * @return Group
+     * @return Model
      * @throws MapperException if for some reason it can't be created
      */
-    public function findOrCreateOneForFolderByName(int $folderId, string $name, bool $cache = true): Group
+    public function findOrCreateOneForFolderByName(int $folderId, string $name, bool $cache = true): Model
     {
-        return $this->findOrCreateOneForParentByName($folderId, Group::PARENT_TYPE_CATEGORY, $name, $cache);
+        return $this->findOrCreateOneForParentByName($folderId, Model::PARENT_TYPE_CATEGORY, $name, $cache);
     }
 
 

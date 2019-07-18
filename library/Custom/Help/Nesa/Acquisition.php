@@ -181,7 +181,7 @@ class Acquisition
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
-            'parentType'      => DataModel\Group::PARENT_TYPE_CATEGORY,
+            'parentType'      => DataModel\Capability\Model::PARENT_TYPE_CATEGORY,
         ], $pb->getParams()));
 
         $hierarchy = [];

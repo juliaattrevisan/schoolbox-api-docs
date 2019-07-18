@@ -128,9 +128,9 @@ class Factory extends AbstractFactory
         // If fetching just capabilities, just get them
 
         if ($showCapabilities && !$showIndicators) {
-            $capabilities = DataModel\GroupMapper::getInstance()->findForFolder($folders->getPropertyValues('id'));
+            $capabilities = DataModel\Capability\Mapper::getInstance()->findForFolder($folders->getPropertyValues('id'));
         } elseif ($showIndicators) {
-            $capabilities = DataModel\GroupMapper::getInstance()->createCollection();
+            $capabilities = DataModel\Capability\Mapper::getInstance()->createCollection();
             foreach (DataModel\CriterionMapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
                 $capability                                       = $indicator->getGroup();
                 $capability->getIndicators()[$indicator->getId()] = $indicator;

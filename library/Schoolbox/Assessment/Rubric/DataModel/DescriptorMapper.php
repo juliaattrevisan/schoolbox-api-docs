@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDO;
 use PDOStatement;
 use Schoolbox;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
@@ -144,7 +145,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
         /** @var Criterion $criterion */
         $criterion = null;
 
-        /** @var Group $group */
+        /** @var Model $group */
         $group = null;
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
@@ -167,7 +168,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 }
 
                 // Set the group as well
-                /** @var Group $group */
+                /** @var Model $group */
                 /** @var Criterion $criterion */
                 $group     = $groups->getOffset($groupId);
                 $criterion = $this->hydrateJoin($r, 'criterion', 'c');

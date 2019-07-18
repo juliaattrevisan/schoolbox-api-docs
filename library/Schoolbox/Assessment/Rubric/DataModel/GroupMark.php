@@ -7,6 +7,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 
@@ -25,7 +26,7 @@ class GroupMark
 
 
     /**
-     * @var Group
+     * @var Model
      */
     private $group;
 
@@ -63,19 +64,19 @@ class GroupMark
 
 
     /**
-     * @return Group
+     * @return Model
      */
-    public function getGroup(): Group
+    public function getGroup(): Model
     {
         return $this->group;
     }
 
 
     /**
-     * @param Group $group
+     * @param Model $group
      * @return static
      */
-    public function setGroup(Group $group): self
+    public function setGroup(Model $group): self
     {
         $this->group = $group;
         return $this;

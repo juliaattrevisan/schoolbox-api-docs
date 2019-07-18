@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -30,7 +31,7 @@ class Criterion implements ISoftDeletable
 
 
     /**
-     * @var Group
+     * @var Model
      */
     private $group;
 
@@ -62,18 +63,18 @@ class Criterion implements ISoftDeletable
     }
 
     /**
-     * @return Group
+     * @return Model
      */
-    public function getGroup(): Group
+    public function getGroup(): Model
     {
         return $this->group;
     }
 
     /**
-     * @param Group $group
+     * @param Model $group
      * @return static
      */
-    public function setGroup(Group $group)
+    public function setGroup(Model $group)
     {
         $this->group = $group;
         return $this;

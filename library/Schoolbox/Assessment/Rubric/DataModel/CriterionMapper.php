@@ -9,6 +9,8 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDOStatement;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
@@ -33,7 +35,7 @@ class CriterionMapper extends BaseMapper {
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joins('rubric_group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
+        $this->joins('rubric_group_id', Mapper::class, 'id', null, null, 'group', 'group');
 
         // Add curriculum codes
         $this->joinsVia(
@@ -87,7 +89,7 @@ class CriterionMapper extends BaseMapper {
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var GroupMapper                   $groupMapper */
+        /** @var Mapper                   $groupMapper */
         /** @var NodeMapper                    $curriculumNodeMapper */
         /** @var GenericCollection|Criterion[] $collection */
         $groupMapper          = $this->getJoinMapper('group');
@@ -265,7 +267,7 @@ class CriterionMapper extends BaseMapper {
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
-        return $this->findForParent($folderId, Group::PARENT_TYPE_CATEGORY, $cache);
+        return $this->findForParent($folderId, Model::PARENT_TYPE_CATEGORY, $cache);
     }
 
 
@@ -315,7 +317,7 @@ class CriterionMapper extends BaseMapper {
      */
     public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Criterion
     {
-        return $this->findOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+        return $this->findOneForParentByKey($folderId, Model::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 
@@ -352,7 +354,7 @@ class CriterionMapper extends BaseMapper {
 
         } catch (MapperException $e) {
             // Build it
-            /** @var GroupMapper $groupMapper */
+            /** @var Mapper $groupMapper */
             $groupMapper = $this->getJoinMapper('group');
             $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName, $cache);
             $criterion   = $this->createModel()
@@ -384,7 +386,7 @@ class CriterionMapper extends BaseMapper {
         bool $cache = true
     ): Criterion
     {
-        return $this->findOrCreateOneForParentByKey($folderId, Group::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+        return $this->findOrCreateOneForParentByKey($folderId, Model::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 

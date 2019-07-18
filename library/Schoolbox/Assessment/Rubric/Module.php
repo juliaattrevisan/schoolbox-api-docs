@@ -12,8 +12,8 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Assessment\Rubric\DataModel\CriterionMapper;
-use Schoolbox\Assessment\Rubric\DataModel\GroupMapper;
 use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -75,7 +75,7 @@ class Module extends BaseModule
                 'mapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
                 'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'groupMapper'          => $this->getMapperFactory()->getLazy(GroupMapper::class),
+                'groupMapper'          => $this->getMapperFactory()->getLazy(Mapper::class),
                 'criterionMapper'      => $this->getMapperFactory()->getLazy(CriterionMapper::class),
             ])
         );
