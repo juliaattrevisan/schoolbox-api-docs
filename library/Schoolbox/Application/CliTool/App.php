@@ -81,6 +81,29 @@ abstract class App
 
 
     /**
+     * Returns whether this app should be run as root, not root, or either.
+     *
+     * * TRUE  => must be run as root
+     * * FALSE => must be run as non-root
+     * * NULL  => can be run as either root or non-root
+     *
+     * * Normal tools should probably return FALSE.
+     * * Update scripts should return NULL or TRUE, as they are run by root
+     *
+     * Note that often update scripts will call tools. In this case, if the tool returns FALSE,
+     * simply override the method using an anonymous class.
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        // To err on the side of safety, default to FALSE, as otherwise any logs and files written will be
+        // owned by root and difficult to clean up or use by other tools.
+        return false;
+    }
+
+
+    /**
      * Common app setup implementation
      *
      * @param array           $appOptions

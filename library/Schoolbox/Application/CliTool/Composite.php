@@ -11,6 +11,7 @@ namespace Schoolbox\Application\CliTool;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use Throwable;
+use UnexpectedValueException;
 
 /**
  * A composite app: contains one or more sub-apps to be run in sequence.
@@ -24,15 +25,50 @@ class Composite extends App
      */
     private $subApps = [];
 
+    /** @var null|bool */
+    private $runAsRoot;
+
 
     /**
      * Constructor
      *
+     * Throws an exception if we attempt to add an invalid combination of sub-apps
+     *
      * @param App ...$subApps
+     * @throws UnexpectedValueException
      */
     public function __construct(App... $subApps)
     {
         $this->subApps = $subApps;
+
+        // Ensure all sub-apps are consistent regarding their permitted execution
+        $mustBeRoot = $mustBeNonRoot = false;
+        foreach ($this->subApps as $subApp) {
+            if ($subApp->runAsRoot()) {
+                $mustBeRoot = true;
+            } elseif ($subApp->runAsRoot() === false) {
+                $mustBeNonRoot = true;
+            }
+        }
+        if ($mustBeRoot && $mustBeNonRoot) {
+            throw new UnexpectedValueException('Composite sub-apps require being run as both root and non-root, this is impossible');
+        }
+        if ($mustBeRoot) {
+            $this->runAsRoot = true;
+        } elseif ($mustBeNonRoot) {
+            $this->runAsRoot = false;
+        } else {
+            $this->runAsRoot = null;
+        }
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function runAsRoot(): ?bool
+    {
+        return $this->runAsRoot;
     }
 
 

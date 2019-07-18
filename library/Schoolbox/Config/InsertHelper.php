@@ -27,6 +27,14 @@ abstract class InsertHelper extends CliTool\App
     private $insertStatement;
 
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        // Update scripts run as root
+        return null;
+    }
+
+
     /**
      * Hands off execution over to the App
      *

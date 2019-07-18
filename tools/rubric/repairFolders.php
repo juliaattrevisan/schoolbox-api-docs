@@ -19,7 +19,7 @@ $options = [
 ];
 
 try {
-    (new CliTool\Kernel(new Repair\Folder(), null, $options))->runApp();
+    (new CliTool\Kernel(new Repair\Folder(), $options))->runApp();
 } catch (Throwable $e) {
     /** @noinspection PhpUnhandledExceptionInspection */
     throw $e;

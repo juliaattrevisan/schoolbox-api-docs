@@ -18,6 +18,14 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        // Update scripts run as root
+        return null;
+    }
+
+
     /**
      * Hands off execution over to the App
      */
@@ -122,4 +130,4 @@ $app = new class extends CliTool\App
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

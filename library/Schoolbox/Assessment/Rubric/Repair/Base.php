@@ -221,6 +221,13 @@ abstract class Base extends CliTool\App
     }
 
 
+    /** @inheritdoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
+
     /**
      * Set up basic dependencies for all repair scripts.
      *

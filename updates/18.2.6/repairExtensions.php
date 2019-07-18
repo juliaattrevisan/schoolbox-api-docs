@@ -24,6 +24,13 @@ $app = new class extends CliTool\App
         WHERE storage_id = :storageId
     ';
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        // Update scripts run as root
+        return null;
+    }
+
     /**
      * Re-assign originally intended file extension
      *
@@ -94,4 +101,4 @@ $app = new class extends CliTool\App
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

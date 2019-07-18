@@ -29,6 +29,14 @@ $app = new class extends CliTool\App
     private $countIndicatorUsagesChanged = 0;
 
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        // Update scripts run as root
+        return null;
+    }
+
+
     /**
      * Hands off execution over to the App
      *
@@ -339,7 +347,7 @@ $app = new class extends CliTool\App
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new CliTool\Kernel($app, null, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();
+(new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();
 
 
 

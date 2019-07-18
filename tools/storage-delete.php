@@ -24,6 +24,14 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
     private $hash;
 
+
+    /** @inheritdoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
+
     /** @inheritdoc */
     public function getLongOpts(): array
     {
@@ -51,6 +59,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         exit(0);
     }
 
-}, null, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+}, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

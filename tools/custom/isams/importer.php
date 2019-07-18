@@ -53,6 +53,13 @@ $app = new class extends CliTool\App
     }
 
 
+    /** @inheritdoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
+
     /**
      * Execute each strat in the composite
      */
@@ -104,4 +111,4 @@ HELP;
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

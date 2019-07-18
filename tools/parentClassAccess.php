@@ -262,5 +262,5 @@ $kernel = new CliTool\Kernel(
         }
 
     }
-    , false);
+);
 $kernel->runApp();

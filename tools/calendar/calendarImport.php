@@ -146,8 +146,7 @@ HELP;
 
             return $valid;
         }
-    },
-    false
+    }
 );
 
 $kernel->runApp();

@@ -69,7 +69,6 @@ class Kernel extends CliKernelAbstract
 
     /**
      * @param App       $app
-     * @param bool|null $runAsRoot [TRUE => Must be run as root, FALSE => must not be, NULL => either)
      * @param array     $options Keys are one of the self::OPTION_X constants
      * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
@@ -80,10 +79,10 @@ class Kernel extends CliKernelAbstract
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException
      */
-    public function __construct(App $app, ?bool $runAsRoot, array $options = [])
+    public function __construct(App $app, array $options = [])
     {
         $this->validateOptions($options);
-        $this->checkSystemUserRootStatus($runAsRoot);
+        $this->checkSystemUserRootStatus($app->runAsRoot());
         $this->app = $app;
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
