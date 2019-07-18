@@ -6,9 +6,9 @@ VALUES (
    'Assessment Calendar',
    'A staff only calendar that provides the ability to see all assessments due dates and filter them to specific
     sets of users. Helps provide oversight on student work load and assessment collisions.',
-   (SELECT id from lu_config_field WHERE name = 'boolean'),
+   (SELECT id from lu_config_field WHERE field = 'boolean'),
    null,
-   (SELECT id from lu_config_type WHERE name = 'Modules'),
+   (SELECT id from lu_config_type WHERE type = 'Modules'),
    'true',
    'false',
    'false',
