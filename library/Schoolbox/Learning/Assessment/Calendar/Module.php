@@ -15,6 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Role;
 
 class Module extends BaseModule
 {
@@ -35,7 +36,8 @@ class Module extends BaseModule
         /* Anyone can see the form
          */
         $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF)
         );
 
         $this->register('GET', '', 'getReport', $getPerms);

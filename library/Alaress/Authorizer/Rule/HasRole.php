@@ -6,7 +6,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Alaress\Authorizer\Rule;
 
 use Schoolbox\User;
@@ -24,10 +23,12 @@ class HasRole extends All
      */
     protected $role;
 
+
     /**
-     * @param string $role The role to check.
+     * @param string $role The role to check. Matches one of the consts in Role
+     * @throws \InvalidArgumentException
      */
-    public function __construct($role)
+    public function __construct(string $role)
     {
         $this->role = $role;
 
