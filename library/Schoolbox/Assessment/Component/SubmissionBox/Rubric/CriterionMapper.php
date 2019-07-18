@@ -32,14 +32,7 @@ class CriterionMapper extends BaseMapper {
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-
-        // These fields now belong to rubric_group
-//        $this->uses('grouping', self::TYPE_STRING);
-//        $this->uses('parent_id', self::TYPE_INTEGER);
-//        $this->uses('parent_type', self::TYPE_STRING);
-
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-
         $this->joins('rubric_group_id', GroupMapper::class, 'id', null, null, 'group', 'group');
 
         // Add curriculum codes

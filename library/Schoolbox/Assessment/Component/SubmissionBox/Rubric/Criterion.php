@@ -22,20 +22,6 @@ class Criterion implements ISoftDeletable
     use DeletedAtDate;
     use HasCurriculumNodes;
 
-    /**
-     * @deprecated use `Group::PARENT_TYPE_CATEGORY` instead
-     */
-    public const PARENT_TYPE_CATEGORY   = 'category';
-
-    /**
-     * @deprecated use `Group::PARENT_TYPE_SUBMISSION` instead
-     */
-    public const PARENT_TYPE_SUBMISSION = 'submission';
-
-    /**
-     * @deprecated use `Group::PARENT_TYPE_CURRICULUM` instead
-     */
-    public const PARENT_TYPE_CURRICULUM = 'curriculum';
 
     /**
      * @var string
@@ -58,30 +44,6 @@ class Criterion implements ISoftDeletable
     }
 
     /**
-     * @deprecated use `$this->getGroup()->setName()` instead
-     * @param  string $grouping
-     * @return $this
-     */
-    public function setGrouping($grouping)
-    {
-        trigger_error('This method is deprecated; use "getGroup()->setName()" instead', E_USER_DEPRECATED);
-//        $this->grouping = $grouping;
-        $this->group->setName($grouping);
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->getGroup()->getName()` instead
-     * @return string
-     */
-    public function getGrouping()
-    {
-        trigger_error('This method is deprecated; use "getGroup()->getName()" instead', E_USER_DEPRECATED);
-//        return $this->grouping;
-        return $this->group->getName();
-    }
-
-    /**
      * @param  string $name
      * @return $this
      */
@@ -97,54 +59,6 @@ class Criterion implements ISoftDeletable
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @deprecated use `$this->getGroup()->setParentId()` instead
-     * @param  int $parent_id
-     * @return $this
-     */
-    public function setParentId($parent_id)
-    {
-        trigger_error('This method is deprecated; use "getGroup()->setParentId()" instead', E_USER_DEPRECATED);
-//        $this->parent_id = $parent_id;
-        $this->group->setParentId($parent_id);
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->getGroup()->getParentId()` instead
-     * @return int
-     */
-    public function getParentId()
-    {
-        trigger_error('This method is deprecated; use "getGroup()->getParentId()" instead', E_USER_DEPRECATED);
-//        return $this->parent_id;
-        return $this->group->getParentId();
-    }
-
-    /**
-     * @deprecated use `$this->getGroup()->setParentType()` instead
-     * @param  string $parent_type
-     * @return $this
-     */
-    public function setParentType($parent_type)
-    {
-        trigger_error('This method is deprecated; use "getGroup()->setParentType()" instead', E_USER_DEPRECATED);
-//        $this->parent_type = $parent_type;
-        $this->group->setParentType($parent_type);
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->getGroup()->getParentType()` instead
-     * @return string
-     */
-    public function getParentType()
-    {
-        trigger_error('This method is deprecated; use "getGroup()->getParentType()" instead', E_USER_DEPRECATED);
-//        return $this->parent_type;
-        return $this->group->getParentType();
     }
 
     /**

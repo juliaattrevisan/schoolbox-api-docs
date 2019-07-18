@@ -8,7 +8,6 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
-use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 
@@ -47,38 +46,6 @@ class DescriptorMark
      * @var float|null
      */
     private $value;
-
-
-    /**
-     * @deprecated use `getGroupMark()->getSubmissionReturn()` instead
-     * @return null|ReturnedWork
-     */
-    public function getSubmissionReturn(): ?ReturnedWork
-    {
-        trigger_error(
-            'This method is deprecated; use "getGroupMark()->getSubmissionReturn()" instead',
-            E_USER_DEPRECATED
-        );
-//        return $this->submissionReturn;
-        return $this->groupMark->getSubmissionReturn();
-    }
-
-
-    /**
-     * @deprecated use `getGroupMark()->setSubmissionReturn()` instead
-     * @param null|ReturnedWork $submissionReturn
-     * @return $this
-     */
-    public function setSubmissionReturn(?ReturnedWork $submissionReturn): self
-    {
-        trigger_error(
-            'This method is deprecated; use "getGroupMark()->setSubmissionReturn()" instead',
-            E_USER_DEPRECATED
-        );
-//        $this->submissionReturn = $submissionReturn;
-        $this->groupMark->setSubmissionReturn($submissionReturn);
-        return $this;
-    }
 
 
     /**

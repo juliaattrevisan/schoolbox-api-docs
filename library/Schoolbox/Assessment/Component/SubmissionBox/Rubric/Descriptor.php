@@ -93,28 +93,6 @@ class Descriptor implements ISoftDeletable
     }
 
     /**
-     * @deprecated use `$this->setMaxValue()` instead
-     * @param  float|null $value
-     * @return $this
-     */
-    public function setValue($value)
-    {
-        trigger_error('This method is deprecated; use "setMaxValue()" instead', E_USER_DEPRECATED);
-        $this->setMaxValue($value);
-        return $this;
-    }
-
-    /**
-     * @deprecated use `$this->getMaxValue()` instead
-     * @return float|null
-     */
-    public function getValue()
-    {
-        trigger_error('This method is deprecated; use "getMaxValue()" instead', E_USER_DEPRECATED);
-        return $this->getMaxValue();
-    }
-
-    /**
      * @param  float|null $maxValue
      * @return $this
      */

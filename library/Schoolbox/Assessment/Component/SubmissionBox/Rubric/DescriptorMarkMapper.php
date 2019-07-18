@@ -51,9 +51,6 @@ class DescriptorMarkMapper extends Mapper
             'group_mark'
         );
 
-        // This join is deprecated; join through group_mark.submission_return
-//        $this->joins('return_id', ReturnedWorkMapper::class, 'id', self::TYPE_MODEL, null, 'submissionReturn', 'submission_return');
-
         $this->joins(
             'descriptor_id',
             DescriptorMapper::class,
