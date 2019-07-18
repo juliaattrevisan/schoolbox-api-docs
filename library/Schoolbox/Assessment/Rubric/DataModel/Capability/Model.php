@@ -7,7 +7,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use DomainException;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -75,7 +75,7 @@ class Model implements ISoftDeletable
      */
     private $parentType = self::PARENT_TYPE_CATEGORY;
 
-    /** @var GenericCollection|Criterion[] */
+    /** @var GenericCollection|Model[] */
     private $indicators;
 
     /**
@@ -84,7 +84,7 @@ class Model implements ISoftDeletable
     public function __construct()
     {
         $this->curriculumNodes = new GenericCollection(NodeModel::class);
-        $this->indicators      = new GenericCollection(Criterion::class);
+        $this->indicators      = new GenericCollection(Model::class);
     }
 
     /**
@@ -143,7 +143,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return Criterion[]|GenericCollection
+     * @return Model[]|GenericCollection
      */
     public function getIndicators(): GenericCollection
     {
@@ -152,7 +152,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param Criterion[]|GenericCollection $indicators
+     * @param Model[]|GenericCollection $indicators
      * @return $this
      * @throws DomainException
      */

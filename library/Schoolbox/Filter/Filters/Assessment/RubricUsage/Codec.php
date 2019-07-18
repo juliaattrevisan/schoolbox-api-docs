@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use UnexpectedValueException;
 use function preg_match;
@@ -51,11 +51,11 @@ class Codec
 
 
     /**
-     * @param Criterion $indicator
+     * @param Model $indicator
      * @return string
      * @throws InvalidArgumentException If capability or indicator ID not set
      */
-    public function encodeIndicator(Criterion $indicator): string
+    public function encodeIndicator(Model $indicator): string
     {
         if (!$indicator->getId()) {
             throw new InvalidArgumentException('Indicator ID must be set');

@@ -1,6 +1,6 @@
 <?php
 /**
- * Model for rubric criteria.
+ * Model for rubric indicators.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
@@ -17,7 +17,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Criterion implements ISoftDeletable
+class Model implements ISoftDeletable
 {
     use Id;
     use DeletedAtDate;
@@ -31,7 +31,7 @@ class Criterion implements ISoftDeletable
 
 
     /**
-     * @var Model
+     * @var CapabilityModel
      */
     private $group;
 
@@ -63,18 +63,18 @@ class Criterion implements ISoftDeletable
     }
 
     /**
-     * @return Model
+     * @return CapabilityModel
      */
-    public function getGroup(): Model
+    public function getGroup(): CapabilityModel
     {
         return $this->group;
     }
 
     /**
-     * @param Model $group
+     * @param CapabilityModel $group
      * @return static
      */
-    public function setGroup(Model $group)
+    public function setGroup(CapabilityModel $group)
     {
         $this->group = $group;
         return $this;

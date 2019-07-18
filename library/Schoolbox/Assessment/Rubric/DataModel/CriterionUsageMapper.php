@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 
 /**
  * Class CriterionUsageMapper
@@ -29,7 +29,7 @@ class CriterionUsageMapper extends Schoolbox\Mapper
         $this->hasTable('rubric_criterion_usage');
         $this->hasModel(CriterionUsage::class);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('criterion_id', Mapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
 
         // Criterion usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE

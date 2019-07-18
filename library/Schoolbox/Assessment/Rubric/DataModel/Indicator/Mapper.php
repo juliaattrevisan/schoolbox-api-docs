@@ -9,8 +9,8 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use PDOStatement;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Assessment\Rubric\DataModel\CriterionUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
 use Schoolbox\Assessment\Rubric\Util;
@@ -20,24 +20,24 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * Class CriterionMapper
+ * Mapper for rubric indicators.
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
- * @method Criterion createModel($idValue = null)
- * @method Criterion findById($id)
- * @method Criterion[] findByColumnList($columnList, $options = array())
- * @method Criterion findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model createModel($idValue = null)
+ * @method Model findById($id)
+ * @method Model[] findByColumnList($columnList, $options = array())
+ * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  */
-class CriterionMapper extends BaseMapper {
+class Mapper extends BaseMapper {
 
     protected function mapping() {
         $this->hasTable('rubric_criterion');
-        $this->hasModel(Criterion::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joins('rubric_group_id', Mapper::class, 'id', null, null, 'group', 'group');
+        $this->joins('rubric_group_id', CapabilityMapper::class, 'id', null, null, 'group', 'group');
 
         // Add curriculum codes
         $this->joinsVia(
@@ -91,15 +91,15 @@ class CriterionMapper extends BaseMapper {
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var Mapper                   $groupMapper */
+        /** @var CapabilityMapper $groupMapper */
         /** @var NodeMapper                    $curriculumNodeMapper */
-        /** @var GenericCollection|Criterion[] $collection */
+        /** @var GenericCollection|Model[] $collection */
         $groupMapper          = $this->getJoinMapper('group');
         $groupIds             = [];
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
-            /** @var Criterion $crit */
+            /** @var Model $crit */
             $crit = $this->hydrate($row);
             if ($row['g.id']) {
                 $groupIds[] = $row['g.id'];
@@ -135,10 +135,10 @@ class CriterionMapper extends BaseMapper {
     /**
      * Soft-delete callback to delete any descriptors for this criterion
      *
-     * @param Criterion $criterion
+     * @param Model $criterion
      * @return bool
      */
-    public function softDeleteDescriptors(Criterion $criterion)
+    public function softDeleteDescriptors(Model $criterion)
     {
         DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
         return true;
@@ -151,10 +151,10 @@ class CriterionMapper extends BaseMapper {
      * If there's no remaining non-deleted criteria for this group, delete the
      * group.
      *
-     * @param Criterion $criterion
+     * @param Model $criterion
      * @return bool
      */
-    public function deleteGroup(Criterion $criterion)
+    public function deleteGroup(Model $criterion)
     {
         $remaining = $this->countByColumn('rubric_group_id', $criterion->getGroup()->getId());
         if (0 === $remaining) {
@@ -169,10 +169,10 @@ class CriterionMapper extends BaseMapper {
      *
      * Undelete the criterion's group, if it's deleted.
      *
-     * @param Criterion $criterion
+     * @param Model $criterion
      * @return bool
      */
-    public function restoreGroup(Criterion $criterion)
+    public function restoreGroup(Model $criterion)
     {
         if ($criterion->getGroup()->isDeleted()) {
             $this->getJoinMapper('group')->restoreSoftDeleted($criterion->getGroup());
@@ -187,9 +187,9 @@ class CriterionMapper extends BaseMapper {
      * Soft-deleting a criterion (hard) deletes all of its usages from any
      * rubrics.
      *
-     * @param Criterion $criterion
+     * @param Model $criterion
      */
-    public function deleteUsages(Criterion $criterion): void
+    public function deleteUsages(Model $criterion): void
     {
         CriterionUsageMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
     }
@@ -205,11 +205,11 @@ class CriterionMapper extends BaseMapper {
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
      * characters.
      *
-     * @param  Criterion $object
+     * @param  Model $object
      * @return bool      Always true
      * @throws MapperException if the name isn't unique
      */
-    public function verifyUniqueness(Criterion $object): bool
+    public function verifyUniqueness(Model $object): bool
     {
         $pb = $this->getPredicateBuilder()
                    ->equals('rubric_group_id', $object->getGroup()->getId());
@@ -240,7 +240,7 @@ class CriterionMapper extends BaseMapper {
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
      * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
-     * @return GenericCollection|Criterion[]
+     * @return GenericCollection|Model[]
      * @throws MapperException
      */
     public function findForParent($parentId, string $parentType, bool $cache = true): GenericCollection
@@ -264,12 +264,12 @@ class CriterionMapper extends BaseMapper {
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
-     * @return GenericCollection|Criterion[]
+     * @return GenericCollection|Model[]
      * @throws MapperException
      */
     public function findForFolder($folderId, bool $cache = true): GenericCollection
     {
-        return $this->findForParent($folderId, Model::PARENT_TYPE_CATEGORY, $cache);
+        return $this->findForParent($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $cache);
     }
 
 
@@ -282,7 +282,7 @@ class CriterionMapper extends BaseMapper {
      * @param string $name       The name of the criterion
      * @param string $groupName  The name of the criterion's group
      * @param bool   $cache      If false, bypass result cache
-     * @return Criterion
+     * @return Model
      * @throws MapperException
      */
     public function findOneForParentByKey(
@@ -291,7 +291,7 @@ class CriterionMapper extends BaseMapper {
         string $name,
         string $groupName,
         bool $cache = true
-    ): Criterion
+    ): Model
     {
         return $this->findOneByColumnList(
             [
@@ -314,12 +314,12 @@ class CriterionMapper extends BaseMapper {
      * @param string $name      The name of the criterion
      * @param string $groupName The name of the criterion's group
      * @param bool   $cache     If false, bypass result cache
-     * @return Criterion
+     * @return Model
      * @throws MapperException
      */
-    public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Criterion
+    public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Model
     {
-        return $this->findOneForParentByKey($folderId, Model::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+        return $this->findOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 
@@ -334,7 +334,7 @@ class CriterionMapper extends BaseMapper {
      * @param string $name
      * @param string $groupName
      * @param bool   $cache
-     * @return Criterion
+     * @return Model
      * @throws MapperException
      */
     public function findOrCreateOneForParentByKey(
@@ -343,7 +343,7 @@ class CriterionMapper extends BaseMapper {
         string $name,
         string $groupName,
         bool $cache = true
-    ): Criterion
+    ): Model
     {
         try {
             return $this->findOneForParentByKey($parentId, $parentType, $name, $groupName, $cache);
@@ -356,7 +356,7 @@ class CriterionMapper extends BaseMapper {
 
         } catch (MapperException $e) {
             // Build it
-            /** @var Mapper $groupMapper */
+            /** @var CapabilityMapper $groupMapper */
             $groupMapper = $this->getJoinMapper('group');
             $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName, $cache);
             $criterion   = $this->createModel()
@@ -378,7 +378,7 @@ class CriterionMapper extends BaseMapper {
      * @param string $name
      * @param string $groupName
      * @param bool   $cache
-     * @return Criterion
+     * @return Model
      * @throws MapperException
      */
     public function findOrCreateOneForFolderByKey(
@@ -386,9 +386,9 @@ class CriterionMapper extends BaseMapper {
         string $name,
         string $groupName,
         bool $cache = true
-    ): Criterion
+    ): Model
     {
-        return $this->findOrCreateOneForParentByKey($folderId, Model::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+        return $this->findOrCreateOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
     }
 
 

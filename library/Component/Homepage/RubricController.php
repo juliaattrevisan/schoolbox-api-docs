@@ -7,14 +7,14 @@
  * @link      https://schoolbox.com.au/
  */
 
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion[]
+     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Model[]
      */
     protected $criteria = [];
 
@@ -30,7 +30,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         }
 
         // get rubric details
-        $this->criteria = CriterionMapper::getInstance()->findForFolder($this->getContext()->getId());
+        $this->criteria = Mapper::getInstance()->findForFolder($this->getContext()->getId());
         return true;
     }
 
@@ -83,7 +83,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $i = 0;
 
             /* Create group structure */
-            /** @var Criterion[][] $criteriaList */
+            /** @var Model[][] $criteriaList */
             $criteriaList = [];
 
             foreach ($this->criteria as $crit) {

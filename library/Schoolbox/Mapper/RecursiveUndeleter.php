@@ -216,28 +216,28 @@ class RecursiveUndeleter extends CliTool\App
         QuizQuestion\Mapper::class                 => [
             QuizSolution\Mapper::class => 'question_id',
         ],
-        QuizAnswer\Mapper::class                   => [],
-        QuizSolution\Mapper::class                 => [],
-        StudentSubmissionFile\Mapper::class        => [
+        QuizAnswer\Mapper::class            => [],
+        QuizSolution\Mapper::class          => [],
+        StudentSubmissionFile\Mapper::class => [
             Plagscan\Mapper::class,
             Kami\Mapper::class,
         ],
-        ReturnedWorkFile\Mapper::class             => [],
-        DataModel\DescriptorMapper::class          => [],
-        Plagscan\Mapper::class                     => [],
-        Kami\Mapper::class                         => [],
-        DataModel\Indicator\CriterionMapper::class => [
+        ReturnedWorkFile\Mapper::class      => [],
+        DataModel\DescriptorMapper::class   => [],
+        Plagscan\Mapper::class              => [],
+        Kami\Mapper::class                  => [],
+        DataModel\Indicator\Mapper::class   => [
             DataModel\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
         ],
-        UserMapper::class                          => [
+        UserMapper::class                   => [
             Pastoral\Access\Mapper::class,
             Pastoral\Audience\Mapper::class,
         ],
-        RoleMapper::class                          => [
+        RoleMapper::class                   => [
             Pastoral\Access\Mapper::class => 'role_id',
             Pastoral\Audience\Mapper::class => 'role_id',
         ],
-        Pastoral\Group\Mapper::class               => [
+        Pastoral\Group\Mapper::class        => [
             Pastoral\Access\Mapper::class => 'group_id',
             Pastoral\Audience\Mapper::class => 'group_id',
             Pastoral\Group\Member\Mapper::class => 'group_id',

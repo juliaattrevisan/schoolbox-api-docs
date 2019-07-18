@@ -14,8 +14,8 @@ use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -110,14 +110,14 @@ class RubricMapper
         // Capability contains indicators too: inside-out them
         /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
         $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $indicatorModels = CriterionMapper::getInstance()->findForFolder($folder->getId(), $useCache);
+        $indicatorModels = Mapper::getInstance()->findForFolder($folder->getId(), $useCache);
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $indicatorModels    = CriterionMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
-                                                                ->merge($indicatorModels);
+            $indicatorModels    = Mapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
+                                        ->merge($indicatorModels);
         }
 
         // This is how it SHOULD work...
@@ -200,7 +200,7 @@ class RubricMapper
 
         // Required mappers
         $capabilityMapper         = Mapper::getInstance();
-        $indicatorMapper          = CriterionMapper::getInstance();
+        $indicatorMapper          = Mapper::getInstance();
 
         // Existing data
         $existingRowSet           = $this->retrieveRowSet($rowSet->getContext(), true);
@@ -489,7 +489,7 @@ class RubricMapper
         // (The answer exists: merge SA-6405)
         $levelMapper      = LevelMapper::getInstance();
         $descriptorMapper = DescriptorMapper::getInstance();
-        $indicatorMapper  = CriterionMapper::getInstance();
+        $indicatorMapper  = Mapper::getInstance();
         $capabilityMapper = Mapper::getInstance();
 
 
@@ -1253,7 +1253,7 @@ class RubricMapper
         $levelMapper          = LevelMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $groupMapper          = Mapper::getInstance();
-        $criterionMapper      = CriterionMapper::getInstance();
+        $criterionMapper      = Mapper::getInstance();
         $groupUsageMapper     = GroupUsageMapper::getInstance();
         $criterionUsageMapper = CriterionUsageMapper::getInstance();
 
@@ -1277,7 +1277,7 @@ class RubricMapper
         $dstDescriptors = $descriptorMapper->createCollection();
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroups = $groupMapper->createCollection();
-        /** @var Criterion[]|GenericCollection $dstCriteria */
+        /** @var Model[]|GenericCollection $dstCriteria */
         $dstCriteria = $criterionMapper->createCollection();
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroupUsages = $groupUsageMapper->createCollection();
@@ -1315,7 +1315,7 @@ class RubricMapper
             false
         );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
-        /** @var Criterion[][] $existingCriterionMap */
+        /** @var Model[][] $existingCriterionMap */
         $existingCriterionMap = [];
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[] $existingGroupMap */
         $existingGroupMap = [];
@@ -1426,7 +1426,7 @@ class RubricMapper
         foreach ($srcCriterionUsages as $srcCriterionUsage) {
             $dstCriterionUsage = clone $srcCriterionUsage;
 
-            /** @var Criterion $dstCriterion */
+            /** @var Model $dstCriterion */
             $dstCriterion = $dstCriteria->getOffset($srcCriterionUsage->getCriterion()->getId());
 
             $dstCriterionUsage->setCriterion($dstCriterion);

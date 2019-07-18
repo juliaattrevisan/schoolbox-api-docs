@@ -106,7 +106,7 @@ class Importer
 
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper
+     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper
      */
     private $rubricIndicatorMapper;
 
@@ -160,15 +160,15 @@ class Importer
      * @param HomepageConfigMapper                                               $homepageConfigMapper
      * @param HomepageTemplateMapper                                             $homepageTemplateMapper
      * @param CourseConfigMapper                                               $courseConfigMapper
-     * @param CourseSpecMapper                                                 $courseSpecMapper
-     * @param UnitSpecMapper                                                   $unitSpecMapper
-     * @param RoleAccessMapper                                                 $roleAccessMapper
-     * @param DataModel\RubricMapper                                           $rubricMapper
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper         $rubricCapabilityMapper
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper $rubricIndicatorMapper
-     * @param AssessmentDataSource                                             $assessmentDataSource
-     * @param NodeMapper                                                       $nodeMapper
-     * @param ErrorMapper                                                      $errorMapper
+     * @param CourseSpecMapper                                         $courseSpecMapper
+     * @param UnitSpecMapper                                           $unitSpecMapper
+     * @param RoleAccessMapper                                         $roleAccessMapper
+     * @param DataModel\RubricMapper                                   $rubricMapper
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper $rubricCapabilityMapper
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper  $rubricIndicatorMapper
+     * @param AssessmentDataSource                                     $assessmentDataSource
+     * @param NodeMapper                                               $nodeMapper
+     * @param ErrorMapper                                              $errorMapper
      */
     public function __construct(
         User $currentUser,
@@ -182,7 +182,7 @@ class Importer
         RoleAccessMapper $roleAccessMapper,
         DataModel\RubricMapper $rubricMapper,
         DataModel\Capability\Mapper $rubricCapabilityMapper,
-        DataModel\Indicator\CriterionMapper $rubricIndicatorMapper,
+        DataModel\Indicator\Mapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper,
         ErrorMapper $errorMapper

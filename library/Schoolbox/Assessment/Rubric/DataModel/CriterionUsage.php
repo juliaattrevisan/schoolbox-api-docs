@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
 
 class CriterionUsage
 {
@@ -19,7 +19,7 @@ class CriterionUsage
     public const SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
 
     /**
-     * @var Criterion
+     * @var Model
      */
     private $criterion;
 
@@ -34,17 +34,17 @@ class CriterionUsage
     private $sequence;
 
     /**
-     * @param  Criterion $criterion
+     * @param  Model $criterion
      * @return $this
      */
-    public function setCriterion(Criterion $criterion)
+    public function setCriterion(Model $criterion)
     {
         $this->criterion = $criterion;
         return $this;
     }
 
     /**
-     * @return Criterion
+     * @return Model
      */
     public function getCriterion()
     {

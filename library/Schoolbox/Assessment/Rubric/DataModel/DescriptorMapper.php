@@ -13,8 +13,8 @@ use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\CriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
@@ -35,7 +35,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
         $this->hasTable('rubric_descriptor');
         $this->hasModel(Descriptor::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('criterion_id', CriterionMapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('criterion_id', Mapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('level_id', LevelMapper::class, 'id', null, null, 'level', 'level');
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('description', self::TYPE_STRING);
@@ -144,7 +144,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
         /** @var Level $level */
         $level = null;
 
-        /** @var Criterion $criterion */
+        /** @var Model $criterion */
         $criterion = null;
 
         /** @var Model $group */
@@ -171,7 +171,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
 
                 // Set the group as well
                 /** @var Model $group */
-                /** @var Criterion $criterion */
+                /** @var Model $criterion */
                 $group     = $groups->getOffset($groupId);
                 $criterion = $this->hydrateJoin($r, 'criterion', 'c');
                 $criterion->setGroup($group);

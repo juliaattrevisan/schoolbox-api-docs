@@ -10,7 +10,7 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Criterion;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 
@@ -61,23 +61,23 @@ class CodecTest extends TestCase
 
 
     /**
-     * @param Criterion $indicator
+     * @param Model $indicator
      * @dataProvider providerEncodeInvalidIndicator
      * @expectedException InvalidArgumentException
      */
-    public function testEncodeInvalidIndicator(Criterion $indicator): void
+    public function testEncodeInvalidIndicator(Model $indicator): void
     {
         self::$codec->encodeIndicator($indicator);
     }
 
 
     /**
-     * @param Criterion $indicator
-     * @param string    $expected
+     * @param Model  $indicator
+     * @param string $expected
      * @dataProvider providerEncodeIndicator
      * @throws InvalidArgumentException
      */
-    public function testEncodeIndicator(Criterion $indicator, string $expected): void
+    public function testEncodeIndicator(Model $indicator, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeIndicator($indicator));
     }
@@ -180,11 +180,11 @@ class CodecTest extends TestCase
     public function providerEncodeIndicator(): array
     {
         return [
-            [(new Criterion())->setGroup((new Model())->setId(1))->setId(1), 'c1i1',],
-            [(new Criterion())->setGroup((new Model())->setId(1))->setId(100), 'c1i100',],
-            [(new Criterion())->setGroup((new Model())->setId(1))->setId(999), 'c1i999',],
-            [(new Criterion())->setGroup((new Model())->setId(100))->setId(100), 'c100i100',],
-            [(new Criterion())->setGroup((new Model())->setId(999))->setId(999), 'c999i999',],
+            [(new Model())->setGroup((new Model())->setId(1))->setId(1), 'c1i1',],
+            [(new Model())->setGroup((new Model())->setId(1))->setId(100), 'c1i100',],
+            [(new Model())->setGroup((new Model())->setId(1))->setId(999), 'c1i999',],
+            [(new Model())->setGroup((new Model())->setId(100))->setId(100), 'c100i100',],
+            [(new Model())->setGroup((new Model())->setId(999))->setId(999), 'c999i999',],
         ];
     }
 
@@ -266,26 +266,26 @@ class CodecTest extends TestCase
 
 
     /**
-     * @return Criterion[]
+     * @return Model[]
      */
     private function invalidIndicators(): array
     {
         return [
-            new Criterion(),
-            (new Criterion())->setId(null),
+            new Model(),
+            (new Model())->setId(null),
         ];
     }
 
 
     /**
-     * @return Criterion[]
+     * @return Model[]
      */
     private function validIndicators(): array
     {
         return [
-            (new Criterion())->setId(1),
-            (new Criterion())->setId(100),
-            (new Criterion())->setId('999'),
+            (new Model())->setId(1),
+            (new Model())->setId(100),
+            (new Model())->setId('999'),
         ];
     }
 }

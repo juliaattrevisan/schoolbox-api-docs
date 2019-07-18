@@ -41,7 +41,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     $offendingMappers = [
         LogMapper::getInstance(),
         Filter\Selection\Mapper::getInstance(),
-        DataModel\Indicator\CriterionMapper::getInstance(),
+        DataModel\Indicator\Mapper::getInstance(),
         DataModel\DescriptorMapper::getInstance(),
         DataModel\LevelMapper::getInstance(),
         DataModel\DescriptorMarkMapper::getInstance(),
