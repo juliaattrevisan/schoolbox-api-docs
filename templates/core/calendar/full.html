@@ -59,6 +59,17 @@
     }
 
 
+    window.fullCalendarConfig = {
+        userId:             Number('{CALENDAR_USER_ID}'),
+        taskTypeId:         Number('{TASK_TYPE_ID}'),
+        defaultDate:        '{SELECTED_DATE}',
+        eventLimit:         Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+        firstDay:           Number('{CALENDAR_START_DAY}'),
+        calendarView:       '{CALENDAR_VIEW}',
+        dateDisplayFormats: dateDisplayFormats
+    };
+
+
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
         // PHPLib calendar vars
