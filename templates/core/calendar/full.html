@@ -61,7 +61,6 @@
 
     // once the DOM has loaded, punch a fancy calendar into it
     $(function() {
-        return;
         // PHPLib calendar vars
         var userId        = Number('{CALENDAR_USER_ID}'),
             taskTypeId    = Number('{TASK_TYPE_ID}'),
@@ -70,6 +69,8 @@
             firstDay      = Number('{CALENDAR_START_DAY}'),
             calendarView  = '{CALENDAR_VIEW}',
             bubbleFactory;
+
+        return;
 
         var fc = new FullCalendar.Calendar(
             document.getElementById('calendar'),

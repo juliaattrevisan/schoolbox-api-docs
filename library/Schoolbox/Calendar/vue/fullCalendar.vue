@@ -26,7 +26,7 @@
 <template>
     <div>
         <FullCalendar
-            default-view="dayGridMonth"
+            :plugins="calendarPlugins"
             :views="{
                 timeGridDay: {
                     // dateDisplayFormats.momentJsDateLong: figure out how to inject this
@@ -56,7 +56,11 @@
                 center: 'title',
                 right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
-            :plugins="calendarPlugins"
+            :defaultDate="window.defaultDate"
+            :defaultView="window.anchorView || 'dayGridMonth'"
+            :scrollTime="window.dateDisplayFormats.calendarStartTime"
+            :eventLimit="window.eventLimit"
+            :firstDay="window.firstDay"
         />
     </div>
 </template>
