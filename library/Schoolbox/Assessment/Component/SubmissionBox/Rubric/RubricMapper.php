@@ -37,7 +37,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\User;
@@ -875,212 +874,6 @@ class RubricMapper
     }
 
     /**
-     * Find all criteria that are available or in use by the $box.
-     *
-     * We would wish to retrieve parent criteria when the $box lives in a UnitSpec, or project
-     * in a UnitSpec. In these cases we need to also retrieve Criteria from the CourseSpec
-     *
-     * @param SubmissionBox $box
-     * @param bool          $getParentCriteria - if specified, also get criteria the box's folder's parent
-     *
-     * @return array $return
-     * @var array           $return            [0]                 Groups
-     * @var array           $return            [0][]               A single Criteria-Group
-     * @var string          $return            [0][]['name']       Name of the Criteria-Group
-     * @var string          $return            [0][]['maxValue']   Maximum points value of the Criteria-Group
-     * @var array           $return            [1]                 Criteria
-     * @var array           $return            [1][]               A single Criterion
-     * @var int             $return            [1][]['groupId']    The Criterion's Group's Id
-     * @var bool            $return            [1][]['on']         Whether this criterion is selected in the $box
-     * @var string          $return            [1][]['name']       Name of Criterion
-     * @var bool            $return            [1][]['readonly']   Whether user should be prevented from changing name
-     */
-    protected function findCriteria(SubmissionBox $box, $getParentCriteria)
-    {
-        /** @var array $groups - indexed by groupId */
-        $groups = [];
-
-        /** @var array $criteria - indexed by criterion.id */
-        $criteria = [];
-
-        $criteriaStatement = $this->generateCriteriaStatement($box, $getParentCriteria);
-
-        foreach ($criteriaStatement as $r) {
-
-            $groupId     = $r['group_id'];
-            $selected    = $r['selected'] > 0;
-            $criterionId = $r['crit_id'];
-
-            // First time we've encountered this group?
-            // Add it to the list of groups to return
-            if (empty($groups[$groupId])) {
-                $maxValue               = isset($r['max_value']) ? (float)$r['max_value'] : null;
-                $groups[$groupId]       = [
-                    'name'     => $r['grouping'],
-                    'maxValue' => $selected ? $maxValue : null,
-                ];
-            }
-
-            // First time we've encountered this criterion?
-            // Add it to the list of criteria to return
-            if (empty($criteria[$criterionId])) {
-                $usedElsewhere          = ($r['usages'] - $r['selected']) > 0;
-                $criteria[$criterionId] = [
-                    'groupId'  => $groupId,
-                    'on'       => $selected,
-                    'name'     => $r['name'],
-                    'readonly' => $usedElsewhere,
-                ];
-            }
-        }
-
-        return [$groups, $criteria];
-    }
-
-    /**
-     * Find all criteria that are available for the $box.
-     *
-     * For each criterion, also get:
-     * * how many non-deleted boxes are using the criteria,
-     * * whether the specified box is using the criteria
-     *
-     * Sort criteria by:
-     * * whether they are in use by this box,
-     * * if in use, by sequence, else by name
-       *
-     * Note: A criterion being used by a soft-deleted assessment does not count towards current usages, and hence
-     *       does not prevent the user from editing the criterion's name, or soft-deleting the criterion itself.
-     *
-     * @param SubmissionBox $box
-     * @param bool          $getParentCriteria - whether to also get criteria from box's folder's parent
-     *
-     * @throws \Schoolbox\Mapper\Exception
-     * @return array
-     */
-    protected function generateCriteriaStatement(SubmissionBox $box, $getParentCriteria)
-    {
-        $args = [
-            'boxId'      => $box->getId(),
-            'folderId'   => $box->getCategory()->getId(),
-            'parentType' => Group::PARENT_TYPE_CATEGORY,
-        ];
-
-        $in = ['folderId'];
-
-        // Retrieve criteria from the box's folder's parent ?
-        if ($getParentCriteria) {
-
-            // Is parent not yet hydrated?
-            if (!$box->getCategory()->getParent()) {
-                $box->setCategory(FolderMapper::getInstance()->findCheaplyById($box->getCategory()->getId()));
-            }
-
-            $key        = 'parentFolderId';
-            $args[$key] = $box->getCategory()->getParent()->getId();
-            $in[]       = $key;
-        }
-
-        $in = implode(', :', $in);
-
-        $criteriaStatement = $this->database->query("
-            SELECT
-                sb.id AS box_id,
-                rc.id AS crit_id,
-                rg.id AS group_id,
-                rg.name AS grouping,
-                rc.name,
-                rgu.max_value AS max_value,
-                -- Only get sequence for the requested box (don't care about other usages)
-                IF(sb.id = :boxId, rcu.sequence, NULL) AS sequence
-            FROM rubric_criterion rc
-            INNER JOIN rubric_group           rg  ON rg.id = rc.rubric_group_id
-            LEFT JOIN  rubric_criterion_usage rcu ON rcu.criterion_id = rc.id
-            LEFT JOIN  submission_box         sb  ON rcu.submission_box_id = sb.id
-            LEFT JOIN  assessment             a   ON sb.assessment_id = a.id AND a.deleted_at IS NULL
-            LEFT JOIN  rubric_group_usage     rgu ON rgu.rubric_group_id = rg.id AND rgu.submission_box_id = sb.id
-            WHERE rg.parent_type = :parentType
-            AND rg.parent_id IN (:$in)
-            AND rc.deleted_at IS NULL
-            AND a.deleted_at IS NULL
-            AND rg.deleted_at IS NULL
-            ORDER BY sequence DESC
-        ", $args);
-
-        // Group result by criterion, and track which boxes use the criterion
-        $result = [];
-        while ($row = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
-            $criterionId = (int)$row['crit_id'];
-            if (!isset($result[$criterionId])) {
-                $result[$criterionId] = $row;
-            }
-
-            $result[$criterionId]['box_ids'][] = (int)$row['box_id'];
-        }
-        $criteriaStatement->closeCursor();
-
-        // Add these fields in post-processing:
-        // * selected: is this criterion used by $box?
-        // * usages:   how many boxes (including $box) use this criterion?
-        foreach ($result as $criterionId => $row) {
-            $result[$criterionId]['selected'] = \in_array($box->getId(), $row['box_ids'], true);
-            $result[$criterionId]['usages']   = \count($row['box_ids']);
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param SubmissionBox $box
-     *
-     * @return array
-     */
-    protected function findDescriptors(SubmissionBox $box)
-    {
-        $levelIds = LevelMapper::getInstance()->findIdsByColumn('box_id', $box->getId());
-
-        /** @var Collection|Descriptor[] $descriptorCollection */
-        $descriptorCollection = DescriptorMapper::getInstance()->findByColumnList(['level_id' => $levelIds]);
-
-        $descriptors = [];
-
-        foreach ($descriptorCollection as $d) {
-            $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
-                'id'     => $d->getId(),
-                'text'   => $d->getDescription(),
-                'points' => $d->getMaxValue(),
-            ];
-        }
-
-        return $descriptors;
-    }
-
-    /**
-     * @param SubmissionBox $box
-     *
-     * @return array
-     */
-    protected function generateLevelList(SubmissionBox $box)
-    {
-        $levelList = [];
-
-        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), ['order' => ['sequence' => 'ASC']]);
-
-        foreach ($levelCollection as $level) {
-            $levelList[$level->getSequence()] = [
-                'id'   => $level->getId(),
-                'name' => $level->getName(),
-            ];
-        }
-
-        // ensure there are ALWAYS at least 2 levels
-        while (count($levelList) < 2) {
-            $levelList[] = ['name' => ''];
-        }
-
-        return $levelList;
-    }
-
-    /**
      * Normalises spaces.
      *
      * Trims trailing/leading space, and replaces multiple spaces/newlines/etc.
@@ -1093,35 +886,6 @@ class RubricMapper
     protected function normalizeSpace($string)
     {
         return trim(preg_replace('`\s+`', ' ', $string));
-    }
-
-    /**
-     * Normalize encoding of a cell from the uploaded CSV.
-     *
-     * `$string` _should_ be UTF-8, but the CSV could've been saved in another
-     * encoding. (So far, we only recognise Windows-1252)
-     *
-     * @param string $string
-     * @return string
-     */
-    protected function normalizeEncoding(string $string): string
-    {
-        // Assume $string is utf-8 encoded, unless proven otherwise
-        // If it isn't, assume it's Windows-1252
-        $encoding = mb_detect_encoding($string, ['UTF-8', 'Windows-1252', 'ISO-8859-1'], true);
-
-        switch ($encoding) {
-            case 'Windows-1252':
-            case 'CP1252':
-            case 'ISO-8859-1':
-                // All the CP1252 test strings I used detected as ISO-8859-1.
-                // You actually want CP1252
-                return mb_convert_encoding($string, 'UTF-8', 'CP1252');
-
-            case 'UTF-8':
-            default:
-                return $string;
-        }
     }
 
     /**
@@ -1138,28 +902,6 @@ class RubricMapper
     public function normaliseForComparison($string)
     {
         return strtolower($this->normalizeSpace($string));
-    }
-
-    protected function getcsv($fp, $limit = 13)
-    {
-        $line = fgetcsv($fp);
-
-        if (is_null($line)) {
-            // EOF
-            return null;
-        }
-
-        if (is_array($line)) {
-            // normal data
-            // Normalize line values
-            return array_map(
-                [$this, 'normalizeEncoding'],
-                \array_slice($line, 0, $limit)
-            );
-        }
-
-        // bad data, but not EOF
-        return [];
     }
 
     /**
@@ -1328,132 +1070,6 @@ class RubricMapper
     }
 
     /**
-     * Soft-delete any rubric levels used by the specified submission boxes if they
-     * no longer contain any non-deleted descriptors.
-     *
-     * Returns the count of levels soft-deleted.
-     *
-     * @param int[] $submissionBoxIds
-     *
-     * @return int
-     */
-    public function deleteEmptyLevels(array $submissionBoxIds)
-    {
-        if (!count($submissionBoxIds)) {
-            return 0;
-        }
-
-        $levelMapper       = LevelMapper::getInstance();
-        $pb                = $levelMapper->getPredicateBuilder()->in('rl.box_id', $submissionBoxIds);
-        $boxIdPlaceholders = $pb->getWhere()[0];
-
-        $query = "
-            SELECT rl.id FROM rubric_level rl
-            LEFT JOIN (SELECT id, level_id FROM rubric_descriptor WHERE deleted_at IS NULL) rd ON rd.level_id = rl.id
-            WHERE rd.id IS NULL
-            AND rl.deleted_at IS NULL
-            AND {$boxIdPlaceholders};
-        ";
-
-        $statement = $this->database->query($query, $pb->getParams());
-        $levelIds  = $statement->fetchAll(PDO::FETCH_COLUMN);
-
-        return $levelMapper->deleteByColumn($levelMapper->getIdentifierColumn(), $levelIds);
-    }
-
-    /**
-     * Invalidates selected student marks if already given for this rubric and the rubric has changed.
-     *
-     * * If an existing descriptor has had its value changed then invalidate all marks for the rubric.
-     * * If an indicator is added, do nothing.
-     * * If an indicator is removed, invalidate marks for that indicator.
-     *
-     * @param Collection|Descriptor[] $existingDescriptors
-     * @param Collection|Descriptor[] $newDescriptors The newly saved descriptors
-     *
-     * @return bool Did we invalidate any descriptors?
-     */
-    protected function checkDescriptorValueChanges(Collection $existingDescriptors, Collection $newDescriptors)
-    {
-        // Group descriptors by criterionId, then LevelId, to enable O(1) lookup
-        $criteriaCallback = function (Descriptor $descriptor) {
-            return $descriptor->getCriterion()->getId();
-        };
-        /** @var Collection|Descriptor[][] $existingCriteriaDescriptors */
-        $existingCriteriaDescriptors = $existingDescriptors->groupByCallback($criteriaCallback);
-        /** @var Collection|Descriptor[][] $newCriteriaDescriptors */
-        $newCriteriaDescriptors = $newDescriptors->groupByCallback($criteriaCallback);
-
-        $levelsCallback = function (Descriptor $descriptor) {
-            return $descriptor->getLevel()->getId();
-        };
-        foreach ($existingCriteriaDescriptors as $existingCriterionDescriptors) {
-            $existingCriterionDescriptors->indexByCallback($levelsCallback);
-        }
-        foreach ($newCriteriaDescriptors as $newCriterionDescriptors) {
-            $newCriterionDescriptors->indexByCallback($levelsCallback);
-        }
-
-        // Have any descriptor values been updated ? (but not completely deleted)
-        $hasDescriptorValuesChanged = false;
-        $deletedDescriptors         = DescriptorMapper::getInstance()->createCollection();
-        foreach ($existingCriteriaDescriptors as $criterionId => $existingCriterionDescriptors) {
-            /** @var Collection $newCriterionDescriptors */
-            $newCriterionDescriptors = $newCriteriaDescriptors->getOffset($criterionId);
-
-            // Have we deleted this criterion?
-            if (!$newCriterionDescriptors) {
-                // Make a note of them, we may need you later...
-                $deletedDescriptors = $deletedDescriptors->merge($existingCriterionDescriptors);
-                continue;
-            }
-
-            // Examine each descriptor in this criterion
-            foreach ($existingCriterionDescriptors as $levelId => $existingDescriptor) {
-                /** @var Descriptor $newDescriptor */
-                $newDescriptor = $newCriterionDescriptors->getOffset($levelId);
-
-                // Has the descriptor been deleted?
-                if (!$newDescriptor) {
-                    $hasDescriptorValuesChanged = true;
-                    break;
-                }
-
-                // Has the value changed ?
-                $existingValue = $existingDescriptor->getMaxValue();
-                $newValue      = $newDescriptor->getMaxValue();
-                if ($existingValue !== $newValue) {
-                    $hasDescriptorValuesChanged = true;
-                    break;
-                }
-            }
-
-            // Short-circuit if any desc values changed;
-            // this action invalidates ALL descriptors
-            if ($hasDescriptorValuesChanged) {
-                break;
-            }
-        }
-
-        // Did we detect a value change?
-        if ($hasDescriptorValuesChanged) {
-            $this->invalidateDescriptorMarks($existingDescriptors);
-
-            return true;
-        }
-
-        // Did we delete any criterion?
-        if ($deletedDescriptors->count()) {
-            $this->invalidateDescriptorMarks($deletedDescriptors);
-
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
      * Invalidate ALL the rubric marks given for this assessment.
      *
      * This includes:
@@ -1477,26 +1093,6 @@ class RubricMapper
         $this->database->prepare($query)->execute(['assessmentId' => $assessmentId]);
     }
 
-
-    /**
-     * Invalidates all marks given for the specified descriptors
-     *
-     * @param Collection|Descriptor[] $descriptors
-     */
-    protected function invalidateDescriptorMarks(Collection $descriptors)
-    {
-        $markMapper    = DescriptorMarkMapper::getInstance();
-        $descriptorIds = $descriptors->getColumnValues('id');
-        $columnList    = [
-            'descriptor_id' => $descriptorIds,
-            'valid'         => true,
-        ];
-        $marks         = $markMapper->findByColumnList($columnList);
-        foreach ($marks as $mark) {
-            $mark->setValid(false);
-        }
-        $markMapper->save($marks);
-    }
 
     /**
      * @param IMapper $mapper
@@ -2063,17 +1659,5 @@ class RubricMapper
             ];
         }
         return $criteria;
-    }
-
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Database
-     */
-    public function getDatabase()
-    {
-        return $this->database;
     }
 }
