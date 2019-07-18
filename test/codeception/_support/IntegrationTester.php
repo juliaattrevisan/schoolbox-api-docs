@@ -332,7 +332,7 @@ class IntegrationTester extends \Codeception\Actor
 
         $allow_redirects = $this->redirect_settings;
 
-        $this->client->request('POST', $url, [
+        return $this->client->request('POST', $url, [
             'headers' => $this->guzzle_headers,
             'allow_redirects' => $allow_redirects,
             'cookies'=>$this->client_cookie_jar,
@@ -358,7 +358,7 @@ class IntegrationTester extends \Codeception\Actor
         $allow_redirects = $this->redirect_settings;
 
         try {
-            $this->client->request('POST', $url, [
+            return $this->client->request('POST', $url, [
                 'headers' => $this->guzzle_headers,
                 'allow_redirects' => $allow_redirects,
                 'cookies'=>$this->client_cookie_jar,

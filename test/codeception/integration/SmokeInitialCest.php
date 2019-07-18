@@ -241,32 +241,99 @@ class SmokeInitialCest {
     public function SmokeCoursesPOST(IntegrationTester $i){
         #GIVEN
         $i->loginAdmin(); #we logged in as alaress
-        $folder_title='Test Folder For Courses 123';
+        $folder_title='Test Folder For Courses';
         $faculty_folder=$i->getFirstFolderByTitle('Faculties');
         $i->createFolder($folder_title, -1, $faculty_folder);
         $course_folder=$i->getFirstFolderByTitle($folder_title);
 
         #WHEN
-        $title='Course with empty Unit 123';
-        $i->createNewCourseSpec($title, $course_folder);
+        $title='Course with empty Unit';
+        $response = $i->createNewCourseSpec($title, $course_folder);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $i->comment('Created folder and created a course in it');
+
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create course.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/course/list', $redirect_history[0], 'T expect we get redirected to the course list after creating the course.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        #WHEN
         $course_spec = $i->getFirstCourseByTitle($title);
         $unit_name=$title.' EmptyUnit';
-        $i->createNewUnitSpec($unit_name, $course_spec);
+        $response = $i->createNewUnitSpec($unit_name, $course_spec);
+        $i->comment('Created unit spec for course');
+
+        #THEN
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 okay after creation.');
+
+        #WHEN
         $unit = $i->getFirstUnitByTitle($unit_name);
-        $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
-        
-        $title='Course with Unit with assessment 123';
+        $response = $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $i->comment('Save newly created course');
+
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I save course.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/course/list', $redirect_history[0], 'T expect we get redirected to the course list after saving the course.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+
+        #WHEN
+        $title='Course with Unit with assessment';
         $i->createNewCourseSpec($title, $course_folder);
         $course_spec = $i->getFirstCourseByTitle($title);
         $unit_name=$title.' UnitWithAssessments';
         $i->createNewUnitSpec($unit_name, $course_spec);
         $unit_folder = $i->getFirstFolderByTitle($unit_name);
         $unit = $i->getFirstUnitByTitle($unit_name);
-        $i->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
-        $i->createAssessemntProjectOnCourseUnitSpec('Assessment for course project 77', $unit->getId(), $unit_folder->getId());
-        $project_assessment_id=$i->getFirstAssessmentIdByTitle('Assessment for course project 77');
-        $i->createAssessemntOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
-        $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
+        $response = $i->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $i->comment('create an assessment in a new course + unit spec');
+
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create an assessment in a unit spec.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/course/modify/'.$course_spec->getId(), $redirect_history[0], 'T expect we get redirected to the course list after creating the assessment.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        #WHEN
+        $project_name='Assessment for course project';
+        $response = $i->createAssessemntProjectOnCourseUnitSpec($project_name, $unit->getId(), $unit_folder->getId());
+        $project_assessment_id=$i->getFirstAssessmentIdByTitle($project_name);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $i->comment('create an project in a the course unit spec');
+
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create a project.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$project_assessment_id.'/status', $redirect_history[0], 'T expect we get redirected to the project we just created.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+
+        $response = $i->createAssessemntOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $i->comment('create an assessment in the new projects');
+
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create a assessment in project.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$project_assessment_id.'/status', $redirect_history[0], 'T expect we get redirected to the poject we added an assignment to.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+
+        $response = $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $i->comment('Save newly created course that contains a unit spec with assessment');
+
+        #THEN
+        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I save course.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/course/list', $redirect_history[0], 'T expect we get redirected to the course list after saving the course.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+
     }
 
     /**
