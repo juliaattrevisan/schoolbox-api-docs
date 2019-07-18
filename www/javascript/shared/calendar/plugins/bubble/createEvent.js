@@ -114,7 +114,8 @@
 
 
         // click 'Edit Event' and push data through to main form page
-        bubbleElement.on('click.'+namespace, '#edit-full', function() {
+        bubbleElement.on('click.'+namespace, '#edit-full', function(event) {
+            event.preventDefault();
             var queryString      = $(this).closest('form').serialize();
             window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&' + queryString;
         });
