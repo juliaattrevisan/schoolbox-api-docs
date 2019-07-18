@@ -20,8 +20,9 @@ class IsLoggedIn implements IAuthorizationRule
     /**
      * @param array $params
      * @param User  $user
+     * @throws Unauthenticated
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), User $user = null): void
     {
         // True:  skip to next item in chain
         // False: break chain with request that redirects somewhere
