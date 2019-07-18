@@ -30,6 +30,7 @@ class Learning extends ModuleLoader
      *
      * @param Kernel $kernel
      * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function configure($kernel): void
     {
@@ -49,6 +50,11 @@ class Learning extends ModuleLoader
         $this->loadModule($kernel, Upcoming\Module::class, "/{$namespace}/due");
         $this->loadModule($kernel, AssessmentExporterModule::class, "/{$namespace}/export");
         $this->loadModule($kernel, MarkScheme\Module::class, "/{$namespace}/markscheme");
-        $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
+
+        /* Assessment Calendar is behind a feature flag
+         */
+        if ($kernel->getDependencyInjector()->get('config')->get('assessment_calendar_enabled')) {
+            $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
+        }
     }
 }
