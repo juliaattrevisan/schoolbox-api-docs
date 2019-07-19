@@ -9,8 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 
@@ -38,46 +38,46 @@ class CodecTest extends TestCase
 
 
     /**
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $capability
+     * @param CapabilityModel $capability
      * @dataProvider providerEncodeInvalidCapability
      * @expectedException InvalidArgumentException
      */
-    public function testEncodeInvalidCapability(Model $capability): void
+    public function testEncodeInvalidCapability(CapabilityModel $capability): void
     {
         self::$codec->encodeCapability($capability);
     }
 
 
     /**
-     * @param Model  $capability
-     * @param string $expected
+     * @param CapabilityModel $capability
+     * @param string          $expected
      * @dataProvider providerEncodeCapability
      * @throws InvalidArgumentException
      */
-    public function testEncodeCapability(Model $capability, string $expected): void
+    public function testEncodeCapability(CapabilityModel $capability, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeCapability($capability));
     }
 
 
     /**
-     * @param Model $indicator
+     * @param IndicatorModel $indicator
      * @dataProvider providerEncodeInvalidIndicator
      * @expectedException InvalidArgumentException
      */
-    public function testEncodeInvalidIndicator(Model $indicator): void
+    public function testEncodeInvalidIndicator(IndicatorModel $indicator): void
     {
         self::$codec->encodeIndicator($indicator);
     }
 
 
     /**
-     * @param Model  $indicator
-     * @param string $expected
+     * @param IndicatorModel $indicator
+     * @param string         $expected
      * @dataProvider providerEncodeIndicator
      * @throws InvalidArgumentException
      */
-    public function testEncodeIndicator(Model $indicator, string $expected): void
+    public function testEncodeIndicator(IndicatorModel $indicator, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeIndicator($indicator));
     }
@@ -141,9 +141,9 @@ class CodecTest extends TestCase
     public function providerEncodeCapability(): array
     {
         return [
-            [(new Model())->setId(1), 'c1',],
-            [(new Model())->setId(100), 'c100',],
-            [(new Model())->setId('999'), 'c999',],
+            [(new CapabilityModel())->setId(1), 'c1',],
+            [(new CapabilityModel())->setId(100), 'c100',],
+            [(new CapabilityModel())->setId('999'), 'c999',],
         ];
     }
 
@@ -180,11 +180,11 @@ class CodecTest extends TestCase
     public function providerEncodeIndicator(): array
     {
         return [
-            [(new Model())->setGroup((new Model())->setId(1))->setId(1), 'c1i1',],
-            [(new Model())->setGroup((new Model())->setId(1))->setId(100), 'c1i100',],
-            [(new Model())->setGroup((new Model())->setId(1))->setId(999), 'c1i999',],
-            [(new Model())->setGroup((new Model())->setId(100))->setId(100), 'c100i100',],
-            [(new Model())->setGroup((new Model())->setId(999))->setId(999), 'c999i999',],
+            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(1))->setId(1), 'c1i1',],
+            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(1))->setId(100), 'c1i100',],
+            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(1))->setId(999), 'c1i999',],
+            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(100))->setId(100), 'c100i100',],
+            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(999))->setId(999), 'c999i999',],
         ];
     }
 
@@ -241,51 +241,51 @@ class CodecTest extends TestCase
 
 
     /**
-     * @return Model[]
+     * @return CapabilityModel[]
      */
     private function invalidCapabilities(): array
     {
         return [
-            new Model(),
-            (new Model())->setId(null),
+            new CapabilityModel(),
+            (new CapabilityModel())->setId(null),
         ];
     }
 
 
     /**
-     * @return Model[]
+     * @return CapabilityModel[]
      */
     private function validCapabilities(): array
     {
         return [
-            (new Model())->setId(1),
-            (new Model())->setId(100),
-            (new Model())->setId('999'),
+            (new CapabilityModel())->setId(1),
+            (new CapabilityModel())->setId(100),
+            (new CapabilityModel())->setId('999'),
         ];
     }
 
 
     /**
-     * @return Model[]
+     * @return IndicatorModel[]
      */
     private function invalidIndicators(): array
     {
         return [
-            new Model(),
-            (new Model())->setId(null),
+            new IndicatorModel(),
+            (new IndicatorModel())->setId(null),
         ];
     }
 
 
     /**
-     * @return Model[]
+     * @return IndicatorModel[]
      */
     private function validIndicators(): array
     {
         return [
-            (new Model())->setId(1),
-            (new Model())->setId(100),
-            (new Model())->setId('999'),
+            (new IndicatorModel())->setId(1),
+            (new IndicatorModel())->setId(100),
+            (new IndicatorModel())->setId('999'),
         ];
     }
 }

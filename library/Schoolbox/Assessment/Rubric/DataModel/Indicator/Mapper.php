@@ -8,7 +8,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -137,7 +137,7 @@ class Mapper extends BaseMapper {
      */
     public function softDeleteDescriptors(Model $criterion)
     {
-        Mapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
         return true;
     }
 
