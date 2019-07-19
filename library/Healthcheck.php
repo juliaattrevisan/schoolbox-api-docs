@@ -1,9 +1,5 @@
 <?php
 /**
- * CLI-facing object to perform a health check on external database permissions
- *
- * Notes: hacked from the sync->diagnose() configuration by Matt Day
- *
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -11,23 +7,22 @@
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Database;
 
+/**
+ * Performs a health check on external database permissions
+ *
+ * Notes: hacked from the sync->diagnose() configuration by Matt Day
+ */
 class Healthcheck
 {
-    /**
-     * Whether the external database is enabled
-     *
-     * @var bool
-     */
-    private $externalEnable;
-
     /** @var string $db External database connector type */
     private $externalType;
 
     /** @var string $log Contains log of check output */
     private $log = '';
 
-    /** @var string $errors */
+    /** @var string[] $errors */
     private $errors = [];
 
     /** @var IConnector */
@@ -39,18 +34,27 @@ class Healthcheck
     /** @var IConfigLoader  */
     private $configMapper;
 
+
     /**
      * Constructor
      *
-     * @param IConnector $databaseExternal
-     * @param IConfigLoader $configMapper
-     * @throws Exception
+     * @param IConnector|null  $databaseExternal
+     * @param Database\Factory $databaseFactory
+     * @param IConfigLoader    $configMapper
+     * @throws InvalidArgumentException
+     * @throws \Alaress\Database\Exception
      */
-    public function __construct($databaseExternal, $configMapper)
+    public function __construct(?IConnector $databaseExternal, Database\Factory $databaseFactory, IConfigLoader $configMapper)
     {
-        $this->connector = $databaseExternal;
+        $databaseExternal = $databaseExternal ?? $databaseFactory->getExternalDatabase($configMapper, true);
+
+        // Ensure we can connect to external database
+        if (!$databaseExternal) {
+            throw new InvalidArgumentException('Unable to connect to external database');
+        }
+
+        $this->connector    = $databaseExternal;
         $this->configMapper = $configMapper;
-        $this->externalEnable = $configMapper->get('external_enable');
         $this->externalType = $configMapper->get('external_type');
     }
 
@@ -66,12 +70,6 @@ class Healthcheck
      */
     public function run(): void
     {
-        // Make sure all databases connected correctly
-        if ($this->connector === null) {
-            $this->log .= "ERROR: Unable to connect to database: null connector\n";
-            return;
-        }
-
         // To prevent doing anything unintended to the clients external SIS DB we need to wrap the healthcheck
         // in a transaction which we will rollback- thus we should only proceed if transaction support is
         // available on all external connections

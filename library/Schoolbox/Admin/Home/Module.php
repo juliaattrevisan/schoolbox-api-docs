@@ -44,7 +44,9 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
-            $this->getInjector()->lazyGet('kamiConnector'),
+            'kamiConnector'    => $this->getInjector()->lazyGet('kamiConnector'),
+            'databaseFactory'  => $this->getInjector()->lazyGet('databaseFactory'),
+            'databaseExternal' => $this->getInjector()->lazyGet('databaseExternal'),
         ]));
     }
 
