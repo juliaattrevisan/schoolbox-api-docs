@@ -126,20 +126,20 @@ class Mapper extends Schoolbox\Mapper {
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $levelMapper     = $this->getJoinMapper('level');
-        $indicatorMapper = $this->getJoinMapper('indicator');
-        $groupMapper     = $this->getJoinMapper('indicator.capability');
+        $levelMapper      = $this->getJoinMapper('level');
+        $indicatorMapper  = $this->getJoinMapper('indicator');
+        $capabilityMapper = $this->getJoinMapper('indicator.capability');
 
         /* All indexed by primary key */
-        $descriptors     = $this->createCollection();
-        $levels          = $levelMapper->createCollection();
-        $indicators      = $indicatorMapper->createCollection();
-        $groups          = $groupMapper->createCollection();
+        $descriptors      = $this->createCollection();
+        $levels           = $levelMapper->createCollection();
+        $indicators       = $indicatorMapper->createCollection();
+        $capabilities     = $capabilityMapper->createCollection();
 
         // Row keys for de-duplication
-        $levelKey        = "l.{$levelMapper->getIdentifierColumn()}";
-        $indicatorKey    = "c.{$indicatorMapper->getIdentifierColumn()}";
-        $groupKey        = "g.{$groupMapper->getIdentifierColumn()}";
+        $levelKey         = "l.{$levelMapper->getIdentifierColumn()}";
+        $indicatorKey     = "c.{$indicatorMapper->getIdentifierColumn()}";
+        $capabilityKey    = "g.{$capabilityMapper->getIdentifierColumn()}";
 
         /** @var Level\Model $level */
         $level = null;
@@ -147,14 +147,14 @@ class Mapper extends Schoolbox\Mapper {
         /** @var Indicator\Model $indicator */
         $indicator = null;
 
-        /** @var Capability\Model $group */
-        $group = null;
+        /** @var Capability\Model $capability */
+        $capability = null;
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
-            $levelId     = $r[$levelKey];
-            $indicatorId = $r[$indicatorKey];
-            $groupId     = $r[$groupKey];
+            $levelId      = $r[$levelKey];
+            $indicatorId  = $r[$indicatorKey];
+            $capabilityId = $r[$capabilityKey];
 
             // First time we've encountered this Level ?
             if (!$levels->getOffset($levelId)) {
@@ -165,16 +165,16 @@ class Mapper extends Schoolbox\Mapper {
             // First time we've encountered this indicator?
             if (!$indicators->getOffset($indicatorId)) {
                 // First time we've encountered this group?
-                if (!$groups->getOffset($groupId)) {
-                    $groups->setOffset($groupId, $this->hydrateJoin($r, 'indicator.capability', 'g'));
+                if (!$capabilities->getOffset($capabilityId)) {
+                    $capabilities->setOffset($capabilityId, $this->hydrateJoin($r, 'indicator.capability', 'g'));
                 }
 
                 // Set the group as well
                 /** @var Capability\Model $group */
                 /** @var Indicator\Model $indicator */
-                $group     = $groups->getOffset($groupId);
+                $capability     = $capabilities->getOffset($capabilityId);
                 $indicator = $this->hydrateJoin($r, 'indicator', 'c');
-                $indicator->setCapability($group);
+                $indicator->setCapability($capability);
                 $indicators->setOffset($indicatorId, $indicator);
             }
             $indicator = $indicators->getOffset($indicatorId);

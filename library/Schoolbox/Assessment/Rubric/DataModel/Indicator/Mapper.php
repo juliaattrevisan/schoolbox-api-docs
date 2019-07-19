@@ -52,9 +52,9 @@ class Mapper extends BaseMapper {
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteDescriptors']);
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteGroup']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteCapability']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteUsages']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreGroup']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreCapability']);
     }
 
 
@@ -88,19 +88,19 @@ class Mapper extends BaseMapper {
      */
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
-        /** @var CapabilityMapper $groupMapper */
+        /** @var CapabilityMapper $capabilityMapper */
         /** @var NodeMapper                    $curriculumNodeMapper */
         /** @var GenericCollection|Model[] $collection */
-        $groupMapper          = $this->getJoinMapper('capability');
-        $groupIds             = [];
+        $capabilityMapper     = $this->getJoinMapper('capability');
+        $capabilityIds        = [];
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
             /** @var Model $crit */
             $crit = $this->hydrate($row);
             if ($row['g.id']) {
-                $groupIds[] = $row['g.id'];
-                $crit->setCapability($groupMapper->hydrate($row, 'g'));
+                $capabilityIds[] = $row['g.id'];
+                $crit->setCapability($capabilityMapper->hydrate($row, 'g'));
             }
             $collection[$crit->getId()] = $crit;
         }
@@ -111,17 +111,17 @@ class Mapper extends BaseMapper {
             'curriculum_node_for_rubric_criterion',
             $collection->keys()
         );
-        $groupNodes = $curriculumNodeMapper->findForOtherMapper(
-            $groupMapper,
+        $capabilityNodes = $curriculumNodeMapper->findForOtherMapper(
+            $capabilityMapper,
             'curriculum_node_for_rubric_group',
-            $groupIds
+            $capabilityIds
         );
         foreach ($collection as $indicator) {
             if (isset($indicatorNodes[$indicator->getId()])) {
                 $indicator->setCurriculumNodes($indicatorNodes[$indicator->getId()]);
             }
-            if (isset($groupNodes[$indicator->getCapability()->getId()])) {
-                $indicator->getCapability()->setCurriculumNodes($groupNodes[$indicator->getCapability()->getId()]);
+            if (isset($capabilityNodes[$indicator->getCapability()->getId()])) {
+                $indicator->getCapability()->setCurriculumNodes($capabilityNodes[$indicator->getCapability()->getId()]);
             }
         }
 
@@ -151,7 +151,7 @@ class Mapper extends BaseMapper {
      * @param Model $indicator
      * @return bool
      */
-    public function deleteGroup(Model $indicator)
+    public function deleteCapability(Model $indicator)
     {
         $remaining = $this->countByColumn('rubric_group_id', $indicator->getCapability()->getId());
         if (0 === $remaining) {
@@ -169,7 +169,7 @@ class Mapper extends BaseMapper {
      * @param Model $indicator
      * @return bool
      */
-    public function restoreGroup(Model $indicator)
+    public function restoreCapability(Model $indicator)
     {
         if ($indicator->getCapability()->isDeleted()) {
             $this->getJoinMapper('capability')->restoreSoftDeleted($indicator->getCapability());
@@ -274,11 +274,11 @@ class Mapper extends BaseMapper {
      * Find a single indicator for a parent type, given its unique identifier
      * (parentId+parentType+name+groupName).
      *
-     * @param int    $parentId   The parent ID (or list thereof) to find for
-     * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
-     * @param string $name       The name of the indicator
-     * @param string $groupName  The name of the indicator's group
-     * @param bool   $cache      If false, bypass result cache
+     * @param int    $parentId       The parent ID (or list thereof) to find for
+     * @param string $parentType     One of the `Group::PARENT_TYPE_*` constants
+     * @param string $name           The name of the indicator
+     * @param string $capabilityName The name of the indicator's capability
+     * @param bool   $cache          If false, bypass result cache
      * @return Model
      * @throws MapperException
      */
@@ -286,13 +286,13 @@ class Mapper extends BaseMapper {
         int $parentId,
         string $parentType,
         string $name,
-        string $groupName,
+        string $capabilityName,
         bool $cache = true
     ): Model
     {
         return $this->findOneByColumnList(
             [
-                'g.name'        => $groupName,
+                'g.name'        => $capabilityName,
                 'name'          => $name,
                 'g.parent_type' => $parentType,
                 'g.parent_id'   => $parentId,
@@ -307,16 +307,16 @@ class Mapper extends BaseMapper {
      * Find a single indicator for a folder, given its unique identifier
      * (folder+name+groupName).
      *
-     * @param int    $folderId  The folder ID (or list thereof) to find for
-     * @param string $name      The name of the indicator
-     * @param string $groupName The name of the indicator's group
-     * @param bool   $cache     If false, bypass result cache
+     * @param int    $folderId       The folder ID (or list thereof) to find for
+     * @param string $name           The name of the indicator
+     * @param string $capabilityName The name of the indicator's capability
+     * @param bool   $cache          If false, bypass result cache
      * @return Model
      * @throws MapperException
      */
-    public function findOneForFolderByKey(int $folderId, string $name, string $groupName, bool $cache = true): Model
+    public function findOneForFolderByKey(int $folderId, string $name, string $capabilityName, bool $cache = true): Model
     {
-        return $this->findOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+        return $this->findOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $capabilityName, $cache);
     }
 
 
@@ -329,7 +329,7 @@ class Mapper extends BaseMapper {
      * @param int    $parentId
      * @param string $parentType
      * @param string $name
-     * @param string $groupName
+     * @param string $capabilityName
      * @param bool   $cache
      * @return Model
      * @throws MapperException
@@ -338,12 +338,12 @@ class Mapper extends BaseMapper {
         int $parentId,
         string $parentType,
         string $name,
-        string $groupName,
+        string $capabilityName,
         bool $cache = true
     ): Model
     {
         try {
-            return $this->findOneForParentByKey($parentId, $parentType, $name, $groupName, $cache);
+            return $this->findOneForParentByKey($parentId, $parentType, $name, $capabilityName, $cache);
 
         } catch (MapperException\Deleted $e) {
             // It was deleted; restore it
@@ -353,12 +353,12 @@ class Mapper extends BaseMapper {
 
         } catch (MapperException $e) {
             // Build it
-            /** @var CapabilityMapper $groupMapper */
-            $groupMapper = $this->getJoinMapper('capability');
-            $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName, $cache);
-            $indicator   = $this->createModel()
-                                ->setCapability($group)
-                                ->setName($name);
+            /** @var CapabilityMapper $capabilityMapper */
+            $capabilityMapper = $this->getJoinMapper('capability');
+            $capability       = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache);
+            $indicator        = $this->createModel()
+                                     ->setCapability($capability)
+                                     ->setName($name);
             $this->save($indicator);
             return $indicator;
         }
@@ -373,7 +373,7 @@ class Mapper extends BaseMapper {
      *
      * @param int    $folderId
      * @param string $name
-     * @param string $groupName
+     * @param string $capabilityName
      * @param bool   $cache
      * @return Model
      * @throws MapperException
@@ -381,11 +381,11 @@ class Mapper extends BaseMapper {
     public function findOrCreateOneForFolderByKey(
         int $folderId,
         string $name,
-        string $groupName,
+        string $capabilityName,
         bool $cache = true
     ): Model
     {
-        return $this->findOrCreateOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $groupName, $cache);
+        return $this->findOrCreateOneForParentByKey($folderId, CapabilityModel::PARENT_TYPE_CATEGORY, $name, $capabilityName, $cache);
     }
 
 

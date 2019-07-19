@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
 use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as GroupMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as CapabilityMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Collection;
@@ -46,12 +46,12 @@ class Mapper extends BaseMapper
         $this->uses('value', self::TYPE_DECIMAL);
         $this->joins(
             'rubric_group_mark_id',
-            Mapper::class,
+            CapabilityMarkMapper::class,
             'id',
             self::TYPE_MODEL,
             null,
             'capabilityMark',
-            'capabilityMark'
+            'capability_mark'
         );
 
         $this->joins(
@@ -105,10 +105,10 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper $groupMarkMapper */
-        $groupMarkMapper = $this->getJoinMapper('group_mark');
+        /** @var \Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper $capabilityMarkMapper */
+        $capabilityMarkMapper = $this->getJoinMapper('capability_mark');
         /** @var ReturnedWorkMapper $submissionReturnMapper */
-        $submissionReturnMapper = $this->getJoinMapper('group_mark.submission_return');
+        $submissionReturnMapper = $this->getJoinMapper('capability_mark.submission_return');
         $marks = $this->createCollection();
         $descriptors = $this->getJoinMapper('descriptor')->createCollection();
 
@@ -127,11 +127,11 @@ class Mapper extends BaseMapper
             /** @var DescriptorModel $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
-            $groupMark = $groupMarkMapper->hydrate($r, 'g');
-            $groupMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
+            $capabilityMark = $capabilityMarkMapper->hydrate($r, 'g');
+            $capabilityMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
 
             $mark = $this->hydrate($r);
-            $mark->setCapabilityMark($groupMark);
+            $mark->setCapabilityMark($capabilityMark);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }

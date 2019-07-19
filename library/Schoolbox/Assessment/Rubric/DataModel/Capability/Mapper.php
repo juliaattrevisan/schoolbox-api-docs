@@ -73,20 +73,20 @@ class Mapper extends BaseMapper
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_group');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
-            /** @var Model $group */
-            $group                       = $this->hydrate($row);
-            $collection[$group->getId()] = $group;
+            /** @var Model $capability */
+            $capability                       = $this->hydrate($row);
+            $collection[$capability->getId()] = $capability;
         }
 
         // Fetch curriculum nodes separately
-        $groupNodes = $curriculumNodeMapper->findForOtherMapper(
+        $capabilityNodes = $curriculumNodeMapper->findForOtherMapper(
             $this,
             'curriculum_node_for_rubric_group',
             $collection->keys()
         );
-        foreach ($collection as $group) {
-            if (isset($groupNodes[$group->getId()])) {
-                $group->setCurriculumNodes($groupNodes[$group->getId()]);
+        foreach ($collection as $capability) {
+            if (isset($capabilityNodes[$capability->getId()])) {
+                $capability->setCurriculumNodes($capabilityNodes[$capability->getId()]);
             }
         }
 
@@ -139,11 +139,11 @@ class Mapper extends BaseMapper
      *
      * Soft-deleting a group (hard) deletes all of its usages.
      *
-     * @param Model $group
+     * @param Model $capability
      */
-    public function deleteUsages(Model $group): void
+    public function deleteUsages(Model $capability): void
     {
-        CapabilityUsageMapper::getInstance()->deleteByColumn('rubric_group_id', $group->getId());
+        CapabilityUsageMapper::getInstance()->deleteByColumn('rubric_group_id', $capability->getId());
     }
 
 

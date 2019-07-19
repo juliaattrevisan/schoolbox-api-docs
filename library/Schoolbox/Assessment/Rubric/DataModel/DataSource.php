@@ -186,12 +186,12 @@ class DataSource
      * @noinspection PhpDocMissingThrowsInspection Ignore spurious Aura\Di exception
      *
      * @param RowSet           $rowSet
-     * @param bool             $persistCurriculum    Should curriculum nodes for groups and
+     * @param bool             $persistCurriculum    Should curriculum nodes for capabilities and
      *                                               indicators be updated?
-     * @param bool             $allowModifyUsed      Should groups/indicators that are in use
+     * @param bool             $allowModifyUsed      Should capabilities/indicators that are in use
      *                                               be modifiable or deletable?
      * @param null|IAssessable $allowModifyExclusion If set and `$allowModifyUsed` is off, a
-     *                                               group or indicator in `$rowSet` MAY be
+     *                                               capabilities or indicator in `$rowSet` MAY be
      *                                               modified if it is used by no other
      *                                               assessment than this one.
      * @throws MapperException
@@ -663,7 +663,7 @@ class DataSource
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
 
         // What goes in the grid?
-        // * Capability (fka group) marks
+        // * Capability marks
         // * Descriptor marks
         // ** more correctly known as indicator marks, which reference a descriptor
         /** @var GenericCollection|CapabilityMarkModel[] $capabilityMarkModels */
@@ -1058,7 +1058,7 @@ class DataSource
 
         foreach ($sourceDescriptorMarks as $sourceDescriptor) {
 
-            // Is this group marks set?
+            // Is this capability marks set?
             $sourceCapabilityMark = $sourceDescriptor->getCapabilityMark();
             $capability           = $sourceCapabilityMark->getCapability();
             $capabilityId         = $capability->getId();
@@ -1290,7 +1290,7 @@ class DataSource
         $dstCapabilities = $capabilityMapper->createCollection();
         /** @var IndicatorModel[]|GenericCollection $dstIndicators */
         $dstIndicators = $indicatorMapper->createCollection();
-        /** @var CapabilityUsageModel[]|GenericCollection $dstGroups */
+        /** @var CapabilityUsageModel[]|GenericCollection $dstCapabilityUsages */
         $dstCapabilityUsages = $capabilityUsageMapper->createCollection();
         /** @var IndicatorUsageModel[]|GenericCollection $dstIndicatorUsages */
         $dstIndicatorUsages = $indicatorUsageMapper->createCollection();
@@ -1326,7 +1326,7 @@ class DataSource
             $firstSrcDescriptor->getIndicator()->getCapability()->getParentType(),
             false
         );
-        // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
+        // Convert to 2-D arrays, indexed by 'capability' then 'name', so we can later find duplicates.
         /** @var IndicatorModel[][] $existingIndicatorMap */
         $existingIndicatorMap = [];
         /** @var CapabilityModel[] $existingCapabilityMap */
