@@ -84,6 +84,14 @@ Usage:
         <li>
             <a href="{{ importUrl }}" class="icon-download">Import into classes</a>
         </li>
+
+        {% set assessmentCalendarUrl = routeLookupIfAuthorized('learningAssessmentCalendar.getReport') %}
+        {% if assessmentCalendarUrl %}
+            <li>
+                <a href="{{ assessmentCalendarUrl }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
+            </li>
+        {% endif %}
+
         <li>
         {% if courseSpec.folder.hasHomepage %}
             <a href="/homepage/{{ courseSpec.folder.id }}/" class="icon-home">Course Homepage</a>
@@ -92,6 +100,7 @@ Usage:
         {% endif %}
         </li>
         <li><a href="{{ routeLookup('rubricCriteria.getForm', { folderId: courseSpec.folder.id }) }}" class="icon-criteria">Manage Rubric {{ locale.rubricGroup.properPlural }}</a></li>
+
         {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getMarkbook', {courseSpec: courseSpec, courseSpecId: courseSpec.id}) %}
         {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
         <li><a href="{{ routeLookup('learningAnalytics.course', {courseSpecId: courseSpec.id}) }}" class="icon-poll">Learning Analytics</a></li>
