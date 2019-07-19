@@ -189,15 +189,15 @@ Usage:
                     <li><a class="icon-folder" href="/resources/{{ courseSpec.folder.id }}">View Resources</a></li>
                 {% endif %}
 
+                {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getMarkbook', {courseSpec: courseSpec, courseSpecId: courseSpec.id}) %}
+                {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
+
                 {% set assessmentCalendarUrl = routeLookupIfAuthorized('learningAssessmentCalendar.getReport') %}
                 {% if assessmentCalendarUrl %}
                     <li>
                         <a href="{{ assessmentCalendarUrl }}" class="icon-calendar">{{ locale.assessment|capitalize }} Calendar</a>
                     </li>
                 {% endif %}
-
-                {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getMarkbook', {courseSpec: courseSpec, courseSpecId: courseSpec.id}) %}
-                {% if courseMarkbookRoute %}<li><a href="{{ courseMarkbookRoute }}" class="icon-curriculum">Course Markbook</a></li>{% endif %}
             </ul>
         {% endif %}
     </div>
