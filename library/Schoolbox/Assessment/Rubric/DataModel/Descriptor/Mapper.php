@@ -35,7 +35,7 @@ class Mapper extends Schoolbox\Mapper {
         $this->hasTable('rubric_descriptor');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('criterion_id', Indicator\Mapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('criterion_id', Indicator\Mapper::class, 'id', null, null, 'indicator', 'indicator');
         $this->joins('level_id', Level\Mapper::class, 'id', null, null, 'level', 'level');
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('description', self::TYPE_STRING);
@@ -70,8 +70,8 @@ class Mapper extends Schoolbox\Mapper {
     /**
      * Ensure that if we restore a descriptor, its level does not remain deleted.
      *
-     * This is required because deletion of a criterion may have triggered deletion
-     * of the last descriptor in a level. If we restore that criterion, it will restore
+     * This is required because deletion of a indicator may have triggered deletion
+     * of the last descriptor in a level. If we restore that indicator, it will restore
      * the descriptor, which should restore the level.
      *
      * If the descriptor was not the last descriptor deleted in some level, it does
@@ -110,12 +110,12 @@ class Mapper extends Schoolbox\Mapper {
         return "
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('level', 'l')},
-                    {$this->getJoinColumnString('criterion', 'c')},
-                    {$this->getJoinColumnString('criterion.group', 'g')}
+                    {$this->getJoinColumnString('indicator', 'c')},
+                    {$this->getJoinColumnString('indicator.group', 'g')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
-            INNER JOIN {$this->getJoinSql('criterion', '', 'c', true)}
-            INNER JOIN {$this->getJoinSql('criterion.group', 'c', 'g', true)}
+            INNER JOIN {$this->getJoinSql('indicator', '', 'c', true)}
+            INNER JOIN {$this->getJoinSql('indicator.group', 'c', 'g', true)}
         ";
     }
 
@@ -127,18 +127,18 @@ class Mapper extends Schoolbox\Mapper {
     protected function hydrateSelect(PDOStatement $statement)
     {
         $levelMapper     = $this->getJoinMapper('level');
-        $criterionMapper = $this->getJoinMapper('criterion');
-        $groupMapper     = $this->getJoinMapper('criterion.group');
+        $indicatorMapper = $this->getJoinMapper('indicator');
+        $groupMapper     = $this->getJoinMapper('indicator.group');
 
         /* All indexed by primary key */
         $descriptors     = $this->createCollection();
         $levels          = $levelMapper->createCollection();
-        $criteria        = $criterionMapper->createCollection();
+        $criteria        = $indicatorMapper->createCollection();
         $groups          = $groupMapper->createCollection();
 
         // Row keys for de-duplication
         $levelKey        = "l.{$levelMapper->getIdentifierColumn()}";
-        $criterionKey    = "c.{$criterionMapper->getIdentifierColumn()}";
+        $criterionKey    = "c.{$indicatorMapper->getIdentifierColumn()}";
         $groupKey        = "g.{$groupMapper->getIdentifierColumn()}";
 
         /** @var Level\Model $level */
@@ -162,18 +162,18 @@ class Mapper extends Schoolbox\Mapper {
             }
             $level = $levels->getOffset($levelId);
 
-            // First time we've encountered this Criterion ?
+            // First time we've encountered this indicator?
             if (!$criteria->getOffset($criterionId)) {
                 // First time we've encountered this group?
                 if (!$groups->getOffset($groupId)) {
-                    $groups->setOffset($groupId, $this->hydrateJoin($r, 'criterion.group', 'g'));
+                    $groups->setOffset($groupId, $this->hydrateJoin($r, 'indicator.group', 'g'));
                 }
 
                 // Set the group as well
                 /** @var Capability\Model $group */
                 /** @var Indicator\Model $criterion */
                 $group     = $groups->getOffset($groupId);
-                $criterion = $this->hydrateJoin($r, 'criterion', 'c');
+                $criterion = $this->hydrateJoin($r, 'indicator', 'c');
                 $criterion->setGroup($group);
                 $criteria->setOffset($criterionId, $criterion);
             }
@@ -186,8 +186,8 @@ class Mapper extends Schoolbox\Mapper {
             $descriptor->setLevel($level);
             $level->getDescriptors()->setOffset($descriptor->getId(), $descriptor);
 
-            // Link to Criterion
-            $descriptor->setCriterion($criterion);
+            // Link to indicator
+            $descriptor->setIndicator($criterion);
         }
 
         return $descriptors;

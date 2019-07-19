@@ -23,7 +23,7 @@ class Model implements ISoftDeletable
     /**
      * @var IndicatorModel
      */
-    private $criterion;
+    private $indicator;
 
     /**
      * @var LevelModel
@@ -41,21 +41,21 @@ class Model implements ISoftDeletable
     private $description;
 
     /**
-     * @param IndicatorModel $criterion
+     * @param IndicatorModel $indicator
      * @return $this
      */
-    public function setCriterion(IndicatorModel $criterion)
+    public function setIndicator(IndicatorModel $indicator)
     {
-        $this->criterion = $criterion;
+        $this->indicator = $indicator;
         return $this;
     }
 
     /**
      * @return IndicatorModel
      */
-    public function getCriterion()
+    public function getIndicator()
     {
-        return $this->criterion;
+        return $this->indicator;
     }
 
     /**

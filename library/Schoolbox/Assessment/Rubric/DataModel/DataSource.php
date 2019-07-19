@@ -398,7 +398,7 @@ class DataSource
         $descriptorsByIndicator = [];
         foreach ($descriptorModels as $descriptorModel) {
             $levelId     = $descriptorModel->getLevel()->getId();
-            $indicatorId = $descriptorModel->getCriterion()->getId();
+            $indicatorId = $descriptorModel->getIndicator()->getId();
             $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
                 ->setId($descriptorModel->getId())
                 ->setDescription($descriptorModel->getDescription())
@@ -601,7 +601,7 @@ class DataSource
                     if ($descriptor) {
                         $descriptorModel = $descriptorMapper->createModel()
                             ->setId($descriptor->getId())
-                            ->setCriterion($indicatorModel)
+                            ->setIndicator($indicatorModel)
                             ->setLevel($levelMapper->createModel($level->getId()))
                             // One day: set min value here
                             ->setMaxValue($descriptor->getMaxValue())
@@ -686,7 +686,7 @@ class DataSource
             function (GenericCollection $c) {
                 return $c->indexByCallback(
                     function (DescriptorMarkModel $mark) {
-                        return $mark->getDescriptor()->getCriterion()->getId();
+                        return $mark->getDescriptor()->getIndicator()->getId();
                     }
                 );
             }
