@@ -15,12 +15,12 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMark;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model;
-use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model;
-use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Mapper as DescriptorMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model as DescriptorMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
@@ -118,14 +118,14 @@ class RubricMapper
         // Capability contains indicators too: inside-out them
         /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
         $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $indicatorModels = Mapper::getInstance()->findForFolder($folder->getId(), $useCache);
+        $indicatorModels = DescriptorMarkMapper::getInstance()->findForFolder($folder->getId(), $useCache);
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $indicatorModels    = Mapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
-                                        ->merge($indicatorModels);
+            $indicatorModels    = DescriptorMarkMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
+                                                      ->merge($indicatorModels);
         }
 
         // This is how it SHOULD work...
@@ -150,7 +150,7 @@ class RubricMapper
                     ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
 
                 if ($getUsages) {
-                    foreach (Mapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
+                    foreach (DescriptorMarkMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
                         $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
@@ -163,7 +163,7 @@ class RubricMapper
                 ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
 
             if ($getUsages) {
-                foreach (Mapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
+                foreach (DescriptorMarkMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
                         = (new DueWork\Model())
                             ->setId($indicatorUsage['id'])
@@ -207,8 +207,8 @@ class RubricMapper
         $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
         // Required mappers
-        $capabilityMapper         = Mapper::getInstance();
-        $indicatorMapper          = Mapper::getInstance();
+        $capabilityMapper         = DescriptorMarkMapper::getInstance();
+        $indicatorMapper          = DescriptorMarkMapper::getInstance();
 
         // Existing data
         $existingRowSet           = $this->retrieveRowSet($rowSet->getContext(), true);
@@ -380,7 +380,7 @@ class RubricMapper
         )->indexByCallback(function (Level $l) {
             return $l->getId();
         });
-        $descriptorModels = Mapper::getInstance()->findByColumnList([
+        $descriptorModels = DescriptorMarkMapper::getInstance()->findByColumnList([
             'criterion_id' => $indicatorUsageModels->keys(),
             'level_id'     => $levelModels->keys(),
         ]);
@@ -496,7 +496,7 @@ class RubricMapper
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
         $levelMapper      = LevelMapper::getInstance();
-        $descriptorMapper = Mapper::getInstance();
+        $descriptorMapper = DescriptorMarkMapper::getInstance();
         $indicatorMapper  = IndicatorMapper::getInstance();
         $capabilityMapper = CapabilityMapper::getInstance();
 
@@ -669,14 +669,14 @@ class RubricMapper
             'valid'     => true,
         ]);
 
-        /** @var Collection|GenericCollection[]|Model[][] $indicatorMarkModelsByCapability */
-        $indicatorMarkModelsByCapability = Mapper::getInstance()->findByColumnList([
+        /** @var Collection|GenericCollection[]|DescriptorMarkModel[] $indicatorMarkModelsByCapability */
+        $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumnList([
             'rubric_group_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
             'valid'                => true,
-        ])->filter(function (Model $indicatorMark) {
+        ])->filter(function (DescriptorMarkModel $indicatorMark) {
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
-            function (Model $indicatorMark) {
+            function (DescriptorMarkModel $indicatorMark) {
                 return $indicatorMark->getGroupMark()->getGroup()->getId();
             }
         );
@@ -684,7 +684,7 @@ class RubricMapper
         $indicatorMarkModelsByCapability = $indicatorMarkModelsByCapability->map(
             function (GenericCollection $c) {
                 return $c->indexByCallback(
-                    function (Model $mark) {
+                    function (DescriptorMarkModel $mark) {
                         return $mark->getDescriptor()->getCriterion()->getId();
                     }
                 );
@@ -765,8 +765,8 @@ class RubricMapper
     {
         // Required mappers
         $capabilityMapper     = CapabilityMapper::getInstance();
-        $descriptorMapper     = Mapper::getInstance();
-        $indicatorMarkMapper  = Mapper::getInstance();
+        $descriptorMapper     = DescriptorMarkMapper::getInstance();
+        $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
         $capabilityMarkMapper = GroupMarkMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
@@ -1047,7 +1047,7 @@ class RubricMapper
             return;
         }
         $groupMarkMapper            = GroupMarkMapper::getInstance();
-        $descriptorMarkMapper       = Mapper::getInstance();
+        $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
         $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
         $destinationGroupMarks      = $groupMarkMapper->createCollection();
         $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
@@ -1117,7 +1117,7 @@ class RubricMapper
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
                 function ($model) use ($exclude) {
-                    /** @var Model|Level $model */
+                    /** @var DescriptorMarkModel|Level $model */
                     return !in_array($model->getId(), $exclude);
                 }
             )
@@ -1259,11 +1259,11 @@ class RubricMapper
         // Get required mappers
         $boxMapper            = SubmissionBoxMapper::getInstance();
         $levelMapper          = LevelMapper::getInstance();
-        $descriptorMapper     = Mapper::getInstance();
-        $groupMapper          = Mapper::getInstance();
-        $criterionMapper      = Mapper::getInstance();
-        $groupUsageMapper     = Mapper::getInstance();
-        $criterionUsageMapper = Mapper::getInstance();
+        $descriptorMapper     = DescriptorMarkMapper::getInstance();
+        $groupMapper          = DescriptorMarkMapper::getInstance();
+        $criterionMapper      = DescriptorMarkMapper::getInstance();
+        $groupUsageMapper     = DescriptorMarkMapper::getInstance();
+        $criterionUsageMapper = DescriptorMarkMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1281,15 +1281,15 @@ class RubricMapper
         // Index all these collections by source version ID, even though the object will be destination version.
         /** @var Level[]|GenericCollection $dstLevels */
         $dstLevels = $levelMapper->createCollection();
-        /** @var Model[]|GenericCollection $dstDescriptors */
+        /** @var DescriptorMarkModel[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroups = $groupMapper->createCollection();
-        /** @var Model[]|GenericCollection $dstCriteria */
+        /** @var DescriptorMarkModel[]|GenericCollection $dstCriteria */
         $dstCriteria = $criterionMapper->createCollection();
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroupUsages = $groupUsageMapper->createCollection();
-        /** @var Model[]|GenericCollection $dstCriterionUsages */
+        /** @var DescriptorMarkModel[]|GenericCollection $dstCriterionUsages */
         $dstCriterionUsages = $criterionUsageMapper->createCollection();
 
         // Copy Levels
@@ -1302,7 +1302,7 @@ class RubricMapper
         }
 
         // Get Source Descriptors
-        /** @var Model[]|GenericCollection $srcDescriptors */
+        /** @var DescriptorMarkModel[]|GenericCollection $srcDescriptors */
         $srcDescriptors = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
         $srcCriteria    = $criterionMapper->createCollection();
         $srcGroups      = $groupMapper->createCollection();
@@ -1315,7 +1315,7 @@ class RubricMapper
          * For now, need to by-pass cache, as we may have inserted criteria during previous call to this function.
          * //TODO - the mappers should be invalidating the SELECT cache on INSERT/UPDATE @see SA-1951
          */
-        /** @var Model $firstSrcDescriptor */
+        /** @var DescriptorMarkModel $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
         $existingCriteria   = $criterionMapper->findForParent(
             $dstBox->getCategory()->getId(),
@@ -1323,7 +1323,7 @@ class RubricMapper
             false
         );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
-        /** @var Model[][] $existingCriterionMap */
+        /** @var DescriptorMarkModel[] $existingCriterionMap */
         $existingCriterionMap = [];
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[] $existingGroupMap */
         $existingGroupMap = [];
@@ -1407,8 +1407,8 @@ class RubricMapper
         }
 
         // Get Source Usages
-        /** @var Model[]|GenericCollection $srcGroupUsages */
-        /** @var Model[]|GenericCollection $srcCriterionUsages */
+        /** @var DescriptorMarkModel[]|GenericCollection $srcGroupUsages */
+        /** @var DescriptorMarkModel[]|GenericCollection $srcCriterionUsages */
         $srcGroupUsages = $groupUsageMapper->findByColumnList([
             'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
@@ -1434,7 +1434,7 @@ class RubricMapper
         foreach ($srcCriterionUsages as $srcCriterionUsage) {
             $dstCriterionUsage = clone $srcCriterionUsage;
 
-            /** @var Model $dstCriterion */
+            /** @var DescriptorMarkModel $dstCriterion */
             $dstCriterion = $dstCriteria->getOffset($srcCriterionUsage->getCriterion()->getId());
 
             $dstCriterionUsage->setCriterion($dstCriterion);

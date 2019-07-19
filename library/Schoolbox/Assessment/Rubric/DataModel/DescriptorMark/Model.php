@@ -8,8 +8,8 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
 
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMark;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
-use Schoolbox\Assessment\Rubric\DataModel\GroupMark;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 
@@ -121,7 +121,7 @@ class Model
 
 
     /**
-     * @return null|GroupMark
+     * @return null|\Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMark
      */
     public function getGroupMark(): ?GroupMark
     {

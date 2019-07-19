@@ -11,9 +11,9 @@ namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
 use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
-use Schoolbox\Assessment\Rubric\DataModel\GroupMarkMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -105,7 +105,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var GroupMarkMapper $groupMarkMapper */
+        /** @var \Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMarkMapper $groupMarkMapper */
         $groupMarkMapper = $this->getJoinMapper('group_mark');
         /** @var ReturnedWorkMapper $submissionReturnMapper */
         $submissionReturnMapper = $this->getJoinMapper('group_mark.submission_return');

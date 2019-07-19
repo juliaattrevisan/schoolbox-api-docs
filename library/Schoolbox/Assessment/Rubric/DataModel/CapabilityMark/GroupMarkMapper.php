@@ -4,7 +4,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
 use PDO;
 use PDOStatement;
