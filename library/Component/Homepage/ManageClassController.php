@@ -102,6 +102,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
         $this->setBlock($templateHandle, 'manage_criteria', 'manage_criteria_block');
         $this->setBlock($templateHandle, 'course_link', 'course_link_block');
+        $this->setBlock($templateHandle, 'assessment_calendar_link', 'assessment_calendar_link_block');
 
         // Determine the term for the grades link
         $currentTerm = $this->termMapper->findForToday();
@@ -139,6 +140,18 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->setVar('course_markbook_link_block');
         }
 
+        /* Assessment Calendar Link
+         */
+        $route = 'learningAssessmentCalendar.getReport';
+        $params = [];
+
+        if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser()) && $this->getConfigMapper()->get('assessment_calendar_enabled')) {
+            $this->parse('assessment_calendar_link_block', 'assessment_calendar_link');
+        } else {
+            $this->setVar([
+                'assessment_calendar_link_block' => ''
+            ]);
+        }
 
         $involvedInGroup = $isGroupPage && $this->userAccessMapper->involvedInGroup(
                 $this->getUser(),
