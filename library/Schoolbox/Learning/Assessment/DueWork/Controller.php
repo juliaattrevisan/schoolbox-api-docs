@@ -50,7 +50,7 @@ use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
-    /** @var DataModel\ResultMapper */
+    /** @var \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper */
     private $resultSetMapper;
 
     /** @var DataModel\RubricMapper */
@@ -72,22 +72,22 @@ class Controller extends Assessment\Controller
     private $kamiMapper;
 
     /**
-     * @param UserMapper                    $userMapper
-     * @param Error\Mapper                  $errorMapper
-     * @param MapperProxy                   $assessmentMapper
-     * @param WorkTypeMapper                $workTypeMapper
-     * @param Access                        $access
-     * @param Transactor                    $transactor
-     * @param Assessment\Breadcrumb\Factory $bakery
-     * @param DataModel\RubricMapper        $rubricMapper
-     * @param DataModel\ResultMapper        $resultSetMapper
-     * @param DueWorkResponseMapper         $dueWorkResponseMapper
-     * @param ParticipantMapper             $participantMapper
-     * @param Term\Mapper                   $termMapper
-     * @param SingleFile\Mapper             $submissionFileMapper
-     * @param Kami\Connector                $kamiConnector
-     * @param Kami\Mapper                   $kamiMapper
-     * @param Participant\DataSource        $participantDataSource
+     * @param UserMapper                                           $userMapper
+     * @param Error\Mapper                                               $errorMapper
+     * @param MapperProxy                                          $assessmentMapper
+     * @param WorkTypeMapper                                       $workTypeMapper
+     * @param Access                                               $access
+     * @param Transactor                                           $transactor
+     * @param Assessment\Breadcrumb\Factory                        $bakery
+     * @param DataModel\RubricMapper                               $rubricMapper
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
+     * @param DueWorkResponseMapper                                $dueWorkResponseMapper
+     * @param ParticipantMapper                                    $participantMapper
+     * @param Term\Mapper                                          $termMapper
+     * @param SingleFile\Mapper                                    $submissionFileMapper
+     * @param Kami\Connector                                       $kamiConnector
+     * @param Kami\Mapper                                          $kamiMapper
+     * @param Participant\DataSource                               $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -98,7 +98,7 @@ class Controller extends Assessment\Controller
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
         DataModel\RubricMapper $rubricMapper,
-        DataModel\ResultMapper $resultSetMapper,
+        DataModel\Result\Mapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,

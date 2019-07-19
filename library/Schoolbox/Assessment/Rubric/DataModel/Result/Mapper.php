@@ -8,20 +8,20 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Result;
 
-use Schoolbox;
 use Schoolbox\GenericCollection;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
- * @method Result[]|GenericCollection findAll($options = array())
+ * @method Model[]|GenericCollection findAll($options = array())
  */
-class ResultMapper extends Schoolbox\Mapper {
+class Mapper extends BaseMapper {
 
     protected function mapping()
     {
         $this->hasTable('rubric_result');
-        $this->hasModel(Result::class);
+        $this->hasModel(Model::class);
         $this->uses('resultset_id', self::TYPE_INTEGER, null, 'resultSetId'); // This is NOT an identifier
         $this->uses('value', self::TYPE_INTEGER);
         $this->uses('label', self::TYPE_STRING);

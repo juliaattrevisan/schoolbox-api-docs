@@ -45,7 +45,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
         DataModel\Descriptor\Mapper::getInstance(),
         DataModel\Level\Mapper::getInstance(),
         DataModel\DescriptorMark\Mapper::getInstance(),
-        DataModel\ResultMapper::getInstance(),
+        DataModel\Result\Mapper::getInstance(),
         DataModel\IndicatorUsage\Mapper::getInstance(),
     ];
 
