@@ -310,7 +310,7 @@ class Module extends BaseModule
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
-        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Rubric\DataModel\RubricMapper::class);
+        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class);
         $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Rubric\DataModel\Result\Mapper::class);
 
         // TODO get this out of DI

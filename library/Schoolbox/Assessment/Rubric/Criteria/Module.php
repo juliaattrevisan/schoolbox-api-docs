@@ -12,7 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -73,7 +73,7 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'nodeMapper'   => $this->getMapperFactory()->getLazy(NodeMapper::class),
-                    'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                    'rubricMapper' => $this->getMapperFactory()->getLazy(DataSource::class),
                     'rosettaStone' => $injector->lazyGet('l10n'),
                 ]
             )

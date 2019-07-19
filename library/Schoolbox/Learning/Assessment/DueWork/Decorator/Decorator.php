@@ -108,7 +108,7 @@ class Decorator implements DecoratorInterface
 
 
         if ($this->getUseRubric()) {
-            $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\RubricMapper::getInstance();
+            $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\DataSource::getInstance();
             $gridFactory  = new GridFactory();
             $existingGrid = new Grid(
                 $assessment,

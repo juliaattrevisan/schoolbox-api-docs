@@ -51,7 +51,7 @@ class Acquisition
     private $indicators;
 
     /**
-     * @var DataModel\RubricMapper
+     * @var DataModel\DataSource
      */
     private $rubricMapper;
 
@@ -76,12 +76,12 @@ class Acquisition
      *
      * $involvement limits the number of Participants and Folders to hydrate
      *
-     * @param array                  $states     The Chosen States
-     * @param int                    $unaccreditedOnly
-     * @param array                  $indicators An array of indicator text
-     * @param DataModel\RubricMapper $rubricMapper
-     * @param DataModel\MapperProxy  $assessmentMapperProxy
-     * @param UserMapper             $userMapper
+     * @param array                 $states     The Chosen States
+     * @param int                   $unaccreditedOnly
+     * @param array                 $indicators An array of indicator text
+     * @param DataModel\DataSource  $rubricMapper
+     * @param DataModel\MapperProxy $assessmentMapperProxy
+     * @param UserMapper            $userMapper
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
@@ -89,7 +89,7 @@ class Acquisition
         array $states,
         int $unaccreditedOnly,
         array $indicators,
-        DataModel\RubricMapper $rubricMapper,
+        DataModel\DataSource $rubricMapper,
         DataModel\MapperProxy $assessmentMapperProxy,
         UserMapper $userMapper
     ) {

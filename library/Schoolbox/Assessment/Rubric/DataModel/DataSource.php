@@ -57,13 +57,11 @@ use UnderflowException;
 use UnexpectedValueException;
 
 /**
- * Umm. Not *exactly* a mapper... at the moment it's more like a handler...
- *
- * Class Mapper
+ * Data source for rubric related information.
  *
  * @package Schoolbox\Assessment\Rubric
  */
-class RubricMapper
+class DataSource
 {
 
     /**

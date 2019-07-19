@@ -16,7 +16,7 @@ use InvalidArgumentException;
 use LogicException;
 use ReflectionException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
@@ -65,7 +65,7 @@ class Controller extends Base
     private $assessmentMapperProxy;
 
     /**
-     * @var RubricMapper
+     * @var DataSource
      */
     private $rubricMapper;
 
@@ -92,7 +92,7 @@ class Controller extends Base
      * @param Folder\Mapper                    $folderMapper
      * @param Term\Mapper                      $termMapper
      * @param GradeGroup\Model                 $defaultGradeGroup
-     * @param RubricMapper                     $rubricMapper
+     * @param DataSource                       $rubricMapper
      * @param FilterSelection\Mapper           $filterSelectionMapper
      * @param Access                           $access
      * @param AssessmentFilters\IdFinder       $assessmentIdFinder
@@ -103,7 +103,7 @@ class Controller extends Base
         Folder\Mapper $folderMapper,
         Term\Mapper $termMapper,
         GradeGroup\Model $defaultGradeGroup,
-        RubricMapper $rubricMapper,
+        DataSource $rubricMapper,
         FilterSelection\Mapper $filterSelectionMapper,
         Access $access,
         AssessmentFilters\IdFinder $assessmentIdFinder,

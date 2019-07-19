@@ -10,7 +10,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\BridgeFactory;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Learning\Course;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -88,7 +88,7 @@ class Module extends \Alaress\Module\Module
                                 $this->getConfig(),
                                 $this->getMapperFactory(),
                                 $injector->get('assessmentDataSource'),
-                                RubricMapper::getInstance()
+                                DataSource::getInstance()
                             ))->build();
                         }
                     ),

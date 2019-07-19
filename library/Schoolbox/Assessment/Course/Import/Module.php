@@ -15,7 +15,7 @@ use Component_ConfigMapper;
 use Component_DefinitionMapper;
 use Component_InstanceMapper;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
 use Schoolbox\Learning\Assessment\Replicator;
@@ -106,7 +106,7 @@ class Module extends \Alaress\Module\Module
                 'replicator'                      => $injector->lazyNew(Replicator::class, [
                     'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                     'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                    'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                    'rubricMapper'          => $this->getMapperFactory()->getLazy(DataSource::class),
                 ]),
                 'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
             ])

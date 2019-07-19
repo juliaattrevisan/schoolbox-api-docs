@@ -12,7 +12,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
@@ -72,7 +72,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'courseSpecificationMapper' => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-            'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'rubricMapper' => $this->getMapperFactory()->getLazy(DataSource::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];

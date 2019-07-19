@@ -53,7 +53,7 @@ class Controller extends Assessment\Controller
     /** @var \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper */
     private $resultSetMapper;
 
-    /** @var DataModel\RubricMapper */
+    /** @var DataModel\DataSource */
     private $rubricMapper;
 
     /** @var DueWorkResponseMapper */
@@ -73,13 +73,13 @@ class Controller extends Assessment\Controller
 
     /**
      * @param UserMapper                                           $userMapper
-     * @param Error\Mapper                                               $errorMapper
+     * @param Error\Mapper                                         $errorMapper
      * @param MapperProxy                                          $assessmentMapper
      * @param WorkTypeMapper                                       $workTypeMapper
      * @param Access                                               $access
      * @param Transactor                                           $transactor
      * @param Assessment\Breadcrumb\Factory                        $bakery
-     * @param DataModel\RubricMapper                               $rubricMapper
+     * @param DataModel\DataSource                                 $rubricMapper
      * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
      * @param DueWorkResponseMapper                                $dueWorkResponseMapper
      * @param ParticipantMapper                                    $participantMapper
@@ -97,7 +97,7 @@ class Controller extends Assessment\Controller
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        DataModel\RubricMapper $rubricMapper,
+        DataModel\DataSource $rubricMapper,
         DataModel\Result\Mapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper,

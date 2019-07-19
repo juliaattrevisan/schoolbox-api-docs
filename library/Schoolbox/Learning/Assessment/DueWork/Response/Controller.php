@@ -13,7 +13,7 @@ use GuzzleHttp\Client;
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Attachzone;
@@ -175,7 +175,7 @@ class Controller extends Base
 
         /* Rubrics data
         */
-        $rubricMapper = RubricMapper::getInstance();
+        $rubricMapper = DataSource::getInstance();
         if ($assessment->getUseRubric()) {
             $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
             if ($latestFeedback instanceof Feedback) {
@@ -308,7 +308,7 @@ class Controller extends Base
 
         /* Rubrics data
         */
-        $rubricMapper = RubricMapper::getInstance();
+        $rubricMapper = DataSource::getInstance();
         if ($assessment->getUseRubric()) {
             $assessment->setRubricGrid($rubricMapper->retrieveGrid($assessment, false));
             if ($feedback instanceof Feedback) {

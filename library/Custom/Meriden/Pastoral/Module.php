@@ -18,7 +18,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use House;
 use HouseMapper;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\External\SubjectMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -130,7 +130,7 @@ class Module extends BaseModule
         $injector->params[StudentInvolvement\Factory::class]['assessmentDataSource']
             = $injector->lazyGet('assessmentDataSource');
         $injector->params[StudentInvolvement\Factory::class]['rubricMapper']
-            = $this->getMapperFactory()->getLazy(RubricMapper::class);
+            = $this->getMapperFactory()->getLazy(DataSource::class);
         $injector->params[StudentInvolvement\Factory::class]['currentUser']
             = $injector->lazyGet('user');
         $injector->params[StudentInvolvement\Factory::class]['access'] = Access::getInstance();

@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\Criteria;
 
 use Alaress\Web\Controller\Base as BaseController;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Assessment\Rubric\RowSet\Factory;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -28,7 +28,7 @@ class Controller extends BaseController
 
 
     /**
-     * @var RubricMapper
+     * @var DataSource
      */
     private $rubricMapper;
 
@@ -43,12 +43,12 @@ class Controller extends BaseController
      * Constructor
      *
      * @param NodeMapper   $nodeMapper
-     * @param RubricMapper $rubricMapper
+     * @param DataSource   $rubricMapper
      * @param RosettaStone $rosettaStone
      */
     public function __construct(
         NodeMapper $nodeMapper,
-        RubricMapper $rubricMapper,
+        DataSource $rubricMapper,
         RosettaStone $rosettaStone
     ) {
         $this->nodeMapper   = $nodeMapper;

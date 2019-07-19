@@ -94,7 +94,7 @@ class Importer
 
 
     /**
-     * @var DataModel\RubricMapper
+     * @var DataModel\DataSource
      */
     private $rubricMapper;
 
@@ -157,13 +157,13 @@ class Importer
      * @param User                      $currentUser
      * @param IConfigLoader                                                      $config
      * @param FolderMapper                                                       $folderMapper
-     * @param HomepageConfigMapper                                               $homepageConfigMapper
-     * @param HomepageTemplateMapper                                             $homepageTemplateMapper
-     * @param CourseConfigMapper                                               $courseConfigMapper
+     * @param HomepageConfigMapper                                     $homepageConfigMapper
+     * @param HomepageTemplateMapper                                   $homepageTemplateMapper
+     * @param CourseConfigMapper                                       $courseConfigMapper
      * @param CourseSpecMapper                                         $courseSpecMapper
      * @param UnitSpecMapper                                           $unitSpecMapper
      * @param RoleAccessMapper                                         $roleAccessMapper
-     * @param DataModel\RubricMapper                                   $rubricMapper
+     * @param DataModel\DataSource                                     $rubricMapper
      * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper $rubricCapabilityMapper
      * @param \Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper  $rubricIndicatorMapper
      * @param AssessmentDataSource                                     $assessmentDataSource
@@ -180,7 +180,7 @@ class Importer
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
-        DataModel\RubricMapper $rubricMapper,
+        DataModel\DataSource $rubricMapper,
         DataModel\Capability\Mapper $rubricCapabilityMapper,
         DataModel\Indicator\Mapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,

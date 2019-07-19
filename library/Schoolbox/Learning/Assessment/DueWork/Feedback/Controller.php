@@ -47,7 +47,7 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var DataModel\RubricMapper */
+    /** @var DataModel\DataSource */
     private $rubricMapper;
 
     /** @var ReturnedWorkMapper */
@@ -59,14 +59,14 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
-     * @param IFeedbackDataSource    $feedbackDataSource
-     * @param ParticipantDataSource  $participantDataSource
-     * @param AssessmentDataSource   $assessmentDataSource
-     * @param ResponseDataSource     $responseDataSource
-     * @param UserMapper             $userMapper
-     * @param DataModel\RubricMapper $rubricMapper
-     * @param ReturnedWorkMapper     $returnedWorkMapper
-     * @param Plagscan\Mapper        $plagscanMapper
+     * @param IFeedbackDataSource   $feedbackDataSource
+     * @param ParticipantDataSource $participantDataSource
+     * @param AssessmentDataSource  $assessmentDataSource
+     * @param ResponseDataSource    $responseDataSource
+     * @param UserMapper            $userMapper
+     * @param DataModel\DataSource  $rubricMapper
+     * @param ReturnedWorkMapper    $returnedWorkMapper
+     * @param Plagscan\Mapper       $plagscanMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -74,7 +74,7 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
-        DataModel\RubricMapper $rubricMapper,
+        DataModel\DataSource $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
         Plagscan\Mapper $plagscanMapper
     ) {

@@ -33,7 +33,7 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
-     * @var DataModel\RubricMapper
+     * @var DataModel\DataSource
      */
     private $rubricMapper;
 
@@ -52,14 +52,14 @@ class Controller extends Base
      *
      * @param Error\Mapper                   $errorMapper
      * @param Specification\Mapper           $courseSpecificationMapper
-     * @param DataModel\RubricMapper         $rubricMapper
+     * @param DataModel\DataSource           $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
      * @param UserMapper                     $userMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         Specification\Mapper $courseSpecificationMapper,
-        DataModel\RubricMapper $rubricMapper,
+        DataModel\DataSource $rubricMapper,
         ProfessionalDevelopment\Mapper $pdMapper,
         UserMapper $userMapper
     ) {

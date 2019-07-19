@@ -7,7 +7,7 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
@@ -44,7 +44,7 @@ class AllRubrics
      */
     public function __construct(GenericCollection $unitImplementations, Term\Model $term)
     {
-        $rubricMapper = RubricMapper::getInstance();
+        $rubricMapper = DataSource::getInstance();
 
         $folderIds = $unitImplementations->map(function (UnitImplementation\Model $unitImpl) {
             return $unitImpl->getFolder()->getId();

@@ -17,7 +17,7 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
@@ -89,7 +89,7 @@ class Module extends Alaress\Module\Module
         $injector->params[Controller::class] = [
             'externalUser'          => $injector->lazyGet('externalUser'),
             'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(DataSource::class),
             'textboxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
             'visibility'            => $injector->lazy(function () {
                 /** @var Access $access */

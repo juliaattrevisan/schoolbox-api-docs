@@ -820,7 +820,7 @@ class MapperProxy
             $dueWork = $assessable;
             if ($dueWork->getUseRubric()) {
                 // Rubric involved? Save the due work, and then persist rubric
-                $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\RubricMapper::getInstance();
+                $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\DataSource::getInstance();
 
                 // Need to compare the previously existing grid with the newly
                 // saved one, for invalidation purposes

@@ -14,7 +14,7 @@ use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricGroupMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricCriterionMapper;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
@@ -62,7 +62,7 @@ class ImporterFactory
 
 
     /**
-     * @var RubricMapper
+     * @var DataSource
      */
     private $rubricMapper;
 
@@ -74,14 +74,14 @@ class ImporterFactory
      * @param IConfigLoader        $config
      * @param MapperFactory        $mapperFactory
      * @param AssessmentDataSource $assessmentDataSource
-     * @param RubricMapper         $rubricMapper
+     * @param DataSource           $rubricMapper
      */
     public function __construct(
         User $user,
         IConfigLoader $config,
         MapperFactory $mapperFactory,
         AssessmentDataSource $assessmentDataSource,
-        RubricMapper $rubricMapper
+        DataSource $rubricMapper
     ) {
         // I'm aware that passing a DI container (which the mapper factory
         // effectively is) is an anti-pattern, but is it less of one than

@@ -14,7 +14,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
@@ -72,7 +72,7 @@ class Module extends BaseModule
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class,
             [
-                'mapper'               => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                'mapper'               => $this->getMapperFactory()->getLazy(DataSource::class),
                 'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'groupMapper'          => $this->getMapperFactory()->getLazy(Mapper::class),

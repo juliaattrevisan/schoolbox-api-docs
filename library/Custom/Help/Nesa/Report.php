@@ -24,7 +24,7 @@ class Report
     private $assessmentMapperProxy;
 
     /**
-     * @var DataModel\RubricMapper
+     * @var DataModel\DataSource
      */
     private $rubricMapper;
 
@@ -36,13 +36,13 @@ class Report
     /**
      * Report constructor.
      *
-     * @param DataModel\MapperProxy  $assessmentMapperProxy
-     * @param DataModel\RubricMapper $rubricMapper
-     * @param UserMapper             $userMapper
+     * @param DataModel\MapperProxy $assessmentMapperProxy
+     * @param DataModel\DataSource  $rubricMapper
+     * @param UserMapper            $userMapper
      */
     public function __construct(
         DataModel\MapperProxy $assessmentMapperProxy,
-        DataModel\RubricMapper $rubricMapper,
+        DataModel\DataSource $rubricMapper,
         UserMapper $userMapper
     ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;

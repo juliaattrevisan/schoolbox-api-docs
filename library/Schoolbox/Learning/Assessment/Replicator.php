@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -31,19 +31,19 @@ class Replicator
     private $quizMapper;
 
     /**
-     * @var RubricMapper
+     * @var DataSource
      */
     private $rubricMapper;
 
     /**
      * @param AssessmentMapperProxy $assessmentMapperProxy
-     * @param QuizMapper $quizMapper
-     * @param RubricMapper $rubricMapper
+     * @param QuizMapper            $quizMapper
+     * @param DataSource            $rubricMapper
      */
     public function __construct(
         AssessmentMapperProxy $assessmentMapperProxy,
         QuizMapper $quizMapper,
-        RubricMapper $rubricMapper
+        DataSource $rubricMapper
     )
     {
         $this->assessmentMapperProxy = $assessmentMapperProxy;

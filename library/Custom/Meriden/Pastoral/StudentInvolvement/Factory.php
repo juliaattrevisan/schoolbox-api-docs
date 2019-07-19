@@ -10,7 +10,7 @@
 namespace Custom\Meriden\Pastoral\StudentInvolvement;
 
 use Alaress\Statistics\Statistics;
-use Schoolbox\Assessment\Rubric\DataModel\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -51,7 +51,7 @@ class Factory
     private $assessmentDataSource;
 
     /**
-     * @var RubricMapper
+     * @var DataSource
      */
     private $rubricMapper;
 
@@ -83,7 +83,7 @@ class Factory
      * @param UserMapper           $userMapper
      * @param FolderMapper         $folderMapper
      * @param AssessmentDataSource $assessmentDataSource
-     * @param RubricMapper         $rubricMapper
+     * @param DataSource           $rubricMapper
      * @param User                 $currentUser
      * @param Access               $access
      * @param UserAccessMapper     $userAccessMapper
@@ -93,7 +93,7 @@ class Factory
         UserMapper $userMapper,
         FolderMapper $folderMapper,
         AssessmentDataSource $assessmentDataSource,
-        RubricMapper $rubricMapper,
+        DataSource $rubricMapper,
         User $currentUser,
         Access $access,
         UserAccessMapper $userAccessMapper
