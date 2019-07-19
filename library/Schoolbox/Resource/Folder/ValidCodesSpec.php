@@ -59,6 +59,9 @@ class ValidCodesSpec extends Leaf
             return true;
         }
 
+        // MySQL is case-insensitive by default, so we will need to mimic that here
+        $codes = array_map('strtolower', $codes);
+
         // 1. Check candidate's codes are unique
         if (count($codes) !== count(array_unique($codes))) {
             return false;
@@ -109,7 +112,7 @@ class ValidCodesSpec extends Leaf
 
 
     /**
-     * Returns codes from other folders that are EQUAL or LIKE the specified stripped codes
+     * Returns (in lower case) codes from other folders that are EQUAL or LIKE the specified stripped codes
      *
      * @param int|null $folderId
      * @param null[]   $rawCodes
@@ -134,7 +137,7 @@ class ValidCodesSpec extends Leaf
         }
         $pb->any($innerPb);
 
-        $otherFolderCodes = array_unique($this->folderCodeMapper->findScalarByPredicates('code', $pb));
+        $otherFolderCodes = array_map('strtolower', array_unique($this->folderCodeMapper->findScalarByPredicates('code', $pb)));
         return array_combine($otherFolderCodes, array_fill(0, count($otherFolderCodes), null));
     }
 

@@ -132,12 +132,12 @@ class ValidCodesSpecTest extends TestCase
     public function providerNonUniqueOnFolder(): array
     {
         return [
-            [['a', 'a'], []],
-            [['a', 'a'], []],
-            [['a', 'a/a'], []],
-            [['a', 'a/a'], []],
-            [['a', 'a a/a'], []],
-            [['a', 'a a/a'], []],
+            [['a', 'A'], []],
+            [['a', 'A'], []],
+            [['a', 'A/A'], []],
+            [['a', 'A/A'], []],
+            [['a', 'A A/A'], []],
+            [['a', 'A A/A'], []],
         ];
     }
 
@@ -156,10 +156,10 @@ class ValidCodesSpecTest extends TestCase
     public function providerExactCollisionWithOtherFolder(): array
     {
         return [
-            [['a'], ['a']],
-            [['a/aaa'], ['a/aaa']],
-            [['a', 'b', 'c', 'd'], ['a']],
-            [['a/aaa'], ['c', 'a/aaa', 'b', 'b/bbb']],
+            [['a'], ['A']],
+            [['a/aaa'], ['a/AAA']],
+            [['a', 'b', 'c', 'd'], ['A']],
+            [['a/aaa'], ['c', 'A/AAA', 'b', 'b/bbb']],
         ];
     }
 
@@ -167,8 +167,8 @@ class ValidCodesSpecTest extends TestCase
     public function providerPrefixCollisionWithOtherFolder(): array
     {
         return [
-            [['a'], ['S/a']],
-            [['S/a'], ['a']],
+            [['a'], ['S/A']],
+            [['S/a'], ['A']],
         ];
     }
 
