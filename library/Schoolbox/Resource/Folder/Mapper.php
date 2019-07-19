@@ -68,6 +68,7 @@ use Schoolbox\Error;
  * @method Collection|Model[] findByColumnList($columnList, $options = []);
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method GenericCollection|Model[] createCollection($contents = [])
+ * @method GenericCollection|Model[] findAll($options = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method GenericCollection|Model[] findByPredicates(PredicateBuilder $pb, array $options = []) *
  */
@@ -889,7 +890,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         /** @var Node\Mapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_category');
 
-        /** @var GenericCollection|Model[] $folders */
         $folders = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
