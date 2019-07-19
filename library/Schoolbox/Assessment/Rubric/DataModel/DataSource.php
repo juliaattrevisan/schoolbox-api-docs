@@ -15,8 +15,8 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as GroupMarkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as GroupMarkModel;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as CapabilityMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as CapabilityMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
@@ -27,8 +27,8 @@ use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Model as LevelModel;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as LevelMapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -70,7 +70,7 @@ class DataSource
     /**
      * Stores the singleton instance of the mapper
      *
-     * @var array[Mapper]
+     * @var self[]
      */
     static protected $instance;
 
@@ -376,11 +376,11 @@ class DataSource
         )->indexByCallback(function (IndicatorUsageModel $cu) {
             return $cu->getIndicator()->getId();
         });
-        $levelModels = Mapper::getInstance()->findByColumn(
+        $levelModels = LevelMapper::getInstance()->findByColumn(
             'b.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (Model $l) {
+        )->indexByCallback(function (LevelModel $l) {
             return $l->getId();
         });
         $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
@@ -412,7 +412,7 @@ class DataSource
 
 
         // Add levels
-        /** @var Model[] $levelModels */
+        /** @var LevelModel[] $levelModels */
         foreach ($levelModels as $levelModel) {
             $levelId = $levelModel->getId();
             $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
@@ -498,7 +498,7 @@ class DataSource
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
-        $levelMapper      = Mapper::getInstance();
+        $levelMapper      = LevelMapper::getInstance();
         $descriptorMapper = DescriptorMapper::getInstance();
         $indicatorMapper  = IndicatorMapper::getInstance();
         $capabilityMapper = CapabilityMapper::getInstance();
@@ -666,8 +666,8 @@ class DataSource
         // * Capability (fka group) marks
         // * Descriptor marks
         // ** more correctly known as indicator marks, which reference a descriptor
-        /** @var GenericCollection|GroupMarkModel[] $capabilityMarkModels */
-        $capabilityMarkModels = Mapper::getInstance()->findByColumnList([
+        /** @var GenericCollection|CapabilityMarkModel[] $capabilityMarkModels */
+        $capabilityMarkModels = CapabilityMarkMapper::getInstance()->findByColumnList([
             'return_id' => $feedback->getId(),
             'valid'     => true,
         ]);
@@ -770,7 +770,7 @@ class DataSource
         $capabilityMapper     = CapabilityMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
-        $capabilityMarkMapper = Mapper::getInstance();
+        $capabilityMarkMapper = CapabilityMarkMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
 
@@ -879,7 +879,7 @@ class DataSource
         // Determine if there's valid capability marks for this participant.
         // Don't need to check descriptor marks separately, because they cannot
         // exist without capability marks.
-        $validCapMarkCount = Mapper::getInstance()->countByColumnList([
+        $validCapMarkCount = DescriptorMarkMapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
@@ -1049,7 +1049,7 @@ class DataSource
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
-        $groupMarkMapper            = Mapper::getInstance();
+        $groupMarkMapper            = LevelMapper::getInstance();
         $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
         $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
         $destinationGroupMarks      = $groupMarkMapper->createCollection();
@@ -1120,7 +1120,7 @@ class DataSource
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
                 function ($model) use ($exclude) {
-                    /** @var DescriptorMarkModel|Model $model */
+                    /** @var DescriptorMarkModel|LevelModel $model */
                     return !in_array($model->getId(), $exclude);
                 }
             )
@@ -1261,7 +1261,7 @@ class DataSource
 
         // Get required mappers
         $boxMapper            = SubmissionBoxMapper::getInstance();
-        $levelMapper          = Mapper::getInstance();
+        $levelMapper          = LevelMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $groupMapper          = CapabilityMapper::getInstance();
         $indicatorMapper      = IndicatorMapper::getInstance();
@@ -1270,7 +1270,7 @@ class DataSource
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
-        /** @var Model[]|GenericCollection $srcLevels */
+        /** @var LevelModel[]|GenericCollection $srcLevels */
         $srcLevels = $levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
         if (! $sourceBox->getUseRubric()) {
@@ -1282,7 +1282,7 @@ class DataSource
 
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.
-        /** @var Model[]|GenericCollection $dstLevels */
+        /** @var LevelModel[]|GenericCollection $dstLevels */
         $dstLevels = $levelMapper->createCollection();
         /** @var DescriptorModel[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
@@ -1400,7 +1400,7 @@ class DataSource
 
 
             // Link Descriptor + Level
-            /** @var Model $dstLevel */
+            /** @var LevelModel $dstLevel */
             $dstLevel = $dstLevels->getOffset($srcDescriptor->getLevel()->getId());
             $dstDescriptor->setLevel($dstLevel);
             $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
