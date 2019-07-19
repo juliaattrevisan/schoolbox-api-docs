@@ -7,14 +7,14 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 
 /**
  * Model for marks on a rubric group.
  */
-class GroupMark
+class Model
 {
     use Id;
 
@@ -66,7 +66,7 @@ class GroupMark
     /**
      * @return \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
      */
-    public function getGroup(): Model
+    public function getGroup(): CapabilityModel
     {
         return $this->group;
     }
@@ -76,7 +76,7 @@ class GroupMark
      * @param \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model $group
      * @return static
      */
-    public function setGroup(Model $group): self
+    public function setGroup(CapabilityModel $group): self
     {
         $this->group = $group;
         return $this;

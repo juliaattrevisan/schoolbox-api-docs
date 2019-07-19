@@ -15,8 +15,8 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMark;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as GroupMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as GroupMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
@@ -666,8 +666,8 @@ class DataSource
         // * Capability (fka group) marks
         // * Descriptor marks
         // ** more correctly known as indicator marks, which reference a descriptor
-        /** @var GenericCollection|GroupMark[] $capabilityMarkModels */
-        $capabilityMarkModels = GroupMarkMapper::getInstance()->findByColumnList([
+        /** @var GenericCollection|GroupMarkModel[] $capabilityMarkModels */
+        $capabilityMarkModels = Mapper::getInstance()->findByColumnList([
             'return_id' => $feedback->getId(),
             'valid'     => true,
         ]);
@@ -770,7 +770,7 @@ class DataSource
         $capabilityMapper     = CapabilityMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
-        $capabilityMarkMapper = GroupMarkMapper::getInstance();
+        $capabilityMarkMapper = Mapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
 
@@ -879,7 +879,7 @@ class DataSource
         // Determine if there's valid capability marks for this participant.
         // Don't need to check descriptor marks separately, because they cannot
         // exist without capability marks.
-        $validCapMarkCount = GroupMarkMapper::getInstance()->countByColumnList([
+        $validCapMarkCount = Mapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
@@ -1049,7 +1049,7 @@ class DataSource
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
-        $groupMarkMapper            = GroupMarkMapper::getInstance();
+        $groupMarkMapper            = Mapper::getInstance();
         $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
         $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
         $destinationGroupMarks      = $groupMarkMapper->createCollection();

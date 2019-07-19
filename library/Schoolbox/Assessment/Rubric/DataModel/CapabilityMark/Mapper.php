@@ -11,17 +11,17 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Mapper for marks for a rubric group.
  *
- * @method GroupMark hydrate(array $row, $alias = '', $callback = null)
- * @method GroupMark createModel($idValue = null)
- * @method GenericCollection|GroupMark[] createCollection($contents = [])
- * @method GenericCollection|GroupMark[] findByColumnList($columnList, $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  */
-class GroupMarkMapper extends Mapper
+class Mapper extends BaseMapper
 {
     /**
      * @inheritdoc
@@ -29,7 +29,7 @@ class GroupMarkMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('rubric_group_mark');
-        $this->hasModel(GroupMark::class);
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('value', self::TYPE_DECIMAL);
         $this->joins(
@@ -85,8 +85,8 @@ class GroupMarkMapper extends Mapper
 
     /**
      * @param PDOStatement $statement
-     * @return GroupMark[]|GenericCollection
-     * @throws Mapper\Exception
+     * @return Model[]|GenericCollection
+     * @throws BaseMapper\Exception
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
