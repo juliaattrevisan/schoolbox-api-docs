@@ -9,7 +9,7 @@ use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
-use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
@@ -188,7 +188,7 @@ class Mapper extends BaseMapper {
      */
     public function deleteUsages(Model $criterion): void
     {
-        Mapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        IndicatorUsageMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
     }
 
 
