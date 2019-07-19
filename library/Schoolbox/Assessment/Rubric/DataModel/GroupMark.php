@@ -26,7 +26,7 @@ class GroupMark
 
 
     /**
-     * @var Model
+     * @var \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
      */
     private $group;
 
@@ -64,7 +64,7 @@ class GroupMark
 
 
     /**
-     * @return Model
+     * @return \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
      */
     public function getGroup(): Model
     {
@@ -73,7 +73,7 @@ class GroupMark
 
 
     /**
-     * @param Model $group
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model $group
      * @return static
      */
     public function setGroup(Model $group): self

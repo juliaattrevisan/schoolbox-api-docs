@@ -18,6 +18,9 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model;
+use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model;
+use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Mapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
@@ -666,14 +669,14 @@ class RubricMapper
             'valid'     => true,
         ]);
 
-        /** @var Collection|GenericCollection[]|DescriptorMark[][] $indicatorMarkModelsByCapability */
-        $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumnList([
+        /** @var Collection|GenericCollection[]|Model[][] $indicatorMarkModelsByCapability */
+        $indicatorMarkModelsByCapability = Mapper::getInstance()->findByColumnList([
             'rubric_group_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
             'valid'                => true,
-        ])->filter(function (DescriptorMark $indicatorMark) {
+        ])->filter(function (Model $indicatorMark) {
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
-            function (DescriptorMark $indicatorMark) {
+            function (Model $indicatorMark) {
                 return $indicatorMark->getGroupMark()->getGroup()->getId();
             }
         );
@@ -681,7 +684,7 @@ class RubricMapper
         $indicatorMarkModelsByCapability = $indicatorMarkModelsByCapability->map(
             function (GenericCollection $c) {
                 return $c->indexByCallback(
-                    function (DescriptorMark $mark) {
+                    function (Model $mark) {
                         return $mark->getDescriptor()->getCriterion()->getId();
                     }
                 );
@@ -763,7 +766,7 @@ class RubricMapper
         // Required mappers
         $capabilityMapper     = CapabilityMapper::getInstance();
         $descriptorMapper     = Mapper::getInstance();
-        $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
+        $indicatorMarkMapper  = Mapper::getInstance();
         $capabilityMarkMapper = GroupMarkMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
@@ -1044,7 +1047,7 @@ class RubricMapper
             return;
         }
         $groupMarkMapper            = GroupMarkMapper::getInstance();
-        $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
+        $descriptorMarkMapper       = Mapper::getInstance();
         $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
         $destinationGroupMarks      = $groupMarkMapper->createCollection();
         $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();

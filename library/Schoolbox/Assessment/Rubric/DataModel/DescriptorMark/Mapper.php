@@ -6,27 +6,29 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
 
 use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
+use Schoolbox\Assessment\Rubric\DataModel\GroupMarkMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class DescriptorMarkMapper
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
- * @method DescriptorMark hydrate(array $row, $alias = '', $callback = null)
- * @method DescriptorMark createModel($idValue = null)
- * @method GenericCollection|DescriptorMark[] createCollection($contents = [])
- * @method GenericCollection|DescriptorMark[] findByColumnList($columnList, $options = array())
- * @method GenericCollection|DescriptorMark[] findByColumn($columnName, $columnValue, $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method GenericCollection|Model[] createCollection($contents = [])
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = array())
+ * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  */
-class DescriptorMarkMapper extends Mapper
+class Mapper extends BaseMapper
 {
 
     /**
@@ -37,7 +39,7 @@ class DescriptorMarkMapper extends Mapper
     protected function mapping()
     {
         $this->hasTable('rubric_descriptor_mark');
-        $this->hasModel(DescriptorMark::class);
+        $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
@@ -54,7 +56,7 @@ class DescriptorMarkMapper extends Mapper
 
         $this->joins(
             'descriptor_id',
-            Mapper::class,
+            DescriptorMapper::class,
             'id',
             null,
             null,
@@ -99,7 +101,7 @@ class DescriptorMarkMapper extends Mapper
 
     /**
      * @param PDOStatement $statement
-     * @return Collection|DescriptorMark[]
+     * @return Collection|Model[]
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -122,7 +124,7 @@ class DescriptorMarkMapper extends Mapper
                     $descriptors->setOffset($descriptorId, $descriptor);
                 }
             }
-            /** @var Model $descriptor */
+            /** @var DescriptorModel $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
             $groupMark = $groupMarkMapper->hydrate($r, 'g');

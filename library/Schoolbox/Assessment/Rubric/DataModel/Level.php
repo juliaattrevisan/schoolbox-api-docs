@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;

@@ -13,7 +13,6 @@ use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
-use Schoolbox\Assessment\Rubric\DataModel\Model;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\Level;
 use Schoolbox\Assessment\Rubric\DataModel\LevelMapper;

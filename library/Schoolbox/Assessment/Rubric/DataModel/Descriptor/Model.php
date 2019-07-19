@@ -7,9 +7,10 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Descriptor;
 
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
+use Schoolbox\Assessment\Rubric\DataModel\Level;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;

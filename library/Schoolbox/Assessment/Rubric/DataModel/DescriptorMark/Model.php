@@ -6,8 +6,10 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
 
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
+use Schoolbox\Assessment\Rubric\DataModel\GroupMark;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 
@@ -19,7 +21,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
  */
-class DescriptorMark
+class Model
 {
     use Id;
 
@@ -31,7 +33,7 @@ class DescriptorMark
 
 
     /**
-     * @var null|Model
+     * @var null|DescriptorModel
      */
     private $descriptor;
 
@@ -49,19 +51,19 @@ class DescriptorMark
 
 
     /**
-     * @return null|Model
+     * @return null|DescriptorModel
      */
-    public function getDescriptor(): ?Model
+    public function getDescriptor(): ?DescriptorModel
     {
         return $this->descriptor;
     }
 
 
     /**
-     * @param null|Model $descriptor
+     * @param null|DescriptorModel $descriptor
      * @return static
      */
-    public function setDescriptor(?Model $descriptor): self
+    public function setDescriptor(?DescriptorModel $descriptor): self
     {
         $this->descriptor = $descriptor;
         return $this;
