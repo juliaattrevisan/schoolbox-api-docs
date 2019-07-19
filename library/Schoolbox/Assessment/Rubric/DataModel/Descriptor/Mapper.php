@@ -14,8 +14,7 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
@@ -37,7 +36,7 @@ class Mapper extends Schoolbox\Mapper {
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('criterion_id', Indicator\Mapper::class, 'id', null, null, 'criterion', 'criterion');
-        $this->joins('level_id', Mapper::class, 'id', null, null, 'level', 'level');
+        $this->joins('level_id', Level\Mapper::class, 'id', null, null, 'level', 'level');
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('description', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -53,7 +52,7 @@ class Mapper extends Schoolbox\Mapper {
      */
     public function deleteEmptyLevel(Model $descriptor)
     {
-        /** @var Mapper $levelMapper */
+        /** @var Level\Mapper $levelMapper */
         $levelMapper = $this->getJoinMapper('level');
 
         // Find all descriptors whose level ID is the same as the level ID of the current level
@@ -87,7 +86,7 @@ class Mapper extends Schoolbox\Mapper {
      */
     public function restoreRubricLevel(Model $descriptor)
     {
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\Level\Mapper $levelMapper */
+        /** @var Level\Mapper $levelMapper */
         $levelMapper = $this->getJoinMapper('level');
 
         try {
@@ -142,7 +141,7 @@ class Mapper extends Schoolbox\Mapper {
         $criterionKey    = "c.{$criterionMapper->getIdentifierColumn()}";
         $groupKey        = "g.{$groupMapper->getIdentifierColumn()}";
 
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\Level\Model $level */
+        /** @var Level\Model $level */
         $level = null;
 
         /** @var Indicator\Model $criterion */

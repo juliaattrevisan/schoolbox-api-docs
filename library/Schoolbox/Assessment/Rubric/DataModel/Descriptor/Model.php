@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Descriptor;
 
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Model as LevelModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -26,7 +26,7 @@ class Model implements ISoftDeletable
     private $criterion;
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Level\Model
+     * @var LevelModel
      */
     private $level;
 
@@ -77,7 +77,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Model
+     * @return LevelModel
      */
     public function getLevel()
     {
@@ -85,10 +85,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Model $level
+     * @param LevelModel $level
      * @return static
      */
-    public function setLevel(Model $level)
+    public function setLevel(LevelModel $level)
     {
         $this->level = $level;
         return $this;

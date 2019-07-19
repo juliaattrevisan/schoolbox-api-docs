@@ -12,9 +12,8 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource;
 use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
@@ -47,13 +46,13 @@ class Controller extends BaseController
 
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper
+     * @var Capability\Mapper
      */
     private $groupMapper;
 
 
     /**
-     * @var Mapper
+     * @var Indicator\Mapper
      */
     private $criterionMapper;
 
@@ -61,18 +60,18 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param DataSource                                               $mapper
-     * @param AssessmentDataSource                                     $assessmentDataSource
-     * @param FolderMapper                                             $folderMapper
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper $groupMapper
-     * @param Mapper                                                   $criterionMapper
+     * @param DataSource           $mapper
+     * @param AssessmentDataSource $assessmentDataSource
+     * @param FolderMapper         $folderMapper
+     * @param Capability\Mapper    $groupMapper
+     * @param Indicator\Mapper     $criterionMapper
      */
     public function __construct(
         DataSource $mapper,
         AssessmentDataSource $assessmentDataSource,
         FolderMapper $folderMapper,
-        Mapper $groupMapper,
-        Mapper $criterionMapper
+        Capability\Mapper $groupMapper,
+        Indicator\Mapper $criterionMapper
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
@@ -144,7 +143,7 @@ class Controller extends BaseController
             if ($groupId) {
                 $groupModel = $this->groupMapper->findById($groupId);
                 // Surely this capability is in a folder?
-                if ($groupModel->getParentType() !== Model::PARENT_TYPE_CATEGORY) {
+                if ($groupModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
                     $this->sendJSONError('May only create folder-level indicators');
                     return;
                 }
