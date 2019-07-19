@@ -347,9 +347,9 @@ class Controller extends Base
             $response
         );
 
-        $feedback = $dueWorkFeedbackFactory->produce();
-
-        if (!$hasRubric && $feedback->isEmpty()) {
+        $feedback      = $dueWorkFeedbackFactory->produce();
+        $isNewFeedback = $feedback->getId() === null;
+        if (!$hasRubric && !$isNewFeedback && $feedback->isEmpty()) {
             $this->getFeedbackDataSource()->delete($feedback);
         } else {
             $this->getFeedbackDataSource()->save($feedback);
