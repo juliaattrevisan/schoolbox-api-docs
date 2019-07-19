@@ -67,7 +67,7 @@ class SubjectMapper extends Schoolbox\External\Mapper
         $statement->execute(array($id));
         $row = $statement->fetch();
         if (!empty($row)) {
-            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Schoolbox\Mapper\Exception\NotFound();
         }
         return $this->hydrate($row);
     }

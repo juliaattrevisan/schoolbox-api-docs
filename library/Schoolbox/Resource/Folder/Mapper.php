@@ -1641,7 +1641,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             return $folder;
         } else {
-            throw new MapperException("Instance of object not found");
+            throw new MapperException\NotFound();
         }
     }
 

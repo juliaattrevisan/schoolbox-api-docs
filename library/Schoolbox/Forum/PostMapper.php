@@ -126,7 +126,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
             return $post;
         }
         else {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception\NotFound();
         }
 
     }
@@ -209,7 +209,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
             return $post;
         }
         else {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception\NotFound();
         }
 
     }

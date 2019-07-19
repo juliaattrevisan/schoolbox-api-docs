@@ -16,18 +16,11 @@ use Alaress\DebugBar\DataCollector\RouteCollector;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Web\Output\OutputInterface;
 use Aura\Router\Route;
-use Okta\JwtVerifier\Adaptors\FirebasePhpJwt;
-use Okta\JwtVerifier\Discovery\Oidc;
-use Okta\JwtVerifier\JwtVerifierBuilder;
 use ReflectionMethod;
 use RuntimeException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\WebKernelAbstract;
-use Schoolbox\Auth\TokenParser;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception\Deleted;
-use Schoolbox\MapperFactory;
-use Schoolbox\UserMapper;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
@@ -268,18 +261,19 @@ class Kernel extends WebKernelAbstract
                     ->setFlash(\Schoolbox\Application\Login\Controller::LOGIN_ERROR_FLASH, get_class($e));
                 $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
             }
-        } catch (Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
             $response = $this->di->get('webFactory')->newResponse();
+            $code     = $e instanceof Deleted ? 410 : 404;
             if ($controller->getRequest()->isXhr()) {
-                //TODO replace this with standard outputError (ApiProblem style payload)
+                // TODO replace this with standard outputError (ApiProblem style payload)
                 // Fabricate an AJAX response. Don't redirect
-                $response->status->setCode(410);
+                $response->status->setCode($code);
                 $response->content->set([
                     'format' => 'json',
-                    'data'   => ['error' => 'Object was deleted'],
+                    'data'   => ['error' => $e->getMessage()],
                 ]);
             } else {
-                $this->outputError($e, $e->getMessage(), '', [], 410);
+                $this->outputError($e, $e->getMessage(), '', [], $code);
                 return;
             }
         } catch (Forbidden $e) {

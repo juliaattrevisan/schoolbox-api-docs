@@ -121,7 +121,7 @@ class TimetableCampusMapper extends Schoolbox\Mapper {
             ;
             return $timetable_campus;
         }
-        throw new Schoolbox\Mapper\Exception('Instance of object not found');
+        throw new Schoolbox\Mapper\Exception\NotFound();
     }
 
     /**
@@ -152,6 +152,6 @@ class TimetableCampusMapper extends Schoolbox\Mapper {
         if ($row = $statement->fetch()) {
             return $this->hydrate($row, 'tc');
         }
-        throw new Schoolbox\Mapper\Exception('Instance of object not found');
+        throw new Schoolbox\Mapper\Exception\NotFound();
     }
 }

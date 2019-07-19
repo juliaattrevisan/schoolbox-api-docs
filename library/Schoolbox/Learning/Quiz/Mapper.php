@@ -454,7 +454,7 @@ class Mapper extends BaseMapper
         }
 
         if (!($quiz instanceof Model)) {
-            throw new BaseMapper\Exception("Instance of object not found");
+            throw new BaseMapper\Exception\NotFound();
         }
 
         $this->throwIfDeleted($quiz);

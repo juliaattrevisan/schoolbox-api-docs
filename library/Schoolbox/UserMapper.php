@@ -400,7 +400,7 @@ class UserMapper extends Mapper
         $user = $this->findByPredicates($pb)->first();
 
         if (!$user instanceOf User) {
-            throw new Schoolbox\Mapper\Exception('Instance of object not found');
+            throw new Schoolbox\Mapper\Exception\NotFound();
         }
 
         return $user;

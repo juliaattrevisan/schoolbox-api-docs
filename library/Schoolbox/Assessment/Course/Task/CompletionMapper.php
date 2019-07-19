@@ -236,7 +236,7 @@ class CompletionMapper extends Mapper {
     public function findLatestForTaskAndStudent($task_id, $student_id) {
         $list = $this->findLatestForList(array($task_id), $student_id);
         if ($list->count() === 0) {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new Mapper\Exception\NotFound();
         }
         return $list->first();
     }
