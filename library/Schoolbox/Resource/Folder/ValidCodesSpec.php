@@ -53,8 +53,13 @@ class ValidCodesSpec extends Leaf
      */
     public function isSatisfiedBy($candidate): bool
     {
-        // 1. Check candidate's codes are unique
+        // If new folder has no codes, it can never collide.
         $codes = $candidate->getCodes()->getPropertyValues('code');
+        if (!count($codes)) {
+            return true;
+        }
+
+        // 1. Check candidate's codes are unique
         if (count($codes) !== count(array_unique($codes))) {
             return false;
         }
@@ -93,7 +98,7 @@ class ValidCodesSpec extends Leaf
             }
         }
 
-        foreach(array_keys($otherPrefixedCodes) as $otherPrefixedCode){
+        foreach (array_keys($otherPrefixedCodes) as $otherPrefixedCode) {
             if (array_key_exists($this->unPrefixCode($otherPrefixedCode), $rawCodes)) {
                 return false;
             }
@@ -123,7 +128,6 @@ class ValidCodesSpec extends Leaf
         $innerPb = $this->folderCodeMapper->getPredicateBuilder();
 
         $rawAndStripped = array_merge($rawCodes, $strippedCodes);
-
         foreach (array_keys($rawAndStripped) as $code) {
             $innerPb->equals('code', $code);
             $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->escapeForLike($code));
