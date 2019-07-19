@@ -132,7 +132,7 @@ class Factory extends AbstractFactory
         } elseif ($showIndicators) {
             $capabilities = DataModel\Capability\Mapper::getInstance()->createCollection();
             foreach (DataModel\Indicator\Mapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
-                $capability                                       = $indicator->getGroup();
+                $capability                                       = $indicator->getCapability();
                 $capability->getIndicators()[$indicator->getId()] = $indicator;
                 if (!$capabilities->offsetExists($capability->getId())) {
                     $capabilities[$capability->getId()] = $capability;

@@ -23,7 +23,7 @@ class Model
     /**
      * @var CapabilityModel
      */
-    private $group;
+    private $capability;
 
 
     /**
@@ -47,19 +47,19 @@ class Model
     /**
      * @return CapabilityModel
      */
-    public function getGroup(): CapabilityModel
+    public function getCapability(): CapabilityModel
     {
-        return $this->group;
+        return $this->capability;
     }
 
 
     /**
-     * @param CapabilityModel $group
+     * @param CapabilityModel $capability
      * @return static
      */
-    public function setGroup(CapabilityModel $group): self
+    public function setCapability(CapabilityModel $capability): self
     {
-        $this->group = $group;
+        $this->capability = $capability;
         return $this;
     }
 

@@ -61,7 +61,7 @@ class Codec
             throw new InvalidArgumentException('Indicator ID must be set');
         }
 
-        return "{$this->encodeCapability($indicator->getGroup())}i{$indicator->getId()}";
+        return "{$this->encodeCapability($indicator->getCapability())}i{$indicator->getId()}";
     }
 
 

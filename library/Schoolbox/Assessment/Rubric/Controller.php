@@ -171,7 +171,7 @@ class Controller extends BaseController
             );
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
-                ->setId($criterionModel->getGroup()->getId())
+                ->setId($criterionModel->getCapability()->getId())
                 ->setName($groupName);
 
             // Don't have to save anything yet

@@ -37,8 +37,8 @@ class Mapper extends Schoolbox\Mapper
             'id',
             null,
             null,
-            'group',
-            'group'
+            'capability',
+            'capability'
         );
         $this->joins(
             'submission_box_id',

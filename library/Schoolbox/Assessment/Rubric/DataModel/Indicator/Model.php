@@ -33,7 +33,7 @@ class Model implements ISoftDeletable
     /**
      * @var CapabilityModel
      */
-    private $group;
+    private $capability;
 
 
     /**
@@ -65,18 +65,18 @@ class Model implements ISoftDeletable
     /**
      * @return CapabilityModel
      */
-    public function getGroup(): CapabilityModel
+    public function getCapability(): CapabilityModel
     {
-        return $this->group;
+        return $this->capability;
     }
 
     /**
-     * @param CapabilityModel $group
+     * @param CapabilityModel $capability
      * @return static
      */
-    public function setGroup(CapabilityModel $group)
+    public function setCapability(CapabilityModel $capability)
     {
-        $this->group = $group;
+        $this->capability = $capability;
         return $this;
     }
 }

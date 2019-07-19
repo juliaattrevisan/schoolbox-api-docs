@@ -87,7 +87,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $criteriaList = [];
 
             foreach ($this->criteria as $crit) {
-                $criteriaList[$crit->getGroup()->getName()][] = $crit;
+                $criteriaList[$crit->getCapability()->getName()][] = $crit;
             }
 
             foreach ($criteriaList as $criterion_group => $criterions) {

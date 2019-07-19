@@ -101,7 +101,7 @@ class Selector
         $deduped = [];
 
         foreach ($allSpecDescriptors as $descriptorId => $current) {
-            $index = "{$current->getDescription()}{$current->getIndicator()->getName()}{$current->getIndicator()->getGroup()->getName()}";
+            $index = "{$current->getDescription()}{$current->getIndicator()->getName()}{$current->getIndicator()->getCapability()->getName()}";
 
             /* Mark it as seen so we can ignore it later
              */

@@ -141,7 +141,7 @@ class DataSource
 //        }
 
         foreach ($indicatorModels as $indicatorModel) {
-            $capabilityModel    = $indicatorModel->getGroup();
+            $capabilityModel    = $indicatorModel->getCapability();
             $isCourseCapability = $capabilityModel->getParentId() === $courseSpecFolderId;
             $capabilityId       = $capabilityModel->getId();
             $indicatorId        = $indicatorModel->getId();
@@ -153,7 +153,7 @@ class DataSource
                     ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
 
                 if ($getUsages) {
-                    foreach (IndicatorUsageMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
+                    foreach (IndicatorUsageMapper::getInstance()->findCapabilityUsage($capabilityId) as $capabilityUsage) {
                         $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
@@ -281,7 +281,7 @@ class DataSource
                 if (!$indicatorModel) {
                     $indicatorModel = $indicatorMapper->createModel()
                         ->setId($indicatorId)
-                        ->setGroup($capabilityModel);
+                        ->setCapability($capabilityModel);
                 }
 
                 // Validate whether name can be changed
@@ -367,7 +367,7 @@ class DataSource
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (CapabilityUsageModel $gu) {
-            return $gu->getGroup()->getId();
+            return $gu->getCapability()->getId();
         });
         $indicatorUsageModels = IndicatorUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
@@ -390,7 +390,7 @@ class DataSource
 
         $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
             function (IndicatorUsageModel $cu) {
-                return $cu->getIndicator()->getGroup()->getId();
+                return $cu->getIndicator()->getCapability()->getId();
             }
         );
 
@@ -427,7 +427,7 @@ class DataSource
         // Respect prescribed ordering in usage objects
         foreach ($capabilityUsageModels as $capabilityUsageModel) {
             /** @var CapabilityUsageModel $capabilityUsageModel */
-            $capabilityModel = $capabilityUsageModel->getGroup();
+            $capabilityModel = $capabilityUsageModel->getCapability();
             $capabilityId    = $capabilityModel->getId();
             $capability      = $grid->getRowSet()->retrieveCapability($capabilityId);
             if (!$capability) {
@@ -583,7 +583,7 @@ class DataSource
 
             $capabilityUsageModel = $capabilityUsageMapper->createModel()
                 ->setSubmissionBox($submissionBox)
-                ->setGroup($capabilityModels[$capabilityUsage->getCapability()->getId()])
+                ->setCapability($capabilityModels[$capabilityUsage->getCapability()->getId()])
                 ->setMaxValue($capabilityMaxValue)
                 ->setSequence($capabilitySequence++);
             $capabilityUsageModels->add($capabilityUsageModel);
@@ -1323,7 +1323,7 @@ class DataSource
         /** @var IndicatorModel[] $existingIndicators */
         $existingIndicators = $indicatorMapper->findForParent(
             $dstBox->getCategory()->getId(),
-            $firstSrcDescriptor->getIndicator()->getGroup()->getParentType(),
+            $firstSrcDescriptor->getIndicator()->getCapability()->getParentType(),
             false
         );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
@@ -1332,19 +1332,19 @@ class DataSource
         /** @var CapabilityModel[] $existingGroupMap */
         $existingGroupMap = [];
         foreach ($existingIndicators as $existingIndicator) {
-            $groupName                           = $this->normaliseForComparison($existingIndicator->getGroup()->getName());
+            $groupName                           = $this->normaliseForComparison($existingIndicator->getCapability()->getName());
             $indicatorName                       = $this->normaliseForComparison($existingIndicator->getName());
             $existingIndicatorMap[$groupName][$indicatorName] = $existingIndicator;
-            $existingGroupMap[$groupName]                     = $existingIndicator->getGroup();
+            $existingGroupMap[$groupName]                     = $existingIndicator->getCapability();
         }
 
         // Build new Rubric for destination box
         foreach ($srcDescriptors as $srcDescriptor) {
 
             // Copy source group, or reuse existing
-            $srcGroupId = $srcDescriptor->getIndicator()->getGroup()->getId();
+            $srcGroupId = $srcDescriptor->getIndicator()->getCapability()->getId();
             if (!$srcGroups->getOffset($srcGroupId)) {
-                $srcGroup = $srcDescriptor->getIndicator()->getGroup();
+                $srcGroup = $srcDescriptor->getIndicator()->getCapability();
                 $srcGroups->setOffset($srcGroupId, $srcGroup);
             }
 
@@ -1373,7 +1373,7 @@ class DataSource
             if ($duplicateGroup) {
                 $dstGroup = $existingGroupMap[$groupName];
             } else {
-                $dstGroup = clone $srcDescriptor->getIndicator()->getGroup();
+                $dstGroup = clone $srcDescriptor->getIndicator()->getCapability();
                 $dstGroup->setId(null);
                 $dstGroup->setParentId($dstBox->getCategory()->getId());
                 $existingGroupMap[$groupName] = $dstGroup;
@@ -1387,7 +1387,7 @@ class DataSource
             } else {
                 $dstIndicator = clone $srcDescriptor->getIndicator();
                 $dstIndicator->setId(null);
-                $dstIndicator->setGroup($dstGroup);
+                $dstIndicator->setCapability($dstGroup);
                 $existingIndicatorMap[$groupName][$indicatorName] = $dstIndicator;
             }
             $dstIndicators->setOffset($srcIndicatorId, $dstIndicator);
@@ -1427,9 +1427,9 @@ class DataSource
             $dstGroupUsage = clone $srcGroupUsage;
 
             /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $dstGroup */
-            $dstGroup = $dstGroups->getOffset($srcGroupUsage->getGroup()->getId());
+            $dstGroup = $dstGroups->getOffset($srcGroupUsage->getCapability()->getId());
 
-            $dstGroupUsage->setGroup($dstGroup);
+            $dstGroupUsage->setCapability($dstGroup);
             $dstGroupUsage->setSubmissionBox($dstBox);
             $dstGroupUsages->add($dstGroupUsage);
         }

@@ -1132,7 +1132,7 @@ class Controller extends Base\Base
             $criteriaMapper->findOrCreateOneForFolderByKey(
                 $destinationId,
                 $criteria->getName(),
-                $criteria->getGroup()->getName(),
+                $criteria->getCapability()->getName(),
                 false
             );
         }

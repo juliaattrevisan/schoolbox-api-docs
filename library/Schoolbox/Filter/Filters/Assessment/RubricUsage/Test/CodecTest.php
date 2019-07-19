@@ -158,7 +158,7 @@ class CodecTest extends TestCase
             $capability = clone $validCapability;
             foreach ($this->invalidIndicators() as $invalidIndicator) {
                 $indicator = clone $invalidIndicator;
-                $indicator->setGroup($capability);
+                $indicator->setCapability($capability);
                 $data[] = [$indicator];
             }
         }
@@ -168,7 +168,7 @@ class CodecTest extends TestCase
             $capability = clone $invalidCapability;
             foreach ($this->validIndicators() as $validIndicator) {
                 $indicator = clone $validIndicator;
-                $indicator->setGroup($capability);
+                $indicator->setCapability($capability);
                 $data[] = [$indicator];
             }
         }
@@ -180,11 +180,11 @@ class CodecTest extends TestCase
     public function providerEncodeIndicator(): array
     {
         return [
-            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(1))->setId(1), 'c1i1',],
-            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(1))->setId(100), 'c1i100',],
-            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(1))->setId(999), 'c1i999',],
-            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(100))->setId(100), 'c100i100',],
-            [(new IndicatorModel())->setGroup((new CapabilityModel())->setId(999))->setId(999), 'c999i999',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(1), 'c1i1',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(100), 'c1i100',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(999), 'c1i999',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(100))->setId(100), 'c100i100',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(999))->setId(999), 'c999i999',],
         ];
     }
 

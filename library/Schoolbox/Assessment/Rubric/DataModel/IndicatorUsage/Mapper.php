@@ -128,7 +128,7 @@ class Mapper extends Schoolbox\Mapper
      * @param  int $groupId
      * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
      */
-    public function findGroupUsage($groupId): array
+    public function findCapabilityUsage($groupId): array
     {
         $query = "
             SELECT DISTINCT

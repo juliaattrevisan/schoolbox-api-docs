@@ -34,7 +34,7 @@ class Mapper extends BaseMapper {
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joins('rubric_group_id', CapabilityMapper::class, 'id', null, null, 'group', 'group');
+        $this->joins('rubric_group_id', CapabilityMapper::class, 'id', null, null, 'capability', 'capability');
 
         // Add curriculum codes
         $this->joinsVia(
@@ -66,7 +66,7 @@ class Mapper extends BaseMapper {
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('group', 'g')}
+                {$this->getJoinColumnString('capability', 'g')}
         ";
     }
 
@@ -78,7 +78,7 @@ class Mapper extends BaseMapper {
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('group', '', 'g', true)}
+            INNER JOIN {$this->getJoinSql('capability', '', 'g', true)}
         ";
     }
 
@@ -91,7 +91,7 @@ class Mapper extends BaseMapper {
         /** @var CapabilityMapper $groupMapper */
         /** @var NodeMapper                    $curriculumNodeMapper */
         /** @var GenericCollection|Model[] $collection */
-        $groupMapper          = $this->getJoinMapper('group');
+        $groupMapper          = $this->getJoinMapper('capability');
         $groupIds             = [];
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
         $collection           = $this->createCollection();
@@ -100,7 +100,7 @@ class Mapper extends BaseMapper {
             $crit = $this->hydrate($row);
             if ($row['g.id']) {
                 $groupIds[] = $row['g.id'];
-                $crit->setGroup($groupMapper->hydrate($row, 'g'));
+                $crit->setCapability($groupMapper->hydrate($row, 'g'));
             }
             $collection[$crit->getId()] = $crit;
         }
@@ -120,8 +120,8 @@ class Mapper extends BaseMapper {
             if (isset($indicatorNodes[$indicator->getId()])) {
                 $indicator->setCurriculumNodes($indicatorNodes[$indicator->getId()]);
             }
-            if (isset($groupNodes[$indicator->getGroup()->getId()])) {
-                $indicator->getGroup()->setCurriculumNodes($groupNodes[$indicator->getGroup()->getId()]);
+            if (isset($groupNodes[$indicator->getCapability()->getId()])) {
+                $indicator->getCapability()->setCurriculumNodes($groupNodes[$indicator->getCapability()->getId()]);
             }
         }
 
@@ -153,9 +153,9 @@ class Mapper extends BaseMapper {
      */
     public function deleteGroup(Model $indicator)
     {
-        $remaining = $this->countByColumn('rubric_group_id', $indicator->getGroup()->getId());
+        $remaining = $this->countByColumn('rubric_group_id', $indicator->getCapability()->getId());
         if (0 === $remaining) {
-            $this->getJoinMapper('group')->delete($indicator->getGroup());
+            $this->getJoinMapper('group')->delete($indicator->getCapability());
         }
         return true;
     }
@@ -171,8 +171,8 @@ class Mapper extends BaseMapper {
      */
     public function restoreGroup(Model $indicator)
     {
-        if ($indicator->getGroup()->isDeleted()) {
-            $this->getJoinMapper('group')->restoreSoftDeleted($indicator->getGroup());
+        if ($indicator->getCapability()->isDeleted()) {
+            $this->getJoinMapper('capability')->restoreSoftDeleted($indicator->getCapability());
         }
         return true;
     }
@@ -209,7 +209,7 @@ class Mapper extends BaseMapper {
     public function verifyUniqueness(Model $object): bool
     {
         $pb = $this->getPredicateBuilder()
-                   ->equals('rubric_group_id', $object->getGroup()->getId());
+                   ->equals('rubric_group_id', $object->getCapability()->getId());
 
         // Don't compare this object with itself
         if ($object->getId()) {
@@ -354,10 +354,10 @@ class Mapper extends BaseMapper {
         } catch (MapperException $e) {
             // Build it
             /** @var CapabilityMapper $groupMapper */
-            $groupMapper = $this->getJoinMapper('group');
+            $groupMapper = $this->getJoinMapper('capability');
             $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName, $cache);
             $indicator   = $this->createModel()
-                                ->setGroup($group)
+                                ->setCapability($group)
                                 ->setName($name);
             $this->save($indicator);
             return $indicator;

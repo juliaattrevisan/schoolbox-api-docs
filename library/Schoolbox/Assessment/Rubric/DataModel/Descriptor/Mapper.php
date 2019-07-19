@@ -174,7 +174,7 @@ class Mapper extends Schoolbox\Mapper {
                 /** @var Indicator\Model $indicator */
                 $group     = $groups->getOffset($groupId);
                 $indicator = $this->hydrateJoin($r, 'indicator', 'c');
-                $indicator->setGroup($group);
+                $indicator->setCapability($group);
                 $indicators->setOffset($indicatorId, $indicator);
             }
             $indicator = $indicators->getOffset($indicatorId);
