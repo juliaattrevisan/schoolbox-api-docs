@@ -9,6 +9,7 @@ namespace Schoolbox\Resource\Folder\Test;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\ValidCodesSpec;
 use Schoolbox\Resource\Folder;
 use PHPUnit\Framework;
@@ -27,13 +28,13 @@ class ValidCodesSpecTest extends TestCase
 
     /**
      * @param array $codes
-     * @param array $otherFolderCodes
+     * @param int   $countDbMatches
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
      * @dataProvider providerNonUniqueOnFolder
      */
-    public function testNonUniqueOnFolder(array $codes, array $otherFolderCodes): void
+    public function testNonUniqueOnFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = new Folder\Model();
 
@@ -41,19 +42,19 @@ class ValidCodesSpecTest extends TestCase
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
         }
 
-        $this->assertFalse($this->createSpec($otherFolderCodes)->isSatisfiedBy($folderModel));
+        $this->assertFalse($this->createSpec($countDbMatches)->isSatisfiedBy($folderModel));
     }
 
 
     /**
      * @param array $codes
-     * @param array $otherFolderCodes
+     * @param int   $countDbMatches
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
      * @dataProvider providerUniqueOnFolder
      */
-    public function testUniqueOnFolder(array $codes, array $otherFolderCodes): void
+    public function testUniqueOnFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = new Folder\Model();
 
@@ -61,19 +62,19 @@ class ValidCodesSpecTest extends TestCase
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
         }
 
-        $this->assertTrue($this->createSpec($otherFolderCodes)->isSatisfiedBy($folderModel));
+        $this->assertTrue($this->createSpec($countDbMatches)->isSatisfiedBy($folderModel));
     }
 
 
     /**
      * @param array $codes
-     * @param array $otherFolderCodes
+     * @param int   $countDbMatches
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
      * @dataProvider providerExactCollisionWithOtherFolder
      */
-    public function testExactCollisionWithOtherFolder(array $codes, array $otherFolderCodes): void
+    public function testExactCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = new Folder\Model();
 
@@ -81,19 +82,19 @@ class ValidCodesSpecTest extends TestCase
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
         }
 
-        $this->assertFalse($this->createSpec($otherFolderCodes)->isSatisfiedBy($folderModel));
+        $this->assertFalse($this->createSpec($countDbMatches)->isSatisfiedBy($folderModel));
     }
 
 
     /**
      * @param array $codes
-     * @param array $otherFolderCodes
+     * @param int   $countDbMatches
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
      * @dataProvider providerPrefixCollisionWithOtherFolder
      */
-    public function testPrefixCollisionWithOtherFolder(array $codes, array $otherFolderCodes): void
+    public function testPrefixCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
         $folderModel = new Folder\Model();
 
@@ -101,20 +102,20 @@ class ValidCodesSpecTest extends TestCase
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
         }
 
-        $this->assertFalse($this->createSpec($otherFolderCodes)->isSatisfiedBy($folderModel));
+        $this->assertFalse($this->createSpec($countDbMatches)->isSatisfiedBy($folderModel));
     }
 
 
     /**
      * @param int|null $folderId
      * @param array    $codes
-     * @param array    $otherFolderCodes
+     * @param int      $countDbMatches
      * @throws Framework\AssertionFailedError
      * @throws Framework\Exception
      * @throws Predicate\InvalidColumnException
      * @dataProvider providerNoCollisionWithOtherFolder
      */
-    public function testNoCollisionWithOtherFolder(?int $folderId, array $codes, array $otherFolderCodes): void
+    public function testNoCollisionWithOtherFolder(?int $folderId, array $codes, int $countDbMatches): void
     {
         $folderModel = (new Folder\Model())->setId($folderId);
 
@@ -122,7 +123,7 @@ class ValidCodesSpecTest extends TestCase
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
         }
 
-        $this->assertTrue($this->createSpec($otherFolderCodes)->isSatisfiedBy($folderModel));
+        $this->assertTrue($this->createSpec($countDbMatches)->isSatisfiedBy($folderModel));
 
     }
 
@@ -132,12 +133,12 @@ class ValidCodesSpecTest extends TestCase
     public function providerNonUniqueOnFolder(): array
     {
         return [
-            [['a', 'A'], []],
-            [['a', 'A'], []],
-            [['a', 'A/A'], []],
-            [['a', 'A/A'], []],
-            [['a', 'A A/A'], []],
-            [['a', 'A A/A'], []],
+            [['a', 'A'], 0],
+            [['a', 'A'], 0],
+            [['a', 'A/A'], 0],
+            [['a', 'A/A'], 0],
+            [['a', 'A A/A'], 0],
+            [['a', 'A A/A'], 0],
         ];
     }
 
@@ -145,10 +146,10 @@ class ValidCodesSpecTest extends TestCase
     public function providerUniqueOnFolder(): array
     {
         return [
-            [[], []],
-            [['a'], []],
-            [['a/aaa', 'b/bbb'], []],
-            [['a/a', 'aa', 'a a', 'a a a'], []],
+            [[], 0],
+            [['a'], 0],
+            [['a/aaa', 'b/bbb'], 0],
+            [['a/a', 'aa', 'a a', 'a a a'], 0],
         ];
     }
 
@@ -156,10 +157,7 @@ class ValidCodesSpecTest extends TestCase
     public function providerExactCollisionWithOtherFolder(): array
     {
         return [
-            [['a'], ['A']],
-            [['a/aaa'], ['a/AAA']],
-            [['a', 'b', 'c', 'd'], ['A']],
-            [['a/aaa'], ['c', 'A/AAA', 'b', 'b/bbb']],
+            [['a'], 1],
         ];
     }
 
@@ -167,8 +165,8 @@ class ValidCodesSpecTest extends TestCase
     public function providerPrefixCollisionWithOtherFolder(): array
     {
         return [
-            [['a'], ['S/A']],
-            [['S/a'], ['A']],
+            [['a'], 1],
+            [['S/a'], 1],
         ];
     }
 
@@ -176,18 +174,10 @@ class ValidCodesSpecTest extends TestCase
     public function providerNoCollisionWithOtherFolder(): array
     {
         return [
-            [null, ['a'], ['b']],
-            [null, ['a'], ['b']],
-            [null, ['a'], ['aa']],
-            [null, ['a/aaa'], ['b/aaa']],
-            [null, ['a/aaa'], ['a a/aaa']],
-            [null, ['a/aaa'], ['a/bbb']],
-            [1, ['a'], ['b']],
-            [1, ['a'], ['b']],
-            [1, ['a'], ['aa']],
-            [1, ['a/aaa'], ['b/aaa']],
-            [1, ['a/aaa'], ['a a/aaa']],
-            [1, ['a/aaa'], ['a/bbb']],
+            [null, ['a'], 0],
+            [null, ['a/aaa'], 0],
+            [1, ['a'], 0],
+            [1, ['a/aaa'], 0],
         ];
     }
 
@@ -196,13 +186,14 @@ class ValidCodesSpecTest extends TestCase
 
 
     /**
-     * Builds a validation spec that contains a folderCode mapper that returns the specified folder codes
+     * Builds a validation spec that contains a folderCode mapper that will pretend
+     * to return the specified number of matches.
      *
-     * @param array $otherFolderCodes
+     * @param int $countDbMatches
      * @return ValidCodesSpec
      * @throws Framework\Exception
      */
-    private function createSpec(array $otherFolderCodes): ValidCodesSpec
+    private function createSpec(int $countDbMatches): ValidCodesSpec
     {
         /** @var Folder\Code\Mapper|PHPUnit_Framework_MockObject_MockObject $folderCodeMapper */
         $folderCodeMapper = $this->createMock(Folder\Code\Mapper::class);
@@ -220,9 +211,10 @@ class ValidCodesSpecTest extends TestCase
             ->method('getDatabase')
             ->willReturn($mockDatabase);
 
+        $results = new Collection(array_fill(0, $countDbMatches, null));
         $folderCodeMapper
-            ->method('findScalarByPredicates')
-            ->willReturn($otherFolderCodes);
+            ->method('findByPredicates')
+            ->willReturn($results);
 
         return new ValidCodesSpec($folderCodeMapper);
     }

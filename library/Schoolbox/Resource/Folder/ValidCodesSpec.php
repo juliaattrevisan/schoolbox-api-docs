@@ -12,7 +12,6 @@ use function array_combine;
 use function array_fill;
 use function array_key_exists;
 use function array_keys;
-use function array_merge;
 use function array_unique;
 use function count;
 use function strpos;
@@ -74,53 +73,28 @@ class ValidCodesSpec extends Leaf
         [$rawCodes, $prefixedCodes] = $this->filterRawAndPrefixedCodes($indexedCodes);
 
         // Will include raw codes, and campus-prefixed codes with the campus prefix removed.
-        $strippedCodes = [];
         foreach (array_keys($prefixedCodes) as $prefixedCode) {
             $stripped = $this->unPrefixCode($prefixedCode);
             if (array_key_exists($stripped, $rawCodes)) {
                 return false;
             }
-            $strippedCodes[$stripped] = null;
         }
 
-        $otherFoldersIndexedCodes = $this->getOtherFoldersCodes($candidate->getId(), $rawCodes, $strippedCodes);
-        [$otherRawCodes, $otherPrefixedCodes] = $this->filterRawAndPrefixedCodes($otherFoldersIndexedCodes);
-
-
-        // 3. Check candidate's codes don't have an exact match with other folders' codes
-        foreach (array_keys($indexedCodes) as $code) {
-            if (array_key_exists($code, $otherFoldersIndexedCodes)) {
-                return false;
-            }
-        }
-
-        // 4. Check candidate's prefixed codes don't conflict with other folders' raw codes
-        foreach (array_keys($strippedCodes) as $stripped) {
-            if (array_key_exists($stripped, $otherRawCodes)) {
-                return false;
-            }
-        }
-
-        foreach (array_keys($otherPrefixedCodes) as $otherPrefixedCode) {
-            if (array_key_exists($this->unPrefixCode($otherPrefixedCode), $rawCodes)) {
-                return false;
-            }
-        }
-
-        return true;
+        // 3. Check candidate's codes against codes already existing on other folders
+        return 0 === $this->getCountOtherFoldersCodes($candidate->getId(), $rawCodes, $prefixedCodes);
     }
 
 
     /**
-     * Returns (in lower case) codes from other folders that are EQUAL or LIKE the specified stripped codes
+     * Returns the count of other codes that are would collide with the specified codes
      *
      * @param int|null $folderId
      * @param null[]   $rawCodes
-     * @param null[]   $strippedCodes
-     * @return null[]
+     * @param null[]   $prefixedCodes
+     * @return int
      * @throws Database\Predicate\InvalidColumnException
      */
-    private function getOtherFoldersCodes(?int $folderId, array $rawCodes, array $strippedCodes): array
+    private function getCountOtherFoldersCodes(?int $folderId, array $rawCodes, array $prefixedCodes): int
     {
         $pb = $this->folderCodeMapper->getPredicateBuilder();
         if ($folderId) {
@@ -130,15 +104,17 @@ class ValidCodesSpec extends Leaf
         }
         $innerPb = $this->folderCodeMapper->getPredicateBuilder();
 
-        $rawAndStripped = array_merge($rawCodes, $strippedCodes);
-        foreach (array_keys($rawAndStripped) as $code) {
+        foreach (array_keys($rawCodes) as $code) {
             $innerPb->equals('code', $code);
             $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->escapeForLike($code));
         }
+        foreach (array_keys($prefixedCodes) as $prefixedCode) {
+            $innerPb->equals('code', $prefixedCode);
+            $innerPb->equals('code', $this->unPrefixCode($prefixedCode));
+        }
         $pb->any($innerPb);
 
-        $otherFolderCodes = array_map('strtolower', array_unique($this->folderCodeMapper->findScalarByPredicates('code', $pb)));
-        return array_combine($otherFolderCodes, array_fill(0, count($otherFolderCodes), null));
+        return $this->folderCodeMapper->findByPredicates($pb)->count();
     }
 
 
