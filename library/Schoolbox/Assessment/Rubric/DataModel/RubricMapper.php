@@ -24,6 +24,8 @@ use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model as DescriptorMark
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -373,11 +375,11 @@ class RubricMapper
         )->indexByCallback(function (IndicatorUsageModel $cu) {
             return $cu->getCriterion()->getId();
         });
-        $levelModels = LevelMapper::getInstance()->findByColumn(
+        $levelModels = Mapper::getInstance()->findByColumn(
             'b.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (Level $l) {
+        )->indexByCallback(function (Model $l) {
             return $l->getId();
         });
         $descriptorModels = DescriptorMarkMapper::getInstance()->findByColumnList([
@@ -409,7 +411,7 @@ class RubricMapper
 
 
         // Add levels
-        /** @var Level[] $levelModels */
+        /** @var Model[] $levelModels */
         foreach ($levelModels as $levelModel) {
             $levelId = $levelModel->getId();
             $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
@@ -495,7 +497,7 @@ class RubricMapper
 
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
-        $levelMapper      = LevelMapper::getInstance();
+        $levelMapper      = Mapper::getInstance();
         $descriptorMapper = DescriptorMarkMapper::getInstance();
         $indicatorMapper  = IndicatorMapper::getInstance();
         $capabilityMapper = CapabilityMapper::getInstance();
@@ -1117,7 +1119,7 @@ class RubricMapper
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
                 function ($model) use ($exclude) {
-                    /** @var DescriptorMarkModel|Level $model */
+                    /** @var DescriptorMarkModel|Model $model */
                     return !in_array($model->getId(), $exclude);
                 }
             )
@@ -1258,7 +1260,7 @@ class RubricMapper
 
         // Get required mappers
         $boxMapper            = SubmissionBoxMapper::getInstance();
-        $levelMapper          = LevelMapper::getInstance();
+        $levelMapper          = Mapper::getInstance();
         $descriptorMapper     = DescriptorMarkMapper::getInstance();
         $groupMapper          = DescriptorMarkMapper::getInstance();
         $criterionMapper      = DescriptorMarkMapper::getInstance();
@@ -1267,7 +1269,7 @@ class RubricMapper
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
-        /** @var Level[]|GenericCollection $srcLevels */
+        /** @var Model[]|GenericCollection $srcLevels */
         $srcLevels = $levelMapper->findByColumn('box_id', $sourceBox->getId())->indexBy('id');
 
         if (! $sourceBox->getUseRubric()) {
@@ -1279,7 +1281,7 @@ class RubricMapper
 
         // Cannot mutate identity of objects returned from mappers.
         // Index all these collections by source version ID, even though the object will be destination version.
-        /** @var Level[]|GenericCollection $dstLevels */
+        /** @var Model[]|GenericCollection $dstLevels */
         $dstLevels = $levelMapper->createCollection();
         /** @var DescriptorMarkModel[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
@@ -1396,7 +1398,7 @@ class RubricMapper
 
 
             // Link Descriptor + Level
-            /** @var Level $dstLevel */
+            /** @var Model $dstLevel */
             $dstLevel = $dstLevels->getOffset($srcDescriptor->getLevel()->getId());
             $dstDescriptor->setLevel($dstLevel);
             $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);

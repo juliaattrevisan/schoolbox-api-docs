@@ -185,9 +185,9 @@ class RecursiveUndeleter extends CliTool\App
             QuizAttempt\Mapper::class => 'assess_id',
         ],
         SubmissionBoxMapper::class          => [
-            SubmissionMapper::class      => 'box_id',
-            ReturnedWorkMapper::class    => 'box_id',
-            DataModel\LevelMapper::class => 'box_id',
+            SubmissionMapper::class       => 'box_id',
+            ReturnedWorkMapper::class     => 'box_id',
+            DataModel\Level\Mapper::class => 'box_id',
             Eportfolio\ShowcaseMapper::class,
         ],
         TaskMapper::class                   => [
@@ -209,7 +209,7 @@ class RecursiveUndeleter extends CliTool\App
         ReturnedWorkMapper::class           => [
             ReturnedWorkFile\Mapper::class,
         ],
-        DataModel\LevelMapper::class        => [
+        DataModel\Level\Mapper::class       => [
             DataModel\Descriptor\Mapper::class => 'rubric_descriptor.level_id',
         ],
         Eportfolio\ShowcaseMapper::class    => [],

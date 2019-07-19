@@ -6,25 +6,25 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Level;
 
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
-use Schoolbox\Mapper;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class LevelMapper
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
- * @method Level hydrate(array $row, $alias = '', $callback = null)
- * @method Level createModel($idValue = null)
- * @method Level findById($id)
- * @method Collection|Level[] findByColumn($columnName, $columnValue, $options = array())
- * @method Collection|Level[] findByColumnList($columnList, $options = array())
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method Model findById($id)
+ * @method Collection|Model[] findByColumn($columnName, $columnValue, $options = array())
+ * @method Collection|Model[] findByColumnList($columnList, $options = array())
  */
-class LevelMapper extends Mapper
+class Mapper extends BaseMapper
 {
 
     /**
@@ -34,7 +34,7 @@ class LevelMapper extends Mapper
      */
     protected function mapping()
     {
-        $this->hasModel(Level::class);
+        $this->hasModel(Model::class);
 
         $this->hasTable('rubric_level');
 
@@ -52,10 +52,10 @@ class LevelMapper extends Mapper
     /**
      * Verify this level belongs to the same box it always belonged to.
      *
-     * @param Level $level
+     * @param Model $level
      * @return bool
      */
-    public function validateBoxIdNotChanged(Level $level): bool
+    public function validateBoxIdNotChanged(Model $level): bool
     {
         $this->assertJoinedModelNotChanged($level, 'box', 'Rubric levels may not be transferred between due works');
         return true;

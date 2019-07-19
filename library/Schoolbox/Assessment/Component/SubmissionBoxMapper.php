@@ -189,7 +189,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     public function softDeleteRubricLevels(SubmissionBox $dueWork)
     {
-        DataModel\LevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
+        DataModel\Level\Mapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
         return true;
     }
 

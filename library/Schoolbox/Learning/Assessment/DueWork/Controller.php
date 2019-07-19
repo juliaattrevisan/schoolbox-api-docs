@@ -1159,7 +1159,7 @@ class Controller extends Assessment\Controller
         $data['rubricResultSets'] = $rs;
 
         // Do any students have marks for this rubric?
-        $levelIds      = DataModel\LevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+        $levelIds      = DataModel\Level\Mapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
         $descriptorIds = DataModel\Descriptor\Mapper::getInstance()->findIdsByColumn('level_id', $levelIds);
         $countMarkIds  = DataModel\DescriptorMark\Mapper::getInstance()->countByColumnList([
             'descriptor_id' => $descriptorIds,
