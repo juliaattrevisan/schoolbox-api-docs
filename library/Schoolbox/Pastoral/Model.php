@@ -546,6 +546,7 @@ class Model implements ISoftDeletable
         $accessLevel = PastoralAccessMapper::ACCESS_DENY;
 
         foreach ($this->getAccess() as $access) {
+            $access->setPastoral($this);
             $accessLevelCurrent = $access->getAccessLevel($user);
 
             if ($accessLevelCurrent === null) {

@@ -134,8 +134,8 @@ class Notifier extends AbstractModuleNotifier
         /** @var Collection|PastoralAccess[] $accessRecords */
         $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
 
-        // User ids to send notifications to. Starting with author of the record.
-        $targetUserIds = [$pastoral->getOwner()->getId()];
+        // Users to send notifications to. Starting with author of the record.
+        $targetUsers[$pastoral->getOwner()->getId()] = $pastoral->getOwner();
 
         /** @var PastoralAccess $pastoralAccess */
         foreach ($accessRecords as $pastoralAccess) {
@@ -159,8 +159,8 @@ class Notifier extends AbstractModuleNotifier
                 $teachers = $student->getTeacherCollection();
                 /** @var User $user */
                 foreach ($teachers as $user) {
-                    if ($user->getRole()->getId() == $pastoralAccess->getRole()->getId()) {
-                        $targetUserIds[] = $user->getId();
+                    if ($user->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
+                        $targetUsers[$user->getId()] = $user;
                     }
                 }
             } elseif ($pastoralAccess->getGroup()) {
@@ -178,20 +178,22 @@ class Notifier extends AbstractModuleNotifier
                 foreach ($pastoralGroup->getMembers() as $member) {
                     // Only staff should be in pastoral groups
                     if ($member->getUser()->getRole()->isStaff()) {
-                        $targetUserIds[] = $member->getUser()->getId();
+                        $targetUsers[$member->getUser()->getId()] = $member->getUser();
                     }
                 }
             } elseif ($pastoralAccess->getUser()) {
                 // Only staff ever have access to pastoral comments
-
                 if ($pastoralAccess->getUser()->getRole()->isStaff()) {
-                    $targetUserIds[] = $pastoralAccess->getUser()->getId();
+                    $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
                 }
             }
         }
 
-        $targetUserIds = \array_unique($targetUserIds);
-        foreach ($targetUserIds as $userId) {
+        foreach ($targetUsers as $userId => $user) {
+            // make sure that multiple conditions allow user to access this record
+            if ($pastoral->getAccessLevel($user) === PastoralAccessMapper::ACCESS_DENY) {
+                continue;
+            }
             $envelope->targetToUser($userId, $message);
         }
 

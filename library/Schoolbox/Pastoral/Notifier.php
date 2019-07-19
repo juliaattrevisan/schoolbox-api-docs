@@ -4,12 +4,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
 use Alaress\Async\Notification\Instance\Builder;
-use Alaress\Async\Notification\Instance\Instance;
-use Alaress_Date_NullDate;
 use Monolog\Logger;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
@@ -97,40 +96,38 @@ class Notifier extends AbstractModuleNotifier
      * @param string $method
      *
      * @return Envelope
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
-    protected function buildMessage($model, $method)
+    protected function buildMessage(Model $model, string $method): Envelope
     {
         $envelope = new Envelope();
 
         // Get hydrated pastoral record
-
-        $pastoral = $this->mapper->findById($model->getId());
+        try {
+            $pastoral = $this->mapper->findById($model->getId());
+            $student  = $this->userMapper->findById($pastoral->getStudent()->getId());
+            $pastoral->setStudent($student);
+        } catch (MapperException $e) {
+            $this->log->error("Error: Unable to send pastoral comment {$method} notification. {$e->getMessage()}", ['exception' => $e]);
+            return $envelope;
+        }
 
         // Get the kids teachers
-
-        $student = $this->userMapper->findById($model->getStudent()->getId());
-        $student->loadTeachers();
-        $student->loadParents();
-        $teachers = $student->getTeacherCollection();
-
         // Create the message
 
         $timestamp = md5(date("YmdHis"));
 
-        $href = "/pastoral/student/{$model->getStudent()->getId()}/record/{$model->getId()}?ts={$timestamp}";
+        $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}";
         $severity = $pastoral->getSeverity() ? strtolower($pastoral->getSeverity()->getName()) . ' severity' : '';
         $type = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
 
         $builder = new Builder();
         $builder->setTitle("A :pastoralcare record has been {$method}")
                 ->setParam('pastoralcare', new Param("{$severity} {$type}", $href))
-                ->setIcon("/portrait.php?size=square32&userId={$pastoral->getOwner()->getExternalId()}")
+                ->setIcon("/portrait.php?size=square32&id={$pastoral->getOwner()->getId()}")
                 ->setHref($href)
                 ->setNamespace($this->getSlug())
                 ->setSeverity(Logger::ERROR)
-                ->addTopic("pastoral.{$model->getId()}.{$method}");
+                ->addTopic("pastoral.{$pastoral->getId()}.{$method}");
 
         $message = $builder->build();
 
@@ -139,98 +136,80 @@ class Notifier extends AbstractModuleNotifier
         $parentAccessEnabled = $this->configMapper->get('pastoral_parent_access') == '1';
 
         /** @var Collection|PastoralAccess[] $accessRecords */
-        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $model->getId());
+        $accessRecords = $this->pastoralAccessMapper->findByColumn("pastoral_id", $pastoral->getId());
+
+        // Users to send notifications to. Starting with author of the record.
+        $targetUsers = [];
 
         /** @var PastoralAccess $pastoralAccess */
         foreach ($accessRecords as $pastoralAccess) {
-            $role          = $pastoralAccess->getRole();
-            $pastoralGroup = $pastoralAccess->getGroup();
-            $user          = $pastoralAccess->getUser();
+            // If the comment is private, and they don't have private, fail
+            if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY) {
+                // do not send any notification
+                continue;
+            }
 
             try {
-                if ($role instanceof Role) {
-                    // Sending to a role, make sure its hydrated
-
-                    $role = $this->roleMapper->findById($role->getId());
-
+                if ($pastoralAccess->getRole() instanceof Role) {
                     // The system should only notify staff if they are a teacher of the student
-
-                    if ($role->isStaff()) {
+                    if ($pastoralAccess->getRole()->isStaff()) {
+                        $student->loadTeachers();
+                        $teachers = $student->getTeacherCollection();
                         /** @var User $teacher */
                         foreach ($teachers as $teacher) {
-                            if ($teacher->getRole()->getId() == $role->getId()) {
-                                $this->targetToUser($teacher, $message, $pastoralAccess, $envelope);
+                            if ($teacher->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
+                                $targetUsers[$teacher->getId()] = $teacher;
                             }
                         }
-                    } elseif ($role->isParent() && $parentAccessEnabled) {
+                    } elseif ($pastoralAccess->getRole()->isParent() && $parentAccessEnabled) {
                         // Only send to parents if pastoral parent access is enabled
-
-                        $envelope->targetToParent($model->getStudent()->getId(), $message);
+                        $student->loadParents();
+                        $parents = $student->getParents();
+                        foreach ($parents as $parent) {
+                            if ($parent->getRole()->getId() === $pastoralAccess->getRole()->getId()) {
+                                $targetUsers[$parent->getId()] = $parent;
+                            }
+                        }
                     }
-                } elseif ($pastoralGroup instanceof PastoralGroup) {
+                } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     // Sending to a pastoral group, make sure its hydrated
-
                     /** @var PastoralGroup $pastoralGroup */
-                    $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralGroup->getId());
+                    $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
 
                     /** @var PastoralGroupMember $member */
                     foreach ($pastoralGroup->getMembers() as $member) {
                         // Only staff should be in pastoral groups
-
-                        // user is not hydrated
                         $user = $this->userMapper->findById($member->getUser()->getId());
-
                         if ($user->getRole()->isStaff()) {
-                            $this->targetToUser($user, $message, $pastoralAccess, $envelope);
+                            $targetUsers[$user->getId()] = $user;
                         }
                     }
-                } elseif ($user instanceof User) {
+                } elseif ($pastoralAccess->getUser() instanceof User) {
                     // Sending to an individual user
-
                     // user is not hydrated
-                    $user = $this->userMapper->findById($user->getId());
-
-                    $role = $user->getRole();
-
+                    $user = $this->userMapper->findById($pastoralAccess->getUser()->getId());
                     // Only send to parents if parent access is enabled
-
-                    if ($role->isStaff() || ($role->isParent() && $parentAccessEnabled)) {
-                        $this->targetToUser($user, $message, $pastoralAccess, $envelope);
+                    if ($user->getRole()->isStaff() || ($user->getRole()->isParent() && $parentAccessEnabled)) {
+                        $targetUsers[$pastoralAccess->getUser()->getId()] = $pastoralAccess->getUser();
                     }
                 }
             } catch (MapperException $e) {
                 // Log an error and move on so we don't break the rest of the notifications
-                $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", ['exception'=>$e]);
+                $this->log->error("Error: Unable to send pastoral {$method} notification. {$e->getMessage()}", ['exception' => $e]);
             }
+        }
+
+        foreach ($targetUsers as $userId => $user) {
+            // make sure that multiple conditions allow user to access this record
+            if ($pastoral->getAccessLevel($user) === PastoralAccessMapper::ACCESS_DENY) {
+                continue;
+            }
+            $envelope->targetToUser($userId, $message);
         }
 
         return $envelope;
     }
 
-    /**
-     * Only target message to the user if they have sufficient permissions
-     *
-     * @param User           $user
-     * @param Instance       $message
-     * @param PastoralAccess $pastoralAccess
-     * @param Envelope       $envelope
-     *
-     * @return bool
-     */
-    private function targetToUser($user, $message, $pastoralAccess, $envelope)
-    {
-        // If user has deny permission, fail
-
-        if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY) {
-            return false;
-        }
-
-        // Otherwise it's bombs away...
-
-        $envelope->targetToUser($user->getId(), $message);
-
-        return true;
-    }
 
     /**
      * @return string
@@ -263,8 +242,6 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      *
      * @return Envelope
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     public function notifyCreated(Model $model, User $effector, $diff = [])
     {
@@ -277,8 +254,6 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      *
      * @return Envelope
-     * @throws MapperException
-     * @throws MapperException\Deleted
      */
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
@@ -375,6 +350,4 @@ class Notifier extends AbstractModuleNotifier
 
         return $this;
     }
-
-
 }
