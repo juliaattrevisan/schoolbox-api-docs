@@ -1,73 +1,78 @@
 #!/usr/bin/php
 <?php
 /**
- * Checks whether documents that are still 'processing' in Kami have finished processing
- * If so, updates the document's status in Schoolbox
- *
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 declare(strict_types=1);
 
 use Alaress\Jitter\Jitter;
-use Aura\Di;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$appOpts = [
-    'help',
-    'perform',
-    'dry-run',
-    'max-attempts:',
-    'max-skips:',
-    'base-back-off:',
-    'timeout:',
-];
+/**
+ * Checks whether documents that are still 'processing' in Kami have finished processing
+ * If so, updates the document's status in Schoolbox
+ */
+$app = new class extends CliTool\App
+{
 
-$kernel = new Daemon\Kernel(
-    'Kami Status Checker',
-    [
-        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
-    ]
-);
-
-/** @noinspection PhpUnhandledExceptionInspection */
-$kernel->run(function (
-    Di\Container $di,
-    /** @noinspection PhpUnusedParameterInspection */
-    LoopInterface $loop,
-    LoggerInterface $log,
-    array $opts
-) {
-    $displayHelp = isset($opts['help']);
-    $dryRun      = isset($opts['dry-run']);
-    $perform     = isset($opts['perform']);
-    $maxAttempts = array_key_exists('max-attempts', $opts) ? (int)$opts['max-attempts'] : Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS;
-    $maxSkips    = array_key_exists('max-skips', $opts) ? (int)$opts['max-skips'] : Kami\StatusUpdater::DEFAULT_MAX_SKIPS;
-    $baseBackOff = array_key_exists('base-back-off', $opts) ? (int)$opts['base-back-off'] : Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF;
-    $timeout     = array_key_exists('timeout', $opts) ? (int)$opts['timeout'] : Kami\StatusUpdater::DEFAULT_TIMEOUT;
-
-    $colourRed   = "\033[0;31m";
-    $colourWhite = "\033[0m";
-    if (!$dryRun && !$perform) {
-        echo "{$colourRed}Invalid syntax. You must specify the mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
-        $displayHelp = true;
-    }
-    if ($dryRun && $perform) {
-        echo "{$colourRed}Invalid syntax. You must specify only one mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
-        $displayHelp = true;
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return [
+            'help',
+            'max-attempts:',
+            'max-skips:',
+            'base-back-off:',
+            'timeout:',
+        ];
     }
 
-    if ($displayHelp) {
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        if ($this->getOpt('help')) {
+            $this->displayHelp();
+            exit(0);
+        }
+
+        $maxAttempts = $this->getOptAsInt('max-attempts:', Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS);
+        $maxSkips    = $this->getOptAsInt('max-skips:', Kami\StatusUpdater::DEFAULT_MAX_SKIPS);
+        $baseBackOff = $this->getOptAsInt('base-back-off:', Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF);
+        $timeout     = $this->getOptAsInt('timeout:', Kami\StatusUpdater::DEFAULT_TIMEOUT);
+
+        $this->logConfigurationState($maxAttempts, $maxSkips, $baseBackOff, $timeout);
+
+        $statusUpdater = $this->buildStatusUpdater($maxAttempts, $baseBackOff);
+
+        $lock = $this->acquireLock($timeout);
+
+        // Run the status checker
+        $exitStatus = 0;
+        try {
+            $exitStatus = $statusUpdater->checkProcessingDocumentsStatus(!$this->perform(), $maxSkips);
+        } catch (Throwable $e) {
+            $this->getLogger()->error($e->getMessage(), $e->getTrace());
+            $this->getLogger()->error($e->getTraceAsString());
+            $exitStatus = 1;
+        } finally {
+            $lock->release();
+        }
+        exit($exitStatus);
+    }
+
+
+    /**
+     * Displays a help message
+     */
+    private function displayHelp(): void
+    {
         $maxAttempts       = Kami\StatusUpdater::DEFAULT_MAX_ATTEMPTS;
         $maxSkips          = Kami\StatusUpdater::DEFAULT_MAX_SKIPS;
         $baseJitterBackOff = Kami\StatusUpdater::DEFAULT_BASE_JITTER_BACK_OFF;
@@ -91,72 +96,96 @@ Usage: check-status.php --dry-run|--perform [-v[v[v]]] [--max-attempts={$maxAtte
 
 
 HELP;
-        exit(0);
     }
-
-    $runType = $dryRun ? 'dry' : 'live';
-    $negate  = $dryRun ? 'not ' : '';
-    $log->info("Performing {$runType} run - document status will {$negate}be updated in Schoolbox");
-    $log->debug(sprintf('Max attempts per document: %d', $maxAttempts));
-    $log->debug(sprintf('Max successive failures: %d', $maxSkips));
-    $log->debug(sprintf('Base jitter back off: %d ms', $baseBackOff));
-    $log->debug(sprintf('Timeout: %d ms', $timeout));
 
 
     /**
-     * @var IConfigLoader     $config
-     * @var MapperFactory     $mapperFactory
-     * @var Kami\Mapper       $kamiMapper
+     * Logs some information regarding the app's configuration state.
+     *
+     * @param int $maxAttempts
+     * @param int $maxSkips
+     * @param int $baseBackOff
+     * @param int $timeout
      */
-    $config        = $di->get('config');
-    $mapperFactory = $di->get('mapperFactory');
-    $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-    $connector     = new Kami\Connector(new GuzzleHttp\Client(), $config->get('kami_api_key'), $config->get('site_school_code'));
-
-    if (!$connector->isEnabled()) {
-        $log->warning('Kami has not been enabled by puppet for this instance. Aborting');
-        exit(0);
+    private function logConfigurationState(int $maxAttempts, int $maxSkips, int $baseBackOff, int $timeout): void
+    {
+        $runType = $this->perform() ? 'live' : 'dry';
+        $negate  = $this->perform() ? '' : 'not ';
+        $this->getLogger()->info("Performing {$runType} run - document status will {$negate}be updated in Schoolbox");
+        $this->getLogger()->debug(sprintf('Max attempts per document: %d', $maxAttempts));
+        $this->getLogger()->debug(sprintf('Max successive failures: %d', $maxSkips));
+        $this->getLogger()->debug(sprintf('Base jitter back off: %d ms', $baseBackOff));
+        $this->getLogger()->debug(sprintf('Timeout: %d ms', $timeout));
     }
 
-    $jitter = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
-    $StatusChecker = new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $log);
 
-    // Ensure only one instance of checker is running at a time
-    $lockFile = "{$config->get('stream_dir')}/.kami_status_check_".INSTANCE_ID.".lock";
-    $lock     = new Alaress_Lock($lockFile);
-    if (!$lock->acquire()) {
-        $log->warning('A status-checker is already running. Checking last mod time');
+    /**
+     * Builds and returns a StatusUpdater
+     *
+     * @param int $maxAttempts
+     * @param int $baseBackOff
+     * @return Kami\StatusUpdater
+     */
+    private function buildStatusUpdater(int $maxAttempts, int $baseBackOff): Kami\StatusUpdater
+    {
+        /**
+         * @var MapperFactory $mapperFactory
+         * @var Kami\Mapper   $kamiMapper
+         */
+        $config        = $this->getConfig();
+        $mapperFactory = $this->getDi()->get('mapperFactory');
+        $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
+        $connector     = new Kami\Connector(new GuzzleHttp\Client(), $config->get('kami_api_key'), $config->get('site_school_code'));
+
+        if (!$connector->isEnabled()) {
+            $this->getLogger()->warning('Kami has not been enabled by puppet for this instance. Aborting');
+            exit(0);
+        }
+
+        $jitter = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
+        return new Kami\StatusUpdater($connector, $kamiMapper, $jitter, $this->getLogger());
+    }
+
+
+    /**
+     * Acquires and returns a lock
+     *
+     * @param int $timeout
+     * @return Alaress_Lock
+     */
+    private function acquireLock(int $timeout): Alaress_Lock
+    {
+        // Ensure only one instance of checker is running at a time
+        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_status_check_" . INSTANCE_ID . ".lock";
+        $lock     = new Alaress_Lock($lockFile);
+        if ($lock->acquire()) {
+            return $lock;
+        }
+        $this->getLogger()->warning('A status-checker is already running. Checking last mod time');
         $lastModTime  = filemtime($lockFile);
         $lastModDelta = time() - $lastModTime;
 
         $kill = false;
         if (!$lastModTime) {
-            $log->error('Unable to determine when lock file was last written');
+            $this->getLogger()->error('Unable to determine when lock file was last written');
             $kill = true;
         } elseif ($lastModDelta > $timeout) {
-            $log->error("Lock file last modified {$lastModDelta} seconds ago");
+            $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
             $kill = true;
         }
 
         if ($kill) {
-            $log->error('Assuming process has timed out and killing it');
+            $this->getLogger()->error('Assuming process has timed out and killing it');
             $lock->killProcess();
             $lock->acquire();
         } else {
-            $log->info('No instance has yet timed out - exiting');
+            $this->getLogger()->info('No instance has yet timed out - exiting');
             exit(1);
         }
+        return $lock;
     }
+};
 
-    // Run the status checker
-    $exitStatus = 0;
-    try {
-        $exitStatus = $StatusChecker->checkProcessingDocumentsStatus($dryRun, $maxSkips);
-    } catch (Throwable $e) {
-        $log->error($e->getMessage(), $e->getTrace());
-        $log->error($e->getTraceAsString());
-    } finally {
-        $lock->release();
-    }
-    exit($exitStatus);
-});
+
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+$kernel->runApp();
