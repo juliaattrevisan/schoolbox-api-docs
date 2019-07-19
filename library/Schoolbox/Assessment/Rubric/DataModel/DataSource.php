@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMark;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Mapper as DescriptorMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model as DescriptorMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
@@ -118,13 +119,13 @@ class DataSource
         // Capability contains indicators too: inside-out them
         /** @var GenericCollection|\Schoolbox\Assessment\Rubric\RowSet\Capability[] $capabilities */
         $capabilities    = new GenericCollection(\Schoolbox\Assessment\Rubric\RowSet\Capability::class);
-        $indicatorModels = DescriptorMarkMapper::getInstance()->findForFolder($folder->getId(), $useCache);
+        $indicatorModels = IndicatorMapper::getInstance()->findForFolder($folder->getId(), $useCache);
 
         // Unit-specs have their course spec's capabilities/indicators as well
         $courseSpecFolderId = null;
         if ($context instanceof UnitSpecification || $folder->hasUnitSpecification()) {
             $courseSpecFolderId = (int)$folder->getParent()->getId();
-            $indicatorModels    = DescriptorMarkMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
+            $indicatorModels    = IndicatorMapper::getInstance()->findForFolder($courseSpecFolderId, $useCache)
                                                       ->merge($indicatorModels);
         }
 
@@ -150,7 +151,7 @@ class DataSource
                     ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
 
                 if ($getUsages) {
-                    foreach (DescriptorMarkMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
+                    foreach (IndicatorUsageMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
                         $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
@@ -163,7 +164,7 @@ class DataSource
                 ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
 
             if ($getUsages) {
-                foreach (DescriptorMarkMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
+                foreach (IndicatorUsageMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
                         = (new DueWork\Model())
                             ->setId($indicatorUsage['id'])
@@ -207,8 +208,8 @@ class DataSource
         $folder                   = $rowSet->getContext()->getBaseContext()->getFolder();
 
         // Required mappers
-        $capabilityMapper         = DescriptorMarkMapper::getInstance();
-        $indicatorMapper          = DescriptorMarkMapper::getInstance();
+        $capabilityMapper         = CapabilityMapper::getInstance();
+        $indicatorMapper          = IndicatorMapper::getInstance();
 
         // Existing data
         $existingRowSet           = $this->retrieveRowSet($rowSet->getContext(), true);
@@ -244,7 +245,7 @@ class DataSource
                 $capabilityModel = $capabilityMapper->createModel()
                     ->setId($capabilityId)
                     ->setParentId($folder->getId())
-                    ->setParentType(Capability::PARENT_TYPE_CATEGORY);
+                    ->setParentType(CapabilityModel::PARENT_TYPE_CATEGORY);
             }
 
             // Validate whether name can be changed
@@ -380,7 +381,7 @@ class DataSource
         )->indexByCallback(function (Model $l) {
             return $l->getId();
         });
-        $descriptorModels = DescriptorMarkMapper::getInstance()->findByColumnList([
+        $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
             'criterion_id' => $indicatorUsageModels->keys(),
             'level_id'     => $levelModels->keys(),
         ]);
@@ -496,7 +497,7 @@ class DataSource
         // TODO some way to wrap all this in a transaction would be nice... -_-;
         // (The answer exists: merge SA-6405)
         $levelMapper      = Mapper::getInstance();
-        $descriptorMapper = DescriptorMarkMapper::getInstance();
+        $descriptorMapper = DescriptorMapper::getInstance();
         $indicatorMapper  = IndicatorMapper::getInstance();
         $capabilityMapper = CapabilityMapper::getInstance();
 
@@ -765,7 +766,7 @@ class DataSource
     {
         // Required mappers
         $capabilityMapper     = CapabilityMapper::getInstance();
-        $descriptorMapper     = DescriptorMarkMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
         $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
         $capabilityMarkMapper = GroupMarkMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
@@ -1259,11 +1260,11 @@ class DataSource
         // Get required mappers
         $boxMapper            = SubmissionBoxMapper::getInstance();
         $levelMapper          = Mapper::getInstance();
-        $descriptorMapper     = DescriptorMarkMapper::getInstance();
-        $groupMapper          = DescriptorMarkMapper::getInstance();
-        $criterionMapper      = DescriptorMarkMapper::getInstance();
-        $groupUsageMapper     = DescriptorMarkMapper::getInstance();
-        $criterionUsageMapper = DescriptorMarkMapper::getInstance();
+        $descriptorMapper     = DescriptorMapper::getInstance();
+        $groupMapper          = CapabilityMapper::getInstance();
+        $criterionMapper      = IndicatorMapper::getInstance();
+        $groupUsageMapper     = CapabilityUsageMapper::getInstance();
+        $criterionUsageMapper = IndicatorUsageMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1488,7 +1489,7 @@ class DataSource
         // Step 1: figure out the due works in the term for the given folders
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
-           ->equals('rg.parent_type', Capability::PARENT_TYPE_CATEGORY)
+           ->equals('rg.parent_type', CapabilityModel::PARENT_TYPE_CATEGORY)
            ->greaterThanOrEqualTo('a.due_date', $term->getStart()->getDatabase())
            ->equals('sr.review_route', SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
            ->isNull('a.deleted_at')
