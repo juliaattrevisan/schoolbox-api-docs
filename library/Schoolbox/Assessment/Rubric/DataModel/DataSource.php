@@ -20,9 +20,11 @@ use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\GroupMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Mapper as DescriptorMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model as DescriptorMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Model;
@@ -1262,9 +1264,9 @@ class DataSource
         $levelMapper          = Mapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $groupMapper          = CapabilityMapper::getInstance();
-        $criterionMapper      = IndicatorMapper::getInstance();
+        $indicatorMapper      = IndicatorMapper::getInstance();
         $groupUsageMapper     = CapabilityUsageMapper::getInstance();
-        $criterionUsageMapper = IndicatorUsageMapper::getInstance();
+        $indicatorUsageMapper = IndicatorUsageMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1282,16 +1284,16 @@ class DataSource
         // Index all these collections by source version ID, even though the object will be destination version.
         /** @var Model[]|GenericCollection $dstLevels */
         $dstLevels = $levelMapper->createCollection();
-        /** @var DescriptorMarkModel[]|GenericCollection $dstDescriptors */
+        /** @var DescriptorModel[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
+        /** @var CapabilityModel[]|GenericCollection $dstGroups */
         $dstGroups = $groupMapper->createCollection();
-        /** @var DescriptorMarkModel[]|GenericCollection $dstCriteria */
-        $dstCriteria = $criterionMapper->createCollection();
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
+        /** @var IndicatorModel[]|GenericCollection $dstIndicators */
+        $dstIndicators = $indicatorMapper->createCollection();
+        /** @var CapabilityUsageModel[]|GenericCollection $dstGroups */
         $dstGroupUsages = $groupUsageMapper->createCollection();
-        /** @var DescriptorMarkModel[]|GenericCollection $dstCriterionUsages */
-        $dstCriterionUsages = $criterionUsageMapper->createCollection();
+        /** @var IndicatorUsageModel[]|GenericCollection $dstIndicatorUsages */
+        $dstIndicatorUsages = $indicatorUsageMapper->createCollection();
 
         // Copy Levels
         foreach ($srcLevels as $srcLevel) {
@@ -1303,9 +1305,9 @@ class DataSource
         }
 
         // Get Source Descriptors
-        /** @var DescriptorMarkModel[]|GenericCollection $srcDescriptors */
+        /** @var DescriptorModel[]|GenericCollection $srcDescriptors */
         $srcDescriptors = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
-        $srcCriteria    = $criterionMapper->createCollection();
+        $srcIndicators  = $indicatorMapper->createCollection();
         $srcGroups      = $groupMapper->createCollection();
 
         /* Get existing destination criteria.
@@ -1316,53 +1318,54 @@ class DataSource
          * For now, need to by-pass cache, as we may have inserted criteria during previous call to this function.
          * //TODO - the mappers should be invalidating the SELECT cache on INSERT/UPDATE @see SA-1951
          */
-        /** @var DescriptorMarkModel $firstSrcDescriptor */
+        /** @var DescriptorModel $firstSrcDescriptor */
         $firstSrcDescriptor = $srcDescriptors->first();
-        $existingCriteria   = $criterionMapper->findForParent(
+        /** @var IndicatorModel[] $existingIndicators */
+        $existingIndicators = $indicatorMapper->findForParent(
             $dstBox->getCategory()->getId(),
-            $firstSrcDescriptor->getCriterion()->getGroup()->getParentType(),
+            $firstSrcDescriptor->getIndicator()->getGroup()->getParentType(),
             false
         );
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
-        /** @var DescriptorMarkModel[] $existingCriterionMap */
-        $existingCriterionMap = [];
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[] $existingGroupMap */
+        /** @var IndicatorModel[][] $existingIndicatorMap */
+        $existingIndicatorMap = [];
+        /** @var CapabilityModel[] $existingGroupMap */
         $existingGroupMap = [];
-        foreach ($existingCriteria as $existingCriterion) {
-            $groupName                           = $this->normaliseForComparison($existingCriterion->getGroup()->getName());
-            $criterionName                       = $this->normaliseForComparison($existingCriterion->getName());
-            $existingCriterionMap[$groupName][$criterionName] = $existingCriterion;
-            $existingGroupMap[$groupName]                     = $existingCriterion->getGroup();
+        foreach ($existingIndicators as $existingIndicator) {
+            $groupName                           = $this->normaliseForComparison($existingIndicator->getGroup()->getName());
+            $indicatorName                       = $this->normaliseForComparison($existingIndicator->getName());
+            $existingIndicatorMap[$groupName][$indicatorName] = $existingIndicator;
+            $existingGroupMap[$groupName]                     = $existingIndicator->getGroup();
         }
 
         // Build new Rubric for destination box
         foreach ($srcDescriptors as $srcDescriptor) {
 
             // Copy source group, or reuse existing
-            $srcGroupId = $srcDescriptor->getCriterion()->getGroup()->getId();
+            $srcGroupId = $srcDescriptor->getIndicator()->getGroup()->getId();
             if (!$srcGroups->getOffset($srcGroupId)) {
-                $srcGroup = $srcDescriptor->getCriterion()->getGroup();
+                $srcGroup = $srcDescriptor->getIndicator()->getGroup();
                 $srcGroups->setOffset($srcGroupId, $srcGroup);
             }
 
 
             // Copy source Criterion or re-use existing Criterion
-            $srcCriterionId = $srcDescriptor->getCriterion()->getId();
-            if (!$srcCriteria->getOffset($srcCriterionId)) {
-                $srcCriterion = $srcDescriptor->getCriterion();
-                $srcCriteria->setOffset($srcCriterionId, $srcCriterion);
+            $srcIndicatorId = $srcDescriptor->getIndicator()->getId();
+            if (!$srcIndicators->getOffset($srcIndicatorId)) {
+                $srcIndicator = $srcDescriptor->getIndicator();
+                $srcIndicators->setOffset($srcIndicatorId, $srcIndicator);
             }
 
 
             // Does this Criterion already exist on destination folder ?
             $duplicateGroup     = false;
-            $duplicateCriterion = false;
+            $duplicateIndicator = false;
             $groupName          = $this->normaliseForComparison($srcGroups->getOffset($srcGroupId)->getName());
-            $criterionName      = $this->normaliseForComparison($srcCriteria->getOffset($srcCriterionId)->getName());
+            $indicatorName      = $this->normaliseForComparison($srcIndicators->getOffset($srcIndicatorId)->getName());
             if (array_key_exists($groupName, $existingGroupMap)) {
                 $duplicateGroup = true;
-                if (array_key_exists($criterionName, $existingCriterionMap[$groupName])) {
-                    $duplicateCriterion = true;
+                if (array_key_exists($indicatorName, $existingIndicatorMap[$groupName])) {
+                    $duplicateIndicator = true;
                 }
             }
 
@@ -1370,7 +1373,7 @@ class DataSource
             if ($duplicateGroup) {
                 $dstGroup = $existingGroupMap[$groupName];
             } else {
-                $dstGroup = clone $srcDescriptor->getCriterion()->getGroup();
+                $dstGroup = clone $srcDescriptor->getIndicator()->getGroup();
                 $dstGroup->setId(null);
                 $dstGroup->setParentId($dstBox->getCategory()->getId());
                 $existingGroupMap[$groupName] = $dstGroup;
@@ -1379,15 +1382,15 @@ class DataSource
 
 
             // Did we find an existing Criterion with the same name?
-            if ($duplicateCriterion) {
-                $dstCriterion = $existingCriterionMap[$groupName][$criterionName];
+            if ($duplicateIndicator) {
+                $dstIndicator = $existingIndicatorMap[$groupName][$indicatorName];
             } else {
-                $dstCriterion = clone $srcDescriptor->getCriterion();
-                $dstCriterion->setId(null);
-                $dstCriterion->setGroup($dstGroup);
-                $existingCriterionMap[$groupName][$criterionName] = $dstCriterion;
+                $dstIndicator = clone $srcDescriptor->getIndicator();
+                $dstIndicator->setId(null);
+                $dstIndicator->setGroup($dstGroup);
+                $existingIndicatorMap[$groupName][$indicatorName] = $dstIndicator;
             }
-            $dstCriteria->setOffset($srcCriterionId, $dstCriterion);
+            $dstIndicators->setOffset($srcIndicatorId, $dstIndicator);
 
 
             // Descriptor
@@ -1404,18 +1407,18 @@ class DataSource
 
 
             // Link Descriptor + Criterion
-            $dstDescriptor->setCriterion($dstCriteria->getOffset($srcCriterionId));
+            $dstDescriptor->setIndicator($dstIndicators->getOffset($srcIndicatorId));
         }
 
         // Get Source Usages
-        /** @var DescriptorMarkModel[]|GenericCollection $srcGroupUsages */
-        /** @var DescriptorMarkModel[]|GenericCollection $srcCriterionUsages */
+        /** @var CapabilityUsageModel[]|GenericCollection $srcGroupUsages */
+        /** @var IndicatorUsageModel[]|GenericCollection $srcIndicatorUsages */
         $srcGroupUsages = $groupUsageMapper->findByColumnList([
             'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
-        $srcCriterionUsages = $criterionUsageMapper->findByColumnList([
-            'criterion_id'      => $srcCriteria->getPropertyValues('id'),
+        $srcIndicatorUsages = $indicatorUsageMapper->findByColumnList([
+            'criterion_id'      => $srcIndicators->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
 
@@ -1432,24 +1435,24 @@ class DataSource
         }
 
         // Copy Criterion Usages
-        foreach ($srcCriterionUsages as $srcCriterionUsage) {
-            $dstCriterionUsage = clone $srcCriterionUsage;
+        foreach ($srcIndicatorUsages as $srcIndicatorUsage) {
+            $dstIndicatorUsage = clone $srcIndicatorUsage;
 
-            /** @var DescriptorMarkModel $dstCriterion */
-            $dstCriterion = $dstCriteria->getOffset($srcCriterionUsage->getCriterion()->getId());
+            /** @var IndicatorModel $dstIndicator */
+            $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getCriterion()->getId());
 
-            $dstCriterionUsage->setCriterion($dstCriterion);
-            $dstCriterionUsage->setSubmissionBox($dstBox);
-            $dstCriterionUsages->add($dstCriterionUsage);
+            $dstIndicatorUsage->setIndicator($dstIndicator);
+            $dstIndicatorUsage->setSubmissionBox($dstBox);
+            $dstIndicatorUsages->add($dstIndicatorUsage);
         }
 
         // Save (order is important to ensure IDs are assigned to parents b4 saving children)
         $levelMapper->save($dstLevels);
         $groupMapper->save($dstGroups);
-        $criterionMapper->save($dstCriteria);
+        $indicatorMapper->save($dstIndicators);
         $descriptorMapper->save($dstDescriptors);
         $groupUsageMapper->save($dstGroupUsages);
-        $criterionUsageMapper->save($dstCriterionUsages);
+        $indicatorUsageMapper->save($dstIndicatorUsages);
 
         return true;
     }
