@@ -29,10 +29,10 @@ class Mapper extends Schoolbox\Mapper
         $this->hasTable('rubric_criterion_usage');
         $this->hasModel(Model::class);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('criterion_id', IndicatorMapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('criterion_id', IndicatorMapper::class, 'id', null, null, 'indicator', 'indicator');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
 
-        // Criterion usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
+        // Indicator usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'toggleUseRubric']);
     }
 
@@ -94,14 +94,14 @@ class Mapper extends Schoolbox\Mapper
 
 
     /**
-     * Retrieves a list of assessment IDs and names in which this criterion is used.
+     * Retrieves a list of assessment IDs and names in which this indicator is used.
      *
      * This does not include deleted assessments.
      *
-     * @param  int $criterionId
+     * @param  int $indicatorId
      * @return array[] id: the assessment's ID, title: the assessment's title, 'submission_box_id': the box's id
      */
-    public function findCriterionUsage($criterionId): array
+    public function findIndicatorUsage($indicatorId): array
     {
         $query = "
             SELECT DISTINCT
@@ -114,7 +114,7 @@ class Mapper extends Schoolbox\Mapper
             WHERE ru.criterion_id = ?
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute([$criterionId]);
+        $statement->execute([$indicatorId]);
         $result = [];
         foreach ($statement as $row) {
             $result[$row['id']] = $row;
@@ -141,7 +141,7 @@ class Mapper extends Schoolbox\Mapper
             FROM {$this->getTable()} ru
             INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
             INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
-            INNER JOIN {$this->getJoinSql('criterion', 'ru', 'rc')}
+            INNER JOIN {$this->getJoinSql('indicator', 'ru', 'rc')}
             WHERE rc.rubric_group_id = ?
         ";
         $statement = $this->getDatabase()->prepare($query);

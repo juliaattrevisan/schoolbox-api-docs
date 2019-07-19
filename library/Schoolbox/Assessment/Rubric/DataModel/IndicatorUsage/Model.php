@@ -21,7 +21,7 @@ class Model
     /**
      * @var IndicatorModel
      */
-    private $criterion;
+    private $indicator;
 
     /**
      * @var SubmissionBox
@@ -34,21 +34,21 @@ class Model
     private $sequence;
 
     /**
-     * @param IndicatorModel $criterion
+     * @param IndicatorModel $indicator
      * @return $this
      */
-    public function setCriterion(IndicatorModel $criterion)
+    public function setIndicator(IndicatorModel $indicator)
     {
-        $this->criterion = $criterion;
+        $this->indicator = $indicator;
         return $this;
     }
 
     /**
      * @return IndicatorModel
      */
-    public function getCriterion()
+    public function getIndicator()
     {
-        return $this->criterion;
+        return $this->indicator;
     }
 
     /**

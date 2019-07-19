@@ -164,7 +164,7 @@ class DataSource
                 ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
 
             if ($getUsages) {
-                foreach (IndicatorUsageMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
+                foreach (IndicatorUsageMapper::getInstance()->findIndicatorUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
                         = (new DueWork\Model())
                             ->setId($indicatorUsage['id'])
@@ -372,7 +372,7 @@ class DataSource
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
         )->indexByCallback(function (IndicatorUsageModel $cu) {
-            return $cu->getCriterion()->getId();
+            return $cu->getIndicator()->getId();
         });
         $levelModels = Mapper::getInstance()->findByColumn(
             'b.assessment_id',
@@ -388,7 +388,7 @@ class DataSource
 
         $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
             function (IndicatorUsageModel $cu) {
-                return $cu->getCriterion()->getGroup()->getId();
+                return $cu->getIndicator()->getGroup()->getId();
             }
         );
 
@@ -437,7 +437,7 @@ class DataSource
             $capabilityIndicatorUsageModels = $groupedIndicatorUsageModels[$capabilityId] ?? [];
             foreach ($capabilityIndicatorUsageModels as $indicatorUsageModel) {
                 /** @var IndicatorUsageModel $indicatorUsageModel */
-                $indicatorModel = $indicatorUsageModel->getCriterion();
+                $indicatorModel = $indicatorUsageModel->getIndicator();
                 $indicatorId    = $indicatorModel->getId();
                 $indicator      = $grid->getRowSet()->retrieveIndicator($indicatorId);
                 if (!$indicator) {
@@ -591,7 +591,7 @@ class DataSource
                 $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
                 $indicatorUsageModel = $indicatorUsageMapper->createModel()
                     ->setSubmissionBox($submissionBox)
-                    ->setCriterion($indicatorModel)
+                    ->setIndicator($indicatorModel)
                     ->setSequence($indicatorSequence++);
                 $indicatorUsageModels->add($indicatorUsageModel);
 
