@@ -6,21 +6,21 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 
 /**
- * Mapper for usage of a rubric group on a due work.
+ * Mapper for usage of a rubric capability on a due work.
  *
- * @method GroupUsage hydrate(array $row, $alias = '', $callback = null)
- * @method GroupUsage createModel($idValue = null)
- * @method GroupUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method Model[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
-class GroupUsageMapper extends Schoolbox\Mapper
+class Mapper extends Schoolbox\Mapper
 {
     /**
      * @inheritdoc
@@ -28,12 +28,12 @@ class GroupUsageMapper extends Schoolbox\Mapper
     protected function mapping(): void
     {
         $this->hasTable('rubric_group_usage');
-        $this->hasModel(GroupUsage::class);
+        $this->hasModel(Model::class);
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins(
             'rubric_group_id',
-            Mapper::class,
+            CapabilityMapper::class,
             'id',
             null,
             null,

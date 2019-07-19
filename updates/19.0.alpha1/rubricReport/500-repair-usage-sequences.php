@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 use Alaress\Database;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
 use Schoolbox\Assessment\Rubric\DataModel\CriterionUsage;
-use Schoolbox\Assessment\Rubric\DataModel\GroupUsage;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -237,7 +237,7 @@ $app = new class extends CliTool\App
             $capabilityUsages = $selectStmt->fetchAll();
             $newSequences     = [];
             $this->getLogger()->debug($this->formatSequenceString('Old Capability Usage sequences', $capabilityUsages, 'rubric_group_id'));
-            $newSequence = GroupUsage::SEQUENCE_BASE;
+            $newSequence = Model::SEQUENCE_BASE;
             foreach ($capabilityUsages as $row) {
                 $oldSequence = (int)$row['sequence'];
                 if ($oldSequence !== $newSequence) {

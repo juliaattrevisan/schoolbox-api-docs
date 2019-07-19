@@ -6,22 +6,22 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 
 /**
- * Model for usage of a rubric group on a due work.
+ * Model for usage of a rubric capability on a due work.
  */
-class GroupUsage
+class Model
 {
 
     /** @var int */
     public const SEQUENCE_BASE = 1; // Capability sequence is 1-based, not 0-based
 
     /**
-     * @var Model
+     * @var CapabilityModel
      */
     private $group;
 
@@ -45,19 +45,19 @@ class GroupUsage
 
 
     /**
-     * @return Model
+     * @return CapabilityModel
      */
-    public function getGroup(): Model
+    public function getGroup(): CapabilityModel
     {
         return $this->group;
     }
 
 
     /**
-     * @param Model $group
+     * @param CapabilityModel $group
      * @return static
      */
-    public function setGroup(Model $group): self
+    public function setGroup(CapabilityModel $group): self
     {
         $this->group = $group;
         return $this;

@@ -7,7 +7,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use PDOStatement;
-use Schoolbox\Assessment\Rubric\DataModel\GroupUsageMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
@@ -144,7 +144,7 @@ class Mapper extends BaseMapper
      */
     public function deleteUsages(Model $group): void
     {
-        GroupUsageMapper::getInstance()->deleteByColumn('rubric_group_id', $group->getId());
+        Mapper::getInstance()->deleteByColumn('rubric_group_id', $group->getId());
     }
 
 

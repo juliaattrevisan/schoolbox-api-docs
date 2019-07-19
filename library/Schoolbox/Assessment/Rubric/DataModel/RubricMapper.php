@@ -14,8 +14,9 @@ use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -351,11 +352,11 @@ class RubricMapper
 
         // Load the levels, selected capabilities+indicators, descriptors for
         // the assessment
-        $capabilityUsageModels = GroupUsageMapper::getInstance()->findByColumn(
+        $capabilityUsageModels = Mapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (GroupUsage $gu) {
+        )->indexByCallback(function (Model $gu) {
             return $gu->getGroup()->getId();
         });
         $indicatorUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
@@ -415,7 +416,7 @@ class RubricMapper
         // Add capability/indicator usages
         // Respect prescribed ordering in usage objects
         foreach ($capabilityUsageModels as $capabilityUsageModel) {
-            /** @var GroupUsage $capabilityUsageModel */
+            /** @var Model $capabilityUsageModel */
             $capabilityModel = $capabilityUsageModel->getGroup();
             $capabilityId    = $capabilityModel->getId();
             $capability      = $grid->getRowSet()->retrieveCapability($capabilityId);
@@ -559,11 +560,11 @@ class RubricMapper
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
         $indicatorUsageMapper  = CriterionUsageMapper::getInstance();
-        $capabilityUsageMapper = GroupUsageMapper::getInstance();
+        $capabilityUsageMapper = Mapper::getInstance();
         $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
         $capabilityUsageModels = $capabilityUsageMapper->createCollection();
         $descriptorModels      = $descriptorMapper->createCollection();
-        $capabilitySequence    = GroupUsage::SEQUENCE_BASE;
+        $capabilitySequence    = Model::SEQUENCE_BASE;
         $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
@@ -1254,7 +1255,7 @@ class RubricMapper
         $descriptorMapper     = DescriptorMapper::getInstance();
         $groupMapper          = Mapper::getInstance();
         $criterionMapper      = Mapper::getInstance();
-        $groupUsageMapper     = GroupUsageMapper::getInstance();
+        $groupUsageMapper     = Mapper::getInstance();
         $criterionUsageMapper = CriterionUsageMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
@@ -1399,7 +1400,7 @@ class RubricMapper
         }
 
         // Get Source Usages
-        /** @var GroupUsage[]|GenericCollection $srcGroupUsages */
+        /** @var Model[]|GenericCollection $srcGroupUsages */
         /** @var CriterionUsage[]|GenericCollection $srcCriterionUsages */
         $srcGroupUsages = $groupUsageMapper->findByColumnList([
             'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
