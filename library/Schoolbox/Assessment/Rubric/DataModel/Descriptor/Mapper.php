@@ -133,19 +133,19 @@ class Mapper extends Schoolbox\Mapper {
         /* All indexed by primary key */
         $descriptors     = $this->createCollection();
         $levels          = $levelMapper->createCollection();
-        $criteria        = $indicatorMapper->createCollection();
+        $indicators      = $indicatorMapper->createCollection();
         $groups          = $groupMapper->createCollection();
 
         // Row keys for de-duplication
         $levelKey        = "l.{$levelMapper->getIdentifierColumn()}";
-        $criterionKey    = "c.{$indicatorMapper->getIdentifierColumn()}";
+        $indicatorKey    = "c.{$indicatorMapper->getIdentifierColumn()}";
         $groupKey        = "g.{$groupMapper->getIdentifierColumn()}";
 
         /** @var Level\Model $level */
         $level = null;
 
-        /** @var Indicator\Model $criterion */
-        $criterion = null;
+        /** @var Indicator\Model $indicator */
+        $indicator = null;
 
         /** @var Capability\Model $group */
         $group = null;
@@ -153,7 +153,7 @@ class Mapper extends Schoolbox\Mapper {
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
             $levelId     = $r[$levelKey];
-            $criterionId = $r[$criterionKey];
+            $indicatorId = $r[$indicatorKey];
             $groupId     = $r[$groupKey];
 
             // First time we've encountered this Level ?
@@ -163,7 +163,7 @@ class Mapper extends Schoolbox\Mapper {
             $level = $levels->getOffset($levelId);
 
             // First time we've encountered this indicator?
-            if (!$criteria->getOffset($criterionId)) {
+            if (!$indicators->getOffset($indicatorId)) {
                 // First time we've encountered this group?
                 if (!$groups->getOffset($groupId)) {
                     $groups->setOffset($groupId, $this->hydrateJoin($r, 'indicator.group', 'g'));
@@ -171,13 +171,13 @@ class Mapper extends Schoolbox\Mapper {
 
                 // Set the group as well
                 /** @var Capability\Model $group */
-                /** @var Indicator\Model $criterion */
+                /** @var Indicator\Model $indicator */
                 $group     = $groups->getOffset($groupId);
-                $criterion = $this->hydrateJoin($r, 'indicator', 'c');
-                $criterion->setGroup($group);
-                $criteria->setOffset($criterionId, $criterion);
+                $indicator = $this->hydrateJoin($r, 'indicator', 'c');
+                $indicator->setGroup($group);
+                $indicators->setOffset($indicatorId, $indicator);
             }
-            $criterion = $criteria->getOffset($criterionId);
+            $indicator = $indicators->getOffset($indicatorId);
 
             $descriptor = $this->hydrate($r);
             $descriptors->setOffset($descriptor->getId(), $descriptor);
@@ -187,7 +187,7 @@ class Mapper extends Schoolbox\Mapper {
             $level->getDescriptors()->setOffset($descriptor->getId(), $descriptor);
 
             // Link to indicator
-            $descriptor->setIndicator($criterion);
+            $descriptor->setIndicator($indicator);
         }
 
         return $descriptors;

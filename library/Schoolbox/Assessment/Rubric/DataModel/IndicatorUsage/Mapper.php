@@ -1,8 +1,5 @@
 <?php
 /**
- * Mapper for rubric criterion usage.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -15,7 +12,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 
 /**
- * Class CriterionUsageMapper
+ * Mapper for rubric indicator usage.
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
  * @method Model hydrate(array $row, $alias = '', $callback = null)

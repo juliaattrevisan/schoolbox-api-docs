@@ -134,7 +134,7 @@ class DataSource
         // This is how it SHOULD work...
 //        if ($context instanceof UnitSpecification) {
 //            $indicatorModels = $indicatorModels->merge(
-//                CriterionMapper::getInstance()->findForFolder(
+//                IndicatorMapper::getInstance()->findForFolder(
 //                    $context->getCourse()->getFolder()->getId()
 //                )
 //            );
@@ -187,11 +187,11 @@ class DataSource
      *
      * @param RowSet           $rowSet
      * @param bool             $persistCurriculum    Should curriculum nodes for groups and
-     *                                               criteria be updated?
-     * @param bool             $allowModifyUsed      Should groups/criteria that are in use
+     *                                               indicators be updated?
+     * @param bool             $allowModifyUsed      Should groups/indicators that are in use
      *                                               be modifiable or deletable?
      * @param null|IAssessable $allowModifyExclusion If set and `$allowModifyUsed` is off, a
-     *                                               group or criterion in `$rowSet` MAY be
+     *                                               group or indicator in `$rowSet` MAY be
      *                                               modified if it is used by no other
      *                                               assessment than this one.
      * @throws MapperException
@@ -903,7 +903,7 @@ class DataSource
     }
 
     /**
-     * Converts a Criterion name for comparison. Do NOT use for mutation before storage.
+     * Converts an indicator name for comparison. Do NOT use for mutation before storage.
      *
      * * converts to lowercase
      * * Replaces multiple whitespace with single space character
@@ -1239,14 +1239,14 @@ class DataSource
      *
      * Overall logic is to build the source rubric object graph, then clone and clear all IDs.
      *
-     * If during traversal we detect that the destination folder already has a criterion with the same
-     * name, we use the destination criterion ID to avoid insertion of a duplicate.
+     * If during traversal we detect that the destination folder already has a indicator with the same
+     * name, we use the destination indicator ID to avoid insertion of a duplicate.
      *
      * Logically:
      * * Levels are copied from srcBox to dstBox
      * * Descriptors are copied from srcBox to dstBox
-     * * Criterion only copied from src folder to dst folder (if not already present on dst)
-     * * Usages are copied from srcBox + srcCriterion to dstBox + dstCriterion
+     * * Indicator only copied from src folder to dst folder (if not already present on dst)
+     * * Usages are copied from srcBox + srcIndicator to dstBox + dstIndicator
      *
      * @param int $sourceAssessmentId
      * @param int $destinationAssessmentId
@@ -1310,12 +1310,12 @@ class DataSource
         $srcIndicators  = $indicatorMapper->createCollection();
         $srcGroups      = $groupMapper->createCollection();
 
-        /* Get existing destination criteria.
+        /* Get existing destination indicators.
          *
          * If during destination object graph build, we detect that a source descriptor
-         * already exists on destination, use the destination version instead of creating a new criterion
+         * already exists on destination, use the destination version instead of creating a new indicator
          *
-         * For now, need to by-pass cache, as we may have inserted criteria during previous call to this function.
+         * For now, need to by-pass cache, as we may have inserted indicators during previous call to this function.
          * //TODO - the mappers should be invalidating the SELECT cache on INSERT/UPDATE @see SA-1951
          */
         /** @var DescriptorModel $firstSrcDescriptor */
@@ -1349,7 +1349,7 @@ class DataSource
             }
 
 
-            // Copy source Criterion or re-use existing Criterion
+            // Copy source indicator or re-use existing indicator
             $srcIndicatorId = $srcDescriptor->getIndicator()->getId();
             if (!$srcIndicators->getOffset($srcIndicatorId)) {
                 $srcIndicator = $srcDescriptor->getIndicator();
@@ -1357,7 +1357,7 @@ class DataSource
             }
 
 
-            // Does this Criterion already exist on destination folder ?
+            // Does this indicator already exist on destination folder ?
             $duplicateGroup     = false;
             $duplicateIndicator = false;
             $groupName          = $this->normaliseForComparison($srcGroups->getOffset($srcGroupId)->getName());
@@ -1381,7 +1381,7 @@ class DataSource
             $dstGroups->setOffset($srcGroupId, $dstGroup);
 
 
-            // Did we find an existing Criterion with the same name?
+            // Did we find an existing indicator with the same name?
             if ($duplicateIndicator) {
                 $dstIndicator = $existingIndicatorMap[$groupName][$indicatorName];
             } else {
@@ -1406,7 +1406,7 @@ class DataSource
             $dstLevel->getDescriptors()->setOffset($srcDescriptor->getId(), $dstDescriptor);
 
 
-            // Link Descriptor + Criterion
+            // Link Descriptor + indicator
             $dstDescriptor->setIndicator($dstIndicators->getOffset($srcIndicatorId));
         }
 
@@ -1434,7 +1434,7 @@ class DataSource
             $dstGroupUsages->add($dstGroupUsage);
         }
 
-        // Copy Criterion Usages
+        // Copy indicator usages
         foreach ($srcIndicatorUsages as $srcIndicatorUsage) {
             $dstIndicatorUsage = clone $srcIndicatorUsage;
 
@@ -1474,8 +1474,8 @@ class DataSource
      * @param int[]     $folderIds
      * @param TermModel $term
      * @return array
-     * @internal  string       $data [sb.id][rc.id]['grouping'] criterion.grouping
-     * @internal  string       $data [sb.id][rc.id]['name'] criterion.name
+     * @internal  string       $data [sb.id][rc.id]['grouping'] indicator.grouping
+     * @internal  string       $data [sb.id][rc.id]['name'] indicator.name
      * @internal  string       $data [sb.id][rc.id]['max_mark'] max mark
      * @internal  array        $data [sb.id][rc.id]['marks']
      * @internal  float        $data [sb.id][rc.id]['marks'][student.id]
@@ -1542,7 +1542,7 @@ class DataSource
         sort($feedbackIds);
 
 
-        // Step 2: Get max mark per criterion and dueWork for each due work
+        // Step 2: Get max mark per indicator and dueWork for each due work
         $results = [];
         $pb = new Builder($this->database, '');
         $pb->in('rg.parent_id', $folderIds)
@@ -1639,8 +1639,8 @@ class DataSource
      * @param string $parentType
      *
      * @return array
-     * @var string   $criteria [rc.id]['grouping']
-     * @var string   $criteria [rc.id]['name']
+     * @var string   $indicators[rc.id]['grouping']
+     * @var string   $indicators[rc.id]['name']
      */
     public function getAvailableIndicators(array $parentIds, $parentType = CapabilityModel::PARENT_TYPE_CATEGORY)
     {

@@ -39,7 +39,7 @@ class Model implements ISoftDeletable
      * `$this->parentId` references a submission box's ID.
      *
      * No known rubric groups have or have ever had this parent type; it may
-     * have been added for future use for rubric criteria unique to a due work,
+     * have been added for future use for rubric indicators unique to a due work,
      * but this was never implemented.
      *
      * @deprecated this has never been used
@@ -52,7 +52,7 @@ class Model implements ISoftDeletable
      * `$this->parentId` references a curriculum ID.
      *
      * No known rubric groups have or have ever had this parent type; it may
-     * have been added for future use for rubric criteria unique to a
+     * have been added for future use for rubric indicators unique to a
      * curriculum, but this was never implemented.
      *
      * @deprecated this has never been used

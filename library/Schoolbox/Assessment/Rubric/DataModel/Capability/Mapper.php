@@ -59,7 +59,7 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueness']);
 
-//        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteCriteria']);
+//        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteIndicators']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteUsages']);
     }
 
@@ -172,7 +172,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find all criteria for a folder.
+     * Find all indicators for a folder.
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
@@ -190,7 +190,7 @@ class Mapper extends BaseMapper
      *
      * @param int    $parentId   The parent ID to find for
      * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
-     * @param string $name       The name of the criterion
+     * @param string $name       The name of the indicator
      * @param bool   $cache      If false, bypass result cache
      * @return Model
      * @throws MapperException

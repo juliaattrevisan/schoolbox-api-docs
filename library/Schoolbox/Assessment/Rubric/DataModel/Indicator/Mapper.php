@@ -105,8 +105,8 @@ class Mapper extends BaseMapper {
             $collection[$crit->getId()] = $crit;
         }
 
-        // Fetch curriculum nodes for criterion and group separately
-        $criterionNodes = $curriculumNodeMapper->findForOtherMapper(
+        // Fetch curriculum nodes for indicator and group separately
+        $indicatorNodes = $curriculumNodeMapper->findForOtherMapper(
             $this,
             'curriculum_node_for_rubric_criterion',
             $collection->keys()
@@ -116,12 +116,12 @@ class Mapper extends BaseMapper {
             'curriculum_node_for_rubric_group',
             $groupIds
         );
-        foreach ($collection as $criterion) {
-            if (isset($criterionNodes[$criterion->getId()])) {
-                $criterion->setCurriculumNodes($criterionNodes[$criterion->getId()]);
+        foreach ($collection as $indicator) {
+            if (isset($indicatorNodes[$indicator->getId()])) {
+                $indicator->setCurriculumNodes($indicatorNodes[$indicator->getId()]);
             }
-            if (isset($groupNodes[$criterion->getGroup()->getId()])) {
-                $criterion->getGroup()->setCurriculumNodes($groupNodes[$criterion->getGroup()->getId()]);
+            if (isset($groupNodes[$indicator->getGroup()->getId()])) {
+                $indicator->getGroup()->setCurriculumNodes($groupNodes[$indicator->getGroup()->getId()]);
             }
         }
 
@@ -130,65 +130,65 @@ class Mapper extends BaseMapper {
 
 
     /**
-     * Soft-delete callback to delete any descriptors for this criterion
+     * Soft-delete callback to delete any descriptors for this indicator
      *
-     * @param Model $criterion
+     * @param Model $indicator
      * @return bool
      */
-    public function softDeleteDescriptors(Model $criterion)
+    public function softDeleteDescriptors(Model $indicator)
     {
-        DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $indicator->getId());
         return true;
     }
 
 
     /**
-     * Post-delete callback for this criterion.
+     * Post-delete callback for this indicator.
      *
-     * If there's no remaining non-deleted criteria for this group, delete the
+     * If there's no remaining non-deleted indicator for this group, delete the
      * group.
      *
-     * @param Model $criterion
+     * @param Model $indicator
      * @return bool
      */
-    public function deleteGroup(Model $criterion)
+    public function deleteGroup(Model $indicator)
     {
-        $remaining = $this->countByColumn('rubric_group_id', $criterion->getGroup()->getId());
+        $remaining = $this->countByColumn('rubric_group_id', $indicator->getGroup()->getId());
         if (0 === $remaining) {
-            $this->getJoinMapper('group')->delete($criterion->getGroup());
+            $this->getJoinMapper('group')->delete($indicator->getGroup());
         }
         return true;
     }
 
 
     /**
-     * Post-restore callback for this criterion.
+     * Post-restore callback for this indicator.
      *
-     * Undelete the criterion's group, if it's deleted.
+     * Undelete the indicator's group, if it's deleted.
      *
-     * @param Model $criterion
+     * @param Model $indicator
      * @return bool
      */
-    public function restoreGroup(Model $criterion)
+    public function restoreGroup(Model $indicator)
     {
-        if ($criterion->getGroup()->isDeleted()) {
-            $this->getJoinMapper('group')->restoreSoftDeleted($criterion->getGroup());
+        if ($indicator->getGroup()->isDeleted()) {
+            $this->getJoinMapper('group')->restoreSoftDeleted($indicator->getGroup());
         }
         return true;
     }
 
 
     /**
-     * Post-delete callback for this criterion.
+     * Post-delete callback for this indicator.
      *
-     * Soft-deleting a criterion (hard) deletes all of its usages from any
+     * Soft-deleting a indicator (hard) deletes all of its usages from any
      * rubrics.
      *
-     * @param Model $criterion
+     * @param Model $indicator
      */
-    public function deleteUsages(Model $criterion): void
+    public function deleteUsages(Model $indicator): void
     {
-        IndicatorUsageMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        IndicatorUsageMapper::getInstance()->deleteByColumn('criterion_id', $indicator->getId());
     }
 
 
@@ -232,7 +232,7 @@ class Mapper extends BaseMapper {
 
 
     /**
-     * Find all criteria for a parent type.
+     * Find all indicators for a parent type.
      *
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
      * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
@@ -257,7 +257,7 @@ class Mapper extends BaseMapper {
 
 
     /**
-     * Find all criteria for a folder.
+     * Find all indicators for a folder.
      *
      * @param int|int[] $folderId The folder ID (or list thereof) to find for
      * @param bool      $cache    If false, bypass result cache
@@ -271,13 +271,13 @@ class Mapper extends BaseMapper {
 
 
     /**
-     * Find a single criterion for a parent type, given its unique identifier
+     * Find a single indicator for a parent type, given its unique identifier
      * (parentId+parentType+name+groupName).
      *
      * @param int    $parentId   The parent ID (or list thereof) to find for
      * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
-     * @param string $name       The name of the criterion
-     * @param string $groupName  The name of the criterion's group
+     * @param string $name       The name of the indicator
+     * @param string $groupName  The name of the indicator's group
      * @param bool   $cache      If false, bypass result cache
      * @return Model
      * @throws MapperException
@@ -304,12 +304,12 @@ class Mapper extends BaseMapper {
 
 
     /**
-     * Find a single criterion for a folder, given its unique identifier
+     * Find a single indicator for a folder, given its unique identifier
      * (folder+name+groupName).
      *
      * @param int    $folderId  The folder ID (or list thereof) to find for
-     * @param string $name      The name of the criterion
-     * @param string $groupName The name of the criterion's group
+     * @param string $name      The name of the indicator
+     * @param string $groupName The name of the indicator's group
      * @param bool   $cache     If false, bypass result cache
      * @return Model
      * @throws MapperException
@@ -321,7 +321,7 @@ class Mapper extends BaseMapper {
 
 
     /**
-     * Find a single criterion for a parent type, given its unique identifier
+     * Find a single indicator for a parent type, given its unique identifier
      * (parentId+parentType+name+groupName).
      *
      * If none exists: create it
@@ -356,17 +356,17 @@ class Mapper extends BaseMapper {
             /** @var CapabilityMapper $groupMapper */
             $groupMapper = $this->getJoinMapper('group');
             $group       = $groupMapper->findOrCreateOneForParentByName($parentId, $parentType, $groupName, $cache);
-            $criterion   = $this->createModel()
+            $indicator   = $this->createModel()
                                 ->setGroup($group)
                                 ->setName($name);
-            $this->save($criterion);
-            return $criterion;
+            $this->save($indicator);
+            return $indicator;
         }
     }
 
 
     /**
-     * Find a single criterion for a folder, given its unique identifier
+     * Find a single indicator for a folder, given its unique identifier
      * (folder+name+groupName).
      *
      * If none exists: create it
