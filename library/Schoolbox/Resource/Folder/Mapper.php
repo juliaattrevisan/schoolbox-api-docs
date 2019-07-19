@@ -54,6 +54,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
 use Alaress\Database\Predicate;
 use UnexpectedValueException;
+use Schoolbox\Error;
 
 /**
  * Class Mapper
@@ -457,31 +458,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Pre-save callback to ensure a folder's codes are valid
+     *
      * @param Model $model
      * @return bool
      * @throws DefinitionException If specified join not defined
+     * @throws Predicate\InvalidColumnException
+     * @throws SchoolboxException
      */
-    public function validateFolderCodes($model)
+    public function validateFolderCodes(Model $model): bool
     {
-        // iterate codes given; if any already exist, error 136
-        $codeList = $model->getCodes()->getColumnValues('code');
-
-        $collisions = $this->getJoinMapper('codes')->findByColumn('code', $codeList);
-
-        // retain any codes that do NOT match the given model
-        $id = $model->getId();
-        $collisions = $collisions->filter(
-            function ($code) use ($id) {
-                /** @var Code\Model $code */
-                return $code->getFolder()->getId() != $id;
-            }
-        );
-
-        if ($collisions->count()) {
-            error(ErrorMapper::ERROR_CLASS_CODE_EXISTS);
+        /** @var Code\Mapper $codeMapper */
+        $codeMapper = $this->getJoinMapper('codes');
+        if(!(new ValidCodesSpec($this, $codeMapper))->isSatisfiedBy($model)){
+            throw Error\Mapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_EXISTS);
         }
 
-        // persist Model object
         return true;
     }
 
