@@ -7,29 +7,29 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage;
 
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 
 /**
  * Class CriterionUsageMapper
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
- * @method CriterionUsage hydrate(array $row, $alias = '', $callback = null)
- * @method CriterionUsage createModel($idValue = null)
- * @method CriterionUsage[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method Model[]|Schoolbox\GenericCollection findByColumn($columnName, $columnValue, $options = [])
  */
-class CriterionUsageMapper extends Schoolbox\Mapper
+class Mapper extends Schoolbox\Mapper
 {
     protected function mapping()
     {
         $this->hasTable('rubric_criterion_usage');
-        $this->hasModel(CriterionUsage::class);
+        $this->hasModel(Model::class);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('criterion_id', Mapper::class, 'id', null, null, 'criterion', 'criterion');
+        $this->joins('criterion_id', IndicatorMapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
 
         // Criterion usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
@@ -37,9 +37,9 @@ class CriterionUsageMapper extends Schoolbox\Mapper
     }
 
     /**
-     * @param CriterionUsage $indicatorUsage
+     * @param Model $indicatorUsage
      */
-    public function toggleUseRubric(CriterionUsage $indicatorUsage)
+    public function toggleUseRubric(Model $indicatorUsage)
     {
         $currentBoxId = $indicatorUsage->getSubmissionBox()->getId();
         $indicatorUsagesForSubmissionBox = $this->findByColumn('submission_box_id', $currentBoxId);

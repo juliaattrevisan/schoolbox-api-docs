@@ -9,7 +9,7 @@ declare(strict_types=1);
 use Alaress\Database;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
-use Schoolbox\Assessment\Rubric\DataModel\CriterionUsage;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -292,7 +292,7 @@ $app = new class extends CliTool\App
             $indicatorUsages = $selectStmt->fetchAll();
             $newSequences    = [];
             $this->getLogger()->debug($this->formatSequenceString('Old Indicator Usage sequences', $indicatorUsages, 'criterion_id'));
-            $newSequence = CriterionUsage::SEQUENCE_BASE;
+            $newSequence = Model::SEQUENCE_BASE;
             foreach ($indicatorUsages as $idx => $row) {
                 $oldSequence = (int)$row['sequence'];
                 if ($oldSequence !== $newSequence) {

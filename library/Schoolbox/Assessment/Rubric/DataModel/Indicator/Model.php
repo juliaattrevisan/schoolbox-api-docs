@@ -1,8 +1,5 @@
 <?php
 /**
- * Model for rubric indicators.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -17,6 +14,9 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
+/**
+ * Model for rubric indicators.
+ */
 class Model implements ISoftDeletable
 {
     use Id;

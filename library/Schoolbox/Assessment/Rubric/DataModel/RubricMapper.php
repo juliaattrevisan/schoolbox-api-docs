@@ -13,10 +13,10 @@ use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -143,7 +143,7 @@ class RubricMapper
                     ->setCurriculumNodes($capabilityModel->getCurriculumNodes());
 
                 if ($getUsages) {
-                    foreach (CriterionUsageMapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
+                    foreach (Mapper::getInstance()->findGroupUsage($capabilityId) as $capabilityUsage) {
                         $capabilities[$capabilityId]->getUsage()[$capabilityUsage['id']] = (new DueWork\Model())
                             ->setId($capabilityUsage['id'])
                             ->setTitle($capabilityUsage['title']);
@@ -156,7 +156,7 @@ class RubricMapper
                 ->setCurriculumNodes($indicatorModel->getCurriculumNodes());
 
             if ($getUsages) {
-                foreach (CriterionUsageMapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
+                foreach (Mapper::getInstance()->findCriterionUsage($indicatorId) as $indicatorUsage) {
                     $capabilities[$capabilityId]->getIndicators()[$indicatorId]->getUsage()[$indicatorUsage['id']]
                         = (new DueWork\Model())
                             ->setId($indicatorUsage['id'])
@@ -359,11 +359,11 @@ class RubricMapper
         )->indexByCallback(function (Model $gu) {
             return $gu->getGroup()->getId();
         });
-        $indicatorUsageModels = CriterionUsageMapper::getInstance()->findByColumn(
+        $indicatorUsageModels = Mapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (CriterionUsage $cu) {
+        )->indexByCallback(function (Model $cu) {
             return $cu->getCriterion()->getId();
         });
         $levelModels = LevelMapper::getInstance()->findByColumn(
@@ -379,7 +379,7 @@ class RubricMapper
         ]);
 
         $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
-            function (CriterionUsage $cu) {
+            function (Model $cu) {
                 return $cu->getCriterion()->getGroup()->getId();
             }
         );
@@ -428,7 +428,7 @@ class RubricMapper
 
             $capabilityIndicatorUsageModels = $groupedIndicatorUsageModels[$capabilityId] ?? [];
             foreach ($capabilityIndicatorUsageModels as $indicatorUsageModel) {
-                /** @var CriterionUsage $indicatorUsageModel */
+                /** @var Model $indicatorUsageModel */
                 $indicatorModel = $indicatorUsageModel->getCriterion();
                 $indicatorId    = $indicatorModel->getId();
                 $indicator      = $grid->getRowSet()->retrieveIndicator($indicatorId);
@@ -559,7 +559,7 @@ class RubricMapper
 
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
-        $indicatorUsageMapper  = CriterionUsageMapper::getInstance();
+        $indicatorUsageMapper  = Mapper::getInstance();
         $capabilityUsageMapper = Mapper::getInstance();
         $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
         $capabilityUsageModels = $capabilityUsageMapper->createCollection();
@@ -578,7 +578,7 @@ class RubricMapper
                 ->setSequence($capabilitySequence++);
             $capabilityUsageModels->add($capabilityUsageModel);
 
-            $indicatorSequence = CriterionUsage::SEQUENCE_BASE;
+            $indicatorSequence = Model::SEQUENCE_BASE;
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
                 $indicatorUsageModel = $indicatorUsageMapper->createModel()
@@ -1256,7 +1256,7 @@ class RubricMapper
         $groupMapper          = Mapper::getInstance();
         $criterionMapper      = Mapper::getInstance();
         $groupUsageMapper     = Mapper::getInstance();
-        $criterionUsageMapper = CriterionUsageMapper::getInstance();
+        $criterionUsageMapper = Mapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1282,7 +1282,7 @@ class RubricMapper
         $dstCriteria = $criterionMapper->createCollection();
         /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model[]|GenericCollection $dstGroups */
         $dstGroupUsages = $groupUsageMapper->createCollection();
-        /** @var CriterionUsage[]|GenericCollection $dstCriterionUsages */
+        /** @var Model[]|GenericCollection $dstCriterionUsages */
         $dstCriterionUsages = $criterionUsageMapper->createCollection();
 
         // Copy Levels
@@ -1401,7 +1401,7 @@ class RubricMapper
 
         // Get Source Usages
         /** @var Model[]|GenericCollection $srcGroupUsages */
-        /** @var CriterionUsage[]|GenericCollection $srcCriterionUsages */
+        /** @var Model[]|GenericCollection $srcCriterionUsages */
         $srcGroupUsages = $groupUsageMapper->findByColumnList([
             'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),

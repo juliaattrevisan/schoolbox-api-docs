@@ -1,8 +1,5 @@
 <?php
 /**
- * Mapper for rubric criteria.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -11,8 +8,8 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
-use Schoolbox\Assessment\Rubric\DataModel\CriterionUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
@@ -191,7 +188,7 @@ class Mapper extends BaseMapper {
      */
     public function deleteUsages(Model $criterion): void
     {
-        CriterionUsageMapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
+        Mapper::getInstance()->deleteByColumn('criterion_id', $criterion->getId());
     }
 
 

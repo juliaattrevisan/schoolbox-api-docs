@@ -1,25 +1,25 @@
 <?php
 /**
- * Model for rubric criterion usage.
+ * Model for rubric indicator usage.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 
-class CriterionUsage
+class Model
 {
 
     /** @var int */
     public const SEQUENCE_BASE = 1; // Indicator sequence is 1-based, not 0-based
 
     /**
-     * @var Model
+     * @var IndicatorModel
      */
     private $criterion;
 
@@ -34,17 +34,17 @@ class CriterionUsage
     private $sequence;
 
     /**
-     * @param  Model $criterion
+     * @param IndicatorModel $criterion
      * @return $this
      */
-    public function setCriterion(Model $criterion)
+    public function setCriterion(IndicatorModel $criterion)
     {
         $this->criterion = $criterion;
         return $this;
     }
 
     /**
-     * @return Model
+     * @return IndicatorModel
      */
     public function getCriterion()
     {
