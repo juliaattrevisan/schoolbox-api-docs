@@ -7,13 +7,16 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel;
+namespace Schoolbox\Assessment\Rubric\DataModel\Descriptor;
 
 use PDO;
 use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
+use Schoolbox\Assessment\Rubric\DataModel\Model;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
+use Schoolbox\Assessment\Rubric\DataModel\Level;
+use Schoolbox\Assessment\Rubric\DataModel\LevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
@@ -21,18 +24,18 @@ use Schoolbox\GenericCollection;
  * Class DescriptorMapper
  *
  * @package Schoolbox\Assessment\Rubric\DataModel
- * @method Descriptor createModel($idValue = null)
- * @method Descriptor findById($identifierValue)
- * @method Descriptor[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
- * @method Descriptor[]|GenericCollection findByColumnList($columnList, $options = [])
- * @method Descriptor findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
- * @method Descriptor hydrate(array $row, $alias = '', $callback = null)
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
+ * @method Model[]|GenericCollection findByColumnList($columnList, $options = [])
+ * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
-class DescriptorMapper extends Schoolbox\Mapper {
+class Mapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('rubric_descriptor');
-        $this->hasModel(Descriptor::class);
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('criterion_id', Indicator\Mapper::class, 'id', null, null, 'criterion', 'criterion');
         $this->joins('level_id', LevelMapper::class, 'id', null, null, 'level', 'level');
@@ -46,10 +49,10 @@ class DescriptorMapper extends Schoolbox\Mapper {
 
 
     /**
-     * @param Descriptor $descriptor
+     * @param Model $descriptor
      * @throws Schoolbox\Mapper\DefinitionException
      */
-    public function deleteEmptyLevel(Descriptor $descriptor)
+    public function deleteEmptyLevel(Model $descriptor)
     {
         /** @var LevelMapper $levelMapper */
         $levelMapper = $this->getJoinMapper('level');
@@ -79,11 +82,11 @@ class DescriptorMapper extends Schoolbox\Mapper {
      * Note that this restoration is outside the scope of the RecursiveUndeleter as this is
      * not a simple deletion-cascade from parent to child, rather it is from a child to parent.
      *
-     * @param Descriptor $descriptor
+     * @param Model $descriptor
      * @return bool
      * @throws Schoolbox\Mapper\DefinitionException
      */
-    public function restoreRubricLevel(Descriptor $descriptor)
+    public function restoreRubricLevel(Model $descriptor)
     {
         /** @var LevelMapper $levelMapper */
         $levelMapper = $this->getJoinMapper('level');

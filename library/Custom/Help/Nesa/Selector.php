@@ -12,7 +12,7 @@
 namespace Custom\Help\Nesa;
 
 use Schoolbox\Assessment\Rubric\DataModel;
-use Schoolbox\Assessment\Rubric\DataModel\DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
@@ -34,7 +34,7 @@ class Selector
     private $criterionMapper;
 
     /**
-     * @var DescriptorMapper
+     * @var Mapper
      */
     private $rubricDescriptorMapper;
 
@@ -44,13 +44,13 @@ class Selector
      * @param int                     $courseSpecificationId The Teacher Course upon which we report
      * @param UnitSpecificationMapper $unitSpecificationMapper
      * @param Mapper                  $criterionMapper
-     * @param DescriptorMapper        $rubricDescriptorMapper
+     * @param Mapper                  $rubricDescriptorMapper
      */
     public function __construct(
         int $courseSpecificationId,
         UnitSpecificationMapper $unitSpecificationMapper,
         Mapper $criterionMapper,
-        DescriptorMapper $rubricDescriptorMapper
+        Mapper $rubricDescriptorMapper
     ) {
         $this->courseSpecificationId = $courseSpecificationId;
         $this->unitSpecificationMapper = $unitSpecificationMapper;
@@ -61,7 +61,7 @@ class Selector
     /**
      * Generate a list of descriptors that were specified in the course $courseSpecificationId
      *
-     * @return DataModel\Descriptor[]|\Schoolbox\GenericCollection
+     * @return DataModel\Model[]|\Schoolbox\GenericCollection
      */
     public function generate()
     {

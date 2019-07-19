@@ -210,10 +210,10 @@ class RecursiveUndeleter extends CliTool\App
             ReturnedWorkFile\Mapper::class,
         ],
         DataModel\LevelMapper::class        => [
-            DataModel\DescriptorMapper::class => 'rubric_descriptor.level_id',
+            DataModel\Descriptor\Mapper::class => 'rubric_descriptor.level_id',
         ],
         Eportfolio\ShowcaseMapper::class    => [],
-        QuizQuestion\Mapper::class                 => [
+        QuizQuestion\Mapper::class          => [
             QuizSolution\Mapper::class => 'question_id',
         ],
         QuizAnswer\Mapper::class            => [],
@@ -223,11 +223,11 @@ class RecursiveUndeleter extends CliTool\App
             Kami\Mapper::class,
         ],
         ReturnedWorkFile\Mapper::class      => [],
-        DataModel\DescriptorMapper::class   => [],
+        DataModel\Descriptor\Mapper::class  => [],
         Plagscan\Mapper::class              => [],
         Kami\Mapper::class                  => [],
         DataModel\Indicator\Mapper::class   => [
-            DataModel\DescriptorMapper::class => 'rubric_descriptor.criterion_id',
+            DataModel\Descriptor\Mapper::class => 'rubric_descriptor.criterion_id',
         ],
         UserMapper::class                   => [
             Pastoral\Access\Mapper::class,

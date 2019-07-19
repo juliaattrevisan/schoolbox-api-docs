@@ -9,18 +9,18 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel;
 
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class Descriptor implements ISoftDeletable
+class Model implements ISoftDeletable
 {
     use Id;
     use DeletedAtDate;
 
     /**
-     * @var Model
+     * @var IndicatorModel
      */
     private $criterion;
 
@@ -40,17 +40,17 @@ class Descriptor implements ISoftDeletable
     private $description;
 
     /**
-     * @param  Model $criterion
+     * @param IndicatorModel $criterion
      * @return $this
      */
-    public function setCriterion(Model $criterion)
+    public function setCriterion(IndicatorModel $criterion)
     {
         $this->criterion = $criterion;
         return $this;
     }
 
     /**
-     * @return Model
+     * @return IndicatorModel
      */
     public function getCriterion()
     {

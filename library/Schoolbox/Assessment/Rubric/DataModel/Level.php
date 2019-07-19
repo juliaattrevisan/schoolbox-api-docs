@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -34,14 +35,14 @@ class Level implements ISoftDeletable
     private $sequence;
 
     /**
-     * @var Descriptor[]|GenericCollection
+     * @var Model[]|GenericCollection
      */
     private $descriptors;
 
 
     public function __construct()
     {
-        $this->descriptors = DescriptorMapper::getInstance()->createCollection();
+        $this->descriptors = Mapper::getInstance()->createCollection();
     }
 
     /**
@@ -104,7 +105,7 @@ class Level implements ISoftDeletable
     }
 
     /**
-     * @return Descriptor[]|GenericCollection
+     * @return Model[]|GenericCollection
      */
     public function getDescriptors()
     {
@@ -112,7 +113,7 @@ class Level implements ISoftDeletable
     }
 
     /**
-     * @param Descriptor[]|GenericCollection $descriptors
+     * @param Model[]|GenericCollection $descriptors
      * @return static
      */
     public function setDescriptors(GenericCollection $descriptors)

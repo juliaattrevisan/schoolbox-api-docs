@@ -96,7 +96,7 @@ class Controller extends Base
             Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
             DataModel\Indicator\Mapper::getInstance(),
-            DataModel\DescriptorMapper::getInstance()
+            DataModel\Descriptor\Mapper::getInstance()
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [

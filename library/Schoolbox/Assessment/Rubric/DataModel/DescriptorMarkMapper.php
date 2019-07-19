@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel;
 use PDO;
 use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
@@ -53,7 +54,7 @@ class DescriptorMarkMapper extends Mapper
 
         $this->joins(
             'descriptor_id',
-            DescriptorMapper::class,
+            Mapper::class,
             'id',
             null,
             null,
@@ -121,7 +122,7 @@ class DescriptorMarkMapper extends Mapper
                     $descriptors->setOffset($descriptorId, $descriptor);
                 }
             }
-            /** @var Descriptor $descriptor */
+            /** @var Model $descriptor */
             $descriptor = $descriptors->getOffset($descriptorId);
 
             $groupMark = $groupMarkMapper->hydrate($r, 'g');

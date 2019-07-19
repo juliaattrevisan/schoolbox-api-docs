@@ -31,7 +31,7 @@ class DescriptorMark
 
 
     /**
-     * @var null|Descriptor
+     * @var null|Model
      */
     private $descriptor;
 
@@ -49,19 +49,19 @@ class DescriptorMark
 
 
     /**
-     * @return null|Descriptor
+     * @return null|Model
      */
-    public function getDescriptor(): ?Descriptor
+    public function getDescriptor(): ?Model
     {
         return $this->descriptor;
     }
 
 
     /**
-     * @param null|Descriptor $descriptor
+     * @param null|Model $descriptor
      * @return static
      */
-    public function setDescriptor(?Descriptor $descriptor): self
+    public function setDescriptor(?Model $descriptor): self
     {
         $this->descriptor = $descriptor;
         return $this;
