@@ -13,4 +13,5 @@ use Schoolbox\Mapper\Exception as BaseException;
  */
 class NotFound extends BaseException
 {
+    protected $message = 'Unable to find object';
 }
