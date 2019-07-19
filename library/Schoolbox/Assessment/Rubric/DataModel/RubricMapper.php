@@ -13,10 +13,14 @@ use Database;
 use PDO;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
-use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model;
-use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -352,18 +356,18 @@ class RubricMapper
 
         // Load the levels, selected capabilities+indicators, descriptors for
         // the assessment
-        $capabilityUsageModels = Mapper::getInstance()->findByColumn(
+        $capabilityUsageModels = CapabilityUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (Model $gu) {
+        )->indexByCallback(function (CapabilityUsageModel $gu) {
             return $gu->getGroup()->getId();
         });
-        $indicatorUsageModels = Mapper::getInstance()->findByColumn(
+        $indicatorUsageModels = IndicatorUsageMapper::getInstance()->findByColumn(
             'sb.assessment_id',
             $assessment->getId(),
             ['order' => ['sequence' => 'asc',]]
-        )->indexByCallback(function (Model $cu) {
+        )->indexByCallback(function (IndicatorUsageModel $cu) {
             return $cu->getCriterion()->getId();
         });
         $levelModels = LevelMapper::getInstance()->findByColumn(
@@ -379,7 +383,7 @@ class RubricMapper
         ]);
 
         $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
-            function (Model $cu) {
+            function (IndicatorUsageModel $cu) {
                 return $cu->getCriterion()->getGroup()->getId();
             }
         );
@@ -416,7 +420,7 @@ class RubricMapper
         // Add capability/indicator usages
         // Respect prescribed ordering in usage objects
         foreach ($capabilityUsageModels as $capabilityUsageModel) {
-            /** @var Model $capabilityUsageModel */
+            /** @var CapabilityUsageModel $capabilityUsageModel */
             $capabilityModel = $capabilityUsageModel->getGroup();
             $capabilityId    = $capabilityModel->getId();
             $capability      = $grid->getRowSet()->retrieveCapability($capabilityId);
@@ -428,7 +432,7 @@ class RubricMapper
 
             $capabilityIndicatorUsageModels = $groupedIndicatorUsageModels[$capabilityId] ?? [];
             foreach ($capabilityIndicatorUsageModels as $indicatorUsageModel) {
-                /** @var Model $indicatorUsageModel */
+                /** @var IndicatorUsageModel $indicatorUsageModel */
                 $indicatorModel = $indicatorUsageModel->getCriterion();
                 $indicatorId    = $indicatorModel->getId();
                 $indicator      = $grid->getRowSet()->retrieveIndicator($indicatorId);
@@ -490,8 +494,8 @@ class RubricMapper
         // (The answer exists: merge SA-6405)
         $levelMapper      = LevelMapper::getInstance();
         $descriptorMapper = DescriptorMapper::getInstance();
-        $indicatorMapper  = Mapper::getInstance();
-        $capabilityMapper = Mapper::getInstance();
+        $indicatorMapper  = IndicatorMapper::getInstance();
+        $capabilityMapper = CapabilityMapper::getInstance();
 
 
         // First, persist the levels
@@ -559,12 +563,12 @@ class RubricMapper
 
 
         // usages are a join table with a sequence, not a strict "object" - as such, we can purge the relevant records and simply re-create them
-        $indicatorUsageMapper  = Mapper::getInstance();
-        $capabilityUsageMapper = Mapper::getInstance();
+        $indicatorUsageMapper  = IndicatorUsageMapper::getInstance();
+        $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
         $indicatorUsageModels  = $indicatorUsageMapper->createCollection();
         $capabilityUsageModels = $capabilityUsageMapper->createCollection();
         $descriptorModels      = $descriptorMapper->createCollection();
-        $capabilitySequence    = Model::SEQUENCE_BASE;
+        $capabilitySequence    = CapabilityUsageModel::SEQUENCE_BASE;
         $indicatorUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
         $capabilityUsageMapper->deleteByColumn('submission_box_id', $submissionBox->getId());
 
@@ -578,7 +582,7 @@ class RubricMapper
                 ->setSequence($capabilitySequence++);
             $capabilityUsageModels->add($capabilityUsageModel);
 
-            $indicatorSequence = Model::SEQUENCE_BASE;
+            $indicatorSequence = IndicatorUsageModel::SEQUENCE_BASE;
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
                 $indicatorModel      = $indicatorModels[$indicatorUsage->getIndicator()->getId()];
                 $indicatorUsageModel = $indicatorUsageMapper->createModel()
@@ -757,7 +761,7 @@ class RubricMapper
     public function persistMarkedGrid(MarkedGrid $markedGrid): void
     {
         // Required mappers
-        $capabilityMapper     = Mapper::getInstance();
+        $capabilityMapper     = CapabilityMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
         $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
         $capabilityMarkMapper = GroupMarkMapper::getInstance();

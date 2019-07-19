@@ -8,7 +8,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUsageMapper;
-use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model;
 use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
