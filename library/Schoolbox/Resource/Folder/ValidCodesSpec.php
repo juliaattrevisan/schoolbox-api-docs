@@ -17,7 +17,6 @@ use function array_unique;
 use function count;
 use function strpos;
 use function substr;
-use Schoolbox\Mapper;
 use Alaress\Database;
 
 /**
@@ -32,20 +31,15 @@ use Alaress\Database;
 class ValidCodesSpec extends Leaf
 {
 
-    /** @var Mapper */
-    private $folderMapper;
-
     /** @var Code\Mapper */
     private $folderCodeMapper;
 
 
     /**
-     * @param Mapper      $folderMapper
      * @param Code\Mapper $folderCodeMapper
      */
-    public function __construct(Mapper $folderMapper, Code\Mapper $folderCodeMapper)
+    public function __construct(Code\Mapper $folderCodeMapper)
     {
-        $this->folderMapper     = $folderMapper;
         $this->folderCodeMapper = $folderCodeMapper;
     }
 
@@ -55,7 +49,6 @@ class ValidCodesSpec extends Leaf
      *
      * @param Model $candidate
      * @return bool
-     * @throws Mapper\DefinitionException
      * @throws Database\Predicate\InvalidColumnException
      */
     public function isSatisfiedBy($candidate): bool
@@ -83,7 +76,7 @@ class ValidCodesSpec extends Leaf
         }
 
         $otherFoldersIndexedCodes = $this->getOtherFoldersCodes($candidate->getId(), $rawCodes, $strippedCodes);
-        [$otherRawCodes] = $this->filterRawAndPrefixedCodes($otherFoldersIndexedCodes);
+        [$otherRawCodes, $otherPrefixedCodes] = $this->filterRawAndPrefixedCodes($otherFoldersIndexedCodes);
 
 
         // 3. Check candidate's codes don't have an exact match with other folders' codes
@@ -100,6 +93,12 @@ class ValidCodesSpec extends Leaf
             }
         }
 
+        foreach(array_keys($otherPrefixedCodes) as $otherPrefixedCode){
+            if (array_key_exists($this->unPrefixCode($otherPrefixedCode), $rawCodes)) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -112,23 +111,22 @@ class ValidCodesSpec extends Leaf
      * @param null[]   $strippedCodes
      * @return null[]
      * @throws Database\Predicate\InvalidColumnException
-     * @throws Mapper\DefinitionException
      */
     private function getOtherFoldersCodes(?int $folderId, array $rawCodes, array $strippedCodes): array
     {
-        $pb = $this->folderMapper->getJoinMapper('codes')->getPredicateBuilder();
+        $pb = $this->folderCodeMapper->getPredicateBuilder();
         if ($folderId) {
             $pb->notEquals('folder_id', $folderId);
         } else {
             $pb->notNull('folder_id');
         }
-        $innerPb = $this->folderMapper->getJoinMapper('codes')->getPredicateBuilder();
+        $innerPb = $this->folderCodeMapper->getPredicateBuilder();
 
         $rawAndStripped = array_merge($rawCodes, $strippedCodes);
 
         foreach (array_keys($rawAndStripped) as $code) {
             $innerPb->equals('code', $code);
-            $innerPb->like('code', "%/" . $this->folderMapper->getDatabase()->escapeForLike($code));
+            $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->escapeForLike($code));
         }
         $pb->any($innerPb);
 

@@ -469,7 +469,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         /** @var Code\Mapper $codeMapper */
         $codeMapper = $this->getJoinMapper('codes');
-        if(!(new ValidCodesSpec($this, $codeMapper))->isSatisfiedBy($model)){
+        if(!(new ValidCodesSpec($codeMapper))->isSatisfiedBy($model)){
             throw Error\Mapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_EXISTS);
         }
 
