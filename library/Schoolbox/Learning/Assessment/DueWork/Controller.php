@@ -366,10 +366,10 @@ class Controller extends Assessment\Controller
     public function getOverview(IAssessable $assessment)
     {
         // Sort participant by lastname, firstname, and id
-        $participants = $assessment->getParticipantUsers()->sortByCallback(static function(User $participantA, User $participantB){
-            return    strnatcasecmp($participantA->getLastname(), $participantB->getLastname())
-                   ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
-                   ?: strnatcasecmp($participantA->getId(), $participantB->getId());
+        $participants = $assessment->getParticipantUsers()->sortByCallback(static function (User $participantA, User $participantB) {
+            return     strnatcasecmp($participantA->getLastname(), $participantB->getLastname())
+                    ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
+                    ?: strnatcasecmp($participantA->getId(), $participantB->getId());
         });
 
         $data = [
