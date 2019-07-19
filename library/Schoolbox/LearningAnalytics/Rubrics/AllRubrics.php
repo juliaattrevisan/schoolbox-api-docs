@@ -59,8 +59,8 @@ class AllRubrics
             }
         }
 
-        $studentRubricMarks = $rubricMapper->getStudentMarksByCriteriaInFolder($folderIds, $term);
-        $allCriteria        = $rubricMapper->getAvailableCriteria($folderIds);
+        $studentRubricMarks = $rubricMapper->getStudentMarksByIndicatorInFolder($folderIds, $term);
+        $allCriteria        = $rubricMapper->getAvailableIndicators($folderIds);
 
         // Aggregate criteria by grouping+name
         $rubricData = [];

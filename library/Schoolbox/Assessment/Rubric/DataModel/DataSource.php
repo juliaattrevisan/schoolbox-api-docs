@@ -1482,7 +1482,7 @@ class DataSource
      * @throws UnderflowException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function getStudentMarksByCriteriaInFolder(array $folderIds, TermModel $term)
+    public function getStudentMarksByIndicatorInFolder(array $folderIds, TermModel $term)
     {
         if (!count($folderIds)) {
             return [];
@@ -1572,8 +1572,8 @@ class DataSource
 
         foreach ($maxMarksStatement as $row) {
             $boxId       = $row['id'];
-            $criterionId = $row['criterionId'];
-            $results[$boxId][$criterionId] = [
+            $indicatorId = $row['criterionId'];
+            $results[$boxId][$indicatorId] = [
                 'grouping' => $row['grouping'],
                 'name'     => $row['name'],
                 'maxMark'  => $row['maxMark'],
@@ -1614,14 +1614,14 @@ class DataSource
         // Step 4: smoosh them all together
         foreach ($descriptorStatement as $row) {
             $boxId       = $row['id'];
-            $criterionId = $row['criterionId'];
+            $indicatorId = $row['criterionId'];
             $mark        = $row['value'];
-            $maxMark     = $results[$boxId][$criterionId]['maxMark'] ?? 0;
+            $maxMark     = $results[$boxId][$indicatorId]['maxMark'] ?? 0;
             if ($maxMark === 0) {
                 continue;
             }
 
-            $results[$boxId][$criterionId]['marks'][$row['studentId']] = 100.0 * $mark / $maxMark;
+            $results[$boxId][$indicatorId]['marks'][$row['studentId']] = 100.0 * $mark / $maxMark;
         }
 
 
@@ -1631,7 +1631,7 @@ class DataSource
 
 
     /**
-     * Get all criteria available on the specified parent
+     * Get all indicators available on the specified parent
      *
      * TODO this is copied wholesale from now-deleted `Duework_Rubric_Handler`; consider modernizing
      *
@@ -1642,7 +1642,7 @@ class DataSource
      * @var string   $criteria [rc.id]['grouping']
      * @var string   $criteria [rc.id]['name']
      */
-    public function getAvailableCriteria(array $parentIds, $parentType = CapabilityModel::PARENT_TYPE_CATEGORY)
+    public function getAvailableIndicators(array $parentIds, $parentType = CapabilityModel::PARENT_TYPE_CATEGORY)
     {
         if (!count($parentIds)) {
             return [];
@@ -1665,14 +1665,14 @@ class DataSource
         ");
         $stmt->execute($pb->getParams());
 
-        $criteria = [];
+        $indicators = [];
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $criteria[$row['id']] = [
+            $indicators[$row['id']] = [
                 'grouping' => $row['grouping'],
                 'name'     => $row['name'],
             ];
         }
-        return $criteria;
+        return $indicators;
     }
 }
