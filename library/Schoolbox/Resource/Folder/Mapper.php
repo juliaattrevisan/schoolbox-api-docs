@@ -12,6 +12,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use function count;
 use function explode;
 use PDO;
 use PDOException;
@@ -53,6 +54,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
 use Alaress\Database\Predicate;
+use function strpos;
 use UnexpectedValueException;
 use Schoolbox\Error;
 
@@ -74,7 +76,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     const INHERIT_ON = 1;
     const INHERIT_OFF = 0;
     const FOLDER_ROOT = 0;
-    private const FOLDER_CODE_COLUMN = 'fc.code';
 
     /**
      * Maximum number of recursion iterations to execute before dying
@@ -738,7 +739,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findByCurriculumCode(array $codes)
     {
-        if (0 === \count($codes)) {
+        if (0 === count($codes)) {
             // no code? no matches
             return $this->createCollection();
         }
@@ -839,7 +840,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         /* If a list of folder ids was provided to restrict the set of results, use it
          */
-        if (\count($folderIds)) {
+        if (count($folderIds)) {
             $builder->in('id', $folderIds);
         }
 
@@ -954,17 +955,21 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * Does not find codes that have been deleted
      *
-     * @param string $code
-     * @param string $campusCode If provided, use this campus code in the query.
+     * Note that 'ENG34' will match both 'ENG34' and 'SEN/ENG34', but 'SEN/ENG34' will not match 'ENG34'
+     *
+     * Hence, if you have a campus code available, you should attempt to use that first, only falling back to the
+     * non-prefixed form if no campus-prefixed match is found.
+     *
+     * @param string $classCodeCsv May have campus prefix, eg 'J/ENG34,S/ENG43' or 'ABC', or 'J/ENG34'
      * @return Model
      * @throws UnexpectedValueException If multiple folders found for this code
      * @throws MapperException If statement returned no category
      * @throws PDOException
      * @throws Predicate\InvalidColumnException
      */
-    public function findByCode(string $code, string $campusCode = ''): Model
+    public function findByCode(string $classCodeCsv): Model
     {
-        $folders = $this->findAllByCode($code, $campusCode);
+        $folders = $this->findAllByCode($classCodeCsv);
 
         // The set of $code returned exactly one folder (determinate)
         // return this folder because we're sure
@@ -991,17 +996,34 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * Does not match soft-deleted folder codes
      * Does not return soft-deleted folders or folder codes
      *
-     * @param string $classCodeCsv Comma-separated list of class codes
-     * @param string $campusCode   If provided, use this campus code in the query.
-     * @return GenericCollection
+     * @param string $classCodeCsv Comma-separated list of class codes, eg 'J/ENG34,S/ENG43' or 'ABC', or 'J/ENG34'
+     * @return GenericCollection|Model[]
      * @throws Predicate\InvalidColumnException
      * @throws PDOException
      */
-    public function findAllByCode(string $classCodeCsv, string $campusCode = ''): GenericCollection
+    private function findAllByCode(string $classCodeCsv): GenericCollection
     {
-        $pb = $this->getPredicateBuilder()->all(
-            $this->buildFindAllByCodePredicateBuilder($classCodeCsv, $campusCode)
-        );
+        $classCodes = explode(',', $classCodeCsv);
+        if (!count($classCodes)) {
+            return $this->createCollection();
+        }
+
+        $codePb = $this->getPredicateBuilder();
+        foreach ($classCodes as $classCode) {
+            // Always return exact matches
+            $codePb->equals('fc.code', $classCode);
+            // If code does not have a campus prefix, match against campus-prefixed variants
+            if (strpos($classCode, '/') === false) {
+                $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
+            }
+        }
+
+        $folderPb = $this->getPredicateBuilder()
+                   ->isNull('f.deleted_at')
+                   ->isNull('fc.deleted_at')
+                   ->any($codePb);
+
+        $pb = $this->getPredicateBuilder()->all($folderPb);
 
         // Dont bother fetching attributes to hydrate, as this query will be missing codes
         // that don't match the code query
@@ -1021,62 +1043,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return $this->findByColumn($this->getIdentifierColumn(), $folderIds);
     }
 
-    /**
-     * @param string $classCodeCsv
-     * @param string $campusCode
-     *
-     * @return PredicateBuilder
-     */
-    private function buildFindAllByCodePredicateBuilder(string $classCodeCsv, string $campusCode = ''): PredicateBuilder
-    {
-        $classCodes = explode(',', $classCodeCsv);
-
-        if ($campusCode === '') {
-            $innerPb = $this->noCampusCodeInnerPredicateBuilder($classCodes);
-        } else {
-            $innerPb = $this->withCampusCodeInnerPredicateBuilder($campusCode, $classCodes);
-        }
-
-        return $this->getPredicateBuilder()
-            ->isNull('f.deleted_at')
-            ->isNull('fc.deleted_at')
-            ->any($innerPb);
-    }
-
-    /**
-     * @param array $classCodes
-     *
-     * @return PredicateBuilder
-     */
-    private function noCampusCodeInnerPredicateBuilder(array $classCodes): PredicateBuilder
-    {
-        $innerPb    = $this->getPredicateBuilder();
-
-        foreach ($classCodes as $classCode) {
-            $innerPb->equals(self::FOLDER_CODE_COLUMN, $classCode);
-            $innerPb->like(self::FOLDER_CODE_COLUMN, "%/{$this->database->escapeForLike($classCode)}");
-        }
-
-        return $innerPb;
-    }
-
-    /**
-     * @param string $campusCode
-     * @param array  $classCodes
-     *
-     * @return PredicateBuilder
-     */
-    private function withCampusCodeInnerPredicateBuilder(string $campusCode, array $classCodes): PredicateBuilder
-    {
-        $innerPb    = $this->getPredicateBuilder();
-
-        foreach ($classCodes as $classCode) {
-            $innerPb->equals(self::FOLDER_CODE_COLUMN, $classCode);
-            $innerPb->equals(self::FOLDER_CODE_COLUMN, "{$campusCode}/{$classCode}");
-        }
-
-        return $innerPb;
-    }
 
     /**
      * Finds all folders for the given subject list.
@@ -1691,7 +1657,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // If we've recursed too much error out
 
-        if (\count($interimNodes) > $this->getMaxRecursionDepth()) {
+        if (count($interimNodes) > $this->getMaxRecursionDepth()) {
             throw new MapperException("Recursion limit reached");
         }
 
@@ -1933,7 +1899,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
             $codeCollection = $folder->getCodes();
-            $code = $row[self::FOLDER_CODE_COLUMN];
+            $code = $row['fc.code'];
             if($code && !$codeCollection->offsetExists($code)){
                 /** @var FolderCode\Model $folderCode */
                 $folderCode = $this->hydrateJoin($row, 'codes', 'fc');
@@ -2072,7 +2038,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // We need to index by code to de-dupe if mapper hydrates this folder somewhere else
             $codeCollection = $folder->getCodes();
-            $code           = $row[self::FOLDER_CODE_COLUMN];
+            $code           = $row['fc.code'];
             if ($code && !$codeCollection->offsetExists($code)) {
                 /** @var FolderCode\Model $folderCode */
                 $folderCode            = $this->hydrateJoin($row, 'codes', 'fc');
