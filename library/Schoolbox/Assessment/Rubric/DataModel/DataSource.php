@@ -1439,7 +1439,7 @@ class DataSource
             $dstIndicatorUsage = clone $srcIndicatorUsage;
 
             /** @var IndicatorModel $dstIndicator */
-            $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getCriterion()->getId());
+            $dstIndicator = $dstIndicators->getOffset($srcIndicatorUsage->getIndicator()->getId());
 
             $dstIndicatorUsage->setIndicator($dstIndicator);
             $dstIndicatorUsage->setSubmissionBox($dstBox);
