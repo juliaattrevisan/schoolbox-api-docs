@@ -109,9 +109,9 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @return \Schoolbox\Collection
+     * @return GenericCollection|Model[]
      */
-    public function getPending()
+    public function getPending(): GenericCollection
     {
         return $this->findByColumn('status', self::UPLOAD_STATUS_PENDING);
     }
