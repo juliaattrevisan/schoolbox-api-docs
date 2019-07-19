@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
 
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as GroupMarkModel;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as CapabilityMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -27,9 +27,9 @@ class Model
 
 
     /**
-     * @var null|GroupMarkModel
+     * @var null|CapabilityMarkModel
      */
-    private $groupMark;
+    private $capabilityMark;
 
 
     /**
@@ -123,19 +123,19 @@ class Model
     /**
      * @return null|\Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model
      */
-    public function getGroupMark(): ?GroupMarkModel
+    public function getCapabilityMark(): ?CapabilityMarkModel
     {
-        return $this->groupMark;
+        return $this->capabilityMark;
     }
 
 
     /**
-     * @param null|GroupMarkModel $groupMark
+     * @param null|CapabilityMarkModel $capabilityMark
      * @return static
      */
-    public function setGroupMark(?GroupMarkModel $groupMark): self
+    public function setCapabilityMark(?CapabilityMarkModel $capabilityMark): self
     {
-        $this->groupMark = $groupMark;
+        $this->capabilityMark = $capabilityMark;
         return $this;
     }
 }

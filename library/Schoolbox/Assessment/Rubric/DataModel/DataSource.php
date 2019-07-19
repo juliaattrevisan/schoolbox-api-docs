@@ -680,7 +680,7 @@ class DataSource
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
             function (DescriptorMarkModel $indicatorMark) {
-                return $indicatorMark->getGroupMark()->getCapability()->getId();
+                return $indicatorMark->getCapabilityMark()->getCapability()->getId();
             }
         );
         // Still only one selected descriptor per indicator
@@ -806,7 +806,7 @@ class DataSource
                     $descriptorModel = $descriptorMapper->findById($indicatorMark->getDescriptor()->getId());
                 }
                 $indicatorMarksToSave[$indicatorId] = $indicatorMarkMapper->createModel()
-                    ->setGroupMark($capabilityMarkModel)
+                    ->setCapabilityMark($capabilityMarkModel)
                     ->setDescriptor($descriptorModel)
                     ->setValue($indicatorMark->getValue())
                     ->setValid(true);
@@ -1049,37 +1049,37 @@ class DataSource
         if ($sourceReturnId === $destinationReturnId) {
             return;
         }
-        $groupMarkMapper            = LevelMapper::getInstance();
+        $capabilityMarkMapper       = CapabilityMarkMapper::getInstance();
         $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
         $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
-        $destinationGroupMarks      = $groupMarkMapper->createCollection();
+        $destinationCapabilityMarks = $capabilityMarkMapper->createCollection();
         $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
         $destinationReturn          = SubmissionBox\ReturnedWorkMapper::getInstance()->createModel($destinationReturnId);
 
         foreach ($sourceDescriptorMarks as $sourceDescriptor) {
 
             // Is this group marks set?
-            $sourceGroupMark = $sourceDescriptor->getGroupMark();
-            $group           = $sourceGroupMark->getCapability();
-            $groupId         = $group->getId();
-            if (!$destinationGroupMarks[$groupId]) {
-                $destinationGroupMarks[$groupId] = $groupMarkMapper->createModel()
-                    ->setGroup($group)
+            $sourceCapabilityMark = $sourceDescriptor->getCapabilityMark();
+            $capability           = $sourceCapabilityMark->getCapability();
+            $capabilityId         = $capability->getId();
+            if (!$destinationCapabilityMarks[$capabilityId]) {
+                $destinationCapabilityMarks[$capabilityId] = $capabilityMarkMapper->createModel()
+                    ->setCapability($capability)
                     ->setSubmissionReturn($destinationReturn)
-                    ->setValue($sourceGroupMark->getValue())
-                    ->setValid($sourceGroupMark->isValid());
+                    ->setValue($sourceCapabilityMark->getValue())
+                    ->setValid($sourceCapabilityMark->isValid());
             }
 
             $destinationDescriptorMarks->add(
                 $descriptorMarkMapper->createModel()
-                    ->setGroupMark($destinationGroupMarks[$groupId])
+                    ->setCapabilityMark($destinationCapabilityMarks[$capabilityId])
                     ->setDescriptor($sourceDescriptor->getDescriptor())
 //                    ->setSubmissionReturn($destinationReturn)
                     ->setValue($sourceDescriptor->getValue())
                     ->setValid($sourceDescriptor->isValid())
             );
         }
-        $groupMarkMapper->save($destinationGroupMarks);
+        $capabilityMarkMapper->save($destinationCapabilityMarks);
         $descriptorMarkMapper->save($destinationDescriptorMarks);
     }
 
@@ -1260,13 +1260,13 @@ class DataSource
         // TODO extract this entire monstrosity elsewhere
 
         // Get required mappers
-        $boxMapper            = SubmissionBoxMapper::getInstance();
-        $levelMapper          = LevelMapper::getInstance();
-        $descriptorMapper     = DescriptorMapper::getInstance();
-        $groupMapper          = CapabilityMapper::getInstance();
-        $indicatorMapper      = IndicatorMapper::getInstance();
-        $groupUsageMapper     = CapabilityUsageMapper::getInstance();
-        $indicatorUsageMapper = IndicatorUsageMapper::getInstance();
+        $boxMapper             = SubmissionBoxMapper::getInstance();
+        $levelMapper           = LevelMapper::getInstance();
+        $descriptorMapper      = DescriptorMapper::getInstance();
+        $capabilityMapper      = CapabilityMapper::getInstance();
+        $indicatorMapper       = IndicatorMapper::getInstance();
+        $capabilityUsageMapper = CapabilityUsageMapper::getInstance();
+        $indicatorUsageMapper  = IndicatorUsageMapper::getInstance();
 
         $sourceBox = $boxMapper->findOneByColumn('assessment_id', $sourceAssessmentId);
 
@@ -1286,12 +1286,12 @@ class DataSource
         $dstLevels = $levelMapper->createCollection();
         /** @var DescriptorModel[]|GenericCollection $dstDescriptors */
         $dstDescriptors = $descriptorMapper->createCollection();
-        /** @var CapabilityModel[]|GenericCollection $dstGroups */
-        $dstGroups = $groupMapper->createCollection();
+        /** @var CapabilityModel[]|GenericCollection $dstCapabilities */
+        $dstCapabilities = $capabilityMapper->createCollection();
         /** @var IndicatorModel[]|GenericCollection $dstIndicators */
         $dstIndicators = $indicatorMapper->createCollection();
         /** @var CapabilityUsageModel[]|GenericCollection $dstGroups */
-        $dstGroupUsages = $groupUsageMapper->createCollection();
+        $dstCapabilityUsages = $capabilityUsageMapper->createCollection();
         /** @var IndicatorUsageModel[]|GenericCollection $dstIndicatorUsages */
         $dstIndicatorUsages = $indicatorUsageMapper->createCollection();
 
@@ -1306,9 +1306,9 @@ class DataSource
 
         // Get Source Descriptors
         /** @var DescriptorModel[]|GenericCollection $srcDescriptors */
-        $srcDescriptors = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
-        $srcIndicators  = $indicatorMapper->createCollection();
-        $srcGroups      = $groupMapper->createCollection();
+        $srcDescriptors  = $descriptorMapper->findByColumn('level_id', $srcLevels->getColumnValues('id'))->indexBy('id');
+        $srcIndicators   = $indicatorMapper->createCollection();
+        $srcCapabilities = $capabilityMapper->createCollection();
 
         /* Get existing destination indicators.
          *
@@ -1329,23 +1329,23 @@ class DataSource
         // Convert to 2-D arrays, indexed by 'group' then 'name', so we can later find duplicates.
         /** @var IndicatorModel[][] $existingIndicatorMap */
         $existingIndicatorMap = [];
-        /** @var CapabilityModel[] $existingGroupMap */
-        $existingGroupMap = [];
+        /** @var CapabilityModel[] $existingCapabilityMap */
+        $existingCapabilityMap = [];
         foreach ($existingIndicators as $existingIndicator) {
-            $groupName                           = $this->normaliseForComparison($existingIndicator->getCapability()->getName());
-            $indicatorName                       = $this->normaliseForComparison($existingIndicator->getName());
-            $existingIndicatorMap[$groupName][$indicatorName] = $existingIndicator;
-            $existingGroupMap[$groupName]                     = $existingIndicator->getCapability();
+            $capabilityName                                        = $this->normaliseForComparison($existingIndicator->getCapability()->getName());
+            $indicatorName                                         = $this->normaliseForComparison($existingIndicator->getName());
+            $existingIndicatorMap[$capabilityName][$indicatorName] = $existingIndicator;
+            $existingCapabilityMap[$capabilityName]                = $existingIndicator->getCapability();
         }
 
         // Build new Rubric for destination box
         foreach ($srcDescriptors as $srcDescriptor) {
 
             // Copy source group, or reuse existing
-            $srcGroupId = $srcDescriptor->getIndicator()->getCapability()->getId();
-            if (!$srcGroups->getOffset($srcGroupId)) {
-                $srcGroup = $srcDescriptor->getIndicator()->getCapability();
-                $srcGroups->setOffset($srcGroupId, $srcGroup);
+            $srcCapabilityId = $srcDescriptor->getIndicator()->getCapability()->getId();
+            if (!$srcCapabilities->getOffset($srcCapabilityId)) {
+                $srcCapability = $srcDescriptor->getIndicator()->getCapability();
+                $srcCapabilities->setOffset($srcCapabilityId, $srcCapability);
             }
 
 
@@ -1358,37 +1358,37 @@ class DataSource
 
 
             // Does this indicator already exist on destination folder ?
-            $duplicateGroup     = false;
-            $duplicateIndicator = false;
-            $groupName          = $this->normaliseForComparison($srcGroups->getOffset($srcGroupId)->getName());
-            $indicatorName      = $this->normaliseForComparison($srcIndicators->getOffset($srcIndicatorId)->getName());
-            if (array_key_exists($groupName, $existingGroupMap)) {
-                $duplicateGroup = true;
-                if (array_key_exists($indicatorName, $existingIndicatorMap[$groupName])) {
+            $duplicateCapability = false;
+            $duplicateIndicator  = false;
+            $capabilityName      = $this->normaliseForComparison($srcCapabilities->getOffset($srcCapabilityId)->getName());
+            $indicatorName       = $this->normaliseForComparison($srcIndicators->getOffset($srcIndicatorId)->getName());
+            if (array_key_exists($capabilityName, $existingCapabilityMap)) {
+                $duplicateCapability = true;
+                if (array_key_exists($indicatorName, $existingIndicatorMap[$capabilityName])) {
                     $duplicateIndicator = true;
                 }
             }
 
             // Did we find an existing group with the same name?
-            if ($duplicateGroup) {
-                $dstGroup = $existingGroupMap[$groupName];
+            if ($duplicateCapability) {
+                $dstCapability = $existingCapabilityMap[$capabilityName];
             } else {
-                $dstGroup = clone $srcDescriptor->getIndicator()->getCapability();
-                $dstGroup->setId(null);
-                $dstGroup->setParentId($dstBox->getCategory()->getId());
-                $existingGroupMap[$groupName] = $dstGroup;
+                $dstCapability = clone $srcDescriptor->getIndicator()->getCapability();
+                $dstCapability->setId(null);
+                $dstCapability->setParentId($dstBox->getCategory()->getId());
+                $existingCapabilityMap[$capabilityName] = $dstCapability;
             }
-            $dstGroups->setOffset($srcGroupId, $dstGroup);
+            $dstCapabilities->setOffset($srcCapabilityId, $dstCapability);
 
 
             // Did we find an existing indicator with the same name?
             if ($duplicateIndicator) {
-                $dstIndicator = $existingIndicatorMap[$groupName][$indicatorName];
+                $dstIndicator = $existingIndicatorMap[$capabilityName][$indicatorName];
             } else {
                 $dstIndicator = clone $srcDescriptor->getIndicator();
                 $dstIndicator->setId(null);
-                $dstIndicator->setCapability($dstGroup);
-                $existingIndicatorMap[$groupName][$indicatorName] = $dstIndicator;
+                $dstIndicator->setCapability($dstCapability);
+                $existingIndicatorMap[$capabilityName][$indicatorName] = $dstIndicator;
             }
             $dstIndicators->setOffset($srcIndicatorId, $dstIndicator);
 
@@ -1411,10 +1411,10 @@ class DataSource
         }
 
         // Get Source Usages
-        /** @var CapabilityUsageModel[]|GenericCollection $srcGroupUsages */
+        /** @var CapabilityUsageModel[]|GenericCollection $srcCapabilityUsages */
         /** @var IndicatorUsageModel[]|GenericCollection $srcIndicatorUsages */
-        $srcGroupUsages = $groupUsageMapper->findByColumnList([
-            'rubric_group_id'   => $srcGroups->getPropertyValues('id'),
+        $srcCapabilityUsages = $capabilityUsageMapper->findByColumnList([
+            'rubric_group_id'   => $srcCapabilities->getPropertyValues('id'),
             'submission_box_id' => $sourceBox->getId(),
         ]);
         $srcIndicatorUsages = $indicatorUsageMapper->findByColumnList([
@@ -1423,15 +1423,15 @@ class DataSource
         ]);
 
         // Copy Group Usages
-        foreach ($srcGroupUsages as $srcGroupUsage) {
-            $dstGroupUsage = clone $srcGroupUsage;
+        foreach ($srcCapabilityUsages as $srcCapabilityUsage) {
+            $dstCapabilityUsage = clone $srcCapabilityUsage;
 
-            /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $dstGroup */
-            $dstGroup = $dstGroups->getOffset($srcGroupUsage->getCapability()->getId());
+            /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $dstCapability */
+            $dstCapability = $dstCapabilities->getOffset($srcCapabilityUsage->getCapability()->getId());
 
-            $dstGroupUsage->setCapability($dstGroup);
-            $dstGroupUsage->setSubmissionBox($dstBox);
-            $dstGroupUsages->add($dstGroupUsage);
+            $dstCapabilityUsage->setCapability($dstCapability);
+            $dstCapabilityUsage->setSubmissionBox($dstBox);
+            $dstCapabilityUsages->add($dstCapabilityUsage);
         }
 
         // Copy indicator usages
@@ -1448,10 +1448,10 @@ class DataSource
 
         // Save (order is important to ensure IDs are assigned to parents b4 saving children)
         $levelMapper->save($dstLevels);
-        $groupMapper->save($dstGroups);
+        $capabilityMapper->save($dstCapabilities);
         $indicatorMapper->save($dstIndicators);
         $descriptorMapper->save($dstDescriptors);
-        $groupUsageMapper->save($dstGroupUsages);
+        $capabilityUsageMapper->save($dstCapabilityUsages);
         $indicatorUsageMapper->save($dstIndicatorUsages);
 
         return true;

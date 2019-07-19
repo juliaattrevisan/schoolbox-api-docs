@@ -50,8 +50,8 @@ class Mapper extends BaseMapper
             'id',
             self::TYPE_MODEL,
             null,
-            'groupMark',
-            'group_mark'
+            'capabilityMark',
+            'capabilityMark'
         );
 
         $this->joins(
@@ -131,7 +131,7 @@ class Mapper extends BaseMapper
             $groupMark->setSubmissionReturn($submissionReturnMapper->hydrate($r, 'r'));
 
             $mark = $this->hydrate($r);
-            $mark->setGroupMark($groupMark);
+            $mark->setCapabilityMark($groupMark);
             $mark->setDescriptor($descriptor);
             $marks->add($mark);
         }
