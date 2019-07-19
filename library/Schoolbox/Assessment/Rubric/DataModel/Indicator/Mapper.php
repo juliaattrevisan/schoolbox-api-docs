@@ -155,7 +155,7 @@ class Mapper extends BaseMapper {
     {
         $remaining = $this->countByColumn('rubric_group_id', $indicator->getCapability()->getId());
         if (0 === $remaining) {
-            $this->getJoinMapper('group')->delete($indicator->getCapability());
+            $this->getJoinMapper('capability')->delete($indicator->getCapability());
         }
         return true;
     }

@@ -680,7 +680,7 @@ class DataSource
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
             function (DescriptorMarkModel $indicatorMark) {
-                return $indicatorMark->getGroupMark()->getGroup()->getId();
+                return $indicatorMark->getGroupMark()->getCapability()->getId();
             }
         );
         // Still only one selected descriptor per indicator
@@ -698,7 +698,7 @@ class DataSource
         // Load em into the marked grid
         foreach ($capabilityMarkModels as $capabilityMarkModel) {
             // Load the capability
-            $capabilityId = $capabilityMarkModel->getGroup()->getId();
+            $capabilityId = $capabilityMarkModel->getCapability()->getId();
             $capability   = $rowSet->retrieveCapability($capabilityId);
             if (!$capability) {
                 continue;
@@ -793,7 +793,7 @@ class DataSource
             $capabilityModel = $capabilityMapper->findById($capabilityId);
             $capabilityMarksToSave[$capabilityId] = $capabilityMarkModel = $capabilityMarkMapper->createModel()
                 ->setSubmissionReturn($returnedWork)
-                ->setGroup($capabilityModel)
+                ->setCapability($capabilityModel)
                 ->setValue($capabilityMark->getValue())
                 ->setValid(true);
 
@@ -1060,7 +1060,7 @@ class DataSource
 
             // Is this group marks set?
             $sourceGroupMark = $sourceDescriptor->getGroupMark();
-            $group           = $sourceGroupMark->getGroup();
+            $group           = $sourceGroupMark->getCapability();
             $groupId         = $group->getId();
             if (!$destinationGroupMarks[$groupId]) {
                 $destinationGroupMarks[$groupId] = $groupMarkMapper->createModel()

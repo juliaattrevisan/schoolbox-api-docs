@@ -47,8 +47,8 @@ class Mapper extends BaseMapper
             'id',
             null,
             null,
-            'group',
-            'group'
+            'capability',
+            'capability'
         );
 
         // This is NOT a soft-delete column, but effectively has the same

@@ -111,11 +111,11 @@ class Mapper extends Schoolbox\Mapper {
             SELECT  {$this->getColumnString()},
                     {$this->getJoinColumnString('level', 'l')},
                     {$this->getJoinColumnString('indicator', 'c')},
-                    {$this->getJoinColumnString('indicator.group', 'g')}
+                    {$this->getJoinColumnString('indicator.capability', 'g')}
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('level', '', 'l', true)}
             INNER JOIN {$this->getJoinSql('indicator', '', 'c', true)}
-            INNER JOIN {$this->getJoinSql('indicator.group', 'c', 'g', true)}
+            INNER JOIN {$this->getJoinSql('indicator.capability', 'c', 'g', true)}
         ";
     }
 
@@ -128,7 +128,7 @@ class Mapper extends Schoolbox\Mapper {
     {
         $levelMapper     = $this->getJoinMapper('level');
         $indicatorMapper = $this->getJoinMapper('indicator');
-        $groupMapper     = $this->getJoinMapper('indicator.group');
+        $groupMapper     = $this->getJoinMapper('indicator.capability');
 
         /* All indexed by primary key */
         $descriptors     = $this->createCollection();
@@ -166,7 +166,7 @@ class Mapper extends Schoolbox\Mapper {
             if (!$indicators->getOffset($indicatorId)) {
                 // First time we've encountered this group?
                 if (!$groups->getOffset($groupId)) {
-                    $groups->setOffset($groupId, $this->hydrateJoin($r, 'indicator.group', 'g'));
+                    $groups->setOffset($groupId, $this->hydrateJoin($r, 'indicator.capability', 'g'));
                 }
 
                 // Set the group as well

@@ -28,7 +28,7 @@ class Model
     /**
      * @var \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
      */
-    private $group;
+    private $capability;
 
 
     /**
@@ -66,19 +66,19 @@ class Model
     /**
      * @return \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
      */
-    public function getGroup(): CapabilityModel
+    public function getCapability(): CapabilityModel
     {
-        return $this->group;
+        return $this->capability;
     }
 
 
     /**
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model $group
+     * @param \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model $capability
      * @return static
      */
-    public function setGroup(CapabilityModel $group): self
+    public function setCapability(CapabilityModel $capability): self
     {
-        $this->group = $group;
+        $this->capability = $capability;
         return $this;
     }
 
