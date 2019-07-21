@@ -1,15 +1,8 @@
 $(function() {
     $('#feedbackForm').alaressValidate({
         rules: {
-            name: {
-                required: true
-            },
             email: {
-                required: true,
                 email: true
-            },
-            message: {
-                required: true
             },
             recaptcha: {
                 required: true

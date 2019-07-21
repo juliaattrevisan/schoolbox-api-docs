@@ -231,10 +231,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Folder Name
-                            <input type="text" id="name" class="required" name="name" maxlength="100" size="40" value="{{ folder.getName }}" />
-                        </label>
+                        <label for="name" class="required">Folder Name</label>
+                        <input type="text" id="name" name="name" maxlength="100" size="40" value="{{ folder.getName }}" required />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>

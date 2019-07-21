@@ -1,26 +1,6 @@
 <script type="text/javascript">
     $(function() {
-        $('#seasonForm').alaressValidate({
-            rules: {
-                name: {
-                    required: true,
-                    minlength: 1
-                },
-                start: {
-                    required: true,
-                    minlength: 2
-                },
-                end: {
-                    required: true,
-                    minlength: 2
-                }
-            },
-            messages: {
-                name:  'Please enter a Season name.',
-                start: 'Please select a season start date.',
-                end:   'Please select a season end date.'
-            }
-        });
+        $('#seasonForm').alaressValidate();
     });
 </script>
 
@@ -51,27 +31,18 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="id" value="{{ season.id }}"/>
 
-                        <label>
-                            Name
-                            <span data-tooltip class="hint has-tip tip-top" title="Internally, what this season is known as.">?</span>
-                            <input type="text" name="name" value="{{ season.name }}"/>
-                        </label>
-
+                        <label for="name" class="required">Name</label>
+                        <input type="text" name="name" id="name" value="{{ season.name }}" required />
                     </div>
 
                     <div class="column small-12 medium-6">
-                        <label>
-                            Start Date
-                            <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datesync-enddate="#end" value="{{ season.start.getLocalShort }}">
-                        </label>
+                        <label for="start" class="required">Start Date</label>
+                        <input type="text" id="start" name="start" placeholder="Start Date" data-datepicker data-datesync-enddate="#end" value="{{ season.start.getLocalShort }}">
                     </div>
 
-
                     <div class="column small-12 medium-6">
-                        <label>
-                            End Date
-                            <input type="text" id="end" name="end" placeholder="End Date" data-datepicker data-datesync-startdate="#start" value="{{ season.end.getLocalShort }}">
-                        </label>
+                        <label for="end" class="required">End Date</label>
+                        <input type="text" id="end" name="end" placeholder="End Date" data-datepicker data-datesync-startdate="#start" value="{{ season.end.getLocalShort }}">
                     </div>
 
                 </fieldset>

@@ -19,7 +19,6 @@
         form.alaressValidate({
             rules: {
                 name: {
-                    required: true,
                     minlength: 2
                 }
             }
@@ -57,10 +56,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Title
-                            <input class="required" name="name" type="text" value="{{ item.name }}" size="30"/>
-                        </label>
+                        <label for="name" class="required">Title</label>
+                        <input class="required" name="name" id="name" type="text" value="{{ item.name }}" maxlength="250" required/>
                     </div>
                 </fieldset>
             </section>

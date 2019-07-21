@@ -53,7 +53,6 @@
             form.alaressValidate({
                 rules: {
                     name: {
-                        required: true,
                         minlength: 2
                     },
                     resource_category_id: {
@@ -181,10 +180,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Name
-                            <input class="required" name="name" type="text" value="{{ item.name }}" />
-                        </label>
+                        <label for="name" class="required">Name</label>
+                        <input name="name" id="name" type="text" value="{{ item.name }}" maxlength="250" required />
 
                         <label>
                             Description
@@ -197,18 +194,16 @@
                             <input name="room_code" type="text" value="{{ item.roomCode }}" /></label>
                         </label>
 
-                        <label>
-                            Category
-                            <select name="resource_category_id">
-                                <option>-- select --</option>
-                                {% for category in categoryList %}
-                                    <option {{ category.id == item.category.id ? 'selected' : '' }}
-                                            value="{{ category.id|e('html_attr') }}"
-                                            label="{{ category.name|e('html_attr') }}"
-                                            >{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
+                        <label for="resource_category" class="required">Category</label>
+                        <select name="resource_category_id" id="resource_category">
+                            <option>-- select --</option>
+                            {% for category in categoryList %}
+                                <option {{ category.id == item.category.id ? 'selected' : '' }}
+                                        value="{{ category.id|e('html_attr') }}"
+                                        label="{{ category.name|e('html_attr') }}"
+                                        >{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
 
                         <label>
                             Related Resources

@@ -47,29 +47,28 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 column">
-                            <label>
-                                Current Password
-                                <input type="password"
-                                       name="current_password"
-                                       id="current_password"
-                                       required/>
+                            <label class="required" for="current_password">Current Password</label>
+                            <input type="password"
+                                   name="current_password"
+                                   id="current_password"
+                                   required/>
+
+                            <label class="required" for="new_password">New Password</label>
+                            <input type="password"
+                                   name="new_password"
+                                   id="new_password"
+                                   data-rule-minlength="8"
+                                   required/>
+
+                            <label class="required" for="confirm_password">Confirm New
+                                <span data-tooltip class="hint has-tip tip-top" title="Password must be at least 8 characters in length">?</span>
                             </label>
-                            <label>
-                                New Password
-                                <input type="password"
-                                       name="new_password"
-                                       id="new_password"
-                                       data-rule-minlength="8"
-                                       required/>
-                            </label>
-                            <label>
-                                Confirm New Password
-                                <input type="password"
-                                       name="confirm_password"
-                                       id="confirm_password"
-                                       data-rule-minlength="8"
-                                       required/>
-                            </label>
+                            <input type="password"
+                                   name="confirm_password"
+                                   id="confirm_password"
+                                   data-rule-minlength="8"
+                                   required/>
+
                         </div>
                     </fieldset>
                 </section>

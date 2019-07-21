@@ -1,14 +1,7 @@
 <script type="text/javascript">
     $(function() {
         $('#venueForm').alaressValidate({
-            rules: {
-                name: {
-                    required: true,
-                    minlength: 2
-                }
-            },
             messages: {
-                name: 'Please enter a Venue name.',
                 latitude: {
                     min: 'Latitude must lie between -90.000000 and 90.0000000',
                     max: 'Latitude must lie between -90.000000 and 90.0000000'
@@ -52,11 +45,8 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="id" value="{{ venue.id }}"/>
 
-                        <label>
-                            Name
-                            <span data-tooltip class="hint has-tip tip-top" title="Internally, what this venue is known as.">?</span>
-                            <input type="text" name="name" value="{{ venue.name }}"/>
-                        </label>
+                        <label for="name" class="required">Name</label>
+                        <input type="text" name="name" id="name" value="{{ venue.name }}" required/>
 
                         <label>
                             Location

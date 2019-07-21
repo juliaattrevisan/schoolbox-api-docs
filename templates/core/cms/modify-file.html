@@ -43,12 +43,10 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Title
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the file, this will be used for display and search">?</span>
-                            <input type="text" name="description" maxlength="100" size="40" class="required" value="{DESCRIPTION}" />
-                        </label>
-                        <label>
+                        <label for="description" class="required">Title</label>
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="One line description of the file, this will be used for display and search">?</span>
+                        <input type="text" name="description" id="description" maxlength="100" value="{DESCRIPTION}" required />
+                        <label for="cms-zone" class="required">
                             Attach File
                         </label>
                         {ATTACH_ZONE}

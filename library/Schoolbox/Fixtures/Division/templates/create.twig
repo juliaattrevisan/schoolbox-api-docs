@@ -4,21 +4,9 @@
     $(function() {
         $('#divisionForm').alaressValidate({
             rules: {
-                name: {
-                    required: true,
-                    minlength: 2
-                },
-                seasonId: {
-                    required: true,
-                    minlength: 1
-                },
                 url: {
                     isURL: true
                 }
-            },
-            messages: {
-                'name': 'Please enter a Division name.',
-                'seasonId': 'Please select a Season.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
@@ -97,15 +85,11 @@
                         <input type="hidden" name="sportId" value="{{ sport.id }}"/>
                         <input type="hidden" name="divisionId" value="{{ division.id }}"/>
 
-                        <label>
-                            Name
-                            <input type="text" name="name" value="{{ division.name }}"/>
-                        </label>
+                        <label for="name" class="required">Name</label>
+                        <input type="text" name="name" id="name" value="{{ division.name }}"/>
 
-                        <label>
-                            Current Season
-                            <input id="season" name="seasonId" type="text" value="{{ division.season.name }}" placeholder="Search Seasons" />
-                        </label>
+                        <label for="season" class="required">Current Season</label>
+                        <input id="season" name="seasonId" type="text" value="{{ division.season.name }}" placeholder="Search Seasons" required />
 
                         <label for="url">Homepage URL</label>
                         <div class="input-group">

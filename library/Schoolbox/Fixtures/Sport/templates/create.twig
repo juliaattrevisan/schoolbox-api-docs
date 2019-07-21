@@ -2,16 +2,9 @@
     $(function() {
         $('#sportForm').alaressValidate({
             rules: {
-                name: {
-                    required: true,
-                    minlength: 2
-                },
                 url: {
                     isURL: true
                 }
-            },
-            messages: {
-                'name': 'Please enter a Sport name.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
@@ -62,10 +55,8 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="id" value="{{ sport.id }}"/>
 
-                        <label>
-                            Name
-                            <input type="text" name="name" value="{{ sport.name }}"/>
-                        </label>
+                        <label for="name" class="required">Name</label>
+                        <input type="text" name="name" id="name" value="{{ sport.name }}" required />
 
                         <label for="url">Homepage URL</label>
                         <div class="input-group">
