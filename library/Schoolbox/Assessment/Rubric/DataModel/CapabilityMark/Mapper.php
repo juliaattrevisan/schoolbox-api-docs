@@ -14,7 +14,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
- * Mapper for marks for a rubric group.
+ * Mapper for marks for a rubric capability.
  *
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model createModel($idValue = null)

@@ -105,7 +105,7 @@ class Mapper extends BaseMapper {
             $collection[$crit->getId()] = $crit;
         }
 
-        // Fetch curriculum nodes for indicator and group separately
+        // Fetch curriculum nodes for indicator and capability separately
         $indicatorNodes = $curriculumNodeMapper->findForOtherMapper(
             $this,
             'curriculum_node_for_rubric_criterion',
@@ -145,8 +145,8 @@ class Mapper extends BaseMapper {
     /**
      * Post-delete callback for this indicator.
      *
-     * If there's no remaining non-deleted indicator for this group, delete the
-     * group.
+     * If there's no remaining non-deleted indicator for this capability, delete
+     * the capability.
      *
      * @param Model $indicator
      * @return bool
@@ -164,7 +164,7 @@ class Mapper extends BaseMapper {
     /**
      * Post-restore callback for this indicator.
      *
-     * Undelete the indicator's group, if it's deleted.
+     * Undelete the indicator's capability, if it's deleted.
      *
      * @param Model $indicator
      * @return bool
@@ -235,7 +235,8 @@ class Mapper extends BaseMapper {
      * Find all indicators for a parent type.
      *
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
-     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string    $parentType One of the `CapabilityModel::PARENT_TYPE_*`
+     *                              constants
      * @param bool      $cache      If false, bypass result cache
      * @return GenericCollection|Model[]
      * @throws MapperException
@@ -272,10 +273,11 @@ class Mapper extends BaseMapper {
 
     /**
      * Find a single indicator for a parent type, given its unique identifier
-     * (parentId+parentType+name+groupName).
+     * (parentId+parentType+name+capabilityName).
      *
      * @param int    $parentId       The parent ID (or list thereof) to find for
-     * @param string $parentType     One of the `Group::PARENT_TYPE_*` constants
+     * @param string $parentType     One of the `CapabilityModel::PARENT_TYPE_*`
+     *                               constants
      * @param string $name           The name of the indicator
      * @param string $capabilityName The name of the indicator's capability
      * @param bool   $cache          If false, bypass result cache
@@ -305,7 +307,7 @@ class Mapper extends BaseMapper {
 
     /**
      * Find a single indicator for a folder, given its unique identifier
-     * (folder+name+groupName).
+     * (folder+name+capabilityName).
      *
      * @param int    $folderId       The folder ID (or list thereof) to find for
      * @param string $name           The name of the indicator
@@ -322,7 +324,7 @@ class Mapper extends BaseMapper {
 
     /**
      * Find a single indicator for a parent type, given its unique identifier
-     * (parentId+parentType+name+groupName).
+     * (parentId+parentType+name+capabilityName).
      *
      * If none exists: create it
      *
@@ -367,7 +369,7 @@ class Mapper extends BaseMapper {
 
     /**
      * Find a single indicator for a folder, given its unique identifier
-     * (folder+name+groupName).
+     * (folder+name+capabilityName).
      *
      * If none exists: create it
      *

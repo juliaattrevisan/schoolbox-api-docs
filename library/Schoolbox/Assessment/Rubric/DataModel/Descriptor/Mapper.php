@@ -164,13 +164,13 @@ class Mapper extends Schoolbox\Mapper {
 
             // First time we've encountered this indicator?
             if (!$indicators->getOffset($indicatorId)) {
-                // First time we've encountered this group?
+                // First time we've encountered this capability?
                 if (!$capabilities->getOffset($capabilityId)) {
                     $capabilities->setOffset($capabilityId, $this->hydrateJoin($r, 'indicator.capability', 'g'));
                 }
 
-                // Set the group as well
-                /** @var Capability\Model $group */
+                // Set the capability as well
+                /** @var Capability\Model $capability */
                 /** @var Indicator\Model $indicator */
                 $capability     = $capabilities->getOffset($capabilityId);
                 $indicator = $this->hydrateJoin($r, 'indicator', 'c');

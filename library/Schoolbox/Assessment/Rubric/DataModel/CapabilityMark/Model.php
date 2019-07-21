@@ -12,7 +12,7 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 
 /**
- * Model for marks on a rubric group.
+ * Model for marks on a rubric capability.
  */
 class Model
 {

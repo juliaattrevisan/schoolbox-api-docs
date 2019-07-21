@@ -135,9 +135,9 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Post-delete callback for this group.
+     * Post-delete callback for this capability.
      *
-     * Soft-deleting a group (hard) deletes all of its usages.
+     * Soft-deleting a capability (hard) deletes all of its usages.
      *
      * @param Model $capability
      */
@@ -148,10 +148,10 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find all groups for a parent type.
+     * Find all capabilities for a parent type.
      *
      * @param int|int[] $parentId   The parent ID (or list thereof) to find for
-     * @param string    $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string    $parentType One of the `Model::PARENT_TYPE_*` constants
      * @param bool      $cache      If false, bypass result cache
      * @return GenericCollection|Model[]
      * @throws MapperException
@@ -186,10 +186,10 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find a group, given its parent ID, type and name.
+     * Find a capability, given its parent ID, type and name.
      *
      * @param int    $parentId   The parent ID to find for
-     * @param string $parentType One of the `Group::PARENT_TYPE_*` constants
+     * @param string $parentType One of the `Model::PARENT_TYPE_*` constants
      * @param string $name       The name of the indicator
      * @param bool   $cache      If false, bypass result cache
      * @return Model
@@ -215,10 +215,10 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find a group, given its folder and name.
+     * Find a capability, given its folder and name.
      *
      * @param int    $folderId  The folder ID to find for
-     * @param string $name      The name of the group
+     * @param string $name      The name of the capability
      * @param bool   $cache     If false, bypass result cache
      * @return Model
      * @throws MapperException
@@ -230,7 +230,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find a group with the given name for the given parent.
+     * Find a capability with the given name for the given parent.
      * If none is found, create one and return it.
      *
      * @param int    $parentId
@@ -268,7 +268,7 @@ class Mapper extends BaseMapper
 
 
     /**
-     * Find a group with the given name for the given folder.
+     * Find a capability with the given name for the given folder.
      * If none is found, create one and return it.
      *
      * @param int    $folderId

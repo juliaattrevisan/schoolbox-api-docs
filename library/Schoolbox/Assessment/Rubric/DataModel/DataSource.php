@@ -1341,7 +1341,7 @@ class DataSource
         // Build new Rubric for destination box
         foreach ($srcDescriptors as $srcDescriptor) {
 
-            // Copy source group, or reuse existing
+            // Copy source capability, or reuse existing
             $srcCapabilityId = $srcDescriptor->getIndicator()->getCapability()->getId();
             if (!$srcCapabilities->getOffset($srcCapabilityId)) {
                 $srcCapability = $srcDescriptor->getIndicator()->getCapability();
@@ -1369,7 +1369,7 @@ class DataSource
                 }
             }
 
-            // Did we find an existing group with the same name?
+            // Did we find an existing capability with the same name?
             if ($duplicateCapability) {
                 $dstCapability = $existingCapabilityMap[$capabilityName];
             } else {
@@ -1422,7 +1422,7 @@ class DataSource
             'submission_box_id' => $sourceBox->getId(),
         ]);
 
-        // Copy Group Usages
+        // Copy capability Usages
         foreach ($srcCapabilityUsages as $srcCapabilityUsage) {
             $dstCapabilityUsage = clone $srcCapabilityUsage;
 
