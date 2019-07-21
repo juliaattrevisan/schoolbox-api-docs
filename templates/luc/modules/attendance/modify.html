@@ -1,7 +1,8 @@
 <!-- BEGIN custom_head -->
 <script type='text/javascript' src='/javascript/components/jquery-timepicker-jt/jquery.timepicker.js'></script>
+<script type="text/javascript" src="/javascript/jquery.chained.min.js"></script>
 <script type='text/javascript'>
-    $(function() {
+	$(function() {
         $('[data-timepicker]').timepicker({
             'timeFormat':'g:ia',
             'scrollDefaultNow': true,
@@ -18,46 +19,7 @@
         absenceChecks.on('change', function() {
             absenceCounter.text(absenceChecks.not(':checked').length);
         });
-
-        /* Get the list of values that exist per type
-         */
-        var reasonStack = {DROPDOWN_HASH};
-
-        /* For each student's Type dropdown, figure out
-         *  - the type currently selected
-         *  - the corresponding Reason dropdown that needs to be replaced
-         */
-        $('[data-absence-type]').on('change', function(event) {
-            var id = $(this).attr('data-absence-type');
-
-            var destination = '#' + 'absenceReason' + id;
-
-            /* When the Type dropdown changes, find its value
-             * then build the Reason dropdown
-             */
-            var availableOptions = reasonStack[$(this).val()];
-
-            var select = $('<select id="absenceReason'+id+'" name="PossibleReasonCode[]" data-absence-reason="'+id+'" />');
-
-            /* All other uncorrelated options (also happens to include Not Selected)
-             */
-            $.each(reasonStack['{INDEX_ALL}'], function(index, element) {
-                $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
-            });
-
-            /* Correlated options
-             */
-            if (availableOptions !== undefined) {
-                $.each(availableOptions, function(index, element) {
-                    $('<option />', {value: element.Code, text: element.Description}).appendTo(select);
-                });
-            }
-
-            /* Stick it in
-             */
-            $(destination).replaceWith(select);
-        });
-    });
+	});
 </script>
 <!-- END custom_head -->
 
@@ -103,7 +65,7 @@
                     </thead>
                     <tbody>
                     <!-- BEGIN student -->
-                    <tr>
+                    <tr class='{ON_OFF}'>
                         <th scope="row" class="no-pad">
                             <div class="card wrap-down">
                                 <a href="/search/user/{STUDENT_UID}" title="View Profile">
@@ -129,8 +91,8 @@
                                 <input type='text' maxlength='10' size="8" name='EarlyDepartureTime[]' data-timepicker value="{STUDENT_DEPT_TIME}" />
                             </div>
                         </td>
-                        <td class="hide>
-                            <select id='absenceType{STUDENT_SYNERGY_ID}' name='PossibleAbsenceCode[]' data-absence-type="{STUDENT_SYNERGY_ID}">
+                        <td class="hide">
+                            <select id='absenceType{STUDENT_UID}' name='PossibleAbsenceCode[]'>
                                 <!-- BEGIN absence_options -->
                                 <option value='{ABSENCE_OPTIONS_VALUE}' {ABSENCE_OPTIONS_VALUE_SELECTED}>{ABSENCE_OPTIONS_DESCRIPTION}</option>
                                 <!-- END absence_options -->
