@@ -74,7 +74,7 @@ case "$1" in
 
         # Attempt to execute repair on schoolbox database using database root user credentials
         optionsFile="/root/.my.cnf";
-        if [[ ! -f ${optionsFile} ]]; then
+        if [ ! -f ${optionsFile} ]; then
             echo "DB root credentials file '$optionsFile' not found, skipping repair";
         else
             echo "DB root credentials file '$optionsFile' found, initiating repair";
