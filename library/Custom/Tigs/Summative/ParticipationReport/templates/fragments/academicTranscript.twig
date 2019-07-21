@@ -32,6 +32,10 @@ Data:
         text-align: center;
         vertical-align: top;
     }
+    .result-group.error{
+        background-color: #fa4a47;
+        color: white;
+    }
     .result-item {
         display: inline-block;
         padding: 3px 10px;
@@ -85,7 +89,7 @@ Data:
 
                             {% set ibGraphDatum = folderData.ibGraphData | first %}
                             {% if ibGraphDatum.showComponent %}
-                                <div class="result-group">
+                                <div class="result-group{% if ibGraphDatum.error|default(false) %} error{% endif %}">
                                     <div class="result-item myp-grade">
                                         <span class="result-heading">{{ ibGraphDatum.header }}</span><br>
                                         <span class="result-value">{{ ibGraphDatum.studentMark|default('-') }}</span>
@@ -118,10 +122,10 @@ Data:
 
                             {% set nesaGraphDatum = folderData.nesaGraphData | first %}
                             {% if nesaGraphDatum.showComponent %}
-                                <div class="result-group">
+                                <div class="result-group{% if nesaGraphDatum.error|default(false) %} error{% endif %}">
                                     <div class="result-item nesa-grade">
                                         <span class="result-heading">NESA Grade</span><br>
-                                        <span class="result-value">{{ nesaGraphDatum.studentMark }}</span>
+                                        <span class="result-value">{{ nesaGraphDatum.studentMark|default('-') }}</span>
                                     </div>
                                 </div>
                             {% endif %}
