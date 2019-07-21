@@ -94,11 +94,11 @@ class NesaScoreGraph extends BaseComponent
         $markData      = self::BASE_MARKS;
         $studentMark   = null;
         $error         = null;
-        $showComponent = true; // If exceptions occur, we need to show component so we can see those errors
         try {
             [$markData, $studentMark, $showComponent] = $this->collateMarks($this->collateAssessables());
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
+            $showComponent = $this->showErrors();
         }
 
         $context = [
@@ -347,7 +347,10 @@ class NesaScoreGraph extends BaseComponent
             if (!$assessment->isParticipant($this->student)) {
                 continue;
             }
-            return $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false);
+
+            return
+                $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false) &&
+                $this->isFeedbackVisibleToUser($assessment);
         }
         return false;
     }

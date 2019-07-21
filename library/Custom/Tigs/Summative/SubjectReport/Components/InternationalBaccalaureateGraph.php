@@ -138,13 +138,14 @@ class InternationalBaccalaureateGraph extends BaseComponent
         $studentComment = null;
         $error       = null;
         $header      = $this->generateHeader();
-        $showComponent = true; // If exceptions occur, we need to show component so we can see those errors
         try {
             [$markData, $studentMark, $studentComment, $showComponent] = $this->collateMarks($this->collateAssessments());
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
+            $showComponent = $this->showErrors();
         } catch (MapperException $e) {
             $error = $e->getMessage();
+            $showComponent = $this->showErrors();
         }
 
         $context = [
@@ -452,7 +453,9 @@ class InternationalBaccalaureateGraph extends BaseComponent
             if (!$assessment->isParticipant($this->student)) {
                 continue;
             }
-            return $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false);
+            return
+                $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false) &&
+                $this->isFeedbackVisibleToUser($assessment);
         }
         return false;
     }
