@@ -18,6 +18,7 @@ class Util
      * Normalizes a name:
      * * Leading and trailing spaces are stripped
      * * Multiple consecutive spaces are converted to single spaces
+     * * Convert to UTF-8 lowercase
      *
      * This is used to ensure that a capability or indicator with a similar name
      * to an existing one in the same place cannot be created.
@@ -27,6 +28,6 @@ class Util
      */
     public static function normalizeName(string $name): string
     {
-        return preg_replace('`\s+`', ' ', trim($name));
+        return mb_strtolower(preg_replace('`\s+`', ' ', trim($name)), 'UTF-8');
     }
 }
