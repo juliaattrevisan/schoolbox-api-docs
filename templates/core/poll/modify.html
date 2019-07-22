@@ -26,7 +26,7 @@ $(function() {
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label class="required" for="question">Question</label>
-                        <input class="required" type="text" id="question" name="question" value="{POLL_QUESTION}" />
+                        <input type="text" id="question" name="question" value="{POLL_QUESTION}" required />
                     </div>
                 </fieldset>
 
@@ -51,11 +51,9 @@ $(function() {
 
                 <fieldset class="content">
                     <div class="small-12 large-6 columns">
-                        <label>
-                            Close Date
-                            <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date">?</span>
-                            <input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}" data-datepicker />
-                        </label>
+                        <label for="cal_date" class="required">Close Date</label>
+                        <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date">?</span>
+                        <input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}" data-datepicker required />
                     </div>
                     <div class="small-12 large-6 columns">
                         <label>
