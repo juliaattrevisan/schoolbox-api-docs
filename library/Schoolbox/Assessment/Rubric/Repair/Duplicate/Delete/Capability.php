@@ -43,7 +43,7 @@ class Capability extends Base
 
     private const COUNT_CAPABILITY_INDICATORS_QUERY = '
         SELECT COUNT(*)
-        FROM   rubric_criterion
+        FROM   rubric_indicator
         WHERE  rubric_group_id = :capabilityId
         AND    deleted_at IS NULL
         ORDER BY name, id

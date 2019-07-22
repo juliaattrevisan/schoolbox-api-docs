@@ -23,7 +23,7 @@ class Mapper extends Schoolbox\Mapper
 {
     protected function mapping()
     {
-        $this->hasTable('rubric_criterion_usage');
+        $this->hasTable('rubric_indicator_usage');
         $this->hasModel(Model::class);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins('criterion_id', IndicatorMapper::class, 'id', null, null, 'indicator', 'indicator');

@@ -33,7 +33,7 @@ class Indicator extends Base
     /**************************** Capability queries ***************************/
 
     private const DELETE_INDICATOR_QUERY = '
-        UPDATE rubric_criterion
+        UPDATE rubric_indicator
         SET    deleted_at = :now
         WHERE  id         = :indicatorId
     ';
@@ -43,7 +43,7 @@ class Indicator extends Base
 
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
         SELECT id, name
-        FROM   rubric_criterion
+        FROM   rubric_indicator
         WHERE  rubric_group_id = :capabilityId
         AND    deleted_at      IS NULL
         ORDER BY name, id
@@ -54,7 +54,7 @@ class Indicator extends Base
 
     private const COUNT_INDICATOR_USAGES_QUERY = '
         SELECT COUNT(*)
-        FROM       rubric_criterion_usage rcu
+        FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box         sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment             a  ON sb.assessment_id = a.id
         WHERE rcu.criterion_id = :indicatorId

@@ -55,13 +55,13 @@ $kernel->run(new class extends App
 
     private const FIND_RUBRIC_INDICATOR_QUERY = "
         SELECT id, name
-        FROM   rubric_criterion
+        FROM   rubric_indicator
         WHERE  rubric_group_id = :capabilityId
         AND    deleted_at IS NULL
     ";
 
     private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
-        UPDATE rubric_criterion
+        UPDATE rubric_indicator
         SET    rubric_group_id = :courseCapabilityId
         WHERE  id              = :unitIndicatorId
     ';
@@ -73,7 +73,7 @@ $kernel->run(new class extends App
     ';
 
     private const DELETE_RUBRIC_INDICATOR_QUERY = '
-        UPDATE rubric_criterion
+        UPDATE rubric_indicator
         SET    deleted_at = :now
         WHERE  id         = :unitIndicatorId
     ';
@@ -106,14 +106,14 @@ $kernel->run(new class extends App
 
     private const FIND_RUBRIC_INDICATOR_USAGE_QUERY = '
         SELECT     a.id
-        FROM       rubric_criterion_usage rcu
+        FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box          sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment               a ON sb.assessment_id = a.id
         WHERE rcu.criterion_id = :unitIndicatorId
     ';
 
     private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
-        UPDATE rubric_criterion_usage rcu
+        UPDATE rubric_indicator_usage rcu
         INNER JOIN submission_box      sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
         SET    rcu.criterion_id = :courseIndicatorId
@@ -123,7 +123,7 @@ $kernel->run(new class extends App
 
     private const DELETE_RUBRIC_INDICATOR_USAGE_QUERY = '
         DELETE rcu
-        FROM       rubric_criterion_usage rcu
+        FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box          sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment               a ON sb.assessment_id = a.id
         WHERE rcu.criterion_id = :unitIndicatorId

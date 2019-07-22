@@ -37,14 +37,14 @@ class Capability extends Base
 
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
         SELECT id, name
-        FROM   rubric_criterion
+        FROM   rubric_indicator
         WHERE  rubric_group_id = :capabilityId
         AND    deleted_at IS NULL
         ORDER BY name, id
     ';
 
     private const MERGE_CAPABILITY_INDICATOR_QUERY = '
-        UPDATE rubric_criterion
+        UPDATE rubric_indicator
         SET rubric_group_id = :originalCapabilityId
         WHERE rubric_group_id = :duplicateCapabilityId
         AND id = :indicatorId

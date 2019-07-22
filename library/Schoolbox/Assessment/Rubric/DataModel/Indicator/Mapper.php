@@ -28,7 +28,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 class Mapper extends BaseMapper {
 
     protected function mapping() {
-        $this->hasTable('rubric_criterion');
+        $this->hasTable('rubric_indicator');
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
