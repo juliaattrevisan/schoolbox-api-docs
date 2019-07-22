@@ -57,7 +57,6 @@ class External_Schoolpro_Class implements External_ClassInterface
                     'StudentSpecialNeedsFlag' => '',
                     'EnglishSecondFlag'       => '',
                     'StudentTutorDescription' => '',
-                    'ClassCampus'             => '',
                 ];
 
                 $allStudents[] = $student;

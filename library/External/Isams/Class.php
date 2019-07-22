@@ -62,8 +62,7 @@ class External_Isams_Class implements External_ClassInterface
                       V_Student.txtadditionalHealth AS StudentSpecialNeedsFlag,
                       ''                            AS EnglishSecondFlag,
                       ''                            AS StudentTutorDescription,
-                      V_Student.StudentID           AS synergy_id, 
-                      null                          AS ClassCampus 
+                      V_Student.StudentID           AS synergy_id
             FROM      V_Student 
             JOIN      V_Class ON V_Class.StudentID = V_Student.StudentID
             WHERE     $classQuery

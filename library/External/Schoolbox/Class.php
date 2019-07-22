@@ -59,7 +59,6 @@ class External_Schoolbox_Class implements External_ClassInterface
                     'StudentSpecialNeedsFlag' => '',
                     'EnglishSecondFlag'       => $student['esl_flag'],
                     'StudentTutorDescription' => '',
-                    'ClassCampus'             => '',
                 ];
 
                 $found[$studentExternalId] = true;

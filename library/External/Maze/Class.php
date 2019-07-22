@@ -54,8 +54,7 @@ class External_Maze_Class implements External_ClassInterface {
                 MEDICAL AS MedicalAlert,
                 '' AS SpecialNeedsFlag,
                 '' AS EnglishSecondFlag,
-                '' AS StudentTutorDescription,
-                '' AS ClassCampus
+                '' AS StudentTutorDescription
             FROM STMA
             LEFT JOIN SU ON STMA.MKEY = SU.SUKEY
             LEFT JOIN ST ON STMA.SKEY = ST.STKEY

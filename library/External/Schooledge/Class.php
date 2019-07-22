@@ -100,8 +100,7 @@ class External_Schooledge_Class implements External_ClassInterface
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
                 ''             AS EnglishSecondFlag,
                 s.HomeGroup    AS StudentTutorDescription,
-                s.Code         AS synergy_id,
-                ''             AS ClassCampus
+                s.Code         AS synergy_id
             FROM fc.TimetableSubject ts
             
             INNER JOIN fc.Timetable              t   ON ts.TimetableID = t.ID
@@ -125,8 +124,7 @@ class External_Schooledge_Class implements External_ClassInterface
                 s.SpecialNeeds AS StudentSpecialNeedsFlag,
                 ''             AS EnglishSecondFlag,
                 s.HomeGroup    AS StudentTutorDescription,
-                s.Code         AS synergy_id,
-                ''             AS ClassCampus
+                s.Code         AS synergy_id
 
             FROM fc.TimetableSubject ts
 

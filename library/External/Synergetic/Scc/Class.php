@@ -40,7 +40,7 @@ class External_Synergetic_Scc_Class extends External_Synergetic_Class
                         vStudents.IntegrationFlag,
                         vStudents.EMAFlag,
                         vStudents.StudentTutorDescription,
-                        StudentClasses.StudentID as synergy_id, StudentClasses.ClassCampus
+                        StudentClasses.StudentID as synergy_id
         FROM    dbo.vStudentClasses StudentClasses
         JOIN dbo.vStudents vStudents ON (
             vStudents.FileYear = StudentClasses.FileYear AND

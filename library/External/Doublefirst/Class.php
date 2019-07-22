@@ -61,8 +61,7 @@ class External_Doublefirst_Class implements External_ClassInterface
                     0 as StudentSpecialNeedsFlag,
                     '' as EnglishSecondFlag,
                     null AS StudentTutorDescription,
-                    pbi.PupilID as synergy_id, 
-                    null AS ClassCampus 
+                    pbi.PupilID as synergy_id
                 FROM PupilSubjects ps JOIN V_PupilBasicInformation pbi ON pbi.PupilID = ps.PupilID 
                 LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = ps.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = ps.SchoolYear 
                 JOIN TimetableClassRoom tcr ON tcr.YearGroup = ps.yeargroup AND tcr.SubjectID = ps.SubjectID AND tcr.DivisionID = ps.DivisionID AND tcr.AcademicYear = ps.SchoolYear 

@@ -21,8 +21,7 @@ interface External_ClassInterface extends External\IConnector
      * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
      * StudentSpecialNeedsFlag,
      * StudentTutorDescription,
-     * synergy_id,
-     * ClassCampus
+     * synergy_id
      *
      * @param string $classCode  CSV list of class codes to find students in. eg 'ABC123' or 'ABC123,XYZ456'
      * @return string[][]
