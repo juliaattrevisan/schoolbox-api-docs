@@ -11,7 +11,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
-
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
 
@@ -57,7 +56,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $externalClassHandler = new External_Class();
         $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
 
-        if (!is_array($allStudents)) {
+        if (!count($allStudents)) {
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
             $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
