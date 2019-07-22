@@ -674,8 +674,8 @@ class DataSource
 
         /** @var Collection|GenericCollection[]|DescriptorMarkModel[] $indicatorMarkModelsByCapability */
         $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumnList([
-            'rubric_group_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
-            'valid'                => true,
+            'rubric_capability_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
+            'valid'                     => true,
         ])->filter(function (DescriptorMarkModel $indicatorMark) {
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
@@ -1096,9 +1096,9 @@ class DataSource
     {
         $query = "
             UPDATE     rubric_descriptor_mark rdm
-            INNER JOIN rubric_capability_mark  rgm ON rdm.rubric_group_mark_id = rgm.id
-            INNER JOIN submission_return       sr ON rgm.return_id            = sr.id
-            INNER JOIN submission_box          sb ON sr.box_id                = sb.id
+            INNER JOIN rubric_capability_mark  rgm ON rdm.rubric_capability_mark_id = rgm.id
+            INNER JOIN submission_return       sr  ON rgm.return_id                 = sr.id
+            INNER JOIN submission_box          sb  ON sr.box_id                     = sb.id
             SET        rdm.valid = FALSE,
                        rgm.valid = FALSE
             WHERE      sb.assessment_id = :assessmentId
@@ -1200,8 +1200,8 @@ class DataSource
                         a.title,
                         rd.description
                     FROM       rubric_descriptor_mark rdm
-                    INNER JOIN rubric_capability_mark rgm ON rdm.rubric_group_mark_id = rgm.id
-                    INNER JOIN rubric_capability       rg ON rgm.rubric_group_id = rg.id
+                    INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
+                    INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
                     INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
                     INNER JOIN rubric_indicator        rc ON rd.criterion_id = rc.id
                     INNER JOIN submission_return       sr ON rgm.return_id = sr.id
@@ -1414,8 +1414,8 @@ class DataSource
         /** @var CapabilityUsageModel[]|GenericCollection $srcCapabilityUsages */
         /** @var IndicatorUsageModel[]|GenericCollection $srcIndicatorUsages */
         $srcCapabilityUsages = $capabilityUsageMapper->findByColumnList([
-            'rubric_group_id'   => $srcCapabilities->getPropertyValues('id'),
-            'submission_box_id' => $sourceBox->getId(),
+            'rubric_capability_id' => $srcCapabilities->getPropertyValues('id'),
+            'submission_box_id'    => $sourceBox->getId(),
         ]);
         $srcIndicatorUsages = $indicatorUsageMapper->findByColumnList([
             'criterion_id'      => $srcIndicators->getPropertyValues('id'),
@@ -1512,11 +1512,11 @@ class DataSource
                 sr.id    AS feedbackId,
                 a.id     AS assessmentId
             FROM submission_return sr
-            INNER JOIN user                 u ON sr.owner = u.id
-            INNER JOIN submission_box      sb ON sr.box_id = sb.id
+            INNER JOIN user                      u ON sr.owner = u.id
+            INNER JOIN submission_box           sb ON sr.box_id = sb.id
             INNER JOIN rubric_capability_usage rgu ON sb.id = rgu.submission_box_id
-            INNER JOIN rubric_capability        rg ON rgu.rubric_group_id = rg.id
-            INNER JOIN assessment           a ON sb.assessment_id = a.id
+            INNER JOIN rubric_capability        rg ON rgu.rubric_capability_id = rg.id
+            INNER JOIN assessment                a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY sr.published_at ASC
         ");
@@ -1559,7 +1559,7 @@ class DataSource
                 MAX(rd.max_value) AS maxMark
             FROM rubric_descriptor rd
             JOIN rubric_indicator  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
-            JOIN rubric_capability rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+            JOIN rubric_capability rg ON rg.id = rc.rubric_capability_id AND rg.deleted_at IS NULL
             JOIN rubric_level      rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
             JOIN submission_box    sb ON rl.box_id = sb.id
             JOIN assessment         a ON sb.assessment_id = a.id
@@ -1598,8 +1598,8 @@ class DataSource
                 rd.description,
                 rdm.value
             FROM       rubric_descriptor_mark rdm
-            INNER JOIN rubric_capability_mark rgm ON rdm.rubric_group_mark_id = rgm.id
-            INNER JOIN rubric_capability       rg ON rgm.rubric_group_id = rg.id
+            INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
+            INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
             INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
             INNER JOIN rubric_indicator        rc ON rd.criterion_id = rc.id
             INNER JOIN submission_return       sr ON rgm.return_id = sr.id
@@ -1657,7 +1657,7 @@ class DataSource
         $stmt = $this->database->prepare("
             SELECT rg.name AS grouping, rc.id, rc.name
             FROM rubric_indicator  rc
-            JOIN rubric_capability rg ON rg.id = rc.rubric_group_id AND rg.deleted_at IS NULL
+            JOIN rubric_capability rg ON rg.id = rc.rubric_capability_id AND rg.deleted_at IS NULL
             WHERE {$whereClause}
             AND rc.deleted_at IS NULL
             AND rg.deleted_at IS NULL

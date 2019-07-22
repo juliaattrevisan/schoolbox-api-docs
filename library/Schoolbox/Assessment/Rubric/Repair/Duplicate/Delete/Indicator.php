@@ -44,7 +44,7 @@ class Indicator extends Base
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
         SELECT id, name
         FROM   rubric_indicator
-        WHERE  rubric_group_id = :capabilityId
+        WHERE  rubric_capability_id = :capabilityId
         AND    deleted_at      IS NULL
         ORDER BY name, id
     ';

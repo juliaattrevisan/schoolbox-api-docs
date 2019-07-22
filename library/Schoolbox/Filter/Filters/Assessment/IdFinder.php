@@ -606,7 +606,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         foreach(array_unique($capabilityIds) as $uniqueCapId) {
-            $pb->equals('rgu.rubric_group_id', $uniqueCapId);
+            $pb->equals('rgu.rubric_capability_id', $uniqueCapId);
         }
 
         return [$join, '(' . implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];

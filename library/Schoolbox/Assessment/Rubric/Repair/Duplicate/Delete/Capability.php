@@ -44,7 +44,7 @@ class Capability extends Base
     private const COUNT_CAPABILITY_INDICATORS_QUERY = '
         SELECT COUNT(*)
         FROM   rubric_indicator
-        WHERE  rubric_group_id = :capabilityId
+        WHERE  rubric_capability_id = :capabilityId
         AND    deleted_at IS NULL
         ORDER BY name, id
     ';
@@ -57,7 +57,7 @@ class Capability extends Base
         FROM rubric_capability_usage rgu
         INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment     a  ON sb.assessment_id = a.id
-        WHERE rgu.rubric_group_id = :capabilityId
+        WHERE rgu.rubric_capability_id = :capabilityId
         AND   a.deleted_at IS NULL
     ';
 

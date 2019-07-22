@@ -31,15 +31,15 @@ FROM assessment a
 
     -- Rubric indicator, descriptor joins
     -- Join through rubric_criterion_usage as I only care about indicators actually in use
-    INNER JOIN rubric_capability_usage rgu ON  sb.id               = rgu.submission_box_id
-    INNER JOIN rubric_capability       rg  ON  rgu.rubric_group_id = rg.id
+    INNER JOIN rubric_capability_usage rgu ON sb.id                    = rgu.submission_box_id
+    INNER JOIN rubric_capability       rg  ON rgu.rubric_capability_id = rg.id
 
-    INNER JOIN rubric_indicator_usage  rcu ON  sb.id               = rcu.submission_box_id
-    INNER JOIN rubric_indicator        rc  ON  rcu.criterion_id    = rc.id AND
-                                               rc.rubric_group_id  = rg.id
+    INNER JOIN rubric_indicator_usage  rcu ON sb.id                    = rcu.submission_box_id
+    INNER JOIN rubric_indicator        rc  ON rcu.criterion_id         = rc.id AND
+                                              rc.rubric_capability_id  = rg.id
 
-    INNER JOIN rubric_descriptor       rd  ON  rd.criterion_id     = rc.id AND
-                                       rd.level_id         = rl.id
+    INNER JOIN rubric_descriptor       rd  ON  rd.criterion_id         = rc.id AND
+                                               rd.level_id             = rl.id
 
 -- Only valid rubric marks
 WHERE
@@ -91,16 +91,16 @@ SELECT
     IF (rdm.valid, rd.description, NULL) AS descriptor_name
 
 FROM rubric_descriptor_mark rdm
-    INNER JOIN rubric_descriptor      rd      ON rdm.descriptor_id        = rd.id
-    INNER JOIN rubric_capability_mark rgm     ON rdm.rubric_group_mark_id = rgm.id
+    INNER JOIN rubric_descriptor      rd      ON rdm.descriptor_id             = rd.id
+    INNER JOIN rubric_capability_mark rgm     ON rdm.rubric_capability_mark_id = rgm.id
 
-    INNER JOIN submission_return      sr      ON rgm.return_id            = sr.id
-    INNER JOIN user                   student ON sr.owner                 = student.id
-    INNER JOIN user                   marker  ON sr.marker                = marker.id
+    INNER JOIN submission_return      sr      ON rgm.return_id                 = sr.id
+    INNER JOIN user                   student ON sr.owner                      = student.id
+    INNER JOIN user                   marker  ON sr.marker                     = marker.id
 
-    INNER JOIN submission_box         sb      ON sr.box_id                = sb.id
-    INNER JOIN v_rubric               vr      ON vr.assessment_id         = sb.assessment_id AND
-                                                 rd.criterion_id          = vr.indicator_id
+    INNER JOIN submission_box         sb      ON sr.box_id                     = sb.id
+    INNER JOIN v_rubric               vr      ON vr.assessment_id              = sb.assessment_id AND
+                                                 rd.criterion_id               = vr.indicator_id
 
 -- Only valid published rubric
 WHERE

@@ -34,7 +34,7 @@ class Mapper extends BaseMapper {
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joins('rubric_group_id', CapabilityMapper::class, 'id', null, null, 'capability', 'capability');
+        $this->joins('rubric_capability_id', CapabilityMapper::class, 'id', null, null, 'capability', 'capability');
 
         // Add curriculum codes
         $this->joinsVia(
@@ -153,7 +153,7 @@ class Mapper extends BaseMapper {
      */
     public function deleteCapability(Model $indicator)
     {
-        $remaining = $this->countByColumn('rubric_group_id', $indicator->getCapability()->getId());
+        $remaining = $this->countByColumn('rubric_capability_id', $indicator->getCapability()->getId());
         if (0 === $remaining) {
             $this->getJoinMapper('capability')->delete($indicator->getCapability());
         }

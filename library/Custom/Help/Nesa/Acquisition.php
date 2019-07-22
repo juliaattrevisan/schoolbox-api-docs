@@ -161,7 +161,7 @@ class Acquisition
             INNER JOIN `user` u ON upd.user_id = u.`id`
             INNER JOIN submission_return sr ON u.`id` = sr.`owner`
             INNER JOIN rubric_capability_mark rgm on sr.id = rgm.return_id
-            INNER JOIN rubric_capability rg on rgm.rubric_group_id = rg.id
+            INNER JOIN rubric_capability rg on rgm.rubric_capability_id = rg.id
             INNER JOIN userAccess ua ON ua.uid = u.`id` AND rg.parent_id = ua.`sid` AND rg.parent_type = :parentType
             INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
             INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`

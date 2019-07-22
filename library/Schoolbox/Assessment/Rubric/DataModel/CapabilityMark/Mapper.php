@@ -42,7 +42,7 @@ class Mapper extends BaseMapper
             'submission_return'
         );
         $this->joins(
-            'rubric_group_id',
+            'rubric_capability_id',
             CapabilityMapper::class,
             'id',
             null,

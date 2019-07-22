@@ -38,15 +38,15 @@ class Capability extends Base
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
         SELECT id, name
         FROM   rubric_indicator
-        WHERE  rubric_group_id = :capabilityId
+        WHERE  rubric_capability_id = :capabilityId
         AND    deleted_at IS NULL
         ORDER BY name, id
     ';
 
     private const MERGE_CAPABILITY_INDICATOR_QUERY = '
         UPDATE rubric_indicator
-        SET rubric_group_id = :originalCapabilityId
-        WHERE rubric_group_id = :duplicateCapabilityId
+        SET rubric_capability_id = :originalCapabilityId
+        WHERE rubric_capability_id = :duplicateCapabilityId
         AND id = :indicatorId
     ';
 
@@ -61,22 +61,22 @@ class Capability extends Base
         FROM rubric_capability_usage rgu
         INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment     a  ON sb.assessment_id = a.id
-        WHERE rgu.rubric_group_id = :capabilityId
+        WHERE rgu.rubric_capability_id = :capabilityId
         AND   a.deleted_at IS NULL
     ';
 
     private const MERGE_CAPABILITY_USAGE_QUERY = '
         UPDATE rubric_capability_usage
-        SET rubric_group_id = :originalCapabilityId
-        WHERE rubric_group_id = :duplicateCapabilityId
+        SET rubric_capability_id = :originalCapabilityId
+        WHERE rubric_capability_id = :duplicateCapabilityId
         AND submission_box_id = :boxId
     ';
 
     private const MERGE_CAPABILITY_MARK_QUERY = '
         UPDATE rubric_capability_mark rm
-        INNER JOIN rubric_capability_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
-        SET rm.rubric_group_id = :originalCapabilityId
-        WHERE rm.rubric_group_id = :duplicateCapabilityId
+        INNER JOIN rubric_capability_usage rgu ON rm.rubric_capability_id = rgu.rubric_capability_id
+        SET rm.rubric_capability_id = :originalCapabilityId
+        WHERE rm.rubric_capability_id = :duplicateCapabilityId
         AND rgu.submission_box_id = :boxId
     ';
 

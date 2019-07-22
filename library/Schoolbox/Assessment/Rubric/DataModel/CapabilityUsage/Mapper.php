@@ -32,7 +32,7 @@ class Mapper extends Schoolbox\Mapper
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->joins(
-            'rubric_group_id',
+            'rubric_capability_id',
             CapabilityMapper::class,
             'id',
             null,

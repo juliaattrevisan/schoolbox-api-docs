@@ -56,13 +56,13 @@ $kernel->run(new class extends App
     private const FIND_RUBRIC_INDICATOR_QUERY = "
         SELECT id, name
         FROM   rubric_indicator
-        WHERE  rubric_group_id = :capabilityId
+        WHERE  rubric_capability_id = :capabilityId
         AND    deleted_at IS NULL
     ";
 
     private const MIGRATE_RUBRIC_INDICATOR_QUERY = '
         UPDATE rubric_indicator
-        SET    rubric_group_id = :courseCapabilityId
+        SET    rubric_capability_id = :courseCapabilityId
         WHERE  id              = :unitIndicatorId
     ';
 

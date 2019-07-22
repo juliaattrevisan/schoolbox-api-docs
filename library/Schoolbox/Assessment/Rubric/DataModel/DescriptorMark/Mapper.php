@@ -45,7 +45,7 @@ class Mapper extends BaseMapper
 
         $this->uses('value', self::TYPE_DECIMAL);
         $this->joins(
-            'rubric_group_mark_id',
+            'rubric_capability_mark_id',
             CapabilityMarkMapper::class,
             'id',
             self::TYPE_MODEL,
@@ -150,7 +150,7 @@ class Mapper extends BaseMapper
         $query = "
             DELETE     rdm
             FROM       rubric_descriptor_mark rdm
-            INNER JOIN rubric_capability_mark rgm on rdm.rubric_group_mark_id = rgm.id
+            INNER JOIN rubric_capability_mark rgm on rdm.rubric_capability_mark_id = rgm.id
             WHERE      rgm.return_id = :return_id;
         ";
 

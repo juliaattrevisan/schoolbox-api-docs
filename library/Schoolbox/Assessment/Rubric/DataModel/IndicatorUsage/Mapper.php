@@ -139,7 +139,7 @@ class Mapper extends Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
             INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
             INNER JOIN {$this->getJoinSql('indicator', 'ru', 'rc')}
-            WHERE rc.rubric_group_id = ?
+            WHERE rc.rubric_capability_id = ?
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$capabilityId]);
