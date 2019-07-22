@@ -8,8 +8,8 @@ declare(strict_types=1);
 
 use Alaress\Database;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model;
-use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model;
+use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
@@ -237,7 +237,7 @@ $app = new class extends CliTool\App
             $capabilityUsages = $selectStmt->fetchAll();
             $newSequences     = [];
             $this->getLogger()->debug($this->formatSequenceString('Old Capability Usage sequences', $capabilityUsages, 'rubric_group_id'));
-            $newSequence = Model::SEQUENCE_BASE;
+            $newSequence = CapabilityUsageModel::SEQUENCE_BASE;
             foreach ($capabilityUsages as $row) {
                 $oldSequence = (int)$row['sequence'];
                 if ($oldSequence !== $newSequence) {
@@ -292,7 +292,7 @@ $app = new class extends CliTool\App
             $indicatorUsages = $selectStmt->fetchAll();
             $newSequences    = [];
             $this->getLogger()->debug($this->formatSequenceString('Old Indicator Usage sequences', $indicatorUsages, 'criterion_id'));
-            $newSequence = Model::SEQUENCE_BASE;
+            $newSequence = IndicatorUsageModel::SEQUENCE_BASE;
             foreach ($indicatorUsages as $idx => $row) {
                 $oldSequence = (int)$row['sequence'];
                 if ($oldSequence !== $newSequence) {
