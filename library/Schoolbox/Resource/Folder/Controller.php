@@ -449,7 +449,7 @@ class Controller extends BaseController
             if ($access->getFolderAccess($user, $postData['categoryID']) < UserAccess::ACCESS_WRITE) {
                 throw new OutOfBoundsException("I find your lack of access disturbing.");
             }
-            $model->setId($postData['categoryID']);
+            $model->setId((int)$postData['categoryID']);
         }
         // Or is action INSERT ?
         elseif ($access->getFolderAccess($user, $postData['parent']) < UserAccess::ACCESS_WRITE) {

@@ -102,10 +102,22 @@ class Bulk_Folder
                     /* Check codes */
 
                     $codes = [];
+                    $lowerCaseCodes = [];
                     $skip = false;
 
                     for ($i=2; $row[$i]; $i++) {
                         $subjectCode = trim($row[$i]);
+                        $lowerCaseCode = strtolower($subjectCode);
+                        if (in_array($lowerCaseCode, $lowerCaseCodes, true) && !in_array($subjectCode, $codes, true)) {
+                            $skip     = true;
+                            $output[] = [
+                                'id'     => '',
+                                'name'   => $row[1],
+                                'status' => 'Skipped',
+                                'error'  => "Ambiguous subject code. Same characters but different capitalisation ({$subjectCode})",
+                            ];
+                            break;
+                        }
 
                         /* Check if code too looong */
                         if(strlen($subjectCode) > 20) {
@@ -139,6 +151,7 @@ class Bulk_Folder
                             /* noop - folder doesn't exist
                              */
                             $codes[] = $subjectCode;
+                            $lowerCaseCodes[] = $lowerCaseCode;
                         }
                     }
 

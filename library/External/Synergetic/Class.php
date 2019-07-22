@@ -76,6 +76,7 @@ class External_Synergetic_Class implements External_ClassInterface
             WHERE $classQuery
             AND FileYear='" . $fileYear . "'
             AND FileSemester='" . $fileSemester . "'
+            ORDER BY ClassCampus
         ";
 
         return $this->getDatabase()->getRow($query);

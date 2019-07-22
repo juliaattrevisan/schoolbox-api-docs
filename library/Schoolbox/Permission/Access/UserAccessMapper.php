@@ -193,7 +193,8 @@ class UserAccessMapper extends Mapper
             try {
                 // If campus code is set, find the code within the campus.
                 $campusCode = (isset($extSubj['campusCode']) && !empty($extSubj['campusCode'])) ? $extSubj['campusCode'] : '';
-                $catId = FolderMapper::getInstance()->findByCode($extSubj['code'], $campusCode)->getId();
+                $code       = $campusCode ? "$campusCode/{$extSubj['code']}" : $extSubj['code'];
+                $catId      = FolderMapper::getInstance()->findByCode($code)->getId();
 
                 $ua = new UserAccess();
 
