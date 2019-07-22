@@ -1,6 +1,6 @@
 {
   "name": "schoolbox",
-  "version": "18.2.0",
+  "version": "19.1.2",
   "author": "Schoolbox Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {
@@ -43,10 +43,9 @@
     "url": "git://github.com/alaress/schoolbox.git"
   },
   "scripts": {
-    "styleguide": "npx styleguidist server",
-    "build": "webpack --config webpack.config.js --mode development",
-    "watch": "webpack --config webpack.config.js --mode development --watch",
-    "publish": "webpack --config webpack.config.js --mode production"
+    "build": "webpack --config webpack.config.js --mode=development",
+    "watch": "webpack --config webpack.config.js --mode=development --watch",
+    "publish": "webpack --config webpack.config.js --mode=production"
   },
   "babel": {
     "presets": [
