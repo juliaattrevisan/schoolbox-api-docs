@@ -151,11 +151,11 @@ class Controller extends BaseController
             }
 
             $criterionModels = $this->criterionMapper->findByColumn('rubric_capability_id', $groupId);
-            $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
-            $proposedName    = $this->mapper->normaliseForComparison($critName);
+            $proposedGroup   = Util::normalizeName($groupName);
+            $proposedName    = Util::normalizeName($critName);
             foreach ($criterionModels as $criterionModel) {
-                $normGroup = $this->mapper->normaliseForComparison($criterionModel->getCapability()->getName());
-                $normName  = $this->mapper->normaliseForComparison($criterionModel->getName());
+                $normGroup = Util::normalizeName($criterionModel->getCapability()->getName());
+                $normName  = Util::normalizeName($criterionModel->getName());
                 if ($normGroup === $proposedGroup && $normName === $proposedName){
                     // TODO localise!!!!!
                     $this->sendJSONError("Indicator already exists in this Group");
@@ -201,9 +201,9 @@ class Controller extends BaseController
 
             // Ensure the proposed Group name is not already in use.
             $groupModels = $this->groupMapper->findForFolder($folderId);
-            $proposed    = $this->mapper->normaliseForComparison($groupName);
+            $proposed    = Util::normalizeName($groupName);
             foreach ($groupModels as $groupModel) {
-                $grouping = $this->mapper->normaliseForComparison($groupModel->getName());
+                $grouping = Util::normalizeName($groupModel->getName());
                 if ($proposed === $grouping) {
                     // TODO localise
                     $this->sendJSONError("Group name already exists in this context");

@@ -40,6 +40,7 @@ use Schoolbox\Assessment\Rubric\RowSet\Capability;
 use Schoolbox\Assessment\Rubric\RowSet\Indicator;
 use Schoolbox\Assessment\Rubric\RowSet\RowSet;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
+use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -888,37 +889,6 @@ class DataSource
     }
 
     /**
-     * Normalises spaces.
-     *
-     * Trims trailing/leading space, and replaces multiple spaces/newlines/etc.
-     * with a single space.
-     *
-     * @param  string $string
-     *
-     * @return string
-     */
-    protected function normalizeSpace($string)
-    {
-        return trim(preg_replace('`\s+`', ' ', $string));
-    }
-
-    /**
-     * Converts an indicator name for comparison. Do NOT use for mutation before storage.
-     *
-     * * converts to lowercase
-     * * Replaces multiple whitespace with single space character
-     * * trims whitespace
-     *
-     * @param $string
-     *
-     * @return string
-     */
-    public function normaliseForComparison($string)
-    {
-        return strtolower($this->normalizeSpace($string));
-    }
-
-    /**
      * Imports a rubric grid from a CSV into the given due work.
      *
      * @param IStorage      $file
@@ -1332,8 +1302,8 @@ class DataSource
         /** @var CapabilityModel[] $existingCapabilityMap */
         $existingCapabilityMap = [];
         foreach ($existingIndicators as $existingIndicator) {
-            $capabilityName                                        = $this->normaliseForComparison($existingIndicator->getCapability()->getName());
-            $indicatorName                                         = $this->normaliseForComparison($existingIndicator->getName());
+            $capabilityName                                        = Util::normalizeName($existingIndicator->getCapability()->getName());
+            $indicatorName                                         = Util::normalizeName($existingIndicator->getName());
             $existingIndicatorMap[$capabilityName][$indicatorName] = $existingIndicator;
             $existingCapabilityMap[$capabilityName]                = $existingIndicator->getCapability();
         }
@@ -1360,8 +1330,8 @@ class DataSource
             // Does this indicator already exist on destination folder ?
             $duplicateCapability = false;
             $duplicateIndicator  = false;
-            $capabilityName      = $this->normaliseForComparison($srcCapabilities->getOffset($srcCapabilityId)->getName());
-            $indicatorName       = $this->normaliseForComparison($srcIndicators->getOffset($srcIndicatorId)->getName());
+            $capabilityName      = Util::normalizeName($srcCapabilities->getOffset($srcCapabilityId)->getName());
+            $indicatorName       = Util::normalizeName($srcIndicators->getOffset($srcIndicatorId)->getName());
             if (array_key_exists($capabilityName, $existingCapabilityMap)) {
                 $duplicateCapability = true;
                 if (array_key_exists($indicatorName, $existingIndicatorMap[$capabilityName])) {
