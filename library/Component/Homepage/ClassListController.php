@@ -4,10 +4,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Mail\AbstractMailer;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
+use Schoolbox\UserMapper;
+
 
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
@@ -55,7 +58,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
 
         if (!is_array($allStudents)) {
-
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
             $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
@@ -64,30 +66,27 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->setBlock('empty_state', 'empty_students_admin', 'empty_students_admin_block');
 
             $this->setVar([
-                'has_students_block'         => '',
-                'empty_read_block'           => '',
-                'empty_is_group_block'       => '',
-                'empty_code_block'           => '',
-                'empty_code_admin_block'     => '',
-                'empty_students_block'       => '',
+                'has_students_block' => '',
+                'empty_read_block' => '',
+                'empty_is_group_block' => '',
+                'empty_code_block' => '',
+                'empty_code_admin_block' => '',
+                'empty_students_block' => '',
                 'empty_students_admin_block' => '',
             ]);
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->parse('empty_read_block', 'empty_read');
             } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 && !$this->getSource()->getFolder()->isGroup()) {
-
                 if ($this->getUser()
-                         ->isSuperuser()) {
+                    ->isSuperuser()) {
                     $this->parse('empty_code_admin_block', 'empty_code_admin');
                 } else {
                     $this->parse('empty_code_block', 'empty_code');
                 }
-
             } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 && $this->getSource()->getFolder()->isGroup()) {
                 $this->parse('empty_is_group_block', 'empty_is_group');
             } else {
-
                 if ($this->getUser()->isSuperuser()) {
                     $this->parse('empty_students_admin_block', 'empty_students_admin');
                 } else {
@@ -96,9 +95,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setBlock('has_students', 'person', 'person_block');
             $this->setBlock('has_students', 'student_email', 'student_email_block');
             $this->setBlock('has_students', 'parent', 'parent_block');
@@ -106,155 +103,146 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             $this->setBlock('person', 'photo', 'photo_block');
 
             $this->setVar([
-                'empty_state_block'   => '',
-                'person_block'        => '',
+                'empty_state_block' => '',
+                'person_block' => '',
                 'student_email_block' => '',
-                'parent_email_block'  => '',
+                'parent_email_block' => '',
             ]);
 
             /* Display options
              */
             $displayOptions = [
                 'grid' => [
-                    'name'  => 'Grid',
+                    'name' => 'Grid',
                     'value' => 'grid',
-                    'css'   => 'grid',
+                    'css' => 'grid',
                 ],
                 'list' => [
-                    'name'  => 'List',
+                    'name' => 'List',
                     'value' => 'list',
-                    'css'   => '',
+                    'css' => '',
                 ],
             ];
 
             $this->setVar([
+                'student_block' => '',
+                'student_email_block' => '',
                 'LIST_STYLE' => $displayOptions[$this->getConfig('displayPortraits')]['css'],
             ]);
 
             /* Get all the students belonging to this category code
              */
-            $externalClassHandler = new External_Class();
-            $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
-            $userMapper           = \Schoolbox\UserMapper::getInstance();
-            $allStudentEmails     = [];
-            $synergyIds           = [];
+            $userMapper       = UserMapper::getInstance();
+            $allStudentEmails = [];
+            $synergyIds       = [];
 
-            $studentPhotoHidden = $this->getConfigMapper()->get('protect_student_photo');
+            $studentPhotoHidden   = $this->getConfigMapper()->get('protect_student_photo');
             $staffPhotoVisibility = $this->getConfigMapper()->get('protect_teacher_photo');
 
             $viewer = $this->getUser();
 
-            if (is_array($allStudents)) {
-                foreach ($allStudents as $currentStudent) {
+            foreach ($allStudents as $currentStudent) {
 
-                    try {
-                        $user = $userMapper->findByExternalId($currentStudent['synergy_id'], Role::STUDENT);
-                    } catch (MapperException $e) {
-                        // Ok to silently ignore. This just means the SIS has students who are not in SB
-                        continue;
-                    }
+                try {
+                    $user = $userMapper->findByExternalId($currentStudent['synergy_id'], Role::STUDENT);
+                } catch (MapperException $e) {
+                    // Ok to silently ignore. This just means the SIS has students who are not in SB
+                    continue;
+                }
 
-                    /* Accumulate this for a giant parent-based bcc
-                     */
-                    $synergyIds[] = $currentStudent['synergy_id'];
+                /* Accumulate this for a giant parent-based bcc
+                 */
+                $synergyIds[] = $currentStudent['synergy_id'];
 
-                    /* Agglutinate a giant bcc
-                     */
-                    if ($user->getEmail()) {
-                        $allStudentEmails[] = Scrub::text($user->getFormattedEmailDisplay());
-                    }
+                /* Agglutinate a giant bcc
+                 */
+                if ($user->getEmail()) {
+                    $allStudentEmails[] = Scrub::text($user->getFormattedEmailDisplay());
+                }
 
+                $this->setVar([
+                    'PERSON_UID' => $user->getId(),
+                    'PERSON_EXTERNAL_ID' => $user->getExternalId(),
+                    'PERSON_NAME' => Scrub::text($user->getFullName()),
+                    'PERSON_GROUP' => Scrub::text($user->getPreferredTitle()),
+                ]);
+
+                /* Don't display images in list view
+                 */
+                if ($this->getConfig('displayPortraits') == 'grid') {
                     $this->setVar([
-                        'PERSON_UID'         => $user->getId(),
-                        'PERSON_EXTERNAL_ID' => $user->getExternalId(),
-                        'PERSON_NAME'        => Scrub::text($user->getFullName()),
-                        'PERSON_GROUP'       => Scrub::text($user->getPreferredTitle()),
+                        'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
                     ]);
+                } else {
+                    $this->setVar([
+                        'GRID_VIEW_CLASSES' => '',
+                    ]);
+                }
 
-                    /* Don't display images in list view
-                     */
-                    if ($this->getConfig('displayPortraits') == 'grid') {
-                        $this->setVar([
-                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
-                        ]);
+                if ($user->getRole()->isStudent()) {
+
+                    //Hide Student Photo
+                    if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
+                        $this->setVar('photo_block', '');
+                    } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
+                        $this->setVar('photo_block', '');
                     } else {
-                        $this->setVar([
-                            'GRID_VIEW_CLASSES' => '',
-                        ]);
-                    }
-
-                    if($user->getRole()->isStudent()) {
-                        //Hide Student Photo
-                        if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
-                            $this->setVar('photo_block', '');
-                        } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
-                            $this->setVar('photo_block', '');
-                        } else {
-                            $this->parse('photo_block', 'photo');
-                        }
-                    }
-                    else if($user->getRole()->isStaff()) {
-                        //Hide Staff Photo
-
-                        if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
-                            $this->setVar('photo_block', '');
-                        } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
-                            $this->setVar('photo_block', '');
-                        } else {
-                            $this->parse('photo_block', 'photo');
-                        }
-                    }
-                    else {
                         $this->parse('photo_block', 'photo');
                     }
+                } elseif ($user->getRole()->isStaff()) {
 
-                    $this->parse('person_block', 'person', true);
-                }
-
-                /* Student bulk email
-                  */
-                if ($this->getContentPermission() > UserAccess::ACCESS_READ &&  $this->getConfigMapper()->get('mail_enable')) {
-                    $this->setVar([
-                        'REPLY_TO'           => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_STUDENTS' => implode(AbstractMailer::implodeGlue(), $allStudentEmails),
-                    ]);
-
-                    $this->parse('student_email_block', 'student_email');
-                } else {
-                    $this->setVar('student_email_block', '');
-                }
-
-                /* Parent bulk email
-                  */
-                if (count($synergyIds)
-                    && $this->getContentPermission() > UserAccess::ACCESS_READ
-                    && $this->getConfigMapper()->get('email_all_parents')
-                    && $this->getConfigMapper()->get('mail_enable')
-                ) {
-                    $externalHandler = new External_User();
-                    $allParents      = $externalHandler->getParentEmails($synergyIds);
-                    $emailAllParents = '';
-
-                    if (\is_array($allParents) && \count($allParents) > 0) {
-                        // Uniqueify, cleanup empty string emails and merge to string
-                        $emailAllParents = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($allParents)));
+                    //Hide Staff Photo
+                    if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
+                        $this->setVar('photo_block', '');
+                    } elseif ($staffPhotoVisibility == 1 && !$viewer->getRole()->isStaff()) {
+                        $this->setVar('photo_block', '');
+                    } else {
+                        $this->parse('photo_block', 'photo');
                     }
-
-                    $this->setVar([
-                        'REPLY_TO'          => $this->getUser()->getEmail(),
-                        'EMAIL_ALL_PARENTS' => $emailAllParents,
-                    ]);
-
-                    $this->parse('parent_email_block', 'parent_email');
                 } else {
-                    $this->setVar('parent_email_block', '');
+                    $this->parse('photo_block', 'photo');
                 }
 
-            } else {
+                $this->parse('person_block', 'person', true);
+            }
+
+            /* Student bulk email
+             */
+            if ($this->getContentPermission() > UserAccess::ACCESS_READ && $this->getConfigMapper()->get('mail_enable')) {
                 $this->setVar([
-                    'student_block'       => '',
-                    'student_email_block' => '',
+                    'REPLY_TO' => $this->getUser()->getEmail(),
+                    'EMAIL_ALL_STUDENTS' => implode(AbstractMailer::implodeGlue(), $allStudentEmails),
                 ]);
+
+                $this->parse('student_email_block', 'student_email');
+            } else {
+                $this->setVar('student_email_block', '');
+            }
+
+            /* Parent bulk email
+             */
+            if (count($synergyIds)
+                && $this->getContentPermission() > UserAccess::ACCESS_READ
+                && $this->getConfigMapper()->get('email_all_parents')
+                && $this->getConfigMapper()->get('mail_enable')
+            ) {
+                $externalHandler = new External_User();
+                $allParents      = $externalHandler->getParentEmails($synergyIds);
+                $emailAllParents = '';
+
+                if (\is_array($allParents) && \count($allParents) > 0) {
+                    // Uniqueify, cleanup empty string emails and merge to string
+                    $emailAllParents = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($allParents)));
+                }
+
+                $this->setVar([
+                    'REPLY_TO' => $this->getUser()->getEmail(),
+                    'EMAIL_ALL_PARENTS' => $emailAllParents,
+                ]);
+
+                $this->parse('parent_email_block', 'parent_email');
+            } else {
+                $this->setVar('parent_email_block', '');
             }
 
             $this->parse('has_students_block', 'has_students');
