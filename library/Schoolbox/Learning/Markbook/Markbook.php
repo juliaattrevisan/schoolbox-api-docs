@@ -22,7 +22,7 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User;
-use Schoolbox\Learning\Analytics\BoxPlot\Quartile;
+use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 
 /**
  * Class Markbook
@@ -264,7 +264,6 @@ class Markbook
         $minSummator   = new Minimum();
         $maxSummator   = new Maximum();
         $countSummator = new Count();
-        $quartile      = new Quartile();
 
         // Summate assessment statistics for all users for each assessment
         // Render all stats as percentages for now?
@@ -279,17 +278,21 @@ class Markbook
                 $normMarks[] = $participant->getNormalisedMark(true);
             }
         }
+        $summary = new Summary($normMarks);
+        $fivePoints = $summary->getSummaryWithOutliers();
+
         $statistics = [
             'mean'              => null,
             'sd'                => null,
             'min'               => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
-            'minNormalized'     => $minSummator->summateList($normMarks),
+            'minNormalized'     => $fivePoints['min'],
             'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
-            'maxNormalized'     => $maxSummator->summateList($normMarks),
+            'maxNormalized'     => $fivePoints['max'],
             'count'             => $countSummator->summateList($normMarks),
-            'quartile1'         => $quartile->findMedian($quartile->setupFirstQuartile($normMarks)),
-            'quartile2'         => $quartile->findMedian($normMarks),
-            'quartile3'         => $quartile->findMedian($quartile->setupThirdQuartile($normMarks)),
+            'quartile1'         => $fivePoints['quartile1'],
+            'quartile2'         => $fivePoints['quartile2'],
+            'quartile3'         => $fivePoints['quartile3'],
+            'outliers'          => $fivePoints['outliers'],
         ];
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
