@@ -38,7 +38,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('rubric_descriptor_mark');
+        $this->hasTable('rubric_indicator_mark');
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -149,7 +149,7 @@ class Mapper extends BaseMapper
     {
         $query = "
             DELETE     rdm
-            FROM       rubric_descriptor_mark rdm
+            FROM       rubric_indicator_mark rdm
             INNER JOIN rubric_capability_mark rgm on rdm.rubric_capability_mark_id = rgm.id
             WHERE      rgm.return_id = :return_id;
         ";
@@ -172,7 +172,7 @@ class Mapper extends BaseMapper
     {
         $query = "
             SELECT            sr.owner AS student_id, COUNT(rm.id)
-            FROM              rubric_descriptor_mark rm
+            FROM              rubric_indicator_mark rm
             INNER JOIN        rubric_descriptor rd ON rd.id = rm.descriptor_id
             INNER JOIN        rubric_level rl ON rl.id = rd.level_id
             INNER JOIN        submission_box sb ON sb.id = rl.box_id

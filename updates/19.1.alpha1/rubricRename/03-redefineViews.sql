@@ -90,7 +90,7 @@ SELECT
     -- (Not a valid descriptor mark? Don't select it)
     IF (rdm.valid, rd.description, NULL) AS descriptor_name
 
-FROM rubric_descriptor_mark rdm
+FROM rubric_indicator_mark rdm
     INNER JOIN rubric_descriptor      rd      ON rdm.descriptor_id             = rd.id
     INNER JOIN rubric_capability_mark rgm     ON rdm.rubric_capability_mark_id = rgm.id
 

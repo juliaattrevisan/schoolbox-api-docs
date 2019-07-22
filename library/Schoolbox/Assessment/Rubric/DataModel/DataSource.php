@@ -1095,7 +1095,7 @@ class DataSource
     private function invalidateMarks(int $assessmentId): void
     {
         $query = "
-            UPDATE     rubric_descriptor_mark rdm
+            UPDATE     rubric_indicator_mark rdm
             INNER JOIN rubric_capability_mark  rgm ON rdm.rubric_capability_mark_id = rgm.id
             INNER JOIN submission_return       sr  ON rgm.return_id                 = sr.id
             INNER JOIN submission_box          sb  ON sr.box_id                     = sb.id
@@ -1199,7 +1199,7 @@ class DataSource
                         a.id,
                         a.title,
                         rd.description
-                    FROM       rubric_descriptor_mark rdm
+                    FROM       rubric_indicator_mark  rdm
                     INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
                     INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
                     INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
@@ -1597,7 +1597,7 @@ class DataSource
                 a.title,
                 rd.description,
                 rdm.value
-            FROM       rubric_descriptor_mark rdm
+            FROM       rubric_indicator_mark  rdm
             INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
             INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
             INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
