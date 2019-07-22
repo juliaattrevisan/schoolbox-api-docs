@@ -83,16 +83,16 @@ $kernel->run(new class extends App
         FROM       rubric_capability_usage rgu
         INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
-        WHERE rgu.rubric_group_id = :unitCapabilityId
+        WHERE rgu.rubric_capability_id = :unitCapabilityId
     ';
 
     private const MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY = '
         UPDATE     rubric_capability_usage rgu
         INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
-        SET    rgu.rubric_group_id = :courseCapabilityId
-        WHERE  rgu.rubric_group_id = :unitCapabilityId
-        AND    a.id                = :assessmentId
+        SET    rgu.rubric_capability_id = :courseCapabilityId
+        WHERE  rgu.rubric_capability_id = :unitCapabilityId
+        AND    a.id                     = :assessmentId
     ';
 
     private const DELETE_RUBRIC_CAPABILITY_USAGE_QUERY = '
@@ -100,8 +100,8 @@ $kernel->run(new class extends App
         FROM       rubric_capability_usage rgu
         INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
-        WHERE rgu.rubric_group_id = :unitCapabilityId
-        AND   a.id                = :assessmentId
+        WHERE rgu.rubric_capability_id = :unitCapabilityId
+        AND   a.id                     = :assessmentId
     ';
 
     private const FIND_RUBRIC_INDICATOR_USAGE_QUERY = '

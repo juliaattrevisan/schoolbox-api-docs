@@ -150,7 +150,7 @@ class Controller extends BaseController
                 $folderId = $groupModel->getParentId();
             }
 
-            $criterionModels = $this->criterionMapper->findByColumn('rubric_group_id', $groupId);
+            $criterionModels = $this->criterionMapper->findByColumn('rubric_capability_id', $groupId);
             $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
             $proposedName    = $this->mapper->normaliseForComparison($critName);
             foreach ($criterionModels as $criterionModel) {

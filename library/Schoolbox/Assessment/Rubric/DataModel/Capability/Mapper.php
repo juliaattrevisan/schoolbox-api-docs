@@ -50,7 +50,7 @@ class Mapper extends BaseMapper
             NodeMapper::class,
             'id',
             'curriculum_node_id',
-            'rubric_group_id',
+            'rubric_capability_id',
             null,
             null,
             null,
@@ -143,7 +143,7 @@ class Mapper extends BaseMapper
      */
     public function deleteUsages(Model $capability): void
     {
-        CapabilityUsageMapper::getInstance()->deleteByColumn('rubric_group_id', $capability->getId());
+        CapabilityUsageMapper::getInstance()->deleteByColumn('rubric_capability_id', $capability->getId());
     }
 
 

@@ -42,7 +42,7 @@ class Mapper extends BaseMapper {
             NodeMapper::class,
             'id',
             'curriculum_node_id',
-            'rubric_criterion_id',
+            'rubric_indicator_id',
             null,
             null,
             null,
@@ -209,7 +209,7 @@ class Mapper extends BaseMapper {
     public function verifyUniqueness(Model $object): bool
     {
         $pb = $this->getPredicateBuilder()
-                   ->equals('rubric_group_id', $object->getCapability()->getId());
+                   ->equals('rubric_capability_id', $object->getCapability()->getId());
 
         // Don't compare this object with itself
         if ($object->getId()) {
