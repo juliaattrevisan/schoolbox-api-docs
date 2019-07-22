@@ -137,7 +137,7 @@ class Mapper extends BaseMapper {
      */
     public function softDeleteDescriptors(Model $indicator)
     {
-        DescriptorMapper::getInstance()->deleteByColumn('criterion_id', $indicator->getId());
+        DescriptorMapper::getInstance()->deleteByColumn('rubric_indicator_id', $indicator->getId());
         return true;
     }
 
@@ -188,7 +188,7 @@ class Mapper extends BaseMapper {
      */
     public function deleteUsages(Model $indicator): void
     {
-        IndicatorUsageMapper::getInstance()->deleteByColumn('criterion_id', $indicator->getId());
+        IndicatorUsageMapper::getInstance()->deleteByColumn('rubric_indicator_id', $indicator->getId());
     }
 
 

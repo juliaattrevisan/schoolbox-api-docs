@@ -384,8 +384,8 @@ class DataSource
             return $l->getId();
         });
         $descriptorModels = DescriptorMapper::getInstance()->findByColumnList([
-            'criterion_id' => $indicatorUsageModels->keys(),
-            'level_id'     => $levelModels->keys(),
+            'rubric_indicator_id' => $indicatorUsageModels->keys(),
+            'level_id'            => $levelModels->keys(),
         ]);
 
         $groupedIndicatorUsageModels = $indicatorUsageModels->groupByCallback(
@@ -1203,7 +1203,7 @@ class DataSource
                     INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
                     INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
                     INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
-                    INNER JOIN rubric_indicator        rc ON rd.criterion_id = rc.id
+                    INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
                     INNER JOIN submission_return       sr ON rgm.return_id = sr.id
                     INNER JOIN submission_box          sb ON sr.box_id = sb.id
                     INNER JOIN assessment               a ON sb.assessment_id = a.id
@@ -1418,8 +1418,8 @@ class DataSource
             'submission_box_id'    => $sourceBox->getId(),
         ]);
         $srcIndicatorUsages = $indicatorUsageMapper->findByColumnList([
-            'criterion_id'      => $srcIndicators->getPropertyValues('id'),
-            'submission_box_id' => $sourceBox->getId(),
+            'rubric_indicator_id' => $srcIndicators->getPropertyValues('id'),
+            'submission_box_id'   => $sourceBox->getId(),
         ]);
 
         // Copy capability Usages
@@ -1558,7 +1558,7 @@ class DataSource
                 rc.name,
                 MAX(rd.max_value) AS maxMark
             FROM rubric_descriptor rd
-            JOIN rubric_indicator  rc ON rc.id = rd.criterion_id AND rc.deleted_at IS NULL
+            JOIN rubric_indicator  rc ON rc.id = rd.rubric_indicator_id AND rc.deleted_at IS NULL
             JOIN rubric_capability rg ON rg.id = rc.rubric_capability_id AND rg.deleted_at IS NULL
             JOIN rubric_level      rl ON rl.id = rd.level_id AND rl.deleted_at IS NULL
             JOIN submission_box    sb ON rl.box_id = sb.id
@@ -1601,7 +1601,7 @@ class DataSource
             INNER JOIN rubric_capability_mark rgm ON rdm.rubric_capability_mark_id = rgm.id
             INNER JOIN rubric_capability       rg ON rgm.rubric_capability_id = rg.id
             INNER JOIN rubric_descriptor       rd ON rdm.descriptor_id = rd.id
-            INNER JOIN rubric_indicator        rc ON rd.criterion_id = rc.id
+            INNER JOIN rubric_indicator        rc ON rd.rubric_indicator_id = rc.id
             INNER JOIN submission_return       sr ON rgm.return_id = sr.id
             INNER JOIN submission_box          sb ON sr.box_id = sb.id
             INNER JOIN assessment               a ON sb.assessment_id = a.id

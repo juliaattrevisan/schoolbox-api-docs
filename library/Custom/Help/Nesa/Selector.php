@@ -89,7 +89,7 @@ class Selector
             $criterionIds[] = $currentSpecCrit->getId();
         }
 
-        $allSpecDescriptors = $this->rubricDescriptorMapper->findByColumn('criterion_id', $criterionIds);
+        $allSpecDescriptors = $this->rubricDescriptorMapper->findByColumn('rubric_indicator_id', $criterionIds);
 
         /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
          * From here we can choose which descriptors we want to include in the report

@@ -35,10 +35,10 @@ FROM assessment a
     INNER JOIN rubric_capability       rg  ON rgu.rubric_capability_id = rg.id
 
     INNER JOIN rubric_indicator_usage  rcu ON sb.id                    = rcu.submission_box_id
-    INNER JOIN rubric_indicator        rc  ON rcu.criterion_id         = rc.id AND
+    INNER JOIN rubric_indicator        rc  ON rcu.rubric_indicator_id  = rc.id AND
                                               rc.rubric_capability_id  = rg.id
 
-    INNER JOIN rubric_descriptor       rd  ON  rd.criterion_id         = rc.id AND
+    INNER JOIN rubric_descriptor       rd  ON  rd.rubric_indicator_id  = rc.id AND
                                                rd.level_id             = rl.id
 
 -- Only valid rubric marks
@@ -100,7 +100,7 @@ FROM rubric_descriptor_mark rdm
 
     INNER JOIN submission_box         sb      ON sr.box_id                     = sb.id
     INNER JOIN v_rubric               vr      ON vr.assessment_id              = sb.assessment_id AND
-                                                 rd.criterion_id               = vr.indicator_id
+                                                 rd.rubric_indicator_id        = vr.indicator_id
 
 -- Only valid published rubric
 WHERE

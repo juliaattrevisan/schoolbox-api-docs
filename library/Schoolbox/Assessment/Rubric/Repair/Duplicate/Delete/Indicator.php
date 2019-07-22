@@ -57,7 +57,7 @@ class Indicator extends Base
         FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box         sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment             a  ON sb.assessment_id = a.id
-        WHERE rcu.criterion_id = :indicatorId
+        WHERE rcu.rubric_indicator_id = :indicatorId
         AND   a.deleted_at IS NULL
     ';
 

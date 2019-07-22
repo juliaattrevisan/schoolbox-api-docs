@@ -227,7 +227,7 @@ class RecursiveUndeleter extends CliTool\App
         Plagscan\Mapper::class              => [],
         Kami\Mapper::class                  => [],
         DataModel\Indicator\Mapper::class   => [
-            DataModel\Descriptor\Mapper::class => 'rubric_descriptor.criterion_id',
+            DataModel\Descriptor\Mapper::class => 'rubric_descriptor.rubric_indicator_id',
         ],
         UserMapper::class                   => [
             Pastoral\Access\Mapper::class,

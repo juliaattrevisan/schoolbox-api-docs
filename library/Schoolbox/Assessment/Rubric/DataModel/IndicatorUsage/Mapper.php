@@ -26,7 +26,7 @@ class Mapper extends Schoolbox\Mapper
         $this->hasTable('rubric_indicator_usage');
         $this->hasModel(Model::class);
         $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('criterion_id', IndicatorMapper::class, 'id', null, null, 'indicator', 'indicator');
+        $this->joins('rubric_indicator_id', IndicatorMapper::class, 'id', null, null, 'indicator', 'indicator');
         $this->joins('submission_box_id', SubmissionBoxMapper::class, 'id', null, null, 'submissionBox', 'submission_box');
 
         // Indicator usages are hard-deleted, so we have to use CALLBACK_POSTDELETE not CALLBACK_POSTSOFTDELETE
@@ -108,7 +108,7 @@ class Mapper extends Schoolbox\Mapper
             FROM {$this->getTable()} ru
             INNER JOIN {$this->getJoinSql('submission_box', 'ru', 'sb')}
             INNER JOIN {$this->getJoinSql('submission_box.assessmentModel', 'sb', 'a')}
-            WHERE ru.criterion_id = ?
+            WHERE ru.rubric_indicator_id = ?
         ";
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$indicatorId]);

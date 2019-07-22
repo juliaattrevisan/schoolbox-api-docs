@@ -109,15 +109,15 @@ $kernel->run(new class extends App
         FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box          sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment               a ON sb.assessment_id = a.id
-        WHERE rcu.criterion_id = :unitIndicatorId
+        WHERE rcu.rubric_indicator_id = :unitIndicatorId
     ';
 
     private const MIGRATE_RUBRIC_INDICATOR_USAGE_QUERY = '
         UPDATE rubric_indicator_usage rcu
         INNER JOIN submission_box      sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
-        SET    rcu.criterion_id = :courseIndicatorId
-        WHERE  rcu.criterion_id = :unitIndicatorId
+        SET    rcu.rubric_indicator_id = :courseIndicatorId
+        WHERE  rcu.rubric_indicator_id = :unitIndicatorId
         AND    a.id             = :assessmentId
     ';
 
@@ -126,7 +126,7 @@ $kernel->run(new class extends App
         FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box          sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment               a ON sb.assessment_id = a.id
-        WHERE rcu.criterion_id = :unitIndicatorId
+        WHERE rcu.rubric_indicator_id = :unitIndicatorId
         AND   a.id             = :assessmentId
     ';
 
@@ -138,13 +138,13 @@ $kernel->run(new class extends App
         INNER JOIN rubric_level      rl ON rd.level_id = rl.id
         INNER JOIN submission_box    sb ON rl.box_id = sb.id
         INNER JOIN assessment         a ON sb.assessment_id = a.id
-        WHERE rd.criterion_id = :indicatorId
+        WHERE rd.rubric_indicator_id = :indicatorId
         AND   rd.deleted_at IS NULL
     ';
 
     private const MIGRATE_RUBRIC_DESCRIPTOR_QUERY = '
         UPDATE rubric_descriptor
-        SET    criterion_id = :courseIndicatorId
+        SET    rubric_indicator_id = :courseIndicatorId
         WHERE  id           = :unitDescriptorId
     ';
 
