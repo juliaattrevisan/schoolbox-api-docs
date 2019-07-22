@@ -7,6 +7,6 @@
  */
 
 
-// Redirect to new rubric criteria form
-$this->localRedir('/rubric/criteria/' . $this->arg[0], null, 301);
+// Redirect to new rubric manager form
+$this->localRedir('/rubric/manager/' . $this->arg[0], null, 301);
 exit;

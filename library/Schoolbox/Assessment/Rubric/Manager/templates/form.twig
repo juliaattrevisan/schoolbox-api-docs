@@ -229,7 +229,7 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ routeLookup('rubricCriteria.postForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
+        <form action="{{ routeLookup('rubricManager.postForm', {folderId: folder.id}) }}" method="POST" class='top' data-role="rubric-criteria-form">
             <section>
                 {#
                 <!-- Cascade isn't supported, but if it is: -->
@@ -255,7 +255,7 @@ $(function() {
                                 {% if group.courseLevel %}(Course-level){% endif %}
                             </h3>
                             <ul class="information-list">
-                                {% include '@rubricCriteria/sub/group.twig' with {
+                                {% include '@rubricManager/sub/group.twig' with {
                                     group:                    group,
                                     allowModifyUsed:          allowModifyUsed,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
@@ -268,7 +268,7 @@ $(function() {
                             <ul class="information-list">
 
                                 {% for criterion in group.indicators %}
-                                    {% include '@rubricCriteria/sub/criterion.twig' with {
+                                    {% include '@rubricManager/sub/criterion.twig' with {
                                         group:                    group,
                                         criterion:                criterion,
                                         allowModifyUsed:          allowModifyUsed,
@@ -277,7 +277,7 @@ $(function() {
                                 {% endfor %}
 
                                 {# New criterion within group #}
-                                {% include '@rubricCriteria/sub/criterion.twig' with {
+                                {% include '@rubricManager/sub/criterion.twig' with {
                                     group:                    group,
                                     criterion:                null,
                                     allowModifyUsed:          allowModifyUsed,
@@ -293,7 +293,7 @@ $(function() {
                     <div class="{{ groupColumn }} columns">
                         <h3>{{ locale.rubricGroup.proper }}</h3>
                         <ul class="information-list">
-                            {% include '@rubricCriteria/sub/group.twig' with {
+                            {% include '@rubricManager/sub/group.twig' with {
                                 group:                    null,
                                 allowModifyUsed:          allowModifyUsed,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
@@ -304,7 +304,7 @@ $(function() {
                         <h3>{{ locale.rubricCriterion.properPlural }}</h3>
                         <ul class="information-list">
                             {# New criterion within new group #}
-                            {% include '@rubricCriteria/sub/criterion.twig' with {
+                            {% include '@rubricManager/sub/criterion.twig' with {
                                 group:                    null,
                                 criterion:                null,
                                 allowModifyUsed:          allowModifyUsed,

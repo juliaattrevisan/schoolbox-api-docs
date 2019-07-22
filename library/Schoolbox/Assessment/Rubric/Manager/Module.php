@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\Criteria;
+namespace Schoolbox\Assessment\Rubric\Manager;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -25,7 +25,7 @@ use Twig_Error_Loader;
 class Module extends BaseModule
 {
     /** @var string */
-    protected $basename = 'rubricCriteria';
+    protected $basename = 'rubricManager';
 
     /**
      * Hook method for setting up routes via self::register()

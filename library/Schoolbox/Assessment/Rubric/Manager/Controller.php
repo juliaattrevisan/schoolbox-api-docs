@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Assessment\Rubric\Criteria;
+namespace Schoolbox\Assessment\Rubric\Manager;
 
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource;
@@ -60,7 +60,7 @@ class Controller extends BaseController
     /**
      * View the rubric criteria form for a folder.
      *
-     * @api   GET /rubric/criteria/{folderId}
+     * @api   GET /rubric/manager/{folderId}
      * @level 181
      * @param FolderModel $folder
      */
@@ -69,7 +69,7 @@ class Controller extends BaseController
         $this->getResponse()->content->set(
             $this
                 ->buildHtmlOutput(
-                    '@rubricCriteria/form.twig',
+                    '@rubricManager/form.twig',
                     $this->buildTwigDataForForm($this->rubricMapper->retrieveRowSet($folder, true))
                 )
                 ->setTitle(
@@ -86,7 +86,7 @@ class Controller extends BaseController
     /**
      * Save the rubric criteria for a folder.
      *
-     * @api   POST /rubric/criteria/{folderId}
+     * @api   POST /rubric/manager/{folderId}
      * @level 181
      * @param FolderModel $folder
      * @throws \Schoolbox\Mapper\Exception
