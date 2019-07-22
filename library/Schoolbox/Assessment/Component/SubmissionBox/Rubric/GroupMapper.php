@@ -124,7 +124,7 @@ class GroupMapper extends BaseMapper
         foreach ($existingNames as $existingName) {
             if (Util::normalizeName($existingName) === $normalizedName) {
                 throw new MapperException(
-                    sprintf('Rubric capability name "%s" is in use in its context', $normalizedName)
+                    sprintf('Rubric capability name "%s" is already in use in this folder', $normalizedName)
                 );
             }
         }
