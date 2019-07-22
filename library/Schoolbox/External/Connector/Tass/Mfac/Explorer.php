@@ -53,6 +53,7 @@ class Explorer
         $this->companyCode = $companyCode;
     }
 
+
     /**
      * Find the contents of each table
      *

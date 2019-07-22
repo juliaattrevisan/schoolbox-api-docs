@@ -131,7 +131,8 @@ class Sync extends \Schoolbox\External\Connector\Tass\Base\Sync
         ";
 
         // Single Tuple contains data for [P]arent and [S]pouse
-        $iterator = $this->databaseExternal->getQueryIterator($query,
+        $iterator = $this->databaseExternal->getQueryIterator(
+            $query,
             [
                 'companyCode' => $this->companyCode,
                 'companyCode2' => $this->companyCode
