@@ -365,6 +365,13 @@ class Controller extends Assessment\Controller
      */
     public function getOverview(IAssessable $assessment)
     {
+        // Sort participant by lastname, firstname, and id
+        $participants = $assessment->getParticipantUsers()->sortByCallback(static function (User $participantA, User $participantB) {
+            return     strnatcasecmp($participantA->getLastname(), $participantB->getLastname())
+                    ?: strnatcasecmp($participantA->getFirstname(), $participantB->getFirstname())
+                    ?: strnatcasecmp($participantA->getId(), $participantB->getId());
+        });
+
         $data = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                 ->add([
@@ -372,6 +379,7 @@ class Controller extends Assessment\Controller
                     $this->getRouter()->generate('learningAssessment.getStatus', [ 'assessmentId' => $assessment->getId() ]) ])
                 ->add(['Rubric Report','']),
             'dueWork'     => $assessment,
+            'participants'=> $participants,
         ];
 
         if ($assessment->getUseRubric()) {
