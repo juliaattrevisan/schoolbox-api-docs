@@ -21,14 +21,14 @@ use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Mapper as CapabilityUs
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityUsage\Model as CapabilityUsageModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
-use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Mapper as DescriptorMarkMapper;
-use Schoolbox\Assessment\Rubric\DataModel\DescriptorMark\Model as DescriptorMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as IndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as IndicatorMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Model as IndicatorMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Mapper as IndicatorUsageMapper;
 use Schoolbox\Assessment\Rubric\DataModel\IndicatorUsage\Model as IndicatorUsageModel;
-use Schoolbox\Assessment\Rubric\DataModel\Level\Model as LevelModel;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as LevelMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Model as LevelModel;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Importer\CsvImporterFactory;
@@ -672,14 +672,14 @@ class DataSource
             'valid'     => true,
         ]);
 
-        /** @var Collection|GenericCollection[]|DescriptorMarkModel[] $indicatorMarkModelsByCapability */
-        $indicatorMarkModelsByCapability = DescriptorMarkMapper::getInstance()->findByColumnList([
+        /** @var Collection|GenericCollection[]|IndicatorMarkModel[] $indicatorMarkModelsByCapability */
+        $indicatorMarkModelsByCapability = IndicatorMarkMapper::getInstance()->findByColumnList([
             'rubric_capability_mark_id' => $capabilityMarkModels->getPropertyValues('id'),
             'valid'                     => true,
-        ])->filter(function (DescriptorMarkModel $indicatorMark) {
+        ])->filter(function (IndicatorMarkModel $indicatorMark) {
             return null !== $indicatorMark->getDescriptor();
         })->groupByCallback(
-            function (DescriptorMarkModel $indicatorMark) {
+            function (IndicatorMarkModel $indicatorMark) {
                 return $indicatorMark->getCapabilityMark()->getCapability()->getId();
             }
         );
@@ -687,7 +687,7 @@ class DataSource
         $indicatorMarkModelsByCapability = $indicatorMarkModelsByCapability->map(
             function (GenericCollection $c) {
                 return $c->indexByCallback(
-                    function (DescriptorMarkModel $mark) {
+                    function (IndicatorMarkModel $mark) {
                         return $mark->getDescriptor()->getIndicator()->getId();
                     }
                 );
@@ -769,7 +769,7 @@ class DataSource
         // Required mappers
         $capabilityMapper     = CapabilityMapper::getInstance();
         $descriptorMapper     = DescriptorMapper::getInstance();
-        $indicatorMarkMapper  = DescriptorMarkMapper::getInstance();
+        $indicatorMarkMapper  = IndicatorMarkMapper::getInstance();
         $capabilityMarkMapper = CapabilityMarkMapper::getInstance();
         $returnedWorkMapper   = SubmissionBox\ReturnedWorkMapper::getInstance();
 
@@ -879,7 +879,7 @@ class DataSource
         // Determine if there's valid capability marks for this participant.
         // Don't need to check descriptor marks separately, because they cannot
         // exist without capability marks.
-        $validCapMarkCount = DescriptorMarkMapper::getInstance()->countByColumnList([
+        $validCapMarkCount = IndicatorMarkMapper::getInstance()->countByColumnList([
             'r.id'  => $feedbackIds,
             'valid' => true,
         ]);
@@ -1050,7 +1050,7 @@ class DataSource
             return;
         }
         $capabilityMarkMapper       = CapabilityMarkMapper::getInstance();
-        $descriptorMarkMapper       = DescriptorMarkMapper::getInstance();
+        $descriptorMarkMapper       = IndicatorMarkMapper::getInstance();
         $sourceDescriptorMarks      = $descriptorMarkMapper->findByColumn('g.return_id', $sourceReturnId);
         $destinationCapabilityMarks = $capabilityMarkMapper->createCollection();
         $destinationDescriptorMarks = $descriptorMarkMapper->createCollection();
@@ -1120,7 +1120,7 @@ class DataSource
         return $mapper->delete(
             $mapper->findByColumnList($search)->filter(
                 function ($model) use ($exclude) {
-                    /** @var DescriptorMarkModel|LevelModel $model */
+                    /** @var IndicatorMarkModel|LevelModel $model */
                     return !in_array($model->getId(), $exclude);
                 }
             )

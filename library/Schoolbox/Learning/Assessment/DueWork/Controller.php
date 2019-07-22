@@ -166,7 +166,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'download'       => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'    => DataModel\DescriptorMark\Mapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'rubricMarks'    => DataModel\IndicatorMark\Mapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
         ];
 
@@ -1161,7 +1161,7 @@ class Controller extends Assessment\Controller
         // Do any students have marks for this rubric?
         $levelIds      = DataModel\Level\Mapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
         $descriptorIds = DataModel\Descriptor\Mapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $countMarkIds  = DataModel\DescriptorMark\Mapper::getInstance()->countByColumnList([
+        $countMarkIds  = DataModel\IndicatorMark\Mapper::getInstance()->countByColumnList([
             'descriptor_id' => $descriptorIds,
             'valid'         => true
         ]);

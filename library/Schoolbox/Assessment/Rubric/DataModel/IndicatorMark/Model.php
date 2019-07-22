@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Assessment\Rubric\DataModel\DescriptorMark;
+namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorMark;
 
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as CapabilityMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
