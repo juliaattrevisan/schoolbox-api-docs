@@ -1,7 +1,14 @@
 #!/usr/bin/php
 <?php
 /**
- * Merge duplicate rubric indicators, again.
+ * Run the repair folders script.
+ *
+ * This consists of:
+ * * merge duplicate capabilities
+ * * merge duplicate indicators
+ * * delete duplicate indicators
+ * * delete duplicate capabilities
+ * in that order.
  *
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,18 +16,5 @@
 
 declare(strict_types=1);
 
-use Schoolbox\Application\CliTool;
-use Schoolbox\Assessment\Rubric\Repair;
-
-require __DIR__ . '/../../../conf/core/require.php';
-
-$options = [
-    CliTool\Kernel::OPTION_ERRORS => E_ALL,
-];
-
-try {
-    (new CliTool\Kernel(new Repair\Folder(), null, $options))->runApp();
-} catch (Throwable $e) {
-    /** @noinspection PhpUnhandledExceptionInspection */
-    throw $e;
-}
+passthru(__DIR__ .  '/../../../tools/rubric/repairFolders.php -vvv --perform --mailto=support@schoolbox.com.au', $returnVar);
+exit($returnVar);
