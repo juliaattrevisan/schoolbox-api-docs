@@ -44,8 +44,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
                 '' AS StudentMedicalAlert,
                 '' AS StudentSpecialNeedsFlag,
                 '' AS EnglishSecondFlag,
-                '' AS StudentTutorDescription,
-                '' AS ClassCampus
+                '' AS StudentTutorDescription
             FROM  $studentClass
             LEFT JOIN $students ON $studentClass.STUDENT_NUMBER = $students.STUDENT_NUMBER
             WHERE $studentClass.CLASS_CODE IN (".implode(',',$codes).")

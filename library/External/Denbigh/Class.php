@@ -69,7 +69,6 @@ class External_Denbigh_Class implements External_ClassInterface
                 'StudentSpecialNeedsFlag' => '',
                 'EnglishSecondFlag'       => '',
                 'StudentTutorDescription' => '',
-                'ClassCampus'             => '',
             ];
         }
 

@@ -36,8 +36,7 @@ class External_Synergetic_Smcs_Class extends External_Synergetic_Class
                         uvStudents.StudentSpecialNeedsFlag,
                         uvStudents.StudentTutorDescription,
                         uvStudents.EnglishSecondFlag,
-                        StudentClasses.StudentID as synergy_id,
-                        StudentClasses.ClassCampus
+                        StudentClasses.StudentID as synergy_id
         FROM            dbo.vStudentClasses StudentClasses
         JOIN dbo.uvStudents uvStudents ON (
             uvStudents.FileYear = StudentClasses.FileYear AND
