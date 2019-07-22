@@ -28,7 +28,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('rubric_group_mark');
+        $this->hasTable('rubric_capability_mark');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('value', self::TYPE_DECIMAL);
@@ -112,7 +112,7 @@ class Mapper extends BaseMapper
      */
     public function deleteFeedbackMarks($returnId): int
     {
-        $query = "DELETE FROM rubric_group_mark WHERE return_id = :return_id";
+        $query = "DELETE FROM rubric_capability_mark WHERE return_id = :return_id";
 
         $statement = $this->database->prepare($query);
         $statement->execute([

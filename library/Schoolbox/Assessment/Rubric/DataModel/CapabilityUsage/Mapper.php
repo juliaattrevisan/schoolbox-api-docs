@@ -27,7 +27,7 @@ class Mapper extends Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('rubric_group_usage');
+        $this->hasTable('rubric_capability_usage');
         $this->hasModel(Model::class);
         $this->uses('max_value', self::TYPE_DECIMAL);
         $this->uses('sequence', self::TYPE_INTEGER);

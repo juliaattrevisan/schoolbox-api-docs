@@ -33,7 +33,7 @@ class Capability extends Base
     /**************************** Capability queries ***************************/
 
     private const DELETE_CAPABILITY_QUERY = '
-        UPDATE rubric_group
+        UPDATE rubric_capability
         SET    deleted_at = :now
         WHERE  id         = :capabilityId
     ';
@@ -54,7 +54,7 @@ class Capability extends Base
 
     private const COUNT_CAPABILITY_USAGES_QUERY = '
         SELECT COUNT(*)
-        FROM rubric_group_usage rgu
+        FROM rubric_capability_usage rgu
         INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment     a  ON sb.assessment_id = a.id
         WHERE rgu.rubric_group_id = :capabilityId

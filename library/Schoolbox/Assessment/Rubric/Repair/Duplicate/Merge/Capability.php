@@ -58,7 +58,7 @@ class Capability extends Base
             rgu.submission_box_id AS box_id,
             a.id,
             a.title
-        FROM rubric_group_usage rgu
+        FROM rubric_capability_usage rgu
         INNER JOIN submission_box sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment     a  ON sb.assessment_id = a.id
         WHERE rgu.rubric_group_id = :capabilityId
@@ -66,15 +66,15 @@ class Capability extends Base
     ';
 
     private const MERGE_CAPABILITY_USAGE_QUERY = '
-        UPDATE rubric_group_usage
+        UPDATE rubric_capability_usage
         SET rubric_group_id = :originalCapabilityId
         WHERE rubric_group_id = :duplicateCapabilityId
         AND submission_box_id = :boxId
     ';
 
     private const MERGE_CAPABILITY_MARK_QUERY = '
-        UPDATE rubric_group_mark rm
-        INNER JOIN rubric_group_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
+        UPDATE rubric_capability_mark rm
+        INNER JOIN rubric_capability_usage rgu ON rm.rubric_group_id = rgu.rubric_group_id
         SET rm.rubric_group_id = :originalCapabilityId
         WHERE rm.rubric_group_id = :duplicateCapabilityId
         AND rgu.submission_box_id = :boxId

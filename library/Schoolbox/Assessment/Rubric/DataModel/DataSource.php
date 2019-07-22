@@ -1096,7 +1096,7 @@ class DataSource
     {
         $query = "
             UPDATE     rubric_descriptor_mark rdm
-            INNER JOIN rubric_group_mark      rgm ON rdm.rubric_group_mark_id = rgm.id
+            INNER JOIN rubric_capability_mark  rgm ON rdm.rubric_group_mark_id = rgm.id
             INNER JOIN submission_return       sr ON rgm.return_id            = sr.id
             INNER JOIN submission_box          sb ON sr.box_id                = sb.id
             SET        rdm.valid = FALSE,
@@ -1514,8 +1514,8 @@ class DataSource
             FROM submission_return sr
             INNER JOIN user                 u ON sr.owner = u.id
             INNER JOIN submission_box      sb ON sr.box_id = sb.id
-            INNER JOIN rubric_group_usage rgu ON sb.id = rgu.submission_box_id
-            INNER JOIN rubric_group        rg ON rgu.rubric_group_id = rg.id
+            INNER JOIN rubric_capability_usage rgu ON sb.id = rgu.submission_box_id
+            INNER JOIN rubric_capability        rg ON rgu.rubric_group_id = rg.id
             INNER JOIN assessment           a ON sb.assessment_id = a.id
             WHERE {$where}
             ORDER BY sr.published_at ASC

@@ -55,7 +55,7 @@ abstract class Base extends CliTool\App
     // Query for finding capabilities to repair within a folder.
     protected const FIND_CAPABILITIES_QUERY = "
         SELECT id, name
-        FROM   rubric_group
+        FROM   rubric_capability
         WHERE  parent_type = 'category'
         AND    parent_id   = :folderId
         AND    deleted_at  IS NULL

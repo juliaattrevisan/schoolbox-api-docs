@@ -30,7 +30,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('rubric_group');
+        $this->hasTable('rubric_capability');
         $this->hasModel(Model::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);

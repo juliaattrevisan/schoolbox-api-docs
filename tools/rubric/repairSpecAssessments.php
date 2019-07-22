@@ -47,7 +47,7 @@ $kernel->run(new class extends App
 
     private const FIND_RUBRIC_CAPABILITY_QUERY = "
         SELECT id, name
-        FROM   rubric_group
+        FROM   rubric_capability
         WHERE  parent_type = 'category'
         AND    parent_id   = :folderId
         AND    deleted_at IS NULL
@@ -67,7 +67,7 @@ $kernel->run(new class extends App
     ';
 
     private const DELETE_RUBRIC_CAPABILITY_QUERY = '
-        UPDATE rubric_group
+        UPDATE rubric_capability
         SET    deleted_at = :now
         WHERE  id         = :unitCapabilityId
     ';
@@ -80,14 +80,14 @@ $kernel->run(new class extends App
 
     private const FIND_RUBRIC_CAPABILITY_USAGE_QUERY = '
         SELECT     a.id
-        FROM       rubric_group_usage rgu
+        FROM       rubric_capability_usage rgu
         INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
         WHERE rgu.rubric_group_id = :unitCapabilityId
     ';
 
     private const MIGRATE_RUBRIC_CAPABILITY_USAGE_QUERY = '
-        UPDATE     rubric_group_usage rgu
+        UPDATE     rubric_capability_usage rgu
         INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
         SET    rgu.rubric_group_id = :courseCapabilityId
@@ -97,7 +97,7 @@ $kernel->run(new class extends App
 
     private const DELETE_RUBRIC_CAPABILITY_USAGE_QUERY = '
         DELETE rgu
-        FROM       rubric_group_usage rgu
+        FROM       rubric_capability_usage rgu
         INNER JOIN submission_box      sb ON rgu.submission_box_id = sb.id
         INNER JOIN assessment           a ON sb.assessment_id = a.id
         WHERE rgu.rubric_group_id = :unitCapabilityId

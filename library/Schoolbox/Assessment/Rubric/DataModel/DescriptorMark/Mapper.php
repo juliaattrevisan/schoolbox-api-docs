@@ -150,7 +150,7 @@ class Mapper extends BaseMapper
         $query = "
             DELETE     rdm
             FROM       rubric_descriptor_mark rdm
-            INNER JOIN rubric_group_mark rgm on rdm.rubric_group_mark_id = rgm.id
+            INNER JOIN rubric_capability_mark rgm on rdm.rubric_group_mark_id = rgm.id
             WHERE      rgm.return_id = :return_id;
         ";
 
