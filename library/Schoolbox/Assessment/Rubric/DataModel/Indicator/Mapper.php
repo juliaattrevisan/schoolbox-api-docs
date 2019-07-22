@@ -38,7 +38,7 @@ class Mapper extends BaseMapper {
 
         // Add curriculum codes
         $this->joinsVia(
-            'curriculum_node_for_rubric_criterion',
+            'curriculum_node_for_rubric_indicator',
             NodeMapper::class,
             'id',
             'curriculum_node_id',
@@ -93,7 +93,7 @@ class Mapper extends BaseMapper {
         /** @var GenericCollection|Model[] $collection */
         $capabilityMapper     = $this->getJoinMapper('capability');
         $capabilityIds        = [];
-        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_criterion');
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
             /** @var Model $crit */
@@ -108,12 +108,12 @@ class Mapper extends BaseMapper {
         // Fetch curriculum nodes for indicator and capability separately
         $indicatorNodes = $curriculumNodeMapper->findForOtherMapper(
             $this,
-            'curriculum_node_for_rubric_criterion',
+            'curriculum_node_for_rubric_indicator',
             $collection->keys()
         );
         $capabilityNodes = $curriculumNodeMapper->findForOtherMapper(
             $capabilityMapper,
-            'curriculum_node_for_rubric_group',
+            'curriculum_node_for_rubric_capability',
             $capabilityIds
         );
         foreach ($collection as $indicator) {

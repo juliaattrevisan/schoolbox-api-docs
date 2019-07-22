@@ -46,7 +46,7 @@ class Mapper extends BaseMapper
 
         // Add curriculum codes
         $this->joinsVia(
-            'curriculum_node_for_rubric_group',
+            'curriculum_node_for_rubric_capability',
             NodeMapper::class,
             'id',
             'curriculum_node_id',
@@ -70,7 +70,7 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         /** @var NodeMapper $curriculumNodeMapper */
-        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_group');
+        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_capability');
         $collection           = $this->createCollection();
         foreach ($statement as $row) {
             /** @var Model $capability */
@@ -81,7 +81,7 @@ class Mapper extends BaseMapper
         // Fetch curriculum nodes separately
         $capabilityNodes = $curriculumNodeMapper->findForOtherMapper(
             $this,
-            'curriculum_node_for_rubric_group',
+            'curriculum_node_for_rubric_capability',
             $collection->keys()
         );
         foreach ($collection as $capability) {
