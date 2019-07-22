@@ -35,6 +35,10 @@ abstract class Base extends CliTool\App
     private const INDENT = '  ';
 
 
+    // Query for validating whether this should even run.
+    private const VERIFY_RUNNABLE_QUERY = "SHOW TABLES LIKE 'rubric_capability'";
+
+
     // Query for finding folders to repair.
     // Don't repair course spec or unit spec folders: there's already a script
     // for those (tools/rubric/repairSpecAssessments.php)
@@ -222,6 +226,26 @@ abstract class Base extends CliTool\App
 
 
     /**
+     * Can this tool even be run?
+     *
+     * @return bool
+     */
+    private function verifyRunnable(): bool
+    {
+        $this->log->notice('Verifying `rubric_capability` table exists...');
+        $query = $this->db->prepareQuery(self::VERIFY_RUNNABLE_QUERY);
+        $query->execute();
+        if ($query->rowCount() > 0) {
+            $this->log->notice('`rubric_capability` table exists: continuing');
+            return true;
+        }
+        $this->log->warning('`rubric_capability` table does not exist: stopping');
+        $this->log->warning('(This is likely occurring due to an update that has not run yet: this will run later)');
+        return false;
+    }
+
+
+    /**
      * Set up basic dependencies for all repair scripts.
      *
      * @throws ServiceNotFound
@@ -269,6 +293,10 @@ abstract class Base extends CliTool\App
     public function run(): void
     {
         $this->setupDependencies();
+        if (!$this->verifyRunnable()) {
+            $this->log->warning('Not running due to above issues: skipping');
+            return;
+        }
         $this->setupCommonQueries();
         $this->setupQueries();
 
