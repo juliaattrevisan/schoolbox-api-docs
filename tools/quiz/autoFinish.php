@@ -103,6 +103,7 @@ $app = new class extends CliTool\App{
                 if (is_array($allResponses)) {
                     $log->notice(sprintf("Automarking attempt #%s", $attempt->getId()));
                     foreach ($allResponses as $currentResponse) {
+                        /** @var IAutomarkable $answerHandler */
                         $answerHandler = $factory->createAnswerModel($currentResponse['type_id']);
 
                         $answerHandler->mark($currentResponse);

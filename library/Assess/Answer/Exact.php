@@ -1,4 +1,7 @@
 <?php
+
+use Assess\IAutomarkable;
+
 /**
  * Assess_Answer_Exact
  *
@@ -8,7 +11,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Assess_Answer_Exact extends Evaluation_Answer_Exact
+class Assess_Answer_Exact extends Evaluation_Answer_Exact implements IAutomarkable
 {
     /**
     * Automatically marks a response. Customised to be applicable to the way in
@@ -17,7 +20,7 @@ class Assess_Answer_Exact extends Evaluation_Answer_Exact
     * @param  $currentResponse
     * @return void
     */
-    public function mark($currentResponse)
+    public function mark($currentResponse): void
     {
         // Normalize both response and answer for comparison
         if ( $this->compareStrings($currentResponse['response'], $currentResponse['answer']) ) {

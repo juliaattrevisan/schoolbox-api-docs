@@ -19,7 +19,7 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
      * @param  $currentResponse
      * @return void
      */
-    public function mark($currentResponse)
+    public function mark($currentResponse): void
     {
         $response = unserialize($currentResponse['response']);
         $answer = unserialize($currentResponse['answer']);

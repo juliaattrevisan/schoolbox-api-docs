@@ -1,4 +1,7 @@
 <?php
+
+use Assess\IAutomarkable;
+
 /**
  * Assess_Answer_Fillgap
  *
@@ -8,7 +11,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap
+class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutomarkable
 {
 	/**
      * Automatically marks a response. Customised to be applicable to the way in
@@ -17,7 +20,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap
      * @param  $currentResponse
      * @return void
      */
-    public function mark($currentResponse)
+    public function mark($currentResponse): void
     {
         $response = unserialize($currentResponse['response']);
         $answer = html_entity_decode($currentResponse['answer'], ENT_IGNORE | ENT_QUOTES);
