@@ -630,7 +630,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
                 if (empty($pastoral->getExternalId())) {
-                    $pastoral->setExternalId($this->connector->lastInsertId());
+
+                    $externalId = $this->connector->executeQuery("SELECT SCOPE_IDENTITY()")->fetchColumn();
+
+                    $pastoral->setExternalId($externalId);
 
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
@@ -790,7 +793,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
                 'modifiedOwnerId' => $comment->getOwner()->getExternalId(),
             ]);
-            $comment->setExternalCode($this->connector->lastInsertId());
+
+            $externalId = $this->connector->executeQuery("SELECT SCOPE_IDENTITY()")->fetchColumn();
+            $comment->setExternalCode($externalId);
 
             // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
             // notification every time someone creates a pastoral record
@@ -946,7 +951,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             throw new ExternalException('Error uploading pastoral document to Synergetic database.');
         }
 
-        $documentReferencesSeq = $this->connector->lastInsertId();
+        $documentReferencesSeq = $this->connector->executeQuery("SELECT SCOPE_IDENTITY()")->fetchColumn();
 
         // Add a document reference to the student so it shows up on their normal community record
         $query = $this->connector->prepareQuery(
