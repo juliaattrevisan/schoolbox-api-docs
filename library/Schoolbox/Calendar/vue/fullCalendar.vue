@@ -21,13 +21,13 @@
             config: function () { return window.fullCalendarConfig; }
         },
         methods: {
-            customExportClick: function () {
+            onExportClick: function () {
                 window.$('#calendar-export').foundation('reveal', 'open');
             },
-            customFiltersClick: function () {
+            onFilterClick: function () {
                 window.$('#calendar-controls').foundation('reveal', 'open');
             },
-            loading: function (isLoading) {
+            onLoading:  function (isLoading) {
                 /* Show loading div right in the middle
                  */
                 if (isLoading === true) {
@@ -85,7 +85,11 @@
                     },
                     cache: false
                 });
-            }
+            },
+            onDateClick: function (dateClickInfo) {
+                // Create a bubble here
+                console.log(dateClickInfo);
+            },
         }
     }
 
@@ -108,11 +112,11 @@
             :custom-buttons="{
                 customExport: {
                     text: 'export',
-                    click: customExportClick
+                    click: onExportClick
                 },
                 customFilters: {
                     text: 'filters',
-                    click: customFiltersClick
+                    click: onFilterClick
                 },
             }"
             :header="{
@@ -126,7 +130,8 @@
             :eventLimit="config.eventLimit"
             :firstDay="config.firstDay"
             :events="events"
-            @loading="loading"
+            @loading="onLoading"
+            @dateClick="onDateClick"
         />
     </div>
 </template>
