@@ -11,7 +11,7 @@
     export default {
         components: {
             FullCalendar,
-            dialog
+            reveal: dialog
         },
         data() {
             return {
@@ -109,13 +109,13 @@
 
 <template>
     <div>
-        <dialog ref="export">
+        <reveal ref="export">
             bbb
-        </dialog>
+        </reveal>
 
-        <dialog ref="filter">
+        <reveal ref="filter">
             ccc
-        </dialog>
+        </reveal>
 
         <FullCalendar
             :plugins="calendarPlugins"
