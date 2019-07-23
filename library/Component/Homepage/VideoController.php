@@ -130,154 +130,158 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         /* No videos found
          */
-        if ($this->outputList->count() == 0) {
+        if (!$this->outputList->count()) {
             $this->buildEmptyState();
-        } else {
-            $this->setBlock('has_video', 'source_folder_deleted', 'source_folder_deleted_block');
-            $this->setBlock('has_video', 'source_folder_exists', 'source_folder_exists_block');
-            $this->setBlock('source_folder_exists', 'default_video', 'default_video_block');
-            $this->setBlock('source_folder_exists', 'video_list', 'video_list_block');
-            $this->setBlock('source_folder_exists', 'video_pending_list', 'video_pending_list_block');
-            $this->setBlock('source_folder_exists', 'submit_video', 'submit_video_block');
-            $this->setBlock('video_list', 'owner_exists', 'owner_exists_block');
-            $this->setBlock('video_list', 'owner_deleted', 'owner_deleted_block');
-            $this->setBlock('video_list', 'video_edit', 'video_edit_block');
 
+            return true;
+        }
+
+        /* Render full list
+         */
+        $this->setBlock('has_video', 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock('has_video', 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'default_video', 'default_video_block');
+        $this->setBlock('source_folder_exists', 'video_list', 'video_list_block');
+        $this->setBlock('source_folder_exists', 'video_pending_list', 'video_pending_list_block');
+        $this->setBlock('source_folder_exists', 'submit_video', 'submit_video_block');
+        $this->setBlock('video_list', 'owner_exists', 'owner_exists_block');
+        $this->setBlock('video_list', 'owner_deleted', 'owner_deleted_block');
+        $this->setBlock('video_list', 'video_edit', 'video_edit_block');
+
+        $this->setVar([
+            'empty_state_block' => '',
+            'source_folder_deleted_block' => '',
+            'video_list_block' => '',
+            'video_pending_list_block' => '',
+            'default_video_block' => '',
+        ]);
+
+        // Select a video to play by default.
+        // Only show a video that has actually finished encoding, though.
+        $this->defaultVideo = null;
+
+        if ($this->getConfig('video')) {
+            try {
+                $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
+
+                if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()) {
+                    if ($this->isVisibleToCurrentUser($video)) {
+                        $this->defaultVideo = $video;
+                    } else {
+                        $this->defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
+                    }
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // passthru: figure out which video later
+            }
+        }
+
+        if (!isset($this->defaultVideo)) {
+            // Show the first video that has completed encoding
+            foreach ($this->outputList as $video) {
+                /** @var \Schoolbox\Video\ResourceVideo $video */
+                // Don't pick a video not visible to the user as the default video
+                if ($video->isComplete() && $this->isVisibleToCurrentUser($video)) {
+                    $this->defaultVideo = $video;
+                    break;
+                }
+            }
+        }
+
+        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
+            return false;
+        }
+
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
+        /* Number of videos that were shown in the list
+         *
+         * Because the visibility check is done in the iteration we won't know how many videos from
+         * $outputList were actually shown to the user; it could be none (at which point you need to
+         * render an empty state)
+         */
+        $numVideosListed = 0;
+
+        if (count($this->outputList) >= 1) {
+            foreach ($this->outputList as $video) {
+                // Display the list of videos if the user has permission to view them.
+                if ($this->isVisibleToCurrentUser($video)) {
+                    /* Apply values only if you can see them
+                     */
+                    $this->setVar([
+                        'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
+                        'VIDEO_LIST_TITLE' =>       Scrub::text($video->getFile()->getTitle()),
+                        'VIDEO_LIST_DURATION' =>    $video->getDuration() >= 3600
+                            ? gmdate('H:i:s', $video->getDuration())
+                            : gmdate('i:s', $video->getDuration()),
+                        'VIDEO_LIST_COMMENT' =>     Scrub::text($video->getFile()->getDescription()),
+                        'VIDEO_LIST_HIDDEN' =>      $video->getFile()->getHidden() ? 'hidden' : '',
+                        'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
+                        'VIDEO_LIST_POSTER' =>      $video->getFile()->getOwner()->getFullName(),
+                    ]);
+
+
+                    // Owner and edit blocks are children of the video list item,
+                    // so should not appear unless we are parsing the list item.
+
+                    // Owner name and optional link
+                    if($video->getFile()->getOwner()->isDeleted()){
+                        $this->setVar('owner_exists_block', '');
+                        $this->parse('owner_deleted_block', 'owner_deleted');
+                    } else {
+                        $this->parse('owner_exists_block', 'owner_exists');
+                        $this->setVar('owner_deleted_block', '');
+                    }
+
+                    if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                        $this->parse('video_edit_block', 'video_edit', true);
+                    } else {
+                        $this->setVar('video_edit_block', '');
+                    }
+
+                    // Video list block
+                    if ($video->getStatus() == "completed") {
+                        // Anyone can see completed video uploads if video is not hidden
+                        // or they have sufficient permissions
+                        $this->parse('video_list_block', 'video_list', true);
+                    } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                        // Only users with higher permissions can see pending videos
+                        $this->setVar([
+                            'VIDEO_LIST_STATUS' => $video->getStatus(),
+                            'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
+                        ]);
+                        $this->parse('video_pending_list_block', 'video_pending_list', true);
+                    }
+
+                    $numVideosListed++;
+                }
+            }
+        }
+
+        if (is_object($this->defaultVideo) and $this->defaultVideo->getStatus() == 'completed') {
+            $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
+            $this->parse('default_video_block', 'default_video');
+        }
+
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+            $this->parse('submit_video_block', 'submit_video');
+        } else {
+            $this->setVar('submit_video_block', '');
+        }
+
+        $this->parse('source_folder_exists_block', 'source_folder_exists');
+
+        /* Show empty state when videos existed but none could be shown to the user
+         * Hide the list of videos that would otherwise have rendered
+         */
+        if (!$numVideosListed) {
             $this->setVar([
-                'empty_state_block' => '',
-                'source_folder_deleted_block' => '',
-                'video_list_block' => '',
-                'video_pending_list_block' => '',
-                'default_video_block' => '',
+                'has_video_block' => ''
             ]);
 
-            // Select a video to play by default.
-            // Only show a video that has actually finished encoding, though.
-            $this->defaultVideo = null;
-
-            if ($this->getConfig('video')) {
-                try {
-                    $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
-
-                    if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()) {
-                        if ($this->isVisibleToCurrentUser($video)) {
-                            $this->defaultVideo = $video;
-                        } else {
-                            $this->defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
-                        }
-                    }
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    // passthru: figure out which video later
-                }
-            }
-
-            if (!isset($this->defaultVideo)) {
-                // Show the first video that has completed encoding
-                foreach ($this->outputList as $video) {
-                    /** @var \Schoolbox\Video\ResourceVideo $video */
-                    // Don't pick a video not visible to the user as the default video
-                    if ($video->isComplete() && $this->isVisibleToCurrentUser($video)) {
-                        $this->defaultVideo = $video;
-                        break;
-                    }
-                }
-            }
-
-            if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
-                return false;
-            }
-
-            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
-            /* Number of videos that were shown in the list
-             *
-             * Because the visibility check is done in the iteration we won't know how many videos from
-             * $outputList were actually shown to the user; it could be none (at which point you need to
-             * render an empty state)
-             */
-            $numVideosListed = 0;
-
-            if (count($this->outputList) >= 1) {
-                foreach ($this->outputList as $video) {
-                    // Display the list of videos if the user has permission to view them.
-                    if ($this->isVisibleToCurrentUser($video)) {
-                        /* Apply values only if you can see them
-                         */
-                        $this->setVar([
-                            'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
-                            'VIDEO_LIST_TITLE' =>       Scrub::text($video->getFile()->getTitle()),
-                            'VIDEO_LIST_DURATION' =>    $video->getDuration() >= 3600
-                                ? gmdate('H:i:s', $video->getDuration())
-                                : gmdate('i:s', $video->getDuration()),
-                            'VIDEO_LIST_COMMENT' =>     Scrub::text($video->getFile()->getDescription()),
-                            'VIDEO_LIST_HIDDEN' =>      $video->getFile()->getHidden() ? 'hidden' : '',
-                            'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
-                            'VIDEO_LIST_POSTER' =>      $video->getFile()->getOwner()->getFullName(),
-                        ]);
-
-
-                        // Owner and edit blocks are children of the video list item,
-                        // so should not appear unless we are parsing the list item.
-
-                        // Owner name and optional link
-                        if($video->getFile()->getOwner()->isDeleted()){
-                            $this->setVar('owner_exists_block', '');
-                            $this->parse('owner_deleted_block', 'owner_deleted');
-                        } else {
-                            $this->parse('owner_exists_block', 'owner_exists');
-                            $this->setVar('owner_deleted_block', '');
-                        }
-
-                        if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                            $this->parse('video_edit_block', 'video_edit', true);
-                        } else {
-                            $this->setVar('video_edit_block', '');
-                        }
-
-                        // Video list block
-                        if ($video->getStatus() == "completed") {
-                            // Anyone can see completed video uploads if video is not hidden
-                            // or they have sufficient permissions
-                            $this->parse('video_list_block', 'video_list', true);
-                        } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                            // Only users with higher permissions can see pending videos
-                            $this->setVar([
-                                'VIDEO_LIST_STATUS' => $video->getStatus(),
-                                'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
-                            ]);
-                            $this->parse('video_pending_list_block', 'video_pending_list', true);
-                        }
-
-                        $numVideosListed++;
-                    }
-                }
-            }
-
-            if (is_object($this->defaultVideo) and $this->defaultVideo->getStatus() == 'completed') {
-                $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
-                $this->parse('default_video_block', 'default_video');
-            }
-
-            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                $this->parse('submit_video_block', 'submit_video');
-            } else {
-                $this->setVar('submit_video_block', '');
-            }
-
-            $this->parse('source_folder_exists_block', 'source_folder_exists');
-
-            /* Show empty state when videos existed but none could be shown to the user
-             * Hide the list of videos that would otherwise have rendered
-             */
-            if (!$numVideosListed) {
-                $this->setVar([
-                    'has_video_block' => ''
-                ]);
-
-                $this->buildEmptyState();
-            } else {
-                $this->parse('has_video_block', 'has_video');
-            }
+            $this->buildEmptyState();
+        } else {
+            $this->parse('has_video_block', 'has_video');
         }
 
         return true; // everything went according to plan
