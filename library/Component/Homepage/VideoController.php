@@ -200,59 +200,57 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
          */
         $numVideosListed = 0;
 
-        if (count($this->outputList) >= 1) {
-            foreach ($this->outputList as $video) {
-                // Display the list of videos if the user has permission to view them.
-                if ($this->isVisibleToCurrentUser($video)) {
-                    /* Apply values only if you can see them
-                     */
-                    $this->setVar([
-                        'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
-                        'VIDEO_LIST_TITLE' =>       Scrub::text($video->getFile()->getTitle()),
-                        'VIDEO_LIST_DURATION' =>    $video->getDuration() >= 3600
-                            ? gmdate('H:i:s', $video->getDuration())
-                            : gmdate('i:s', $video->getDuration()),
-                        'VIDEO_LIST_COMMENT' =>     Scrub::text($video->getFile()->getDescription()),
-                        'VIDEO_LIST_HIDDEN' =>      $video->getFile()->getHidden() ? 'hidden' : '',
-                        'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
-                        'VIDEO_LIST_POSTER' =>      $video->getFile()->getOwner()->getFullName(),
-                    ]);
+        foreach ($this->outputList as $video) {
+            // Display the list of videos if the user has permission to view them.
+            if ($this->isVisibleToCurrentUser($video)) {
+                /* Apply values only if you can see them
+                 */
+                $this->setVar([
+                    'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
+                    'VIDEO_LIST_TITLE' =>       Scrub::text($video->getFile()->getTitle()),
+                    'VIDEO_LIST_DURATION' =>    $video->getDuration() >= 3600
+                        ? gmdate('H:i:s', $video->getDuration())
+                        : gmdate('i:s', $video->getDuration()),
+                    'VIDEO_LIST_COMMENT' =>     Scrub::text($video->getFile()->getDescription()),
+                    'VIDEO_LIST_HIDDEN' =>      $video->getFile()->getHidden() ? 'hidden' : '',
+                    'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
+                    'VIDEO_LIST_POSTER' =>      $video->getFile()->getOwner()->getFullName(),
+                ]);
 
 
-                    // Owner and edit blocks are children of the video list item,
-                    // so should not appear unless we are parsing the list item.
+                // Owner and edit blocks are children of the video list item,
+                // so should not appear unless we are parsing the list item.
 
-                    // Owner name and optional link
-                    if($video->getFile()->getOwner()->isDeleted()){
-                        $this->setVar('owner_exists_block', '');
-                        $this->parse('owner_deleted_block', 'owner_deleted');
-                    } else {
-                        $this->parse('owner_exists_block', 'owner_exists');
-                        $this->setVar('owner_deleted_block', '');
-                    }
-
-                    if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
-                        $this->parse('video_edit_block', 'video_edit', true);
-                    } else {
-                        $this->setVar('video_edit_block', '');
-                    }
-
-                    // Video list block
-                    if ($video->getStatus() == "completed") {
-                        // Anyone can see completed video uploads if video is not hidden
-                        // or they have sufficient permissions
-                        $this->parse('video_list_block', 'video_list', true);
-                    } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                        // Only users with higher permissions can see pending videos
-                        $this->setVar([
-                            'VIDEO_LIST_STATUS' => $video->getStatus(),
-                            'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
-                        ]);
-                        $this->parse('video_pending_list_block', 'video_pending_list', true);
-                    }
-
-                    $numVideosListed++;
+                // Owner name and optional link
+                if($video->getFile()->getOwner()->isDeleted()){
+                    $this->setVar('owner_exists_block', '');
+                    $this->parse('owner_deleted_block', 'owner_deleted');
+                } else {
+                    $this->parse('owner_exists_block', 'owner_exists');
+                    $this->setVar('owner_deleted_block', '');
                 }
+
+                if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
+                    $this->parse('video_edit_block', 'video_edit', true);
+                } else {
+                    $this->setVar('video_edit_block', '');
+                }
+
+                // Video list block
+                if ($video->getStatus() == "completed") {
+                    // Anyone can see completed video uploads if video is not hidden
+                    // or they have sufficient permissions
+                    $this->parse('video_list_block', 'video_list', true);
+                } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                    // Only users with higher permissions can see pending videos
+                    $this->setVar([
+                        'VIDEO_LIST_STATUS' => $video->getStatus(),
+                        'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
+                    ]);
+                    $this->parse('video_pending_list_block', 'video_pending_list', true);
+                }
+
+                $numVideosListed++;
             }
         }
 
