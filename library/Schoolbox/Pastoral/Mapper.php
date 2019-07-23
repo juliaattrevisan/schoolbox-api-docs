@@ -44,6 +44,7 @@ use Schoolbox\UserMapper;
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  * @method Model findById($identifierValue)
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method GenericCollection|Model[] findAll($options = [])
  */
 class Mapper extends BaseMapper
 {

@@ -10,6 +10,7 @@ namespace Schoolbox\Pastoral\Attachment;
 use PDOStatement;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as Pastoral;
@@ -21,6 +22,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
  * Class Mapper
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method GenericCollection|Model[] findByColumnList($columnList, $options = [])
  *
  * @package Schoolbox\Pastoral\Attachment
  */
