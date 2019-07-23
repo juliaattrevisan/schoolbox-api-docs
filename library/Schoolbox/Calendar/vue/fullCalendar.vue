@@ -15,7 +15,8 @@
         },
         data() {
             return {
-                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ]
+                calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+                currentEvent: {},
             }
         },
         computed: {
@@ -93,7 +94,9 @@
                 console.log(dateClickInfo);
             },
             onEventClick: function (eventInfo) {
-                // Create a bubble here (needs to be a Vue modal)
+                // Ideally the current event would be a part of the modal,
+                // not this component, but :shrug:
+                this.currentEvent = eventInfo.event;
                 this.$refs.event.open();
             },
             onEventResize: function (eventResizeInfo) {
@@ -120,9 +123,9 @@
         <reveal-modal ref="event">
             <div class="row">
                 <div class="small-12">
-                    <h3 class="note">{{ data.event.title }}</h3>
+                    <h3 class="note">{{ currentEvent.title }}</h3>
                     <article class="detail">
-                        <span v-html="data.event.detail"></span>
+                        <span v-html="currentEvent.detail"></span>
                     </article>
                 </div>
             </div>
