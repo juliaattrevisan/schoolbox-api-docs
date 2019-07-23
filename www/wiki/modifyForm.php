@@ -29,7 +29,7 @@ if (is_ascii($_POST['heading'])) {
     $potentialSlug = $url->getSlug();
 }
 
-$wikis = $wikiHandler->getByCategory($_POST['categoryID']);
+$wikis = $wikiMapper->findByColumn('categoryID', $_POST['categoryID']);
 
 foreach ($wikis as $wiki) {
     if ($wiki['slug'] == $potentialSlug && $wiki['wikiID'] != $_POST['wikiID']) {
