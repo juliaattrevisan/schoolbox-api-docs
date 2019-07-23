@@ -55,6 +55,7 @@ class IntegrationTester extends \Codeception\Actor
     public $client_cookie_jar;
     public $guzzle_headers=[];
     public $redirect_settings;
+    /** @var Database $database */
     public $database;
 
     function initGuzzleClient()
@@ -143,7 +144,7 @@ class IntegrationTester extends \Codeception\Actor
 
     function getFirstHomepageIdByTitle($title)
     {
-        return $this->getFirstFolderIdByTitle($title)->getId();
+        return $this->getFirstFolderByTitle($title)->getId();
     }
 
     function getFirstFolderByTitle($title)
@@ -162,6 +163,23 @@ class IntegrationTester extends \Codeception\Actor
         }
         $course_folder = $this->getFirstFolderByTitle($title);
         return CourseSpecificationMapper::getInstance()->findOneByColumn('folder_id', $course_folder->getId());
+    }
+
+    function getUnitsByCourseSpecId($course_spec_id)
+    {
+        if (!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return UnitMapper::getInstance()->findAllByCourseId($course_spec_id);
+    }
+
+    function getAssessmentIdByCourseUnitSpecId($unit_id)
+    {
+        if (!isset($this->database)) {
+            $this->initDatabase();
+        }
+        $query = $this->database->prepare('select * from assessment_course_unit_specification where course_unit_specification_id='.$unit_id.';');
+        return $query->fetchAll();
     }
 
     function getFirstUnitByTitle($title)
@@ -431,7 +449,12 @@ class IntegrationTester extends \Codeception\Actor
         return $this->createFolder($title, 9);
     }
 
-    public function createFolder($title, $template=-1, $parent_folder=null)
+    public function createClass($title, $code)
+    {
+        return $this->createFolder($title, 9, null, $code);
+    }
+
+    public function createFolder($title, $template=-1, $parent_folder=null, $code='')
     {
 
         if (!isset($this->client))
@@ -462,7 +485,7 @@ class IntegrationTester extends \Codeception\Actor
             'group[4]'=>1,
             'group[5]'=>1,
             'group[6]'=>0,
-            'code'=>'',
+            'code'=>$code,
             'curriculumCodes[]'=>''];
 
         if ($parent_id != 0)
@@ -479,6 +502,121 @@ class IntegrationTester extends \Codeception\Actor
             'allow_redirects' => $allow_redirects
         ]);
 
+    }
+
+    public function importCourseSpecToClass($course_spec_id, $class_page_id){
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/course/import/'.$course_spec_id.'/folder/0/0';
+
+        $page='/course/import/classes';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data = [
+            'course_spec_id' => $course_spec_id,
+            'import_folders' => $class_page_id,
+            'component_id' => '',
+            'part-1' => 1
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function importUnitSpecToClassCourse($course_spec_id, $class_page_id){
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $unitsForCourseSpec=$this->getUnitsByCourseSpecId($course_spec_id);
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/course/import/'.$course_spec_id.'/folder/0/0';
+
+        $page='/course/import/units';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data = [
+            'course_spec_id' => $course_spec_id,
+            'import_folders' => $class_page_id,
+            'component_id' => '',
+            'part-2' => 1
+        ];
+
+        $count=1;
+        foreach($unitsForCourseSpec as $unit)
+        {
+            $data['unit['.$count.'][unit_spec_id]']=$unit->getId();
+            $data['unit['.$count.'][unit_impl_id]']='';
+            $data['unit['.$count.'][import]']='on';
+            $data['unit['.$count.'][open_date]']='22/06/2019';
+            $data['unit['.$count.'][close_date]']='22/08/2019';
+            $count++;
+        }
+
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function importDueWorkToClassCourseUnit($course_spec_id, $class_page_id){
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $unitsForCourseSpec=$this->getUnitsByCourseSpecId($course_spec_id);
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/course/import/'.$course_spec_id.'/folder/0/0';
+
+        $page='/course/import/activities';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data = [
+            'action' => 'import',
+            'course_spec_id' => $course_spec_id,
+            'import_folders' => $class_page_id,
+            'component_id' => '',
+            'part-3' => 1
+        ];
+
+        foreach($unitsForCourseSpec as $unit)
+        {
+            $data['unit['.$unit->getId().'][unit_spec_id]']=$unit->getId();
+            $data['unit['.$unit->getId().'][unit_impl_id]']='';
+            $data['unit['.$unit->getId().'][open_date]']='22/06/2019';
+            $data['unit['.$unit->getId().'][close_date]']='22/08/2019';
+            $assessment_ids = $this->getAssessmentIdByCourseUnitSpecId($unit->getId());
+            foreach ($assessment_ids as $assessment_id)
+            {
+                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][spec_id]'] = $assessment_id;
+                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][impl_id]'] = '';
+                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][checked]'] = 1;
+                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][dates][publish]'] ='22/06/2019 12:00am';
+                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][dates][due]'] ='22/08/2019 12:00am';
+            }
+        }
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
     }
 
 
