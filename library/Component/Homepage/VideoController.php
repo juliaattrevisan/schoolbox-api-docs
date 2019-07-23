@@ -190,8 +190,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             return false;
         }
 
-        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
         /* Number of videos that were shown in the list
          *
          * Because the visibility check is done in the iteration we won't know how many videos from
