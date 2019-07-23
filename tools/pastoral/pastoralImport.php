@@ -12,55 +12,45 @@
  */
 declare(strict_types=1);
 
-use Aura\Di;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon;
-
-$appOpts = [
-    'help',
-    'user:',
-    'default-owner:',
-    'parent-access',
-    'add-records',
-    'add-attachments',
-    'delete-records',
-];
+use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel(
-    'Pastoral Import',
-    [
-        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::CRITICAL,
-        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
-    ]
-);
+$app = new class extends CliTool\App{
 
-/** @noinspection PhpUnhandledExceptionInspection */
-$kernel->run(function (
-    Di\Container $di,
-    /** @noinspection PhpUnusedParameterInspection */
-    LoopInterface $loop,
-    LoggerInterface $log,
-    array $opts
-) {
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return [
+            'help',
+            'user:',
+            'default-owner:',
+            'parent-access',
+            'add-records',
+            'add-attachments',
+            'delete-records',
+        ];
+    }
 
-    /* command-line options
-     */
-    $importParentAccess = isset($opts['parent-access']);
-    $importRecords      = isset($opts['add-records']);
-    $importAttachments  = isset($opts['add-attachments']);
-    $deleteRecords      = isset($opts['delete-records']);
-    $defaultOwnerId     = array_key_exists('default-owner', $opts) ? (int)$opts['default-owner'] : false;
-    /** @var int|bool $userId The user conducting the import (used in logging) */
-    $userId             = array_key_exists('user', $opts) ? (int)$opts['user'] : false;
 
-    /* Help
-     */
-    if (isset($opts['help'])) {
-        echo <<<HELP
+    /** @inheritDoc */
+    public function run(): void
+    {
+
+        /* command-line options
+         */
+        $importParentAccess = $this->getOpt('parent-access');
+        $importRecords      = $this->getOpt('add-records');
+        $importAttachments  = $this->getOpt('add-attachments');
+        $deleteRecords      = $this->getOpt('delete-records');
+        $defaultOwnerId     = $this->getOptAsInt('default-owner:');
+        /** @var ?int $userId The user conducting the import (used in logging) */
+        $userId             = $this->getOptAsInt('user:');
+
+        /* Help
+         */
+        if ($this->getOpt('help')) {
+            echo <<<HELP
 
 Imports Pastoral records from external source. Primarily used if there are many records.
 
@@ -75,54 +65,67 @@ Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachmen
     
 HELP;
 
-        exit(0);
+            exit(0);
+        }
+
+        $log = $this->getLogger();
+        $di = $this->getDi();
+        if (!$userId) {
+            $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
+            exit(0);
+        }
+
+        $userMapper = new \Schoolbox\UserMapper();
+
+        try {
+            $user = $userMapper->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $log->critical('Invalid user id. User not found.');
+            exit(0);
+        }
+
+        if (!$defaultOwnerId) {
+            $log->critical('Invalid default owner id. Specify a user to whom pastoral records are assigned.');
+            exit(0);
+        }
+
+        try {
+            $defaultOwner = $userMapper->findById($defaultOwnerId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $log->critical('Invalid default owner id. User not found');
+            exit(0);
+        }
+
+        // Only process if pastoral docman writeback is actually enabled in config
+        if (!$di->get('config')->get("external_pastoral")) {
+            $log->critical('Pastoral external is disabled, exiting...');
+            exit(0);
+        }
+
+        pcntl_signal(SIGCHLD, SIG_DFL);
+
+        $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
+
+        if (!$lock->acquire()) {
+            $log->critical('A pastoral import is currently in progress, exiting...');
+            exit(0);
+        }
+
+        $log->info("Beginning import of pastoral records...");
+
+        $pastoralExternal = new External_Pastoral();
+        $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
+
+        $lock->release();
     }
+};
 
-    if (!$userId) {
-        $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
-        exit(0);
-    }
 
-    $userMapper = new \Schoolbox\UserMapper();
-
-    try {
-        $user = $userMapper->findById($userId);
-    } catch (\Schoolbox\Mapper\Exception $e) {
-        $log->critical('Invalid user id. User not found.');
-        exit(0);
-    }
-
-    if (!$defaultOwnerId) {
-        $log->critical('Invalid default owner id. Specify a user to whom pastoral records are assigned.');
-        exit(0);
-    }
-
-    try {
-        $defaultOwner = $userMapper->findById($defaultOwnerId);
-    } catch (\Schoolbox\Mapper\Exception $e) {
-        $log->critical('Invalid default owner id. User not found');
-        exit(0);
-    }
-
-    // Only process if pastoral docman writeback is actually enabled in config
-    if (!$di->get('config')->get("external_pastoral")) {
-        $log->critical('Pastoral external is disabled, exiting...');
-        exit(0);
-    }
-
-    pcntl_signal(SIGCHLD, SIG_DFL);
-
-    $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
-
-    if (!$lock->acquire()) {
-        $log->critical('A pastoral import is currently in progress, exiting...');
-        exit(0);
-    }
-
-    $log->info("Beginning import of pastoral records...");
-
-    $pastoralExternal = new External_Pastoral();
-    $pastoralExternal->importPastoral($user, $defaultOwner, $importParentAccess, $importRecords, $importAttachments, $deleteRecords);
-
-    $lock->release();
-});
+$kernel = new CliTool\Kernel(
+    $app,
+    [
+        CliTool\Kernel::OPTION_LEVEL  => Monolog\Logger::CRITICAL,
+        CliTool\Kernel::OPTION_ERRORS => E_ALL,
+    ]
+);
+$kernel->runApp();
