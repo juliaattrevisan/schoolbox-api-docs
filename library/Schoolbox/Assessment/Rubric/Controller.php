@@ -154,7 +154,7 @@ class Controller extends BaseController
             $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
             $proposedName    = $this->mapper->normaliseForComparison($critName);
             foreach ($criterionModels as $criterionModel) {
-                $normGroup = $this->mapper->normaliseForComparison($criterionModel->getGroup()->getName());
+                $normGroup = $this->mapper->normaliseForComparison($criterionModel->getCapability()->getName());
                 $normName  = $this->mapper->normaliseForComparison($criterionModel->getName());
                 if ($normGroup === $proposedGroup && $normName === $proposedName){
                     // TODO localise!!!!!
