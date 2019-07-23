@@ -32,8 +32,6 @@ $app = new class extends CliTool\App{
             exit;
         }
 
-        pcntl_signal(SIGCHLD, SIG_DFL);
-
         $pastoralMapper            = PastoralMapper::getInstance();
         $pastoralAttachmentMapper  = PastoralAttachmentMapper::getInstance();
         $pastoralUploadQueueMapper = PastoralUploadQueueMapper::getInstance();

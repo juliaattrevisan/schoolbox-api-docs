@@ -16,8 +16,6 @@ $app = new class extends CliTool\App{
     public function run(): void
     {
         $logger = $this->getLogger();
-        pcntl_signal(SIGCHLD, SIG_DFL);
-
 
         define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin-'.INSTANCE_ID.'.scss');
         define('CUSTOM_CSS_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_custom-'.INSTANCE_ID.'.scss');

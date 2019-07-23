@@ -51,11 +51,6 @@ $app = new class extends CliTool\App{
         $storageMapper = $mapperFactory->get(StorageMapper::class);
 
         // ------------------------------------------------------------------------------------------------------------
-        // Let kernel decide how to handle dead child processes
-        // ------------------------------------------------------------------------------------------------------------
-        pcntl_signal(SIGCHLD, SIG_DFL);
-
-        // ------------------------------------------------------------------------------------------------------------
         // Allow only a single migration at a time
         // ------------------------------------------------------------------------------------------------------------
         $lock = new Alaress_Lock($configLoader->get('video_dir') . '/.migration_'.INSTANCE_ID.'.lock');

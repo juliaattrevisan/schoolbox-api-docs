@@ -102,8 +102,6 @@ HELP;
             exit(0);
         }
 
-        pcntl_signal(SIGCHLD, SIG_DFL);
-
         $lock = new Alaress_Lock('pastoral_import.' . INSTANCE_ID . '.lock');
 
         if (!$lock->acquire()) {

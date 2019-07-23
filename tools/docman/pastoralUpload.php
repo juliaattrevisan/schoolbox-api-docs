@@ -45,7 +45,6 @@ $app = new class extends CliTool\App
         if (!$this->getConfig()->get("external_pastoral_upload")) {
             exit;
         }
-        pcntl_signal(SIGCHLD, SIG_DFL);
         $this->pastoralUploadQueueMapper = Pastoral\UploadQueue\Mapper::getInstance();
         $this->externalPastoral          = new External_Pastoral();
         return $this;
