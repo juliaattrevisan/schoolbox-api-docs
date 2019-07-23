@@ -94,6 +94,12 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             return false;
         }
 
+        /* Check access perms first
+         */
+        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
+            return false;
+        }
+
         if(!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
@@ -184,10 +190,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     break;
                 }
             }
-        }
-
-        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
-            return false;
         }
 
         /* Number of videos that were shown in the list
