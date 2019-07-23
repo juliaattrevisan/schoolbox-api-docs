@@ -94,7 +94,7 @@
             },
             onEventClick: function (eventInfo) {
                 // Create a bubble here (needs to be a Vue modal)
-                console.log(eventInfo);
+                this.$refs.event.open();
             },
             onEventResize: function (eventResizeInfo) {
                 console.log(eventResizeInfo);
@@ -115,6 +115,17 @@
 
         <reveal-modal ref="filter">
             ccc
+        </reveal-modal>
+
+        <reveal-modal ref="event">
+            <div class="row">
+                <div class="small-12">
+                    <h3 class="note">{{ data.event.title }}</h3>
+                    <article class="detail">
+                        <span v-html="data.event.detail"></span>
+                    </article>
+                </div>
+            </div>
         </reveal-modal>
 
         <full-calendar
