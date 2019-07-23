@@ -235,7 +235,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 }
 
                 // Video list block
-                if ($video->getStatus() == "completed") {
+                if ($video->isComplete()) {
                     // Anyone can see completed video uploads if video is not hidden
                     // or they have sufficient permissions
                     $this->parse('video_list_block', 'video_list', true);
@@ -252,7 +252,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
         }
 
-        if (is_object($this->defaultVideo) and $this->defaultVideo->getStatus() == 'completed') {
+        if (is_object($this->defaultVideo) and $this->defaultVideo->isComplete()) {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
             $this->parse('default_video_block', 'default_video');
         }
