@@ -109,17 +109,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         /* Sort order
          */
-        $sortConfig = array(
-            'sort' => $this->getConfig('sort'),
-            'sortdir' => $this->getConfig('sortdir'),
-            'mime' => 'video',
-        );
-
         $limit = (int)$this->getConfig('size');
 
         $this->outputList = $videoResourceMapper->findByCategory(
             $this->getSource()->getId(),
-            $sortConfig,
+            [
+                'sort' => $this->getConfig('sort'),
+                'sortdir' => $this->getConfig('sortdir'),
+                'mime' => 'video',
+            ],
             $limit
         );
 
