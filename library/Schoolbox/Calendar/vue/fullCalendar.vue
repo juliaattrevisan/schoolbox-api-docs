@@ -22,9 +22,11 @@
         },
         methods: {
             onExportClick: function () {
+                // This needs to be a Vue modal
                 window.$('#calendar-export').foundation('reveal', 'open');
             },
             onFilterClick: function () {
+                // This needs to be a Vue modal
                 window.$('#calendar-controls').foundation('reveal', 'open');
             },
             onLoading:  function (isLoading) {
@@ -87,11 +89,11 @@
                 });
             },
             onDateClick: function (dateClickInfo) {
-                // Create a bubble here
+                // Create a bubble here (needs to be a Vue modal)
                 console.log(dateClickInfo);
             },
             onEventClick: function (eventInfo) {
-                // Create a bubble here
+                // Create a bubble here (needs to be a Vue modal)
                 console.log(eventInfo);
             },
         }
@@ -113,6 +115,7 @@
                 }
             }"
             event-time-format="h(:mm)a"
+            content-height="auto"
             :custom-buttons="{
                 customExport: {
                     text: 'export',
@@ -128,11 +131,11 @@
                 center: 'title',
                 right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
-            :defaultDate="config.defaultDate"
-            :defaultView="config.anchorView || 'dayGridMonth'"
-            :scrollTime="config.dateDisplayFormats.calendarStartTime"
-            :eventLimit="config.eventLimit"
-            :firstDay="config.firstDay"
+            :default-date="config.defaultDate"
+            :default-view="config.anchorView || 'dayGridMonth'"
+            :scroll-time="config.dateDisplayFormats.calendarStartTime"
+            :event-limit="config.eventLimit"
+            :first-day="config.firstDay"
             :events="events"
             @loading="onLoading"
             @dateClick="onDateClick"
