@@ -90,6 +90,10 @@
                 // Create a bubble here
                 console.log(dateClickInfo);
             },
+            onEventClick: function (eventInfo) {
+                // Create a bubble here
+                console.log(eventInfo);
+            },
         }
     }
 
@@ -132,6 +136,7 @@
             :events="events"
             @loading="onLoading"
             @dateClick="onDateClick"
+            @eventClick="onEventClick"
         />
     </div>
 </template>
