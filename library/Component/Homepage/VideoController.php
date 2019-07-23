@@ -141,16 +141,24 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             $this->setBlock('source_folder_exists', 'submit_video', 'submit_video_block');
             $this->setBlock('video_list', 'owner_exists', 'owner_exists_block');
             $this->setBlock('video_list', 'owner_deleted', 'owner_deleted_block');
+            $this->setBlock('video_list', 'video_edit', 'video_edit_block');
 
-            $this->setVar('empty_state_block', '');
-            $this->setVar('source_folder_deleted_block', '');
+            $this->setVar([
+                'empty_state_block' => '',
+                'source_folder_deleted_block' => '',
+                'video_list_block' => '',
+                'video_pending_list_block' => '',
+                'default_video_block' => '',
+            ]);
 
             // Select a video to play by default.
             // Only show a video that has actually finished encoding, though.
             $this->defaultVideo = null;
+
             if ($this->getConfig('video')) {
                 try {
                     $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
+
                     if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()) {
                         if ($this->isVisibleToCurrentUser($video)) {
                             $this->defaultVideo = $video;
@@ -162,6 +170,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     // passthru: figure out which video later
                 }
             }
+
             if (!isset($this->defaultVideo)) {
                 // Show the first video that has completed encoding
                 foreach ($this->outputList as $video) {
@@ -179,14 +188,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
 
             $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
-            $this->setVar([
-                'video_list_block' => '',
-                'video_pending_list_block' => '',
-                'default_video_block' => '',
-            ]);
-
-            $this->setBlock('video_list', 'video_edit', 'video_edit_block');
 
             /* Number of videos that were shown in the list
              *
@@ -262,6 +263,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             } else {
                 $this->setVar('submit_video_block', '');
             }
+
             $this->parse('source_folder_exists_block', 'source_folder_exists');
 
             /* Show empty state when videos existed but none could be shown to the user
