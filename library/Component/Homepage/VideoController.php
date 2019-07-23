@@ -81,12 +81,16 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->parse('empty_state_block', 'empty_state');
     }
 
+
     /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle
      *
      * @return boolean
+     * @throws PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function renderTemplate($templateHandle)
     {
