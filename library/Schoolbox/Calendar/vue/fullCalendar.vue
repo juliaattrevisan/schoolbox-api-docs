@@ -96,6 +96,12 @@
                 // Create a bubble here (needs to be a Vue modal)
                 console.log(eventInfo);
             },
+            onEventResize: function (eventResizeInfo) {
+                console.log(eventResizeInfo);
+            },
+            onEventDrop: function (eventDropInfo) {
+                console.log(eventDropInfo);
+            }
         }
     }
 
@@ -140,6 +146,8 @@
             @loading="onLoading"
             @dateClick="onDateClick"
             @eventClick="onEventClick"
+            @eventResize="onEventResize"
+            @eventDrop="onEventDrop"
         />
     </div>
 </template>
