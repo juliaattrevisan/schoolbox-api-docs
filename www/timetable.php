@@ -248,13 +248,13 @@ foreach ($userList as $user) {
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
                                     if (!isset($catCache[$class['code']])) {
-                                        try {
-                                            $cat = $categoryMapper->findByCode($class['code']);
-                                            /** @var Schoolbox\Resource\Folder\Model[] $catCache */
-                                            $catCache[$class['code']] = $cat;
-                                        } catch (\Schoolbox\Mapper\Exception $e) {
-                                            //Subject not found
+                                        $cat = $categoryMapper->findByCodeAndCampus($class['code'], $class['campus'], false);
+                                        if (!$cat) {
+                                            continue;
                                         }
+                                        /** @var Schoolbox\Resource\Folder\Model[] $catCache */
+                                        // TODO: we may need to add campus to cache key here.
+                                        $catCache[$class['code']] = $cat;
                                     }
 
                                     if ($class['description']) {

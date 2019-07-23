@@ -28,6 +28,7 @@ use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
@@ -1041,6 +1042,65 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Retrieve all codes for folder, not just those specified by $classCodeCsv
         return $this->findByColumn($this->getIdentifierColumn(), $folderIds);
+    }
+
+
+    /**
+     * Finds a folder which has campusCode/classCode, or classCode if exact is false.
+     * @param string $classCode
+     * @param string $campusCode
+     * @param bool $exact
+     * @return Model|null
+     */
+    public function findByCodeAndCampus(string $classCode, string $campusCode, bool $exact): ?Model
+    {
+        if (!$classCode || $classCode === '') {
+            return null;
+        }
+        $searchCode = ($campusCode && $campusCode !== '') ? "{$campusCode}/{$classCode}" : $classCode;
+        $result = $this->findExactByCode($searchCode);
+
+        if ($result || $campusCode === "" || $exact) {
+            return $result;
+        }
+
+        // Take two
+        return $this->findExactByCode($classCode);
+    }
+
+
+    /**
+     * Queries a folder with a code.
+     * @param string $code
+     * @return Model|null
+     */
+    private function findExactByCode(string $code): ?Model
+    {
+        $folderPb = $this->getPredicateBuilder()
+            ->isNull('f.deleted_at')
+            ->isNull('fc.deleted_at')
+            ->equals('fc.code', $code);
+        $whereClause = implode(' AND ', $folderPb->getWhere());
+        $query = "
+            SELECT f.id
+            FROM folder f
+            JOIN folder_code fc ON fc.folder_id = f.id
+            WHERE {$whereClause}
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($folderPb->getParams());
+        $folderIds = $statement->fetchAll(PDO::FETCH_COLUMN);
+
+        if (empty($folderIds)) {
+            return null;
+        }
+        try {
+            return $this->findById($folderIds[0]);
+        } catch (Exception $e) {
+            return null;
+        }
+
     }
 
 

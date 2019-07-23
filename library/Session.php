@@ -513,26 +513,7 @@ class Session
 
                         if (is_array($subjectList)) {
                             foreach ($subjectList as $subject) {
-                                //check subject exists.. we cant link to subjects that dont exist its ugly
-                                $cat = false;
-
-                                if ($subject['campusCode']) {
-                                    //Check for subject with campus code
-                                    try {
-                                        $cat = $folderMapper->findByCode($subject['campusCode'] . '/' . $subject['code']);
-                                    } catch (\Exception $e) {
-                                        //Try to fetch without campus code
-                                        try {
-                                            $cat = $folderMapper->findByCode($subject['code']);
-                                        } catch (\Exception $e) {
-                                        }
-                                    }
-                                } else {
-                                    try {
-                                        $cat = $folderMapper->findByCode($subject['code']);
-                                    } catch (\Exception $e) {
-                                    }
-                                }
+                                $cat = $folderMapper->findByCodeAndCampus($subject['code'], $subject['campusCode'], false);
 
                                 if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
                                     $subject['id']   = $cat->getId();
@@ -575,22 +556,17 @@ class Session
                         $result = false;
                         // Ensure the link goes to an actual homepage, too
                         $homepageCode = '';
-                        
+
                         if ($subject['campusCode']) {
-                            //Check for subject with campus code
-                            try {
-                                $homepageCode = $subject['campusCode'].'/'.$subject['code'];
-                                $result = $folderMapper->findByCode($homepageCode);
-                            } catch (\Exception $e) {
-                                // noop
-                            }
+                            $homepageCode = $subject['campusCode'] . '/' . $subject['code'];
+                            $result = $folderMapper->findByCodeAndCampus($subject['code'], $subject['campusCode'], true);
                         }
 
                         //Try to fetch without campus code
                         if (!($result instanceof Folder)) {
                             try {
                                 $homepageCode = $subject['code'];
-                                $result = $folderMapper->findByCode($subject['code']);
+                                $result = $folderMapper->findByCodeAndCampus($subject['code'], '', true);
                             } catch (\Exception $e) {
                                 // noop
                             }

@@ -170,46 +170,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
 
     /**
-     * Returns the subject's folder's name, or empty string if not found
-     *
-     * @param string $subjectCode
-     * @return string
-     */
-    private function getSubjectFolderName(string $subjectCode): string
-    {
-        try {
-            return $this->getFolderMapper()->findByCode($subjectCode)->getName();
-        } catch (MapperException $e) {
-            // Is ok to ignore. $subjectCode is coming from SIS and may not be present in Schoolbox.
-            return '';
-        }
-    }
-
-
-    /**
-     * Returns a link from a class to a homepage if user permitted to follow it
-     *
-     * @param string $subjectCode
-     * @return string
-     */
-    private function getClassLink(string $subjectCode): string
-    {
-        try {
-            $folder = $this->getFolderMapper()->findByCode($subjectCode);
-            if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
-                // Yes you really do need to double url-encode this
-                return '/homepage/code/' . urlencode(urlencode($subjectCode));
-            }
-            return '';
-        } catch (MapperException $e) {
-            // We're ignoring this as $subjectCode is being supplied from the SIS and it simply means this SIS class is not
-            // present in Schoolbox
-            return '';
-        }
-    }
-
-
-    /**
      * Returns a link the user can follow to mark attendance in their SIS
      *
      * @param array               $class
@@ -347,18 +307,25 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
+        $classDescription = '';
+        $classLink = '';
         if ($class['description']) {
             $classDescription = $class['description'];
-        } elseif (!empty($class['code'])) {
-            $classDescription = $this->getSubjectFolderName($class['code']);
         } else {
-            $classDescription = '';
+            $folder = $this->getFolderMapper()->findByCodeAndCampus($class['code'], $class['campus'], false);
+            if ($folder) {
+                $classDescription = $folder->getName();
+                if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
+                    // Yes you really do need to double url-encode this
+                    $classLink = '/homepage/code/' . urlencode(urlencode($class['code']));
+                }
+            }
         }
 
         $classContext = [
             'code'      => $class['code'],
             'room'      => $class['room'],
-            'url'       => empty($class['code']) ? '' : $this->getClassLink($class['code']),
+            'url'       => $classLink,
             'colour'    => $this->getSubjectColour((string)$class['code']),
             'desc'      => $classDescription,
             'cancelled' => (bool)$class['ClassCancelled'],

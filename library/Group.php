@@ -7,6 +7,7 @@ use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Permission\Access\Access;
+use Schoolbox\Collection;
 
 class Group extends DeprecatedModel
 {
@@ -686,39 +687,45 @@ class Group extends DeprecatedModel
         if ($user->getExternalId()) {
             $externalUser = new External_User;
             $externalSubjectList = $externalUser->getSubjectList($user);
+            $failedCodes = new Collection();
+            $folders = new Collection();
 
             if (is_array($externalSubjectList)) {
+                // Search using campus and class code
                 foreach ($externalSubjectList as $currentSubject) {
-                    try {
-                        if($currentSubject['campusCode']) {
-                            $code = $currentSubject['campusCode'].'/'.$currentSubject['code'];
-                            try {
-                                $folder = $folderMapper->findByCode($code);
-                            } catch(MapperException $e) {
-                                $folder = $folderMapper->findByCode($currentSubject['code']);
-                            }
-
+                    $folder = $folderMapper->findByCodeAndCampus($currentSubject['code'], $currentSubject['campusCode'], true);
+                    if (!$folder) {
+                        if ($currentSubject['campusCode'] !== '') {
+                            // try later without campus code
+                            $failedCodes->add($currentSubject['code']);
                         }
-                        else {
-                            $folder = $folderMapper->findByCode($currentSubject['code']);
-                        }
-
-                        /** @var $folder Schoolbox\Resource\Folder\Model  */
-                        $template = null;
-                        if($folder->getHomepage() instanceof  \Schoolbox\Resource\HomepageConfig ) {
-                            $template = $folder->getHomepage()->getTemplate()->getId();
-                        }
-
-                        $allFolders[$folder->getId()] = array(
-                            'id' => $folder->getId(),
-                            'name' => $folder->getName(),
-                            'parent' => $folder->getParent()->getId(),
-                            'deleted_at' => $folder->getDeletedAt(),
-                            'code' => $folder->getCodeString(),
-                            'template' => $template,
-                        );
-                    } catch (MapperException $e) {
+                        continue;
                     }
+                    $folders->add($folder);
+                }
+                // For failed codes, search using only code
+                foreach ($failedCodes as $code) {
+                    $folder = $folderMapper->findByCodeAndCampus($code, '', true);
+                    if ($folder && !$folders->contains($folder)) {
+                        $folders->add($folder);
+                    }
+                }
+                // Populate folders
+                foreach ($folders as $folder) {
+                    /** @var $folder Schoolbox\Resource\Folder\Model */
+                    $template = null;
+                    if ($folder->getHomepage() instanceof \Schoolbox\Resource\HomepageConfig) {
+                        $template = $folder->getHomepage()->getTemplate()->getId();
+                    }
+
+                    $allFolders[$folder->getId()] = array(
+                        'id' => $folder->getId(),
+                        'name' => $folder->getName(),
+                        'parent' => $folder->getParent()->getId(),
+                        'deleted_at' => $folder->getDeletedAt(),
+                        'code' => $folder->getCodeString(),
+                        'template' => $template,
+                    );
                 }
             }
         }

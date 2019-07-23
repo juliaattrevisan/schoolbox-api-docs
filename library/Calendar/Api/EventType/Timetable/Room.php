@@ -168,13 +168,11 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
 
                 $categoryCode = $room['ClassCode'];
                 if (!(array_key_exists($categoryCode, $categoryList))) {
-                    try {
-                        $categoryList[$categoryCode] = FolderMapper::getInstance()->findByCode(
-                            $categoryCode
-                        );
-                    } catch (Schoolbox\Mapper\Exception $e) {
-                        $categoryList[$categoryCode] = null;
-                    }
+                    $categoryList[$categoryCode] = FolderMapper::getInstance()->findByCodeAndCampus(
+                        $room['ClassCode'],
+                        $room['ClassCampus'],
+                        false
+                    );
                 }
                 if ($categoryList[$categoryCode] instanceof FolderModel) {
                     $event->setCategoryId($categoryList[$categoryCode]->getId());

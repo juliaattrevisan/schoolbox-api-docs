@@ -191,15 +191,15 @@ class UserAccessMapper extends Mapper
                 continue;
             }
             try {
-                // If campus code is set, find the code within the campus.
-                $campusCode = (isset($extSubj['campusCode']) && !empty($extSubj['campusCode'])) ? $extSubj['campusCode'] : '';
-                $code       = $campusCode ? "$campusCode/{$extSubj['code']}" : $extSubj['code'];
-                $catId      = FolderMapper::getInstance()->findByCode($code)->getId();
+                $folder = FolderMapper::getInstance()->findByCodeAndCampus($extSubj['code'], $extSubj['campusCode'], false);
+                if (!$folder) {
+                    continue;
+                }
 
                 $ua = new UserAccess();
 
                 $ua->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setServiceIdentifier($catId)
+                    ->setServiceIdentifier($folder->getId())
                     ->setUser($user);
 
                 //Teachers automatically get write access to their class pages
@@ -211,8 +211,6 @@ class UserAccessMapper extends Mapper
 
                 $external->add($ua);
 
-            } catch (Mapper\Exception $e) {
-                // noop
             } catch (UnexpectedValueException $e) {
                 // noop
             }
