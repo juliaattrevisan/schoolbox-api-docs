@@ -160,7 +160,7 @@
                 right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
             }"
             :default-date="config.defaultDate"
-            :default-view="config.anchorView || 'dayGridMonth'"
+            :default-view="config.defaultView || 'dayGridMonth'"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-limit="config.eventLimit"
             :first-day="config.firstDay"
