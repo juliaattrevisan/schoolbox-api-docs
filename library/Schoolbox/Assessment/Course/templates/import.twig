@@ -251,9 +251,8 @@ Usages:
                         <p class="course-import icon-next"></p>
                     </div>
                     <div class="small-5 medium-5 large-8 columns">
-                        <label>Class(es)
-                            <input id="import_folders" type="text" name="import_folders" />
-                        </label>
+                        <label for="import_folders" class="required">Class(es)</label>
+                        <input id="import_folders" type="text" name="import_folders" required />
                     </div>
                     {% if 1 == initialStage %}
                         <div class="small-12 column">
