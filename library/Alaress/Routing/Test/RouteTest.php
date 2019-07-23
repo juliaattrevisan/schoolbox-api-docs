@@ -78,7 +78,8 @@ class RouteTest extends TestCase
      */
     public function testValidConstruction($path, $delim)
     {
-        $this->route($path, $delim);
+        $route = $this->route($path, $delim);
+        $this->assertEquals(true, $route instanceof Route);
     }
 
 

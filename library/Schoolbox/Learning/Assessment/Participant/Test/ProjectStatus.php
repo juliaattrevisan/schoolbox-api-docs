@@ -116,7 +116,7 @@ class ProjectStatus extends TestCase
                 $subReviewComplete = $subParticipant->isReviewComplete();
 
                 if ($subResponseRequired !== $subFeedbackRequired || $subFeedbackRequired !== $subReviewComplete) {
-                    return;
+                    $this->markTestSkipped('Data set does not have all sub assessment in the same state, skipped');
                 }
             }
         }
