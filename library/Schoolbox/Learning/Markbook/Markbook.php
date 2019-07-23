@@ -279,7 +279,7 @@ class Markbook
             }
         }
         $summary = new Summary($normMarks);
-        $fivePoints = $summary->getSummaryWithOutliers();
+        $fivePoints = $summary->getSummary();
 
         $statistics = [
             'mean'              => null,
@@ -291,8 +291,7 @@ class Markbook
             'count'             => $countSummator->summateList($normMarks),
             'quartile1'         => $fivePoints['quartile1'],
             'quartile2'         => $fivePoints['quartile2'],
-            'quartile3'         => $fivePoints['quartile3'],
-            'outliers'          => $fivePoints['outliers'],
+            'quartile3'         => $fivePoints['quartile3']
         ];
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
