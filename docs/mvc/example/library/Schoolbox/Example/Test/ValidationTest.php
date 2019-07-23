@@ -117,13 +117,13 @@ class ValidationTest extends TestCase
     public function getTestErrorRaisedData(): array
     {
         return [
-            1.5,
-            null,
-            'a string',
-            '1.5',
-            new \stdClass(),
-            [],
-            STDOUT,
+            [1.5],
+            [null],
+            ['a string'],
+            ['1.5'],
+            [new \stdClass()],
+            [[]],
+            [STDOUT]
         ];
     }
 }
