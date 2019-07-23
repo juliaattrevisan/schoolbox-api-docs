@@ -18,7 +18,7 @@
 <div>
 
     {% if event.categoryId > 0 %}
-        <a class="button icon-home" href="/homepage/{{ event.categoryId }}">Homepage</a>
+        <a class="button icon-home" href="/homepage/{{ event.categoryId }}" title="Go to homepage">Go to homepage</a>
     {% endif %}
 
     {% if renderer.showAttendanceLink() %}
@@ -29,7 +29,7 @@
             {% set classLink = '0/' ~ encodedClass %}
         {% endif %}
 
-        <a class="button" href="/modules/attendance/modify/{{ classLink }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Attendance</a>
+        <a class="button" href="/modules/attendance/modify/{{ classLink }}/{{ event.getStartTime.getDatabaseDate() }}/{{ event.getPeriod() }}/{{ event.getTimetableCode() }}" title="Mark Attendance">Mark Attendance</a>
     {% endif %}
 
 </div>
