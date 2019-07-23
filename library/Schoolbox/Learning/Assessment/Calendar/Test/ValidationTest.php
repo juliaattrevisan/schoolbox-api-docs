@@ -111,19 +111,20 @@ class ValidationTest extends TestCase
 
     /**
      * Data provider for `testErrorRaised`.
+     * To allow the return everything is wrapped in an array.
      *
      * @return array
      */
     public function getTestErrorRaisedData(): array
     {
         return [
-            1.5,
-            null,
-            'a string',
-            '1.5',
-            new \stdClass(),
-            [],
-            STDOUT,
+            [1.5],
+            [null],
+            ['a string'],
+            ['1.5'],
+            [new \stdClass()],
+            [[]],
+            [STDOUT]
         ];
     }
 }

@@ -59,6 +59,7 @@ class ArchivedSeason extends TestCase
     /**
      * @dataProvider providerSeasonNotArchived
      * @param array $routeParams
+     * @doesNotPerformAssertions
      */
     public function testSeasonNotArchived(array $routeParams)
     {
