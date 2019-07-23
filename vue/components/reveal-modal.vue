@@ -7,7 +7,7 @@
 <script>
     import ucid from 'ucid';
     export default {
-        name: "dialog",
+        name: "reveal-modal",
         mixins: [
             ucid,
         ],

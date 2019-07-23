@@ -6,12 +6,12 @@
     import timeGridPlugin    from '@fullcalendar/timegrid'
     import listPlugin        from '@fullcalendar/list'
     import momentPlugin      from '@fullcalendar/moment'
-    import dialog            from '@schoolbox/dialog'
+    import RevealModal       from '@schoolbox/reveal-modal'
 
     export default {
         components: {
             FullCalendar,
-            reveal: dialog
+            RevealModal
         },
         data() {
             return {
@@ -109,15 +109,15 @@
 
 <template>
     <div>
-        <reveal ref="export">
+        <reveal-modal ref="export">
             bbb
-        </reveal>
+        </reveal-modal>
 
-        <reveal ref="filter">
+        <reveal-modal ref="filter">
             ccc
-        </reveal>
+        </reveal-modal>
 
-        <FullCalendar
+        <full-calendar
             :plugins="calendarPlugins"
             :views="{
                 timeGridDay: {
