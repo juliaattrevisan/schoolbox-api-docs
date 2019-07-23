@@ -100,7 +100,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             return false;
         }
 
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -180,7 +180,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
         }
 
-        if (!isset($this->defaultVideo)) {
+        if (null !== $this->defaultVideo) {
             // Show the first video that has completed encoding
             foreach ($this->outputList as $video) {
                 /** @var \Schoolbox\Video\ResourceVideo $video */
