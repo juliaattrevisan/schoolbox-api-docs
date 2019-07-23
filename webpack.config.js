@@ -44,7 +44,11 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      '@schoolbox': path.resolve(
+          __dirname,
+          "vue/components"
+      ),
     },
     extensions: ['*', '.js', '.vue', '.json']
   },
