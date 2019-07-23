@@ -203,6 +203,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         foreach ($this->outputList as $video) {
             // Display the list of videos if the user has permission to view them.
             if ($this->isVisibleToCurrentUser($video)) {
+
                 /* Apply values only if you can see them
                  */
                 $this->setVar([
@@ -220,7 +221,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 // so should not appear unless we are parsing the list item.
 
                 // Owner name and optional link
-                if($video->getFile()->getOwner()->isDeleted()){
+                if ($video->getFile()->getOwner()->isDeleted()){
                     $this->setVar('owner_exists_block', '');
                     $this->parse('owner_deleted_block', 'owner_deleted');
                 } else {
@@ -245,6 +246,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                         'VIDEO_LIST_STATUS' => $video->getStatus(),
                         'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
                     ]);
+
                     $this->parse('video_pending_list_block', 'video_pending_list', true);
                 }
 
@@ -252,7 +254,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
         }
 
-        if (is_object($this->defaultVideo) and $this->defaultVideo->isComplete()) {
+        if (is_object($this->defaultVideo) && $this->defaultVideo->isComplete()) {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
             $this->parse('default_video_block', 'default_video');
         }
