@@ -4,19 +4,22 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract
 {
 
     /**
-     * @var \Schoolbox\Collection|\Schoolbox\Video\ResourceVideo[]
+     * @var Collection|ResourceVideo[]
      */
     protected $outputList;
 
     /**
-     * @var \Schoolbox\Video\ResourceVideo
+     * @var ResourceVideo
      */
     protected $defaultVideo;
 
@@ -25,16 +28,16 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      *
      * @var array
      */
-    protected $sortFields = array('name', 'date');
+    protected $sortFields = ['name', 'date'];
 
     /**
      * Determine whether the current user should be able to see the video given as an argument.
      *
-     * @param \Schoolbox\Video\ResourceVideo $video
+     * @param ResourceVideo $video
      *
      * @return boolean
      */
-    private function isVisibleToCurrentUser($video)
+    private function isVisibleToCurrentUser($video): bool
     {
         // Read access users should not be able to see hidden videos.
         return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
@@ -43,17 +46,18 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     /**
      * Return the first visible video in a list, or null if no visible videos.
      *
-     * @param \Schoolbox\Collection(array()) $videoList
+     * @param Collection $videoList
      *
-     * @return \Schoolbox\Video\ResourceVideo|null
+     * @return ResourceVideo|null
      */
-    private function findFirstVisibleVideoIn($videoList)
+    private function findFirstVisibleVideoIn(Collection $videoList): ?ResourceVideo
     {
         foreach ($videoList as $video) {
             if ($this->isVisibleToCurrentUser($video)) {
                 return $video;
             }
         }
+
         return null;
     }
 
@@ -187,7 +191,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         if (null !== $this->defaultVideo) {
             // Show the first video that has completed encoding
             foreach ($this->outputList as $video) {
-                /** @var \Schoolbox\Video\ResourceVideo $video */
+                /** @var ResourceVideo $video */
                 // Don't pick a video not visible to the user as the default video
                 if ($video->isComplete() && $this->isVisibleToCurrentUser($video)) {
                     $this->defaultVideo = $video;
