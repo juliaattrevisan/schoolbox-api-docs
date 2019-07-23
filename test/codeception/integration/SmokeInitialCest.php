@@ -404,7 +404,7 @@ class SmokeInitialCest {
         #THEN
         $i->comment('Created homepage and added assessment to it');
         $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create an assessment.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId, $redirect_history[0], 'T expect we get redirected to the homepage our assessment is on.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId, $redirect_history[0], 'I expect we get redirected to the homepage our assessment is on.');
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
         #WHEN
@@ -462,11 +462,114 @@ class SmokeInitialCest {
     }
 
     /**
-     * @incomplete
+     *
      */
     public function SmokeCalendarPOST(IntegrationTester $i)
     {
-        ;
+        #GIVEN
+        $i->loginAdmin(); #we logged in as alaress
+        $admin = $i->getUser('alaress');
+
+        #WHEN
+        $event_title='Personal event for user '.$admin->getId().'. On full Calendar.';
+        $response = $i->createPersonalCalendarEventViaCalendar($event_title, $admin->getId());
+
+        #THEN
+        $i->comment('Create calendar event from full calander');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after creating event on full calendar screen.');
+
+        #WHEN
+        $event_title='Personal event for user '.$admin->getId().'. On create version of modify event.';
+        $response = $i->createPersonalCalendarEvent($event_title, $admin->getId());
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+
+        #THEN
+        $i->comment('Create calendar event from edit event - Personal event');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I create a calendar personal event via editinng event.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        #WHEN
+        $groups_effected= [
+            $i->getFirstHomepageIdByTitle('Oak House')
+        ];
+        $event_title='Group event for a group. On create version of modify event.';
+        $response = $i->createGroupCalendarEvent($event_title, $admin->getId(), $groups_effected);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+
+        #THEN
+        $i->comment('Create calendar event from edit event - Group event');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I create a calendar group event via editinng event.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        #WHEN
+        $roles_effected= [
+            $i->getRoleByTitle('Administration')->getId(),
+            $i->getRoleByTitle('Teachers')->getId()
+        ];
+        $campuses_effected= [
+            $i->getCampusByName('Senior')->getId(),
+            $i->getCampusByName('Junior')->getId()
+        ];
+        $event_title='Campus event for 2 roles and all the campuses. On create version of modify event.';
+        $response = $i->createCampusCalendarEvent($event_title, $admin->getId(), $roles_effected, $campuses_effected);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+
+        #THEN
+        $i->comment('Create calendar event from edit event - Campus event');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I create a calendar campus event via editinng event.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        #WHEN
+        $admin = $i->getUser('alaress');
+        $event_title='Personal event for user '.$admin->getId().'. Edited Test.';
+        $i->createPersonalCalendarEventViaCalendar($event_title, $admin->getId());
+        $response = $i->editPersonalCalendarEvent($event_title, $admin->getId());
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+
+        #THEN
+        $i->comment('Create personal calendar event then edit the personal event.');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I edit a personal event.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+
+        #WHEN
+        $event_title='Campus event for administrators and teachers '.$admin->getId().'. RCVP Test.';
+        $roles_effected= [
+            $i->getRoleByTitle('Administration')->getId(),
+            $i->getRoleByTitle('Teachers')->getId()
+        ];
+        $campuses_effected= [
+            $i->getCampusByName('Senior')->getId(),
+            $i->getCampusByName('Junior')->getId()
+        ];
+        $i->createCampusCalendarEventWithAttendance($event_title, $admin->getId(), $roles_effected, $campuses_effected);
+        $event = $i->getCalendarEventByTitle($event_title);
+        $response = $i->RSVPtoEvent($event->getId());
+
+        #THEN
+        $i->comment('Create personal calendar event then RCVP to it.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after sending an RSVP to the event.');
+
+        #WHEN
+        $users_to_approve=[
+            $admin->getId()
+        ];
+        $response = $i->AppoveAttendeeOnRSVPEvent($event->getId(), $users_to_approve);
+        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+
+        #THEN
+        $i->comment('Approve attendees on event.');
+        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after we approve attendance.');
+        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/'.$event->getId(), $redirect_history[0], 'I expect we get redirected to the event we have added attendance to.');
+        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
     }
 
     /**
@@ -474,7 +577,86 @@ class SmokeInitialCest {
      */
     public function SmokePastoralCarePOST(IntegrationTester $i)
     {
-        ;
+        $i->loginAdmin(); #we logged in as alaress
+        #create pastoral care record
+        #url https://vagrant.dev.schoolbox.cloud/pastoral/record/insert
+        #refere https://vagrant.dev.schoolbox.cloud/pastoral/student/206/record/insert
+        /* dataform
+        *
+         * 'id' = ''
+         * 'student_id'=206
+         * 'heading' = 'heading'
+         * typeId = 1
+         * subtypeId = 1
+         * severityId = 1
+         * points = 1
+         * tags = ''
+         * body_public = <p>some stuff</p>
+         * body_private = <p>some stuff</p>
+         * role[2] = 1
+         * user[151] = 2
+         * user[156] = 0
+         */
+
+        #modify pastoral care record
+        #url https://vagrant.dev.schoolbox.cloud/pastoral/record/1/update
+        #refere https://vagrant.dev.schoolbox.cloud/pastoral/student/206/record/1/update
+        /* dataform
+        *
+         * 'id' = ''
+         * 'student_id'=206
+         * 'heading' = 'heading'
+         * typeId = 1
+         * subtypeId = 1
+         * severityId = 1
+         * points = 1
+         * tags = ''
+         * body_public = <p>some stuff</p>
+         * body_private = <p>some stuff</p>
+         * role[2] = 1
+         * user[151] = 2
+         * user[156] = 0
+         */
+
+        #duplicate pastoral care record and link to student
+        #url https://vagrant.dev.schoolbox.cloud/pastoral/record/1/update
+        #refere https://vagrant.dev.schoolbox.cloud/pastoral/student/206/record/1/update
+        /* dataform
+        *
+         * 'id' = ''
+         * 'student_id'=206
+         * 'heading' = 'heading'
+         * typeId = 1
+         * subtypeId = 1
+         * severityId = 1
+         * points = 1
+         * tags = ''
+         * body_public = <p>some stuff</p>
+         * body_private = <p>some stuff</p>
+         * role[2] = 1
+         * user[151] = 2
+         * user[156] = 0
+         * duplicate_id[] = 230
+         */
+
+        #comment on pastoral care record on general content
+        #url https://vagrant.dev.schoolbox.cloud/pastoral/record/1/comment/insert
+        #refere https://vagrant.dev.schoolbox.cloud/pastoral/student/206/record/1
+        /*data form
+         * pastoral_id	1
+            student_id	206
+            comment_body	This+is+a+comment
+         */
+
+        #comment on pastoral care record on private content
+        #url https://vagrant.dev.schoolbox.cloud/pastoral/record/1/comment/insert
+        #refere https://vagrant.dev.schoolbox.cloud/pastoral/student/206/record/1
+        /* data form
+         * pastoral_id	1
+            student_id	206
+            comment_body	This+is+a+comment
+            comment_private	1
+         */
     }
 
 }

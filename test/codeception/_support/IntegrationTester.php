@@ -13,6 +13,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\UserMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Comms\News\Mapper as NewsMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -97,6 +100,38 @@ class IntegrationTester extends \Codeception\Actor
         return UserMapper::getInstance()->findOneByColumn('username', $username);
     }
 
+    function getRoleByTitle($title){
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return RoleMapper::getInstance()->findOneByColumn('name', $title);
+    }
+
+    function getCampusByName($name){
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return CampusMapper::getInstance()->findOneByColumn('name', $name);
+    }
+
+    public function getCalendarEventByTitle($title)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return EventMapper::getInstance()->findOneByColumn('title', $title);
+    }
+
+    public function getCalendarEventAttendanceList($event_id){
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+
+        $query = $this->database->prepare('select user_id, id from event_attendance where event_id='.$event_id.';');
+        $query->execute();
+        return $query->fetchAll();
+    }
+
     public function getComponentByClass($element_class)
     {
         if(!isset($this->database)) {
@@ -179,6 +214,7 @@ class IntegrationTester extends \Codeception\Actor
             $this->initDatabase();
         }
         $query = $this->database->prepare('select * from assessment_course_unit_specification where course_unit_specification_id='.$unit_id.';');
+        $query->execute();
         return $query->fetchAll();
     }
 
@@ -598,14 +634,14 @@ class IntegrationTester extends \Codeception\Actor
             $data['unit['.$unit->getId().'][unit_impl_id]']='';
             $data['unit['.$unit->getId().'][open_date]']='22/06/2019';
             $data['unit['.$unit->getId().'][close_date]']='22/08/2019';
-            $assessment_ids = $this->getAssessmentIdByCourseUnitSpecId($unit->getId());
-            foreach ($assessment_ids as $assessment_id)
+            $assessments = $this->getAssessmentIdByCourseUnitSpecId($unit->getId());
+            foreach ($assessments as $assessment)
             {
-                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][spec_id]'] = $assessment_id;
-                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][impl_id]'] = '';
-                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][checked]'] = 1;
-                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][dates][publish]'] ='22/06/2019 12:00am';
-                $data['unit['.$unit->getId().'][a]['.$assessment_id.'][dates][due]'] ='22/08/2019 12:00am';
+                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][spec_id]'] = $assessment['id'];
+                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][impl_id]'] = '';
+                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][checked]'] = 1;
+                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][dates][publish]'] ='22/06/2019 12:00am';
+                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][dates][due]'] ='22/08/2019 12:00am';
             }
         }
 
@@ -618,6 +654,202 @@ class IntegrationTester extends \Codeception\Actor
             'form_params'=>$data
         ]);
     }
+
+    public function createPersonalCalendarEventViaCalendar($event_title, $user_id)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/calendar/full';
+
+        $page='/calendar/ajax/create';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'userId' => $user_id,
+            'allDay' => 1,
+            'date' => '19-07-2019',
+            'title' => $event_title,
+            'type' => 1
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function modifyCalendarEventWithLevel($event_title, $user_id, $level_data, $id='')
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/calendar/modify.php';
+
+        $page='/calendar/modifyForm.php';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'id' => $id,
+            'userId' => $user_id,
+            'authorId' => $user_id,
+            'allday' => 1,
+            'return' => '/calendar/full/19-07-2019/'.$user_id,
+            'efficacy' => 'self',
+            'action' => 'Add',
+            'title' => $event_title,
+            'startDate' => '19/07/2019',
+            'endDate' => '19/07/2019',
+            'repeat' => null,
+            'repeat_until' => null,
+            'type' => 1,
+            'location' => 'Automated test location',
+            'detail' => '<p>Automated test description</p>',
+            'publishDate' => '18/07/2019 12:00pm'
+        ];
+        if ($id == '')
+        {
+            $data['Add'] ='Add Event';
+        } else {
+            $data['Add'] ='Update Event';
+        }
+        $data = array_merge($data, $level_data);
+
+        $allow_redirects = $this->redirect_settings;
+
+        try {
+            return $this->client->request('POST', $url, [
+                'headers' => $this->guzzle_headers,
+                'allow_redirects' => $allow_redirects,
+                'cookies'=>$this->client_cookie_jar,
+                'form_params'=>$data
+            ]);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            print($e->getMessage());
+            print($e->getResponse()->getBody()->getContents());
+            throw $e;
+        }
+    }
+
+    public function createPersonalCalendarEvent($event_title, $user_id)
+    {
+        $level_data= [
+            'level' => 1,
+            'campus[]' => 1
+        ];
+        return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
+    }
+
+    public function createCampusCalendarEventWithAttendance($event_title, $user_id, $roles, $campuses)
+    {
+        $level_data= [
+            'level' => 3,
+            'roles' => $roles,
+            'campus' => $campuses,
+            'attendance' => 1
+        ];
+        return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
+    }
+
+    public function createGroupCalendarEvent($event_title, $user_id, $event_groups)
+    {
+        $level_data= [
+            'level' => 2,
+            'group' => $event_groups,
+            'campus[]' => 1
+        ];
+        return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
+    }
+
+
+    public function createCampusCalendarEvent($event_title, $user_id, $roles, $campuses)
+    {
+        $level_data= [
+            'level' => 3,
+            'roles' => $roles,
+            'campus' => $campuses
+        ];
+        return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
+    }
+
+    public function editPersonalCalendarEvent($event_title, $user_id)
+    {
+        $event = $this->getCalendarEventByTitle($event_title);
+
+        $level_data= [
+            'level' => 1,
+            'campus' => [1]
+        ];
+
+        return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data, $event->getId());
+    }
+
+    public function RSVPtoEvent($event_id)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/calendar/full/09-08-2019';
+
+        $page='/service/attendance/setAttendance';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'event[id]' => $event_id,
+            'status' => 'add'
+        ];
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function AppoveAttendeeOnRSVPEvent($event_id, $user_ids)
+    {
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/calendar/attendance/list/'.$event_id;
+
+        $attendanceList = $this->getCalendarEventAttendanceList($event_id);
+
+        $page='/calendar/attendance/processModifyAttendanceList';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'event[id]' => $event_id,
+            'approve' => 'Approve Selected'
+        ];
+
+        foreach ($attendanceList as $attendee)
+        {
+            if ( in_array($attendee['user_id'], $user_ids))
+            $data['attendanceList['.$attendee['user_id'].'][id]'] = $attendee['id'];
+        }
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
 
 
     public function addUsersToHomepageGroup($homepage_id, $user_ids)
