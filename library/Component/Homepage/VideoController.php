@@ -114,17 +114,13 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             'mime' => 'video',
         );
 
-        if ($this->getConfig('size') >= 1) {
-            $this->outputList = $videoResourceMapper->findByCategory(
-                $this->getSource()->getId(),
-                $sortConfig,
-                $this->getConfig('size')
-            );
-        } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
-        } else {
-            $this->outputList = new \Schoolbox\Collection(array());
-        }
+        $limit = (int)$this->getConfig('size');
+
+        $this->outputList = $videoResourceMapper->findByCategory(
+            $this->getSource()->getId(),
+            $sortConfig,
+            $limit
+        );
 
         // Set up component name
         $this->setVar([
