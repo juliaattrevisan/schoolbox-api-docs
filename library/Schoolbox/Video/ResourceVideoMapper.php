@@ -8,6 +8,7 @@
 namespace Schoolbox\Video;
 
 use Component\Eportfolio\FileListMapper;
+use Component_Config_Size;
 use Schoolbox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
@@ -53,17 +54,20 @@ class ResourceVideoMapper extends Mapper
         ]);
     }
 
+
     /**
      * Find videos for a particular category
      *
-     * @param  int   $category The category to search
-     * @param  array $options  sort, sortdir, mime, getHidden
-     * @param  bool  $limit
+     * @param int        $category The category to search
+     * @param array      $options  sort, sortdir, mime, getHidden
+     * @param int|null   $limit
      *
      * @return Collection|ResourceVideo[]
      * @throws MapperException
+     * @throws Mapper\DefinitionException
+     * @throws \PDOException
      */
-    public function findByCategory(int $category, array $options, bool $limit = false): Collection
+    public function findByCategory(int $category, array $options, ?int $limit = Component_Config_Size::SIZE_ALL): Collection
     {
         $videoList  = $this->createCollection();
         $fileMapper = FileMapper::getInstance();
@@ -106,7 +110,7 @@ class ResourceVideoMapper extends Mapper
             }
         }
 
-        if ($limit != false) {
+        if ($limit) {
             $query .= "LIMIT 0,:lim";
         }
 

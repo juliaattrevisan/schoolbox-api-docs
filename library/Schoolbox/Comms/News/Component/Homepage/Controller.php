@@ -24,7 +24,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        $limit = Component_Config_Size::SIZE_ALL === $this->getConfig('size')
+        $limit = Component_Config_Size::SIZE_ALL === (int)$this->getConfig('size')
             ? self::HARD_LIMIT
             : (int)$this->getConfig('size');
 
