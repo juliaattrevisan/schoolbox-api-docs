@@ -21,6 +21,9 @@ use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
 use Schoolbox\Role;
 
+/**
+ * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ */
 class Mapper extends BaseMapper
 {
 
