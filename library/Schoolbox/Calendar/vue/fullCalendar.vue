@@ -6,10 +6,12 @@
     import timeGridPlugin    from '@fullcalendar/timegrid'
     import listPlugin        from '@fullcalendar/list'
     import momentPlugin      from '@fullcalendar/moment'
+    import dialog            from '@schoolbox/dialog'
 
     export default {
         components: {
-            FullCalendar // make the <FullCalendar> tag available
+            FullCalendar,
+            dialog
         },
         data() {
             return {
@@ -22,12 +24,10 @@
         },
         methods: {
             onExportClick: function () {
-                // This needs to be a Vue modal
-                window.$('#calendar-export').foundation('reveal', 'open');
+                this.$refs.export.open();
             },
             onFilterClick: function () {
-                // This needs to be a Vue modal
-                window.$('#calendar-controls').foundation('reveal', 'open');
+                this.$refs.filter.open();
             },
             onLoading:  function (isLoading) {
                 /* Show loading div right in the middle
@@ -109,6 +109,14 @@
 
 <template>
     <div>
+        <dialog ref="export">
+            bbb
+        </dialog>
+
+        <dialog ref="filter">
+            ccc
+        </dialog>
+
         <FullCalendar
             :plugins="calendarPlugins"
             :views="{
