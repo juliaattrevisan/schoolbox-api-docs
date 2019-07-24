@@ -1,7 +1,5 @@
-#!/usr/bin/php
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
@@ -23,8 +21,14 @@
  *  -w       | --window    duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
  *  -v       | --verbose   verbosity:   how much activity will be logged.
  */
+namespace Schoolbox\Mapper;
 
 use Alaress\Lumberjack\Logger;
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use Database;
+use Eportfolio;
+use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
@@ -60,26 +64,11 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\CliTool;
+use Throwable;
 
-require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Recursive Undeleter');
-
-$undeleter = new RecursiveUndeleter();
-$undeleter->run();
-
-class RecursiveUndeleter
+class RecursiveUndeleter extends CliTool\App
 {
-    const COLOUR_GREEN = "\033[0;32m";
-    const COLOUR_RED = "\033[0;31m";
-    const COLOUR_GREY = "\033[0;37m";
-    const COLOUR_YELLOW = "\033[0;33m";
-    const COLOUR_WHITE = "\033[0m";
-
-    const COLOUR_BOLD_GREEN = "\033[0;32m";
-    const COLOUR_BOLD_RED = "\033[0;31m";
-    const COLOUR_BOLD_GREY = "\033[0;37m";
-    const COLOUR_BOLD_YELLOW = "\033[0;33m";
-
     // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
     // part of same action?
     const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
@@ -92,12 +81,6 @@ class RecursiveUndeleter
      */
     private $deletedAtWindow;
 
-    /**
-     * If false, identify soft-deleted items and print report, but don't actually restore anything
-     *
-     * @var bool
-     */
-    private $perform;
 
     /**
      * Command-line specified date to pretend the indicated root objects were deleted at.
@@ -118,9 +101,6 @@ class RecursiveUndeleter
 
     /** @var IMapper */
     private $rootMapper;
-
-    /** @var int */
-    private $logThreshold;
 
     /** @var int[] */
     private $rootIds;
@@ -264,15 +244,28 @@ class RecursiveUndeleter
     ];
 
 
-    /**
-     * Public entry point
-     */
-    public function run()
+    /** @inheritDoc */
+    public function getShortOpts(): array
     {
+        return ['t:', 'i:', 'd:', 'w:'];
+    }
+
+
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return ['table:', 'id:', 'override:', 'window:'];
+    }
+
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        // TODO update all usages of '$this->logger' to '$this->getLogger()', this is an interim measure to limit the size of this PR
+        $this->logger = $this->getLogger();
+
         try {
-            $this->checkCLI();
             $this->parseCommandLineArgs();
-            $this->buildLogger();
             $this->loadRootMapper();
             $this->connectToDatabase();
             $this->checkRestoreAllRequested();
@@ -280,7 +273,7 @@ class RecursiveUndeleter
             $this->printResults($this->softDeletedModels);
             $this->printDeletedAtDates($this->softDeletedModels);
 
-            if($this->perform) {
+            if($this->perform()) {
                 $this->restoreSoftDeletedModels();
             }
         }
@@ -291,16 +284,6 @@ class RecursiveUndeleter
                 "Standard naming is `{child_table}`.`{parent_table}_{parent_table_identifier}`.\n" .
                 'If this is not the case, you need to specify the join column manually in the soft-delete registry.';
             $this->logger->error($helpMsg);
-        }
-        catch(Exception $e) {
-            // TODO remove this block when we drop PHP5 support
-            if($this->logger instanceof Logger) {
-                $this->logger->error($e->getMessage());
-            }
-            else {
-                echo "{$e->getMessage()}\n\n";
-            }
-            exit(1);
         }
         catch(Throwable $e) {
             if($this->logger instanceof Logger) {
@@ -342,15 +325,6 @@ class RecursiveUndeleter
 
 
     /**
-     * Build a logger with a threshold level dependent on whether user requested verbose mode
-     */
-    private function buildLogger()
-    {
-        $this->logger = new Logger(STDOUT, STDERR, $this->logThreshold);
-    }
-
-
-    /**
      * Load an instance of the root mapper
      */
     private function loadRootMapper()
@@ -371,7 +345,7 @@ class RecursiveUndeleter
                     return;
                 }
             }
-            catch(Exception $e) {
+            catch(\Exception $e) {
                 $this->logger->warning($e->getMessage());
             }
         }
@@ -382,30 +356,15 @@ class RecursiveUndeleter
 
 
     /**
-     * Ensure running as CLI and exits if not
-     */
-    private function checkCLI()
-    {
-        if(PHP_SAPI !== 'cli') {
-            echo 'Must be run from Command Line Interface (CLI) only';
-            exit(1);
-        }
-    }
-
-
-    /**
      * Either successfully load all command line args, or print and error message and exit
      */
     private function parseCommandLineArgs()
     {
-        $opts   = getopt('t:i:o:w:vp', ['table:', 'id:', 'override:', 'window:', 'verbose', 'perform']);
         $errors = [];
-        $this->getCommandLinePerform($opts);
-        $this->getCommandLineThreshold($opts);
-        $errors = $this->getCommandLineExplicitDeletionDate($errors, $opts);
-        $errors = $this->getCommandLineTable($errors, $opts);
-        $errors = $this->getCommandLineIds($errors, $opts);
-        $errors = $this->getCommandLineTimestampWindow($errors, $opts);
+        $errors = $this->getCommandLineExplicitDeletionDate($errors);
+        $errors = $this->getCommandLineTable($errors);
+        $errors = $this->getCommandLineIds($errors);
+        $errors = $this->getCommandLineTimestampWindow($errors);
 
         $red    = self::COLOUR_RED;
         $green  = self::COLOUR_GREEN;
@@ -420,7 +379,7 @@ class RecursiveUndeleter
                 echo "\t- $error\n";
             }
 
-            $file   = __FILE__;
+            $file   = $this->getToolFilename();
             $class  = __CLASS__;
             $table = 'folder';
 
@@ -446,7 +405,7 @@ DESCRIPTION
        {$yellow}-p, --perform{$white}
               *without* this flag, un-delete will only perform a dry-run
 
-       {$yellow}-o, --override=OVERRIDE_DATE{$white}
+       {$yellow}-d, --override=OVERRIDE_DATE{$white}
               Format: {$yellow}'{$dateFormat}'{$white}
               If specified, treat specified root objects as having been deleted at this date, regardless of when they
               were really deleted, whether they have a boolean soft-delete field, or whether they are deleted at all.
@@ -455,8 +414,8 @@ DESCRIPTION
        {$yellow}-w, --window=WINDOW{$white}
               duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
 
-       {$yellow}-v, --verbose{$white}
-              verbosity:   whether to print verbose output or not.
+       {$yellow}-v[v[v]]{$white}
+              verbosity: log with increasing verbosity.
 
 EXAMPLES:
        1. To undelete a soft-deleted folder with ID = 123:
@@ -477,25 +436,24 @@ EXAMPLES:
      * Get the IDs provided on command line
      *
      * @param string[] $errors
-     * @param array    $opts
      * @return string[]
      */
-    private function getCommandLineIds(array $errors, array $opts)
+    private function getCommandLineIds(array $errors)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
-        if(isset($opts['i'], $opts['id'])) {
+        if ($this->getOpt('i:') !== null && $this->getOpt('id:') !== null) {
             $errors[] = "{$red}not specify IDs using both the short '{$yellow}-i{$red}' and long '{$yellow}--id{$red}' option syntax";
             return $errors;
         }
 
         $idString = null;
-        if(isset($opts['i'])) {
-            $idString = $opts['i'];
+        if ($this->getOpt('i:') !== null) {
+            $idString = $this->getOpt('i:');
         }
-        elseif(isset($opts['id'])) {
-            $idString = $opts['id'];
+        elseif ($this->getOpt('id:') !== null) {
+            $idString = $this->getOpt('id:');
         }
         else {
             $errors[] = "{$red}specify IDs using either the short '{$yellow}-i{$red}' or long '{$yellow}--id{$red}' option syntax";
@@ -521,25 +479,24 @@ EXAMPLES:
      * Get the period in time in which to match deleted_at timestamps provided on command line
      *
      * @param string[] $errors
-     * @param array    $opts
      * @return string[]
      */
-    private function getCommandLineTimestampWindow(array $errors, array $opts)
+    private function getCommandLineTimestampWindow(array $errors)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
-        if(isset($opts['w'], $opts['window'])) {
+        if ($this->getOpt('w:') !== null && $this->getOpt('window:') !== null) {
             $errors[] = "{$red}not specify timestamp window using both the short '{$yellow}-w{$red}' and long '{$yellow}--window{$red}' option syntax";
             return $errors;
         }
 
         $window = null;
-        if(isset($opts['w'])) {
-            $window = $opts['w'];
+        if ($this->getOpt('w:') !== null) {
+            $window = $this->getOpt('w:');
         }
-        elseif(isset($opts['window'])) {
-            $window = $opts['window'];
+        elseif ($this->getOpt('window:') !== null) {
+            $window = $this->getOpt('window:');
         }
 
         if(null !== $window && preg_match('/\D+/', $window)){
@@ -556,40 +513,28 @@ EXAMPLES:
 
 
     /**
-     * Determine whether command line args indicate we should perform the actions or just do a dry-run
-     *
-     * @param array $opts
-     */
-    private function getCommandLinePerform(array $opts)
-    {
-        $this->perform = isset($opts['p']) || isset($opts['perform']);
-    }
-
-
-    /**
      * @param string[] $errors
-     * @param array $opts
      * @return string[]
      */
-    private function getCommandLineTable(array $errors, array $opts)
+    private function getCommandLineTable(array $errors)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         // Did user provide both short and long options?
-        if(isset($opts['t'], $opts['table'])) {
+        if ($this->getOpt('t:') !== null && $this->getOpt('table:') !== null) {
             $errors[] = "{$red}specify database table using either the short '{$yellow}-t{$red}' or long '{$yellow}--table{$red}' option syntax, but not both";
             return $errors;
         }
         // Did user provide neither short nor long option
-        if(!isset($opts['t']) && !isset($opts['table'])) {
+        if ($this->getOpt('t:') === null && $this->getOpt('table:') === null) {
             $errors[] = "{$red}specify database table using either the short '{$yellow}-t{$red}' or long '{$yellow}--table{$red}' option syntax";
             return $errors;
         }
 
         // What table are we targeting?
-        $shortOpt = isset($opts['t']) ? $opts['t'] : null;
-        $longOpt  = isset($opts['table']) ? $opts['table'] : null;
+        $shortOpt = $this->getOpt('t:');
+        $longOpt  = $this->getOpt('table:');
 
         if(is_string($shortOpt)) {
             $this->rootTable = $shortOpt;
@@ -605,47 +550,32 @@ EXAMPLES:
 
 
     /**
-     * Determine the log verbosity from command line args
-     *
-     * @param array $opts
-     */
-    private function getCommandLineThreshold(array $opts)
-    {
-        $verboseOn  = 100; // max verbosity: EV-ER-Y-THING...
-        $verboseOff = 200; // mod verbosity: most things
-
-        $this->logThreshold = isset($opts['v']) || isset($opts['verbose']) ? $verboseOn : $verboseOff;
-    }
-
-
-    /**
-     * Did caller specify to
+     * Did caller specify to target a specific deletion date
      *
      * @param string[] $errors
-     * @param array    $opts
      * @return string[]
      */
-    private function getCommandLineExplicitDeletionDate(array $errors, array $opts)
+    private function getCommandLineExplicitDeletionDate(array $errors)
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         // Did user provide both short and long options?
-        if (isset($opts['o'], $opts['override'])) {
-            $errors[] = "{$red}specify override deletion date using either the short '{$yellow}-o{$red}' or long '{$yellow}--override{$red}' option syntax, but not both";
+        if ($this->getOpt('d:') !== null && $this->getOpt('override:') !== null) {
+            $errors[] = "{$red}specify override deletion date using either the short '{$yellow}-d{$red}' or long '{$yellow}--override{$red}' option syntax, but not both";
             return $errors;
         }
 
         // Did user specify neither?
-        if (!isset($opts['o']) && !isset($opts['override'])) {
+        if ($this->getOpt('d:') === null && $this->getOpt('override:') === null) {
             return $errors;
         }
 
-        $dateString = isset($opts['o']) ? $opts['o'] : $opts['override'];
+        $dateString = $this->getOpt('d:') ?? $this->getOpt('override:');
 
         try {
-            $this->explicitDeletionDate = new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
-        } catch (Exception $e) {
+            $this->explicitDeletionDate = new Alaress_Date_Format(strtotime($dateString), Alaress_Date_Format::TIMESTAMP);
+        } catch (\Exception $e) {
             echo self::COLOUR_RED."Could not generate a date from string: {$dateString}\n";
             echo "{$e->getMessage()}\n".self::COLOUR_WHITE;
             exit(1);
@@ -770,7 +700,7 @@ EXAMPLES:
     private function findDeletedModels(IMapper $mapper, array $ids)
     {
         if(!$mapper->getIdentifierColumn()) {
-            $this->logger->error("Mapper '%s' does not appear to have an identifier column. Unable to fetch root models", get_class($mapper));
+            $this->logger->error(sprintf("Mapper '%s' does not appear to have an identifier column. Unable to fetch root models", get_class($mapper)));
             error(1);
         }
 
@@ -779,8 +709,8 @@ EXAMPLES:
 
         $firstModel = $rootModels->first();
         if($firstModel && !$firstModel instanceof ISoftDeletable && !$this->explicitDeletionDate) {
-            $this->logger->error("Mapper '%s' does not appear to be soft-deletable, and no override deletion"
-            . ' date specified. Unable to restore', get_class($mapper));
+            $this->logger->error(sprintf("Mapper '%s' does not appear to be soft-deletable, and no override deletion"
+            . ' date specified. Unable to restore', get_class($mapper)));
             error(1);
         }
 
@@ -905,7 +835,7 @@ EXAMPLES:
 
         $reportWidth = 5 + $maxCountLength + $maxTableLength + $maxMapperClassLength + $maxIdsStringLength;
 
-        $runType       = $this->perform ? 'LIVE RUN' : 'DRY RUN';
+        $runType       = $this->perform() ? 'LIVE RUN' : 'DRY RUN';
         $runTypeLength = strlen($runType);
 
         $countLeadingHyphens  = (int)(($reportWidth - $runTypeLength - 4) / 2);
