@@ -175,7 +175,12 @@
             </dl>
             <div class="tabs-content">
                 <div class="content active" id="createEventPanel" aria-hidden="false">
-                    <form ref="createEventForm" method="post" action="/calendar/ajax/create" class="top">
+                    <form ref="createEventForm"
+                          method="post"
+                          action="/calendar/ajax/create"
+                          @submit.prevent="createNewEvent"
+                          class="top"
+                    >
                         <input name="userId" type="hidden" :value="config.userId" />
                         <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
                         <input name="date"   type="hidden" :value="newEvent.date" />
@@ -199,7 +204,6 @@
                         </section>
                         <ul class="flex-list buttons">
                             <li><input type="submit"
-                                       @submit.prevent="createNewEvent"
                                        :disabled="!isNewEventSubmittable"
                                        value="Create Event" /></li>
                             <li><button @click.prevent="redirectToEventForm($event)"
@@ -208,7 +212,11 @@
                     </form>
                 </div>
                 <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
-                    <form ref="createTaskForm" method="post" action="/calendar/ajax/create">
+                    <form ref="createTaskForm"
+                          method="post"
+                          action="/calendar/ajax/create"
+                          @submit.prevent="createNewTask"
+                    >
                         <input name="userId" type="hidden" :value="config.userId" />
                         <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
                         <input name="date"   type="hidden" :value="newEvent.date" />
@@ -230,7 +238,6 @@
                         <div class="row">
                             <div class="small-12 columns no-pad">
                                 <input type="submit"
-                                       @submit.prevent="createNewTask"
                                        :disabled="!isNewEventSubmittable"
                                        value="Create Task" />
                             </div>
