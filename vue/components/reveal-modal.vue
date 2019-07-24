@@ -28,6 +28,9 @@
             open() {
                 this.dialog.foundation('reveal', 'open');
             },
+            close() {
+                this.dialog.foundation('reveal', 'close');
+            },
         },
     }
 </script>
