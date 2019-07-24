@@ -98,7 +98,8 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         /* Render event types to choose from
          */
         /** @var Collection $allTypes */
-        $allTypes = EventTypeMapper::getInstance()->findAll();
+        $allTypes   = EventTypeMapper::getInstance()->findAll();
+        $eventTypes = [];
 
         if ($allTypes->count()) {
             foreach ($allTypes as $currentType) {
@@ -111,6 +112,10 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
                         'EVENT_TYPE_ID' => $currentType->getId(),
                         'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
                     ]);
+                    $eventTypes[] = [
+                        'id'   => $currentType->getId(),
+                        'name' => $currentType->getType(),
+                    ];
 
                     $this->getPage()->parse('event_type_block', 'event_type', true);
                 }
@@ -118,5 +123,6 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         } else {
             $this->getPage()->setVar('event_type_block', '');
         }
+        $this->getPage()->setVar('EVENT_TYPES_JSON', json_encode($eventTypes));
     }
 }
