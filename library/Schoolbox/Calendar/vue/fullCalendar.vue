@@ -7,10 +7,14 @@
     import listPlugin               from '@fullcalendar/list'
     import momentPlugin, {toMoment} from '@fullcalendar/moment'
     import RevealModal              from '@schoolbox/reveal-modal'
+    import MetaList                 from '@schoolbox/meta/list'
+    import MetaItem                 from '@schoolbox/meta/item'
     import axios                    from 'axios'
 
     export default {
         components: {
+            MetaItem,
+            MetaList,
             FullCalendar,
             RevealModal
         },
@@ -247,7 +251,14 @@
             <div class="row">
                 <div class="small-12">
                     <h3 class="note">{{ currentEvent.title }}</h3>
-                    <article class="detail">
+                    <meta-list>
+                        <meta-item class="icon-resource-booking" data-event-modal-field="bookingStatus"></meta-item>
+                        <meta-item class="icon-calendar" data-event-modal-field="displayDate"></meta-item>
+                        <meta-item class="icon-location" data-event-modal-field="location"></meta-item>
+                        <meta-item class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></meta-item>
+                        <meta-item class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></meta-item>
+                    </meta-list>
+                    <article>
                         <span v-html="currentEvent.detail"></span>
                     </article>
                 </div>
