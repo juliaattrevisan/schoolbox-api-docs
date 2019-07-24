@@ -129,9 +129,8 @@
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
             },
-            createNewEvent: function () {
-                let form = this.$refs.createEventForm,
-                    self = this;
+            createNewEvent: function (form) {
+                let self = this;
                 axios.request({
                     url:          form.action,
                     data:         $(form).serialize(),
@@ -143,9 +142,6 @@
                 }).finally(function () {
                     self.$refs.createEvent.close();
                 });
-            },
-            createNewTask: function () {
-                console.log('createNewTask');
             },
             redirectToEventForm: function () {
                 // Use jQuery's form serialize for now: replace later
@@ -178,7 +174,7 @@
                     <form ref="createEventForm"
                           method="post"
                           action="/calendar/ajax/create"
-                          @submit.prevent="createNewEvent"
+                          @submit.prevent="createNewEvent($refs.createEventForm)"
                           class="top"
                     >
                         <input name="userId" type="hidden" :value="config.userId" />
@@ -215,7 +211,7 @@
                     <form ref="createTaskForm"
                           method="post"
                           action="/calendar/ajax/create"
-                          @submit.prevent="createNewTask"
+                          @submit.prevent="createNewEvent($refs.createTaskForm)"
                     >
                         <input name="userId" type="hidden" :value="config.userId" />
                         <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
