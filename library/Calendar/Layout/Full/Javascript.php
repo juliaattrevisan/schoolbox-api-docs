@@ -87,12 +87,32 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             ]);
         }
 
+        // Translate old calendar view to new one
+        $calendarView = null;
+        switch ($_SESSION['user']->getCalendarView()) {
+            case 'week':
+            case 'agendaWeek':
+                $calendarView = 'timeGridWeek';
+                break;
+
+            case 'day':
+            case 'agendaDay':
+                $calendarView = 'timeGridDay';
+                break;
+
+            case 'month':
+            case 'list':
+            default:
+                $calendarView = 'dayGridMonth';
+                break;
+        }
+
         $this->getPage()->setVar([
-            'CALENDAR_USER_ID' => $this->getUser()->getId(),
-            'CALENDAR_VIEW' =>  ($_SESSION['user']->getCalendarView() !== 'list') ? $_SESSION['user']->getCalendarView() : 'month',
+            'CALENDAR_USER_ID'         => $this->getUser()->getId(),
+            'CALENDAR_VIEW'            => $calendarView,
             'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
-            'CALENDAR_START_DAY' => Config::get('calendar_start_day') ? : 0,
-            'USER_TOKEN' => $this->getUser()->getKey(),
+            'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
+            'USER_TOKEN'               => $this->getUser()->getKey(),
         ]);
 
         /* Render event types to choose from
