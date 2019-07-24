@@ -3,7 +3,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
-    news: "./src/index.js"
+    // news: "./src/index.js"
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),
