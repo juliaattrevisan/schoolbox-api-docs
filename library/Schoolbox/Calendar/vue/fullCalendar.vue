@@ -124,6 +124,17 @@
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
             },
+            createNewEvent: function () {
+                console.log('createNewEvent');
+            },
+            createNewTask: function () {
+                console.log('createNewTask');
+            },
+            redirectToEventForm: function () {
+                // Use jQuery's form serialize for now: replace later
+                window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
+                    + window.$(this.$refs.createEventForm).serialize();
+            }
         }
     }
 
@@ -147,7 +158,7 @@
             </dl>
             <div class="tabs-content">
                 <div class="content active" id="createEventPanel" aria-hidden="false">
-                    <form id="createEvent" method="post" action="/calendar/ajax/create" class="top">
+                    <form ref="createEventForm" method="post" action="/calendar/ajax/create" class="top">
                         <input name="userId" type="hidden" :value="config.userId" />
                         <input name="allDay" type="hidden" v-model="newEvent.allDay" />
                         <input name="date"   type="hidden" v-model="newEvent.date" />
@@ -170,13 +181,17 @@
                             </label>
                         </section>
                         <ul class="flex-list buttons">
-                            <li><input type="submit" :disabled="!isNewEventSubmittable" value="Create Event" /></li>
-                            <li><a href="#" id="edit-full" class="button icon-modify">Edit Event</a></li>
+                            <li><input type="submit"
+                                       @submit.prevent="createNewEvent"
+                                       :disabled="!isNewEventSubmittable"
+                                       value="Create Event" /></li>
+                            <li><button @click.prevent="redirectToEventForm($event)"
+                                        class="icon-modify">Edit Event</button></li>
                         </ul>
                     </form>
                 </div>
                 <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
-                    <form id="createTask" method="post" action="/calendar/ajax/create">
+                    <form ref="createTaskForm" method="post" action="/calendar/ajax/create">
                         <input name="userId" type="hidden" :value="config.userId" />
                         <input name="allDay" type="hidden" v-model="newEvent.allDay" />
                         <input name="date"   type="hidden" v-model="newEvent.date" />
@@ -197,7 +212,10 @@
                         </section>
                         <div class="row">
                             <div class="small-12 columns no-pad">
-                                <input type="submit" :disabled="!isNewEventSubmittable" value="Create Task" />
+                                <input type="submit"
+                                       @submit.prevent="createNewTask"
+                                       :disabled="!isNewEventSubmittable"
+                                       value="Create Task" />
                             </div>
                         </div>
                     </form>
