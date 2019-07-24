@@ -7,6 +7,7 @@
     import listPlugin               from '@fullcalendar/list'
     import momentPlugin, {toMoment} from '@fullcalendar/moment'
     import RevealModal              from '@schoolbox/reveal-modal'
+    import axios                    from 'axios'
 
     export default {
         components: {
@@ -71,17 +72,21 @@
             },
             events: function (fetchInfo, callback) {
                 var self = this;
-                // Use axios instead of jQuery to fetch events?
-                window.$.ajax({
-                    dataType: 'json',
-                    url: '/calendar/ajax/full',
-                    data: {
-                        start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        userId: self.config.userId
-                    },
-                    success: function (data) {
-                        callback(data.filter(function (v) {
+                axios.get(
+                    '/calendar/ajax/full',
+                    {
+                        headers: {
+                            'X-Requested-With' : 'XMLHttpRequest'
+                        },
+                        params: {
+                            start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                            end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                            userId: self.config.userId,
+                        }
+                    }
+                ).then(
+                    function (response) {
+                        callback(response.data.filter(function (v) {
                             return 'start' in v;
                         }));
 
@@ -90,9 +95,8 @@
                         //  */
                         // // TODO restore this
                         // $.post('/calendar/changeState', {calendarView: fc.view.type});
-                    },
-                    cache: false
-                });
+                    }
+                );
             },
             onDateClick: function (dateClickInfo) {
                 // this.currentEvent = eventInfo.event;
