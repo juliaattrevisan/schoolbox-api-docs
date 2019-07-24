@@ -177,8 +177,8 @@
                 <div class="content active" id="createEventPanel" aria-hidden="false">
                     <form ref="createEventForm" method="post" action="/calendar/ajax/create" class="top">
                         <input name="userId" type="hidden" :value="config.userId" />
-                        <input name="allDay" type="hidden" v-model="newEvent.allDay" />
-                        <input name="date"   type="hidden" v-model="newEvent.date" />
+                        <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
+                        <input name="date"   type="hidden" :value="newEvent.date" />
 
                         <section>
                             <h3>On <span>{{ newEvent.displayDate }}</span></h3>
@@ -210,8 +210,8 @@
                 <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
                     <form ref="createTaskForm" method="post" action="/calendar/ajax/create">
                         <input name="userId" type="hidden" :value="config.userId" />
-                        <input name="allDay" type="hidden" v-model="newEvent.allDay" />
-                        <input name="date"   type="hidden" v-model="newEvent.date" />
+                        <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
+                        <input name="date"   type="hidden" :value="newEvent.date" />
                         <input name="type"   type="hidden" :value="config.taskTypeId" />
 
                         <section>
