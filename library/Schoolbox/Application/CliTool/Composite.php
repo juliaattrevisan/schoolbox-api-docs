@@ -57,8 +57,6 @@ class Composite extends App
             $this->runAsRoot = true;
         } elseif ($mustBeNonRoot) {
             $this->runAsRoot = false;
-        } else {
-            $this->runAsRoot = null;
         }
     }
 
