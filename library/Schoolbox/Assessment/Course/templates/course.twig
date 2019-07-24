@@ -209,15 +209,15 @@ Usage:
                 <fieldset class="content" data-mage="course-info">
                     <legend>Course Information</legend>
                     <div class="small-12 column">
-                        <label>Name
+                        <label class="required" for="name">Name</label>
                             <input type="text"
                                    name="name"
+                                   id="name"
                                    value="{{ courseSpec.folder.name }}"
                                    placeholder="What's this course called?"
                                    required
                                    maxlength="255"
                             />
-                        </label>
                     </div>
 
                     <div class="small-12 column">

@@ -73,11 +73,11 @@ $(function() {
                             <input type="hidden" readonly="readonly" name="linkID" value="{MYLINK_ID}" />
                             <div class="row">
                                 <div class="small-12 medium-6 columns">
-                                    <label for="url-{MYLINK_ID}">Link</label>
+                                    <label for="url-{MYLINK_ID}" class="required">Link</label>
                                     <input id="url-{MYLINK_ID}" name="url" type="text" class="required" placeholder="Hyperlink (http://schoolbox.com/)" value="{MYLINK_URL}" />
                                 </div>
                                 <div class="small-12 medium-6 columns">
-                                    <label for="description-{MYLINK_ID}">Title</label>
+                                    <label for="description-{MYLINK_ID}" class="required">Title</label>
                                     <input id="description-{MYLINK_ID}" name="description" type="text" class="required" placeholder="Name (Schoolbox LMS)" value="{MYLINK_DESCRIPTION}" />
                                 </div>
                                 <div class="small-12 columns">
@@ -97,11 +97,11 @@ $(function() {
             <form method="post" action="/cms/myLinksForm.php" data-role="link-form">
                 <div class="row">
                     <div class="small-12 medium-6 columns">
-                        <label for="url-new">Link</label>
+                        <label for="url-new" class="required">Link</label>
                         <input id="url-new" name="url" type="text" class="required" />
                     </div>
                     <div class="small-12 medium-6 columns">
-                        <label for="description-new">Title</label>
+                        <label for="description-new" class="required">Title</label>
                         <input id="description-new" name="description" type="text" class="required" />
                     </div>
                     <div class="small-12 columns">

@@ -5,11 +5,8 @@
 {# Basic Details #}
 {# ----------------------------------------------------------- #}
 <fieldset>
-    <label>
-        Title
-        <input type="text" name="title" value="{{ assessment.title }}" required maxlength="255"/>
-    </label>
-
+    <label class="required" for="title">Title</label>
+    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
     <label>
         Work Type
         <select name="workType">

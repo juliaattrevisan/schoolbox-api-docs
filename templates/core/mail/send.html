@@ -153,9 +153,8 @@ $(function() {
             <section>
                 <fieldset class="content">
                     <div class="small-10 large-11 columns">
-                        <label>To
-                            <input name="to" id="to"/>
-                        </label>
+                        <label for="to" class="required">To</label>
+                        <input name="to" id="to"/>
                     </div>
                     <div class="small-2 large-1 columns">
                         <label for="to">
@@ -191,10 +190,8 @@ $(function() {
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label>
-                            Subject
-                            <input type="text" name="subject" value="{SUBJECT}" required />
-                        </label>
+                        <label for="subject" class="required">Subject</label>
+                        <input type="text" name="subject" id="subject" value="{SUBJECT}" required />
                         <label>
                             <textarea name="message" id="body">{BODY}</textarea>
                         </label>
