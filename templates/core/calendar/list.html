@@ -182,8 +182,12 @@
                 </label>
             </fieldset>
         </section>
-        <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
-        <input type="submit" id="download-calendar-export" value="Download CSV"/>
+        <div class="component-action">
+            <section>
+                <input type="submit" id="open-calendar-export-dialog" value="Generate URL" />
+                <input type="submit" id="download-calendar-export" value="Download CSV" />
+            </section>
+        </div>
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -247,7 +251,7 @@
             </fieldset>
         </section>
     </form>
-    <a href="#" data-update-filter id="applyFilters" class="button icon-tick">Apply Filters</a>
+    <a href="#" data-update-filter id="applyFilters" class="button submit">Apply Filters</a>
     <!--/filter-drop-->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

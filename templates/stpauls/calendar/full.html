@@ -624,17 +624,15 @@
                         <dd class="rm"><p class="attendanceStatus"></p></dd>
                     </dl>
                 </div>
-                <div>
-                    <dl>
-                        <dd>
-                            <span class="homepageLink" data-is-html="1"></span>
-                            <span class="moreDetailsLink" data-is-html="1"></span>
-                            <span class="modifyLink" data-is-html="1"></span>
-                            <span class="deleteLink" data-is-html="1"></span>
-                            <span class="attendanceListButton" data-is-html="1"></span>
-                            <span class="attendanceRequestButton" data-is-html="1"></span>
-                        </dd>
-                    </dl>
+                <div class="component-action">
+                    <section>
+                        <span class="homepageLink" data-is-html="1"></span>
+                        <span class="moreDetailsLink" data-is-html="1"></span>
+                        <span class="attendanceListButton" data-is-html="1"></span>
+                        <span class="attendanceRequestButton" data-is-html="1"></span>
+                        <span class="modifyLink" data-is-html="1"></span>
+                        <span class="deleteLink" data-is-html="1"></span>
+                    </section>
                 </div>
                 <div class="bookingActions" data-is-html="1"></div>
             </div>
@@ -739,7 +737,7 @@
             </fieldset>
         </section>
     </form>
-    <a href="#" id="applyFilters" class="button icon-tick">Apply Filters</a>
+    <a href="#" id="applyFilters" class="submit button">Apply Filters</a>
     <!--/filter-drop-->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -805,8 +803,12 @@
                 </label>
             </fieldset>
         </section>
-        <input type="submit" id="open-calendar-export-dialog" value="Generate URL"  />
-        <input type="submit" id="download-calendar-export" value="Download CSV"/>
+        <div class="component-action">
+            <section>
+                <input type="submit" id="open-calendar-export-dialog" value="Generate URL" />
+                <input type="submit" id="download-calendar-export" value="Download CSV" />
+            </section>
+        </div>
     </form>
    
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>

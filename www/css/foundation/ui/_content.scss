@@ -1396,6 +1396,9 @@ tr:hover{
         section {
             border-bottom-width: 0;
             margin-top: 2rem;
+            &:empty {
+                display: none;
+            }
         }
     }
 
@@ -1405,6 +1408,10 @@ tr:hover{
 
     .close-reveal-modal {
         right: $reveal-close-right;
+    }
+
+    form {
+        margin: 0;
     }
 
     // Fix spacing for forms inside modals that have columns

@@ -1,3 +1,8 @@
+#start_date,
+#finish_date {
+    margin: 0;
+}
+
 .calendar-list {
     @include information-list;
 
@@ -40,6 +45,16 @@
  */
 #calendar {
     .calendar-controls {
+        .fc-left .fc-button-group {
+            margin-left: 1rem;
+            margin-top: 1rem;
+        }
+
+        .fc-right .fc-button-group {
+            margin-right: 1rem;
+            margin-top: 1rem;
+        }
+
         button {
             color: $content-ui-foreground;
             background-color: $content-ui-background;
@@ -57,8 +72,14 @@
         .fc-button-group button{
             float: none;
         }
-        .fc-button-group{
-            margin-bottom: 1rem;
+        .calendar-controls {
+            .fc-left .fc-button-group {
+                margin-left: 0;
+            }
+
+            .fc-right .fc-button-group {
+                margin-right: 0;
+            }
         }
         .fc-icon {
             line-height: 0.6rem;

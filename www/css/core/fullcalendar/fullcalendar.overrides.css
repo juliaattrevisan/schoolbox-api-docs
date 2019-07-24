@@ -14,7 +14,7 @@
 /* Vertically center datepicker icon and current month title
  */
 .fc .fc-center {
-    padding: 0.375rem 0;
+    padding: 1rem 0 0;
 }
 
 .fc .fc-button-group>*{

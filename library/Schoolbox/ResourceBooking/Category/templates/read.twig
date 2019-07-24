@@ -311,13 +311,14 @@
 </div>
 
 <div class="row">
-    <div class="small-12 columns">
+    <section class="small-12 island">
         <h2 class="subheader">
             Bookings
             <span class="hint has-tip tip-top" data-tooltip title="Click the calendar to add a booking for that time.">?</span>
         </h2>
-
-        <div id="calendar"></div>
+        <section>
+            <div id="calendar"></div>
+        </section>
     </div>
 </div>
 
@@ -337,7 +338,7 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div class="reveal-modal large" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
+<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
     <!-- Edit Event Form -->
     <form id="editEvent">
         <input type="hidden" name="eventId" />
@@ -406,7 +407,8 @@
             </fieldset>
         </section>
     </form>
-    <a href="#" id="applyFilters" class="button">Apply Filters</a>
+    <a href="#" id="applyFilters" class="submit button">Apply Filters</a>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 {# Dialog for changing bookings in series #}

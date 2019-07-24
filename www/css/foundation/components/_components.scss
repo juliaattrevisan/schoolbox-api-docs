@@ -56,7 +56,6 @@
     .button, button, input{
         background-color: transparent;
         margin: 0;
-        min-height: auto;
         text-transform: uppercase;
         font-weight: $font-weight-semibold;
 
@@ -70,9 +69,14 @@
             }
         }
     }
-    .button, button {
-        &:empty {
-            display: none;
+    input {
+        color: $content-ui-foreground;
+        display: inline-block;
+        font-size: rem-calc(($base-font-size - 2));
+        width: auto;
+
+        &:hover {
+            color: $content-ui-foreground;
         }
     }
     p{
