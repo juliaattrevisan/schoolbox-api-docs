@@ -18,6 +18,8 @@ use Schoolbox\Filter\Filters\Assessment\YearDue;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Resource\Folder;
 use InvalidArgumentException;
 use UnexpectedValueException;
@@ -64,7 +66,9 @@ class Exporter
             'class code',
             'assessment title',
             'assessment item code',
+            'weight',
             'result',
+            'percentage',
         ];
 
         $data = [];
@@ -72,6 +76,7 @@ class Exporter
         foreach ($assessments as $assessment) {
             $assessmentTitle = $assessment->getTitle();
             $workType        = $assessment->getWorkType();
+            $weight          = $assessment->getWeight();
             /** @var Folder\Code\Model $folderCode */
             $folderCode = $assessment->getBaseContext()->getFolder()->getCodes()->first();
 
@@ -96,7 +101,10 @@ class Exporter
             $assessment = $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($singleCollection)->first();
 
             foreach ($assessment->getAllParticipants() as $participant) {
+                /** @var Participant $participant */
                 $mark = $participant->getHumanReadableMark(true);
+                $percentage = $participant->getNormalisedMark(true);
+
                 if (!$mark) {
                     continue;
                 }
@@ -105,14 +113,16 @@ class Exporter
                 $mark = str_replace('%', '', $participant->getHumanReadableMark(true));
 
                 // If this is a total mark, only show the actual mark (without '/ [total]')
-                [$mark] = explode(' / ', $mark);
+                //[$mark] = explode(' / ', $mark);
 
                 $data[] = [
                     $headings[0] => $participant->getUser()->getExternalId(),
                     $headings[1] => $folderCode->getCode(),
                     $headings[2] => $assessmentTitle,
                     $headings[3] => $assessmentCode,
-                    $headings[4] => $mark,
+                    $headings[4] => $weight,
+                    $headings[5] => $mark,
+                    $headings[6] => $percentage,
                 ];
             }
         }
@@ -142,6 +152,7 @@ class Exporter
         $filters     = [
             AssessmentType\Definition::class           => [
                 AssessmentType\Definition::KEY_DUE_WORK => AssessmentType\Definition::KEY_DUE_WORK,
+                AssessmentType\Definition::KEY_QUIZ => AssessmentType\Definition::KEY_QUIZ,
                 AssessmentType\Definition::KEY_PROJECT  => AssessmentType\Definition::KEY_PROJECT,
             ],
             NullableContext\UnitSpec\Definition::class => [],
