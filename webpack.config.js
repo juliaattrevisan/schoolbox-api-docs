@@ -3,7 +3,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
-    // news: "./src/index.js"
+    hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js')
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),
