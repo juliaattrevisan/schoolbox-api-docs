@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -34,21 +34,21 @@ class RedisCache implements ICache
 
     /**
      * @param Predis\ClientInterface $redisClient
-     * @param LoggerInterface        $logger
-     * @param string                 $instanceId
+     * @param LoggerInterface $logger
+     * @param string $instanceId
      */
     public function __construct(Predis\ClientInterface $redisClient, LoggerInterface $logger, $instanceId = '')
     {
-        $this->log        = $logger;
-        $this->redis      = $redisClient;
+        $this->log = $logger;
+        $this->redis = $redisClient;
         $this->instanceId = $instanceId;
     }
 
 
     /**
-     * @param Connector   $mq
+     * @param Connector $mq
      * @param IPropagator $propagator
-     * @param string      $queueName
+     * @param string $queueName
      * @return bool
      */
     public function restoreSchedule(Connector $mq, IPropagator $propagator, string $queueName)
@@ -77,12 +77,11 @@ class RedisCache implements ICache
             $event = unserialize(gzuncompress($this->redis->get($itemKey)), []);
 
             /** @var IPropagator $propagator */
-            if($event instanceof CrudEventInterface) {
+            if ($event instanceof CrudEventInterface) {
                 $propagator->propagateEvent($event);
 
                 ++$i;
-            }
-            else {
+            } else {
                 $this->log->error("Error decompressing cached data");
             }
         }
@@ -117,7 +116,7 @@ class RedisCache implements ICache
             foreach ($resolvers->offsetGet($resolver) as $trigger) {
                 /** @var TriggerInterface $trigger */
 
-                $zip  = gzcompress(serialize($trigger->getEvent()), 9);
+                $zip = gzcompress(serialize($trigger->getEvent()), 9);
                 $hash = sha1($zip); // this might not be...erm..good.
                 $size = strlen($zip);
                 $timestamp = date('Y-m-d H:i:s', $trigger->getTimestamp());
@@ -130,7 +129,7 @@ class RedisCache implements ICache
                     $this->log->debug("Cached $name");
                     $i++;
                 } else {
-                    $this->log->notice("Event $name already exists in cache, skipping", [ 'char' => '-' ]);
+                    $this->log->notice("Event $name already exists in cache, skipping", ['char' => '-']);
                 }
             }
         }
@@ -174,7 +173,7 @@ class RedisCache implements ICache
             if ($deleted) {
                 ++$i;
             } else {
-                $this->log->notice("Redis error: unable to delete $itemKey", [ 'char' => '?' ]);
+                $this->log->notice("Redis error: unable to delete $itemKey", ['char' => '?']);
             }
         }
 
@@ -199,9 +198,9 @@ class RedisCache implements ICache
                 // don't override data if it already exists (it probably doesn't matter, but hey. integrity, yo.)
                 $tx->setnx($itemKey, $compressedData)
                     // REGARDLESS of whether we just set the key, reset its TTL
-                   ->expire($itemKey, self::EXPIRY_WINDOW)
+                    ->expire($itemKey, self::EXPIRY_WINDOW)
                     // ensure the key is in the index
-                   ->sadd($this->getNamespacedKey('index'), $itemKey);
+                    ->sadd($this->getNamespacedKey('index'), $itemKey);
             }
         );
         return (bool)$isset;
@@ -216,7 +215,7 @@ class RedisCache implements ICache
      */
     protected function getNamespacedKey($key)
     {
-        return $this->implodeFiltered(':', [ 'schedule', $this->instanceId, $key ]);
+        return $this->implodeFiltered(':', ['schedule', $this->instanceId, $key]);
     }
 
 
