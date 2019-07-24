@@ -551,7 +551,7 @@ class External_Synergetic_User implements External_UserInterface
                         StudentContactLegalFullName,
                         StudentContactSurname,
                         CASE
-                            WHEN ShareEmailFlag = 1 THEN StudentContactDefaultEmail
+                            WHEN scp.ShareEmailFlag = 1 THEN StudentContactDefaultEmail
                             ELSE ''
                         END AS StudentContactDefaultEmail,
                         vStudentContactAllAddress.ValidAddressFlag,
@@ -570,11 +570,11 @@ class External_Synergetic_User implements External_UserInterface
                         StudentContactHomeState,
                         StudentCountry.Description AS StudentContactHomeCountryCode,
                         CASE
-                            WHEN ShareHomePhoneFlag = 1 THEN StudentContactPhoneActual
+                            WHEN scp.ShareHomePhoneFlag = 1 THEN StudentContactPhoneActual
                             ELSE ''
                         END AS StudentContactPhoneActual,
                         CASE
-                            WHEN ShareMobileFlag = 1 THEN StudentContactMobilePhone
+                            WHEN scp.ShareMobileFlag = 1 THEN StudentContactMobilePhone
                             ELSE ''
                         END AS StudentContactMobilePhone,
                         StudentContactOccupPhone,
@@ -584,12 +584,12 @@ class External_Synergetic_User implements External_UserInterface
                         StudentContactSpouseLegalFullName,
                         StudentContactSpouseSurname,
                         CASE
-                            WHEN ShareMobileFlag = 1 THEN StudentContactSpouseMobilePhone
+                            WHEN scpSpouse.ShareMobileFlag = 1 THEN StudentContactSpouseMobilePhone
                             ELSE ''
                         END AS StudentContactSpouseMobilePhone,
                         StudentContactSpouseOccupPhone,
                         CASE
-                            WHEN ShareEmailFlag = 1 THEN StudentContactSpouseDefaultEmail
+                            WHEN scpSpouse.ShareEmailFlag = 1 THEN StudentContactSpouseDefaultEmail
                             ELSE ''
                         END AS StudentContactSpouseDefaultEmail,
                         StudentContactType,
@@ -598,7 +598,7 @@ class External_Synergetic_User implements External_UserInterface
                         Contact.DirectoryIncludeFlag PrimaryDirectoryIncludeFlag,
                         Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
                         ContactAddress.SilentHomeAddressFlag SilentHomeAddressFlag,
-                        ShareHomeAddressFlag,
+                        scp.ShareHomeAddressFlag,
                         StudentParentsSeparatedFlag
             FROM        dbo.vStudentContactAllAddress
             LEFT JOIN   dbo.Community Contact ON StudentContactID = Contact.ID
@@ -610,7 +610,8 @@ class External_Synergetic_User implements External_UserInterface
                         StudentCampus = Year.Campus
             LEFT JOIN   dbo.luCountry StudentCountry ON StudentContactCountryCode = StudentCountry.Code
             LEFT JOIN   dbo.luCountry StudentHomeCountry ON StudentContactHomeCountryCode = StudentHomeCountry.Code
-            LEFT JOIN   dbo.StudentContactsPortal ON vStudentContactAllAddress.StudentID = StudentContactsPortal.StudentID
+            LEFT JOIN   dbo.StudentContactsPortal scp ON vStudentContactAllAddress.StudentID = scp.StudentID AND StudentContactID = scp.CommunityID
+            LEFT JOIN   dbo.StudentContactsPortal scpSpouse ON vStudentContactAllAddress.StudentID = scpSpouse.StudentID AND StudentContactSpouseID = scpSpouse.CommunityID
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentContactAllAddress.FileSemester AND
                             Semester.FileYear = vStudentContactAllAddress.FileYear AND
@@ -620,7 +621,6 @@ class External_Synergetic_User implements External_UserInterface
             ORDER BY    StudentSurname, 
                         StudentID, 
                         StudentContactType
-                        
         ";
 
         // Now that we have created the query, time to shove it across to the database with
