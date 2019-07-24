@@ -13,6 +13,8 @@ use function floor;
 use function is_numeric;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
+use function strrpos;
+use function substr;
 use UnexpectedValueException;
 
 /**
@@ -211,6 +213,28 @@ abstract class App
             throw new UnexpectedValueException(sprintf("Command line option '$name' is not numeric. Found: '$value' (%s)", gettype($value)));
         }
         return (float)$value;
+    }
+
+
+    /**
+     * Returns the filename of of the script that invoked this App, suitable for generating help output.
+     *
+     * The following should all return "./myTool.php"
+     * * "./relative/path/to/myTool.php"
+     * * "relative/path/to/myTool.php"
+     * * "./../relative/path/to/myTool.php"
+     * * "/absolute/path/to/myTool.php"
+     *
+     * @return string
+     */
+    protected function getToolFilename(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);
+        if ($lastIndex !== false) {
+            $scriptName = substr($scriptName, $lastIndex + 1);
+        }
+        return "./$scriptName";
     }
 
 
