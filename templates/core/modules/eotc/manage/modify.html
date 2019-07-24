@@ -127,10 +127,8 @@
                 <legend>Details</legend>
 
                 <div class="small-12 columns">
-                    <label>
-                        Title
-                        <input name="note" class="required" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" />
-                    </label>
+                    <label for="note" class="required">Title</label>
+                    <input name="note" id="note" type="text" size="50" maxlength="100" value="{EVENT_TITLE}" required />
                 </div>
 
                 <div class="small-12 columns no-pad">
@@ -209,10 +207,8 @@
                 <legend>Event Details</legend>
 
                 <div class="small-12 column">
-                    <label>
-                        Location
-                        <input name="location" class='required' type="text" size="50" value="{EVENT_LOCATION}"/>
-                    </label>
+                    <label for="location" class="required">Location</label>
+                    <input name="location" id="location" type="text" size="50" value="{EVENT_LOCATION}" required/>
                 </div>
 
                 <div class="small-12 column">
