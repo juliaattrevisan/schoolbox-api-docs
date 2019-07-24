@@ -97,14 +97,15 @@
             onDateClick: function (dateClickInfo) {
                 // this.currentEvent = eventInfo.event;
                 // this.$refs.createEvent.open();
-                let momentDate = this.toMoment(dateClickInfo.date);
+                let momentDate       = this.toMoment(dateClickInfo.date),
+                    [firstEventType] = this.config.eventTypes;
                 this.newEvent = {
                     allDay:      dateClickInfo.allDay,
                     date:        momentDate.format(dateClickInfo.allDay ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm'),
                     displayDate: momentDate.format(dateClickInfo.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'),
                     title:       '',
                     detail:      '',
-                    type:        null,
+                    type:        firstEventType ? firstEventType.id : null,
                 };
                 this.$refs.createEvent.open();
             },
