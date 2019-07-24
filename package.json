@@ -59,6 +59,7 @@
   "scripts": {
     "build": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development",
     "watch": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch",
+    "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
     "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production"
   },
   "babel": {
