@@ -54,14 +54,13 @@
 </script>
 {% endautoescape %}
 
-<label>
-    {{ locale.faculty.proper }} / {{ locale.subject.proper }} Folder
+<label class="required">{{ locale.faculty.proper }} / {{ locale.subject.proper }} Folder</label>
 
-    <a data-course-parent-selector data-source="parent"
-       title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
-       class="source-select icon-folder {% if not courseSpec.id %}placeholder{% endif %}"
-       href="#" >
-       {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
-    </a>
-    <input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
-</label>
+<a data-course-parent-selector data-source="parent"
+   title="Click to change the {{ locale.faculty }} / {{ locale.subject }} this course belongs to"
+   class="source-select icon-folder {% if not courseSpec.id %}placeholder{% endif %}"
+   href="#" >
+   {{ courseSpec.id ? courseSpec.folder.parent.name : '(Click to select)' }}
+</a>
+<input class="hide" name="parent" id="parent" value="{{ courseSpec.folder.parent.id }}" />
+
