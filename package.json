@@ -57,9 +57,9 @@
     "url": "git://github.com/alaress/schoolbox.git"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js --mode=development",
-    "watch": "webpack --config webpack.config.js --mode=development --watch",
-    "publish": "webpack --config webpack.config.js --mode=production"
+    "build": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development",
+    "watch": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch",
+    "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production"
   },
   "babel": {
     "presets": [
