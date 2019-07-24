@@ -205,15 +205,24 @@ foreach ($userList as $user) {
                             $this->setVar('period_class_link_block', '');
                             $this->setVar('period_class_block', '');
 
+
+                            /**
+                             * Indexed by "CampusCode|ClassCode"
+                             *
+                             * @var Schoolbox\Resource\Folder\Model[]|null[] $catCache
+                             */
+                            $catCache = [];
                             if (count($period) > 0) {
                                 foreach ($period as $class) {
+                                    $cacheKey = $class['campus'] . $class['code'];
+
                                     /* Handle colour array */
-                                    if ($class['code'] && !array_key_exists($class['code'], $subjectColourMap)) {
+                                    if ($class['code'] && !array_key_exists($cacheKey, $subjectColourMap)) {
                                         // not enough colors: loop around to index 0.
                                         if (!$colourList->offsetExists($colourIndex)) {
                                             $colourIndex = 0;
                                         }
-                                        $subjectColourMap[$class['code']] = $colourList->offsetGet($colourIndex)->getHexColour();
+                                        $subjectColourMap[$cacheKey] = $colourList[$colourIndex]->getHexColour();
                                         $colourIndex++;
                                     }
 
@@ -247,20 +256,14 @@ foreach ($userList as $user) {
                                     } // staff, or external_db is disabled
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
-                                    if (!isset($catCache[$class['code']])) {
-                                        $cat = $categoryMapper->findByCodeAndCampus($class['code'], $class['campus'], false);
-                                        if (!$cat) {
-                                            continue;
-                                        }
-                                        /** @var Schoolbox\Resource\Folder\Model[] $catCache */
-                                        // TODO: we may need to add campus to cache key here.
-                                        $catCache[$class['code']] = $cat;
+                                    if (!array_key_exists($cacheKey, $catCache)) {
+                                        $catCache[$cacheKey] = $categoryMapper->findForCampusAndClass($class['campus'] ?? '', $class['code']);
                                     }
 
                                     if ($class['description']) {
                                         $description = $class['description'];
-                                    } elseif (isset($catCache[$class['code']])) {
-                                        $description = $catCache[$class['code']]->getName();
+                                    } elseif (isset($catCache[$cacheKey])) {
+                                        $description = $catCache[$cacheKey]->getName();
                                     } else {
                                         $description = $class['code'];
                                     }
@@ -270,10 +273,10 @@ foreach ($userList as $user) {
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($period_staff),
-                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
+                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$cacheKey]),
                                     ]);
 
-                                    if (isset($catCache[$class['code']]) && $groupHandler->getPermission($catCache[$class['code']]->getId()) >= UserAccess::ACCESS_READ) {
+                                    if (isset($catCache[$cacheKey]) && $groupHandler->getPermission($catCache[$cacheKey]->getId()) >= UserAccess::ACCESS_READ) {
                                         // Yes you really do need to double url-encode this
                                         $this->setVar(
                                             'PERIOD_URL',

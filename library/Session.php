@@ -513,7 +513,7 @@ class Session
 
                         if (is_array($subjectList)) {
                             foreach ($subjectList as $subject) {
-                                $cat = $folderMapper->findByCodeAndCampus($subject['code'], $subject['campusCode'], false);
+                                $cat = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
 
                                 if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
                                     $subject['id']   = $cat->getId();
@@ -553,31 +553,15 @@ class Session
 
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
-                        $result = false;
                         // Ensure the link goes to an actual homepage, too
-                        $homepageCode = '';
-
-                        if ($subject['campusCode']) {
-                            $homepageCode = $subject['campusCode'] . '/' . $subject['code'];
-                            $result = $folderMapper->findByCodeAndCampus($subject['code'], $subject['campusCode'], true);
-                        }
-
-                        //Try to fetch without campus code
-                        if (!($result instanceof Folder)) {
-                            try {
-                                $homepageCode = $subject['code'];
-                                $result = $folderMapper->findByCodeAndCampus($subject['code'], '', true);
-                            } catch (\Exception $e) {
-                                // noop
-                            }
-                        }
+                        $result = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
 
                         if ($result instanceof Folder) {
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
                                 $subject['perm'] = $sisFolderAccess;
-                                $subject['code'] = $homepageCode;
+                                $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 
                                 $catList[] = $result->getId(); //check for dupes

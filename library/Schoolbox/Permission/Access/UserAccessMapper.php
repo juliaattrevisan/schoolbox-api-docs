@@ -191,7 +191,7 @@ class UserAccessMapper extends Mapper
                 continue;
             }
             try {
-                $folder = FolderMapper::getInstance()->findByCodeAndCampus($extSubj['code'], $extSubj['campusCode'], false);
+                $folder = FolderMapper::getInstance()->findForCampusAndClass($extSubj['campusCode'] ?? '', $extSubj['code']);
                 if (!$folder) {
                     continue;
                 }

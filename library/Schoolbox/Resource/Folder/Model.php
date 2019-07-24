@@ -62,6 +62,13 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $codes;
 
     /**
+     * Place holder for folder code, when folder is found by code
+     * @var null|string
+     */
+    private $matchedCode;
+
+
+    /**
      * A group instance
      *
      * @var \Schoolbox\Resource\Group
@@ -636,4 +643,20 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return true;
     }
 
+    /**
+     * Sets current search code
+     * @param string $code
+     */
+    public function setMatchedCode(string $code) {
+        $this->matchedCode = $code;
+    }
+
+    /**
+     * Gets current search code
+     * @return string
+     */
+    public function getMatchedCode(): string
+    {
+        return $this->matchedCode ?? '';
+    }
 }

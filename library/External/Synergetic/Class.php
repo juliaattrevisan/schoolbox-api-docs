@@ -45,9 +45,9 @@ class External_Synergetic_Class implements External_ClassInterface
             if (strpos($code, '/') !== false) {
                 $codeArray = explode('/', $code, 2);
                 $classQuery .= "( ClassCode = '{$this->database->quote($codeArray[1])}' AND ClassCampus = '{$this->database->quote($codeArray[0])}' ) OR ";
-            } else {
-                $classQuery .= "ClassCode = '{$this->database->quote($code)}' OR ";
             }
+            // SB class code may or may not have the SIS campus code prefixed, a '/' char is not conclusive as a class code can contain this.
+            $classQuery .= "ClassCode = '{$this->database->quote($code)}' OR ";
         }
 
         return substr($classQuery, 0, -3) . ')';

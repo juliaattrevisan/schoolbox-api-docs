@@ -687,31 +687,14 @@ class Group extends DeprecatedModel
         if ($user->getExternalId()) {
             $externalUser = new External_User;
             $externalSubjectList = $externalUser->getSubjectList($user);
-            $failedCodes = new Collection();
-            $folders = new Collection();
 
             if (is_array($externalSubjectList)) {
-                // Search using campus and class code
                 foreach ($externalSubjectList as $currentSubject) {
-                    $folder = $folderMapper->findByCodeAndCampus($currentSubject['code'], $currentSubject['campusCode'], true);
+                    $folder = $folderMapper->findForCampusAndClass($currentSubject['campusCode'] ?? '', $currentSubject['code']);
                     if (!$folder) {
-                        if ($currentSubject['campusCode'] !== '') {
-                            // try later without campus code
-                            $failedCodes->add($currentSubject['code']);
-                        }
                         continue;
                     }
-                    $folders->add($folder);
-                }
-                // For failed codes, search using only code
-                foreach ($failedCodes as $code) {
-                    $folder = $folderMapper->findByCodeAndCampus($code, '', true);
-                    if ($folder && !$folders->contains($folder)) {
-                        $folders->add($folder);
-                    }
-                }
-                // Populate folders
-                foreach ($folders as $folder) {
+
                     /** @var $folder Schoolbox\Resource\Folder\Model */
                     $template = null;
                     if ($folder->getHomepage() instanceof \Schoolbox\Resource\HomepageConfig) {

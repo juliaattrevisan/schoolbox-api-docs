@@ -307,14 +307,14 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     private function buildClassContext(array $campusList, int $campusId, array $period, Alaress_Date_Format $now, array $class): array
     {
-        $classDescription = !empty($class['description']) ? $class['description'] : '';
+        $classDescription = $class['description'] ?? '';
         $classLink = '';
-        $folder = $this->getFolderMapper()->findByCodeAndCampus($class['code'], $class['campus'], false);
+        $folder = $this->getFolderMapper()->findForCampusAndClass($class['campus'], $class['code']);
         if ($folder) {
-            $classDescription = empty($classDescription) ? $folder->getName() : $classDescription;
+            $classDescription = $classDescription ?? $folder->getName();
             if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
                 // Yes you really do need to double url-encode this
-                $classLink = '/homepage/code/' . urlencode(urlencode($class['code']));
+                $classLink = '/homepage/code/' . urlencode(urlencode($folder->getMatchedCode()));
             }
         }
 

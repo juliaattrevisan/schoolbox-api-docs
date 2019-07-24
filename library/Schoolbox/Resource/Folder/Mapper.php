@@ -1046,61 +1046,61 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * Finds a folder which has campusCode/classCode, or classCode if exact is false.
-     * @param string $classCode
-     * @param string $campusCode
-     * @param bool $exact
+     * Returns the Schoolbox folder (if it exists) that matches the SIS campus + class code.
+     *
+     * If multiple folders are found (which is an invalid system state), logs to sentry but just returns the first match.
+     *
+     * @param null|string $sisCampus
+     * @param string $sisClass Will never have the campus code embedded inside it.
      * @return Model|null
      */
-    public function findByCodeAndCampus(string $classCode, string $campusCode, bool $exact): ?Model
+    public function findForCampusAndClass(?string $sisCampus, string $sisClass): ?Model
     {
-        if (!$classCode || $classCode === '') {
+        if ($sisClass === '') {
             return null;
         }
-        $searchCode = ($campusCode && $campusCode !== '') ? "{$campusCode}/{$classCode}" : $classCode;
-        $result = $this->findExactByCode($searchCode);
 
-        if ($result || $campusCode === "" || $exact) {
-            return $result;
+        // Need to support schools who do not include the campus code in schoolbox folder code.
+        // This is a common workflow where schools have only a single campus.
+        // Validation exists to ensure that if they are using this form, then
+        // they cannot add the campus-prefixed form as well.
+        // @see $this->validateFolderCodes()
+
+        // If a campus code was provided, prefer exact match
+        if ($sisCampus !== null && $sisCampus !== '') {
+            $folderCodes = ["$sisCampus/$sisClass", $sisClass];
+        } else {
+            $folderCodes = [$sisClass];
         }
 
-        // Take two
-        return $this->findExactByCode($classCode);
-    }
-
-
-    /**
-     * Queries a folder with a code.
-     * @param string $code
-     * @return Model|null
-     */
-    private function findExactByCode(string $code): ?Model
-    {
-        $folderPb = $this->getPredicateBuilder()
-            ->isNull('f.deleted_at')
-            ->isNull('fc.deleted_at')
-            ->equals('fc.code', $code);
-        $whereClause = implode(' AND ', $folderPb->getWhere());
-        $query = "
-            SELECT f.id
+        $fcCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
+        $sql            = "
+            SELECT f.id, fc.code
             FROM folder f
-            JOIN folder_code fc ON fc.folder_id = f.id
-            WHERE {$whereClause}
-        ";
+            JOIN folder_code fc on f.id = fc.folder_id
+            WHERE f.deleted_at IS NULL AND fc.deleted_at IS NULL AND fc.code IN ({$fcCodeBindings->getPlaceholder()})";
 
-        $statement = $this->database->prepare($query);
-        $statement->execute($folderPb->getParams());
-        $folderIds = $statement->fetchAll(PDO::FETCH_COLUMN);
+        $rows = $this->database->query($sql, $fcCodeBindings->getParams())->fetchAll(PDO::FETCH_NUM);
 
-        if (empty($folderIds)) {
-            return null;
-        }
-        try {
-            return $this->findById($folderIds[0]);
-        } catch (Exception $e) {
+        if (!count($rows)) {
             return null;
         }
 
+        // The first in $folderCodes is preferred.
+        foreach ($folderCodes as $folderCode) {
+            foreach ($rows as [$rowFolderId, $rowFolderCode]) {
+                if ($folderCode === $rowFolderCode) {
+                    try {
+                        $folder = $this->findById($rowFolderId);
+                    } catch (Exception $e) {
+                        return null;
+                    }
+                    $folder->setMatchedCode($rowFolderCode);
+                    return $folder;
+                }
+            }
+        }
+        return null;
     }
 
 

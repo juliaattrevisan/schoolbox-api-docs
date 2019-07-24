@@ -307,16 +307,15 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 }
                 $period['staff'] = $timetableStaff[$staffId];
 
-                // Load category into period defintion
+                // Load category into period definition
                 $categoryId = $period['code'];
                 if (!empty($categoryId)) {
                     // Don't load more than once
                     if (!array_key_exists($categoryId, $timetableCategories)) {
                         $timetableCategories[$categoryId] =
-                            \Schoolbox\Resource\Folder\Mapper::getInstance()->findByCodeAndCampus(
-                                $period['code'],
-                                $period['campus'],
-                                false
+                            \Schoolbox\Resource\Folder\Mapper::getInstance()->findForCampusAndClass(
+                                $period['campus'] ?? '',
+                                $categoryId
                             );
                     }
                 } else {

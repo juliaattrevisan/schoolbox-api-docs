@@ -171,14 +171,16 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
 
         // Load a bunch of category and teacher info too
-        try {
-            $subject['folder'] = $folderMapper->findByCode($subject['code']);
+        $folder = $folderMapper->findForCampusAndClass($subject['campus'] ?? '', $subject['code']);
+        if ($folder) {
+            $subject['folder'] = $folder;
             $subject['perms']  = $groupHandler->getPermission($subject['folder']->getId());
-
-        } catch (Exception $e) {
+            $classCode = $subject['folder']->getCodeString();
+        } else {
             if (ConfigMapper::getInstance()->get('show_all_subjects')) {
+                $classCode = ($subject['campus'] && $subject['campus'] != '') ? "{$subject['campus']}/{$subject['code']}" : $subject['code'];
                 $code = new FolderCode();
-                $code->setCode($subject['code']);
+                $code->setCode($classCode);
                 $subject['folder'] = new Folder();
                 $subject['folder']->setName($subject['name'])->addCode($code);
             } else {
@@ -186,7 +188,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
             }
         }
 
-        $teacherCodes = $classHandler->getTeachers($subject['folder']->getCodeString() ?: $subject['code']);
+        $teacherCodes = $classHandler->getTeachers($classCode);
 
         if (is_array($teacherCodes) && count($teacherCodes) > 0) {
             $subject['teachers'] = $userMapper->findByColumnList([
