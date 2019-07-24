@@ -252,11 +252,25 @@
                 <div class="small-12">
                     <h3 class="note">{{ currentEvent.title }}</h3>
                     <meta-list>
-                        <meta-item class="icon-resource-booking" data-event-modal-field="bookingStatus"></meta-item>
-                        <meta-item class="icon-calendar" data-event-modal-field="displayDate"></meta-item>
-                        <meta-item class="icon-location" data-event-modal-field="location"></meta-item>
-                        <meta-item class="icon-staff-students" data-event-modal-field="post-by">Posted by <a class="author" href="#" data-is-user-link="1"></a></meta-item>
-                        <meta-item class="icon-staff-students" data-event-modal-field="reviewedBy">Reviewed by <a class="reviewer" href="#" data-is-user-link="1"></a></meta-item>
+                        <meta-item class="icon-resource-booking" v-if="false"></meta-item>
+                        <meta-item class="icon-calendar">
+
+                        </meta-item>
+                        <meta-item class="icon-location" v-if="currentEvent.extendedProps?.data?.meta?.location">
+                            {{ currentEvent.extendedProps?.data?.meta?.location }}
+                        </meta-item>
+                        <meta-item class="icon-staff-students" v-if="currentEvent.extendedProps?.data?.meta?.authorId">
+                            Posted by
+                            <a :href="'/search/user/' + String(currentEvent.extendedProps?.data?.meta?.authorId)">
+                                {{ currentEvent.extendedProps?.data?.meta?.author }}
+                            </a>
+                        </meta-item>
+                        <meta-item class="icon-staff-students" v-if="currentEvent.extendedProps?.data?.meta?.reviewerId">
+                            Reviewed by
+                            <a :href="'/search/user/' + String(currentEvent.extendedProps?.data?.meta?.reviewerId)">
+                                {{ currentEvent.extendedProps?.data?.meta?.reviewer }}
+                            </a>
+                        </meta-item>
                     </meta-list>
                     <article>
                         <span v-html="currentEvent.detail"></span>
