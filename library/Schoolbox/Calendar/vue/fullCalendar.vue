@@ -104,6 +104,7 @@
                     displayDate: momentDate.format(dateClickInfo.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'),
                     title:       '',
                     detail:      '',
+                    type:        null,
                 };
                 this.$refs.createEvent.open();
             },
@@ -160,11 +161,10 @@
 
                             <label>
                                 Event Type
-                                <!-- Pass in a list of event types as well, so that a dropdown can be rendered -->
-                                <select name="type">
-                                    <!-- BEGIN event_type -->
-                                    <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
-                                    <!-- END event_type -->
+                                <select name="type" v-model="newEvent.type">
+                                    <option v-for="eventType in config.eventTypes" :value="eventType.id">
+                                        {{ eventType.name }}
+                                    </option>
                                 </select>
                             </label>
                         </section>
