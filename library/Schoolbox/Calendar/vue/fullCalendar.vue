@@ -22,7 +22,10 @@
         },
         computed: {
             window: function () { return window; },
-            config: function () { return window.fullCalendarConfig; }
+            config: function () { return window.fullCalendarConfig; },
+            isNewEventSubmittable: function() {
+                return this.newEvent.title && this.newEvent.title.length !== 0;
+            },
         },
         methods: {
             onExportClick: function () {
@@ -135,7 +138,7 @@
         </reveal-modal>
 
         <reveal-modal ref="createEvent">
-            <!-- create a tab Vue component? -->
+            <!-- create a tab Vue component? Currently they just work magically -->
             <dl class="tabs" data-tab>
                 <dd class="active"><a href="#createEventPanel">Create Event</a></dd>
                 <dd><a href="#createTaskPanel">Create Task</a></dd>
@@ -157,7 +160,7 @@
 
                             <label>
                                 Event Type
-                                <!-- Pass in a list of event types as well -->
+                                <!-- Pass in a list of event types as well, so that a dropdown can be rendered -->
                                 <select name="type">
                                     <!-- BEGIN event_type -->
                                     <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
@@ -166,7 +169,7 @@
                             </label>
                         </section>
                         <ul class="flex-list buttons">
-                            <li><input type="submit" data-modal-submit disabled value="Create Event" /></li>
+                            <li><input type="submit" :disabled="!isNewEventSubmittable" value="Create Event" /></li>
                             <li><a href="#" id="edit-full" class="button icon-modify">Edit Event</a></li>
                         </ul>
                     </form>
@@ -193,7 +196,7 @@
                         </section>
                         <div class="row">
                             <div class="small-12 columns no-pad">
-                                <input type="submit" data-modal-submit disabled value="Create Task" />
+                                <input type="submit" :disabled="!isNewEventSubmittable" value="Create Task" />
                             </div>
                         </div>
                     </form>
