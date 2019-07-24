@@ -132,15 +132,15 @@
             createNewEvent: function () {
                 let form = this.$refs.createEventForm,
                     self = this;
-                axios({
+                axios.request({
                     url:          form.action,
-                    data:         $(form).serializeArray(),
+                    data:         $(form).serialize(),
                     method:       form.method,
                     responseType: 'json',
                 }).then(function (response) {
                     // Add this event to the calendar
                     self.$refs.fullCalendar.getApi().addEvent(response.data);
-                }).always(function () {
+                }).finally(function () {
                     self.$refs.createEvent.close();
                 });
             },
