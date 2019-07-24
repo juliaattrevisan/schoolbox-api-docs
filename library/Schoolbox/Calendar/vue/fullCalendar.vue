@@ -97,6 +97,7 @@
                         // $.post('/calendar/changeState', {calendarView: fc.view.type});
                     }
                 );
+                // Fail callback: consider a message saying something failed
             },
             onDateClick: function (dateClickInfo) {
                 // this.currentEvent = eventInfo.event;
@@ -129,7 +130,19 @@
                 return toMoment(date, this.$refs.fullCalendar.getApi());
             },
             createNewEvent: function () {
-                console.log('createNewEvent');
+                let form = this.$refs.createEventForm,
+                    self = this;
+                axios({
+                    url:          form.action,
+                    data:         $(form).serializeArray(),
+                    method:       form.method,
+                    responseType: 'json',
+                }).then(function (response) {
+                    // Add this event to the calendar
+                    self.$refs.fullCalendar.getApi().addEvent(response.data);
+                }).always(function () {
+                    self.$refs.createEvent.close();
+                });
             },
             createNewTask: function () {
                 console.log('createNewTask');
