@@ -12,12 +12,14 @@
 use Alaress\Async\Stomp\IClient;
 use Alaress\Scheduler\Cache\RedisCache;
 use Predis\ClientInterface;
+use Schoolbox\Di\Configurator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\MQ\Connector;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Realtime\Schedule;
+use Schoolbox\Realtime\Schedule\Event\NotifierInflector;
 use Schoolbox\Realtime\Schedule\Event\Splitter;
 use Schoolbox\Realtime\Schedule\Trigger\Propagator;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerFactoryFactory;
@@ -62,13 +64,9 @@ $k->run(function ($di, $loop, $log, $opts) {
         try {
             // get the cache handler
             $jit = new RedisCache(Alaress\Redis::getClientInstance(), $log, INSTANCE_ID);
-
-            /** @var IConfigLoader $conf */
-            $conf = $di->get('config');
-
             $tff = new TriggerFactoryFactory(true);
 
-            $splitter = new Splitter($conf, $di, $tff);
+            $splitter = new Splitter(new NotifierInflector(new Configurator($di)), $tff);
 
             /** @var Alaress\Async\AMQP\AMQPInterface $amqp */
             $amqp = $di->get('amqp');
