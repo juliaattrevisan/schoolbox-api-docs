@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use PDOStatement;
+use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
@@ -198,9 +199,10 @@ class CriterionMapper extends BaseMapper {
 
 
     /**
-     * Pre-save callback - if a criterion with the same name already exists in
-     * its group, then set its ID to the existing one (thus updating the
-     * existing record) instead of saving a new one.
+     * Pre-save callback.
+     *
+     * If a capability with the same name already exists in its indicator, then
+     * block saving.
      *
      * This replaces the unique index on this table, which had to be removed
      * because MySQL max index size doesn't allow more than about ~330 UTF-8
@@ -208,21 +210,27 @@ class CriterionMapper extends BaseMapper {
      *
      * @param  Criterion $object
      * @return bool      Always true
+     * @throws MapperException if the name isn't unique
      */
     public function verifyUniqueness(Criterion $object): bool
     {
-        // normalize object's name for saving
-        $object->setName($object->retrieveNormalizedName());
+        $pb = $this->getPredicateBuilder()
+                   ->equals('rubric_group_id', $object->getGroup()->getId());
 
-        // Lookup existing IDs
-        $existingIds = $this->findIdsByColumnList([
-            'rubric_group_id' => $object->getGroup()->getId(),
-            'name'            => $object->getName(),
-        ]);
+        // Don't compare this object with itself
+        if ($object->getId()) {
+            $pb->notEquals('id', $object->getId());
+        }
 
-        // found something? assign that ID if so
-        if ($existingIds) {
-            $object->setId(array_shift($existingIds));
+        // Check this name isn't in use
+        $existingNames  = $this->findScalarByPredicates('name', $pb);
+        $normalizedName = Util::normalizeName($object->getName());
+        foreach ($existingNames as $existingName) {
+            if (Util::normalizeName($existingName) === $normalizedName) {
+                throw new MapperException(
+                    sprintf('Rubric indicator name "%s" is in use in its capability', $normalizedName)
+                );
+            }
         }
 
         return true;

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
+use Schoolbox\Assessment\Rubric\Util;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 
@@ -73,8 +74,13 @@ class RowSet
      */
     public function retrieveCapabilityByName(string $name): ?Capability
     {
-        // TODO consider if normalized capability names should be used
-        return $this->capabilities->getBy('name', $name);
+        $normalizedName = Util::normalizeName($name);
+        foreach ($this->capabilities as $capability) {
+            if (Util::normalizeName($capability->getName()) === $normalizedName) {
+                return $capability;
+            }
+        }
+        return null;
     }
 
 

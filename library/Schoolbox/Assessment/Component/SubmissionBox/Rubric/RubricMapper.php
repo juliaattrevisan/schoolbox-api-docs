@@ -1170,6 +1170,8 @@ class RubricMapper
      * @param int           $maxLevels
      *
      * @throws UnexpectedValueException if the importer couldn't be built
+     * @throws UnexpectedValueException if a capability or indicator could not
+     *                                  be found after it was supposedly created
      * @throws MapperException          if something happens whilst retrieving
      *                                  or persisting the rowset
      * @return void
@@ -1239,14 +1241,24 @@ class RubricMapper
             // If $capabilityObject is null here, that's a problem:
             // it should've been created
             $capabilityObject = $rowSet->retrieveCapabilityByName($capability['name']);
-            $capabilityUsage  = (new CapabilityUsage($capabilityObject))
+            if (!$capabilityObject) {
+                throw new UnexpectedValueException(
+                    "Capability {$capability['name']} could not be found even after it was created"
+                );
+            }
+            $capabilityUsage = (new CapabilityUsage($capabilityObject))
                 ->setMaxValue($capability['maxValue']);
 
             foreach ($capability['indicators'] as $indicator) {
-                $indicatorObject = $capabilityObject->retrieveIndicatorByName($indicator['name']);
-
                 // Likewise if $indicatorObject is null here, that's a problem
-                $indicatorUsage  = new IndicatorUsage($indicatorObject);
+                $indicatorObject = $capabilityObject->retrieveIndicatorByName($indicator['name']);
+                if (!$indicatorObject) {
+                    throw new UnexpectedValueException(
+                        "Indicator {$indicator['name']} could not be found even after it was created"
+                    );
+                }
+
+                $indicatorUsage = new IndicatorUsage($indicatorObject);
                 foreach ($indicator['descriptors'] as $level => $descriptor) {
                     if ($descriptor !== null) {
                         $capInUse         = true;

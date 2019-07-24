@@ -58,19 +58,6 @@ class Criterion implements ISoftDeletable
     }
 
     /**
-     * Retrieves a normalized form of this object's name, for comparison with
-     * other objects.
-     * * Leading and trailing spaces are stripped
-     * * Multiple consecutive spaces are converted to single spaces
-     *
-     * @return string
-     */
-    public function retrieveNormalizedName(): string
-    {
-        return preg_replace('`\s+`', ' ', trim($this->name));
-    }
-
-    /**
      * @deprecated use `$this->getGroup()->setName()` instead
      * @param  string $grouping
      * @return $this
