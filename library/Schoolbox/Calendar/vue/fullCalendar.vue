@@ -1,12 +1,12 @@
 <script>
 
-    import FullCalendar      from '@fullcalendar/vue'
-    import interactionPlugin from '@fullcalendar/interaction'
-    import dayGridPlugin     from '@fullcalendar/daygrid'
-    import timeGridPlugin    from '@fullcalendar/timegrid'
-    import listPlugin        from '@fullcalendar/list'
-    import momentPlugin      from '@fullcalendar/moment'
-    import RevealModal       from '@schoolbox/reveal-modal'
+    import FullCalendar             from '@fullcalendar/vue'
+    import interactionPlugin        from '@fullcalendar/interaction'
+    import dayGridPlugin            from '@fullcalendar/daygrid'
+    import timeGridPlugin           from '@fullcalendar/timegrid'
+    import listPlugin               from '@fullcalendar/list'
+    import momentPlugin, {toMoment} from '@fullcalendar/moment'
+    import RevealModal              from '@schoolbox/reveal-modal'
 
     export default {
         components: {
@@ -17,6 +17,7 @@
             return {
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 currentEvent: {},
+                newEvent: {},
             }
         },
         computed: {
@@ -67,6 +68,7 @@
             },
             events: function (fetchInfo, callback) {
                 var self = this;
+                // Use axios instead of jQuery to fetch events?
                 window.$.ajax({
                     dataType: 'json',
                     url: '/calendar/ajax/full',
@@ -90,8 +92,17 @@
                 });
             },
             onDateClick: function (dateClickInfo) {
-                // Create a bubble here (needs to be a Vue modal)
-                console.log(dateClickInfo);
+                // this.currentEvent = eventInfo.event;
+                // this.$refs.createEvent.open();
+                let momentDate = this.toMoment(dateClickInfo.date);
+                this.newEvent = {
+                    allDay:      dateClickInfo.allDay,
+                    date:        momentDate.format(dateClickInfo.allDay ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm'),
+                    displayDate: momentDate.format(dateClickInfo.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'),
+                    title:       '',
+                    detail:      '',
+                };
+                this.$refs.createEvent.open();
             },
             onEventClick: function (eventInfo) {
                 // Ideally the current event would be a part of the modal,
@@ -104,7 +115,10 @@
             },
             onEventDrop: function (eventDropInfo) {
                 console.log(eventDropInfo);
-            }
+            },
+            toMoment: function (date) {
+                return toMoment(date, this.$refs.fullCalendar.getApi());
+            },
         }
     }
 
@@ -120,6 +134,73 @@
             ccc
         </reveal-modal>
 
+        <reveal-modal ref="createEvent">
+            <!-- create a tab Vue component? -->
+            <dl class="tabs" data-tab>
+                <dd class="active"><a href="#createEventPanel">Create Event</a></dd>
+                <dd><a href="#createTaskPanel">Create Task</a></dd>
+            </dl>
+            <div class="tabs-content">
+                <div class="content active" id="createEventPanel" aria-hidden="false">
+                    <form id="createEvent" method="post" action="/calendar/ajax/create" class="top">
+                        <input name="userId" type="hidden" :value="config.userId" />
+                        <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
+                        <input name="date"   type="hidden" :value="newEvent.date" />
+
+                        <section>
+                            <h3>On <span>{{ newEvent.displayDate }}</span></h3>
+
+                            <label>
+                                Event Title
+                                <input name="title" type="text" :value="newEvent.title" />
+                            </label>
+
+                            <label>
+                                Event Type
+                                <!-- Pass in a list of event types as well -->
+                                <select name="type">
+                                    <!-- BEGIN event_type -->
+                                    <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
+                                    <!-- END event_type -->
+                                </select>
+                            </label>
+                        </section>
+                        <ul class="flex-list buttons">
+                            <li><input type="submit" data-modal-submit disabled value="Create Event" /></li>
+                            <li><a href="#" id="edit-full" class="button icon-modify">Edit Event</a></li>
+                        </ul>
+                    </form>
+                </div>
+                <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
+                    <form id="createTask" method="post" action="/calendar/ajax/create">
+                        <input name="userId" type="hidden" :value="config.userId" />
+                        <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
+                        <input name="date"   type="hidden" :value="newEvent.date" />
+                        <input name="type"   type="hidden" :value="config.taskTypeId" />
+
+                        <section>
+                            <h3>Due <span>{{ newEvent.displayDate }}</span></h3>
+
+                            <label>
+                                Task
+                                <input name="title" type="text" :value="newEvent.title" />
+                            </label>
+
+                            <label class="detail">
+                                Note
+                                <textarea name="detail">{{ newEvent.detail }}</textarea>
+                            </label>
+                        </section>
+                        <div class="row">
+                            <div class="small-12 columns no-pad">
+                                <input type="submit" data-modal-submit disabled value="Create Task" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </reveal-modal>
+
         <reveal-modal ref="event">
             <div class="row">
                 <div class="small-12">
@@ -132,6 +213,7 @@
         </reveal-modal>
 
         <full-calendar
+            ref="fullCalendar"
             :plugins="calendarPlugins"
             :views="{
                 timeGridDay: {
