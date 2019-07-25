@@ -32,6 +32,7 @@ class SummaryTest extends TestCase
                     'quartile3' => null,
                     'min'       => null,
                     'max'       => null,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -42,6 +43,7 @@ class SummaryTest extends TestCase
                     'quartile3' => null,
                     'min'       => null,
                     'max'       => null,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -52,6 +54,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 4,
                     'min'       => 0,
                     'max'       => 5,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -62,6 +65,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 93,
                     'min'       => 1,
                     'max'       => 100,
+                    'outliers'  => []
                 ]
 
             ],
@@ -73,6 +77,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 4,
                     'min'       => 1,
                     'max'       => 5,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -83,6 +88,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 7.2,
                     'min'       => 3.4,
                     'max'       => 7.5,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -93,6 +99,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 7.3,
                     'min' => 7.3,
                     'max' => 7.3,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -103,6 +110,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 85,
                     'min' => 65,
                     'max' => 85,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -113,6 +121,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 70.5,
                     'min' => 0,
                     'max' => 83,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -123,6 +132,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 80,
                     'min' => 0,
                     'max' => 1000,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -133,6 +143,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 9.3,
                     'min' => 9.3,
                     'max' => 9.3,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -143,6 +154,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 14.9,
                     'min' => 10.2,
                     'max' => 16.4,
+                    'outliers'  => []
                 ]
             ],
             [
@@ -153,6 +165,7 @@ class SummaryTest extends TestCase
                     'quartile3' => 33,
                     'min' => 21,
                     'max' => 49,
+                    'outliers'  => []
                 ]
             ],
         ];

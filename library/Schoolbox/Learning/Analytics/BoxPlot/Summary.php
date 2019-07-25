@@ -11,7 +11,7 @@ class Summary
 {
 
     /**
-     * @var
+     * @var array
      */
     private $dataset;
 
@@ -38,8 +38,9 @@ class Summary
                     'quartile1' => $this->findMedian($this->setupFirstQuartile()),
                     'quartile2' => $this->findMedian($this->dataset),
                     'quartile3' => $this->findMedian($this->setupThirdQuartile()),
-                    'min' => $this->min(),
-                    'max' => $this->max(),
+                    'min'       => $this->min(),
+                    'max'       => $this->max(),
+                    'outliers'  => []
                 ];
         }
 
@@ -47,8 +48,9 @@ class Summary
             'quartile1' => null,
             'quartile2' => null,
             'quartile3' => null,
-            'min' => null,
-            'max' => null,
+            'min'       => null,
+            'max'       => null,
+            'outliers'  => []
         ];
     }
 
@@ -81,7 +83,6 @@ class Summary
         $fivePoints = $this->getSummary();
 
         if (empty($this->dataset)) {
-            $fivePoints['outliers'] = [];
             return $fivePoints;
         }
 
@@ -93,7 +94,7 @@ class Summary
         /* Lower whisker
          * Use the first value that is above the lowerThreshold
          */
-        $lowerThreshold = $fivePoints['quartile1'] - (1.5 * $this->generateIQR());
+        $lowerThreshold = $fivePoints['quartile1'] - (1.5 * $this->generateInterquartileRange());
 
         for ($i = 0; $i < $countValues; $i++) {
             if ($this->dataset[$i] > $lowerThreshold) {
@@ -109,7 +110,7 @@ class Summary
         /* Upper whisker
          * Use the first value that is below the upperThreshold
          */
-        $upperThreshold = $fivePoints['quartile3'] + (1.5 * $this->generateIQR());
+        $upperThreshold = $fivePoints['quartile3'] + (1.5 * $this->generateInterquartileRange());
 
         for ($i = $countValues - 1; $i >= 0; $i--) {
             if ($this->dataset[$i] < $upperThreshold) {
@@ -212,7 +213,7 @@ class Summary
 
     /**
      * @param $dataset
-     * @return array|null
+     * @return array
      */
     private function filterDataset(array $dataset): array
     {
@@ -230,11 +231,11 @@ class Summary
     }
 
     /**
-     * Generate IQR value
+     * Generates Interquartile range
      *
      * @return float|null
      */
-    private function generateIQR()
+    private function generateInterquartileRange()
     {
         return ($this->findMedian($this->setupThirdQuartile()) - $this->findMedian($this->setupFirstQuartile()));
     }
