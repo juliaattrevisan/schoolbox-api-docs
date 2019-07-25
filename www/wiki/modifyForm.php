@@ -29,14 +29,16 @@ if (is_ascii($_POST['heading'])) {
     $potentialSlug = $url->getSlug();
 }
 
-$wikis = $wikiMapper->findByColumn('categoryID', $_POST['categoryID']);
+$pb = $wikiMapper->getPredicateBuilder();
+$pb->equals('categoryID', (int)$_POST['categoryID'])
+    ->notEquals('wikiID', (int)$_POST['wikiID'])
+    ->equals('deleted', 'false')
+    ->equals('slug', $potentialSlug);
+$count = $wikiMapper->countByPredicates($pb);
 
-/** @var \Schoolbox\Wiki\Wiki $wiki */
-foreach ($wikis as $wiki) {
-    if ($wiki->getSlug() == $potentialSlug && $wiki->getId() != $_POST['wikiID']) {
-        //You have been naughty and bypassed javascript validation
-        error($errorMapper::ERROR_WIKI_NAME_IN_USE);
-    }
+if ($count > 0) {
+    //You have been naughty and bypassed javascript validation
+    error($errorMapper::ERROR_WIKI_NAME_IN_USE);
 }
 
 // posting a revision - wiki may or may not exist
