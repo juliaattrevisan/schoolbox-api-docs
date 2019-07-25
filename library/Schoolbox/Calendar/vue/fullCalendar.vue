@@ -31,6 +31,19 @@
             isNewEventSubmittable: function() {
                 return this.newEvent.title && this.newEvent.title.length !== 0;
             },
+            currentEventExtendedProps: function () {
+                return {
+                    location: this.currentEvent.extendedProps?.data?.meta?.location,
+                    author: {
+                        id:   this.currentEvent.extendedProps?.data?.meta?.authorId,
+                        name: this.currentEvent.extendedProps?.data?.meta?.author,
+                    },
+                    reviewer: {
+                        id:   this.currentEvent.extendedProps?.data?.meta?.reviewerId,
+                        name: this.currentEvent.extendedProps?.data?.meta?.reviewer,
+                    },
+                };
+            },
         },
         methods: {
             onExportClick: function () {
@@ -256,19 +269,19 @@
                         <meta-item class="icon-calendar">
 
                         </meta-item>
-                        <meta-item class="icon-location" v-if="currentEvent.extendedProps?.data?.meta?.location">
-                            {{ currentEvent.extendedProps?.data?.meta?.location }}
+                        <meta-item class="icon-location" v-if="currentEventExtendedProps.location">
+                            {{ currentEventExtendedProps.location }}
                         </meta-item>
-                        <meta-item class="icon-staff-students" v-if="currentEvent.extendedProps?.data?.meta?.authorId">
+                        <meta-item class="icon-staff-students" v-if="currentEventExtendedProps.author.id">
                             Posted by
-                            <a :href="'/search/user/' + String(currentEvent.extendedProps?.data?.meta?.authorId)">
-                                {{ currentEvent.extendedProps?.data?.meta?.author }}
+                            <a :href="'/search/user/' + String(currentEventExtendedProps.author.id)">
+                                {{ currentEventExtendedProps.author.name }}
                             </a>
                         </meta-item>
-                        <meta-item class="icon-staff-students" v-if="currentEvent.extendedProps?.data?.meta?.reviewerId">
+                        <meta-item class="icon-staff-students" v-if="currentEventExtendedProps.reviewer.id">
                             Reviewed by
-                            <a :href="'/search/user/' + String(currentEvent.extendedProps?.data?.meta?.reviewerId)">
-                                {{ currentEvent.extendedProps?.data?.meta?.reviewer }}
+                            <a :href="'/search/user/' + String(currentEventExtendedProps.reviewer.id)">
+                                {{ currentEventExtendedProps.reviewer.name }}
                             </a>
                         </meta-item>
                     </meta-list>
