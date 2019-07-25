@@ -50,6 +50,7 @@
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     booking: {
                         status: data?.booking?.status,
+                        related: data?.booking?.related,
                     }
                 };
             },
@@ -332,6 +333,33 @@
                     <article style="white-space: pre-line">
                         <span v-html="currentEventExtendedProps.detail"></span>
                     </article>
+
+                    <div v-if="currentEventExtendedProps.booking.related">
+                        <h3>Related Bookings</h3>
+                        <ul>
+                            <li v-for="relatedBooking in currentEventExtendedProps.booking.related">
+                                ({{ relatedBooking.status.name }})
+                                <a :href="relatedBooking.status.href">{{ relatedBooking.title }}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="attendance">
+                        <dl>
+                            <dd><p class="attendanceIcon"></p></dd>
+                            <dd class="rm"><p class="attendanceStatus"></p></dd>
+                        </dl>
+                    </div>
+
+                    <span class="homepageLink" data-is-html="1"></span>
+                    <span class="moreDetailsLink" data-is-html="1"></span>
+                    <span class="attendanceListButton" data-is-html="1"></span>
+                    <span class="attendanceRequestButton" data-is-html="1"></span>
+                    <span class="modifyLink" data-is-html="1"></span>
+                    <span class="deleteLink" data-is-html="1"></span>
+
+                    <div class="bookingActions" data-is-html="1"></div>
+
                 </div>
             </div>
         </reveal-modal>
