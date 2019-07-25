@@ -41,7 +41,9 @@ class Composite extends App
     {
         $this->subApps = $subApps;
 
-        // Ensure all sub-apps are consistent regarding their permitted execution
+        // Ensure all sub-apps are consistent regarding whether they should be run as root or not.
+        // We can ignore sub-apps that don't have a preference (ie return null)
+        // If some apps require root perm, and others should not be run as root, error out. (that's an invalid combination)
         $mustBeRoot = $mustBeNonRoot = false;
         foreach ($this->subApps as $subApp) {
             if ($subApp->runAsRoot()) {
