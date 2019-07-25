@@ -49,7 +49,7 @@
                         name: metadata?.reviewer,
                     },
                     folder: {
-                        id: data?.links?.category.id,
+                        id: Math.max(0, data?.links?.category.id || 0),
                     },
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     booking: {
@@ -376,7 +376,7 @@
                     <div v-if="currentEventExtendedProps.attendance">
                         <dl>
                             <dd><p :class="currentEventExtendedProps.attendance.icon"></p></dd>
-                            <dd class="rm"><p>{{ currentEventExtendedProps.attendance.icon }}</p></dd>
+                            <dd class="rm"><p>{{ currentEventExtendedProps.attendance.status }}</p></dd>
                         </dl>
                     </div>
 
@@ -388,11 +388,11 @@
                         <a class="button icon-due-work"
                            :href="currentEventExtendedProps.href">View More Details</a>
                     </span>
-                    <span v-if="currentEventExtendedProps.attendance.listButton">
+                    <span v-if="currentEventExtendedProps.attendance && currentEventExtendedProps.attendance.listButton">
                         <a class="button icon-group"
                            :href="'/calendar/attendance/list/' + String(currentEventExtendedProps.eventId)">Attendees</a>
                     </span>
-                    <span v-if="currentEventExtendedProps.attendance.requestButton">
+                    <span v-if="currentEventExtendedProps.attendance && currentEventExtendedProps.attendance.requestButton">
                         <a class="button icon-reply"
                            @click.prevent="toggleAttendance"
                            href="#">{{ currentEventExtendedProps.attendance.requestButton }}</a>
