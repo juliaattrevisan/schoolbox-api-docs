@@ -14,6 +14,20 @@ $app = new class extends CliTool\App
 {
 
     /** @inheritDoc */
+    public function getShortOpts(): array
+    {
+        return ['f'];
+    }
+
+
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return ['force'];
+    }
+
+
+    /** @inheritDoc */
     public function run(): void
     {
         $logger = $this->getLogger();

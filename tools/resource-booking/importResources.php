@@ -11,7 +11,15 @@ use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App{
+$app = new class extends CliTool\App
+{
+
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return ['dry-run'];
+    }
+
 
     /** @inheritDoc */
     public function run(): void
