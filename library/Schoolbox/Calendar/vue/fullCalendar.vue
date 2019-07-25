@@ -48,12 +48,16 @@
                         id:   Math.max(0, metadata?.reviewerId || 0),
                         name: metadata?.reviewer,
                     },
+                    folder: {
+                        id: data?.links?.category.id,
+                    },
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     booking: {
                         status: data?.booking?.status,
                         related: data?.booking?.related,
                     },
                     attendance: data?.attendance,
+                    href: data?.custom?.moreDetailsLink,
                 };
             },
         },
@@ -376,8 +380,14 @@
                         </dl>
                     </div>
 
-                    <span class="homepageLink" data-is-html="1"></span>
-                    <span class="moreDetailsLink" data-is-html="1"></span>
+                    <span v-if="currentEventExtendedProps.folder.id">
+                        <a class="button icon-home"
+                           :href="'/homepage/' + String(currentEventExtendedProps.folder.id)">Go to homepage</a>
+                    </span>
+                    <span v-if="currentEventExtendedProps.href">
+                        <a class="button icon-due-work"
+                           :href="currentEventExtendedProps.href">View More Details</a>
+                    </span>
                     <span v-if="currentEventExtendedProps.attendance.listButton">
                         <a class="button icon-group"
                            :href="'/calendar/attendance/list/' + String(currentEventExtendedProps.eventId)">Attendees</a>
