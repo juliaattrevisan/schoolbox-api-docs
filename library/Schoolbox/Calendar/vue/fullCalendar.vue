@@ -209,7 +209,30 @@
                     // Start and end are the same - just show the start
                     return start;
                 }
-            }
+            },
+            toggleAttendance: function () {
+                // TODO get this to work
+                // var button = $(this);
+                //
+                // var data = config.getFormData(button);
+                //
+                // if (button.text() === config.text.rsvp) {
+                //     data['status'] = 'add';
+                // } else {
+                //     data['status'] = 'remove';
+                // }
+                //
+                // $.post(config.url, data, function (data) {
+                //     if (data.error == undefined) {
+                //         if (button.text() === config.text.rsvp) {
+                //             button.html(config.text.unattend);
+                //         }
+                //         else {
+                //             button.html(config.text.rsvp);
+                //         }
+                //     }
+                // });
+            },
         }
     }
 
@@ -361,6 +384,7 @@
                     </span>
                     <span v-if="currentEventExtendedProps.attendance.requestButton">
                         <a class="button icon-reply"
+                           @click.prevent="toggleAttendance"
                            href="#">{{ currentEventExtendedProps.attendance.requestButton }}</a>
                     </span>
                     <span class="modifyLink" data-is-html="1"></span>
