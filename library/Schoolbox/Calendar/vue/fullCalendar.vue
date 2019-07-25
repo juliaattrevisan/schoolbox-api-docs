@@ -216,11 +216,10 @@
                             </label>
                         </section>
                         <ul class="flex-list buttons">
+                            <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
                             <li><input type="submit"
                                        :disabled="!isNewEventSubmittable"
                                        value="Create Event" /></li>
-                            <li><button @click.prevent="redirectToEventForm($event)"
-                                        class="icon-modify">Edit Event</button></li>
                         </ul>
                     </form>
                 </div>
