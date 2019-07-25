@@ -31,8 +31,9 @@ if (is_ascii($_POST['heading'])) {
 
 $wikis = $wikiMapper->findByColumn('categoryID', $_POST['categoryID']);
 
+/** @var \Schoolbox\Wiki\Wiki $wiki */
 foreach ($wikis as $wiki) {
-    if ($wiki['slug'] == $potentialSlug && $wiki['wikiID'] != $_POST['wikiID']) {
+    if ($wiki->getSlug() == $potentialSlug && $wiki->getId() != $_POST['wikiID']) {
         //You have been naughty and bypassed javascript validation
         error($errorMapper::ERROR_WIKI_NAME_IN_USE);
     }
