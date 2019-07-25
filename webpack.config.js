@@ -1,37 +1,36 @@
-const path = require("path");
+const path = require('path');
+const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
-    news: "./library/Schoolbox/Comms/News/react/News.tsx"
+    // news: "./src/index.js"
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),
     filename: "[name].bundle.js"
   },
-  devtool: "source-map",
-  resolve: {
-    extensions: [".js", ".ts", ".tsx"],
-    alias: {
-      '@schoolbox': path.resolve(
-        __dirname,
-        "react/components"
-      ),
-    }
-  },
   module: {
     rules: [
       {
-        test: /\.(js)$/,
+        test: /\.js$/,
         exclude: /node_modules/,
         use: {
           loader: "babel-loader"
         }
       },
-      { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
-      { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      }
     ]
   },
-  devServer: {
-    public: "vagrant.dev.schoolbox.cloud"
-  }
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    },
+    extensions: ['*', '.js', '.vue', '.json']
+  },
+  plugins: [
+      new VueLoaderPlugin()
+  ]
 };

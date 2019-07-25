@@ -1,35 +1,26 @@
 {
   "name": "schoolbox",
-  "version": "18.2.0",
+  "version": "19.1.0",
   "author": "Schoolbox Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {
-    "@types/classnames": "^2.2.7",
-    "@types/react": "^16.8.3",
-    "@types/react-dom": "^16.8.2",
-    "@types/react-paginate": "^6.2.1",
-    "@types/react-tabs": "^2.3.1",
+    "@types/classnames": "^2.2.9",
     "axios": "0.18.0",
     "classnames": "^2.2.6",
     "es6-object-assign": "1.1.0",
     "lodash": "4.17.11",
     "promise-polyfill": "8.1.0",
-    "react": "^16.8.2",
-    "react-dom": "^16.8.2",
-    "react-habitat": "^1.0.1",
-    "react-paginate": "^6.2.1",
-    "react-tabs": "^3.0.0",
-    "vue": "2.5.16",
+    "vue": "2.6.10",
+    "vue-style-loader": "^4.1.2",
     "vuejs-paginate": "2.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.0",
-    "@babel/preset-react": "^7.0.0",
-    "awesome-typescript-loader": "^5.2.1",
-    "babel-loader": "^8.0.4",
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
     "bower": "^1.8.4",
-    "grunt": "^1.0.1",
+    "css-loader": "^3.1.0",
+    "grunt": "^1.0.4",
     "grunt-bower-task": "^0.5.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-concat": "^1.0.1",
@@ -38,18 +29,12 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-shell": "^2.0.0",
     "jit-grunt": "^0.10.0",
-    "react-docgen-typescript": "^1.12.2",
-    "react-styleguidist": "^8.0.6",
     "shelljs": "^0.2.6",
     "source-map-loader": "^0.2.4",
-    "tslint": "^5.12.1",
-    "tslint-config-airbnb": "^5.11.1",
-    "tslint-config-prettier": "^1.17.0",
-    "tslint-react": "^3.6.0",
-    "tslint-react-a11y": "^1.0.0",
-    "typescript": "^3.2.2",
-    "webpack": "^4.27.1",
-    "webpack-cli": "^3.2.3"
+    "vue-loader": "^15.7.1",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.36.1",
+    "webpack-cli": "^3.3.6"
   },
   "license": "Commercial",
   "repository": {
@@ -57,15 +42,13 @@
     "url": "git://github.com/alaress/schoolbox.git"
   },
   "scripts": {
-    "styleguide": "npx styleguidist server",
-    "build": "webpack --config webpack.config.js --mode development",
-    "watch": "webpack --config webpack.config.js --mode development --watch",
-    "publish": "webpack --config webpack.config.js --mode production"
+    "build": "webpack --config webpack.config.js --mode=development",
+    "watch": "webpack --config webpack.config.js --mode=development --watch",
+    "publish": "webpack --config webpack.config.js --mode=production"
   },
   "babel": {
     "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
+      "@babel/preset-env"
     ]
   }
 }

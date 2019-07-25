@@ -27,4 +27,3 @@ done
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Website URL => https://vagrant.dev.schoolbox.cloud";
 echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL => https://vagrant.dev.schoolbox.cloud:8882/";
-echo "[SB][`date +%Y-%m-%d\ %X`] Styleguide URL => http://vagrant.dev.schoolbox.cloud:8883/";
