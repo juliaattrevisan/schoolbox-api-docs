@@ -32,7 +32,9 @@
                 return this.newEvent.title && this.newEvent.title.length !== 0;
             },
             currentEventExtendedProps: function () {
-                let metadata = this?.currentEvent?.extendedProps?.data?.meta;
+                // Also need to render the event's buttons
+                let event    = this?.currentEvent,
+                    metadata = event?.extendedProps?.data?.meta;
                 return {
                     detail: metadata?.detail,
                     location: metadata?.location,
@@ -44,6 +46,7 @@
                         id:   Math.max(0, metadata?.reviewerId || 0),
                         name: metadata?.reviewer,
                     },
+                    dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                 };
             },
         },
@@ -166,6 +169,39 @@
                 // Use jQuery's form serialize for now: replace later
                 window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
                     + window.$(this.$refs.createEventForm).serialize();
+            },
+            determineDateSpan: function (startDate, endDate, allDay) {
+                if (!startDate) {
+                    return '';
+                }
+                let format      = allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma',
+                    momentStart = this.toMoment(startDate),
+                    start       = momentStart.format(format),
+                    momentEnd   = null,
+                    end         = null;
+
+                if (endDate != null) {
+                    momentEnd = this.toMoment(endDate);
+                    if (allDay) {
+                        end = momentEnd.subtract(1, 'd').format(format);
+                    } else {
+                        end = momentEnd.format(format);
+                    }
+                }
+
+                if (momentEnd && !momentStart.isSame(momentEnd)) {
+                    // Start and end aren't the same - stitch them together.
+                    if (!allDay && momentStart.isSame(momentEnd, 'day')) {
+                        // Between two times on the same day - show the timespan but only one date
+                        return start + " – " + momentEnd.format('h:mma');
+                    } else {
+                        // Between two different days - show the whole timespan
+                        return start + " – " + end;
+                    }
+                } else {
+                    // Start and end are the same - just show the start
+                    return start;
+                }
             }
         }
     }
@@ -261,13 +297,15 @@
             </div>
         </reveal-modal>
 
+        <!-- TODO consider moving this to its own component? -->
         <reveal-modal ref="event">
             <div class="row">
                 <div class="small-12">
                     <h2 class="note">{{ currentEvent.title }}</h2>
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="false"></meta-item>
-                        <meta-item class="icon-calendar">
+                        <meta-item class="icon-calendar" v-if="currentEventExtendedProps.dateSpan">
+                            {{ currentEventExtendedProps.dateSpan }}
                         </meta-item>
                         <meta-item class="icon-location" v-if="currentEventExtendedProps.location">
                             {{ currentEventExtendedProps.location }}
