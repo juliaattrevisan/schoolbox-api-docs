@@ -262,7 +262,7 @@
         <reveal-modal ref="event">
             <div class="row">
                 <div class="small-12">
-                    <h3 class="note">{{ currentEvent.title }}</h3>
+                    <h2 class="note">{{ currentEvent.title }}</h2>
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="false"></meta-item>
                         <meta-item class="icon-calendar">
