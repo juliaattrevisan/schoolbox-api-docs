@@ -37,6 +37,7 @@
                     data     = event?.extendedProps?.data,
                     metadata = data?.meta;
                 return {
+                    eventId: metadata?.eventId,
                     detail: metadata?.detail,
                     location: metadata?.location,
                     author: {
@@ -354,8 +355,14 @@
 
                     <span class="homepageLink" data-is-html="1"></span>
                     <span class="moreDetailsLink" data-is-html="1"></span>
-                    <span class="attendanceListButton" data-is-html="1"></span>
-                    <span class="attendanceRequestButton" data-is-html="1"></span>
+                    <span v-if="currentEventExtendedProps.attendance.listButton">
+                        <a class="button icon-group"
+                           :href="'/calendar/attendance/list/' + String(currentEventExtendedProps.eventId)">Attendees</a>
+                    </span>
+                    <span v-if="currentEventExtendedProps.attendance.requestButton">
+                        <a class="button icon-reply"
+                           href="#">{{ currentEventExtendedProps.attendance.requestButton }}</a>
+                    </span>
                     <span class="modifyLink" data-is-html="1"></span>
                     <span class="deleteLink" data-is-html="1"></span>
 
