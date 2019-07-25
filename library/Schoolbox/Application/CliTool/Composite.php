@@ -9,6 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Aura\Di;
+use function count;
+use function get_class;
+use function implode;
 use Psr\Log\LoggerInterface;
 use Throwable;
 use UnexpectedValueException;
@@ -44,20 +47,26 @@ class Composite extends App
         // Ensure all sub-apps are consistent regarding whether they should be run as root or not.
         // We can ignore sub-apps that don't have a preference (ie return null)
         // If some apps require root perm, and others should not be run as root, error out. (that's an invalid combination)
-        $mustBeRoot = $mustBeNonRoot = false;
+        $requireRoot = $shouldNotBeRoot = [];
         foreach ($this->subApps as $subApp) {
             if ($subApp->runAsRoot()) {
-                $mustBeRoot = true;
+                $requireRoot[] = get_class($subApp);
             } elseif ($subApp->runAsRoot() === false) {
-                $mustBeNonRoot = true;
+                $shouldNotBeRoot[] = get_class($subApp);
             }
         }
-        if ($mustBeRoot && $mustBeNonRoot) {
-            throw new UnexpectedValueException('Composite sub-apps require being run as both root and non-root, this is impossible');
+        if (count($requireRoot) && count($shouldNotBeRoot)) {
+            throw new UnexpectedValueException(sprintf(
+                "Sub-apps require being run as both root and non-root, this is impossible.\n" .
+                "Sub Apps requiring root: [%s]\n" .
+                "Sub Apps that should not be run as root: [%s]\n",
+                implode(',', $requireRoot),
+                implode(',', $shouldNotBeRoot)
+            ));
         }
-        if ($mustBeRoot) {
+        if (count($requireRoot)) {
             $this->runAsRoot = true;
-        } elseif ($mustBeNonRoot) {
+        } elseif (count($shouldNotBeRoot)) {
             $this->runAsRoot = false;
         }
     }
