@@ -9,8 +9,11 @@
 namespace External\Tass\Portal;
 
 use Alaress;
+use function array_merge;
 use Aura\Web\Exception\InvalidStatusCode;
 use Alaress\Session\ImpersonationCheck;
+use function json_encode;
+use function rtrim;
 use Schoolbox\User;
 use Schoolbox\Error;
 
@@ -25,7 +28,7 @@ class Controller extends Alaress\Web\Controller\Base
     protected $sso;
 
     /**
-     * The URL on which TASS services are hosted
+     * The URL on which TASS services are hosted, no trailing slash
      *
      * @var string
      */
@@ -60,7 +63,7 @@ class Controller extends Alaress\Web\Controller\Base
     public function __construct(SSO $sso, $portalHost, $appCodes, Error\Mapper $errorMapper)
     {
         $this->sso         = $sso;
-        $this->portalHost  = $portalHost;
+        $this->portalHost  = rtrim($portalHost, '/');
         $this->appCodes    = array_merge($this->appCodes, $appCodes);
         $this->errorMapper = $errorMapper;
     }
@@ -86,7 +89,9 @@ class Controller extends Alaress\Web\Controller\Base
         }
 
         if ((int)$this->getConfigLoader()->get('external_tass_sso_token_generation_strategy') === SSO::SSO_STRATEGY_V3_SAML) {
-            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}");
+            // Redirect to SAML supporting TASS url
+            $samlDeepLink = json_encode(array_merge($deepLinkV2, ['prod_menu' => $prodMenu ? 'Y' : 'N']));
+            $this->getResponse()->redirect->to("{$this->portalHost}{$productPath}?go={$samlDeepLink}");
             return;
         }
 
