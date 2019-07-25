@@ -33,6 +33,7 @@
             },
             currentEventExtendedProps: function () {
                 return {
+                    detail: this.currentEvent.extendedProps?.data?.meta?.detail,
                     location: this.currentEvent.extendedProps?.data?.meta?.location,
                     author: {
                         id:   this.currentEvent.extendedProps?.data?.meta?.authorId,
@@ -283,8 +284,8 @@
                             </a>
                         </meta-item>
                     </meta-list>
-                    <article>
-                        <span v-html="currentEvent.detail"></span>
+                    <article style="white-space: pre-line">
+                        <span v-html="currentEventExtendedProps.detail"></span>
                     </article>
                 </div>
             </div>
