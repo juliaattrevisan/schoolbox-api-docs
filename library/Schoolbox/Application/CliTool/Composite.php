@@ -12,9 +12,9 @@ use Aura\Di;
 use function count;
 use function get_class;
 use function implode;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Throwable;
-use UnexpectedValueException;
 
 /**
  * A composite app: contains one or more sub-apps to be run in sequence.
@@ -38,7 +38,7 @@ class Composite extends App
      * Throws an exception if we attempt to add an invalid combination of sub-apps
      *
      * @param App ...$subApps
-     * @throws UnexpectedValueException
+     * @throws InvalidArgumentException
      */
     public function __construct(App... $subApps)
     {
@@ -56,7 +56,7 @@ class Composite extends App
             }
         }
         if (count($requireRoot) && count($shouldNotBeRoot)) {
-            throw new UnexpectedValueException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 "Sub-apps require being run as both root and non-root, this is impossible.\n" .
                 "Sub Apps requiring root: [%s]\n" .
                 "Sub Apps that should not be run as root: [%s]\n",
