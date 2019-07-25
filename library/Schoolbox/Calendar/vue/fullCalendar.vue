@@ -51,7 +51,8 @@
                     booking: {
                         status: data?.booking?.status,
                         related: data?.booking?.related,
-                    }
+                    },
+                    attendance: data?.attendance,
                 };
             },
         },
@@ -344,10 +345,10 @@
                         </ul>
                     </div>
 
-                    <div class="attendance">
+                    <div v-if="currentEventExtendedProps.attendance">
                         <dl>
-                            <dd><p class="attendanceIcon"></p></dd>
-                            <dd class="rm"><p class="attendanceStatus"></p></dd>
+                            <dd><p :class="currentEventExtendedProps.attendance.icon"></p></dd>
+                            <dd class="rm"><p>{{ currentEventExtendedProps.attendance.icon }}</p></dd>
                         </dl>
                     </div>
 
