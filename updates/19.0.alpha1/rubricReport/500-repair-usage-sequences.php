@@ -29,14 +29,6 @@ $app = new class extends CliTool\App
     private $countIndicatorUsagesChanged = 0;
 
 
-    /** @inheritDoc */
-    public function runAsRoot(): ?bool
-    {
-        // Update scripts run as root
-        return null;
-    }
-
-
     /**
      * Hands off execution over to the App
      *

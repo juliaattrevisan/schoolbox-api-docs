@@ -53,13 +53,6 @@ $app = new class extends CliTool\App
     }
 
 
-    /** @inheritdoc */
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
-
-
     /**
      * Execute each strat in the composite
      */

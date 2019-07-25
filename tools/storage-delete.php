@@ -24,14 +24,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
     private $hash;
 
-
-    /** @inheritdoc */
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
-
-
     /** @inheritdoc */
     public function getLongOpts(): array
     {

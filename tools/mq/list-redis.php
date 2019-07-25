@@ -38,13 +38,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     }
 
 
-    /** @inheritdoc */
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
-
-
     /**
      * @inheritDoc
      */

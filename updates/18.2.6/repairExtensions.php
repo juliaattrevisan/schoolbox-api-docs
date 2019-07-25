@@ -24,12 +24,6 @@ $app = new class extends CliTool\App
         WHERE storage_id = :storageId
     ';
 
-    /** @inheritDoc */
-    public function runAsRoot(): ?bool
-    {
-        // Update scripts run as root
-        return null;
-    }
 
     /**
      * Re-assign originally intended file extension
