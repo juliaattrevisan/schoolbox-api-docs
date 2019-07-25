@@ -13,6 +13,7 @@ use function array_merge;
 use Aura\Web\Exception\InvalidStatusCode;
 use Alaress\Session\ImpersonationCheck;
 use function json_encode;
+use function rtrim;
 use Schoolbox\User;
 use Schoolbox\Error;
 
@@ -27,7 +28,7 @@ class Controller extends Alaress\Web\Controller\Base
     protected $sso;
 
     /**
-     * The URL on which TASS services are hosted
+     * The URL on which TASS services are hosted, no trailing slash
      *
      * @var string
      */
@@ -62,7 +63,7 @@ class Controller extends Alaress\Web\Controller\Base
     public function __construct(SSO $sso, $portalHost, $appCodes, Error\Mapper $errorMapper)
     {
         $this->sso         = $sso;
-        $this->portalHost  = $portalHost;
+        $this->portalHost  = rtrim($portalHost, '/');
         $this->appCodes    = array_merge($this->appCodes, $appCodes);
         $this->errorMapper = $errorMapper;
     }
