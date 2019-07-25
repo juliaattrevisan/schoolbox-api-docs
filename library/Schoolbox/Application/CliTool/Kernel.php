@@ -9,8 +9,9 @@ namespace Schoolbox\Application\CliTool;
 
 use Alaress\Lumberjack;
 use ErrorException;
-use function get_current_user;
 use InvalidArgumentException;
+use function posix_geteuid;
+use function posix_getpwuid;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 
@@ -178,7 +179,10 @@ class Kernel extends CliKernelAbstract
         $isRoot = $this->isRunAsSuperuser();
 
         if ($runAsRoot && !$isRoot) {
-            throw new \UnexpectedValueException(sprintf("App requires to be run as system 'root' user, current user: %s", get_current_user()));
+            throw new \UnexpectedValueException(sprintf(
+                "App requires to be run as system 'root' user, current user: '%s'",
+                posix_getpwuid(posix_geteuid())['name'])
+            );
         }
         if (!$runAsRoot && $isRoot) {
             $this->logger()->warning(
