@@ -33,9 +33,22 @@
             },
             currentEventExtendedProps: function () {
                 // Also need to render the event's buttons
-                let event    = this?.currentEvent,
-                    data     = event?.extendedProps?.data,
-                    metadata = data?.meta;
+                let event      = this?.currentEvent,
+                    data       = event?.extendedProps?.data,
+                    metadata   = data?.meta,
+                    modifyLink = null,
+                    deleteLink = null;
+
+                // Modify/delete links
+                if (event?.editable) {
+                    if (data?.custom?.modifyLink) {
+                        modifyLink = data?.custom?.modifyLink;
+                    } else if (metadata?.eventId) {
+                        modifyLink = '/calendar/modify.php?eventID=' + metadata?.eventId + '&returnTo=calendar';
+                        deleteLink = '/calendar/modifyForm.php?action=Delete&id=' + metadata?.eventId + '&returnTo=calendar';
+                    }
+                }
+
                 return {
                     eventId: metadata?.eventId,
                     detail: metadata?.detail,
@@ -57,7 +70,11 @@
                         related: data?.booking?.related,
                     },
                     attendance: data?.attendance,
-                    href: data?.custom?.moreDetailsLink,
+                    links: {
+                        view: data?.custom?.moreDetailsLink,
+                        modify: modifyLink,
+                        delete: deleteLink,
+                    },
                 };
             },
         },
@@ -384,9 +401,9 @@
                         <a class="button icon-home"
                            :href="'/homepage/' + String(currentEventExtendedProps.folder.id)">Go to homepage</a>
                     </span>
-                    <span v-if="currentEventExtendedProps.href">
+                    <span v-if="currentEventExtendedProps.links.view">
                         <a class="button icon-due-work"
-                           :href="currentEventExtendedProps.href">View More Details</a>
+                           :href="currentEventExtendedProps.links.view">View More Details</a>
                     </span>
                     <span v-if="currentEventExtendedProps.attendance && currentEventExtendedProps.attendance.listButton">
                         <a class="button icon-group"
@@ -397,10 +414,18 @@
                            @click.prevent="toggleAttendance"
                            href="#">{{ currentEventExtendedProps.attendance.requestButton }}</a>
                     </span>
-                    <span class="modifyLink" data-is-html="1"></span>
-                    <span class="deleteLink" data-is-html="1"></span>
+                    <span v-if="currentEventExtendedProps.modifyLink">
+                        <a class="button icon-modify"
+                           :href="currentEventExtendedProps.modifyLink">Modify</a>
+                    </span>
+                    <span v-if="currentEventExtendedProps.deleteLink">
+                        <a class="button icon-delete"
+                           :href="currentEventExtendedProps.deleteLink">Delete</a>
+                    </span>
 
-                    <div class="bookingActions" data-is-html="1"></div>
+                    <div class="bookingActions" data-is-html="1">
+
+                    </div>
 
                 </div>
             </div>
