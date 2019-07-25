@@ -68,6 +68,7 @@
                     booking: {
                         status: data?.booking?.status,
                         related: data?.booking?.related,
+                        actions: data?.booking?.buttons,
                     },
                     attendance: data?.attendance,
                     links: {
@@ -423,8 +424,8 @@
                            :href="currentEventExtendedProps.deleteLink">Delete</a>
                     </span>
 
-                    <div class="bookingActions" data-is-html="1">
-
+                    <div v-for="action in currentEventExtendedProps.booking.actions">
+                        <a :href="action.href" class="button">{{ action.label }}</a>
                     </div>
 
                 </div>
