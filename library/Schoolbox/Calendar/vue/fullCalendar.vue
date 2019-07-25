@@ -26,9 +26,9 @@
             }
         },
         computed: {
-            window: function () { return window; },
-            config: function () { return window.fullCalendarConfig; },
-            isNewEventSubmittable: function() {
+            window: () => window,
+            config: () => window.fullCalendarConfig,
+            isNewEventSubmittable: function () {
                 return this.newEvent.title && this.newEvent.title.length !== 0;
             },
             currentEventExtendedProps: function () {
@@ -266,7 +266,6 @@
                     <meta-list>
                         <meta-item class="icon-resource-booking" v-if="false"></meta-item>
                         <meta-item class="icon-calendar">
-
                         </meta-item>
                         <meta-item class="icon-location" v-if="currentEventExtendedProps.location">
                             {{ currentEventExtendedProps.location }}
