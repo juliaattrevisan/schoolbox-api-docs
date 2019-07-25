@@ -33,7 +33,7 @@ class UtilTest extends TestCase
             'trim multiple'    => ['123', '       123       '],
             'normalize spaces' => ['123 456', '123  456'],
             'normalize break'  => ['123 456', "123\n\r456"],
-            'preserve case'    => ['ABCabc', 'ABCabc'],
+            'normalize case'   => ['abcabc', 'ABCabc'],
         ];
     }
 
