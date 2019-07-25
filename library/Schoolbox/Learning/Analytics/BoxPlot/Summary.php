@@ -2,7 +2,7 @@
 
 /**
  * https://www.purplemath.com/modules/boxwhisk.htm
- * Class Quartile
+ * Class Summary
  */
 
 namespace Schoolbox\Learning\Analytics\BoxPlot;
@@ -65,7 +65,7 @@ class Summary
      */
     private function max()
     {
-        return end($this->dataset);
+        return $this->dataset[\count($this->dataset) - 1];
     }
 
     /**
@@ -78,19 +78,13 @@ class Summary
 
     public function getSummaryWithOutliers(): array
     {
+        $fivePoints = $this->getSummary();
 
         if (empty($this->dataset)) {
-            return [
-                'quartile1' => null,
-                'quartile2' => null,
-                'quartile3' => null,
-                'min' => null,
-                'max' => null,
-                'outliers' => null,
-            ];
+            $fivePoints['outliers'] = [];
+            return $fivePoints;
         }
 
-        $fivePoints = $this->getSummary();
         $countValues = count($this->dataset);
         $allOutliers = [];
         $minimum = $this->min();

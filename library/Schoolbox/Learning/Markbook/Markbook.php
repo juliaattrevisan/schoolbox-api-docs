@@ -278,8 +278,8 @@ class Markbook
                 $normMarks[] = $participant->getNormalisedMark(true);
             }
         }
-        $summary = new Summary($normMarks);
-        $fivePoints = $summary->getSummary();
+
+        $fivePoints = (new Summary($normMarks))->getSummary();
 
         $statistics = [
             'mean'              => null,
