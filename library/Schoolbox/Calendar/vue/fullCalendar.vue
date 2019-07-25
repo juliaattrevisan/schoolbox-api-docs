@@ -32,16 +32,17 @@
                 return this.newEvent.title && this.newEvent.title.length !== 0;
             },
             currentEventExtendedProps: function () {
+                let metadata = this?.currentEvent?.extendedProps?.data?.meta;
                 return {
-                    detail: this.currentEvent.extendedProps?.data?.meta?.detail,
-                    location: this.currentEvent.extendedProps?.data?.meta?.location,
+                    detail: metadata?.detail,
+                    location: metadata?.location,
                     author: {
-                        id:   this.currentEvent.extendedProps?.data?.meta?.authorId,
-                        name: this.currentEvent.extendedProps?.data?.meta?.author,
+                        id:   Math.max(0, metadata?.authorId || 0),
+                        name: metadata?.author,
                     },
                     reviewer: {
-                        id:   this.currentEvent.extendedProps?.data?.meta?.reviewerId,
-                        name: this.currentEvent.extendedProps?.data?.meta?.reviewer,
+                        id:   Math.max(0, metadata?.reviewerId || 0),
+                        name: metadata?.reviewer,
                     },
                 };
             },
