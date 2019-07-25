@@ -34,7 +34,8 @@
             currentEventExtendedProps: function () {
                 // Also need to render the event's buttons
                 let event    = this?.currentEvent,
-                    metadata = event?.extendedProps?.data?.meta;
+                    data     = event?.extendedProps?.data,
+                    metadata = data?.meta;
                 return {
                     detail: metadata?.detail,
                     location: metadata?.location,
@@ -47,6 +48,9 @@
                         name: metadata?.reviewer,
                     },
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
+                    booking: {
+                        status: data?.booking?.status,
+                    }
                 };
             },
         },
@@ -303,7 +307,9 @@
                 <div class="small-12">
                     <h2 class="note">{{ currentEvent.title }}</h2>
                     <meta-list>
-                        <meta-item class="icon-resource-booking" v-if="false"></meta-item>
+                        <meta-item class="icon-resource-booking" v-if="currentEventExtendedProps.booking.status">
+                            {{ currentEventExtendedProps.booking.status.name }}
+                        </meta-item>
                         <meta-item class="icon-calendar" v-if="currentEventExtendedProps.dateSpan">
                             {{ currentEventExtendedProps.dateSpan }}
                         </meta-item>
