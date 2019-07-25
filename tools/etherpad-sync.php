@@ -16,16 +16,6 @@ require_once __DIR__ . '/../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
-    /**
-     * @return bool|null
-     */
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
-
-
     /**
      * Hands off execution over to the App
      */

@@ -24,12 +24,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
-    /** @inheritDoc */
-    public function runAsRoot(): ?bool
-    {
-        return null;
-    }
-
 
     /** @inheritDoc */
     public function run(): void

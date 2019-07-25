@@ -30,13 +30,6 @@ $app = new class extends CliTool\App
 
 
     /** @inheritDoc */
-    public function runAsRoot(): ?bool
-    {
-        return true;
-    }
-
-
-    /** @inheritDoc */
     public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
     {
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
