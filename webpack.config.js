@@ -20,7 +20,14 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
+      {
+        test: /\.css$/,
+        use: ['vue-style-loader', 'css-loader']
       }
     ]
   },
