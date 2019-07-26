@@ -1013,10 +1013,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($classCodes as $classCode) {
             // Always return exact matches
             $codePb->equals('fc.code', $classCode);
-            // If code does not have a campus prefix, match against campus-prefixed variants
-            if (strpos($classCode, '/') === false) {
-                $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
-            }
+            $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
         }
 
         $folderPb = $this->getPredicateBuilder()

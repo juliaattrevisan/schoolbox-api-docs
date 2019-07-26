@@ -8,7 +8,6 @@
 use Aura\Router\Router;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -311,7 +310,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $classLink = '';
         $folder = $this->getFolderMapper()->findForCampusAndClass($class['campus'], $class['code']);
         if ($folder) {
-            $classDescription = $classDescription ?? $folder->getName();
+            $classDescription = $classDescription ?: $folder->getName();
             if ($this->getAccess()->getFolderAccess($this->getUser(), $folder->getId()) >= UserAccess::ACCESS_READ) {
                 // Yes you really do need to double url-encode this
                 $classLink = '/homepage/code/' . urlencode(urlencode($folder->getMatchedCode()));

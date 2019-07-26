@@ -7,7 +7,6 @@ use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Permission\Access\Access;
-use Schoolbox\Collection;
 
 class Group extends DeprecatedModel
 {

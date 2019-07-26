@@ -62,11 +62,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $codes;
 
     /**
-     * Place holder for folder code, when folder is found by code
+     * Place holder for one of folder codes of this folder, which matches a class code and a campus code from SIS.
+     * This is for Mapper::findForCampusAndClass().
      * @var null|string
      */
     private $matchedCode;
-
 
     /**
      * A group instance
@@ -647,7 +647,8 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * Sets current search code
      * @param string $code
      */
-    public function setMatchedCode(string $code) {
+    public function setMatchedCode(string $code): void
+    {
         $this->matchedCode = $code;
     }
 

@@ -190,30 +190,26 @@ class UserAccessMapper extends Mapper
             if (!isset($extSubj['code']) || empty($extSubj['code'])) {
                 continue;
             }
-            try {
-                $folder = FolderMapper::getInstance()->findForCampusAndClass($extSubj['campusCode'] ?? '', $extSubj['code']);
-                if (!$folder) {
-                    continue;
-                }
-
-                $ua = new UserAccess();
-
-                $ua->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setServiceIdentifier($folder->getId())
-                    ->setUser($user);
-
-                //Teachers automatically get write access to their class pages
-                if ($user->getRole()->isStaff()) {
-                    $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
-                } else {
-                    $ua->setAccessLevel(UserAccess::ACCESS_READ);
-                }
-
-                $external->add($ua);
-
-            } catch (UnexpectedValueException $e) {
-                // noop
+            $folder = FolderMapper::getInstance()->findForCampusAndClass($extSubj['campusCode'] ?? '', $extSubj['code']);
+            if (!$folder) {
+                continue;
             }
+
+            $ua = new UserAccess();
+
+            $ua->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($folder->getId())
+                ->setUser($user);
+
+            //Teachers automatically get write access to their class pages
+            if ($user->getRole()->isStaff()) {
+                $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+            } else {
+                $ua->setAccessLevel(UserAccess::ACCESS_READ);
+            }
+
+            $external->add($ua);
+
         }
 
         $access = $access->merge($external);

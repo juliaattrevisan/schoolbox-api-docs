@@ -178,7 +178,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
             $classCode = $subject['folder']->getCodeString();
         } else {
             if (ConfigMapper::getInstance()->get('show_all_subjects')) {
-                $classCode = ($subject['campus'] && $subject['campus'] != '') ? "{$subject['campus']}/{$subject['code']}" : $subject['code'];
+                $classCode = (($subject['campus'] ?? '') !== '') ? "{$subject['campus']}/{$subject['code']}" : $subject['code'];
                 $code = new FolderCode();
                 $code->setCode($classCode);
                 $subject['folder'] = new Folder();

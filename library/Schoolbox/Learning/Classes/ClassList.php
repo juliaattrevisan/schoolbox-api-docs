@@ -12,7 +12,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Timetable_ColourMapper;
