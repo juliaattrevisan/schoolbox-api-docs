@@ -637,11 +637,11 @@ class IntegrationTester extends \Codeception\Actor
             $assessments = $this->getAssessmentIdByCourseUnitSpecId($unit->getId());
             foreach ($assessments as $assessment)
             {
-                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][spec_id]'] = $assessment['id'];
-                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][impl_id]'] = '';
-                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][checked]'] = 1;
-                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][dates][publish]'] ='22/06/2019 12:00am';
-                $data['unit['.$unit->getId().'][a]['.$assessment['id'].'][dates][due]'] ='22/08/2019 12:00am';
+                $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][spec_id]'] = $assessment['assessment_id'];
+                $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][impl_id]'] = '';
+                $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][checked]'] = 1;
+                $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][dates][publish]'] ='22/06/2019 12:00am';
+                $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][dates][due]'] ='22/08/2019 12:00am';
             }
         }
 
