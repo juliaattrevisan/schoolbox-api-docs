@@ -97,6 +97,25 @@ HELP;
              * Otherwise we can't do anything about it - none of their accounts have a picture
              */
             if ($mostRecentPortrait) {
+
+                /* Find the affected users, for logging
+                 */
+                $affectedUsersStatement = $db->prepare("
+                    SELECT GROUP_CONCAT(id, ' ', username SEPARATOR ', ') AS affectedUsers
+                    FROM `user`
+                    WHERE portrait_hash IS NOT NULL
+                    AND synergy_id = :externalId
+                    ORDER BY updated_at DESC
+                ");
+
+                $affectedUsersStatement->execute([
+                    'externalId' => $multipleAccountHolder['synergy_id']
+                ]);
+
+                $affectedUsers = $affectedUsersStatement->fetch(\PDO::FETCH_ASSOC)['affectedUsers'];
+
+                /* Update those people
+                 */
                 if ($this->perform()) {
                     $update = $db->prepare('
                         UPDATE `user`
@@ -113,13 +132,12 @@ HELP;
                 /* Log it
                  */
                 $this->getLogger()->info(sprintf(
-                    'Assigning portrait hash %s from %s (externalId %s, user %s) to (externalId %s, user %s) %s',
+                    'Assigning portrait hash %s from %s (externalId %s, user %s) to users (%s) %s',
                     $mostRecentPortrait['portrait_hash'],
                     $mostRecentPortrait['username'],
                     $multipleAccountHolder['synergy_id'],
                     $mostRecentPortrait['id'],
-                    $multipleAccountHolder['synergy_id'],
-                    $multipleAccountHolder['id'],
+                    $affectedUsers,
                     "/portrait.php?userId={$multipleAccountHolder['id']}&size=constrain200"
                 ));
             }
