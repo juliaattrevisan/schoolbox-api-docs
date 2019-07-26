@@ -140,6 +140,8 @@ class Factory
         }
 
         switch ($config->get('external_type')) {
+            case null:
+                return null;
 
             // Schoolbox connector: just return internal DB
             case 'schoolbox':
