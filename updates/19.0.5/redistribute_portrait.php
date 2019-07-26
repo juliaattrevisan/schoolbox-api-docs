@@ -111,12 +111,13 @@ HELP;
                 /* Log it
                  */
                 $this->getLogger()->info(sprintf(
-                    'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s)',
+                    'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s); %s',
                     $mostRecentPortrait['portrait_hash'],
                     $multipleAccountHolder['synergy_id'],
                     $mostRecentPortrait['id'],
                     $multipleAccountHolder['synergy_id'],
-                    $multipleAccountHolder['id']
+                    $multipleAccountHolder['id'],
+                    "/portrait.php?userId={$multipleAccountHolder['id']}}&size=constrain200"
                 ));
             }
         }
