@@ -31,23 +31,50 @@ UPDATE `schoolbox`.`user` SET `synergy_id`='483' WHERE `id`='16';
 UPDATE `schoolbox`.`user` SET `synergy_id`='483' WHERE `id`='13';
 UPDATE `schoolbox`.`user` SET `updated_at`='1970-01-01 11:00:00' WHERE `id`='16';
 UPDATE `schoolbox`.`user` SET `synergy_id`='483', `updated_at`='1980-01-01 09:00:00' WHERE `id`='17';
+UPDATE `schoolbox`.`user` SET `portrait_hash`='0b107a8f53b04e45eb1ee5aa6eae14bd0454546b' WHERE `id`='17';
  */
 
 $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
     /* Find all the users with multiple external ids
-     * Order it by hash, updated_at
-     * Group by synergy_id
-     * Log it
      */
+    $multipleAccountHoldersStatement = $db->prepare('
+        SELECT id, username, synergy_id
+        FROM `user`
+        WHERE synergy_id IS NOT NULL
+        GROUP BY synergy_id
+        HAVING (COUNT(*) > 1)
+        ORDER BY id;
+    ');
 
-    /* For each external_id,
-     * Find the most recent record
-     * Get its hash
-     * Find all the other records for this external id
-     * Apply the hash to those records
-     * Log it
+    $multipleAccountHoldersStatement->execute();
+
+    /* Find the most recently updated account that has a portrait_hash
+     * This has will be redistributed to all the other accounts
      */
+    foreach ($multipleAccountHoldersStatement as $multipleAccountHolder) {
+        $mostRecentPortraitStatement = $db->prepare('
+            SELECT id, username, portrait_hash, updated_at 
+            FROM `user`
+            WHERE portrait_hash IS NOT NULL
+            AND synergy_id = :externalId
+            ORDER BY updated_at DESC
+            LIMIT 1
+        ');
+
+        $mostRecentPortraitStatement->execute([
+            'externalId' => $multipleAccountHolder['synergy_id']
+        ]);
+
+        $mostRecentPortraitHash = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC)['portrait_hash'];
+
+        print_r($mostRecentPortraitHash);
+
+        /* Apply the hash to those records
+         * Log it
+         */
+    }
+
     $log->warning('Test Message.');
 });
