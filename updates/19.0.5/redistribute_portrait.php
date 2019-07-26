@@ -111,8 +111,9 @@ HELP;
                 /* Log it
                  */
                 $this->getLogger()->info(sprintf(
-                    'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s) %s',
+                    'Assigning portrait hash %s from %s (externalId %s, user %s) to (externalId %s, user %s) %s',
                     $mostRecentPortrait['portrait_hash'],
+                    $mostRecentPortrait['username'],
                     $multipleAccountHolder['synergy_id'],
                     $mostRecentPortrait['id'],
                     $multipleAccountHolder['synergy_id'],
