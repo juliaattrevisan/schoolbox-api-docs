@@ -9,19 +9,11 @@
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-use Psr\Log\LoggerInterface;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Application\Daemon;
+declare(strict_types=1);
+
+use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-
-$kernel = new Daemon\Kernel(
-    'Redistribute portraits to multiple accounts',
-    [
-        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
-        Daemon\Kernel::OPTION_ERRORS => E_ALL,
-    ]
-);
 
 /* Setup
  * Assign synergy_id 483 to multiple bros
@@ -33,69 +25,109 @@ UPDATE `schoolbox`.`user` SET `updated_at`='1970-01-01 11:00:00' WHERE `id`='16'
 UPDATE `schoolbox`.`user` SET `synergy_id`='483', `updated_at`='1980-01-01 09:00:00' WHERE `id`='17';
 UPDATE `schoolbox`.`user` SET `portrait_hash`='0b107a8f53b04e45eb1ee5aa6eae14bd0454546b' WHERE `id`='17';
  */
+$app = new class extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
-$kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
-    $db = Database::getInstance();
 
-    /* Find all the users with multiple external ids
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
      */
-    $multipleAccountHoldersStatement = $db->prepare('
-        SELECT id, username, synergy_id
-        FROM `user`
-        WHERE synergy_id IS NOT NULL
-        GROUP BY synergy_id
-        HAVING (COUNT(*) > 1)
-        ORDER BY id;
-    ');
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+Redistribute portraits to multiple accounts
 
-    $multipleAccountHoldersStatement->execute();
+Usage: redistribute_portrait.php
 
-    /* Find the most recently updated account that has a portrait_hash
-     * This has will be redistributed to all the other accounts
-     */
-    foreach ($multipleAccountHoldersStatement as $multipleAccountHolder) {
-        $mostRecentPortraitStatement = $db->prepare('
-            SELECT id, username, portrait_hash, updated_at 
+HELP;
+            exit;
+        }
+
+        $db = Database::getInstance();
+
+        /* Find all the users with multiple external ids
+         */
+        $multipleAccountHoldersStatement = $db->prepare('
+            SELECT id, username, synergy_id
             FROM `user`
-            WHERE portrait_hash IS NOT NULL
-            AND synergy_id = :externalId
-            ORDER BY updated_at DESC
-            LIMIT 1
+            WHERE synergy_id IS NOT NULL
+            GROUP BY synergy_id
+            HAVING (COUNT(*) > 1)
+            ORDER BY id;
         ');
 
-        $mostRecentPortraitStatement->execute([
-            'externalId' => $multipleAccountHolder['synergy_id']
-        ]);
+        $multipleAccountHoldersStatement->execute();
 
-        $mostRecentPortrait = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC);
-
-        /* If an account exists that contains a redistribute portrait, do it
-         * Apply the hash to all records with the same externalId
-         *
-         * Otherwise we can't do anything about it - none of their accounts have a picture
+        /* Find the most recently updated account that has a portrait_hash
+         * This has will be redistributed to all the other accounts
          */
-        if ($mostRecentPortrait) {
-            $update = $db->prepare('
-                UPDATE `user`
-                SET portrait_hash = :portraitHash
-                WHERE synergy_id = :externalId
+        foreach ($multipleAccountHoldersStatement as $multipleAccountHolder) {
+            $mostRecentPortraitStatement = $db->prepare('
+                SELECT id, username, portrait_hash, updated_at 
+                FROM `user`
+                WHERE portrait_hash IS NOT NULL
+                AND synergy_id = :externalId
+                ORDER BY updated_at DESC
+                LIMIT 1
             ');
 
-            $update->execute([
-                'portraitHash' => $mostRecentPortrait['portrait_hash'],
+            $mostRecentPortraitStatement->execute([
                 'externalId' => $multipleAccountHolder['synergy_id']
             ]);
 
-            /* Log it
+            $mostRecentPortrait = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC);
+
+            /* If an account exists that contains a redistribute portrait, do it
+             * Apply the hash to all records with the same externalId
+             *
+             * Otherwise we can't do anything about it - none of their accounts have a picture
              */
-            $log->info(sprintf(
-                'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s)',
-                $mostRecentPortrait['portrait_hash'],
-                $multipleAccountHolder['synergy_id'],
-                $mostRecentPortrait['id'],
-                $multipleAccountHolder['synergy_id'],
-                $multipleAccountHolder['id']
-            ));
+            if ($mostRecentPortrait) {
+                if ($this->perform()) {
+                    $update = $db->prepare('
+                        UPDATE `user`
+                        SET portrait_hash = :portraitHash
+                        WHERE synergy_id = :externalId
+                    ');
+
+                    $update->execute([
+                        'portraitHash' => $mostRecentPortrait['portrait_hash'],
+                        'externalId' => $multipleAccountHolder['synergy_id']
+                    ]);
+                }
+
+                /* Log it
+                 */
+                $this->getLogger()->info(sprintf(
+                    'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s)',
+                    $mostRecentPortrait['portrait_hash'],
+                    $multipleAccountHolder['synergy_id'],
+                    $mostRecentPortrait['id'],
+                    $multipleAccountHolder['synergy_id'],
+                    $multipleAccountHolder['id']
+                ));
+            }
+        }
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
         }
     }
-});
+};
+
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, null, $options))->runApp();
