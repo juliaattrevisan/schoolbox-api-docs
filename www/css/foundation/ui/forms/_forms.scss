@@ -138,6 +138,7 @@ label {
 	}
 	&.error {
 		display: block;
+		font-style: italic;
 		width: 100%;
 	}
 }
