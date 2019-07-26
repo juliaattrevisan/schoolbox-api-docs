@@ -69,10 +69,20 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         $mostRecentPortraitHash = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC)['portrait_hash'];
 
-        print_r($mostRecentPortraitHash);
+        /* Apply the hash to all records with the same externalId
+         */
+        $update = $db->prepare('
+            UPDATE `user`
+            SET portrait_hash = :portraitHash
+            WHERE synergy_id = :externalId
+        ');
 
-        /* Apply the hash to those records
-         * Log it
+        $update->execute([
+            'portraitHash' => $mostRecentPortraitHash,
+            'externalId' => $multipleAccountHolder['synergy_id']
+        ]);
+
+        /* Log it
          */
     }
 
