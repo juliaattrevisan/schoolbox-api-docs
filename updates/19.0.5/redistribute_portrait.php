@@ -58,6 +58,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             SELECT id, username, portrait_hash, updated_at 
             FROM `user`
             WHERE portrait_hash IS NOT NULL
+            AND LENGTH(portrait_hash) > 0 
             AND synergy_id = :externalId
             ORDER BY updated_at DESC
             LIMIT 1
@@ -67,7 +68,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             'externalId' => $multipleAccountHolder['synergy_id']
         ]);
 
-        $mostRecentPortraitHash = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC)['portrait_hash'];
+        $mostRecentPortrait = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC);
 
         /* Apply the hash to all records with the same externalId
          */
@@ -78,13 +79,19 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
         ');
 
         $update->execute([
-            'portraitHash' => $mostRecentPortraitHash,
+            'portraitHash' => $mostRecentPortrait['portrait_hash'],
             'externalId' => $multipleAccountHolder['synergy_id']
         ]);
 
         /* Log it
          */
+        $log->info(sprintf(
+            'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s)',
+            $mostRecentPortrait['portrait_hash'],
+            $multipleAccountHolder['synergy_id'],
+            $mostRecentPortrait['id'],
+            $multipleAccountHolder['synergy_id'],
+            $multipleAccountHolder['id']
+        ));
     }
-
-    $log->warning('Test Message.');
 });
