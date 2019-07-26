@@ -155,6 +155,6 @@ $app = new class extends CliTool\App {
     }
 };
 
-$kernel = new CliTool\Kernel($app, false);
+$kernel = new CliTool\Kernel($app);
 $kernel->runapp();
 

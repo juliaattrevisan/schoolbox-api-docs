@@ -39,6 +39,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         ];
     }
 
+
     /**
      * @inheritDoc
      */
@@ -147,6 +148,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     }
 
 
-}, null, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+}, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

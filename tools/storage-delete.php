@@ -51,6 +51,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         exit(0);
     }
 
-}, null, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+}, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

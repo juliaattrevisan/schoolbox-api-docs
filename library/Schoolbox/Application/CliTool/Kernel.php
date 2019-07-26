@@ -10,6 +10,8 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Lumberjack;
 use ErrorException;
 use InvalidArgumentException;
+use function posix_geteuid;
+use function posix_getpwuid;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
 
@@ -69,7 +71,6 @@ class Kernel extends CliKernelAbstract
 
     /**
      * @param App       $app
-     * @param bool|null $runAsRoot [TRUE => Must be run as root, FALSE => must not be, NULL => either)
      * @param array     $options Keys are one of the self::OPTION_X constants
      * @throws InvalidArgumentException
      * @throws \Aura\Di\Exception
@@ -80,17 +81,19 @@ class Kernel extends CliKernelAbstract
      * @throws \Schoolbox\External\Exception
      * @throws \UnexpectedValueException
      */
-    public function __construct(App $app, ?bool $runAsRoot, array $options = [])
+    public function __construct(App $app, array $options = [])
     {
+        parent::__construct($options[self::OPTION_LEVEL] ?? null);
+
         $this->validateOptions($options);
-        $this->checkSystemUserRootStatus($runAsRoot);
         $this->app = $app;
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
         $this->parseCommandLineOptions($app);
+        $this->checkSystemUserRootStatus($app->runAsRoot());
         $this->outStream = $this->getOutputStream();
 
-        parent::__construct($options[self::OPTION_LEVEL] ?? null);
+
     }
 
 
@@ -176,10 +179,19 @@ class Kernel extends CliKernelAbstract
         $isRoot = $this->isRunAsSuperuser();
 
         if ($runAsRoot && !$isRoot) {
-            throw new \UnexpectedValueException('Kernel options indicate it SHOULD be run as root, but is NOT');
+            throw new \UnexpectedValueException(sprintf(
+                "App requires to be run as system 'root' user, current user: '%s'",
+                posix_getpwuid(posix_geteuid())['name'])
+            );
         }
         if (!$runAsRoot && $isRoot) {
-            throw new \UnexpectedValueException('Kernel options indicate it should NOT be run as root, but IS');
+            $this->logger()->warning(
+                "This App is not designed to be run as root but is being run as root. " .
+                "If this is because this App has been invoked by an update script, this is probably fine, " .
+                "as the update/deployment system has post-execution tools to correct file ownership. " .
+                "If you are invoking this tool manually, you will need to manually fix the ownership of any files " .
+                "this app has created."
+            );
         }
     }
 

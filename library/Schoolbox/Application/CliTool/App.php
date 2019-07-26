@@ -81,6 +81,32 @@ abstract class App
 
 
     /**
+     * Returns whether this app should be run as the system root user.
+     *
+     * * TRUE  => *must* be run as root
+     * * FALSE => *should not* be run as root, will log a warning if invoked as root
+     * * NULL  => not-applicable, can be run as either root or non-root,
+     *
+     * Normal tools (especially if they write files) should return FALSE.
+     *
+     * While normal tools should not be run as root, they are may be invoked by update scripts which
+     * are running as root. In this case any files, logs etc will be root owned, however the
+     * deployment architecture has a post-deployment script that iterates over data directories and
+     * attempts to restore correct ownership.
+     *
+     * @see debian/postinst (it contains a number of chown calls)
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        // To err on the side of safety, default to FALSE, as otherwise any logs and files written will be
+        // owned by root and difficult to clean up or use by other tools or the web server.
+        return false;
+    }
+
+
+    /**
      * Common app setup implementation
      *
      * @param array           $appOptions

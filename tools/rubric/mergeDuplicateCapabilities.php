@@ -19,7 +19,7 @@ $options = [
 ];
 
 try {
-    (new Schoolbox\Application\CliTool\Kernel(new Capability(), null, $options))->runApp();
+    (new Schoolbox\Application\CliTool\Kernel(new Capability(), $options))->runApp();
 } catch (Throwable $e) {
     /** @noinspection PhpUnhandledExceptionInspection */
     throw $e;
