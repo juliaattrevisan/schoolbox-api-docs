@@ -58,7 +58,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
             SELECT id, username, portrait_hash, updated_at 
             FROM `user`
             WHERE portrait_hash IS NOT NULL
-            AND LENGTH(portrait_hash) > 0 
             AND synergy_id = :externalId
             ORDER BY updated_at DESC
             LIMIT 1
@@ -70,28 +69,33 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
         $mostRecentPortrait = $mostRecentPortraitStatement->fetch(\PDO::FETCH_ASSOC);
 
-        /* Apply the hash to all records with the same externalId
+        /* If an account exists that contains a redistribute portrait, do it
+         * Apply the hash to all records with the same externalId
+         *
+         * Otherwise we can't do anything about it - none of their accounts have a picture
          */
-        $update = $db->prepare('
-            UPDATE `user`
-            SET portrait_hash = :portraitHash
-            WHERE synergy_id = :externalId
-        ');
+        if ($mostRecentPortrait) {
+            $update = $db->prepare('
+                UPDATE `user`
+                SET portrait_hash = :portraitHash
+                WHERE synergy_id = :externalId
+            ');
 
-        $update->execute([
-            'portraitHash' => $mostRecentPortrait['portrait_hash'],
-            'externalId' => $multipleAccountHolder['synergy_id']
-        ]);
+            $update->execute([
+                'portraitHash' => $mostRecentPortrait['portrait_hash'],
+                'externalId' => $multipleAccountHolder['synergy_id']
+            ]);
 
-        /* Log it
-         */
-        $log->info(sprintf(
-            'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s)',
-            $mostRecentPortrait['portrait_hash'],
-            $multipleAccountHolder['synergy_id'],
-            $mostRecentPortrait['id'],
-            $multipleAccountHolder['synergy_id'],
-            $multipleAccountHolder['id']
-        ));
+            /* Log it
+             */
+            $log->info(sprintf(
+                'Assigning portrait hash %s from (externalId %s, user %s) to (externalId %s, user %s)',
+                $mostRecentPortrait['portrait_hash'],
+                $multipleAccountHolder['synergy_id'],
+                $mostRecentPortrait['id'],
+                $multipleAccountHolder['synergy_id'],
+                $multipleAccountHolder['id']
+            ));
+        }
     }
 });
