@@ -10,7 +10,6 @@ helpmsg() {
 
 stopservices() {
     echo "Stopping Services";
-    service apache2 stop >/dev/null 2>&1;
     service nginx stop >/dev/null 2>&1;
     service schoolbox-socketd stop >/dev/null 2>&1;
     service schoolbox-routed stop >/dev/null 2>&1;
@@ -22,7 +21,6 @@ stopservices() {
 restartservices() {
     echo "Restarting Services";
     mysql schoolbox < /vagrant/vagrantcache/vagrant.sql;
-    service apache2 restart >/dev/null 2>&1;
     service nginx restart >/dev/null 2>&1;
     service schoolbox-socketd restart >/dev/null 2>&1;
     service schoolbox-routed restart >/dev/null 2>&1;
