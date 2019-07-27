@@ -24,10 +24,9 @@ Most of the front-end code in Schoolbox is written with the technologies above.
 | [Axios](https://github.com/axios/axios)                         |           XHR requests            |
 | [Webpack](https://webpack.js.org/)                              |             Bundling              |
 | [NPM](https://www.npmjs.com/)                                   | Package management & task running |
-| [React Styleguidist](https://react-styleguidist.js.org/)        |      Automated documentation      |
 
-As of early 2019 we have moved from writing our JS in jQuery to React & TypeScript. We have also started to move off Bower for package management onto NPM, and switched to Webpack for bundling.
+As of early 2019 we have moved from writing our JS in jQuery to Vue. We have also started to move off Bower for package management onto NPM, and switched to Webpack for bundling.
 
-Twig will still be used to load individual pages. All it will really do is just create a container element for React and pass through any required data from the PHP page load to React. At this point there is no plan to convert Schoolbox to a single page app (or a collection of module based single page apps).
+Twig will still be used to load individual pages. All it will really do is just create a container element for Vue and pass through any required data from the PHP page load to React. At this point there is no plan to convert Schoolbox to a single page app (or a collection of module based single page apps).
 
 For now, Foundation & Sass is still being used for UI components and styling. A decision is yet to be made about whether or what React UI library we might use.
