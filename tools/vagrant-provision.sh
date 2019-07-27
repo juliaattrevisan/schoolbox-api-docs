@@ -302,13 +302,6 @@ cp -f $cachedir/vagrant.sql /tmp/vagrant.sql;
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox < /tmp/vagrant.sql
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Removing existing apache vhosts";
-rm -f /etc/apache2/sites-enabled/*;
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox apache vhost";
-cp /vagrant/tools/apache-vhost-schoolbox-webdav-only.conf /etc/apache2/sites-available/;
-a2ensite apache-vhost-schoolbox-webdav-only
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
 sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/7.1/fpm/pool.d/schoolbox*.conf;
@@ -571,13 +564,6 @@ echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-epl installed: $eplver";
 ffmpegver=`dpkg -l schoolbox-ffmpeg | tail -n1 | awk {'print $3'}`;
 echo "[SB][`date +%Y-%m-%d\ %X`] schoolbox-ffmpeg installed: $ffmpegver";
 
-if [ "`apache2 -v | grep Apache | cut -d'/' -f2 | cut -d'.' -f1-2`" == "2.4" ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Apache is v2.4.x, changing access config to match";
-    sed -i 's/Order\ allow,deny//g' /etc/apache2/sites-available/*.conf;
-    sed -i 's/Allow\ from\ all/Require\ all\ granted/g' /etc/apache2/sites-available/*.conf;
-fi
-
 if [ "$enable_xdebug" == "true" ];
 then
     echo "[SB][`date +%Y-%m-%d\ %X`] Enabling xdebug";
@@ -588,11 +574,6 @@ then
     else
         echo "[SB][`date +%Y-%m-%d\ %X`] Using default xdebug: tools/xdebug.default.ini";
         cp -f /vagrant/tools/xdebug.default.ini /etc/php/7.1/mods-available/xdebug.ini;
-    fi
-    if [ -d /etc/php/7.1/apache2/conf.d ];
-    then
-        ln -s /etc/php/7.1/mods-available/xdebug.ini /etc/php/7.1/apache2/conf.d/20-xdebug.ini >/dev/null 2>&1;
-        ln -s /etc/php/7.1/mods-available/tideways.ini /etc/php/7.1/apache2/conf.d/20-tideways.ini >/dev/null 2>&1;
     fi
     if [ -d /etc/php/7.1/fpm/conf.d ];
     then
@@ -630,8 +611,6 @@ then
 
 else
     echo "[SB][`date +%Y-%m-%d\ %X`] Disabling xdebug";
-    rm -f /etc/php/7.1/apache2/conf.d/20-xdebug.ini;
-    rm -f /etc/php/7.1/apache2/conf.d/20-tideways.ini;
     rm -f /etc/php/7.1/cli/conf.d/20-xdebug.ini;
     rm -f /etc/php/7.1/cli/conf.d/20-tideways.ini;
     rm -f /etc/php/7.1/fpm/conf.d/20-xdebug.ini;
@@ -640,7 +619,6 @@ fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
 service schoolbox-epl restart > /dev/null 2>&1;
-service apache2 restart > /dev/null 2>&1;
 service php7.1-fpm restart > /dev/null 2>&1;
 service nginx restart > /dev/null 2>&1;
 service styleguide restart > /dev/null 2>&1;
