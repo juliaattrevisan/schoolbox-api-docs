@@ -11,5 +11,5 @@
  */
 declare(strict_types=1);
 
-passthru(__DIR__ .  '/../../tools/portrait/redistribute_portrait.php -vvv', $returnVar);
+passthru(__DIR__ .  '/../../tools/portrait/redistribute_portrait.php -vvv --perform', $returnVar);
 exit($returnVar);
