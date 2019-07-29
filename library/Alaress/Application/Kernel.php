@@ -553,6 +553,15 @@ abstract class Kernel
         );
 
         $di->set(
+            'userSearch',
+            $di->lazy(
+                function () use ($di) {
+                    return new User\Search\Query($di->get('databaseInternal'));
+                }
+            )
+        );
+
+        $di->set(
             'commsNewsUserResolver',
             $di->lazy(
                 function() use ($di) {

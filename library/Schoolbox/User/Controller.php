@@ -131,4 +131,31 @@ class Controller extends Base
         // Return a json encoded array :)
         $this->getResponse()->content->set($this->buildJsonOutput($parentEmails));
     }
+
+    /**
+     * Returns a JSON array of users based on keyword
+     *
+     * @api /user/search
+     */
+    public function search()
+    {
+        $result = [
+            'records'       => [],
+            'totalCount'    => 0
+        ];
+
+        $keyword = $this->request->query['keyword'];
+
+        /**
+         * @var User\Search\Query $userSearchService
+         */
+        $userSearchService = $this->di->get('userSearch');
+
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                $userSearchService->buildQuery($keyword)->getResults()
+            )
+        );
+    }
 }

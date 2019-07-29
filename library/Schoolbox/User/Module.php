@@ -40,7 +40,14 @@ class Module extends BaseModule
             return $params['folderId'];
         }, Access::getInstance());
 
+        $loggedIn = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn()
+            );
+        });
+
         $this->register('GET', '/parentEmails/folder/{folderId}', 'getParentEmailsByFolder', $folderPermFull);
+        $this->register('GET', '/search', 'search', $loggedIn);
     }
 
     /**
