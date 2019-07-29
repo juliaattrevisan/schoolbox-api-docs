@@ -8,10 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Folder;
 
 use Alaress\Specification\Leaf;
-use function array_combine;
-use function array_fill;
-use function array_key_exists;
-use function array_keys;
 use function array_unique;
 use function count;
 use function strpos;
@@ -66,16 +62,13 @@ class ValidCodesSpec extends Leaf
             return false;
         }
 
-        // Generate a indexed map for O(1) lookup
-        $indexedCodes = array_combine($codes, array_fill(0, count($codes), null));
-
         // 2. Check candidate's prefixed and raw codes don't conflict
-        [$rawCodes, $prefixedCodes] = $this->filterRawAndPrefixedCodes($indexedCodes);
+        [$rawCodes, $prefixedCodes] = $this->filterRawAndPrefixedCodes($codes);
 
         // Will include raw codes, and campus-prefixed codes with the campus prefix removed.
-        foreach (array_keys($prefixedCodes) as $prefixedCode) {
+        foreach ($prefixedCodes as $prefixedCode) {
             $stripped = $this->unPrefixCode($prefixedCode);
-            if (array_key_exists($stripped, $rawCodes)) {
+            if (in_array($stripped, $rawCodes, true)) {
                 return false;
             }
         }
@@ -89,8 +82,8 @@ class ValidCodesSpec extends Leaf
      * Returns the count of other codes that are would collide with the specified codes
      *
      * @param int|null $folderId
-     * @param null[]   $rawCodes
-     * @param null[]   $prefixedCodes
+     * @param string[] $rawCodes
+     * @param string[] $prefixedCodes
      * @return int
      * @throws Database\Predicate\InvalidColumnException
      */
@@ -104,11 +97,11 @@ class ValidCodesSpec extends Leaf
         }
         $innerPb = $this->folderCodeMapper->getPredicateBuilder();
 
-        foreach (array_keys($rawCodes) as $code) {
+        foreach ($rawCodes as $code) {
             $innerPb->equals('code', $code);
             $innerPb->like('code', "%/" . $this->folderCodeMapper->getDatabase()->escapeForLike($code));
         }
-        foreach (array_keys($prefixedCodes) as $prefixedCode) {
+        foreach ($prefixedCodes as $prefixedCode) {
             $innerPb->equals('code', $prefixedCode);
             $innerPb->equals('code', $this->unPrefixCode($prefixedCode));
         }
@@ -121,18 +114,18 @@ class ValidCodesSpec extends Leaf
     /**
      * Filters the specified codes into non-prefixed and prefixed sets
      *
-     * @param null[] $codes
-     * @return null[][]
+     * @param string[] $codes
+     * @return string[][]
      */
     private function filterRawAndPrefixedCodes(array $codes): array
     {
         $rawCodes = $prefixedCodes = [];
-        foreach (array_keys($codes) as $code) {
+        foreach ($codes as $code) {
             $idx = strpos($code, '/');
             if ($idx === false) {
-                $rawCodes[$code] = null;
+                $rawCodes[] = $code;
             } else {
-                $prefixedCodes[$code] = null;
+                $prefixedCodes[] = $code;
             }
         }
         return [$rawCodes, $prefixedCodes];
