@@ -452,7 +452,7 @@ class User extends AbstractImporter
                 } else {
                     $this->updateUser($userResult);
                 }
-                if (!$this->hasExternalDb()) {
+                if (!self::hasExternalDb() && $userResult->getUser()->getId()) {
                     $this->updateUserProfile($userResult);
                 }
             }
