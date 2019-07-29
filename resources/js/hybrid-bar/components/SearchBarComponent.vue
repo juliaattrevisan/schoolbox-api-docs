@@ -5,38 +5,38 @@
                name="keyword"
                placeholder="Search"
                autocomplete="off"
-               v-model="keyword"
-               @focusin="isFocused = true"
-               @blur="isFocused = false"
+               v-model.trim="keyword"
+               @focusin="isFocused=true"
+               @blur="isFocused=false"
                @input="onChange"
         />
         <ul class="results" v-show="isFocused && isOpen">
-            <li class="result-meta" v-if="viewAllUsers">
-                <result-meta>Showing 5 of 25 matching users</result-meta>
+            <li class="result-meta" v-if="results.length && viewAllUsers">
+                <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
                 <div class="list-item small-12">
-                    <a href="/search/user/6">
-                        <img src="/portrait.php?userId=506&amp;size=square64">
-                        <p class="name">{{ result }}</p>
-                        <p class="meta">Parent / Teacher / Year XX Student</p>
+                    <a v-bind:href="'/search/user/' + result.id">
+                        <img v-bind:src="result.portrait + 'square64'">
+                        <p class="name">{{ result.full_name }}</p>
+                        <p class="meta">{{ formatMeta(result) }}</p>
                     </a>
                 </div>
             </li>
             <li class="result-meta" v-if="isLoading">
                 <result-meta><div class="loader"></div></result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="viewAllUsers">
+            <li class="result-meta with-bg" v-if="results.length && totalCount > results.length">
                 <result-meta>
-                    <a href="/search/user/6">View all 25 users here</a>
+                    <a href="#">View all {{ totalCount }} users</a>
                 </result-meta>
             </li>
-            <li class="result-meta" v-if="viewAllUsers">
+            <li class="result-meta" v-if="!results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="viewAllUsers">
+            <li class="result-meta with-bg" v-if="!results.length">
                 <result-meta>
-                    <a href="/search/user/6">Search everything for "{{ keyword }}"</a>
+                    <a href="#">Search everything for "{{ keyword }}"</a>
                 </result-meta>
             </li>
         </ul>
@@ -49,11 +49,7 @@
     export default {
         components: {ResultMeta},
         props: {
-            items: {
-                type: Array,
-                required: false,
-                default: () => [],
-            }
+
         },
         data: function () {
             return {
@@ -63,18 +59,39 @@
                 isOpen: false,
                 isLoading: true,
                 noResults: true,
-                viewAllUsers: true
+                viewAllUsers: true,
+                totalCount: 0
             }
         },
         methods: {
             onChange: function(event) {
-                this.isOpen = true;
-                this.isFocused = true;
-                this.filterResults();
+                var self = this;
+                if (self.keyword.length >= 3) {
+                    this.isOpen = true;
+                    this.isFocused = true;
+                    this.isLoading = true;
+                    this.filterResults();
+                }
             },
 
             filterResults: function() {
-                this.results = this.items.filter(item => item.toLowerCase().indexOf(this.keyword.toLowerCase()) > -1);
+                var self = this;
+                axios.get('/user/search?keyword=' + self.keyword).then(function (response) {
+                    self.totalCount = response.data.totalCount;
+                    self.results = response.data.results;
+                }).finally(function () {
+                    self.isLoading = false;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
+
+            formatMeta: function(result) {
+                if (result.year) {
+                    return 'Year ' + result.year + ' ' + result.group_name;
+                }
+
+                return result.group_name;
             }
         }
     }

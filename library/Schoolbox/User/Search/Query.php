@@ -44,14 +44,13 @@ class Query
 
     /**
      * @param string $keyword
-     * @param int    $offset
      * @param int    $limit
      * @param string $sortBy
      * @param string $sortMethod
      *
      * @return Query
      */
-    public function buildQuery(string $keyword, int $offset = 0, int $limit = 20, string $sortBy = 'lastname', string $sortMethod = 'ASC'): self
+    public function buildQuery(string $keyword, int $limit = 5, string $sortBy = 'lastname', string $sortMethod = 'ASC'): self
     {
         $this->keyword = $keyword;
 
@@ -73,7 +72,7 @@ class Query
             user.synergy_id AS external_id, 
             groups.name AS group_name, 
             luCampus.name AS campus_name ' . $joinStatement . $whereStatement .
-            ' ORDER BY ' . $sortBy . ' ' . $sortMethod . ' LIMIT ' . $offset . ', ' . $limit;
+            ' ORDER BY ' . $sortBy . ' ' . $sortMethod . ' LIMIT 0 , ' . $limit;
 
 
         $this->countQuery = 'SELECT COUNT(*) AS totalCount ' . $joinStatement . $whereStatement;

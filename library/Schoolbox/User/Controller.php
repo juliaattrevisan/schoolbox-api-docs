@@ -31,6 +31,9 @@ class Controller extends Base
     private $assumeUserLogMapper;
 
 
+    private const AUTOSUGGEST_LIMIT = 3;
+
+
     /**
      * @param UserAccessMapper $userAccessMapper
      * @param External_User   $externalHandler
@@ -139,11 +142,6 @@ class Controller extends Base
      */
     public function search()
     {
-        $result = [
-            'records'       => [],
-            'totalCount'    => 0
-        ];
-
         $keyword = $this->request->query['keyword'];
 
         /**
@@ -154,7 +152,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
-                $userSearchService->buildQuery($keyword)->getResults()
+                $userSearchService->buildQuery($keyword, self::AUTOSUGGEST_LIMIT)->getResults()
             )
         );
     }
