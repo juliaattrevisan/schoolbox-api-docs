@@ -22,6 +22,7 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\SortUsersByName;
 use Schoolbox\User;
+use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 
 /**
  * Class Markbook
@@ -278,14 +279,19 @@ class Markbook
             }
         }
 
+        $fivePoints = (new Summary($normMarks))->getSummary();
+
         $statistics = [
             'mean'              => null,
             'sd'                => null,
             'min'               => $markScheme->getHumanReadableMark($minSummator->summateList($normMarks)),
-            'minNormalized'     => $minSummator->summateList($normMarks),
+            'minNormalized'     => $fivePoints['min'],
             'max'               => $markScheme->getHumanReadableMark($maxSummator->summateList($normMarks)),
-            'maxNormalized'     => $maxSummator->summateList($normMarks),
+            'maxNormalized'     => $fivePoints['max'],
             'count'             => $countSummator->summateList($normMarks),
+            'quartile1'         => $fivePoints['quartile1'],
+            'quartile2'         => $fivePoints['quartile2'],
+            'quartile3'         => $fivePoints['quartile3']
         ];
         if ($assessment->getContext() instanceof Project) {
             $statistics['weightInProject'] = $assessment->getWeight();
@@ -297,7 +303,6 @@ class Markbook
         // mean and SD are only meaningful for quantitative marks
         if ($assessment->getMarkScheme()->isQuantitative()) {
             $statistics['mean']             = $markScheme->getHumanReadableMark($meanSummator->summateList($normMarks));
-            $statistics['meanNormalized']   = $meanSummator->summateList($normMarks);
             $statistics['sd']               = $markScheme->getHumanReadableMark($stdevSummator->summateList($normMarks));
             $statistics['sdNormalized']     = $stdevSummator->summateList($normMarks);
         }
