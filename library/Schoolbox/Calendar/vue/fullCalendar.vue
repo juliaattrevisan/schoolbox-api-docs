@@ -9,10 +9,12 @@
     import RevealModal              from '@schoolbox/reveal-modal'
     import MetaList                 from '@schoolbox/meta/list'
     import MetaItem                 from '@schoolbox/meta/item'
+    import EventModal               from './eventModal';
     import axios                    from 'axios'
 
     export default {
         components: {
+            EventModal,
             MetaItem,
             MetaList,
             FullCalendar,
@@ -30,53 +32,6 @@
             config: () => window.fullCalendarConfig,
             isNewEventSubmittable: function () {
                 return this.newEvent.title && this.newEvent.title.length !== 0;
-            },
-            currentEventExtendedProps: function () {
-                // Also need to render the event's buttons
-                let event      = this?.currentEvent,
-                    data       = event?.extendedProps?.data,
-                    metadata   = data?.meta,
-                    modifyLink = null,
-                    deleteLink = null;
-
-                // Modify/delete links
-                if (event?.editable) {
-                    if (data?.custom?.modifyLink) {
-                        modifyLink = data?.custom?.modifyLink;
-                    } else if (metadata?.eventId) {
-                        modifyLink = '/calendar/modify.php?eventID=' + metadata?.eventId + '&returnTo=calendar';
-                        deleteLink = '/calendar/modifyForm.php?action=Delete&id=' + metadata?.eventId + '&returnTo=calendar';
-                    }
-                }
-
-                return {
-                    eventId: metadata?.eventId,
-                    detail: metadata?.detail,
-                    location: metadata?.location,
-                    author: {
-                        id:   Math.max(0, metadata?.authorId || 0),
-                        name: metadata?.author,
-                    },
-                    reviewer: {
-                        id:   Math.max(0, metadata?.reviewerId || 0),
-                        name: metadata?.reviewer,
-                    },
-                    folder: {
-                        id: Math.max(0, data?.links?.category.id || 0),
-                    },
-                    dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
-                    booking: {
-                        status: data?.booking?.status,
-                        related: data?.booking?.related,
-                        actions: data?.booking?.buttons,
-                    },
-                    attendance: data?.attendance,
-                    links: {
-                        view: data?.custom?.moreDetailsLink,
-                        modify: modifyLink,
-                        delete: deleteLink,
-                    },
-                };
             },
         },
         methods: {
@@ -199,39 +154,6 @@
                 window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
                     + window.$(this.$refs.createEventForm).serialize();
             },
-            determineDateSpan: function (startDate, endDate, allDay) {
-                if (!startDate) {
-                    return '';
-                }
-                let format      = allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma',
-                    momentStart = this.toMoment(startDate),
-                    start       = momentStart.format(format),
-                    momentEnd   = null,
-                    end         = null;
-
-                if (endDate != null) {
-                    momentEnd = this.toMoment(endDate);
-                    if (allDay) {
-                        end = momentEnd.subtract(1, 'd').format(format);
-                    } else {
-                        end = momentEnd.format(format);
-                    }
-                }
-
-                if (momentEnd && !momentStart.isSame(momentEnd)) {
-                    // Start and end aren't the same - stitch them together.
-                    if (!allDay && momentStart.isSame(momentEnd, 'day')) {
-                        // Between two times on the same day - show the timespan but only one date
-                        return start + " – " + momentEnd.format('h:mma');
-                    } else {
-                        // Between two different days - show the whole timespan
-                        return start + " – " + end;
-                    }
-                } else {
-                    // Start and end are the same - just show the start
-                    return start;
-                }
-            },
             toggleAttendance: function () {
                 // TODO get this to work
                 // var button = $(this);
@@ -349,88 +271,7 @@
             </div>
         </reveal-modal>
 
-        <!-- TODO consider moving this to its own component? -->
-        <reveal-modal ref="event">
-            <div class="row">
-                <div class="small-12">
-                    <h2 class="note">{{ currentEvent.title }}</h2>
-                    <meta-list>
-                        <meta-item class="icon-resource-booking" v-if="currentEventExtendedProps.booking.status">
-                            {{ currentEventExtendedProps.booking.status.name }}
-                        </meta-item>
-                        <meta-item class="icon-calendar" v-if="currentEventExtendedProps.dateSpan">
-                            {{ currentEventExtendedProps.dateSpan }}
-                        </meta-item>
-                        <meta-item class="icon-location" v-if="currentEventExtendedProps.location">
-                            {{ currentEventExtendedProps.location }}
-                        </meta-item>
-                        <meta-item class="icon-staff-students" v-if="currentEventExtendedProps.author.id">
-                            Posted by
-                            <a :href="'/search/user/' + String(currentEventExtendedProps.author.id)">
-                                {{ currentEventExtendedProps.author.name }}
-                            </a>
-                        </meta-item>
-                        <meta-item class="icon-staff-students" v-if="currentEventExtendedProps.reviewer.id">
-                            Reviewed by
-                            <a :href="'/search/user/' + String(currentEventExtendedProps.reviewer.id)">
-                                {{ currentEventExtendedProps.reviewer.name }}
-                            </a>
-                        </meta-item>
-                    </meta-list>
-                    <article style="white-space: pre-line">
-                        <span v-html="currentEventExtendedProps.detail"></span>
-                    </article>
-
-                    <div v-if="currentEventExtendedProps.booking.related">
-                        <h3>Related Bookings</h3>
-                        <ul>
-                            <li v-for="relatedBooking in currentEventExtendedProps.booking.related">
-                                ({{ relatedBooking.status.name }})
-                                <a :href="relatedBooking.status.href">{{ relatedBooking.title }}</a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div v-if="currentEventExtendedProps.attendance">
-                        <dl>
-                            <dd><p :class="currentEventExtendedProps.attendance.icon"></p></dd>
-                            <dd class="rm"><p>{{ currentEventExtendedProps.attendance.status }}</p></dd>
-                        </dl>
-                    </div>
-
-                    <span v-if="currentEventExtendedProps.folder.id">
-                        <a class="button icon-home"
-                           :href="'/homepage/' + String(currentEventExtendedProps.folder.id)">Go to homepage</a>
-                    </span>
-                    <span v-if="currentEventExtendedProps.links.view">
-                        <a class="button icon-due-work"
-                           :href="currentEventExtendedProps.links.view">View More Details</a>
-                    </span>
-                    <span v-if="currentEventExtendedProps.attendance && currentEventExtendedProps.attendance.listButton">
-                        <a class="button icon-group"
-                           :href="'/calendar/attendance/list/' + String(currentEventExtendedProps.eventId)">Attendees</a>
-                    </span>
-                    <span v-if="currentEventExtendedProps.attendance && currentEventExtendedProps.attendance.requestButton">
-                        <a class="button icon-reply"
-                           @click.prevent="toggleAttendance"
-                           href="#">{{ currentEventExtendedProps.attendance.requestButton }}</a>
-                    </span>
-                    <span v-if="currentEventExtendedProps.modifyLink">
-                        <a class="button icon-modify"
-                           :href="currentEventExtendedProps.modifyLink">Modify</a>
-                    </span>
-                    <span v-if="currentEventExtendedProps.deleteLink">
-                        <a class="button icon-delete"
-                           :href="currentEventExtendedProps.deleteLink">Delete</a>
-                    </span>
-
-                    <div v-for="action in currentEventExtendedProps.booking.actions">
-                        <a :href="action.href" class="button">{{ action.label }}</a>
-                    </div>
-
-                </div>
-            </div>
-        </reveal-modal>
+        <event-modal ref="event" :event="currentEvent" :to-moment="toMoment" />
 
         <full-calendar
             ref="fullCalendar"
