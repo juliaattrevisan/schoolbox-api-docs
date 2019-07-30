@@ -66,6 +66,17 @@ use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\CliTool;
 use Throwable;
+use function count;
+use function get_class;
+use function max;
+use function method_exists;
+use function min;
+use function preg_replace;
+use function sprintf;
+use function str_pad;
+use function str_repeat;
+use function strlen;
+use function strpos;
 
 class RecursiveUndeleter extends CliTool\App
 {
