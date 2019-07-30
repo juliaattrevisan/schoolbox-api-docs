@@ -15,18 +15,6 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-/* Setup
- * Assign synergy_id 483 to multiple bros
- * Make someone without a hash the most recently updated bro
-UPDATE `schoolbox`.`user` SET `synergy_id`='483', `updated_at`='2019-07-26 12:00:16' WHERE `id`='15';
-UPDATE `schoolbox`.`user` SET `synergy_id`='483' WHERE `id`='16';
-UPDATE `schoolbox`.`user` SET `synergy_id`='483' WHERE `id`='13';
-UPDATE `schoolbox`.`user` SET `updated_at`='1970-01-01 11:00:00' WHERE `id`='16';
-UPDATE `schoolbox`.`user` SET `synergy_id`='483', `updated_at`='1980-01-01 09:00:00' WHERE `id`='17';
-
-Turn off Load Photos From SIS
-Give asaxon and treese some pics, in that order
- */
 $app = new class extends CliTool\App
 {
     // --help: print help
@@ -49,9 +37,13 @@ $app = new class extends CliTool\App
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
-Redistribute portraits to multiple accounts
+
+Redistribute portraits from one user account to all others that have the 
+same external id (synergy_id) value. It takes the most recently updated 
+account with a portrait hash and gives it to all the others.
 
 Usage: redistribute_portrait.php
+
 
 HELP;
             exit;
