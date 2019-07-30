@@ -95,6 +95,7 @@ class Javascript extends Base
              */
             'data'       => array(
                 'meta'       => array(
+                    'editable'    => $this->getEvent()->isEditable(),
                     'eventId'     => $this->getEvent()->getEventId(),
                     'time'        => $this->getEvent()->getTime(),
                     'detail'      => \Scrub::html($this->getEvent()->getDetail()),

@@ -21,8 +21,7 @@
                     deleteLink = null;
 
                 // Modify/delete links
-                // (This doesn't get set?)
-                if (event?.editable) {
+                if (metadata?.editable) {
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
@@ -33,6 +32,7 @@
 
                 return {
                     eventId: metadata?.eventId,
+                    editable: metadata?.editable,
                     detail: metadata?.detail,
                     location: metadata?.location,
                     author: {
@@ -108,7 +108,7 @@
 
 <template>
     <reveal-modal ref="modal">
-        <template v-if="eventExtendedProps.task.isTask">
+        <template v-if="eventExtendedProps.editable && eventExtendedProps.task.isTask">
             <form ref="updateForm" method="post" action="/calendar/ajax/update">
                 <input type="hidden" name="eventId" :value="eventExtendedProps.eventId"/>
 
@@ -188,30 +188,30 @@
                     </div>
 
                     <span v-if="eventExtendedProps.folder.id">
-                    <a class="button icon-home"
-                       :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
-                </span>
+                        <a class="button icon-home"
+                           :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
+                    </span>
                     <span v-if="eventExtendedProps.links.view">
-                    <a class="button icon-due-work"
-                       :href="eventExtendedProps.links.view">View More Details</a>
-                </span>
+                        <a class="button icon-due-work"
+                           :href="eventExtendedProps.links.view">View More Details</a>
+                    </span>
                     <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.listButton">
-                    <a class="button icon-group"
-                       :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
-                </span>
+                        <a class="button icon-group"
+                           :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
+                    </span>
                     <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.requestButton">
-                    <a class="button icon-reply"
-                       @click.prevent="toggleAttendance"
-                       href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
-                </span>
+                        <a class="button icon-reply"
+                           @click.prevent="toggleAttendance"
+                           href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
+                    </span>
                     <span v-if="eventExtendedProps.modifyLink">
-                    <a class="button icon-modify"
-                       :href="eventExtendedProps.modifyLink">Modify</a>
-                </span>
+                        <a class="button icon-modify"
+                           :href="eventExtendedProps.modifyLink">Modify</a>
+                    </span>
                     <span v-if="eventExtendedProps.deleteLink">
-                    <a class="button icon-delete"
-                       :href="eventExtendedProps.deleteLink">Delete</a>
-                </span>
+                        <a class="button icon-delete"
+                           :href="eventExtendedProps.deleteLink">Delete</a>
+                    </span>
 
                     <div v-for="action in eventExtendedProps.booking.actions">
                         <a :href="action.href" class="button">{{ action.label }}</a>
