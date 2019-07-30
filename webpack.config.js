@@ -3,7 +3,8 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
-    hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js')
+    hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
+    clickoutside: path.resolve(__dirname, 'resources/js/click-outside/index.js')
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),

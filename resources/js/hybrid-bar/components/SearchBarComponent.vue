@@ -6,17 +6,20 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @focusin="isFocused=true"
-               @blur="isFocused=false"
+               @click="isFocused=true"
                @input="onChange"
+               @keydown.down="onArrowDown"
+               @keydown.up="onArrowUp"
+               @keydown.enter.prevent="onEnter"
+               v-click-outside="lostFocus"
         />
         <ul class="results" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount">
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
-                <div class="list-item small-12">
-                    <a v-bind:href="'/search/user/' + result.id">
+                <div class="list-item small-12" v-bind:class="{ 'is-active': i === arrowCounter }">
+                    <a @click="goToProfilePage(result.id)">
                         <img v-bind:src="formatPortrait(result.id)">
                         <p class="name">{{ result.formattedName }}</p>
                         <p class="meta">{{ formatMeta(result) }}</p>
@@ -46,11 +49,10 @@
 
 <script>
     import ResultMeta from "./slots/result-meta";
+
     export default {
         components: {ResultMeta},
-        props: {
 
-        },
         data: function () {
             return {
                 isFocused: false,
@@ -59,10 +61,16 @@
                 isOpen: false,
                 isLoading: true,
                 noResults: true,
-                totalCount: 0
+                totalCount: 0,
+                arrowCounter: -1,
             }
         },
+
         methods: {
+            lostFocus: function(event) {
+                this.isFocused = false;
+            },
+
             onChange: function(event) {
                 var self = this;
                 if (self.keyword.length >= 3) {
@@ -72,6 +80,30 @@
                     this.filterResults();
                     this.results = [];
                 }
+            },
+
+            onClose: function() {
+                this.isFocused = false;
+            },
+
+            onArrowDown: function() {
+                if (this.arrowCounter < this.results.length) {
+                    this.arrowCounter = this.arrowCounter + 1;
+                }
+            },
+
+            onArrowUp: function() {
+                if (this.arrowCounter > 0) {
+                    this.arrowCounter = this.arrowCounter - 1;
+                }
+            },
+
+            onEnter: function(id) {
+                this.goToProfilePage(this.results[this.arrowCounter].id);
+            },
+
+            goToProfilePage: function(id) {
+                window.location.href = '/search/user/' + id;
             },
 
             filterResults: function() {
@@ -154,13 +186,21 @@
         cursor: pointer;
     }
 
-    .result a:hover {
-        color: #FFF;
+    .name {
+        color: #0066b0;
     }
 
-    .result:hover {
+    .is-active .name,
+    .result:hover,
+    .name:hover,
+    a:hover {
+        color: #FFF !important;
+    }
+
+    .result:hover,
+    .result .is-active {
         background-color: #0066b0;
-        color: #FFF;
+        color: #FFF !important;
     }
 
     .results {
