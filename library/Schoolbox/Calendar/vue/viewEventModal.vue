@@ -4,7 +4,7 @@
     import MetaItem    from '@schoolbox/meta/item'
 
     export default {
-        name: "event-modal",
+        name: "view-event-modal",
         props: ['event', 'toMoment',],
         components: {
             MetaItem,

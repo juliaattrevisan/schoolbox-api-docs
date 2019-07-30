@@ -10,14 +10,14 @@
     import RevealModal              from '@schoolbox/reveal-modal'
     import MetaList                 from '@schoolbox/meta/list'
     import MetaItem                 from '@schoolbox/meta/item'
-    import EventModal               from './eventModal';
+    import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
     import axios                    from 'axios'
 
     export default {
         components: {
             CreateEventModal,
-            EventModal,
+            ViewEventModal,
             MetaItem,
             MetaList,
             FullCalendar,
@@ -262,9 +262,9 @@
                             :to-moment="toMoment"
                             @eventCreated="addEvent" />
 
-        <event-modal ref="event"
-                     :event="currentEvent"
-                     :to-moment="toMoment" />
+        <view-event-modal ref="event"
+                          :event="currentEvent"
+                          :to-moment="toMoment" />
 
         <full-calendar
             ref="fullCalendar"
