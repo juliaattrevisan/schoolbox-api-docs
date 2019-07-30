@@ -11,14 +11,14 @@
                @input="onChange"
         />
         <ul class="results" v-show="isFocused && isOpen">
-            <li class="result-meta" v-if="results.length && viewAllUsers">
+            <li class="result-meta" v-if="results.length && results.length !== totalCount">
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
                 <div class="list-item small-12">
                     <a v-bind:href="'/search/user/' + result.id">
-                        <img v-bind:src="result.portrait + 'square64'">
-                        <p class="name">{{ result.full_name }}</p>
+                        <img v-bind:src="formatPortrait(result.id)">
+                        <p class="name">{{ result.formattedName }}</p>
                         <p class="meta">{{ formatMeta(result) }}</p>
                     </a>
                 </div>
@@ -28,7 +28,7 @@
             </li>
             <li class="result-meta with-bg" v-if="results.length && totalCount > results.length">
                 <result-meta>
-                    <a href="#">View all {{ totalCount }} users</a>
+                    <a v-bind:href="'/search?keyword=' + keyword + '#user'">View all {{ totalCount }} users</a>
                 </result-meta>
             </li>
             <li class="result-meta" v-if="!results.length">
@@ -59,7 +59,6 @@
                 isOpen: false,
                 isLoading: true,
                 noResults: true,
-                viewAllUsers: true,
                 totalCount: 0
             }
         },
@@ -71,6 +70,7 @@
                     this.isFocused = true;
                     this.isLoading = true;
                     this.filterResults();
+                    this.results = [];
                 }
             },
 
@@ -88,10 +88,14 @@
 
             formatMeta: function(result) {
                 if (result.year) {
-                    return 'Year ' + result.year + ' ' + result.group_name;
+                    return 'Year ' + result.year + ' ' + result.metadata;
                 }
 
-                return result.group_name;
+                return result.metadata;
+            },
+
+            formatPortrait: function(id) {
+                return '/portrait.php?id=' + id + '&size=square64';
             }
         }
     }
