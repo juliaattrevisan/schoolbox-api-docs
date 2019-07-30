@@ -593,8 +593,8 @@ EXAMPLES:
         try {
             $this->explicitDeletionDate = new Alaress_Date_Format(strtotime($dateString), Alaress_Date_Format::TIMESTAMP);
         } catch (\Exception $e) {
-            echo self::COLOUR_RED."Could not generate a date from string: {$dateString}\n";
-            echo "{$e->getMessage()}\n".self::COLOUR_WHITE;
+            $this->logger->error("Could not generate a date from string: {$dateString}");
+            $this->logger->error($e->getMessage());
             exit(1);
         }
 
