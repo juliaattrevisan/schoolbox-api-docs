@@ -750,7 +750,7 @@ EXAMPLES:
         // For each root model, recursively search for deleted children (matching the root's timestamp)
         foreach($rootModelsToTraverse as $rootModel){
             // Try to get deletedAt timespan
-            list($deletedAfter, $deletedBefore) = $this->getDeletedBetweenDates($rootModel);
+            [$deletedAfter, $deletedBefore] = $this->getDeletedBetweenDates($rootModel);
 
             // Enter recursive rabbit hole
             $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($rootModel), $deletedAfter, $deletedBefore);
@@ -1047,7 +1047,7 @@ EXAMPLES:
              * @var IMapper $childMapper
              * @var string  $foreignKeyColumn
              */
-            list($childMapper, $foreignKeyColumn) = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
+            [$childMapper, $foreignKeyColumn] = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
             $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
 
@@ -1074,7 +1074,7 @@ EXAMPLES:
             }
 
             if(null === $after && null === $before){
-                list($after, $before) = $this->getDeletedBetweenDates($deletedChildModels->first());
+                [$after, $before] = $this->getDeletedBetweenDates($deletedChildModels->first());
             }
 
             // Recurse!!
