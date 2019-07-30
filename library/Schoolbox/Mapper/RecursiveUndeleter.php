@@ -71,7 +71,7 @@ class RecursiveUndeleter extends CliTool\App
 {
     // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
     // part of same action?
-    const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
+    private const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
 
     /**
      * Period in seconds, centered on parent deletedAt timestamp, that child models must be deleted within
