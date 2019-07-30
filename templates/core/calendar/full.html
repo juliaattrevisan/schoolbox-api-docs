@@ -832,72 +832,9 @@
 </script>
 <!-- END custom_head -->
 
-<div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-create" >
-    <!-- Create Event Form-->
-    <dl class="tabs" data-tab>
-        <dd class="active"><a href="#createEventPanel">Create Event</a></dd>
-        <dd><a href="#createTaskPanel">Create Task</a></dd>
-    </dl>
-    <div class="tabs-content">
-        <div class="content active" id="createEventPanel" aria-hidden="false">
-            <form id="createEvent" method="post" action="/calendar/ajax/create" class="top">
-                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
-                <input name="allDay" type="hidden" value="" />
-                <input name="date" type="hidden" value="" />
+<!-- BEGIN event_type -->
 
-                <section>
-                    <h3>On <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
-
-                    <label>
-                        Event Title
-                        <input name="title" type="text" value="" />
-                    </label>
-
-                    <label>
-                        Event Type
-                        <select name="type">
-                            <!-- BEGIN event_type -->
-                            <option value="{EVENT_TYPE_ID}">{EVENT_TYPE_NAME}</option>
-                            <!-- END event_type -->
-                        </select>
-                    </label>
-                </section>
-                <ul class="flex-list buttons">
-                    <li><a href="#" id="edit-full" class="button ">Edit Event</a></li>
-                    <li><input type="submit" data-modal-submit disabled value="Create Event" /></li>
-                </ul>
-            </form>
-        </div>
-        <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
-            <form id="createTask" method="post" action="/calendar/ajax/create">
-                <input name='userId' type='hidden' value='{USER_CALENDAR_ID}' />
-                <input name="date" type="hidden" value="" />
-                <input name="allDay" type="hidden" value="" />
-                <input name="type" type="hidden" value="{TASK_TYPE_ID}" />
-
-                <section>
-                    <h3>Due <span data-event-modal-field="displayDate"><!-- Date gets shoved in here --></span></h3>
-
-                    <label>
-                        Task
-                        <input name="title" type="text" value="" />
-                    </label>
-
-                    <label class="detail">
-                        Note
-                        <textarea name="detail"></textarea>
-                    </label>
-                </section>
-                <div class="row">
-                    <div class="small-12 columns no-pad">
-                        <input type="submit" data-modal-submit disabled value="Create Task" />
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
+<!-- END event_type -->
 
 <div class="reveal-modal small" data-reveal aria-hidden="true" role="dialog" id="calendar-bubble" >
     <!-- Edit Event Form -->
