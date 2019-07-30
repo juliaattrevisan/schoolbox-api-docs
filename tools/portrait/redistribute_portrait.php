@@ -70,21 +70,41 @@ HELP;
             ORDER BY id;
         ');
 
-        $multipleAccountHoldersStatement->execute();
-
         /* Find the most recently updated account that has a portrait_hash
          * This has will be redistributed to all the other accounts
          */
-        foreach ($multipleAccountHoldersStatement as $multipleAccountHolder) {
-            $mostRecentPortraitStatement = $db->prepare('
-                SELECT id, username, portrait_hash, updated_at 
-                FROM `user`
-                WHERE portrait_hash IS NOT NULL
-                AND synergy_id = :externalId
-                ORDER BY updated_at DESC
-                LIMIT 1
-            ');
+        $mostRecentPortraitStatement = $db->prepare('
+            SELECT id, username, portrait_hash, updated_at 
+            FROM `user`
+            WHERE portrait_hash IS NOT NULL
+            AND synergy_id = :externalId
+            ORDER BY updated_at DESC
+            LIMIT 1
+        ');
 
+        /* The affected users, for logging
+         */
+        $affectedUsersStatement = $db->prepare("
+            SELECT GROUP_CONCAT(id, ' ', username SEPARATOR ', ') AS affectedUsers
+            FROM `user`
+            WHERE portrait_hash IS NOT NULL
+            AND synergy_id = :externalId
+            ORDER BY updated_at DESC
+        ");
+
+        /* Mass update users
+         */
+        $update = $db->prepare('
+            UPDATE `user`
+            SET portrait_hash = :portraitHash
+            WHERE synergy_id = :externalId
+        ');
+
+        /* Go find 'em
+         */
+        $multipleAccountHoldersStatement->execute();
+
+        foreach ($multipleAccountHoldersStatement as $multipleAccountHolder) {
             $mostRecentPortraitStatement->execute([
                 'externalId' => $multipleAccountHolder['synergy_id']
             ]);
@@ -97,17 +117,6 @@ HELP;
              * Otherwise we can't do anything about it - none of their accounts have a picture
              */
             if ($mostRecentPortrait) {
-
-                /* Find the affected users, for logging
-                 */
-                $affectedUsersStatement = $db->prepare("
-                    SELECT GROUP_CONCAT(id, ' ', username SEPARATOR ', ') AS affectedUsers
-                    FROM `user`
-                    WHERE portrait_hash IS NOT NULL
-                    AND synergy_id = :externalId
-                    ORDER BY updated_at DESC
-                ");
-
                 $affectedUsersStatement->execute([
                     'externalId' => $multipleAccountHolder['synergy_id']
                 ]);
@@ -117,12 +126,6 @@ HELP;
                 /* Update those people
                  */
                 if ($this->perform()) {
-                    $update = $db->prepare('
-                        UPDATE `user`
-                        SET portrait_hash = :portraitHash
-                        WHERE synergy_id = :externalId
-                    ');
-
                     $update->execute([
                         'portraitHash' => $mostRecentPortrait['portrait_hash'],
                         'externalId' => $multipleAccountHolder['synergy_id']
