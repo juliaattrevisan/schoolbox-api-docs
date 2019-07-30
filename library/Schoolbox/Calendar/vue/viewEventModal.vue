@@ -80,7 +80,6 @@
                     method:       form.method,
                     responseType: 'json',
                 }).then(function (response) {
-                    // Add this event to the calendar
                     self.$emit('eventUpdated', response.data);
                 }).finally(function () {
                     self.$refs.modal.close();
@@ -135,6 +134,23 @@
                     return start;
                 }
             },
+            updateCompleted: function ($event) {
+                let data = Object.create(this.event?.extendedProps?.data || {});
+                if (typeof data?.meta === 'object') {
+                    data.meta.completed = $event.target.checked;
+                }
+                this.event.setExtendedProp('data', data);
+            },
+            updateTitle: function ($event) {
+                this.event.setProp('title', $event.target.value);
+            },
+            updateDetail: function ($event) {
+                let data = Object.create(this.event?.extendedProps?.data || {});
+                if (typeof data?.meta === 'object') {
+                    data.meta.detail = $event.target.value;
+                }
+                this.event.setExtendedProp('data', data);
+            },
         },
     }
 </script>
@@ -156,19 +172,30 @@
                        name="completed"
                        type="checkbox"
                        value="1"
-                       v-model="eventExtendedProps.completed" />
+                       :checked="eventExtendedProps.completed"
+                       @change="updateCompleted($event)"
+                />
                 <label for="modifyTaskBubbleCompleted" class="checkbox-label">
                     Complete
                 </label>
 
                 <label>
                     Task
-                    <input name="title" type="text" v-model="event.title" />
+                    <input name="title"
+                           type="text"
+                           :value="event.title"
+                           @change="updateTitle($event)"
+                           @input="updateTitle($event)"
+                    />
                 </label>
 
                 <label class="detail">
                     Note
-                    <textarea name="detail" v-model="eventExtendedProps.detail"></textarea>
+                    <textarea name="detail"
+                              :value="eventExtendedProps.detail"
+                              @change="updateDetail($event)"
+                              @input="updateDetail($event)"
+                    ></textarea>
                 </label>
 
                 <ul class="flex-list buttons">
