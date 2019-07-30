@@ -5,7 +5,7 @@
 
     export default {
         name: "view-event-modal",
-        props: ['event', 'toMoment',],
+        props: ['event', 'toMoment', 'taskTypeId',],
         components: {
             MetaItem,
             MetaList,
@@ -21,6 +21,7 @@
                     deleteLink = null;
 
                 // Modify/delete links
+                // (This doesn't get set?)
                 if (event?.editable) {
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
@@ -52,7 +53,10 @@
                         actions: data?.booking?.buttons,
                     },
                     attendance: data?.attendance,
-                    completed: metadata?.completed,
+                    task: {
+                        isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
+                        completed: metadata?.completed,
+                    },
                     links: {
                         view: data?.custom?.moreDetailsLink,
                         modify: modifyLink,
@@ -104,85 +108,118 @@
 
 <template>
     <reveal-modal ref="modal">
-        <div class="row">
-            <div class="small-12">
-                <h2 class="note">{{ event.title }}</h2>
-                <meta-list>
-                    <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
-                        {{ eventExtendedProps.booking.status.name }}
-                    </meta-item>
-                    <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">
-                        {{ eventExtendedProps.dateSpan }}
-                    </meta-item>
-                    <meta-item class="icon-location" v-if="eventExtendedProps.location">
-                        {{ eventExtendedProps.location }}
-                    </meta-item>
-                    <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">
-                        Posted by
-                        <a :href="'/search/user/' + String(eventExtendedProps.author.id)">
-                            {{ eventExtendedProps.author.name }}
-                        </a>
-                    </meta-item>
-                    <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">
-                        Reviewed by
-                        <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
-                            {{ eventExtendedProps.reviewer.name }}
-                        </a>
-                    </meta-item>
-                </meta-list>
-                <article style="white-space: pre-line">
-                    <span v-html="eventExtendedProps.detail"></span>
-                </article>
+        <template v-if="eventExtendedProps.task.isTask">
+            <form ref="updateForm" method="post" action="/calendar/ajax/update">
+                <input type="hidden" name="eventId" :value="eventExtendedProps.eventId"/>
 
-                <div v-if="eventExtendedProps.booking.related">
-                    <h3>Related Bookings</h3>
-                    <ul>
-                        <li v-for="relatedBooking in eventExtendedProps.booking.related">
-                            ({{ relatedBooking.status.name }})
-                            <a :href="relatedBooking.status.href">{{ relatedBooking.title }}</a>
-                        </li>
-                    </ul>
+                <!-- Currently only tasks have this form -->
+                <h3>Task</h3>
+
+                <label>
+                    Due {{ eventExtendedProps.dateSpan }}
+                </label>
+
+                <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" v-model="eventExtendedProps.completed" />
+                <label for="modifyTaskBubbleCompleted" class="checkbox-label">
+                    Complete
+                </label>
+
+                <label>
+                    Task
+                    <input name="title" type="text" v-model="event.title" />
+                </label>
+
+                <label class="detail">
+                    Note
+                    <textarea name="detail" v-model="event.detail"></textarea>
+                </label>
+
+                <input type="submit" value="Update Task" />
+                <span class="deleteLink" data-is-html="1"></span>
+            </form>
+        </template>
+
+        <template v-else>
+            <div class="row">
+                <div class="small-12">
+                    <h2 class="note">{{ event.title }}</h2>
+                    <meta-list>
+                        <meta-item class="icon-resource-booking" v-if="eventExtendedProps.booking.status">
+                            {{ eventExtendedProps.booking.status.name }}
+                        </meta-item>
+                        <meta-item class="icon-calendar" v-if="eventExtendedProps.dateSpan">
+                            {{ eventExtendedProps.dateSpan }}
+                        </meta-item>
+                        <meta-item class="icon-location" v-if="eventExtendedProps.location">
+                            {{ eventExtendedProps.location }}
+                        </meta-item>
+                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.author.id">
+                            Posted by
+                            <a :href="'/search/user/' + String(eventExtendedProps.author.id)">
+                                {{ eventExtendedProps.author.name }}
+                            </a>
+                        </meta-item>
+                        <meta-item class="icon-staff-students" v-if="eventExtendedProps.reviewer.id">
+                            Reviewed by
+                            <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
+                                {{ eventExtendedProps.reviewer.name }}
+                            </a>
+                        </meta-item>
+                    </meta-list>
+                    <article style="white-space: pre-line">
+                        <span v-html="eventExtendedProps.detail"></span>
+                    </article>
+
+                    <div v-if="eventExtendedProps.booking.related">
+                        <h3>Related Bookings</h3>
+                        <ul>
+                            <li v-for="relatedBooking in eventExtendedProps.booking.related">
+                                ({{ relatedBooking.status.name }})
+                                <a :href="relatedBooking.status.href">{{ relatedBooking.title }}</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div v-if="eventExtendedProps.attendance">
+                        <dl>
+                            <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
+                            <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
+                        </dl>
+                    </div>
+
+                    <span v-if="eventExtendedProps.folder.id">
+                    <a class="button icon-home"
+                       :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
+                </span>
+                    <span v-if="eventExtendedProps.links.view">
+                    <a class="button icon-due-work"
+                       :href="eventExtendedProps.links.view">View More Details</a>
+                </span>
+                    <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.listButton">
+                    <a class="button icon-group"
+                       :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
+                </span>
+                    <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.requestButton">
+                    <a class="button icon-reply"
+                       @click.prevent="toggleAttendance"
+                       href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
+                </span>
+                    <span v-if="eventExtendedProps.modifyLink">
+                    <a class="button icon-modify"
+                       :href="eventExtendedProps.modifyLink">Modify</a>
+                </span>
+                    <span v-if="eventExtendedProps.deleteLink">
+                    <a class="button icon-delete"
+                       :href="eventExtendedProps.deleteLink">Delete</a>
+                </span>
+
+                    <div v-for="action in eventExtendedProps.booking.actions">
+                        <a :href="action.href" class="button">{{ action.label }}</a>
+                    </div>
+
                 </div>
-
-                <div v-if="eventExtendedProps.attendance">
-                    <dl>
-                        <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
-                        <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
-                    </dl>
-                </div>
-
-                <span v-if="eventExtendedProps.folder.id">
-                        <a class="button icon-home"
-                           :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
-                    </span>
-                <span v-if="eventExtendedProps.links.view">
-                        <a class="button icon-due-work"
-                           :href="eventExtendedProps.links.view">View More Details</a>
-                    </span>
-                <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.listButton">
-                        <a class="button icon-group"
-                           :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
-                    </span>
-                <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.requestButton">
-                        <a class="button icon-reply"
-                           @click.prevent="toggleAttendance"
-                           href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
-                    </span>
-                <span v-if="eventExtendedProps.modifyLink">
-                        <a class="button icon-modify"
-                           :href="eventExtendedProps.modifyLink">Modify</a>
-                    </span>
-                <span v-if="eventExtendedProps.deleteLink">
-                        <a class="button icon-delete"
-                           :href="eventExtendedProps.deleteLink">Delete</a>
-                    </span>
-
-                <div v-for="action in eventExtendedProps.booking.actions">
-                    <a :href="action.href" class="button">{{ action.label }}</a>
-                </div>
-
             </div>
-        </div>
+        </template>
     </reveal-modal>
 </template>
 

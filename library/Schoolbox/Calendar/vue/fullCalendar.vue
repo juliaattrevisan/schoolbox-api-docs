@@ -12,14 +12,12 @@
     import MetaItem                 from '@schoolbox/meta/item'
     import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
-    import UpdateEventModal         from './updateEventModal';
     import axios                    from 'axios'
 
     export default {
         components: {
             CreateEventModal,
             ViewEventModal,
-            UpdateEventModal,
             MetaItem,
             MetaList,
             FullCalendar,
@@ -178,13 +176,7 @@
                 // Ideally the current event would be a part of the modal,
                 // not this component, but :shrug:
                 this.currentEvent = eventInfo.event;
-
-                // So is the event a task or a standard event?
-                if (this.isTask(this.currentEvent)) {
-                    this.$refs.updateEvent.open();
-                } else {
-                    this.$refs.event.open();
-                }
+                this.$refs.event.open();
             },
             onEventResize: function (eventResizeInfo) {
                 let event = eventResizeInfo.event,
@@ -275,11 +267,8 @@
 
         <view-event-modal ref="event"
                           :event="currentEvent"
+                          :task-type-id="config.taskTypeId"
                           :to-moment="toMoment" />
-
-        <update-event-modal ref="updateEvent"
-                            :event="currentEvent"
-                            :to-moment="toMoment" />
 
         <full-calendar
             ref="fullCalendar"
