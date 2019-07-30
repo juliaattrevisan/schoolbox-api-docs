@@ -10,7 +10,7 @@
                @blur="isFocused=false"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
-               @keydown.enter.prevent="onEnter"
+               @keydown.ctrl.enter="onEnter"
                @input="onChange"
                v-click-outside="lostFocus"
         />
