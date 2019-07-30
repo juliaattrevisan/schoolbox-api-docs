@@ -281,7 +281,7 @@ foreach ($userList as $user) {
                                         $this->setVar(
                                             'PERIOD_URL',
                                             Scrub::text(
-                                                '/homepage/code/' . urlencode(urlencode($class['code']))
+                                                '/homepage/code/' . urlencode(urlencode($catCache[$cacheKey]->getMatchedCode()))
                                             )
                                         );
                                         $this->parse('period_class_link_block', 'period_class_link', true);
