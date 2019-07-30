@@ -108,13 +108,12 @@
                 // Fail callback: consider a message saying something failed
             },
             onDateClick: function (dateClickInfo) {
-                // TODO migrate calculations into create event modal
+                // TODO migrate date rendering into create event modal
                 let momentDate       = this.toMoment(dateClickInfo.date),
                     [firstEventType] = this.config.eventTypes;
                 this.newEvent = {
+                    date:        dateClickInfo.date,
                     allDay:      dateClickInfo.allDay,
-                    date:        momentDate.format(dateClickInfo.allDay ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm'),
-                    displayDate: momentDate.format(dateClickInfo.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'),
                     title:       '',
                     detail:      '',
                     type:        firstEventType ? firstEventType.id : null,
@@ -198,9 +197,12 @@
                             :user-id="config.userId"
                             :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
+                            :to-moment="toMoment"
         />
 
-        <event-modal ref="event" :event="currentEvent" :to-moment="toMoment" />
+        <event-modal ref="event"
+                     :event="currentEvent"
+                     :to-moment="toMoment" />
 
         <full-calendar
             ref="fullCalendar"

@@ -7,6 +7,8 @@
             'userId',
             'eventTypes',
             'taskTypeId',
+            // TODO why do I have to pass this method around?
+            'toMoment',
         ],
         components: {
             RevealModal,
@@ -14,6 +16,16 @@
         computed: {
             isNewEventSubmittable: function () {
                 return this.event.title && this.event.title.length !== 0;
+            },
+            formDate() {
+                return this.event.date
+                    ? this.toMoment(this.event.date).format(this.event.allDay ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm')
+                    : '';
+            },
+            displayDate() {
+                return this.event.date
+                    ? this.toMoment(this.event.date).format(this.event.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma')
+                    : '';
             },
         },
         methods: {
@@ -41,10 +53,10 @@
                 >
                     <input name="userId" type="hidden" :value="userId" />
                     <input name="allDay" type="hidden" :value="event.allDay ? 1 : 0" />
-                    <input name="date"   type="hidden" :value="event.date" />
+                    <input name="date"   type="hidden" :value="formDate" />
 
                     <section>
-                        <h3>On <span>{{ event.displayDate }}</span></h3>
+                        <h3>On <span>{{ displayDate }}</span></h3>
 
                         <label>
                             Event Title
@@ -76,11 +88,11 @@
                 >
                     <input name="userId" type="hidden" :value="userId" />
                     <input name="allDay" type="hidden" :value="event.allDay ? 1 : 0" />
-                    <input name="date"   type="hidden" :value="event.date" />
+                    <input name="date"   type="hidden" :value="formDate" />
                     <input name="type"   type="hidden" :value="taskTypeId" />
 
                     <section>
-                        <h3>Due <span>{{ event.displayDate }}</span></h3>
+                        <h3>Due <span>{{ displayDate }}</span></h3>
 
                         <label>
                             Task
