@@ -1,5 +1,7 @@
 <script>
     import RevealModal from '@schoolbox/reveal-modal'
+    import axios       from 'axios'
+
     export default {
         name: "create-event-modal",
         props: [
@@ -14,6 +16,7 @@
             RevealModal,
         },
         computed: {
+            window: () => window,
             isNewEventSubmittable: function () {
                 return this.event.title && this.event.title.length !== 0;
             },
@@ -31,6 +34,25 @@
         methods: {
             open() {
                 this.$refs.modal.open();
+            },
+            createNewEvent: function (form) {
+                let self = this;
+                axios.request({
+                    url:          form.action,
+                    data:         window.$(form).serialize(),
+                    method:       form.method,
+                    responseType: 'json',
+                }).then(function (response) {
+                    // Add this event to the calendar
+                    self.$emit('eventCreated', response.data);
+                }).finally(function () {
+                    self.$refs.modal.close();
+                });
+            },
+            redirectToEventForm: function () {
+                // Use jQuery's form serialize for now: replace later
+                window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
+                    + window.$(this.$refs.createEventForm).serialize();
             },
         },
     }

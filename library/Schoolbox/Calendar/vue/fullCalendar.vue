@@ -135,25 +135,6 @@
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
             },
-            createNewEvent: function (form) {
-                let self = this;
-                axios.request({
-                    url:          form.action,
-                    data:         $(form).serialize(),
-                    method:       form.method,
-                    responseType: 'json',
-                }).then(function (response) {
-                    // Add this event to the calendar
-                    self.$refs.fullCalendar.getApi().addEvent(response.data);
-                }).finally(function () {
-                    self.$refs.createEvent.close();
-                });
-            },
-            redirectToEventForm: function () {
-                // Use jQuery's form serialize for now: replace later
-                window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
-                    + window.$(this.$refs.createEventForm).serialize();
-            },
             toggleAttendance: function () {
                 // TODO get this to work
                 // var button = $(this);
@@ -177,6 +158,9 @@
                 //     }
                 // });
             },
+            addEvent: function (event) {
+                this.$refs.fullCalendar.getApi().addEvent(event);
+            }
         }
     }
 
@@ -198,7 +182,7 @@
                             :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
-        />
+                            @eventCreated="addEvent" />
 
         <event-modal ref="event"
                      :event="currentEvent"
