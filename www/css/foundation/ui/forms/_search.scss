@@ -60,8 +60,37 @@
         /* Search icon when Search feature is activated
         */
         &:before {
-            color: $navigation-background;
+            color: $navigation-hover;
         }
+    }
+
+    .results {
+        border: 2px solid $navigation-hover;
+        border-top: 0;
+    }
+
+    .list-item:hover,
+    .list-item.is-active {
+        background-color: $navigation-hover;
+    }
+
+    .list-item .name {
+        color: $navigation-foreground;
+    }
+
+    .result-meta.with-bg {
+        background: $navigation-hover;
+        opacity: 0.10;
+        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=10)";
+        filter: alpha(opacity=10);
+    }
+
+    .result-meta.with-bg a {
+        color: $black !important;
+    }
+
+    .loader {
+        background-color: $navigation-foreground;
     }
 }
 

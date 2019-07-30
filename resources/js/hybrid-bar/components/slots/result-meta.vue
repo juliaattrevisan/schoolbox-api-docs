@@ -1,5 +1,5 @@
 <template>
-    <div class="list-item small-12">
+    <div class="list-item-meta small-12">
         <slot></slot>
     </div>
 </template>

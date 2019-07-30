@@ -7,13 +7,13 @@
                autocomplete="off"
                v-model.trim="keyword"
                @mousedown="isFocused=true"
-               @blur="isFocused=false"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.ctrl.enter="onEnter"
                @input="onChange"
                v-click-outside="lostFocus"
         />
+<!--        @blur="isFocused=false"-->
         <ul class="results" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount">
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
@@ -194,27 +194,16 @@
         cursor: pointer;
     }
 
-    .name {
-        color: #0066b0;
-    }
-
     .is-active .name,
     .result:hover,
-    .name:hover,
+    .result:hover p.name,
     a:hover {
-        color: #FFF !important;
-    }
-
-    .result:hover,
-    .result .is-active {
-        background-color: #0066b0;
-        color: #FFF !important;
+        color: #FFF;
     }
 
     .results {
         padding: 0;
         margin: 0;
-        border: 1px solid #0066b0;
         height: auto;
         background-color: #FFF;
         z-index: 10000;
@@ -227,10 +216,6 @@
 
     .result-meta .list-item {
         border-bottom: 0;
-    }
-
-    .with-bg {
-        background-color: #f1f9ff;
     }
 
     .inner-wrap:not(.left-open):not(.right-open) .global-search:hover,
