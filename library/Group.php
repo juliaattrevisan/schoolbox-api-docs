@@ -689,36 +689,25 @@ class Group extends DeprecatedModel
 
             if (is_array($externalSubjectList)) {
                 foreach ($externalSubjectList as $currentSubject) {
-                    try {
-                        if($currentSubject['campusCode']) {
-                            $code = $currentSubject['campusCode'].'/'.$currentSubject['code'];
-                            try {
-                                $folder = $folderMapper->findByCode($code);
-                            } catch(MapperException $e) {
-                                $folder = $folderMapper->findByCode($currentSubject['code']);
-                            }
-
-                        }
-                        else {
-                            $folder = $folderMapper->findByCode($currentSubject['code']);
-                        }
-
-                        /** @var $folder Schoolbox\Resource\Folder\Model  */
-                        $template = null;
-                        if($folder->getHomepage() instanceof  \Schoolbox\Resource\HomepageConfig ) {
-                            $template = $folder->getHomepage()->getTemplate()->getId();
-                        }
-
-                        $allFolders[$folder->getId()] = array(
-                            'id' => $folder->getId(),
-                            'name' => $folder->getName(),
-                            'parent' => $folder->getParent()->getId(),
-                            'deleted_at' => $folder->getDeletedAt(),
-                            'code' => $folder->getCodeString(),
-                            'template' => $template,
-                        );
-                    } catch (MapperException $e) {
+                    $folder = $folderMapper->findForCampusAndClass($currentSubject['campusCode'] ?? '', $currentSubject['code']);
+                    if (!$folder) {
+                        continue;
                     }
+
+                    /** @var $folder Schoolbox\Resource\Folder\Model */
+                    $template = null;
+                    if ($folder->getHomepage() instanceof \Schoolbox\Resource\HomepageConfig) {
+                        $template = $folder->getHomepage()->getTemplate()->getId();
+                    }
+
+                    $allFolders[$folder->getId()] = array(
+                        'id' => $folder->getId(),
+                        'name' => $folder->getName(),
+                        'parent' => $folder->getParent()->getId(),
+                        'deleted_at' => $folder->getDeletedAt(),
+                        'code' => $folder->getCodeString(),
+                        'template' => $template,
+                    );
                 }
             }
         }

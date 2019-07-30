@@ -513,31 +513,16 @@ class Session
 
                         if (is_array($subjectList)) {
                             foreach ($subjectList as $subject) {
-                                //check subject exists.. we cant link to subjects that dont exist its ugly
-                                $cat = false;
-
-                                if ($subject['campusCode']) {
-                                    //Check for subject with campus code
-                                    try {
-                                        $cat = $folderMapper->findByCode($subject['campusCode'] . '/' . $subject['code']);
-                                    } catch (\Exception $e) {
-                                        //Try to fetch without campus code
-                                        try {
-                                            $cat = $folderMapper->findByCode($subject['code']);
-                                        } catch (\Exception $e) {
-                                        }
-                                    }
-                                } else {
-                                    try {
-                                        $cat = $folderMapper->findByCode($subject['code']);
-                                    } catch (\Exception $e) {
-                                    }
-                                }
+                                $cat = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
 
                                 if ($cat instanceof Folder && !\in_array($cat->getId(), $subjectIDList, false)) {
                                     $subject['id']   = $cat->getId();
                                     $subject['name'] = $cat->getName();
                                     $subject['perm'] = Access::getInstance()->getFolderAccess($_SESSION['user'], $cat->getId());
+                                    // TODO Lawn mow student subjects and parent children subjects to have same format and semantics.
+                                    // TODO Currently, a student's $subject['code'] is the SB folder code,
+                                    // TODO whereas a parent's child $subject['code'] is the SIS code.
+                                    $subject['matchedCode'] = $cat->getMatchedCode();
                                     $subjects[]      = $subject;
                                     $subjectIDList[] = $cat->getId(); //dont dupe ids in this list
                                 }
@@ -572,36 +557,15 @@ class Session
 
                     foreach ($subjectList as $subject) {
                         //check subject exists.. we cant link to subjects that dont exist its ugly
-                        $result = false;
                         // Ensure the link goes to an actual homepage, too
-                        $homepageCode = '';
-                        
-                        if ($subject['campusCode']) {
-                            //Check for subject with campus code
-                            try {
-                                $homepageCode = $subject['campusCode'].'/'.$subject['code'];
-                                $result = $folderMapper->findByCode($homepageCode);
-                            } catch (\Exception $e) {
-                                // noop
-                            }
-                        }
-
-                        //Try to fetch without campus code
-                        if (!($result instanceof Folder)) {
-                            try {
-                                $homepageCode = $subject['code'];
-                                $result = $folderMapper->findByCode($subject['code']);
-                            } catch (\Exception $e) {
-                                // noop
-                            }
-                        }
+                        $result = $folderMapper->findForCampusAndClass($subject['campusCode'], $subject['code']);
 
                         if ($result instanceof Folder) {
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
                                 $subject['perm'] = $sisFolderAccess;
-                                $subject['code'] = $homepageCode;
+                                $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 
                                 $catList[] = $result->getId(); //check for dupes

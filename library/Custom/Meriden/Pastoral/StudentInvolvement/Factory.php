@@ -16,7 +16,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -299,9 +298,9 @@ class Factory
      */
     protected function getFolderWithGrades($subjectCode, User $student, bool $publishedOnly)
     {
-        try {
-            // Find by category code, and figure out if they're involved.
-            $folder = $this->folderMapper->findByCode($subjectCode);
+        // Find by category code, and figure out if they're involved.
+        $folder = $this->folderMapper->findForCampusAndClass('', $subjectCode);
+        if ($folder) {
             $involvement = $this->getStudentInvolvement($folder, $student, $publishedOnly);
             if ($involvement) {
                 return [
@@ -309,9 +308,6 @@ class Factory
                     'grades' => $involvement['grades'],
                 ];
             }
-        } catch (MapperException $e) {
-            // no folder with this cat code exists.
-            // Try to find by archived code instead.
         }
 
         // Find by archived code, as this folder might have been rolled over.

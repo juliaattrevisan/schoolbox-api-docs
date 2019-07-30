@@ -833,12 +833,7 @@ class External_Liss_Server
                  * saveEventSource() throws mapper exceptions, so I don't want that affecting
                  * the outcome of this decision
                  */
-                try {
-                    $folder = $folderMapper->findByCode($currentEvent['classCode']);
-                }
-                catch (MapperException $e) {
-                    $folder = null;
-                }
+                $folder = $folderMapper->findForCampusAndClass('', $currentEvent['classCode']);
 
                 if ($folder instanceof Folder) {
 

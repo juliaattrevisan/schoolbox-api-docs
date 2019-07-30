@@ -26,9 +26,6 @@ try {
     // redirect to $folder->getId()
     header("Location: {$router->generate('learning.getClassListPage', ['folderId' => $folder->getId()])}");
     die();
-
-} catch (InvalidArgumentException $exception) {
-    $this->pageNotFound(); // indeterminate destination, bad input or bad codes in db
 } catch (\Schoolbox\Mapper\Exception $exception) {
     $this->pageNotFound(); // no models matched
 }

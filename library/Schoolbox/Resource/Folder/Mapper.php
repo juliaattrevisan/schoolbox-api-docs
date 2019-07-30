@@ -28,6 +28,7 @@ use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
@@ -962,7 +963,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param string $classCodeCsv May have campus prefix, eg 'J/ENG34,S/ENG43' or 'ABC', or 'J/ENG34'
      * @return Model
-     * @throws UnexpectedValueException If multiple folders found for this code
      * @throws MapperException If statement returned no category
      * @throws PDOException
      * @throws Predicate\InvalidColumnException
@@ -986,7 +986,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // this is an edge case that cannot happen normally because business logic prevents it
         // you have to mangle the db, or provide bad data on the url to manifest this situation
         // In either case, pop out an exception because this should never have occurred
-        throw new UnexpectedValueException("Multiple folders found for code");
+
+        // Soften exception to a warning, but log so we can investigate
+        trigger_error("Multiple folders found for code", E_USER_WARNING);
+
+        return $folders->first();
     }
 
 
@@ -1012,10 +1016,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         foreach ($classCodes as $classCode) {
             // Always return exact matches
             $codePb->equals('fc.code', $classCode);
-            // If code does not have a campus prefix, match against campus-prefixed variants
-            if (strpos($classCode, '/') === false) {
-                $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
-            }
+            $codePb->like('fc.code', "%/{$this->database->escapeForLike($classCode)}");
         }
 
         $folderPb = $this->getPredicateBuilder()
@@ -1041,6 +1042,65 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Retrieve all codes for folder, not just those specified by $classCodeCsv
         return $this->findByColumn($this->getIdentifierColumn(), $folderIds);
+    }
+
+
+    /**
+     * Returns the Schoolbox folder (if it exists) that matches the SIS campus + class code.
+     *
+     * If multiple folders are found (which is an invalid system state), logs to sentry but just returns the first match.
+     *
+     * @param null|string $sisCampus
+     * @param string $sisClass Will never have the campus code embedded inside it.
+     * @return Model|null
+     */
+    public function findForCampusAndClass(?string $sisCampus, string $sisClass): ?Model
+    {
+        if ($sisClass === '') {
+            return null;
+        }
+
+        // Need to support schools who do not include the campus code in schoolbox folder code.
+        // This is a common workflow where schools have only a single campus.
+        // Validation exists to ensure that if they are using this form, then
+        // they cannot add the campus-prefixed form as well.
+        // @see $this->validateFolderCodes()
+
+        // If a campus code was provided, prefer exact match
+        if ($sisCampus !== null && $sisCampus !== '') {
+            $folderCodes = ["$sisCampus/$sisClass", $sisClass];
+        } else {
+            $folderCodes = [$sisClass];
+        }
+
+        $fcCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
+        $sql            = "
+            SELECT f.id, fc.code
+            FROM folder f
+            JOIN folder_code fc on f.id = fc.folder_id
+            WHERE f.deleted_at IS NULL AND fc.deleted_at IS NULL AND fc.code IN ({$fcCodeBindings->getPlaceholder()})";
+
+        $rows = $this->database->query($sql, $fcCodeBindings->getParams())->fetchAll(PDO::FETCH_NUM);
+
+        if (!count($rows)) {
+            return null;
+        }
+
+        // The first in $folderCodes is preferred.
+        foreach ($folderCodes as $folderCode) {
+            foreach ($rows as [$rowFolderId, $rowFolderCode]) {
+                if ($folderCode === $rowFolderCode) {
+                    try {
+                        $folder = $this->findById($rowFolderId);
+                    } catch (Exception $e) {
+                        return null;
+                    }
+                    $folder->setMatchedCode($rowFolderCode);
+                    return $folder;
+                }
+            }
+        }
+        return null;
     }
 
 

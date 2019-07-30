@@ -190,32 +190,26 @@ class UserAccessMapper extends Mapper
             if (!isset($extSubj['code']) || empty($extSubj['code'])) {
                 continue;
             }
-            try {
-                // If campus code is set, find the code within the campus.
-                $campusCode = (isset($extSubj['campusCode']) && !empty($extSubj['campusCode'])) ? $extSubj['campusCode'] : '';
-                $code       = $campusCode ? "$campusCode/{$extSubj['code']}" : $extSubj['code'];
-                $catId      = FolderMapper::getInstance()->findByCode($code)->getId();
-
-                $ua = new UserAccess();
-
-                $ua->setService(UserAccess::SERVICE_HOMEPAGE)
-                    ->setServiceIdentifier($catId)
-                    ->setUser($user);
-
-                //Teachers automatically get write access to their class pages
-                if ($user->getRole()->isStaff()) {
-                    $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
-                } else {
-                    $ua->setAccessLevel(UserAccess::ACCESS_READ);
-                }
-
-                $external->add($ua);
-
-            } catch (Mapper\Exception $e) {
-                // noop
-            } catch (UnexpectedValueException $e) {
-                // noop
+            $folder = FolderMapper::getInstance()->findForCampusAndClass($extSubj['campusCode'] ?? '', $extSubj['code']);
+            if (!$folder) {
+                continue;
             }
+
+            $ua = new UserAccess();
+
+            $ua->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($folder->getId())
+                ->setUser($user);
+
+            //Teachers automatically get write access to their class pages
+            if ($user->getRole()->isStaff()) {
+                $ua->setAccessLevel(UserAccess::ACCESS_WRITE);
+            } else {
+                $ua->setAccessLevel(UserAccess::ACCESS_READ);
+            }
+
+            $external->add($ua);
+
         }
 
         $access = $access->merge($external);

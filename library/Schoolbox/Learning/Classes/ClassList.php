@@ -12,7 +12,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use Timetable_ColourMapper;
@@ -87,13 +86,9 @@ class ClassList
             // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
-                try {
-                    $folder                       = $this->folderMapper->findByCode($subject['code']);
-                    $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
-                    $classTypes[$folder->getId()] = $subject['classType'];
-                } catch (MapperException $e) {
-                    // Not found
-                }
+                $folder                       = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
+                $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
+                $classTypes[$folder->getId()] = $subject['classType'] ?? '';
             }
         }
 

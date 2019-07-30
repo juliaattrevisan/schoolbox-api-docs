@@ -104,9 +104,8 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
 
                     /** @var Subject $subject */
                     foreach ($subjects as $subject) {
-                        try {
-                            $folder = $this->folderMapper->findByCode($subject['code']);
-                        } catch (MapperException $e) {
+                        $folder = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
+                        if (!$folder) {
                             continue;
                         }
 
