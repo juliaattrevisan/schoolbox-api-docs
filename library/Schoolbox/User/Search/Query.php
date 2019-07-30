@@ -16,7 +16,7 @@ class Query
     /**
      * Number of users that will show on autosuggest field
      */
-    public const AUTOSUGGEST_LIMIT = 3;
+    public const AUTOSUGGEST_LIMIT = 5;
 
     /**
      * Minimum search length before the query qet's executed
