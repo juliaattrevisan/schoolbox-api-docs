@@ -133,7 +133,7 @@ HELP;
                     $multipleAccountHolder['synergy_id'],
                     $mostRecentPortrait['id'],
                     $affectedUsers,
-                    "/portrait.php?userId={$multipleAccountHolder['id']}&size=constrain200"
+                    "/portrait.php?id={$multipleAccountHolder['id']}&size=constrain200"
                 ));
             }
         }
