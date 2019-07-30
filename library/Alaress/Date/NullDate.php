@@ -65,6 +65,16 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
         return '';
     }
 
+
+    /**
+     * @inheritDoc
+     */
+    public function getJson(): string
+    {
+        return '';
+    }
+
+
     /**
      * This is a null date - performing any sort of date operations will blow
      * up in your face.
