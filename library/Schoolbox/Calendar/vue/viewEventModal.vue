@@ -2,6 +2,7 @@
     import RevealModal from '@schoolbox/reveal-modal'
     import MetaList    from '@schoolbox/meta/list'
     import MetaItem    from '@schoolbox/meta/item'
+    import axios       from 'axios';
 
     export default {
         name: "view-event-modal",
@@ -12,6 +13,7 @@
             RevealModal
         },
         computed: {
+            window: () => window,
             eventExtendedProps: function () {
                 // Also need to render the event's buttons
                 let event      = this.event,
@@ -66,6 +68,36 @@
             }
         },
         methods: {
+            isTaskSubmittable: function () {
+                return this.event.title && this.event.title.length !== 0;
+            },
+            updateEvent: function () {
+                let self = this,
+                    form = self.$refs.updateForm;
+                axios.request({
+                    url:          form.action,
+                    data:         window.$(form).serialize(),
+                    method:       form.method,
+                    responseType: 'json',
+                }).then(function (response) {
+                    // Add this event to the calendar
+                    self.$emit('eventUpdated', response.data);
+                }).finally(function () {
+                    self.$refs.modal.close();
+                });
+            },
+            deleteEvent: function () {
+                // Handle event deletion (series dialog, confirmation)
+                // and all that
+                axios
+                    .post('/calendar/ajax/delete', {})
+                    .then(function (response) {
+                    // Add this event to the calendar
+                    self.$emit('eventDeleted', response.data);
+                }).finally(function () {
+                    self.$refs.modal.close();
+                });
+            },
             open() {
                 this.$refs.modal.open();
             },
@@ -109,7 +141,7 @@
 <template>
     <reveal-modal ref="modal">
         <template v-if="eventExtendedProps.editable && eventExtendedProps.task.isTask">
-            <form ref="updateForm" method="post" action="/calendar/ajax/update">
+            <form ref="updateForm" method="post" action="/calendar/ajax/update" @submit.prevent="updateEvent">
                 <input type="hidden" name="eventId" :value="eventExtendedProps.eventId"/>
 
                 <!-- Currently only tasks have this form -->
@@ -138,8 +170,12 @@
                     <textarea name="detail" v-model="event.detail"></textarea>
                 </label>
 
-                <input type="submit" value="Update Task" />
-                <span class="deleteLink" data-is-html="1"></span>
+                <ul class="flex-list buttons">
+                    <li><input type="submit"
+                               :disabled="!isTaskSubmittable"
+                               value="Update Task" /></li>
+                    <li><button @click.prevent="deleteEvent">Delete Task Event</button></li>
+                </ul>
             </form>
         </template>
 
