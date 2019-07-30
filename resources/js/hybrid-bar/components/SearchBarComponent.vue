@@ -7,11 +7,11 @@
                autocomplete="off"
                v-model.trim="keyword"
                @click="isFocused=true"
-               @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
                v-click-outside="lostFocus"
+               @input="onChange"
         />
         <ul class="results" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount">
@@ -72,12 +72,8 @@
         },
 
         methods: {
-            lostFocus: function(event) {
-                this.isFocused = false;
-                this.arrowCounter = 0;
-            },
 
-            onChange: function(event) {
+            onChange:  _.debounce(function (e) {
                 var self = this;
 
                 if (self.keyword.length >= 3) {
@@ -86,11 +82,7 @@
                     self.isLoading = true;
                     self.filterResults();
                 }
-            },
-
-            onClose: function() {
-                this.isFocused = false;
-            },
+            }, 500),
 
             onArrowDown: function() {
                 if (this.arrowCounter < this.results.length - 1) {
@@ -106,6 +98,11 @@
 
             onEnter: function(id) {
                 this.goToProfilePage(this.results[this.arrowCounter].id);
+            },
+
+            lostFocus: function(event) {
+                this.isFocused = false;
+                this.arrowCounter = -1;
             },
 
             goToProfilePage: function(id) {
