@@ -167,7 +167,7 @@
 
                 <label class="detail">
                     Note
-                    <textarea name="detail" v-model="event.detail"></textarea>
+                    <textarea name="detail" v-model="eventExtendedProps.detail"></textarea>
                 </label>
 
                 <ul class="flex-list buttons">
