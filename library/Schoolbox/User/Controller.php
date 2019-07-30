@@ -8,6 +8,7 @@
 namespace Schoolbox\User;
 
 use Alaress\Web\Controller\Base;
+use http\Client\Response;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
@@ -29,10 +30,6 @@ class Controller extends Base
 
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
-
-
-    private const AUTOSUGGEST_LIMIT = 3;
-
 
     /**
      * @param UserAccessMapper $userAccessMapper
@@ -142,17 +139,23 @@ class Controller extends Base
      */
     public function search()
     {
+        $minQueryStringLength = User\Search\Query::MIN_SEARCH_LENGTH;
+        $result = [
+            'message' => 'Invalid argument, query string length must at least be ' . $minQueryStringLength
+        ];
+
         $keyword = $this->request->query['keyword'];
 
-        /**
-         * @var User\Search\Query $userSearchService
-         */
-        $userSearchService = $this->di->get('userSearch');
-
+        if ($keyword !== null && \strlen($keyword) >= $minQueryStringLength) {
+            $userSearchService = new User\Search\Query($this->di->get('databaseInternal'));
+            $result = $userSearchService->fetchResults($keyword);
+        } else {
+            $this->getResponse()->status->set(422);
+        }
 
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
-                $userSearchService->buildQuery($keyword, self::AUTOSUGGEST_LIMIT)->getResults()
+                $result
             )
         );
     }

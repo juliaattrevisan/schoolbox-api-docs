@@ -9,97 +9,160 @@ namespace Schoolbox\User\Search;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\UserMapper;
 
 class Query
 {
+    /**
+     * Number of users that will show on autosuggest field
+     */
+    public const AUTOSUGGEST_LIMIT = 3;
+
+    /**
+     * Minimum search length before the query qet's executed
+     */
+    public const MIN_SEARCH_LENGTH = 3;
+
     /**
      * @var IConnector
      */
     private $db;
 
     /**
-     * @var string
+     * @var int
      */
-    private $mainQuery;
+    private $limit;
+
+    /**
+     * @var int
+     */
+    private $minSearchLength;
 
     /**
      * @var string
      */
-    private $countQuery;
+    private $sortBy;
 
     /**
      * @var string
      */
-    private $keyword = '';
+    private $sortMethod;
 
     /**
      * Query constructor.
      *
      * @param IConnector $db
+     * @param int        $limit
+     * @param int        $minSearchLength
+     * @param string     $sortBy
+     * @param string     $sortMethod
      */
-    public function __construct(IConnector $db)
-    {
-        $this->db = $db;
+    public function __construct(IConnector $db,
+                                int $limit = self::AUTOSUGGEST_LIMIT,
+                                int $minSearchLength = self::MIN_SEARCH_LENGTH,
+                                string $sortBy = 'lastname',
+                                string $sortMethod = 'ASC'
+    ) {
+        $this->db               = $db;
+        $this->limit            = $limit;
+        $this->minSearchLength  = $minSearchLength;
+        $this->sortBy           = $sortBy;
+        $this->sortMethod       = $sortMethod;
     }
 
     /**
      * @param string $keyword
-     * @param int    $limit
-     * @param string $sortBy
-     * @param string $sortMethod
      *
-     * @return Query
+     * @return array
      */
-    public function buildQuery(string $keyword, int $limit = 5, string $sortBy = 'lastname', string $sortMethod = 'ASC'): self
+    public function fetchResults(string $keyword): array
     {
-        $this->keyword = $keyword;
+        $keyword = trim($keyword);
 
-        $joinStatement = 'FROM `user`
-            LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
-            LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id';
+        $result = [
+            'results'       => [],
+            'totalCount'    => 0,
+        ];
 
+        if ($keyword !== '' && \strlen($keyword) >= $this->minSearchLength && $this->getUserIdsByKeyword($keyword)) {
+            $result['results']      = $this->getUserData($this->getUserIdsByKeyword($keyword));
+            $result['totalCount']   = $this->getTotalCount($keyword);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $userIds
+     *
+     * @return array
+     */
+    private function getUserData(array $userIds): array
+    {
+        $result = [];
+
+        $users = UserMapper::getInstance()->findByColumn('id', $userIds);
+        
+        foreach ($users as $key => $user) {
+            $result[$key]['id']             = $user->getId();
+            $result[$key]['externalId']     = $user->getExternalId();
+            $result[$key]['formattedName']  = $user->formatName();
+            $result[$key]['metadata']       = $user->formatMetadata();
+            $result[$key]['year']           = $user->getYear();
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $keyword
+     *
+     * @return array
+     */
+    private function getUserIdsByKeyword(string $keyword): array
+    {
+        return $this->executeQuery(
+            'SELECT id FROM user' . $this->getWhereStatement() . ' ORDER BY ' . $this->sortBy . ' ' . $this->sortMethod . ' LIMIT 0 , ' . $this->limit,
+            '%' . $keyword . '%'
+        )->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param string $keyword
+     *
+     * @return int
+     */
+    private function getTotalCount(string $keyword)
+    {
+        return (int) $this->executeQuery('SELECT COUNT(*) FROM user' . $this->getWhereStatement(),
+            '%' . $keyword . '%'
+        )->fetchColumn();
+    }
+
+    /**
+     * @return string
+     */
+    private function getWhereStatement()
+    {
         $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
         OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
         OR username LIKE :username AND user.deleted_at IS NULL';
 
-        $this->mainQuery = 'SELECT 
-            user.id,
-            user.username,
-            CONCAT(user.title, \' \', user.firstname, \' \', user.lastname) AS full_name,    
-            CONCAT(\'/portrait.php?userId=\', user.synergy_id, \'&size=\') AS portrait,
-            user.year,
-            user.synergy_id AS external_id, 
-            groups.name AS group_name, 
-            luCampus.name AS campus_name ' . $joinStatement . $whereStatement .
-            ' ORDER BY ' . $sortBy . ' ' . $sortMethod . ' LIMIT 0 , ' . $limit;
+        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
+            $whereStatement .= ' AND user.enabled = 1';
+        }
 
-
-        $this->countQuery = 'SELECT COUNT(*) AS totalCount ' . $joinStatement . $whereStatement;
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getResults()
-    {
-        return [
-            'results'       => $this->executeQuery($this->mainQuery, $this->keyword)->fetchAll(),
-            'totalCount'    => $this->executeQuery($this->countQuery, $this->keyword)->fetchColumn()
-        ];
+        return $whereStatement;
     }
 
     /**
      * @param string $queryString
+     * @param string $keyword
      *
      * @return \Alaress\Database\Statement\Query\IQuery
      */
-    private function executeQuery(string $queryString)
+    private function executeQuery(string $queryString, string $keyword)
     {
-        $keyword = '%' . $this->keyword . '%';
-
         $statement = $this->db->prepareQuery($queryString);
         $statement->execute([
             'firstAndLastName'  => $keyword,
@@ -109,47 +172,4 @@ class Query
 
         return $statement;
     }
-
-    /**
-     * @return string
-     */
-    private function buildMainQuery(): string
-    {
-        return 'SELECT 
-            user.id,
-            user.username,
-            CONCAT(user.title, \' \', user.firstname, \' \', user.lastname) AS full_name,           
-            user.year,
-            user.synergy_id AS external_id, 
-            groups.name AS group_name, 
-            luCampus.name AS campus_name ';
-    }
-
-    /**
-     * @return string
-     */
-    private function buildFromAndJoinQuery(): string
-    {
-        return ' FROM `user`
-            LEFT JOIN `groups` ON `user`.group_id = `groups`.id
-            LEFT JOIN `userCampus` ON `user`.id = `userCampus`.uid AND defaultCampus = 1
-            LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id\' ';
-    }
-
-    /**
-     * @return string
-     */
-    private function buildWherePart(): string
-    {
-        $queryString = ' CONCAT_WS(\' \',title,firstname,lastname) LIKE :firstAndLastName 
-        OR CONCAT_WS(\' \',title,lastname) LIKE :lastname 
-        OR username LIKE :username ';
-
-        if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
-            $queryString .= ' AND `user`.enabled = 1 ';
-        }
-
-        return $queryString;
-    }
-
 }
