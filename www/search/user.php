@@ -171,14 +171,14 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
         $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
 
         // Load a bunch of category and teacher info too
-        $folder = $folderMapper->findForCampusAndClass($subject['campus'] ?? '', $subject['code']);
+        $folder = $folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
         if ($folder) {
             $subject['folder'] = $folder;
             $subject['perms']  = $groupHandler->getPermission($subject['folder']->getId());
             $classCode = $subject['folder']->getCodeString();
         } else {
             if (ConfigMapper::getInstance()->get('show_all_subjects')) {
-                $classCode = (($subject['campus'] ?? '') !== '') ? "{$subject['campus']}/{$subject['code']}" : $subject['code'];
+                $classCode = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
                 $code = new FolderCode();
                 $code->setCode($classCode);
                 $subject['folder'] = new Folder();
