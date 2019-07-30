@@ -76,28 +76,32 @@
                 let self = this,
                     form = self.$refs.updateForm,
                     data = {
-                        eventId:   this.$refs.eventIdInput.value,
+                        eventId:   this.eventExtendedProps.eventId,
                         completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
                         title:     this.$refs.eventTitleInput.value,
                         detail:    this.$refs.eventDetailInput.value,
+                    },
+                    request = {
+                        url:          form.action,
+                        data:         toQueryString(data),
+                        method:       form.method,
+                        responseType: 'json',
                     };
-                axios.request({
-                    url:          form.action,
-                    data:         toQueryString(data),
-                    method:       form.method,
-                    responseType: 'json',
-                }).then(function (response) {
-                    // Assign updated values into existing event
-                    let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
-                    if (typeof eventData?.meta === 'object') {
-                        eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
-                        eventData.meta.detail    = response?.data?.data?.meta?.detail;
-                    }
-                    self.event.setExtendedProp('data', eventData);
-                    self.event.setProp('title', response?.data?.title);
-                }).finally(function () {
-                    self.$refs.modal.close();
-                });
+                axios
+                    .request(request)
+                    .then(function (response) {
+                        // Assign updated values into existing event
+                        let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
+                        if (typeof eventData?.meta === 'object') {
+                            eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
+                            eventData.meta.detail    = response?.data?.data?.meta?.detail;
+                        }
+                        self.event.setExtendedProp('data', eventData);
+                        self.event.setProp('title', response?.data?.title);
+                    })
+                    .finally(function () {
+                        self.$refs.modal.close();
+                    });
             },
             deleteEvent: function () {
                 // Handle event deletion (series dialog, confirmation)
