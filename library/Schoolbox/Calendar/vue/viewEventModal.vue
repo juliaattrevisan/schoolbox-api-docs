@@ -89,11 +89,12 @@
             deleteEvent: function () {
                 // Handle event deletion (series dialog, confirmation)
                 // and all that
+                let self = this;
                 axios
                     .post('/calendar/ajax/delete', {})
-                    .then(function (response) {
+                    .then(function () {
                     // Add this event to the calendar
-                    self.$emit('eventDeleted', response.data);
+                    self.$emit('eventDeleted', this.event);
                 }).finally(function () {
                     self.$refs.modal.close();
                 });
