@@ -159,4 +159,12 @@ class Broker extends Base
     {
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function lastInsertId($name = null)
+    {
+        return $this->connector->executeQuery("SELECT SCOPE_IDENTITY()")->fetchColumn();
+    }
 }

@@ -122,4 +122,12 @@ class Broker extends Base
 
         return "dblib:version=7.0;charset=UTF-8;host={$this->connector->getHostname()}{$portString};dbname={$this->connector->getDatabase()};";
     }
+
+    /**
+      * @inheritdoc
+      */
+    public function lastInsertId($name = null)
+    {
+        return $this->connector->executeQuery("SELECT SCOPE_IDENTITY()")->fetchColumn();
+    }
 }
