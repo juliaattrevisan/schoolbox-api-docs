@@ -106,15 +106,24 @@
             deleteEvent: function () {
                 // Handle event deletion (series dialog, confirmation)
                 // and all that
-                let self = this;
+                let self    = this,
+                    request = {
+                        url:    '/calendar/modifyForm.php',
+                        method: 'post',
+                        data:   toQueryString({id: this.eventExtendedProps.eventId}),
+                        params: {
+                            action: 'Delete',
+                            // TODO add efficacy, redirects, etc?
+                        },
+                    };
                 axios
-                    .post('/calendar/ajax/delete', {})
+                    .request(request)
                     .then(function () {
-                    // Add this event to the calendar
-                    self.$emit('eventDeleted', this.event);
-                }).finally(function () {
-                    self.$refs.modal.close();
-                });
+                        // Remove this event to the calendar
+                        self.event.remove();
+                    }).finally(function () {
+                        self.$refs.modal.close();
+                    });
             },
             open() {
                 this.$refs.modal.open();
@@ -205,7 +214,7 @@
                     <li><input type="submit"
                                :disabled="!isTaskSubmittable"
                                value="Update Task" /></li>
-                    <li><button @click.prevent="deleteEvent">Delete Task Event</button></li>
+                    <li><button @click.prevent="deleteEvent">Delete Task</button></li>
                 </ul>
             </form>
         </template>
