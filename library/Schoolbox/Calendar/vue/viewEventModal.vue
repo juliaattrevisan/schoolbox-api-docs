@@ -1,8 +1,9 @@
 <script>
-    import RevealModal from '@schoolbox/reveal-modal'
-    import MetaList    from '@schoolbox/meta/list'
-    import MetaItem    from '@schoolbox/meta/item'
-    import axios       from 'axios';
+    import RevealModal   from '@schoolbox/reveal-modal'
+    import MetaList      from '@schoolbox/meta/list'
+    import MetaItem      from '@schoolbox/meta/item'
+    import axios         from 'axios';
+    import toQueryString from "./helper/toQueryString";
 
     export default {
         name: "view-event-modal",
@@ -69,18 +70,31 @@
         },
         methods: {
             isTaskSubmittable: function () {
-                return this.event.title && this.event.title.length !== 0;
+                return this.$refs.eventTitleInput.value.length !== 0;
             },
             updateEvent: function () {
                 let self = this,
-                    form = self.$refs.updateForm;
+                    form = self.$refs.updateForm,
+                    data = {
+                        eventId:   this.$refs.eventIdInput.value,
+                        completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
+                        title:     this.$refs.eventTitleInput.value,
+                        detail:    this.$refs.eventDetailInput.value,
+                    };
                 axios.request({
                     url:          form.action,
-                    data:         window.$(form).serialize(),
+                    data:         toQueryString(data),
                     method:       form.method,
                     responseType: 'json',
                 }).then(function (response) {
-                    self.$emit('eventUpdated', response.data);
+                    // Assign updated values into existing event
+                    let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
+                    if (typeof eventData?.meta === 'object') {
+                        eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
+                        eventData.meta.detail    = response?.data?.data?.meta?.detail;
+                    }
+                    self.event.setExtendedProp('data', eventData);
+                    self.event.setProp('title', response?.data?.title);
                 }).finally(function () {
                     self.$refs.modal.close();
                 });
@@ -134,23 +148,6 @@
                     return start;
                 }
             },
-            updateCompleted: function ($event) {
-                let data = Object.create(this.event?.extendedProps?.data || {});
-                if (typeof data?.meta === 'object') {
-                    data.meta.completed = $event.target.checked;
-                }
-                this.event.setExtendedProp('data', data);
-            },
-            updateTitle: function ($event) {
-                this.event.setProp('title', $event.target.value);
-            },
-            updateDetail: function ($event) {
-                let data = Object.create(this.event?.extendedProps?.data || {});
-                if (typeof data?.meta === 'object') {
-                    data.meta.detail = $event.target.value;
-                }
-                this.event.setExtendedProp('data', data);
-            },
         },
     }
 </script>
@@ -159,7 +156,11 @@
     <reveal-modal ref="modal">
         <template v-if="eventExtendedProps.editable && eventExtendedProps.task.isTask">
             <form ref="updateForm" method="post" action="/calendar/ajax/update" @submit.prevent="updateEvent">
-                <input type="hidden" name="eventId" :value="eventExtendedProps.eventId"/>
+                <input ref="eventIdInput"
+                       name="eventId"
+                       type="hidden"
+                       :value="eventExtendedProps.eventId"
+                />
 
                 <!-- Currently only tasks have this form -->
                 <h3>Task</h3>
@@ -168,12 +169,12 @@
                     Due {{ eventExtendedProps.dateSpan }}
                 </label>
 
-                <input id="modifyTaskBubbleCompleted"
+                <input ref="eventCompletedInput"
+                       id="modifyTaskBubbleCompleted"
                        name="completed"
                        type="checkbox"
                        value="1"
                        :checked="eventExtendedProps.completed"
-                       @change="updateCompleted($event)"
                 />
                 <label for="modifyTaskBubbleCompleted" class="checkbox-label">
                     Complete
@@ -181,20 +182,18 @@
 
                 <label>
                     Task
-                    <input name="title"
+                    <input ref="eventTitleInput"
+                           name="title"
                            type="text"
                            :value="event.title"
-                           @change="updateTitle($event)"
-                           @input="updateTitle($event)"
                     />
                 </label>
 
                 <label class="detail">
                     Note
-                    <textarea name="detail"
+                    <textarea ref="eventDetailInput"
+                              name="detail"
                               :value="eventExtendedProps.detail"
-                              @change="updateDetail($event)"
-                              @input="updateDetail($event)"
                     ></textarea>
                 </label>
 
