@@ -107,10 +107,61 @@
                 );
                 // Fail callback: consider a message saying something failed
             },
+            eventRender: function (eventRenderInfo) {
+                let calEvent = eventRenderInfo.event;
+
+                // Always render placeholders in the most basic manner
+                if (calEvent.id === 'placeholder') {
+                    return true;
+                }
+
+                // Ignore the phantom event that the API puts there
+                if (!calEvent?.extendedProps?.data) {
+                    return false;
+                }
+
+                // Don't render me if I'm marked as do not render
+                if ('is_rendered' in calEvent && !calEvent?.is_rendered) {
+                    return false;
+                }
+
+                // Mangle the event using old-fashioned jQuery
+                // TODO don't do this
+                let $element = window.$(eventRenderInfo.el),
+                    inner    = $element.find('.fc-content'),
+                    title    = $element.find('.fc-title'),
+                    content  = $element.find('.fc-event-content');
+
+                // title.text(calEvent?.title || '');
+
+                // If appropriate, indicate this event can be attended
+                if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
+                    let span = '<span class="att">(A)</span>';
+                    if (content.length === 1) {
+                        content.append(span)
+                    } else {
+                        inner.append(span)
+                    }
+                }
+
+                // If this event is a task, alter the state of the checkbox accordingly.
+                if (Number(calEvent?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId) {
+                    inner.prepend(
+                        $('<input type="checkbox" name="completed" class="plain" />')
+                            .attr('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId)
+                    );
+                    if (Boolean(calEvent?.extendedProps?.data?.meta?.completed)) {
+                        title.addClass('strike');
+                        inner.find(':checkbox').prop('checked', true)
+                    }
+                }
+
+                // Apply the visible class?
+                $element.addClass(calEvent?.extendedProps?.data?.styles?.visible);
+                return true;
+            },
             onDateClick: function (dateClickInfo) {
-                // TODO migrate date rendering into create event modal
-                let momentDate       = this.toMoment(dateClickInfo.date),
-                    [firstEventType] = this.config.eventTypes;
+                let [firstEventType] = this.config.eventTypes;
                 this.newEvent = {
                     date:        dateClickInfo.date,
                     allDay:      dateClickInfo.allDay,
@@ -223,6 +274,7 @@
             :event-limit="config.eventLimit"
             :first-day="config.firstDay"
             :events="events"
+            :event-render="eventRender"
             @loading="onLoading"
             @dateClick="onDateClick"
             @eventClick="onEventClick"
