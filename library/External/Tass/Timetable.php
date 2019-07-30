@@ -251,7 +251,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
         if ($this->groupHandler->isStudent($userId)) {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc, day_code
+            $query = "SELECT room_code, tch_code, ttmast.sub_code,  ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc, day_code
                             FROM studsub
                             JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                             JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester
@@ -262,7 +262,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                             ORDER BY prd_code, day_code";
 
         } else {
-            $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, ttmast.year_grp, class, prd_code, sub_desc
+            $query = "SELECT room_code, tch_code, day_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '$fileYear' AND semester = '$fileSemester'
@@ -326,7 +326,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                     + '-'
                     + RTRIM(CAST(ttmast.tt_id AS VARCHAR(20))) AS TimetableGroup,
                 ttmast.cmpy_code AS ClassCampus,
-                RTRIM(CAST(ttmast.year_grp AS VARCHAR(20)))
+                RTRIM(CAST(ISNULL(ttmast.year_grp,subtab.year_grp) AS VARCHAR(20)))
                     + '-'
                     + RTRIM(CAST(ttmast.sub_code AS VARCHAR(20)))
                     + '-'
