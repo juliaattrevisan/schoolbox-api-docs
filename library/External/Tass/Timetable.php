@@ -64,7 +64,7 @@ class External_Tass_Timetable implements External_TimetableInterface
 
         /* Fetch the longest day to use as our day template...  */
         if ($day == 0) {
-            $query      = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '" . $timetableCode . " ' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
+            $query      = "SELECT tt_id, day_code, prd_num FROM ttdays WHERE tt_id = '" . $timetableCode . "' AND cmpy_code = '$campusCode' ORDER BY prd_num DESC";
             $longestDay = $this->getDatabase()->getRow($query);
             $day        = $longestDay['day_code'];
         }
