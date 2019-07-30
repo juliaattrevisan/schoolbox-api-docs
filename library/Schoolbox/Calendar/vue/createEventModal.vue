@@ -1,0 +1,110 @@
+<script>
+    import RevealModal from '@schoolbox/reveal-modal'
+    export default {
+        name: "create-event-modal",
+        props: [
+            'event',
+            'userId',
+            'eventTypes',
+            'taskTypeId',
+        ],
+        components: {
+            RevealModal,
+        },
+        computed: {
+            isNewEventSubmittable: function () {
+                return this.event.title && this.event.title.length !== 0;
+            },
+        },
+        methods: {
+            open() {
+                this.$refs.modal.open();
+            },
+        },
+    }
+</script>
+
+<template>
+    <reveal-modal ref="modal">
+        <!-- create a tab Vue component? Currently they just work magically -->
+        <dl class="tabs" data-tab>
+            <dd class="active"><a href="#createEventPanel">Create Event</a></dd>
+            <dd><a href="#createTaskPanel">Create Task</a></dd>
+        </dl>
+        <div class="tabs-content">
+            <div class="content active" id="createEventPanel" aria-hidden="false">
+                <form ref="createEventForm"
+                      method="post"
+                      action="/calendar/ajax/create"
+                      @submit.prevent="createNewEvent($refs.createEventForm)"
+                      class="top"
+                >
+                    <input name="userId" type="hidden" :value="userId" />
+                    <input name="allDay" type="hidden" :value="event.allDay ? 1 : 0" />
+                    <input name="date"   type="hidden" :value="event.date" />
+
+                    <section>
+                        <h3>On <span>{{ event.displayDate }}</span></h3>
+
+                        <label>
+                            Event Title
+                            <input name="title" type="text" v-model="event.title" />
+                        </label>
+
+                        <label>
+                            Event Type
+                            <select name="type" v-model="event.type">
+                                <option v-for="eventType in eventTypes" :value="eventType.id">
+                                    {{ eventType.name }}
+                                </option>
+                            </select>
+                        </label>
+                    </section>
+                    <ul class="flex-list buttons">
+                        <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
+                        <li><input type="submit"
+                                   :disabled="!isNewEventSubmittable"
+                                   value="Create Event" /></li>
+                    </ul>
+                </form>
+            </div>
+            <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
+                <form ref="createTaskForm"
+                      method="post"
+                      action="/calendar/ajax/create"
+                      @submit.prevent="createNewEvent($refs.createTaskForm)"
+                >
+                    <input name="userId" type="hidden" :value="userId" />
+                    <input name="allDay" type="hidden" :value="event.allDay ? 1 : 0" />
+                    <input name="date"   type="hidden" :value="event.date" />
+                    <input name="type"   type="hidden" :value="taskTypeId" />
+
+                    <section>
+                        <h3>Due <span>{{ event.displayDate }}</span></h3>
+
+                        <label>
+                            Task
+                            <input name="title" type="text" v-model="event.title" />
+                        </label>
+
+                        <label class="detail">
+                            Note
+                            <textarea name="detail" v-model="event.detail"></textarea>
+                        </label>
+                    </section>
+                    <div class="row">
+                        <div class="small-12 columns no-pad">
+                            <input type="submit"
+                                   :disabled="!isNewEventSubmittable"
+                                   value="Create Task" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </reveal-modal>
+</template>
+
+<style scoped>
+
+</style>

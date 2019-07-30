@@ -10,10 +10,12 @@
     import MetaList                 from '@schoolbox/meta/list'
     import MetaItem                 from '@schoolbox/meta/item'
     import EventModal               from './eventModal';
+    import CreateEventModal         from './createEventModal';
     import axios                    from 'axios'
 
     export default {
         components: {
+            CreateEventModal,
             EventModal,
             MetaItem,
             MetaList,
@@ -106,8 +108,7 @@
                 // Fail callback: consider a message saying something failed
             },
             onDateClick: function (dateClickInfo) {
-                // this.currentEvent = eventInfo.event;
-                // this.$refs.createEvent.open();
+                // TODO migrate calculations into create event modal
                 let momentDate       = this.toMoment(dateClickInfo.date),
                     [firstEventType] = this.config.eventTypes;
                 this.newEvent = {
@@ -192,84 +193,12 @@
             ccc
         </reveal-modal>
 
-        <reveal-modal ref="createEvent">
-            <!-- create a tab Vue component? Currently they just work magically -->
-            <dl class="tabs" data-tab>
-                <dd class="active"><a href="#createEventPanel">Create Event</a></dd>
-                <dd><a href="#createTaskPanel">Create Task</a></dd>
-            </dl>
-            <div class="tabs-content">
-                <div class="content active" id="createEventPanel" aria-hidden="false">
-                    <form ref="createEventForm"
-                          method="post"
-                          action="/calendar/ajax/create"
-                          @submit.prevent="createNewEvent($refs.createEventForm)"
-                          class="top"
-                    >
-                        <input name="userId" type="hidden" :value="config.userId" />
-                        <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
-                        <input name="date"   type="hidden" :value="newEvent.date" />
-
-                        <section>
-                            <h3>On <span>{{ newEvent.displayDate }}</span></h3>
-
-                            <label>
-                                Event Title
-                                <input name="title" type="text" v-model="newEvent.title" />
-                            </label>
-
-                            <label>
-                                Event Type
-                                <select name="type" v-model="newEvent.type">
-                                    <option v-for="eventType in config.eventTypes" :value="eventType.id">
-                                        {{ eventType.name }}
-                                    </option>
-                                </select>
-                            </label>
-                        </section>
-                        <ul class="flex-list buttons">
-                            <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
-                            <li><input type="submit"
-                                       :disabled="!isNewEventSubmittable"
-                                       value="Create Event" /></li>
-                        </ul>
-                    </form>
-                </div>
-                <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
-                    <form ref="createTaskForm"
-                          method="post"
-                          action="/calendar/ajax/create"
-                          @submit.prevent="createNewEvent($refs.createTaskForm)"
-                    >
-                        <input name="userId" type="hidden" :value="config.userId" />
-                        <input name="allDay" type="hidden" :value="newEvent.allDay ? 1 : 0" />
-                        <input name="date"   type="hidden" :value="newEvent.date" />
-                        <input name="type"   type="hidden" :value="config.taskTypeId" />
-
-                        <section>
-                            <h3>Due <span>{{ newEvent.displayDate }}</span></h3>
-
-                            <label>
-                                Task
-                                <input name="title" type="text" v-model="newEvent.title" />
-                            </label>
-
-                            <label class="detail">
-                                Note
-                                <textarea name="detail" v-model="newEvent.detail"></textarea>
-                            </label>
-                        </section>
-                        <div class="row">
-                            <div class="small-12 columns no-pad">
-                                <input type="submit"
-                                       :disabled="!isNewEventSubmittable"
-                                       value="Create Task" />
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </reveal-modal>
+        <create-event-modal ref="createEvent"
+                            :event="newEvent"
+                            :user-id="config.userId"
+                            :task-type-id="config.taskTypeId"
+                            :event-types="config.eventTypes"
+        />
 
         <event-modal ref="event" :event="currentEvent" :to-moment="toMoment" />
 

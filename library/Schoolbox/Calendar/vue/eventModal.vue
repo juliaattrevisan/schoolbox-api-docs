@@ -62,7 +62,7 @@
         },
         methods: {
             open() {
-                this.$refs.event.open();
+                this.$refs.modal.open();
             },
             determineDateSpan: function (startDate, endDate, allDay) {
                 if (!startDate) {
@@ -102,7 +102,7 @@
 </script>
 
 <template>
-    <reveal-modal ref="event">
+    <reveal-modal ref="modal">
         <div class="row">
             <div class="small-12">
                 <h2 class="note">{{ event.title }}</h2>
