@@ -12,12 +12,14 @@
     import MetaItem                 from '@schoolbox/meta/item'
     import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
+    import UpdateEventModal         from './updateEventModal';
     import axios                    from 'axios'
 
     export default {
         components: {
             CreateEventModal,
             ViewEventModal,
+            UpdateEventModal,
             MetaItem,
             MetaList,
             FullCalendar,
@@ -146,7 +148,7 @@
                 }
 
                 // If this event is a task, alter the state of the checkbox accordingly.
-                if (Number(calEvent?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId) {
+                if (this.isTask(calEvent)) {
                     inner.prepend(
                         $('<input type="checkbox" name="completed" class="plain" />')
                             .attr('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId)
@@ -176,7 +178,13 @@
                 // Ideally the current event would be a part of the modal,
                 // not this component, but :shrug:
                 this.currentEvent = eventInfo.event;
-                this.$refs.event.open();
+
+                // So is the event a task or a standard event?
+                if (this.isTask(this.currentEvent)) {
+                    this.$refs.updateEvent.open();
+                } else {
+                    this.$refs.event.open();
+                }
             },
             onEventResize: function (eventResizeInfo) {
                 let event = eventResizeInfo.event,
@@ -238,6 +246,9 @@
                     qsParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
                 });
                 return qsParts.join('&');
+            },
+            isTask: function (event) {
+                return Number(event?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId;
             }
         }
     }
@@ -265,6 +276,10 @@
         <view-event-modal ref="event"
                           :event="currentEvent"
                           :to-moment="toMoment" />
+
+        <update-event-modal ref="updateEvent"
+                            :event="currentEvent"
+                            :to-moment="toMoment" />
 
         <full-calendar
             ref="fullCalendar"

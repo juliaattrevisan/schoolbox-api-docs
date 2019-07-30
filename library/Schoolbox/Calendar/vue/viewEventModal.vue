@@ -52,6 +52,7 @@
                         actions: data?.booking?.buttons,
                     },
                     attendance: data?.attendance,
+                    completed: metadata?.completed,
                     links: {
                         view: data?.custom?.moreDetailsLink,
                         modify: modifyLink,
