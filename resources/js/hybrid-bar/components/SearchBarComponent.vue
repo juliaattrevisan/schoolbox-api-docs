@@ -31,7 +31,7 @@
             </li>
             <li class="result-meta with-bg" v-if="results.length && totalCount > results.length">
                 <result-meta>
-                    <a v-bind:href="'/search?keyword=' + keyword + '#user'">View all {{ totalCount }} users</a>
+                    <a v-bind:href="this.paths.searchPage + keyword + '#user'">View all {{ totalCount }} users</a>
                 </result-meta>
             </li>
             <li class="result-meta" v-if="!results.length">
@@ -39,7 +39,7 @@
             </li>
             <li class="result-meta with-bg" v-if="!results.length">
                 <result-meta>
-                    <a href="#">Search everything for "{{ keyword }}"</a>
+                    <a v-bind:href="this.paths.searchPage + keyword + '#all'">Search everything for "{{ keyword }}"</a>
                 </result-meta>
             </li>
         </ul>
@@ -60,25 +60,31 @@
                 results: [],
                 isOpen: false,
                 isLoading: true,
-                noResults: true,
                 totalCount: 0,
-                arrowCounter: -1,
+                arrowCounter: -1, // Want to automatically select the first result? set this to 0
+                paths: {
+                    'portrait': '/portrait.php?id=',
+                    'searchEndpoint': '/user/search?keyword=',
+                    'userPage': '/search/user/',
+                    'searchPage': '/search?keyword=',
+                }
             }
         },
 
         methods: {
             lostFocus: function(event) {
                 this.isFocused = false;
+                this.arrowCounter = 0;
             },
 
             onChange: function(event) {
                 var self = this;
+
                 if (self.keyword.length >= 3) {
-                    this.isOpen = true;
-                    this.isFocused = true;
-                    this.isLoading = true;
-                    this.filterResults();
-                    this.results = [];
+                    self.isOpen = true;
+                    self.isFocused = true;
+                    self.isLoading = true;
+                    self.filterResults();
                 }
             },
 
@@ -87,7 +93,7 @@
             },
 
             onArrowDown: function() {
-                if (this.arrowCounter < this.results.length) {
+                if (this.arrowCounter < this.results.length - 1) {
                     this.arrowCounter = this.arrowCounter + 1;
                 }
             },
@@ -103,12 +109,13 @@
             },
 
             goToProfilePage: function(id) {
-                window.location.href = '/search/user/' + id;
+                window.location.href = this.paths.userPage + id;
             },
 
             filterResults: function() {
                 var self = this;
-                axios.get('/user/search?keyword=' + self.keyword).then(function (response) {
+
+                axios.get(self.paths.searchEndpoint + self.keyword).then(function (response) {
                     self.totalCount = response.data.totalCount;
                     self.results = response.data.results;
                 }).finally(function () {
@@ -127,7 +134,7 @@
             },
 
             formatPortrait: function(id) {
-                return '/portrait.php?id=' + id + '&size=square64';
+                return this.paths.portrait + id + '&size=square64';
             }
         }
     }
@@ -213,7 +220,7 @@
     }
 
     .result-meta {
-        padding: 1rem 0 !important;
+        padding: .5rem 0 !important;
         list-style: none;
     }
 
