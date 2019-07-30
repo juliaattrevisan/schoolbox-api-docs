@@ -173,7 +173,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
         $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
         if ($this->groupHandler->isStudent($userId)) {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, ttmast.class, prd_code, sub_desc
+            $query = "SELECT room_code, tch_code, ttmast.sub_code,ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, ttmast.class, prd_code, sub_desc
                         FROM studsub
                         JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                         JOIN ttmast ON studsub.sub_code=ttmast.sub_code AND studsub.cmpy_code=ttmast.cmpy_code AND studsub.semester=ttmast.semester 
@@ -184,7 +184,7 @@ class External_Tass_Timetable implements External_TimetableInterface
                                 AND day_code = '$dayNumber'
                         ORDER BY prd_code";
         } else {
-            $query = "SELECT room_code, tch_code, ttmast.sub_code, ttmast.year_grp, class, prd_code, sub_desc
+            $query = "SELECT room_code, tch_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
                         JOIN subtab ON subtab.sub_code=ttmast.sub_code AND subtab.cmpy_code=ttmast.cmpy_code
                         WHERE year_num = '$fileYear' AND semester = '$fileSemester'
