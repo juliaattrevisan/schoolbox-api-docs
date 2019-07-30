@@ -11,11 +11,11 @@
                @keydown.up="onArrowUp"
                @keydown.ctrl.enter="onEnter"
                @input="onChange"
+               @blur="isFocused=false"
                v-click-outside="lostFocus"
         />
-<!--        @blur="isFocused=false"-->
         <ul class="results" v-show="isFocused && isOpen">
-            <li class="result-meta" v-if="results.length && results.length !== totalCount">
+            <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
@@ -30,17 +30,17 @@
             <li class="result-meta" v-if="isLoading">
                 <result-meta><div class="loader"></div></result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="results.length && totalCount > results.length">
+            <li class="result-meta with-bg" v-if="results.length && totalCount > results.length" @mousedown="goToPath(paths.searchPage + keyword + '#user')">
                 <result-meta>
-                    <a @mousedown="goToPath(paths.searchPage + keyword + '#user')">View all {{ totalCount }} users</a>
+                    View all {{ totalCount }} users
                 </result-meta>
             </li>
             <li class="result-meta" v-if="!results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="!results.length">
+            <li class="result-meta with-bg" v-if="!results.length" @mousedown="goToPath(paths.searchPage + keyword + '#all')">
                 <result-meta>
-                    <a @mousedown="goToPath(paths.searchPage + keyword + '#all')">Search everything for "{{ keyword }}"</a>
+                    Search everything for "{{ keyword }}"
                 </result-meta>
             </li>
         </ul>
