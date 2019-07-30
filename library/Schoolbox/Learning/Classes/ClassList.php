@@ -86,7 +86,7 @@ class ClassList
             // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
-                $folder                       = $this->folderMapper->findForCampusAndClass($subject['campus'] ?? '', $subject['code']);
+                $folder                       = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
                 $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
                 $classTypes[$folder->getId()] = $subject['classType'] ?? '';
             }
