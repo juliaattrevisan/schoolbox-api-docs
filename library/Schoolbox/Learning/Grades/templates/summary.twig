@@ -37,15 +37,19 @@
     <div class="small-12 medium-7 columns">
         <div class="content">
             <div class="context-switch clearfix">
-                {% include 'sub/semesterSelector.twig' with {
+                {% include '@learningGrades/semesterSelector.twig' with {
                     terms:       terms,
                     currentTerm: term,
                     route:       'learningGrades.getGrades',
-                    routeArgs:   {viewee: student, userId: student.id}
+                    routeArgs:   {viewee: student, userId: student.id},
+
+                    userId:      student.id,
+                    yearUrl:     yearUrl,
+                    year:        year
                 } only %}
 
                 {% include 'sub/subjectSelector.twig' with {
-                    subjects:       folders,
+                    folders:        folders,
                     route:          'learningGrades.getGradesForSubject',
                     routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code}
                 } only %}
@@ -60,83 +64,83 @@
     <div class="small-12 island">
         <section>
             {% for folder in folders %}
-            <ul class="subject-list group">
-                <li class="subject-group">
-                    <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
-                        <div class="small-12 content sibling">
-                            <h3 class="no-margin">
-                                {{ folder.name }}
-                                <span class="meta">
+                <ul class="subject-list group">
+                    <li class="subject-group">
+                        <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
+                            <div class="small-12 content sibling">
+                                <h3 class="no-margin">
+                                    {{ folder.name }}
+                                    <span class="meta">
                                     {% for code in folder.codes %}
                                         ({{ code.code }}){% if not loop.last %},{% endif %}
                                     {% endfor %}
                                 </span>
-                            </h3>
-                        </div>
-                        {% if showOverallGrade %}
-                        <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}-bg no-margin">
-                            <span>{{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}</span>
-                        </div>
-                        {% endif %}
-                    </a>
-                </li>
-                {% for teacher in folder.teachers %}
-                <li class="actions-small-1">
-                    <div class="list-item">
-                        <div class="compact card small-12">
-                            <a href="/search/user/{{ teacher.id }}" title="">
-                                <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64" alt="{{ teacher.fullName }}"/>
-                                <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
-                    </nav>
-                </li>
-                {% endfor %}
-
-                {% if assessmentTasks[folder.id] | length %}
-                <li>
-                    <ul class="information-list">
-                        {% for assessment in assessmentTasks[folder.id] %}
-                            {% set participant = assessment.participantIfExtant(student) %}
-                            <li class="actions-small-2">
-                                <div class="list-item clearfix content">
-                                    <div class="row">
-                                        <div class="small-12 large-6 card column xl">
-                                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
-                                                {{ assessment.title }}
-                                            </a>
-                                            <p class="meta">
-                                                <a href="/homepage/{{ subject.id }}">{{ subject.name }}</a> {{ assessment.typeName }}
-                                            </p>
-                                        </div>
-
-                                        <div class="small-12 large-6 columns grade">
-                                            {% set feedback = participant.findAuthoritativeVisibleFeedback(currentUser) %}
-                                            {% if feedback %}
-                                                <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
-                                                <p class="comment">{{ feedback.comment | nl2br }}</p>
-                                                {% if assessment.useRubric  %}
-                                                    <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
-                                                        View more feedback</a>
-                                                {% endif %}
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                                </h3>
+                            </div>
+                            {% if showOverallGrade %}
+                                <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}-bg no-margin">
+                                    <span>{{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}</span>
                                 </div>
-                                <nav>
-                                    {% if quizzes[assessment.id] is not empty %}
-                                        <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
-                                    {% endif %}
-                                </nav>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-                {% endif %}
-            </ul>
+                            {% endif %}
+                        </a>
+                    </li>
+                    {% for teacher in folder.teachers %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="compact card small-12">
+                                    <a href="/search/user/{{ teacher.id }}" title="">
+                                        <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64" alt="{{ teacher.fullName }}"/>
+                                        <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
+                                    </a>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="{{ mailHandle }}{{ teacher.email }}" class="icon-email" title="Mail"></a>
+                            </nav>
+                        </li>
+                    {% endfor %}
+
+                    {% if assessmentTasks[folder.id] | length %}
+                        <li>
+                            <ul class="information-list">
+                                {% for assessment in assessmentTasks[folder.id] %}
+                                    {% set participant = assessment.participantIfExtant(student) %}
+                                    <li class="actions-small-2">
+                                        <div class="list-item clearfix content">
+                                            <div class="row">
+                                                <div class="small-12 large-6 card column xl">
+                                                    <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                                        {{ assessment.title }}
+                                                    </a>
+                                                    <p class="meta">
+                                                        <a href="/homepage/{{ subject.id }}">{{ subject.name }}</a> {{ assessment.typeName }}
+                                                    </p>
+                                                </div>
+
+                                                <div class="small-12 large-6 columns grade">
+                                                    {% set feedback = participant.findAuthoritativeVisibleFeedback(currentUser) %}
+                                                    {% if feedback %}
+                                                        <div class="{{ urgency.marks(feedback.normalisedMark) }}"><span>{{ feedback.humanReadableMark }}</span></div>
+                                                        <p class="comment">{{ feedback.comment | nl2br }}</p>
+                                                        {% if assessment.useRubric  %}
+                                                            <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: assessment.id, studentId: student.id}) }}{{ returnUrlSuffix }}">
+                                                                View more feedback</a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            {% if quizzes[assessment.id] is not empty %}
+                                                <a class="icon-view" href="/assess/attempts/{{ quizzes[assessment.id].id }}/{{ student.id }}" title="View Attempts"></a>
+                                            {% endif %}
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
             {% endfor %}
         </section>
     </div>

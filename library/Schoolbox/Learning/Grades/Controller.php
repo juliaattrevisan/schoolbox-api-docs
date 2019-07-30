@@ -283,13 +283,12 @@ class Controller extends Base
             }
         }
 
-        //Do we have access to btacs year summary route?
         try{
-            $yearRoute = $this->getRouteIfAuthorized('learningGrades.getCustomGradesYear');
+            $yearUrl = $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $viewee->getId()]);
         } catch (RouteNotFound $e) {
-            $yearRoute = null;
+            $yearUrl = null;
         }
-        
+
         // Squish this mess out
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
@@ -303,7 +302,7 @@ class Controller extends Base
             'showOverallGrade' => $showOverallGrade,
             'mailHandle'      => $this->getSession()->get('mailhandle'),
             'currentUser'     => $this->getUser(),
-            'yearRoute'       => $yearRoute
+            'yearUrl'          => $yearUrl
         ]));
     }
 
@@ -371,6 +370,12 @@ class Controller extends Base
         // Get folders for drop-down.
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
+        try{
+            $yearUrl = $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $viewee->getId()]);
+        } catch (RouteNotFound $e) {
+            $yearUrl = null;
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
                 'student'            => $viewee,
@@ -382,10 +387,36 @@ class Controller extends Base
                 'canSeeGradeAverage' => $canSeeGradeAverage,
                 'markbook'           => $markbook,
                 'conversation'       => $conversation,
+                'yearUrl'            => $yearUrl,
             ])->setTab('grade')->setTitle("Grades for {$subject->getTitle()}")
         );
     }
 
+    /**
+     * @param User $viewee
+     * @param int $year
+     * @throws ServiceNotFound If unable to find mail handler service
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @api   GET /learning/grades-year/{userId}/year/{year}
+     * @level 165
+     */
+    public function getCustomGradesYear(User $viewee, int $year)
+    {
+        $from = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
+        $to = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
+        $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, false, $from, $to);
+
+        //If we are looking at the year, no term is specified.
+        //Specify term 1 of that year in this case
+        $dateString = "{$year}-01-01";
+        $term = $this->getTermMapper()->findForDate(
+            new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_DATE_FORMAT)
+        );
+
+        $filteredWorkTypes = WorkType\Mapper::getInstance()->findByColumn('show_on_grades_page', 1);
+
+        $this->getCustomGrades($viewee, $assessments, $year, $term, $filteredWorkTypes);
+    }
 
     /**
      * @param User         $viewee
