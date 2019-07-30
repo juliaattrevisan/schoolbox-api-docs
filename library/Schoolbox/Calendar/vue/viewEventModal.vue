@@ -119,7 +119,11 @@
                     Due {{ eventExtendedProps.dateSpan }}
                 </label>
 
-                <input id="modifyTaskBubbleCompleted" name="completed" type="checkbox" v-model="eventExtendedProps.completed" />
+                <input id="modifyTaskBubbleCompleted"
+                       name="completed"
+                       type="checkbox"
+                       value="1"
+                       v-model="eventExtendedProps.completed" />
                 <label for="modifyTaskBubbleCompleted" class="checkbox-label">
                     Complete
                 </label>
