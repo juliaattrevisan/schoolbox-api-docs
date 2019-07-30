@@ -13,6 +13,7 @@
     import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
     import axios                    from 'axios'
+    import toQueryString            from "./helper/toQueryString";
 
     export default {
         components: {
@@ -187,7 +188,7 @@
                         end:     this.toMoment(event.end).format(),
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/ajax/update', this.toQueryString(data));
+                axios.post('/calendar/ajax/update', toQueryString(data));
             },
             onEventDrop: function (eventDropInfo) {
                 let event = eventDropInfo.event,
@@ -198,7 +199,7 @@
                         allDay:      event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/ajax/update', this.toQueryString(data));
+                axios.post('/calendar/ajax/update', toQueryString(data));
             },
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
@@ -228,16 +229,6 @@
             },
             addEvent: function (event) {
                 this.$refs.fullCalendar.getApi().addEvent(event);
-            },
-            toQueryString: function (object) {
-                // Helper function for converting an object into a query string.
-                // I'm not going to npm install just to do that!
-                let qsParts = [];
-                Object.keys(object).forEach(function (key) {
-                    let val = object[key];
-                    qsParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
-                });
-                return qsParts.join('&');
             },
             isTask: function (event) {
                 return Number(event?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId;
