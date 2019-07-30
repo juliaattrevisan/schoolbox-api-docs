@@ -34,7 +34,7 @@ class Controller extends Base
     /**
      * @param Kami\IConnector  $kamiConnector
      * @param Database\Factory $databaseFactory
-     * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config
+     * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
      */
     public function __construct(Kami\IConnector $kamiConnector, Database\Factory $databaseFactory, ?IConnector $databaseExternal)
     {
