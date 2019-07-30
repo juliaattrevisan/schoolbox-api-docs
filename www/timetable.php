@@ -214,7 +214,7 @@ foreach ($userList as $user) {
                             $catCache = [];
                             if (count($period) > 0) {
                                 foreach ($period as $class) {
-                                    $cacheKey = $class['campus'] . $class['code'];
+                                    $cacheKey = ($class['campus'] ?? '') . $class['code'];
 
                                     /* Handle colour array */
                                     if ($class['code'] && !array_key_exists($cacheKey, $subjectColourMap)) {
