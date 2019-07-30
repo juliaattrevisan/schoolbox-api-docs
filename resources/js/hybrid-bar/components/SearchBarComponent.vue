@@ -6,12 +6,13 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @click="isFocused=true"
+               @mousedown="isFocused=true"
+               @blur="isFocused=false"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
-               v-click-outside="lostFocus"
                @input="onChange"
+               v-click-outside="lostFocus"
         />
         <ul class="results" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount">
@@ -19,7 +20,7 @@
             </li>
             <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
                 <div class="list-item small-12" v-bind:class="{ 'is-active': i === arrowCounter }">
-                    <a @click="goToProfilePage(result.id)">
+                    <a @mousedown="goToProfilePage(result.id)">
                         <img v-bind:src="formatPortrait(result.id)">
                         <p class="name">{{ result.formattedName }}</p>
                         <p class="meta">{{ formatMeta(result) }}</p>
@@ -31,7 +32,7 @@
             </li>
             <li class="result-meta with-bg" v-if="results.length && totalCount > results.length">
                 <result-meta>
-                    <a v-bind:href="this.paths.searchPage + keyword + '#user'">View all {{ totalCount }} users</a>
+                    <a @mousedown="goToPath(paths.searchPage + keyword + '#user')">View all {{ totalCount }} users</a>
                 </result-meta>
             </li>
             <li class="result-meta" v-if="!results.length">
@@ -39,7 +40,7 @@
             </li>
             <li class="result-meta with-bg" v-if="!results.length">
                 <result-meta>
-                    <a v-bind:href="this.paths.searchPage + keyword + '#all'">Search everything for "{{ keyword }}"</a>
+                    <a @mousedown="goToPath(paths.searchPage + keyword + '#all')">Search everything for "{{ keyword }}"</a>
                 </result-meta>
             </li>
         </ul>
@@ -78,7 +79,6 @@
 
                 if (self.keyword.length >= 3) {
                     self.isOpen = true;
-                    self.isFocused = true;
                     self.isLoading = true;
                     self.filterResults();
                 }
@@ -107,6 +107,10 @@
 
             goToProfilePage: function(id) {
                 window.location.href = this.paths.userPage + id;
+            },
+
+            goToPath: function(path) {
+                window.location.href = path;
             },
 
             filterResults: function() {
