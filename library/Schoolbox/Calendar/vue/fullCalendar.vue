@@ -5,7 +5,8 @@
     import dayGridPlugin            from '@fullcalendar/daygrid'
     import timeGridPlugin           from '@fullcalendar/timegrid'
     import listPlugin               from '@fullcalendar/list'
-    import momentPlugin, {toMoment} from '@fullcalendar/moment'
+    import momentPlugin,
+           {toMoment, toDuration}   from '@fullcalendar/moment'
     import RevealModal              from '@schoolbox/reveal-modal'
     import MetaList                 from '@schoolbox/meta/list'
     import MetaItem                 from '@schoolbox/meta/item'
@@ -178,10 +179,26 @@
                 this.$refs.event.open();
             },
             onEventResize: function (eventResizeInfo) {
-                console.log(eventResizeInfo);
+                let event = eventResizeInfo.event,
+                    data  = {
+                        eventId: event?.extendedProps?.data?.meta?.eventId,
+                        resize:  true,
+                        start:   this.toMoment(event.start).format(),
+                        end:     this.toMoment(event.end).format(),
+                    };
+                // Apply and then remove the "loading" class
+                axios.post('/calendar/ajax/update', this.toQueryString(data));
             },
             onEventDrop: function (eventDropInfo) {
-                console.log(eventDropInfo);
+                let event = eventDropInfo.event,
+                    delta = toDuration(eventDropInfo.delta),
+                    data  = {
+                        eventId:     event?.extendedProps?.data?.meta?.eventId,
+                        minuteDelta: delta.asMinutes(),
+                        allDay:      event.allDay,
+                    };
+                // Apply and then remove the "loading" class
+                axios.post('/calendar/ajax/update', this.toQueryString(data));
             },
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
@@ -211,6 +228,16 @@
             },
             addEvent: function (event) {
                 this.$refs.fullCalendar.getApi().addEvent(event);
+            },
+            toQueryString: function (object) {
+                // Helper function for converting an object into a query string.
+                // I'm not going to npm install just to do that!
+                let qsParts = [];
+                Object.keys(object).forEach(function (key) {
+                    let val = object[key];
+                    qsParts.push(encodeURIComponent(key) + '=' + encodeURIComponent(val));
+                });
+                return qsParts.join('&');
             }
         }
     }
