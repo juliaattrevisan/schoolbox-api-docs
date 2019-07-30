@@ -963,7 +963,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      *
      * @param string $classCodeCsv May have campus prefix, eg 'J/ENG34,S/ENG43' or 'ABC', or 'J/ENG34'
      * @return Model
-     * @throws UnexpectedValueException If multiple folders found for this code
      * @throws MapperException If statement returned no category
      * @throws PDOException
      * @throws Predicate\InvalidColumnException
@@ -987,7 +986,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // this is an edge case that cannot happen normally because business logic prevents it
         // you have to mangle the db, or provide bad data on the url to manifest this situation
         // In either case, pop out an exception because this should never have occurred
-        throw new UnexpectedValueException("Multiple folders found for code");
+
+        // Soften exception to a warning, but log so we can investigate
+        trigger_error("Multiple folders found for code", E_USER_WARNING);
+
+        return $folders->first();
     }
 
 
