@@ -768,10 +768,6 @@ $kernel->run(new class extends App
                 'now'             => $this->now,
                 'unitIndicatorId' => $unitIndicatorId,
             ]);
-
-
-        // TODO consider moving rubric_descriptor_mark and rubric_group_mark
-        // Those should not exist at all for spec assessments, but may need a plan of action.
     }
 
 
