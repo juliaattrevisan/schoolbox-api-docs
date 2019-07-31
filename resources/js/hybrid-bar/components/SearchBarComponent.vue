@@ -6,12 +6,13 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @mousedown="isFocused=true"
+               @blur="isFocused=false"
+               @focus="isFocused=true"
+               @focusout="isFocused=false"
+               @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.ctrl.enter="onEnter"
-               @input="onChange"
-               @blur="isFocused=false"
                v-click-outside="lostFocus"
         />
         <ul class="results" v-show="isFocused && isOpen">
@@ -19,7 +20,7 @@
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
-                <div class="list-item small-12" v-bind:class="{ 'is-active': i === arrowCounter }">
+                <div class="list-item small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
                     <a @mousedown="goToProfilePage(result.id)">
                         <img v-bind:src="formatPortrait(result.id)">
                         <p class="name">{{ result.formattedName }}</p>
