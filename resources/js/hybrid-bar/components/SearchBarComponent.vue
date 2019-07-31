@@ -6,27 +6,31 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @blur="isFocused=false"
+
                @focus="isFocused=true"
-               @focusout="isFocused=false"
+
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.ctrl.enter="onEnter"
                v-click-outside="lostFocus"
         />
-        <ul class="results" v-show="isFocused && isOpen">
+        <ul class="results information-list" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
-            <li v-for="(result, i) in results" :key="i" class="result actions-small-1">
-                <div class="list-item small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
-                    <a @mousedown="goToProfilePage(result.id)">
-                        <img v-bind:src="formatPortrait(result.id)">
-                        <p class="name">{{ result.formattedName }}</p>
-                        <p class="meta">{{ formatMeta(result) }}</p>
-                    </a>
-                </div>
+            <li v-for="(result, i) in results" :key="i" class="result">
+                <a class="link-row">
+                    <div class="compact card small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
+                        <div>
+                            <img v-bind:src="formatPortrait(result.id)">
+                            <p class="name">
+                                {{ result.formattedName }}
+                                <span class="pipe meta">{{ formatMeta(result) }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </a>
             </li>
             <li class="result-meta" v-if="isLoading">
                 <result-meta><div class="loader"></div></result-meta>

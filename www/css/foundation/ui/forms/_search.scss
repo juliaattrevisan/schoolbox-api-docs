@@ -65,56 +65,54 @@
         }
     }
 
-    .result {
-        list-style: none;
-        text-align: left;
-        padding: 0;
-        cursor: pointer;
-    }
-
     .results {
+        background-color: $white;
         border: 2px solid $navigation-hover;
         border-top: 0;
         padding: 0;
         margin: 0;
         height: auto;
-        background-color: $white;
         z-index: 10000;
     }
-
-    .list-item {
-        padding-top: 0 !important;
-        padding-bottom: 0;
-        clear: both;
-        height: 100%;
-        border-bottom: 1px solid #ccc;
+    .result {
+        margin-left: 0;
+        margin-right: 0;
     }
 
-    .list-item:hover,
-    .list-item.is-active {
-        background-color: $navigation-hover;
-    }
+    //
+    //.list-item {
+    //    padding-top: 0 !important;
+    //    padding-bottom: 0;
+    //    clear: both;
+    //    height: 100%;
+    //    border-bottom: 1px solid #ccc;
+    //}
+    //
+    //.list-item:hover,
+    //.list-item.is-active {
+    //    background-color: $navigation-hover;
+    //}
+    //
+    //.list-item .name {
+    //    color: $navigation-hover;
+    //    font-size: 1rem;
+    //    padding-top: .5rem;
+    //    margin-bottom: 0;
+    //}
 
-    .list-item .name {
-        color: $navigation-hover;
-        font-size: 1rem;
-        padding-top: .5rem;
-        margin-bottom: 0;
-    }
-
-    .matching-users .list-item
-    {
-        border-bottom: 0;
-        padding: .5rem 0 .5rem 0 !important;
-    }
-
-    .matching-users .list-item .meta {
-        margin-bottom: 0;
-    }
-
-    .meta {
-        margin-bottom: .65rem;
-    }
+    //.matching-users .list-item
+    //{
+    //    border-bottom: 0;
+    //    padding: .5rem 0 .5rem 0 !important;
+    //}
+    //
+    //.matching-users .list-item .meta {
+    //    margin-bottom: 0;
+    //}
+    //
+    //.meta {
+    //    margin-bottom: .65rem;
+    //}
 
     .result-meta {
         padding: .5rem 0 !important;
@@ -142,17 +140,17 @@
         background-color: $navigation-foreground;
     }
 
-    .is-active .name,
-    .result:hover,
-    .result:hover p.name,
-    a:hover {
-        color: $white;
-    }
+    //.is-active .name,
+    //.result:hover,
+    //.result:hover p.name,
+    //a:hover {
+    //    color: $white;
+    //}
 
-    img {
-        float: left;
-        padding-right: 1rem;
-    }
+    //img {
+    //    float: left;
+    //    padding-right: 1rem;
+    //}
 }
 
 // When notifications are disabled
