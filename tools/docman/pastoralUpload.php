@@ -35,7 +35,8 @@ $app = new class extends CliTool\App
         parent::setup($appOptions, $di, $outStream, $logger, $perform);
 
         // Only process if pastoral docman writeback is actually enabled in config
-        if (!$this->getConfig()->get("external_pastoral_upload")) {
+        if (!$this->getConfig()->get('external_pastoral_upload')) {
+            $this->getLogger()->info('Pastoral Attachment Upload is disabled in config; exiting');
             exit;
         }
         $this->pastoralUploadQueueMapper = Pastoral\UploadQueue\Mapper::getInstance();
@@ -47,7 +48,7 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
-        $this->getLogger()->info("Uploading of pastoral files started");
+        $this->getLogger()->info('Uploading of pastoral files started');
         $lock = $this->checkOverlappingExecution();
         $this->uploadPending();
         $lock->release();
@@ -69,12 +70,12 @@ $app = new class extends CliTool\App
             return $lock;
         }
 
-        $this->getLogger()->critical("A pastoral uploader is already running, checking timeout.");
+        $this->getLogger()->critical('A pastoral uploader is already running, checking timeout.');
 
         // Check existing upload process for timeout (should never be more than uploaded more than once).
         $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
         if ($timeout <= 0) {
-            $this->getLogger()->alert("Timeout of pastoral uploading is disabled.");
+            $this->getLogger()->alert('Timeout of pastoral uploading is disabled.');
             exit;
         }
 
@@ -84,12 +85,12 @@ $app = new class extends CliTool\App
             $pronoun     = $countTimedOut > 1 ? 'these' : 'this';
             $this->getLogger()->warning("Processing of $countTimedOut pastoral $nounAndVerb timed out - marking $pronoun as failed, and continuing");
         } else {
-            $this->getLogger()->info("No pastoral uploads have timed out.");
+            $this->getLogger()->info('No pastoral uploads have timed out.');
         }
 
         $lock->killProcess();
         if(!$lock->acquire()){
-            $this->getLogger()->critical("Still unable to acquire lock after attempt to kill locking process, exiting.");
+            $this->getLogger()->critical('Still unable to acquire lock after attempt to kill locking process, exiting.');
             exit(1);
         }
 
