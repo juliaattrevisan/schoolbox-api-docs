@@ -8,7 +8,6 @@
 namespace Schoolbox\User;
 
 use Alaress\Web\Controller\Base;
-use http\Client\Response;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;

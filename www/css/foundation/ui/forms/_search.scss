@@ -78,7 +78,7 @@
         padding: 0;
         margin: 0;
         height: auto;
-        background-color: #FFF;
+        background-color: $white;
         z-index: 10000;
     }
 
@@ -87,7 +87,7 @@
         padding-bottom: 0;
         clear: both;
         height: 100%;
-        border-bottom: 1px solid #CCC;
+        border-bottom: 1px solid #ccc;
     }
 
     .list-item:hover,
@@ -146,7 +146,7 @@
     .result:hover,
     .result:hover p.name,
     a:hover {
-        color: #FFF;
+        color: $white;
     }
 
     img {

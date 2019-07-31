@@ -57,11 +57,12 @@ class Query
      * @param string     $sortBy
      * @param string     $sortMethod
      */
-    public function __construct(IConnector $db,
-                                int $limit = self::AUTOSUGGEST_LIMIT,
-                                int $minSearchLength = self::MIN_SEARCH_LENGTH,
-                                string $sortBy = 'lastname',
-                                string $sortMethod = 'ASC'
+    public function __construct(
+        IConnector $db,
+        int $limit = self::AUTOSUGGEST_LIMIT,
+        int $minSearchLength = self::MIN_SEARCH_LENGTH,
+        string $sortBy = 'lastname',
+        string $sortMethod = 'ASC'
     ) {
         $this->db               = $db;
         $this->limit            = $limit;
@@ -132,17 +133,15 @@ class Query
      *
      * @return int
      */
-    private function getTotalCount(string $keyword)
+    private function getTotalCount(string $keyword): int
     {
-        return (int) $this->executeQuery('SELECT COUNT(*) FROM user' . $this->getWhereStatement(),
-            '%' . $keyword . '%'
-        )->fetchColumn();
+        return (int) $this->executeQuery('SELECT COUNT(*) FROM user' . $this->getWhereStatement(), '%' . $keyword . '%')->fetchColumn();
     }
 
     /**
      * @return string
      */
-    private function getWhereStatement()
+    private function getWhereStatement(): string
     {
         $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
         OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
@@ -159,7 +158,7 @@ class Query
      * @param string $queryString
      * @param string $keyword
      *
-     * @return \Alaress\Database\Statement\Query\IQuery
+     * @return \Alaress\Database\Statement\Query\Base
      */
     private function executeQuery(string $queryString, string $keyword)
     {
