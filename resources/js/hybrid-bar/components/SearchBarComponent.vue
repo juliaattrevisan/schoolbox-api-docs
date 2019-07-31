@@ -36,10 +36,10 @@
                     View all {{ totalCount }} users
                 </result-meta>
             </li>
-            <li class="result-meta" v-if="!results.length">
+            <li class="result-meta" v-if="!isLoading && !results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="!results.length" @mousedown="goToPath(paths.searchPage + keyword + '#all')">
+            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @mousedown="goToPath(paths.searchPage + keyword + '#all')">
                 <result-meta>
                     Search everything for "{{ keyword }}"
                 </result-meta>
@@ -81,6 +81,7 @@
                 if (self.keyword.length >= 3) {
                     self.isOpen = true;
                     self.isLoading = true;
+                    self.results = [];
                     self.filterResults();
                 }
             }, 500),
