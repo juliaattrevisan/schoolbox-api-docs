@@ -69,13 +69,15 @@ $kernel = new CliTool\Kernel(
 
             if ($this->getOpt(self::OPT_LONG_HELP) || !$this->parseAppOptions()) {
                 echo <<<HELP
+
 Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source='sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
     --owner:      The user ID of who the events should be owned by
     --campus:     Comma-separated list of campus IDs that the events should be shown to
     --role:       Comma-separated list of role IDs that the events should be shown to
     --source:     Optional source name, subsequent uploads will delete any events with the same source name
-    
+
+
 HELP;
                 exit;
             }
