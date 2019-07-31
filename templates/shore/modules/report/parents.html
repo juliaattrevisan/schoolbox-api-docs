@@ -69,17 +69,14 @@
                     <div class="large-2 columns">
                         <label>
                             Year
-                            <!-- BEGIN has_year_selector -->
+                            <!-- BEGIN all_year_selector -->
                             <select name='searchYear'>
-                                <!-- BEGIN year_selector_option -->
-                                <option value="{YEAR_SELECTOR_VALUE}" {YEAR_SELECTOR_SELECTED}>{YEAR_SELECTOR_DESCRIPTION}</option>
-                                <!-- END year_selector_option -->
+                                <option value="" selected></option>
+                                <!-- BEGIN all_year_option -->
+                                <option value="{YEAR_CODE}" {YEAR_SELECTED}>{YEAR_DESCRIPTION}</option>
+                                <!-- END all_year_option -->
                             </select>
-                            <!-- END has_year_selector -->
-
-                            <!-- BEGIN has_year_input -->
-                            <input type='text' name='searchYear' value="{SEARCH_YEAR}"/>
-                            <!-- END has_year_input -->
+                            <!-- END all_year_selector -->
                         </label>
                     </div>
                     <div class="large-12 columns">
