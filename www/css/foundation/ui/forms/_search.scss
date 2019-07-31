@@ -5,6 +5,7 @@
     right: $tabbar-icon-width;
     top: 0;
     width: $tabbar-height;
+    z-index: 1000;
     @include placeholder-color(transparent, $font-weight-normal);
 
     input[type="text"] {
@@ -60,13 +61,33 @@
         /* Search icon when Search feature is activated
         */
         &:before {
-            color: $navigation-hover;
+            color: $navigation-background;
         }
+    }
+
+    .result {
+        list-style: none;
+        text-align: left;
+        padding: 0;
+        cursor: pointer;
     }
 
     .results {
         border: 2px solid $navigation-hover;
         border-top: 0;
+        padding: 0;
+        margin: 0;
+        height: auto;
+        background-color: #FFF;
+        z-index: 10000;
+    }
+
+    .list-item {
+        padding-top: 0 !important;
+        padding-bottom: 0;
+        clear: both;
+        height: 100%;
+        border-bottom: 1px solid #CCC;
     }
 
     .list-item:hover,
@@ -76,6 +97,32 @@
 
     .list-item .name {
         color: $navigation-hover;
+        font-size: 1rem;
+        padding-top: .5rem;
+        margin-bottom: 0;
+    }
+
+    .matching-users .list-item
+    {
+        border-bottom: 0;
+        padding: .5rem 0 .5rem 0 !important;
+    }
+
+    .matching-users .list-item .meta {
+        margin-bottom: 0;
+    }
+
+    .meta {
+        margin-bottom: .65rem;
+    }
+
+    .result-meta {
+        padding: .5rem 0 !important;
+        list-style: none;
+    }
+
+    .result-meta .list-item {
+        border-bottom: 0;
     }
 
     .result-meta.with-bg:hover {
@@ -88,7 +135,23 @@
     }
 
     .loader {
+        height: 1rem;
+        width: 1rem;
+        border-radius: .20rem;
+        margin: 1rem auto;
         background-color: $navigation-foreground;
+    }
+
+    .is-active .name,
+    .result:hover,
+    .result:hover p.name,
+    a:hover {
+        color: #FFF;
+    }
+
+    img {
+        float: left;
+        padding-right: 1rem;
     }
 }
 
