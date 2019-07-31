@@ -27,10 +27,6 @@ class HardLinks extends DbCheck
             "SELECT hash FROM eportfolio_component_blog_image 
              WHERE deleted_at IS NULL",
 
-            "SELECT item_image FROM news_items
-             WHERE item_image IS NOT NULL
-             AND item_deleted = 0",
-
             "SELECT imagehash FROM eportfolio_coverphoto
              WHERE imagehash IS NOT NULL
              AND deleted_at IS NULL",
