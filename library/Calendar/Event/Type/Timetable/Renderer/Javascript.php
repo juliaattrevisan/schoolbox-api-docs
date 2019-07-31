@@ -24,7 +24,7 @@ class Javascript extends Base
             $encodedClass = urlencode(urlencode(urlencode($this->getEvent()->getCode())));
             $classLink = $this->getEvent()->getCampus() ? $this->getEvent()->getCampus() . '/' . $encodedClass : '0/' . $encodedClass;
 
-            $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->getEvent()->getStartTime()->getDatabaseDate()}/{$this->getEvent()->getPeriod()}/{$this->getEvent()->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
+            $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$classLink}/{$this->getEvent()->getStartTime()->getDatabaseDate()}/{$this->getEvent()->getPeriod()}/{$this->getEvent()->getTimetableCode()}' title='Mark Attendance'>Mark Attendance</a>";
         } else {
             $hasListButton = false;
         }
