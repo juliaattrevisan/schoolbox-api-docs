@@ -22,6 +22,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper as Submissio
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as StudentSubmissionMapper;
 use Schoolbox\Assessment\Course\Task\CompletionMapper as TaskResponseMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment;
@@ -310,8 +312,8 @@ class Module extends BaseModule
 
         // due work specific
         $dc =& $injector->params[Assessment\DueWork\Controller::class];
-        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Rubric\DataModel\DataSource::class);
-        $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(\Schoolbox\Assessment\Rubric\DataModel\Result\Mapper::class);
+        $dc['rubricMapper']             = $this->getMapperFactory()->getLazy(RubricDataSource::class);
+        $dc['resultSetMapper']          = $this->getMapperFactory()->getLazy(RubricResultSetMapper::class);
 
         // TODO get this out of DI
         $dc['dueWorkResponseMapper']    = $injector->lazyNew(

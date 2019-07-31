@@ -12,6 +12,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\RowSet\ValidRowSet;
@@ -108,7 +109,7 @@ class Decorator implements DecoratorInterface
 
 
         if ($this->getUseRubric()) {
-            $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\DataSource::getInstance();
+            $rubricMapper = RubricDataSource::getInstance();
             $gridFactory  = new GridFactory();
             $existingGrid = new Grid(
                 $assessment,

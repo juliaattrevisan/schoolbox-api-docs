@@ -24,7 +24,7 @@ use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
 use External_UserInterface;
 use InvalidArgumentException;
 use PDO;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Collection;
 use Schoolbox\Filter\Filters;
 use Schoolbox\GenericCollection;
@@ -52,7 +52,7 @@ class Controller extends Web\Controller\Base
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var DataSource */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var Textbox\Mapper */
@@ -69,7 +69,7 @@ class Controller extends Web\Controller\Base
      * @param External_UserInterface $externalUser
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param DataSource             $rubricMapper
+     * @param RubricDataSource       $rubricMapper
      * @param Textbox\Mapper         $textboxMapper
      * @param Visibility             $visibility
      * @param IConnector             $database
@@ -78,7 +78,7 @@ class Controller extends Web\Controller\Base
         External_UserInterface $externalUser,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
-        DataSource $rubricMapper,
+        RubricDataSource $rubricMapper,
         Textbox\Mapper $textboxMapper,
         Visibility $visibility,
         IConnector $database

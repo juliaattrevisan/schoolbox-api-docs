@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -73,7 +73,7 @@ class AssessmentType implements IType
             $object = (new DueWork())->setContext($context);
 
             if ($context) {
-                $object->setRubricGrid(DataSource::getInstance()->retrieveGrid($object, true));
+                $object->setRubricGrid(RubricDataSource::getInstance()->retrieveGrid($object, true));
             }
 
             return $object;

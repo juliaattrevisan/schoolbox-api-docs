@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
 use Alaress\Specification\Base;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use TypeError;
@@ -38,7 +38,7 @@ class ValidUniqueRowSetForCourseAndUnit extends Base
 
 
     /**
-     * @var DataSource
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -48,12 +48,12 @@ class ValidUniqueRowSetForCourseAndUnit extends Base
      *
      * @param RosettaStone            $translator
      * @param UnitSpecificationMapper $unitSpecMapper
-     * @param DataSource              $rubricMapper
+     * @param RubricDataSource        $rubricMapper
      */
     public function __construct(
         RosettaStone $translator,
         UnitSpecificationMapper $unitSpecMapper,
-        DataSource $rubricMapper
+        RubricDataSource $rubricMapper
     ) {
         $this->translator     = $translator;
         $this->unitSpecMapper = $unitSpecMapper;

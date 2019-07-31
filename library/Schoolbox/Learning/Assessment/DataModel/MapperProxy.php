@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -820,7 +821,7 @@ class MapperProxy
             $dueWork = $assessable;
             if ($dueWork->getUseRubric()) {
                 // Rubric involved? Save the due work, and then persist rubric
-                $rubricMapper = \Schoolbox\Assessment\Rubric\DataModel\DataSource::getInstance();
+                $rubricMapper = RubricDataSource::getInstance();
 
                 // Need to compare the previously existing grid with the newly
                 // saved one, for invalidation purposes

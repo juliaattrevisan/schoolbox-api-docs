@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Rubric\RowSet;
 use Alaress\Specification\Base;
 use Alaress\Specification\Conjunction;
 use Alaress\Specification\ISpecification;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
@@ -37,7 +37,7 @@ class ValidRowSet extends Base
      *
      * @param RosettaStone            $translator
      * @param UnitSpecificationMapper $unitSpecMapper
-     * @param DataSource              $rubricMapper
+     * @param RubricDataSource        $rubricMapper
      * @param RowSet|null             $existingRowSet
      * @param bool                    $allowModifyUsed
      * @param IAssessable|null        $allowModifyExclusion
@@ -45,7 +45,7 @@ class ValidRowSet extends Base
     public function __construct(
         RosettaStone $translator,
         UnitSpecificationMapper $unitSpecMapper,
-        DataSource $rubricMapper,
+        RubricDataSource $rubricMapper,
         ?RowSet $existingRowSet,
         bool $allowModifyUsed,
         ?IAssessable $allowModifyExclusion

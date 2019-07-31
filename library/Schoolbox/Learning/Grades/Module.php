@@ -13,7 +13,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
 use Schoolbox\Filter;
@@ -130,7 +130,7 @@ class Module extends BaseModule
             'termMapper'                 => $this->getMapperFactory()->getLazy(Term\Mapper::class),
             'folderMapper'               => $this->getMapperFactory()->getLazy(Folder\Mapper::class),
             'defaultGradeGroup'          => $this->getInjector()->get('defaultGradeGroup'),
-            'rubricMapper'               => $this->getMapperFactory()->getLazy(DataSource::class),
+            'rubricMapper'               => $this->getMapperFactory()->getLazy(RubricDataSource::class),
             'access'                     => $this->getMapperFactory()->getLazy(Access::class),
             'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
                 /** @var RosettaStone $rosettaStone */

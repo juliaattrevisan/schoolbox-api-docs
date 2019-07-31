@@ -14,7 +14,7 @@ use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
 use Schoolbox\Assessment\Rubric\DataModel\Capability;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -28,7 +28,7 @@ use Url;
 class Controller extends BaseController
 {
     /**
-     * @var DataSource
+     * @var RubricDataSource
      */
     private $mapper;
 
@@ -60,14 +60,14 @@ class Controller extends BaseController
     /**
      * Constructor
      *
-     * @param DataSource           $mapper
+     * @param RubricDataSource     $mapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param FolderMapper         $folderMapper
      * @param Capability\Mapper    $groupMapper
      * @param Indicator\Mapper     $criterionMapper
      */
     public function __construct(
-        DataSource $mapper,
+        RubricDataSource $mapper,
         AssessmentDataSource $assessmentDataSource,
         FolderMapper $folderMapper,
         Capability\Mapper $groupMapper,

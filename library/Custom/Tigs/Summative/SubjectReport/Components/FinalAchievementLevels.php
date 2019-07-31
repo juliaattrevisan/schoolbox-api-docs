@@ -12,7 +12,7 @@ use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -44,7 +44,7 @@ class FinalAchievementLevels extends BaseComponent
     /** @var int */
     private $falWorkTypeId;
 
-    /** @var DataSource */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var Authorizer */
@@ -62,7 +62,7 @@ class FinalAchievementLevels extends BaseComponent
      * @param Visibility                         $visibility
      * @param User                               $viewer
      * @param int                                $falWorkTypeId
-     * @param DataSource                         $rubricMapper
+     * @param RubricDataSource                   $rubricMapper
      * @param Authorizer                         $authorizer
      * @param Router\Router                      $router
      * @param string|null                        $roleTypeOverride
@@ -76,7 +76,7 @@ class FinalAchievementLevels extends BaseComponent
         Visibility $visibility,
         User $viewer,
         int $falWorkTypeId,
-        DataSource $rubricMapper,
+        RubricDataSource $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router,
         ?string $roleTypeOverride

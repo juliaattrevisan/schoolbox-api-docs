@@ -14,7 +14,7 @@ use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
 use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Rubric\DataModel\DataSource;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -68,7 +68,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
 
 
     /**
-     * @var DataSource
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -91,7 +91,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param int               $workTypeId
-     * @param DataSource        $rubricMapper
+     * @param RubricDataSource  $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
      * @param Folder\Model      $folder
@@ -105,7 +105,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
         Visibility $visibility,
         User $viewer,
         int $workTypeId,
-        DataSource $rubricMapper,
+        RubricDataSource $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router,
         Folder\Model $folder,
