@@ -54,7 +54,7 @@ $app = new class extends CliTool\App{
 
 Imports Pastoral records from external source. Primarily used if there are many records.
 
-Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachments] [--user=1] [--default-user=1]
+Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachments] [--user=1] [--default-owner=1]
     --parent-access:    give parents access to pastoral records
     --add-records:      import pastoral records
     --add-attachments:  import documents associated with pastoral records
