@@ -12,7 +12,9 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as RubricCapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -51,12 +53,12 @@ class Acquisition
     private $indicators;
 
     /**
-     * @var DataModel\DataSource
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
     /**
-     * @var DataModel\MapperProxy
+     * @var AssessmentDataSource
      */
     private $assessmentMapperProxy;
 
@@ -76,12 +78,12 @@ class Acquisition
      *
      * $involvement limits the number of Participants and Folders to hydrate
      *
-     * @param array                 $states     The Chosen States
-     * @param int                   $unaccreditedOnly
-     * @param array                 $indicators An array of indicator text
-     * @param DataModel\DataSource  $rubricMapper
-     * @param DataModel\MapperProxy $assessmentMapperProxy
-     * @param UserMapper            $userMapper
+     * @param array                $states     The Chosen States
+     * @param int                  $unaccreditedOnly
+     * @param array                $indicators An array of indicator text
+     * @param RubricDataSource     $rubricMapper
+     * @param AssessmentDataSource $assessmentMapperProxy
+     * @param UserMapper           $userMapper
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
@@ -89,8 +91,8 @@ class Acquisition
         array $states,
         int $unaccreditedOnly,
         array $indicators,
-        DataModel\DataSource $rubricMapper,
-        DataModel\MapperProxy $assessmentMapperProxy,
+        RubricDataSource $rubricMapper,
+        AssessmentDataSource $assessmentMapperProxy,
         UserMapper $userMapper
     ) {
         $this->states = $states;
@@ -181,7 +183,7 @@ class Acquisition
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
-            'parentType'      => DataModel\Capability\Model::PARENT_TYPE_CATEGORY,
+            'parentType'      => RubricCapabilityModel::PARENT_TYPE_CATEGORY,
         ], $pb->getParams()));
 
         $hierarchy = [];
