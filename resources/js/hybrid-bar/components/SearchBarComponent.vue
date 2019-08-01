@@ -20,7 +20,7 @@
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @mousedown="goToProfilePage(result.id)">
+                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)">
                     <div class="card small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
                         <img v-bind:src="formatPortrait(result.id)">
                         <h3 class="name">{{ result.formattedName }}</h3>
@@ -31,7 +31,7 @@
             <li class="result-meta" v-if="isLoading">
                 <result-meta><div class="loader"></div></result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="results.length && totalCount > results.length" @mousedown="goToPath(paths.searchPage + keyword + '#user')">
+            <li class="result-meta with-bg" v-if="results.length && totalCount > results.length" @mousedown.left="goToPath(paths.searchPage + keyword + '#user')">
                 <result-meta>
                     View all {{ totalCount }} users
                 </result-meta>
@@ -39,7 +39,7 @@
             <li class="result-meta" v-if="!isLoading && !results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @mousedown="goToPath(paths.searchPage + keyword + '#all')">
+            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @mousedown.left="goToPath(paths.searchPage + keyword + '#all')">
                 <result-meta>
                     Search everything for "{{ keyword }}"
                 </result-meta>
@@ -105,10 +105,6 @@
             lostFocus: function(event) {
                 this.isFocused = false;
                 this.arrowCounter = -1;
-            },
-
-            goToProfilePage: function(id) {
-                window.location.href = this.paths.userPage + id;
             },
 
             goToPath: function(path) {
