@@ -251,17 +251,16 @@ HELP;
 
 
     /**
-     * @param UserMapper $userMapper
+     * @param UserMapper       $userMapper
      * @param UserAccessMapper $userAccessMapper
-     * @param int $externalId
-     * @param string $role
-     * @param int $folderId
-     * @throws PDOException
+     * @param string|null      $externalId
+     * @param string           $role
+     * @param int              $folderId
      */
-    private function loadUserAccess($userMapper, $userAccessMapper, $externalId, $role, $folderId)
+    private function loadUserAccess(UserMapper $userMapper, UserAccessMapper $userAccessMapper, ?string $externalId, string $role, int $folderId)
     {
         // This would typically happen for a non-existent spouse, just do nothing in this case
-        if (empty($externalId)) {
+        if (!strlen($externalId)) {
             return;
         }
 
