@@ -52,7 +52,7 @@
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     booking: {
                         status: data?.booking?.status,
-                        related: data?.booking?.related,
+                        related: data?.booking?.related || [],
                         actions: data?.booking?.buttons,
                     },
                     attendance: data?.attendance,
@@ -161,6 +161,15 @@
                     return start;
                 }
             },
+            buildBookingButtonClasses: function(action) {
+                let base = {
+                    button: true
+                };
+                if (action.class) {
+                    base[action.class] = true;
+                }
+                return base;
+            },
         },
     }
 </script>
@@ -250,7 +259,7 @@
                         <span v-html="eventExtendedProps.detail"></span>
                     </article>
 
-                    <div v-if="eventExtendedProps.booking.related">
+                    <div v-if="eventExtendedProps.booking.related.length">
                         <h3>Related Bookings</h3>
                         <ul>
                             <li v-for="relatedBooking in eventExtendedProps.booking.related">
@@ -294,7 +303,8 @@
                     </span>
 
                     <div v-for="action in eventExtendedProps.booking.actions">
-                        <a :href="action.href" class="button">{{ action.label }}</a>
+                        <a :href="action.href"
+                           :class="buildBookingButtonClasses(action)">{{ action.label }}</a>
                     </div>
 
                 </div>
