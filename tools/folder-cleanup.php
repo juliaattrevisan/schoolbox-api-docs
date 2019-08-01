@@ -21,15 +21,41 @@ require_once __DIR__ . '/../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
     /**
      * The lost and found folder's name
      */
     private const FOLDER_NAME = 'Lost & Found';
 
 
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Illegal folders are moved into a folder called "Lost & Found". A folder with this exact name must exist.
+
+Illegal folders are ones which have self-referential parent_ids (ie. a folder is its own parent) and folders
+which have a nonexistent parent (orphaned folders). Folders who are their own parent are called "looping folders".
+
+Usage: folder-cleanup.php
+
+
+HELP;
+            exit;
+        }
+
         $db      = $this->getDatabaseInternal();
         $logger  = $this->getLogger();
 
