@@ -20,7 +20,7 @@
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row">
+                <a class="link-row" @mousedown="goToProfilePage(result.id)">
                     <div class="compact card small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
                         <div>
                             <img v-bind:src="formatPortrait(result.id)">
