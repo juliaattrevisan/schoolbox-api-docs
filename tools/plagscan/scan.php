@@ -43,11 +43,11 @@ $app = new class extends CliTool\App
 
             /* Plagscan not configured - nothing to do
              */
-            $log->warning("Plagscan scan did not run: username, api key and/or access token is not configured correctly");
+            $log->warning('Plagscan scan did not run: username, api key and/or access token is not configured correctly');
             exit();
         }
 
-        $log->info("Plagscan is now choosing modes and options");
+        $log->info('Plagscan is now choosing modes and options');
 
         $reRetrieveMode = $this->getOpt('re-retrieve');
 
@@ -55,7 +55,7 @@ $app = new class extends CliTool\App
 
             /* Re-scan plagscan records
              */
-            $log->info("Scanner running in re-retrieve mode");
+            $log->info('Scanner running in re-retrieve mode');
             $predicate = $mapper->getPredicateBuilder();
             $predicate->equals('status', Plagscan::STATUS_COMPLETE);
             $predicate->greaterThan('plagscan_id', 0);
@@ -65,7 +65,7 @@ $app = new class extends CliTool\App
 
             /* Scan currently-pending plagscan records
              */
-            $log->info("Scanner running in scan mode");
+            $log->info('Scanner running in scan mode');
             $predicate = $mapper->getPredicateBuilder();
             $predicate->equals('status', Plagscan::STATUS_PROCESSING);
             $predicate->greaterThan('plagscan_id', 0);
@@ -101,7 +101,7 @@ $app = new class extends CliTool\App
                         $score = $mapper->getConnector()->fetchScore($currentDocument->getPlagscanId());
 
                         /* Update the db with the report contents for this document
-                         * only when we have all three pieces (each seems to generated
+                         * only when we have all three pieces (each seems to generate
                          * independently of each other on plagscan's end, so one might
                          * be available before the others etc.)
                          */
@@ -147,18 +147,17 @@ $app = new class extends CliTool\App
             }
         }
 
-        $log->notice("Plagscan scan completed. $numUpdated documents were scanned");
+        $log->notice("Plagscan scan completed. {$numUpdated} documents were scanned");
 
         /* Also tell me how many died
          */
         $numFailed = $allDocuments->count() - $numUpdated;
 
         if ($numFailed) {
-            $log->notice("$numFailed documents failed scanning or analysis is still in progress");
+            $log->notice("{$numFailed} documents failed scanning or analysis is still in progress");
         }
     }
 };
-
 
 $kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();
