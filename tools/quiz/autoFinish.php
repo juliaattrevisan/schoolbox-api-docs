@@ -50,7 +50,9 @@ $app = new class extends CliTool\App{
 Auto-completes quiz attempts which have expired; users sometimes forget to officially
 finish their attempts so we do it for them when the quiz expires.
 
-Usage: migrate.php
+This might have been installed as a cron script so it runs periodically.
+
+Usage: autoFinish.php
 
 
 HELP;
