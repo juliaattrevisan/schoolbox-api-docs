@@ -21,10 +21,35 @@ require __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
 
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Reupload files to kami if they didn't get there the first time. These are in the student_submission_file_kami
+table and this tool only works if they have status "error" and error_message "Conversion failed".  
+
+Usage: re-upload-failed-kami-docs.php
+
+
+HELP;
+            exit;
+        }
+
         /**
          * @var MapperFactory  $mapperFactory
          * @var Kami\Connector $kamiConnector
