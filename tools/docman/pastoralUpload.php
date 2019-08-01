@@ -21,6 +21,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
     /** @var Pastoral\UploadQueue\Mapper */
     private $pastoralUploadQueueMapper;
@@ -28,6 +30,14 @@ $app = new class extends CliTool\App
     /** @var External_Pastoral */
     private $externalPastoral;
 
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
 
     /** @inheritDoc */
     public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
@@ -48,6 +58,18 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Upload Pastoral Care attachments into synergetic's docman functionality.
+
+Usage: pastoralUpload.php
+
+
+HELP;
+            exit;
+        }
+
         $this->getLogger()->info('Uploading of pastoral files started');
         $lock = $this->checkOverlappingExecution();
         $this->uploadPending();
