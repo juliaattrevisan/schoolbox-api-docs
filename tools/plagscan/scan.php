@@ -23,17 +23,36 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['re-retrieve'];
+        return [
+            self::OPT_LONG_HELP,
+            're-retrieve'
+        ];
     }
 
 
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Proactively queries Plagscan (instead of relying on its callback) for scans on documents.
+Updates our db with status changes and other plagscan report metadata when appropriate.
+
+Usage: scan.php
+
+
+HELP;
+            exit;
+        }
+
         $log = $this->getLogger();
 
         $mapper = PlagscanMapper::getInstance();
