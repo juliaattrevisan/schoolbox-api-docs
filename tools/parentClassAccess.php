@@ -3,7 +3,15 @@
 /**
  * Student + Parents go into the same folder (group) in schoolbox
  *
- * Some schools want to put students into a folder, and also put those students' parents into the same folder
+ * Some schools want to put students into a folder, and also put those students' parents into the same folder.
+ *
+ * The first arg of the csv is the destination folder.
+ * The next n args are folder codes of students whose parents should be put into the destination folder.
+ *
+ * 48, FREA1 = the parents of students in FREA1 will be put into folder 48 (Archery)
+ *
+ * 48, FREA1, EN344 = the parents of students in FREA1 will be put into folder 48 (Archery).
+ *                    the parents of students in EN344 will also be put into folder 48 (Archery)
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
