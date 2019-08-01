@@ -120,6 +120,11 @@ HELP;
             $this->getLogger()->warning('Performing assignation of parents to their students\' folders.');
         }
 
+        /* We only need to spawn these once
+         */
+        $externalUser = new \External_User();
+        $externalClass = new \External_Class();
+
         foreach ($classes as $folderId => $codes) {
             try {
                 $currentFolder = $folderMapper->findById($folderId);
@@ -164,9 +169,10 @@ HELP;
                 if (empty($code)) {
                     continue;
                 }
+
                 $log->notice("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
-                $parents = $this->getParents($code);
+                $parents = $this->getParents($code, $externalClass, $externalUser);
 
                 if ($loadStudents) {
                     $students = $classHandler->getStudents($code);
@@ -201,23 +207,25 @@ HELP;
         }
     }
 
+
     /**
      * Retrieve all parents of students in the specified subject
-     * @param $subCode
-     * @return array|bool
+     *
+     * @param string|null             $subCode
+     * @param External_ClassInterface $externalClass
+     * @param External_UserInterface  $externalUser
+     * @return array
      */
-    private function getParents($subCode)
+    private function getParents(?string $subCode, External_ClassInterface $externalClass, External_UserInterface $externalUser): array
     {
-        $class = new \External_Class();
-        $externalUser = new \External_User();
-
-        $students = $class->getStudents($subCode);
+        $students = $externalClass->getStudents($subCode);
 
         $contacts = [];
 
         if (is_array($students)) {
             foreach ($students as $student) {
                 $contactsCurrent = $externalUser->getStudentContactList($student['synergy_id']);
+
                 foreach ($contactsCurrent as $contactCurrent) {
                     $contacts[$contactCurrent['StudentContactID']] = $contactCurrent;
                 }
@@ -226,6 +234,7 @@ HELP;
 
         return $contacts;
     }
+
 
     /**
      * @param UserMapper $userMapper
