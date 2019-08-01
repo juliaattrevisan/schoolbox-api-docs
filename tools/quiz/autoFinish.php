@@ -19,7 +19,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 use Assess\IAutomarkable;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Application\CliTool;
@@ -30,9 +29,34 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Auto-completes quiz attempts which have expired; users sometimes forget to officially
+finish their attempts so we do it for them when the quiz expires.
+
+Usage: migrate.php
+
+
+HELP;
+            exit;
+        }
+
         /**
          * @var MapperFactory      $mapperFactory
          * @var Participant\Mapper $participantMapper

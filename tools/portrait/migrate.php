@@ -37,10 +37,12 @@ $app = new class extends CliTool\App
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
+
 Migrate portraits from filesystem portrait_dir into Storage and associate them
 with schoolbox user accounts
 
 Usage: migrate.php
+
 
 HELP;
             exit;
