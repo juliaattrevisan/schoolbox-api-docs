@@ -10,8 +10,9 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Error;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ProfessionalDevelopment;
@@ -33,7 +34,7 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
-     * @var DataModel\DataSource
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -52,14 +53,14 @@ class Controller extends Base
      *
      * @param Error\Mapper                   $errorMapper
      * @param Specification\Mapper           $courseSpecificationMapper
-     * @param DataModel\DataSource           $rubricMapper
+     * @param RubricDataSource               $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
      * @param UserMapper                     $userMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         Specification\Mapper $courseSpecificationMapper,
-        DataModel\DataSource $rubricMapper,
+        RubricDataSource $rubricMapper,
         ProfessionalDevelopment\Mapper $pdMapper,
         UserMapper $userMapper
     ) {
@@ -116,7 +117,7 @@ class Controller extends Base
     {
         $start = microtime(true);
 
-        /** @var DataModel\MapperProxy $assessmentMapperProxy */
+        /** @var AssessmentDataSource $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         $report = (new Report(
@@ -157,7 +158,7 @@ class Controller extends Base
      */
     public function postNesaCsv()
     {
-        /** @var DataModel\MapperProxy $assessmentMapperProxy */
+        /** @var AssessmentDataSource $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         $report = (new Report(

@@ -15,7 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -204,7 +204,7 @@ class Module extends BaseModule
             'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
             'userMapper'            => $this->getMapperFactory()->get(UserMapper::class),
             'responseDataSource'    => $injector->lazyGet('responseDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->get(DataModel\DataSource::class),
+            'rubricMapper'          => $this->getMapperFactory()->get(RubricDataSource::class),
             'returnedWorkMapper'    => $this->getMapperFactory()->get(ReturnedWorkMapper::class),
         ];
     }

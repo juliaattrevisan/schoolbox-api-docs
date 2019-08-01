@@ -12,7 +12,7 @@ use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
@@ -47,7 +47,7 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var DataModel\DataSource */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var ReturnedWorkMapper */
@@ -64,7 +64,7 @@ class Controller extends Base
      * @param AssessmentDataSource  $assessmentDataSource
      * @param ResponseDataSource    $responseDataSource
      * @param UserMapper            $userMapper
-     * @param DataModel\DataSource  $rubricMapper
+     * @param RubricDataSource      $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
      * @param Plagscan\Mapper       $plagscanMapper
      */
@@ -74,7 +74,7 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
-        DataModel\DataSource $rubricMapper,
+        RubricDataSource $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
         Plagscan\Mapper $plagscanMapper
     ) {
