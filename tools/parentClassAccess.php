@@ -83,7 +83,6 @@ HELP;
         }
 
         $loadStudents = $this->getOpt(self::OPT_LONG_STUDENTS);
-        $dryRun = $this->perform();
 
         $folders = [];
         $classes = [];
@@ -115,7 +114,7 @@ HELP;
             exit;
         }
 
-        if ($dryRun) {
+        if (!$this->perform()) {
             $this->getLogger()->warning('Planning assignation of parents to their students\' folders.');
         } else {
             $this->getLogger()->warning('Performing assignation of parents to their students\' folders.');
@@ -137,7 +136,7 @@ HELP;
                 $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT);
                 $log->notice("Removing student access from '{$folders[$folderId]->getTitle()}'");
 
-                if (!$dryRun) {
+                if ($this->perform()) {
                     foreach ($students as $student) {
                         $userAccessMapper->deleteByColumnList([
                             'uid' => $student->getId(),
@@ -151,7 +150,7 @@ HELP;
             $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT);
             $log->notice("Removing parent access from '{$folders[$folderId]->getTitle()}'");
 
-            if (!$dryRun) {
+            if ($this->perform()) {
                 foreach ($parents as $parent) {
                     $userAccessMapper->deleteByColumnList([
                         'uid' => $parent->getId(),
@@ -174,22 +173,22 @@ HELP;
 
                     if (is_array($students)) {
                         foreach ($students as $student) {
-                            $this->loadUserAccess($userMapper, $userAccessMapper, $student['synergy_id'], Role::STUDENT, $folderId, $dryRun);
+                            $this->loadUserAccess($userMapper, $userAccessMapper, $student['synergy_id'], Role::STUDENT, $folderId);
                         }
                     }
                 }
 
                 if (is_array($parents)) {
                     foreach ($parents as $parent) {
-                        $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactID'], Role::PARENT, $folderId, $dryRun);
-                        $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactSpouseID'], Role::PARENT, $folderId, $dryRun);
+                        $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactID'], Role::PARENT, $folderId);
+                        $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
                     }
                 }
             }
         }
 
         // Reload cache (if not dry run)
-        if (!$dryRun) {
+        if ($this->perform()) {
             /** @var WritableCache $cache */
             $this->getDi()->values['logger'] = $log;
             $cache = $this->getDi()->get('subscriptionCache');
@@ -234,10 +233,9 @@ HELP;
      * @param int $externalId
      * @param string $role
      * @param int $folderId
-     * @param bool $dryRun
      * @throws PDOException
      */
-    private function loadUserAccess($userMapper, $userAccessMapper, $externalId, $role, $folderId, $dryRun)
+    private function loadUserAccess($userMapper, $userAccessMapper, $externalId, $role, $folderId)
     {
         $log = $this->getLogger();
         // This would typically happen for a non-existent spouse, just do nothing in this case
@@ -254,7 +252,7 @@ HELP;
             if (!isset($usersAdded[$user->getId()])) {
                 // Give student access to the class
 
-                if (!$dryRun) {
+                if ($this->perform()) {
                     $userAccess = $userAccessMapper->createModel();
                     $userAccess->setUser($user);
                     $userAccess->setServiceIdentifier($folderId);
