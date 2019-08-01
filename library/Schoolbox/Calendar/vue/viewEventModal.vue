@@ -376,34 +376,43 @@
             </div>
         </template>
 
-        <!-- A modal within a modal you say? Sure, why not? -->
+        <!-- Modals within a modal you say? Sure, why not? -->
         <reveal-modal ref="deleteEventModal">
             <template v-if="eventExtendedProps.seriesId">
-                <h2>This {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }} is part of a series</h2>
-                <p>
-                    Would you like to delete only this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }},
-                    or all in the series?
-                </p>
+                <h2>This event is part of a series</h2>
+                <p>Would you like to delete only this event, or all in the series?</p>
                 <ul class="flex-list buttons">
-                    <li>
-                        <a href="#" class="button" @click.prevent="confirmDeleteSelf">
-                            Only this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="button" @click.prevent="confirmDeleteSeries">
-                            All {{ eventExtendedProps.booking.isBooking ? 'bookings' : 'events' }} in the series
-                        </a>
-                    </li>
+                    <li><a href="#" class="button" @click.prevent="confirmDeleteSelf">Only this event</a></li>
+                    <li><a href="#" class="button" @click.prevent="confirmDeleteSeries">All events in the series</a></li>
                     <li><a href="#" class="button" @click.prevent="$refs.deleteEventModal.close">Cancel</a></li>
                 </ul>
             </template>
             <template v-else>
                 <h2>Please confirm</h2>
-                <p>Are you sure you wish to delete this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }}?</p>
+                <p>Are you sure you wish to delete this event?</p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button submit" @click.prevent="confirmDeleteSelf">Yes</a></li>
                     <li><a href="#" class="button" @click.prevent="$refs.deleteEventModal.close">No</a></li>
+                </ul>
+            </template>
+        </reveal-modal>
+
+        <reveal-modal ref="deleteBookingModal">
+            <template v-if="eventExtendedProps.seriesId">
+                <h2>This booking is part of a series</h2>
+                <p>Would you like to delete only this booking, or all in the series?</p>
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button" @click.prevent="confirmDeleteSelf">Only this booking</a></li>
+                    <li><a href="#" class="button" @click.prevent="confirmDeleteSeries">All bookings in the series</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.deleteBookingModal.close">Cancel</a></li>
+                </ul>
+            </template>
+            <template v-else>
+                <h2>Please confirm</h2>
+                <p>Are you sure you wish to delete this booking?</p>
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button submit" @click.prevent="confirmDeleteSelf">Yes</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.deleteBookingModal.close">No</a></li>
                 </ul>
             </template>
         </reveal-modal>
