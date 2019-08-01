@@ -70,13 +70,23 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->linkMapper->findAllInCategory(
-            $this->getSource(),
-            array(
-                'size' => $this->getConfig('size'),
-                'sort' => $this->getConfig('sort'),
+            $this->getSource(), [
+                'size'    => $this->getConfig('size'),
+                'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
-            )
+            ],
+            $this->getContentPermission() > UserAccess::ACCESS_READ
         );
+
+        // Get total number of links available for the user
+        $countParams = [
+            'category' => $this->getSource()->getId(),
+        ];
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+            // If readonly user, do not count hidden links
+            $countParams['hidden'] = 0;
+        }
+        $linkCount = $this->linkMapper->countByColumnList($countParams);
 
         /* Need title injected here
          */
@@ -115,6 +125,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->setBlock('has_link', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'link', 'link_block');
             $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
+            $this->setBlock('source_folder_exists', "view_all_links", "view_all_links_block");
             $this->setBlock('link', 'modify_link', 'modify_link_block');
             $this->setBlock('link', 'owner_exists', 'owner_exists_block');
             $this->setBlock('link', 'owner_deleted', 'owner_deleted_block');
@@ -131,10 +142,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 ]);
 
                 foreach ($allLinks as $currentLink) {
-
-                    if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                        continue;
-                    }
 
                     $this->setVar([
                         'LINK_ID'           => Scrub::text($currentLink->getId()),
@@ -170,6 +177,13 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                     $this->setVar("submit_link_block", "");
                 } else {
                     $this->parse("submit_link_block", "submit_link");
+                }
+
+                // Show view all links button, only when total available is more than links displayed.
+                if (\count($allLinks) < $linkCount) {
+                    $this->parse('view_all_links_block', 'view_all_links');
+                } else {
+                    $this->setVar('view_all_links_block', '');
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }

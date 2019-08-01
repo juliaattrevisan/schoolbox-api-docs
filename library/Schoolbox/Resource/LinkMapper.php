@@ -192,11 +192,13 @@ class LinkMapper extends Mapper implements ILocator, Searchable
     /**
      * Find all the links in a given category
      *
-     * @param FolderModel $category
-     * @param $options
+     * @param FolderModel $folder
+     * @param             $options
+     * @param bool        $includeHidden
      * @return Collection
+     * @throws Mapper\Exception
      */
-    public function findAllInCategory(FolderModel $folder, $options)
+    public function findAllInCategory(FolderModel $folder, $options, $includeHidden = true)
     {
         $folderMapper = $this->getJoinMapper('folder');
         $userMapper     = $this->getJoinMapper('user');
@@ -213,6 +215,8 @@ class LinkMapper extends Mapper implements ILocator, Searchable
 
         $limit = (int)$options['size'];
 
+        $hiddenClause = $includeHidden ? '' : ' AND l.hidden = 0 ';
+
         $query = "
             SELECT
             	{$this->getColumnString('l')},
@@ -223,6 +227,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
             LEFT JOIN {$this->getJoinSql('user', 'l', 'o', true)}
             WHERE l.category = :categoryId
             AND l.deleted_at IS NULL
+            $hiddenClause
             ORDER BY l.{$sort} {$sortDir}
 		";
 
