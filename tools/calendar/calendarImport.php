@@ -70,6 +70,9 @@ $kernel = new CliTool\Kernel(
             if ($this->getOpt(self::OPT_LONG_HELP) || !$this->parseAppOptions()) {
                 echo <<<HELP
 
+Calendar CSV import tool. Use to import calendar CSV files from the command line or via cron
+Use the source name to continually override existing calendar source sets
+
 Usage: calendarImport.php --file import.csv --owner=1 --campus=1,2 --role=1 [--source='sourcename']
     --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
     --owner:      The user ID of who the events should be owned by
