@@ -33,7 +33,7 @@ $app = new class extends CliTool\App{
 
             /* Plagscan not configured - nothing to do
              */
-            $log->warning("Plagscan scan did not run: username, api key and/or access token is not configured correctly");
+            $log->warning('Plagscan scan did not run: username, api key and/or access token is not configured correctly');
             exit();
         }
 
