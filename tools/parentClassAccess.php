@@ -54,7 +54,8 @@ $app = new class extends CliTool\App
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
-Test explanation
+
+Assigns parents of students into the students' folders, thus bundling students and their parents together.
 
 Usage: test.php
 
@@ -112,7 +113,7 @@ HELP;
         }
 
         if ($dryRun) {
-            $this->getLogger()->warning('Performing a dry run. Provide --perform to update DB.');
+            $this->getLogger()->warning('Dry run executing. Provide --perform to update DB.');
         } else if (!$this->perform()) {
             // If not explicitly specifying --perform option
             $this->getLogger()->warning('Updating DB. The default behaviour without --perform is subject to change.');
