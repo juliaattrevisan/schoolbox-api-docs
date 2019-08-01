@@ -47,7 +47,7 @@
                         name: metadata?.reviewer,
                     },
                     folder: {
-                        id: Math.max(0, data?.links?.category.id || 0),
+                        id: Math.max(0, data?.links?.category?.id || 0),
                     },
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     booking: {
