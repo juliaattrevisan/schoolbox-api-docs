@@ -23,6 +23,11 @@ $app = new class extends CliTool\App
      */
     private const DURATION = 3650;
 
+    /**
+     * Hashing algorithm
+     */
+    private const DIGEST_ALGORITHM = 'sha256';
+
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -41,7 +46,7 @@ $app = new class extends CliTool\App
 
 Regenerate SAML certificates for saml_private_cert and saml_public_cert fields in config table.
 
-Usage: createKeys.php
+Usage: createKeys.php -vvv
 
 
 HELP;
@@ -52,7 +57,7 @@ HELP;
         $conf = Config::getInstance();
 
         $config = [
-            'digest_alg' => 'sha256',
+            'digest_alg' => self::DIGEST_ALGORITHM,
             'private_key_bits' => 4096,
             'private_key_type' => OPENSSL_KEYTYPE_RSA,
         ];
@@ -71,7 +76,7 @@ HELP;
         $csr = openssl_csr_new($dn, $privkey, $config);
 
         // Generate a self-signed cert, valid for 3650 days (10 years)
-        $x509 = openssl_csr_sign($csr, null, $privkey, self::DURATION, ['digest_alg' => 'sha256']);
+        $x509 = openssl_csr_sign($csr, null, $privkey, self::DURATION, ['digest_alg' => self::DIGEST_ALGORITHM]);
 
         // Save your private key, CSR and self-signed cert for later use
         openssl_csr_export($csr, $csrout);
