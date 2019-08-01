@@ -18,6 +18,9 @@ require_once __DIR__ . '/../conf/core/require.php';
  */
 $app = new class($argv[1] ?? '') extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
 
     /** @var string */
     private $username;
@@ -30,8 +33,34 @@ $app = new class($argv[1] ?? '') extends CliTool\App
     }
 
 
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Change a user's password. This doesn't obey the usual requirements for a password such as length
+and contents; it arbitrarily sets a new password. Primarily used to regain access to the default
+administrator account when it's inadvertently changed.
+
+Usage: passwd.php
+
+
+HELP;
+            exit;
+        }
+
         $username        = $this->getUserName();
         $userMapper      = UserMapper::getInstance();
         $passwordService = new Password\Service();
