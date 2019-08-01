@@ -76,12 +76,6 @@ HELP;
         }
 
         $log = $this->getLogger();
-        $userMapper = UserMapper::getInstance();
-        $userAccessMapper = UserAccessMapper::getInstance();
-        $folderMapper = FolderMapper::getInstance();
-
-        // suppress the route cache mutations
-        $userAccessMapper->unregisterCallbacks();
 
         if (!$this->getOpt(self::OPT_SHORT_FILE)) {
             $log->error('No import filename specified');
@@ -92,6 +86,13 @@ HELP;
             $log->error('Specified import file not found');
             exit;
         }
+
+        $userMapper = UserMapper::getInstance();
+        $userAccessMapper = UserAccessMapper::getInstance();
+        $folderMapper = FolderMapper::getInstance();
+
+        // suppress the route cache mutations
+        $userAccessMapper->unregisterCallbacks();
 
         $loadStudents = $this->getOpt(self::OPT_LONG_STUDENTS);
 
