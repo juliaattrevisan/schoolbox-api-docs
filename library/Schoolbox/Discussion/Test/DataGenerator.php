@@ -3,7 +3,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Test;
@@ -89,14 +88,15 @@ class DataGenerator
      * Generate test data
      *
      * @param int|null $seed If provided, use this as the RNG seed
+     * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception if something went wrong?
+     * @throws \UnexpectedValueException
      */
     public function generateTestData(int $seed = null): void
     {
         if (isset($seed)) {
             mt_srand($seed);
         }
-
 
         // Delete all the old threads and comments
         $this->log->notice('Soft-deleting all existing threads and comments');
