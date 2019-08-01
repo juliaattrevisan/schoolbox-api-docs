@@ -18,7 +18,11 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\IndicatorMark\Mapper as RubricIndicatorMarkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Result\Mapper as RubricResultSetMapper;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
 use Schoolbox\Assessment\Rubric\MarkedGrid\IndicatorMark;
@@ -27,7 +31,7 @@ use Schoolbox\Collection;
 use Schoolbox\Error;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment;
-use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\MapperProxy as DueWorkResponseMapper;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
@@ -50,10 +54,10 @@ use Schoolbox\UserMapper;
 
 class Controller extends Assessment\Controller
 {
-    /** @var \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper */
+    /** @var RubricResultSetMapper */
     private $resultSetMapper;
 
-    /** @var DataModel\DataSource */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var DueWorkResponseMapper */
@@ -72,33 +76,33 @@ class Controller extends Assessment\Controller
     private $kamiMapper;
 
     /**
-     * @param UserMapper                                           $userMapper
-     * @param Error\Mapper                                         $errorMapper
-     * @param MapperProxy                                          $assessmentMapper
-     * @param WorkTypeMapper                                       $workTypeMapper
-     * @param Access                                               $access
-     * @param Transactor                                           $transactor
-     * @param Assessment\Breadcrumb\Factory                        $bakery
-     * @param DataModel\DataSource                                 $rubricMapper
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Result\Mapper $resultSetMapper
-     * @param DueWorkResponseMapper                                $dueWorkResponseMapper
-     * @param ParticipantMapper                                    $participantMapper
-     * @param Term\Mapper                                          $termMapper
-     * @param SingleFile\Mapper                                    $submissionFileMapper
-     * @param Kami\Connector                                       $kamiConnector
-     * @param Kami\Mapper                                          $kamiMapper
-     * @param Participant\DataSource                               $participantDataSource
+     * @param UserMapper                    $userMapper
+     * @param Error\Mapper                  $errorMapper
+     * @param AssessmentDataSource          $assessmentMapper
+     * @param WorkTypeMapper                $workTypeMapper
+     * @param Access                        $access
+     * @param Transactor                    $transactor
+     * @param Assessment\Breadcrumb\Factory $bakery
+     * @param RubricDataSource              $rubricMapper
+     * @param RubricResultSetMapper         $resultSetMapper
+     * @param DueWorkResponseMapper         $dueWorkResponseMapper
+     * @param ParticipantMapper             $participantMapper
+     * @param Term\Mapper                   $termMapper
+     * @param SingleFile\Mapper             $submissionFileMapper
+     * @param Kami\Connector                $kamiConnector
+     * @param Kami\Mapper                   $kamiMapper
+     * @param Participant\DataSource        $participantDataSource
      */
     public function __construct(
         UserMapper $userMapper,
         Error\Mapper $errorMapper,
-        MapperProxy $assessmentMapper,
+        AssessmentDataSource $assessmentMapper,
         WorkTypeMapper $workTypeMapper,
         Access $access,
         Transactor $transactor,
         Assessment\Breadcrumb\Factory $bakery,
-        DataModel\DataSource $rubricMapper,
-        DataModel\Result\Mapper $resultSetMapper,
+        RubricDataSource $rubricMapper,
+        RubricResultSetMapper $resultSetMapper,
         DueWorkResponseMapper $dueWorkResponseMapper,
         ParticipantMapper $participantMapper,
         Term\Mapper $termMapper,
@@ -166,7 +170,7 @@ class Controller extends Assessment\Controller
             'breadcrumbs'    => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment'     => $assessment,
             'download'       => $this->hasDownloadableSubmissionFiles($assessment),
-            'rubricMarks'    => DataModel\IndicatorMark\Mapper::getInstance()->findMarkedByAssessment($assessment->getId()),
+            'rubricMarks'    => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
             'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
         ];
 
@@ -1159,9 +1163,9 @@ class Controller extends Assessment\Controller
         $data['rubricResultSets'] = $rs;
 
         // Do any students have marks for this rubric?
-        $levelIds      = DataModel\Level\Mapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
-        $descriptorIds = DataModel\Descriptor\Mapper::getInstance()->findIdsByColumn('level_id', $levelIds);
-        $countMarkIds  = DataModel\IndicatorMark\Mapper::getInstance()->countByColumnList([
+        $levelIds      = RubricLevelMapper::getInstance()->findIdsByColumn('b.assessment_id', $dueWork->getId());
+        $descriptorIds = RubricDescriptorMapper::getInstance()->findIdsByColumn('level_id', $levelIds);
+        $countMarkIds  = RubricIndicatorMarkMapper::getInstance()->countByColumnList([
             'descriptor_id' => $descriptorIds,
             'valid'         => true
         ]);
