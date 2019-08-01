@@ -13,8 +13,8 @@
  * 48, FREA1, EN344 = the parents of students in FREA1 will be put into folder 48 (Archery).
  *                    the parents of students in EN344 will also be put into folder 48 (Archery)
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
 declare(strict_types=1);

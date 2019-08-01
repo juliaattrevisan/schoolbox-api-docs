@@ -6,8 +6,8 @@
  * Finds schema columns that aren't known by their corresponding mappers (finds unmapped columns).
  * Originally used to identify deprecated columns.
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
 declare(strict_types=1);

@@ -9,8 +9,8 @@
  * Folders that are self-referential (cyclical) are also treated as orphans and moved into
  * this folder.
  *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Alaress Pty Ltd
+ * @author      Steve Chan <steve.chan@schoolbox.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
