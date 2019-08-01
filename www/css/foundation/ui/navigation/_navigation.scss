@@ -25,10 +25,10 @@ $tabbar-padding-left: rem-calc(($base-font-size - 2));
 $tabbar-left-section-border: 0;
 $tabbar-right-section-border: 0;
 
-$tabbar-header-color: $black;
-$tabbar-header-weight: $font-weight-bold;
-$tabbar-header-line-height: $tabbar-height;
-$tabbar-header-margin: 0;
+$tabbar-header-color: inherit;
+$tabbar-header-weight: $header-font-weight;
+$tabbar-header-line-height: $header-line-height;
+$tabbar-header-margin: $header-bottom-margin;
 
 $tabbar-menu-icon-color: $navigation-foreground;
 $tabbar-menu-icon-hover: $navigation-hover;

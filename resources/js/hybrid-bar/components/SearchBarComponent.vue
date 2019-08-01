@@ -21,14 +21,10 @@
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
                 <a class="link-row" @mousedown="goToProfilePage(result.id)">
-                    <div class="compact card small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
-                        <div>
-                            <img v-bind:src="formatPortrait(result.id)">
-                            <p class="name">
-                                {{ result.formattedName }}
-                                <span class="pipe meta">{{ formatMeta(result) }}</span>
-                            </p>
-                        </div>
+                    <div class="card small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
+                        <img v-bind:src="formatPortrait(result.id)">
+                        <h3 class="name">{{ result.formattedName }}</h3>
+                        <p class="meta">{{ formatMeta(result) }}</p>
                     </div>
                 </a>
             </li>
