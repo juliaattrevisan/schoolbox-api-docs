@@ -10,6 +10,11 @@ use GuzzleHttp\Psr7\Response;
 
 class SmokeInitialCest {
 
+    /**
+     * Hit /login/ url with POST request to login user.
+     *
+     * @param IntegrationTester $i
+     */
     public function LoginLocalUser(IntegrationTester $i){
 
         #GIVEN
@@ -26,7 +31,11 @@ class SmokeInitialCest {
         $i->assertArrayNotHasKey(1, $redirect_history_status, 'I expect there is only one redirect in the history of this request');
     }
 
-
+    /**
+     * Hit /passwordReset/createRequest url with POST to request password reset.
+     *
+     * @param IntegrationTester $i
+     */
     public function LoginForgotPassword(IntegrationTester $i){
 
         #GIVEN
@@ -54,7 +63,18 @@ class SmokeInitialCest {
     }
 
     /**
+     * Smoke test news post forms include following actions:
+     * Draft news
+     * Publish news to moderate section
+     * Publish news instatly without moderation
+     * Publish news from moderation
+     * Reject news that was to be moderated
+     * Save news for later
+     * Create and delete news artivle
      *
+     * Each of these in the future itteration should be split into sepperate test functions.
+     *
+     * @param IntegrationTester $i
      */
     public function SmokeNewsPOST(IntegrationTester $i){
 
@@ -153,7 +173,18 @@ class SmokeInitialCest {
     }
 
     /**
+     * Smoke test hompeage post forms include following actions:
+     * Create homepage
+     * Add users to homepage
+     * Set permissions for users in group permissions for homepage
+     * Add text component
+     * delete fresh text input in the text component that we created.
+     * create text input in the text component
      *
+     * Each of these in the future itteration should be split into sepperate test functions.
+     * Also in future itterations we need to cover each component.
+     *
+     * @param IntegrationTester $i
      */
     public function SmokeHomepagePOST(IntegrationTester $i){
         #GIVEN
@@ -236,7 +267,21 @@ class SmokeInitialCest {
     }
 
     /**
+     * Smoke test course post forms include following actions:
+     * Create course
+     * Create unit spec for course
+     * Save newly created course
+     * Create assignment in new course + unit spec
+     * Create project in course unit spec
+     * Create am assessment in project
+     * Save course which contains the assessment and project
+     * Create folder as a class
+     * Import new course and unit with assignment into our class.
      *
+     * Each of these in the future itteration should be split into sepperate test functions.
+     * Also some of the folder stuff belong to testing the resource browser. So might need to be split out
+     *
+     * @param IntegrationTester $i
      */
     public function SmokeCoursesPOST(IntegrationTester $i){
         #GIVEN
@@ -383,7 +428,17 @@ class SmokeInitialCest {
     }
 
     /**
+     * Smoke test assessment post forms include following actions:
+     * Add assessment to created homepage
+     * Update assesssment
+     * Create assessment with rubric
+     * Submit assessment on behalf of student
+     * Mark assessment with rubric
+     * Mark normal assessment
      *
+     * Each of these in the future itteration should be split into sepperate test functions.
+     *
+     * @param IntegrationTester $i
      */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
@@ -462,7 +517,18 @@ class SmokeInitialCest {
     }
 
     /**
+     * Smoke test calendar post forms include following actions:
+     * Create calendar event from full calendar
+     * Create a personal calendar event from the modify screen
+     * Create a group calendar event from the modify screen
+     * Create a campus calendar event from the modify screen
+     * Modify a personal calendar event
+     * RSVP to calendar event.
+     * Approve atendees on event
      *
+     * Each of these in the future itteration should be split into sepperate test functions.
+     *
+     * @param IntegrationTester $i
      */
     public function SmokeCalendarPOST(IntegrationTester $i)
     {
@@ -554,7 +620,7 @@ class SmokeInitialCest {
         $response = $i->RSVPtoEvent($event->getId());
 
         #THEN
-        $i->comment('Create personal calendar event then RCVP to it.');
+        $i->comment('Create campus calendar event then RCVP to it.');
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after sending an RSVP to the event.');
 
         #WHEN
@@ -573,7 +639,17 @@ class SmokeInitialCest {
     }
 
     /**
+     * Smoke test pastoral post forms include following actions:
      *
+     * Create pastoral record
+     * modify a pastoral record
+     * duplicate a pastoral record to a second user
+     * comment on normal section of pastoral record
+     * comment on confidential section of the pastoral record
+     *
+     * Each of these in the future itteration should be split into sepperate test functions.
+     *
+     * @param IntegrationTester $i
      */
     public function SmokePastoralCarePOST(IntegrationTester $i)
     {
@@ -666,5 +742,3 @@ class SmokeInitialCest {
     }
 
 }
-
-//PHPSESSID=dua5o1pn0jmmhp4g9iq9l09mnk; expires=Tue, 25-Jun-2019 00:14:41 GMT; Max-Age=3600; path=/; HttpOnly

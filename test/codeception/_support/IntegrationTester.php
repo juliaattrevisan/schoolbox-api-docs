@@ -10,8 +10,10 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Calendar\EventMapper;
@@ -54,14 +56,25 @@ class IntegrationTester extends \Codeception\Actor
     private const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
     public const HOMEPAGE_COMPONENT_POSITION = ['left'=>'1','right'=>'2','top'=>'3'];
 
+    /** @var GuzzleHttp\Client $client */
     public $client;
+
+    /** @var Kernel $cli_kernel */
     public $cli_kernel;
+
+    /** @var CookieJar $client_cookie_jar */
     public $client_cookie_jar;
+
     public $guzzle_headers=[];
+
     public $redirect_settings;
+
     /** @var Database $database */
     public $database;
 
+    /**
+     * initGuzzleClient initializes the HTTP Guzzle client used to send off curl requests.
+     */
     function initGuzzleClient()
     {
         $this->client = new Client(['base_uri' => 'https://'.$this::VAGRANT_DOMAIN, 'timeout' => 5.0, 'cookies' => true]);
@@ -77,12 +90,18 @@ class IntegrationTester extends \Codeception\Actor
         $this->client_cookie_jar = new CookieJar();
     }
 
+    /**
+     * initDatabase initializes the database for direct requests and mapper requests
+     */
     function initDatabase()
     {
         $this->database=Database::getInstance();
         $this->database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
     }
 
+    /**
+     * initCliKernel initializes the cli kernel so that I can use the dependancy injector.
+     */
     function initCliKernel()
     {
 
@@ -93,6 +112,16 @@ class IntegrationTester extends \Codeception\Actor
         $this->cli_kernel = new Kernel($app_class, false);
     }
 
+    /**
+     * getUser get a user object.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $username
+     *
+     * @return User
+     */
     function getUser($username){
 
         if(!isset($this->database)) {
@@ -101,6 +130,16 @@ class IntegrationTester extends \Codeception\Actor
         return UserMapper::getInstance()->findOneByColumn('username', $username);
     }
 
+    /**
+     * getRoleByTitle gets the first found role matching on title.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return \Schoolbox\Role
+     */
     function getRoleByTitle($title){
         if(!isset($this->database)) {
             $this->initDatabase();
@@ -108,6 +147,16 @@ class IntegrationTester extends \Codeception\Actor
         return RoleMapper::getInstance()->findOneByColumn('name', $title);
     }
 
+    /**
+     * getCampusByName gets the first found Campus using its name.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $name
+     *
+     * @return
+     */
     function getCampusByName($name){
         if(!isset($this->database)) {
             $this->initDatabase();
@@ -115,6 +164,16 @@ class IntegrationTester extends \Codeception\Actor
         return CampusMapper::getInstance()->findOneByColumn('name', $name);
     }
 
+    /**
+     * getCalendarEventByTitle gets the first found calendar event by its title.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return
+     */
     public function getCalendarEventByTitle($title)
     {
         if(!isset($this->database)) {
@@ -123,6 +182,13 @@ class IntegrationTester extends \Codeception\Actor
         return EventMapper::getInstance()->findOneByColumn('title', $title);
     }
 
+    /**
+     * getCalendarEventAttendanceList fetch all event attendance records and returns them based on event id.
+     *
+     * @param int $event_id
+     *
+     * @return array
+     */
     public function getCalendarEventAttendanceList($event_id){
         if(!isset($this->database)) {
             $this->initDatabase();
@@ -133,6 +199,16 @@ class IntegrationTester extends \Codeception\Actor
         return $query->fetchAll();
     }
 
+    /**
+     * getComponentByClass gets the first component definition by its class
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $element_class
+     *
+     * @return Component_Definition
+     */
     public function getComponentByClass($element_class)
     {
         if(!isset($this->database)) {
@@ -141,6 +217,18 @@ class IntegrationTester extends \Codeception\Actor
         return Component_DefinitionMapper::getInstance()->findOneByColumn('class',$element_class);
     }
 
+    /**
+     * getComponentOnHomepage gets the first component instance based on a few variables.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param int $homepage_id,
+     * @param Component_Definition $component
+     * @param string $position
+     *
+     * @return
+     */
     public function getComponentOnHomepage($homepage_id, $component, $position)
     {
         if(!isset($this->database)) {
@@ -152,6 +240,16 @@ class IntegrationTester extends \Codeception\Actor
                                                                             'position'=>$position]);
     }
 
+    /**
+     * getTextBoxByHeading gets the first TextBox by its title.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return
+     */
     public function getTextBoxByHeading($title)
     {
         if(!isset($this->database)) {
@@ -160,6 +258,17 @@ class IntegrationTester extends \Codeception\Actor
         return TextBoxMapper::getInstance()->findOneByColumnList(['heading'=>$title, 'deleted' => null]);
     }
 
+    /**
+     * getNewsArticle gets the first news article based on its title.
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     * @param bool $latest_id
+     *
+     * @return
+     */
     function getNewsArticle($title, $latest_id=true){
 
         if(!isset($this->database)) {
@@ -168,21 +277,53 @@ class IntegrationTester extends \Codeception\Actor
         return NewsMapper::getInstance()->findOneByColumn('title', $title);
     }
 
-    function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $assessment_ownderID, $submission_ownderID)
+    /**
+     * getFirstSubmissionIdByOwnerAndAssessmentID gets the first submission ID by the owner and assignment ID
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param int $assessmentID
+     * @param int $assessment_ownerID
+     * @param int $submission_ownerID
+     *
+     * @return
+     */
+    function getFirstSubmissionIdByOwnerAndAssessmentID($assessmentID, $assessment_ownerID, $submission_ownerID)
     {
         if(!isset($this->database)) {
             $this->initDatabase();
         }
-        $box_id=SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$assessment_ownderID])->getID();
-        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$submission_ownderID]);
+        $box_id=SubmissionBoxMapper::getInstance()->findOneByColumnList(['assessment_id'=>$assessmentID, 'owner'=>$assessment_ownerID])->getID();
+        $submission = SubmissionMapper::getInstance()->findOneByColumnList(['box_id'=>$box_id, 'owner'=>$submission_ownerID]);
         return $submission->getId();
     }
 
+    /**
+     * getFirstHomepageIdByTitle gets the ID of the first homepage that matches the title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return int
+     */
     function getFirstHomepageIdByTitle($title)
     {
         return $this->getFirstFolderByTitle($title)->getId();
     }
 
+    /**
+     * getFirstFolderByTitle gets the first folder that matches the title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return
+     */
     function getFirstFolderByTitle($title)
     {
         if(!isset($this->database)) {
@@ -192,6 +333,16 @@ class IntegrationTester extends \Codeception\Actor
         return FolderMapper::getInstance()->findOneByColumn('name', $title);
     }
 
+    /**
+     * getFirstCourseByTitle gets the first course specification that matches the title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return
+     */
     function getFirstCourseByTitle($title)
     {
         if(!isset($this->database)) {
@@ -201,6 +352,13 @@ class IntegrationTester extends \Codeception\Actor
         return CourseSpecificationMapper::getInstance()->findOneByColumn('folder_id', $course_folder->getId());
     }
 
+    /**
+     * getUnitsByCourseSpecId gets all the units by the course spec ID
+     *
+     * @param int $course_spec_id
+     *
+     * @return Schoolbox\Learning\Course\DataModel\Specification\Unit\Model[]
+     */
     function getUnitsByCourseSpecId($course_spec_id)
     {
         if (!isset($this->database)) {
@@ -209,6 +367,13 @@ class IntegrationTester extends \Codeception\Actor
         return UnitMapper::getInstance()->findAllByCourseId($course_spec_id);
     }
 
+    /**
+     * getAssessmentIdByCourseUnitSpecId gets all assessment ID by the Course Unit Spec Id
+     *
+     * @param int $unit_id
+     *
+     * @return array
+     */
     function getAssessmentIdByCourseUnitSpecId($unit_id)
     {
         if (!isset($this->database)) {
@@ -219,6 +384,16 @@ class IntegrationTester extends \Codeception\Actor
         return $query->fetchAll();
     }
 
+    /**
+     * getFirstUnitByTitle gets first Unit based on the title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     * 
+     * @return 
+     */
     function getFirstUnitByTitle($title)
     {
         if(!isset($this->database)) {
@@ -228,6 +403,16 @@ class IntegrationTester extends \Codeception\Actor
         return UnitMapper::getInstance()->findOneByColumn('folder_id', $unit_folder->getId());
     }
 
+    /**
+     * getFirstAssessmentByTitle gets first Assessment based on the title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return
+     */
     function getFirstAssessmentByTitle($title)
     {
         if(!isset($this->database)) {
@@ -236,6 +421,16 @@ class IntegrationTester extends \Codeception\Actor
         return AssessmentMapper::getInstance()->findOneByColumn('title', $title);
     }
 
+    /**
+     * getFirstAssessmentIdByTitle gets first Assessment ID based on the title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @param string $title
+     *
+     * @return int
+     */
     function getFirstAssessmentIdByTitle($title)
     {
         if(!isset($this->database)) {
@@ -246,6 +441,16 @@ class IntegrationTester extends \Codeception\Actor
         return $assessment->getId();
     }
 
+    /**
+     * getAssessmentRubricGrid gets first rubric grid based on assessment ID
+     *
+     * @param int $assessmentID
+     *
+     * @throws Exception if no instance of model is found
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * 
+     * @return \Schoolbox\Assessment\Rubric\Grid\Grid
+     */
     function getAssessmentRubricGrid($assessmentID)
     {
         if(!isset($this->database)) {
@@ -261,6 +466,16 @@ class IntegrationTester extends \Codeception\Actor
         return RubricMapper::getInstance()->retrieveGrid($assessment, true);
     }
 
+    /**
+     * getPastoralRecordByTitle gets first pastoral record based on its title
+     *
+     * @param string $title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @return Schoolbox\Pastoral\Model
+     */
     function getPastoralRecordByTitle($heading)
     {
         if(!isset($this->database)) {
@@ -269,7 +484,20 @@ class IntegrationTester extends \Codeception\Actor
         return PastoralRecordMapper::getInstance()->findOneByColumn('heading', $heading);
     }
 
-    function waitForUserMessage($user, $time_created, $timeout=10, $filter){
+    /**
+     * waitForUserMessage waits for a message in the redis server
+     *
+     * @param User $user
+     * @param $time_created
+     * @param int $timeout in seconds
+     * @param string $filter addition filtering on events by title
+     *
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
+     *
+     * @return Schoolbox\Pastoral\Model
+     */
+    function waitForUserMessage($user, $time_created, $filter, $timeout=10){
         $factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
 
         // load the data into your hat, and pull out a rabbit
@@ -308,6 +536,17 @@ class IntegrationTester extends \Codeception\Actor
         return NULL;
     }
 
+    /**
+     * loginUser fire off Curl to login user.
+     *
+     * @param string $username
+     * @param string $password
+     * @param bool $redirect if the request should follow the redirect.
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * 
+     * @return array
+     */
     public function loginUser($username, $password, $redirect=true)
     {
         if (!isset($this->client))
@@ -341,6 +580,16 @@ class IntegrationTester extends \Codeception\Actor
             ]);
     }
 
+    /**
+     * loginForgotPasswordUsername fire off Curl a forgot password request using a username
+     *
+     * @param string $username
+     * @param bool $redirect if the request should follow the redirect.
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function loginForgotPasswordUsername($username, $redirect=true)
     {
         if (!isset($this->client))
@@ -370,11 +619,30 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
-    public function loginForgotPasswordEmail($email, $redirect=true)
+    /**
+     * loginForgotPasswordEmail fire off Curl a forgot password request using an email
+     *
+     * @param string $email
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
+    public function loginForgotPasswordEmail($email)
     {
         return $this->loginForgotPasswordUsername($email);
     }
 
+    /**
+     * createNewCourseSpec fire off Curl to create a new course spec.
+     *
+     * @param string $name
+     * @param Schoolbox\Resource\Folder\Model $parent_folder
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createNewCourseSpec($name, $parent_folder)
     {
         if (!isset($this->client))
@@ -403,6 +671,16 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * createNewUnitSpec fire off Curl to create a new unit spec
+     *
+     * @param string $name
+     * @param \Schoolbox\Learning\Course\DataModel\Specification\Model $course
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createNewUnitSpec($name, $course)
     {
         if (!isset($this->client))
@@ -434,6 +712,19 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * saveCourseSpec fire off Curl to save course spec
+     *
+     * @param string $course_name
+     * @param string $unit_name
+     * @param int $parentId
+     * @param \Schoolbox\Learning\Course\DataModel\Specification\Model $course_spec
+     * @param \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model $unit
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function saveCourseSpec($course_name, $unit_name, $parentId, $course_spec, $unit){
         if (!isset($this->client))
         {
@@ -463,42 +754,47 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
-    public function createCourseWithEmptyUnit($title, $parent_folder)
-    {
-        $this->createNewCourseSpec($title, $parent_folder);
-        $course_spec = $this->getFirstCourseByTitle($title);
-        $unit_name=$title.' EmptyUnit';
-        $this->createNewUnitSpec($unit_name, $course_spec);
-        $unit = $this->getFirstUnitByTitle($unit_name);
-        return $this->saveCourseSpec($title, $unit_name, $parent_folder->getId(), $course_spec, $unit);
-    }
-
-    public function createCourseWithTestUnits($title, $parent_folder)
-    {
-        $this->createNewCourseSpec($title, $parent_folder);
-        $course_spec = $this->getFirstCourseByTitle($title);
-        $unit_name=$title.' UnitWithAssessments';
-        $this->createNewUnitSpec($unit_name, $course_spec);
-        $unit_folder = $this->getFirstFolderByTitle($unit_name);
-        $unit = $this->getFirstUnitByTitle($unit_name);
-        $this->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
-        # TODO Project name after first test run through is not unique, might need to rework what is used to fetch it.
-        $this->createAssessemntProjectOnCourseUnitSpec('Assessment for course project', $unit->getId(), $unit_folder->getId());
-        $project_assessment_id=$this->getFirstAssessmentIdByTitle('Assessment for course project');
-        $this->createAssessemntOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
-        return $this->saveCourseSpec($title, $unit_name, $parent_folder->getId(), $course_spec, $unit);
-    }
-
+    /**
+     * createHomepage fire off Curl to create a homepage
+     *
+     * @param string $title
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createHomepage($title)
     {
         return $this->createFolder($title, 9);
     }
 
+    /**
+     * createClass fire off Curl to create a class
+     *
+     * @param string $title
+     * @param string $code
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createClass($title, $code)
     {
         return $this->createFolder($title, 9, null, $code);
     }
 
+    /**
+     * createFolder fire off Curl to create a folder
+     *
+     * @param string $title
+     * @param string $template
+     * @param Schoolbox\Resource\Folder\Model $parant_folder
+     * @param string $code
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createFolder($title, $template=-1, $parent_folder=null, $code='')
     {
 
@@ -549,6 +845,16 @@ class IntegrationTester extends \Codeception\Actor
 
     }
 
+    /**
+     * importCourseSpecToClass fire off Curl to import a course spec to a class
+     *
+     * @param int $course_spec_id
+     * @param int $class_page_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function importCourseSpecToClass($course_spec_id, $class_page_id){
         if (!isset($this->client))
         {
@@ -576,6 +882,16 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * importUnitSpecToClassCourse fire off Curl to import all unit spec to a class based on course spec
+     *
+     * @param int $course_spec_id
+     * @param int $class_page_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function importUnitSpecToClassCourse($course_spec_id, $class_page_id){
         if (!isset($this->client))
         {
@@ -617,6 +933,16 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * importDueWorkToClassCourseUnit fire off Curl to import all due work to a class based on course unit spec
+     *
+     * @param int $course_spec_id
+     * @param int $class_page_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function importDueWorkToClassCourseUnit($course_spec_id, $class_page_id){
         if (!isset($this->client))
         {
@@ -664,6 +990,20 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * createPastoralCareRecord fire off Curl to create a pastoral care record for a given student
+     *
+     *
+     * @param string $heading
+     * @param int $student_id
+     * @param array $public_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
+     * @param array $confidencial_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
+     * @param array $blocked_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createPastoralCareRecord($heading, $student_id, $public_viewers, $confidencial_viewers, $blocked_viewers)
     {
 
@@ -714,6 +1054,21 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * modifyPastoralCareRecord fire off Curl to modify an existing record
+     *
+     *
+     * @param string $heading
+     * @param int $student_id
+     * @param array $public_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
+     * @param array $confidencial_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
+     * @param array $blocked_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
+     * @param int $duplicate_record_to ID of the student the record needs to be duplicated to.
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function modifyPastoralCareRecord($heading, $pastoral_record_id, $student_id, $public_viewers, $confidencial_viewers, $blocked_viewers, $duplicate_record_to=null)
     {
 
@@ -769,6 +1124,19 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * createPastoralCareRecordComment fire off Curl to create a comment on an existing pastoral record
+     *
+     *
+     * @param int $pastoral_record_id
+     * @param int $student_id
+     * @param string $comment
+     * @param bool $confidential is this comment confidential?
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createPastoralCareRecordComment($pastoral_record_id, $student_id, $comment, $confidential=false)
     {
 
@@ -801,6 +1169,17 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * createPersonalCalendarEventViaCalendar fire off Curl to create a personal calendar event.
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createPersonalCalendarEventViaCalendar($event_title, $user_id)
     {
         if (!isset($this->client))
@@ -830,6 +1209,19 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * modifyCalendarEventWithLevel fire off Curl to modify calendar event with data on what kind of event it is.
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     * @param array $level_data contains extra data to append onto the form_params array
+     * @param string $id supply an event ID if you are editing a pre existing event
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function modifyCalendarEventWithLevel($event_title, $user_id, $level_data, $id='')
     {
         if (!isset($this->client))
@@ -883,6 +1275,17 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * createPersonalCalendarEvent fire off Curl to create a personal calendar event
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createPersonalCalendarEvent($event_title, $user_id)
     {
         $level_data= [
@@ -892,6 +1295,17 @@ class IntegrationTester extends \Codeception\Actor
         return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
     }
 
+    /**
+     * createCampusCalendarEventWithAttendance fire off Curl to create a campus calendar event
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createCampusCalendarEventWithAttendance($event_title, $user_id, $roles, $campuses)
     {
         $level_data= [
@@ -903,6 +1317,17 @@ class IntegrationTester extends \Codeception\Actor
         return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
     }
 
+    /**
+     * createGroupCalendarEvent fire off Curl to create a group calendar event
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createGroupCalendarEvent($event_title, $user_id, $event_groups)
     {
         $level_data= [
@@ -913,7 +1338,19 @@ class IntegrationTester extends \Codeception\Actor
         return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
     }
 
-
+    /**
+     * createCampusCalendarEvent fire off Curl to create a group calendar event
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     * @param array $roles
+     * @param array $campuses
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createCampusCalendarEvent($event_title, $user_id, $roles, $campuses)
     {
         $level_data= [
@@ -924,6 +1361,19 @@ class IntegrationTester extends \Codeception\Actor
         return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data);
     }
 
+    /**
+     * editPersonalCalendarEvent fire off Curl to edit a personal calendar event
+     *
+     *
+     * @param string $event_title
+     * @param int $user_id
+     *
+     * @throws Exception
+     * @throws Exception\Deleted
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function editPersonalCalendarEvent($event_title, $user_id)
     {
         $event = $this->getCalendarEventByTitle($event_title);
@@ -936,6 +1386,16 @@ class IntegrationTester extends \Codeception\Actor
         return $this->modifyCalendarEventWithLevel($event_title, $user_id, $level_data, $event->getId());
     }
 
+    /**
+     * RSVPtoEvent fire off Curl to repond with RSVP to an event
+     *
+     *
+     * @param int $event_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function RSVPtoEvent($event_id)
     {
         if (!isset($this->client))
@@ -962,6 +1422,17 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * AppoveAttendeeOnRSVPEvent fire off Curl to approve all attendees of an event
+     *
+     *
+     * @param int $event_id
+     * @param int[] $user_ids
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function AppoveAttendeeOnRSVPEvent($event_id, $user_ids)
     {
         if (!isset($this->client))
@@ -983,7 +1454,9 @@ class IntegrationTester extends \Codeception\Actor
         foreach ($attendanceList as $attendee)
         {
             if ( in_array($attendee['user_id'], $user_ids))
-            $data['attendanceList['.$attendee['user_id'].'][id]'] = $attendee['id'];
+            {
+                $data['attendanceList['.$attendee['user_id'].'][id]'] = $attendee['id'];
+            }
         }
 
         $allow_redirects = $this->redirect_settings;
@@ -996,8 +1469,18 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
-
-
+    /**
+     * addUsersToHomepageGroup fire off Curl to add users to a homepage group
+     *
+     *
+     * @param int $homepage_id
+     * @param int[] $user_ids
+     *
+     * @throws Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function addUsersToHomepageGroup($homepage_id, $user_ids)
     {
         if (!isset($this->client))
@@ -1031,6 +1514,17 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * setHomepageGroupUserPermission fire off Curl to add user permissions to homepage group
+     *
+     *
+     * @param int $homepage_id
+     * @param array $user_id_permission_array ['user_id' => permission_level]
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function setHomepageGroupUserPermission($homepage_id, $user_id_permission_array)
     {
         if (!isset($this->client))
@@ -1059,6 +1553,15 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * addDefaultUsersToHomepage use curls to add some default users to a homepage.
+     *
+     *
+     * @param int $homepage_id
+     *
+     * @throws Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function addDefaultUsersToHomepage($homepage_id)
     {
         if (!isset($this->client))
@@ -1070,6 +1573,18 @@ class IntegrationTester extends \Codeception\Actor
         $this->setHomepageGroupUserPermission($homepage_id, ['151'=>3]);
     }
 
+    /**
+     * addComponentToHomepage fire off Curl to add a component to a homepage
+     *
+     *
+     * @param int $element_id
+     * @param int $homepage_id
+     * @param int $location
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function addComponentToHomepage($element_id, $homepage_id, $location)
     {
         if (!isset($this->client))
@@ -1115,6 +1630,19 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * addComponentToHomepage fire off Curl to add text to a text box to the text component
+     *
+     *
+     * @param int $homepage_id
+     * @param $text_component
+     * @param string $text
+     * @param string $heading
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function addTextBoxToTextComponent($homepage_id, $text_component, $text, $heading)
     {
 
@@ -1123,7 +1651,6 @@ class IntegrationTester extends \Codeception\Actor
             $this->initGuzzleClient();
         }
 
-        //https://vagrant.dev.schoolbox.cloud/homepage/560/textBoxCreate/3679
         $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/homepage/'.$homepage_id.'/textBoxCreate/'.$text_component->getId();
 
         $page='/textbox/textBoxForm.php';
@@ -1150,6 +1677,19 @@ class IntegrationTester extends \Codeception\Actor
 
     }
 
+    /**
+     * deleteTextBoxToTextComponent fire off Curl to delete text box from a text component based on heading
+     *
+     *
+     * @param int $homepage_id
+     * @param string $heading
+     *
+     * @throws Exception
+     * @throws Exception\Deleted
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function deleteTextBoxToTextComponent($homepage_id, $heading)
     {
         if (!isset($this->client))
@@ -1180,6 +1720,20 @@ class IntegrationTester extends \Codeception\Actor
         ]);
     }
 
+    /**
+     * createAssessemnt fire off Curl to create am assessment
+     *
+     *
+     * @param string $contexttype
+     * @param int $contextId
+     * @param int $folderId
+     * @param string $title
+     * @param string $assessmentType
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createAssessemnt($contexttype, $contextId, $folderId, $title, $assessmentType)
     {
         if (!isset($this->client))
@@ -1241,26 +1795,85 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * createAssessemntOnHomepage fire off Curl to create am assessment on a homepage
+     *
+     *
+     * @param string $title
+     * @param int $HomePageID
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createAssessemntOnHomepage($title, $HomePageID)
     {
         return $this->createAssessemnt('folders', $HomePageID, $HomePageID, $title, 'dueWork');
     }
 
+    /**
+     * createAssessemntOnCourseUnitSpec fire off Curl to create am assessment on a course spec
+     *
+     *
+     * @param string $title
+     * @param int $unit_id
+     * @param int $unit_folder_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createAssessemntOnCourseUnitSpec($title, $unit_id, $unit_folder_id)
     {
         return $this->createAssessemnt('unitspecs', $unit_id, $unit_folder_id, $title, 'dueWork');
     }
 
+    /**
+     * createAssessemntOnCourseUnitSpec fire off Curl to create am assessment project on a course spec
+     *
+     *
+     * @param string $title
+     * @param int $unit_id
+     * @param int $unit_folder_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createAssessemntProjectOnCourseUnitSpec($title, $unit_id, $unit_folder_id)
     {
         return $this->createAssessemnt('unitspecs', $unit_id, $unit_folder_id, $title, 'project');
     }
 
+    /**
+     * createAssessemntOnCourseUnitSpec fire off Curl to create am assessment on a project
+     *
+     *
+     * @param string $title
+     * @param int $project_id
+     * @param int $unit_folder_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createAssessemntOnProject($title, $project_id, $unit_folder_id)
     {
         return $this->createAssessemnt('projects', $project_id, $unit_folder_id, $title, 'dueWork');
     }
 
+    /**
+     * determineMarkInvalidation fire off Curl to determine if marks are invalidated
+     *
+     *
+     * @param int $HomePageID
+     * @param int $assignmentID
+     * @param string $assignmentTitle
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function determineMarkInvalidation($HomePageID, $assignmentID, $assignmentTitle)
     {
         if (!isset($this->client))
@@ -1326,6 +1939,18 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * updateAssessemntOnHomepage fire off Curl to update an assessment on a homepage.
+     *
+     *
+     * @param int $HomePageID
+     * @param int $assignmentID
+     * @param string $assignmentTitle
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function updateAssessemntOnHomepage($HomePageID, $assignmentID, $assignmentTitle)
     {
         if (!isset($this->client))
@@ -1391,6 +2016,17 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * createAssessementForHomepageWithRubric fire off Curl to create am assessment with rubric marks set
+     *
+     *
+     * @param string $title
+     * @param int $HomePageID
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createAssessementForHomepageWithRubric($title, $HomePageID)
     {
 
@@ -1568,11 +2204,19 @@ class IntegrationTester extends \Codeception\Actor
 
     }
 
+    /**
+     * submitAssessment fire off Curl to submit an assessment
+     *
+     *
+     * @param int $assessementID
+     * @param int $user_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function submitAssessment($assessementID, $user_id)
     {
-        //https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$assignmentID.'/'.$user_id.'/submit
-        //https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$assignmentID.'/'.$user_id.'/submit
-
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
@@ -1604,6 +2248,20 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * markAssessment fire off Curl to submit an assessment
+     *
+     *
+     * @param int $assessementID
+     * @param int $user_marking_id
+     * @param int $student_submitting_id
+     *
+     * @throws Exception
+     * @throws Exception\Deleted
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function markAssessment($assessementID, $user_marking_id, $student_submitting_id)
     {
         if (!isset($this->client))
@@ -1642,6 +2300,22 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * markAssessmentWithRubric fire off Curl to submit an assessment with a rubric
+     *
+     *
+     * @param int $assessementID
+     * @param int $user_marking_id
+     * @param int $student_submitting_id
+     *
+     * @throws Exception\Deleted
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws Exception
+     *
+     * @return array
+     *
+     */
     public function markAssessmentWithRubric($assessementID, $user_marking_id, $student_submitting_id)
     {
         if (!isset($this->client))
@@ -1693,6 +2367,20 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * draftNews fire off Curl to create a draft news article
+     *
+     *
+     * @param int $assessementID
+     * @param int $user_marking_id
+     * @param int $student_submitting_id
+     *
+     * @throws Exception
+     * @throws Exception\Deleted
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function draftNews($title)
     {
         if (!isset($this->client))
@@ -1732,6 +2420,17 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * createNewsToModerate fire off Curl to create a moderated news article
+     *
+     *
+     * @param string $title
+     * @param int $news_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function createNewsToModerate($title, $news_id)
     {
         if (!isset($this->client))
@@ -1770,6 +2469,16 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * publishModeratedNewsByID fire off Curl to publish a news article that is right now being moderated
+     *
+     *
+     * @param int $news_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function publishModeratedNewsByID($news_id)
     {
         if (!isset($this->client))
@@ -1802,9 +2511,18 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * saveNewsByIDforLater fire off Curl to save a news article to read later.
+     *
+     *
+     * @param int $news_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function saveNewsByIDforLater($news_id)
     {
-        #/saved/20/add
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
@@ -1833,6 +2551,16 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * rejectNewsByID fire off Curl to reject a news article being moderated
+     *
+     *
+     * @param int $news_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function rejectNewsByID($news_id)
     {
         if (!isset($this->client))
@@ -1866,6 +2594,16 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * deleteNewsByID fire off Curl to delete a news article.
+     *
+     *
+     * @param int $news_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function deleteNewsByID($news_id)
     {
 
@@ -1899,6 +2637,17 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * publishNewsForm fire off Curl to publish a draft
+     *
+     *
+     * @param string $title
+     * @param int $news_id
+     *
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     * @return array
+     */
     public function publishNewsForm($title, $news_id)
     {
 
@@ -1937,6 +2686,13 @@ class IntegrationTester extends \Codeception\Actor
         }
     }
 
+    /**
+     * loginAdmin uses curl to log guzzle client into schoolbox using admin credentials
+     *
+     * @throws Exception
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     *
+     */
     public function loginAdmin()
     {
         $admin_username='alaress';
