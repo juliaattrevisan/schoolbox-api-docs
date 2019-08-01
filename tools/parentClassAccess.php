@@ -60,7 +60,7 @@ $app = new class extends CliTool\App
 Assigns parents of students into the students' folders, thus bundling students and their parents together.
 You can specify any csv file that follows the structure described in classes.csv
 
-Usage: parentClassAccess.php -f <classes.csv>
+Usage: parentClassAccess.php -f classes.csv
 
 
 HELP;
