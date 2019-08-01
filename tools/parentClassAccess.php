@@ -141,7 +141,9 @@ HELP;
                 $currentFolder = $folderMapper->findById($folderId);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $codeString = implode(',', $codes);
+
                 $this->getLogger()->warning("Failed to find folder with id: {$folderId}. Skipping adding users from '{$codeString}' to folder id {$folderId}");
+
                 continue;
             }
 
@@ -267,12 +269,11 @@ HELP;
 
         try {
             // Get primary contact
-
             $user = $userMapper->findByExternalId($externalId, $roleType);
 
             if (!isset($usersAdded[$user->getId()])) {
-                // Give student access to the class
 
+                // Give student access to the class
                 if ($this->perform()) {
                     $userAccess = $userAccessMapper->createModel();
                     $userAccess->setUser($user);
