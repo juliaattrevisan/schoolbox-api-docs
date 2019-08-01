@@ -172,8 +172,8 @@ HELP;
 
                 $log->notice("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
-                $parents = $this->getParents($code, $externalClass, $externalUser);
-
+                /* Optionally install students
+                 */
                 if ($loadStudents) {
                     $students = $classHandler->getStudents($code);
 
@@ -183,6 +183,10 @@ HELP;
                         }
                     }
                 }
+
+                /* Install parents
+                 */
+                $parents = $this->getParents($code, $externalClass, $externalUser);
 
                 if (is_array($parents)) {
                     foreach ($parents as $parent) {
