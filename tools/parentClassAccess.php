@@ -113,10 +113,9 @@ HELP;
         }
 
         if ($dryRun) {
-            $this->getLogger()->warning('Dry run executing. Provide --perform to update DB.');
-        } else if (!$this->perform()) {
-            // If not explicitly specifying --perform option
-            $this->getLogger()->warning('Updating DB. The default behaviour without --perform is subject to change.');
+            $this->getLogger()->warning('Planning assignation of parents to their students\' folders.');
+        } else {
+            $this->getLogger()->warning('Performing assignation of parents to their students\' folders.');
         }
 
         foreach ($classes as $folderId => $codes) {
