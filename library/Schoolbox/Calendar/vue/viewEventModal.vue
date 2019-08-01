@@ -260,7 +260,7 @@
                         </ul>
                     </div>
 
-                    <div v-if="eventExtendedProps.attendance">
+                    <div v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.status">
                         <dl>
                             <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
                             <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
@@ -284,13 +284,13 @@
                            @click.prevent="toggleAttendance"
                            href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
                     </span>
-                    <span v-if="eventExtendedProps.modifyLink">
+                    <span v-if="eventExtendedProps.links.modify">
                         <a class="button icon-modify"
-                           :href="eventExtendedProps.modifyLink">Modify</a>
+                           :href="eventExtendedProps.links.modify">Modify</a>
                     </span>
-                    <span v-if="eventExtendedProps.deleteLink">
+                    <span v-if="eventExtendedProps.links.delete">
                         <a class="button icon-delete"
-                           :href="eventExtendedProps.deleteLink">Delete</a>
+                           :href="eventExtendedProps.links.delete">Delete</a>
                     </span>
 
                     <div v-for="action in eventExtendedProps.booking.actions">
