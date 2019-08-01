@@ -54,6 +54,9 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         );
 
         $allFolders = $treeBuilder->buildChildNodes($this->getSource()->getId());
+        \uasort($allFolders, function (array $a, array $b) {
+            return \strnatcasecmp($a['text'], $b['text']);
+        });
 
         //setup block for submission button
         $this->setVar('FOLDER_CAT_ID', $this->getSource()->getId());

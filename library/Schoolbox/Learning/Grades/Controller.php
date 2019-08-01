@@ -502,7 +502,9 @@ class Controller extends Base
                                               ->mergeUnique($this->folderMapper->findFoldersWithFeedbackToStudent($student, $term), 'id')
                                               ->mergeUnique($this->folderMapper->findFoldersWithResponses($student, $term), 'id')
                                               ->indexBy('id')
-                                              ->sortBy('name', 'ASC', null, true);
+                                              ->sortByCallback(function (Folder\Model $a, Folder\Model $b) {
+                                                  return strnatcasecmp($a->getName(), $b->getName());
+                                              });
 
         return $involvedFolders;
     }
