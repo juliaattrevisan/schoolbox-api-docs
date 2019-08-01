@@ -9,7 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use ReflectionException;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractFactory;
 use Schoolbox\Filter\IComponent;
@@ -128,10 +129,10 @@ class Factory extends AbstractFactory
         // If fetching just capabilities, just get them
 
         if ($showCapabilities && !$showIndicators) {
-            $capabilities = DataModel\Capability\Mapper::getInstance()->findForFolder($folders->getPropertyValues('id'));
+            $capabilities = RubricCapabilityMapper::getInstance()->findForFolder($folders->getPropertyValues('id'));
         } elseif ($showIndicators) {
-            $capabilities = DataModel\Capability\Mapper::getInstance()->createCollection();
-            foreach (DataModel\Indicator\Mapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
+            $capabilities = RubricCapabilityMapper::getInstance()->createCollection();
+            foreach (RubricIndicatorMapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
                 $capability                                       = $indicator->getCapability();
                 $capability->getIndicators()[$indicator->getId()] = $indicator;
                 if (!$capabilities->offsetExists($capability->getId())) {

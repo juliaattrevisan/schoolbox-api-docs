@@ -37,7 +37,9 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\Discussion;
 use Schoolbox\GenericCollection;
@@ -185,9 +187,9 @@ class RecursiveUndeleter extends CliTool\App
             QuizAttempt\Mapper::class => 'assess_id',
         ],
         SubmissionBoxMapper::class          => [
-            SubmissionMapper::class       => 'box_id',
-            ReturnedWorkMapper::class     => 'box_id',
-            DataModel\Level\Mapper::class => 'box_id',
+            SubmissionMapper::class   => 'box_id',
+            ReturnedWorkMapper::class => 'box_id',
+            RubricLevelMapper::class  => 'box_id',
             Eportfolio\ShowcaseMapper::class,
         ],
         TaskMapper::class                   => [
@@ -209,8 +211,8 @@ class RecursiveUndeleter extends CliTool\App
         ReturnedWorkMapper::class           => [
             ReturnedWorkFile\Mapper::class,
         ],
-        DataModel\Level\Mapper::class       => [
-            DataModel\Descriptor\Mapper::class => 'rubric_descriptor.level_id',
+        RubricLevelMapper::class            => [
+            RubricDescriptorMapper::class => 'rubric_descriptor.level_id',
         ],
         Eportfolio\ShowcaseMapper::class    => [],
         QuizQuestion\Mapper::class          => [
@@ -223,11 +225,11 @@ class RecursiveUndeleter extends CliTool\App
             Kami\Mapper::class,
         ],
         ReturnedWorkFile\Mapper::class      => [],
-        DataModel\Descriptor\Mapper::class  => [],
+        RubricDescriptorMapper::class       => [],
         Plagscan\Mapper::class              => [],
         Kami\Mapper::class                  => [],
-        DataModel\Indicator\Mapper::class   => [
-            DataModel\Descriptor\Mapper::class => 'rubric_descriptor.rubric_indicator_id',
+        RubricIndicatorMapper::class        => [
+            RubricDescriptorMapper::class => 'rubric_descriptor.rubric_indicator_id',
         ],
         UserMapper::class                   => [
             Pastoral\Access\Mapper::class,

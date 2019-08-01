@@ -16,7 +16,7 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\ActivityFactory;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -189,7 +189,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     public function softDeleteRubricLevels(SubmissionBox $dueWork)
     {
-        DataModel\Level\Mapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
+        RubricLevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
         return true;
     }
 

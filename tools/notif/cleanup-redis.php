@@ -11,7 +11,7 @@ use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\Filter;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\LogMapper;
@@ -41,12 +41,12 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     $offendingMappers = [
         LogMapper::getInstance(),
         Filter\Selection\Mapper::getInstance(),
-        DataModel\Indicator\Mapper::getInstance(),
-        DataModel\Descriptor\Mapper::getInstance(),
-        DataModel\Level\Mapper::getInstance(),
-        DataModel\IndicatorMark\Mapper::getInstance(),
-        DataModel\Result\Mapper::getInstance(),
-        DataModel\IndicatorUsage\Mapper::getInstance(),
+        RubricDataModel\Indicator\Mapper::getInstance(),
+        RubricDataModel\Descriptor\Mapper::getInstance(),
+        RubricDataModel\Level\Mapper::getInstance(),
+        RubricDataModel\IndicatorMark\Mapper::getInstance(),
+        RubricDataModel\Result\Mapper::getInstance(),
+        RubricDataModel\IndicatorUsage\Mapper::getInstance(),
     ];
 
     $modelClasses = [];
