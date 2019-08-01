@@ -56,8 +56,10 @@ $app = new class extends CliTool\App
             echo <<<HELP
 
 Assigns parents of students into the students' folders, thus bundling students and their parents together.
+You can specify any csv file that follows the structure described in classes.csv
 
-Usage: test.php
+Usage: parentClassAccess.php -f <classes.csv>
+
 
 HELP;
             exit;
@@ -73,12 +75,12 @@ HELP;
         $userAccessMapper->unregisterCallbacks();
 
         if (!$this->getOpt(self::OPT_SHORT_FILE)) {
-            $log->error("No import filename specified");
+            $log->error('No import filename specified');
             exit;
         }
 
         if (!file_exists($this->getOpt(self::OPT_SHORT_FILE))) {
-            $log->error("Specified import file not found");
+            $log->error('Specified import file not found');
             exit;
         }
 
