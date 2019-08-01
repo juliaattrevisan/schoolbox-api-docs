@@ -25,10 +25,37 @@ $app = new class extends CliTool\App
     private const SPINLOCK_WAIT_TIME = 5000;            // default spinlock wait time in microseconds
     private const WORKER_CLEANUP_TIME = 50000;          // default wait timeout for worker cleanup in microseconds
 
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
 
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Convert image files into their commonly-accessed transforms. This preconversion trades time for storage 
+so that first-time-accesses don't require an on-demand transform which can sometimes slow the system 
+down when everyone demands image transforms simultaneously.
+ 
+Usage: processor.php
+
+
+HELP;
+            exit;
+        }
+
+
         // Override default values with ENV variables
         $maxWorkers   = (int)getenv('MAX_WORKERS', true) ?: self::MAX_WORKERS;
         $timeInterval = (int)getenv('TIME_INTERVAL', true) ?: self::TIME_INTERVAL;
