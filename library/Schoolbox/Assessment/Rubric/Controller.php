@@ -19,6 +19,7 @@ use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -58,6 +59,12 @@ class Controller extends BaseController
 
 
     /**
+     * @var RosettaStone
+     */
+    private $rosettaStone;
+
+
+    /**
      * Constructor
      *
      * @param RubricDataSource     $mapper
@@ -71,13 +78,15 @@ class Controller extends BaseController
         AssessmentDataSource $assessmentDataSource,
         FolderMapper $folderMapper,
         Capability\Mapper $groupMapper,
-        Indicator\Mapper $criterionMapper
+        Indicator\Mapper $criterionMapper,
+        RosettaStone $rosettaStone
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->folderMapper         = $folderMapper;
         $this->groupMapper          = $groupMapper;
         $this->criterionMapper      = $criterionMapper;
+        $this->rosettaStone         = $rosettaStone;
     }
 
 

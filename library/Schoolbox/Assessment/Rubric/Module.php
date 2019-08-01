@@ -77,6 +77,7 @@ class Module extends BaseModule
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'groupMapper'          => $this->getMapperFactory()->getLazy(CapabilityMapper::class),
                 'criterionMapper'      => $this->getMapperFactory()->getLazy(IndicatorMapper::class),
+                'rosettaStone'         => $injector->lazyGet('l10n'),
             ])
         );
     }
