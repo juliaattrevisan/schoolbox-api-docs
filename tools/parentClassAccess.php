@@ -71,7 +71,6 @@ HELP;
         $userMapper = UserMapper::getInstance();
         $userAccessMapper = UserAccessMapper::getInstance();
         $folderMapper = FolderMapper::getInstance();
-        $classHandler = new \External_Class();
 
         // suppress the route cache mutations
         $userAccessMapper->unregisterCallbacks();
@@ -179,7 +178,7 @@ HELP;
                 /* Optionally install students
                  */
                 if ($loadStudents) {
-                    $students = $classHandler->getStudents($code);
+                    $students = $externalClass->getStudents($code);
 
                     if (is_array($students)) {
                         foreach ($students as $student) {
