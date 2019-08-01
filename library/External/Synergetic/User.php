@@ -52,9 +52,10 @@ class External_Synergetic_User implements External_UserInterface
         // Do a query to get the photos modification date in the SIS. We don't pull the actual photo at this time
 
         $queryPhoto = $this->getConnector()->executeQuery(
-            'SELECT vPhotos.ModifiedDate 
+            'SELECT TOP 1 vPhotos.ModifiedDate
             FROM dbo.vPhotos vPhotos 
-            WHERE vPhotos.ID = :externalId',
+            WHERE vPhotos.ID = :externalId
+            ORDER BY ModifiedDate DESC',
             ['externalId' => $user->getExternalId()]
         );
 
@@ -66,15 +67,23 @@ class External_Synergetic_User implements External_UserInterface
              *
              * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
-            if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))) {
+            if (
+                null === $user->getPortrait() ||
+                (
+                    // This field is nullable in the database. Only replace an existing SB photo if date is set, and is later that the SB version
+                    isset($photo['ModifiedDate']) &&
+                    $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))
+                )
+            ) {
 
                 // Do a query to retrieve the actual photo data from the database
                 unset($queryPhoto);
 
                 $queryPhoto = $this->getConnector()->executeQuery(
-                    'SELECT vPhotos.Photo 
-                    FROM dbo.vPhotos vPhotos 
-                    WHERE vPhotos.ID = :externalId',
+                    'SELECT TOP 1 vPhotos.Photo
+                    FROM dbo.vPhotos vPhotos
+                    WHERE vPhotos.ID = :externalId
+                    ORDER BY ModifiedDate DESC',
                     ['externalId' => $user->getExternalId()]
                 );
 
