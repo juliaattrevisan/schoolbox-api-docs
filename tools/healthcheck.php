@@ -5,7 +5,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
@@ -17,13 +16,42 @@ require_once __DIR__ . '/../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
     public function run(): void
     {
-        $this->getLogger()->info("Running health check script");
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
 
-        if(!$this->getConfig()->get('external_enable')){
-            $this->getLogger()->warning("External Database is currently disabled");
+Check access permissions to database tables and stored procedures in the external db.
+The external database must be enabled. 
+You only get visual feedback when you use verbose mode.
+
+Usage: healthcheck.php -vvv
+
+
+HELP;
+            exit;
+        }
+
+        $this->getLogger()->info('Running health check script');
+
+        if (!$this->getConfig()->get('external_enable')){
+            $this->getLogger()->warning('External Database is currently disabled');
         }
 
         /** @var SchoolboxDatabaseFactory $factory */
