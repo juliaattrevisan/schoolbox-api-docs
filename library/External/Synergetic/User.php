@@ -1164,7 +1164,7 @@ class External_Synergetic_User implements External_UserInterface
         return $this->getConnector()->executeQuery(
             "SELECT Description FROM luBoarder WHERE Code = :code",
             ['code' => $boarderValue]
-        )->fetchColumn() ?? '';
+        )->fetchColumn() ?: '';
     }
 
 
