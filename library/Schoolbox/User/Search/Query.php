@@ -158,7 +158,7 @@ class Query
      * @param string $queryString
      * @param string $keyword
      *
-     * @return \Alaress\Database\Statement\Query\Base
+     * @return \Alaress\Database\Statement\Query\IQuery
      */
     private function executeQuery(string $queryString, string $keyword)
     {
