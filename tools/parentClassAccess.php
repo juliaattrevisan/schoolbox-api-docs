@@ -288,7 +288,7 @@ HELP;
                 $this->getLogger()->notice(" Skipping: {$roleType} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
             }
         } catch (MapperException $e) {
-            $this->getLogger()->error(" Error:    External {$roleType} user ID not found {$externalId}");
+            $this->getLogger()->error(" Error:    External {$roleType} user ID {$externalId} not found.");
         } catch (UnexpectedValueException $e) {
             $this->getLogger()->error(" Error:    {$e->getMessage()}");
         }
