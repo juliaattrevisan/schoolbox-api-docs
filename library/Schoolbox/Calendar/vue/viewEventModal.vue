@@ -175,17 +175,25 @@
             clickBookingButton: function($event) {
                 switch ($event.target.dataset.bookingAction) {
                     case 'modify':
-                        // Follow link
+                        // Just follow the link
                         break;
 
                     case 'cancel':
+                        $event.preventDefault();
+                        this.$refs.deleteEventModal.open();
+                        break;
+
                     case 'approve':
+                        $event.preventDefault();
+                        this.$refs.approveBookingModal.open();
+                        break;
+
                     case 'reject':
                         // All these are AJAX actions, so POST their href.
                         // Cancel action raises another dialog though...
                         // If the event has a series that also raises a dialog.
                         $event.preventDefault();
-                        this.$refs.modifyBooking.open();
+                        this.$refs.rejectBookingModal.open();
                         break;
 
                     default:
@@ -194,14 +202,27 @@
             },
             confirmDeleteSelf: function () {
                 // Post the event's delete
-                this.$refs.modal.close();
+                this.$refs.deleteEventModal.close();
             },
             confirmDeleteSeries: function () {
                 // Post the event's delete (series)
-                this.$refs.modal.close();
+                this.$refs.deleteEventModal.close();
             },
-            cancelDelete: function () {
-                this.$refs.modal.close();
+            confirmApproveSelf: function () {
+                // Post the event's delete
+                this.$refs.deleteEventModal.close();
+            },
+            confirmApproveSeries: function () {
+                // Post the event's delete (series)
+                this.$refs.deleteEventModal.close();
+            },
+            confirmRejectSelf: function () {
+                // Post the event's delete
+                this.$refs.deleteEventModal.close();
+            },
+            confirmRejectSeries: function () {
+                // Post the event's delete (series)
+                this.$refs.deleteEventModal.close();
             },
         },
     }
@@ -374,7 +395,7 @@
                             All {{ eventExtendedProps.booking.isBooking ? 'bookings' : 'events' }} in the series
                         </a>
                     </li>
-                    <li><a href="#" class="button" @click.prevent="cancelDelete">Cancel</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.deleteEventModal.close">Cancel</a></li>
                 </ul>
             </template>
             <template v-else>
@@ -382,7 +403,7 @@
                 <p>Are you sure you wish to delete this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }}?</p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button submit" @click.prevent="confirmDeleteSelf">Yes</a></li>
-                    <li><a href="#" class="button" @click.prevent="cancelDelete">No</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.deleteEventModal.close">No</a></li>
                 </ul>
             </template>
         </reveal-modal>
@@ -391,9 +412,9 @@
             <h2>This booking is part of a series</h2>
             <p>Would you like to approve only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
-                <li><a href="#" class="button">Only this event</a></li>
-                <li><a href="#" class="button">All events in the series</a></li>
-                <li><a href="#" class="button">Cancel</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmApproveSelf">Only this event</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmApproveSeries">All events in the series</a></li>
+                <li><a href="#" class="button" @click.prevent="$refs.approveBookingSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
 
@@ -401,9 +422,9 @@
             <h2>This booking is part of a series</h2>
             <p>Would you like to reject only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
-                <li><a href="#" class="button">Only this event</a></li>
-                <li><a href="#" class="button">All events in the series</a></li>
-                <li><a href="#" class="button">Cancel</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmRejectSelf">Only this event</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmRejectSeries">All events in the series</a></li>
+                <li><a href="#" class="button" @click.prevent="$refs.rejectBookingSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
 
