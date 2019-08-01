@@ -27,6 +27,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Application\CliTool\Kernel;
 use Schoolbox\Application\CliTool\App;
+use Schoolbox\Pastoral\Mapper as PastoralRecordMapper;
 
 /**
  * Inherited Methods
@@ -258,6 +259,14 @@ class IntegrationTester extends \Codeception\Actor
         $assessment = $this->cli_kernel->get('assessmentDataSource')->findById($assessmentID);
 
         return RubricMapper::getInstance()->retrieveGrid($assessment, true);
+    }
+
+    function getPastoralRecordByTitle($heading)
+    {
+        if(!isset($this->database)) {
+            $this->initDatabase();
+        }
+        return PastoralRecordMapper::getInstance()->findOneByColumn('heading', $heading);
     }
 
     function waitForUserMessage($user, $time_created, $timeout=10, $filter){
@@ -643,6 +652,143 @@ class IntegrationTester extends \Codeception\Actor
                 $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][dates][publish]'] ='22/06/2019 12:00am';
                 $data['unit['.$unit->getId().'][a]['.$assessment['assessment_id'].'][dates][due]'] ='22/08/2019 12:00am';
             }
+        }
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function createPastoralCareRecord($heading, $student_id, $public_viewers, $confidencial_viewers, $blocked_viewers)
+    {
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/pastoral/student/'.$student_id.'/record/insert';
+
+        $page='/pastoral/record/insert';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'id' => '',
+            'student_id'=>$student_id,
+            'heading' => $heading,
+            'typeId' => 1,
+            'subtypeId' => 1,
+            'severityId' => 1,
+            'points' => 1,
+            'tags' => '',
+            'body_public' => '<p>automated public statement</p>',
+            'body_private' => '<p>automated private statement</p>'
+        ];
+
+        foreach ($public_viewers as $type => $viewer_id)
+        {
+            $data[$type.'['.$viewer_id.']'] = 1;
+        }
+
+        foreach ($confidencial_viewers as $type => $viewer_id)
+        {
+            $data[$type.'['.$viewer_id.']'] = 2;
+        }
+
+        foreach ($blocked_viewers as $type => $viewer_id)
+        {
+            $data[$type.'['.$viewer_id.']'] = 0;
+        }
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function modifyPastoralCareRecord($heading, $pastoral_record_id, $student_id, $public_viewers, $confidencial_viewers, $blocked_viewers, $duplicate_record_to=null)
+    {
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/pastoral/student/'.$student_id.'/record/'.$pastoral_record_id.'/update';
+
+        $page='/pastoral/record/'.$pastoral_record_id.'/update';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'id' => $pastoral_record_id,
+            'student_id'=>$student_id,
+            'heading' => $heading,
+            'typeId' => 1,
+            'subtypeId' => 1,
+            'severityId' => 1,
+            'points' => 1,
+            'tags' => '',
+            'body_public' => '<p>automated public statement</p>',
+            'body_private' => '<p>automated private statement</p>'
+        ];
+
+        if ($duplicate_record_to)
+        {
+            $data['duplicate_id[]'] = $duplicate_record_to;
+        }
+
+        foreach ($public_viewers as $type => $viewer_id)
+        {
+            $data[$type.'['.$viewer_id.']'] = 1;
+        }
+
+        foreach ($confidencial_viewers as $type => $viewer_id)
+        {
+            $data[$type.'['.$viewer_id.']'] = 2;
+        }
+
+        foreach ($blocked_viewers as $type => $viewer_id)
+        {
+            $data[$type.'['.$viewer_id.']'] = 0;
+        }
+
+        $allow_redirects = $this->redirect_settings;
+
+        return $this->client->request('POST', $url, [
+            'headers' => $this->guzzle_headers,
+            'allow_redirects' => $allow_redirects,
+            'cookies'=>$this->client_cookie_jar,
+            'form_params'=>$data
+        ]);
+    }
+
+    public function createPastoralCareRecordComment($pastoral_record_id, $student_id, $comment, $confidential=false)
+    {
+
+        if (!isset($this->client))
+        {
+            $this->initGuzzleClient();
+        }
+        $this->guzzle_headers['Referer'] = 'https://'.$this::VAGRANT_DOMAIN.'/pastoral/student/'.$student_id.'/record/'.$pastoral_record_id;
+
+        $page='/pastoral/record/'.$pastoral_record_id.'/comment/insert';
+        $url = 'https://'.$this::VAGRANT_DOMAIN.$page;
+        $data=[
+            'pastoral_id' => $pastoral_record_id,
+            'student_id'=>$student_id,
+            'comment_body' => $comment,
+        ];
+
+        if ($confidential)
+        {
+            $data['comment_private']=1;
         }
 
         $allow_redirects = $this->redirect_settings;
