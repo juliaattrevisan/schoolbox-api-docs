@@ -53,7 +53,7 @@
                     booking: {
                         status: data?.booking?.status,
                         related: data?.booking?.related || [],
-                        actions: data?.booking?.buttons,
+                        actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
                     attendance: data?.attendance,
                     task: {
