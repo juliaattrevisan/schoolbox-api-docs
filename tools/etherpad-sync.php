@@ -16,11 +16,37 @@ require_once __DIR__ . '/../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
     /**
      * Hands off execution over to the App
      */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Back up collabdocs from redis into a local table, etherpad_pad - in case users lose their redis cache.
+It only stores the current state of an ethepad collabdoc. The redis cache contains versioning data.
+
+Usage: etherpad-sync.php
+
+
+HELP;
+            exit;
+        }
+
         /** @var MapperFactory $mapperFactory */
         $mapperFactory = $this->getDi()->get('mapperFactory');
         /** @var Etherpad\PadMapper $padMapper */
