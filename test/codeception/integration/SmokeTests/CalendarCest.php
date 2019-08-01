@@ -123,7 +123,7 @@ class CalendarCest {
         $users_to_approve=[
             $admin->getId()
         ];
-        $response = $i->AppoveAttendeeOnRSVPEvent($event->getId(), $users_to_approve);
+        $response = $i->ApproveAttendeeOnRSVPEvent($event->getId(), $users_to_approve);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
 

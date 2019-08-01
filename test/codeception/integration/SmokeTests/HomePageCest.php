@@ -71,7 +71,7 @@ class HomePageCest {
         #WHEN
         $text_component_class=$i->getComponentByClass('Component_Homepage_TextBoxController');
         $text='<p>This is test Text</p>';
-        $response = $i->addComponentToHomepage($text_component_class->getId(), $homePageId, IntegrationTester::HOMEPAGE_COMPONENT_POSITION['top']);
+        $response = $i->addComponentToHomepage($text_component_class->getId(), $homePageId, SchoolboxHelper\SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top']);
         $i->comment('Added the Text component to Homepage.');
 
         #THEN

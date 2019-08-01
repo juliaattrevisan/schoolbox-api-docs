@@ -38,7 +38,7 @@ class AssessmentCest {
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
 
         #WHEN
-        $response = $i->createAssessemntOnHomepage($assessment_title,$homePageId);
+        $response = $i->createAssessmentOnHomepage($assessment_title,$homePageId);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
 
@@ -50,10 +50,10 @@ class AssessmentCest {
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' Edit it';
-        $i->createAssessemntOnHomepage($assessment_title, $homePageId);
+        $i->createAssessmentOnHomepage($assessment_title, $homePageId);
         $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title, $homePageId);
         $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
-        $update_response = $i->updateAssessemntOnHomepage($homePageId, $assessmentPageId, $assessment_title);
+        $update_response = $i->updateAssessmentOnHomepage($homePageId, $assessmentPageId, $assessment_title);
 
         #THEN
         $i->comment('Updated Assessment');

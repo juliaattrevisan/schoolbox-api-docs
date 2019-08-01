@@ -79,7 +79,7 @@ class CourseCest {
         $i->createNewUnitSpec($unit_name, $course_spec);
         $unit_folder = $i->getFirstFolderByTitle($unit_name);
         $unit = $i->getFirstUnitByTitle($unit_name);
-        $response = $i->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
+        $response = $i->createAssessmentOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
         $i->comment('create an assessment in a new course + unit spec');
@@ -91,7 +91,7 @@ class CourseCest {
 
         #WHEN
         $project_name='Assessment for course project';
-        $response = $i->createAssessemntProjectOnCourseUnitSpec($project_name, $unit->getId(), $unit_folder->getId());
+        $response = $i->createAssessmentProjectOnCourseUnitSpec($project_name, $unit->getId(), $unit_folder->getId());
         $project_assessment_id=$i->getFirstAssessmentIdByTitle($project_name);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
@@ -103,7 +103,7 @@ class CourseCest {
         $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
 
         #WHEN
-        $response = $i->createAssessemntOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
+        $response = $i->createAssessmentOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
         $i->comment('create an assessment in the new projects');
@@ -142,11 +142,11 @@ class CourseCest {
         $i->createNewUnitSpec($unit_name, $course_spec);
         $unit_folder = $i->getFirstFolderByTitle($unit_name);
         $unit = $i->getFirstUnitByTitle($unit_name);
-        $i->createAssessemntOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
+        $i->createAssessmentOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
         $project_name='Assessment for course class project';
-        $i->createAssessemntProjectOnCourseUnitSpec($project_name, $unit->getId(), $unit_folder->getId());
+        $i->createAssessmentProjectOnCourseUnitSpec($project_name, $unit->getId(), $unit_folder->getId());
         $project_assessment_id=$i->getFirstAssessmentIdByTitle($project_name);
-        $i->createAssessemntOnProject('Assessment for project in class', $project_assessment_id, $unit_folder->getId());
+        $i->createAssessmentOnProject('Assessment for project in class', $project_assessment_id, $unit_folder->getId());
         #TODO change saveCourseSpec to allow for more than one unit to be present on course.
         $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
         $i->comment('Created new course spec with unit and assessment to import.');
