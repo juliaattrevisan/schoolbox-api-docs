@@ -13,6 +13,7 @@ namespace Custom\Help\Nesa;
 
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as RubricDescriptorModel;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 
 class Selector
@@ -28,7 +29,7 @@ class Selector
     private $unitSpecificationMapper;
 
     /**
-     * @var RubricDescriptorMapper
+     * @var RubricIndicatorMapper
      */
     private $criterionMapper;
 
@@ -42,13 +43,13 @@ class Selector
      *
      * @param int                     $courseSpecificationId The Teacher Course upon which we report
      * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param RubricDescriptorMapper  $criterionMapper
+     * @param RubricIndicatorMapper   $criterionMapper
      * @param RubricDescriptorMapper  $rubricDescriptorMapper
      */
     public function __construct(
         int $courseSpecificationId,
         UnitSpecificationMapper $unitSpecificationMapper,
-        RubricDescriptorMapper $criterionMapper,
+        RubricIndicatorMapper $criterionMapper,
         RubricDescriptorMapper $rubricDescriptorMapper
     ) {
         $this->courseSpecificationId = $courseSpecificationId;

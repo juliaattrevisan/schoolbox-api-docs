@@ -11,6 +11,8 @@ namespace Custom\Help\Nesa;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Error;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Course\DataModel\Specification;
@@ -96,8 +98,8 @@ class Controller extends Base
         $selector = new Selector(
             Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
-            DataModel\Indicator\Mapper::getInstance(),
-            DataModel\Descriptor\Mapper::getInstance()
+            RubricIndicatorMapper::getInstance(),
+            RubricDescriptorMapper::getInstance()
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [
