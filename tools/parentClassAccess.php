@@ -166,7 +166,7 @@ HELP;
 
             // Add parents from class codes to the specified classes
             foreach ($codes as $code) {
-                if (empty($code)) {
+                if (!strlen($code)) {
                     continue;
                 }
 
