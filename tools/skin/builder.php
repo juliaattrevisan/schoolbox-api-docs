@@ -12,6 +12,9 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
 
     /** @inheritDoc */
     public function getShortOpts(): array
@@ -23,13 +26,32 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['force'];
+        return [
+            'force',
+            self::OPT_LONG_HELP
+        ];
     }
 
 
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Skin Builder compiles .scss files into .css files, including an instance's customisations.
+Those customisations override the defaults and are periodically generated when required.
+Customisations are chosen in Skin Config.
+
+You can force regeneration of .css files using the --force parameter.
+
+Usage: builder.php [--force]
+
+
+HELP;
+            exit;
+        }
+
         $logger = $this->getLogger();
 
         define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin-'.INSTANCE_ID.'.scss');
@@ -39,6 +61,7 @@ $app = new class extends CliTool\App
 
         // Skin builder is off? don't set any vars
         $logger->info('Skin builder is on - building using color settings from skin builder');
+
         $vars = [
             'navigation-foreground' => Config::get('skin_colour_navigation_foreground'),
             'navigation-background' => Config::get('skin_colour_navigation_background'),
@@ -59,20 +82,18 @@ $app = new class extends CliTool\App
             'accent-background' => Config::get('skin_colour_accent_background'),
             'accent-hover' => Config::get('skin_colour_accent_hover'),
             'logo-background' => Config::get('skin_colour_logo_background'),
-            'body-bg'         => Config::get('skin_colour_body_bg'),
+            'body-bg' => Config::get('skin_colour_body_bg'),
             'button-input-scale' => Config::get('skin_button_input_scale'),
             'login-form-background-color' => Config::get('skin_colour_login_background'),
             'form-border-color' => Config::get('skin_colour_form_input_border_color'),
             'form-bg-hover-color' => Config::get('skin_colour_form_background_hover_color'),
         ];
 
-
-        if(is_readable(SKIN_FILE) && is_readable(CUSTOM_CSS_FILE)) {
+        if (is_readable(SKIN_FILE) && is_readable(CUSTOM_CSS_FILE)) {
             $origSha = sha1_file(SKIN_FILE);
             $origCustomSha = sha1_file(CUSTOM_CSS_FILE);
             $logger->info("Skin has been built before (hash: $origSha)");
-        }
-        else {
+        } else {
             // File doesnt exist, force the build
             $logger->info('Skin has not been built before - forcing build');
             $force = true;
@@ -81,8 +102,10 @@ $app = new class extends CliTool\App
 
         $newSha  = null;
         $customSha = null;
-        $fp      = fopen(SKIN_FILE, 'w');
-        if($fp) {
+
+        $fp = fopen(SKIN_FILE, 'w');
+
+        if ($fp) {
             $logger->info('Creating skin file...');
             fputs($fp, "// Do not edit, automatically created by tools/skin/builder.php\n");
 
@@ -93,7 +116,7 @@ $app = new class extends CliTool\App
             fclose($fp);
 
             /* Output custom css */
-            if($cfp = fopen(CUSTOM_CSS_FILE, 'w')) {
+            if ($cfp = fopen(CUSTOM_CSS_FILE, 'w')) {
                 fputs($cfp, "// Do not edit, automatically created by tools/skin/builder.php\n");
                 fputs($cfp, Cfg::get('skin_custom_css'));
                 fclose($cfp);
@@ -105,6 +128,7 @@ $app = new class extends CliTool\App
         }
 
         $siteLocation = Config::get('site_location');
+
         if ($origSha != $newSha || $origCustomSha != $newCustomSha || $force) {
             $logger->info('Skin has changed, or build was forced - rebuilding');
             // Compile the new sass file.
@@ -119,15 +143,17 @@ $app = new class extends CliTool\App
             $infileContent = str_replace('utils/custom', 'utils/custom-'.INSTANCE_ID, $infileContent);
             file_put_contents($infileInstance, $infileContent);
 
-            $cmd     = sprintf('sass --style compressed %s %s', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
+            $cmd = sprintf('sass --style compressed %s %s', escapeshellarg($infileInstance), escapeshellarg($tmpfile));
             $logger->info("Building SASS...");
             exec($cmd, $output, $outputCode);
 
             if ($outputCode === 0) {
                 $logger->info("SASS built - copying to CSS location");
+
                 if (!is_dir($outdir)) {
                     mkdir($outdir);
                 }
+
                 copy($tmpfile, $outfile);
                 // Copy the sourcemap
                 if (is_readable($tmpfile.'.map')) {
@@ -159,7 +185,7 @@ $app = new class extends CliTool\App
                 exec($cmd, $output, $outputCode);
 
                 if ($outputCode !== 0) {
-                    $logger->warning("Something went wrong building editor CSS (exit code: $outputCode)");
+                    $logger->warning("Something went wrong building editor CSS (exit code: {$outputCode})");
                 }
 
                 // Move all of the CSS files to S3
@@ -178,24 +204,28 @@ $app = new class extends CliTool\App
                     if ($fsStorage->has("/css/{$siteLocation}/{$basename}")) {
                         $fsStorage->delete("/css/{$siteLocation}/{$basename}");
                     }
+
                     $fsStorage->write("/css/{$siteLocation}/{$basename}", file_get_contents($file));
                 }
-
             } else {
                 // something went wrong
-                $logger->error("Something went wrong during SASS build process! (exit code: $outputCode)");
-                $logger->info("Command: $cmd");
-                $logger->info("Output:");
+                $logger->error("Something went wrong during SASS build process! (exit code: {$outputCode})");
+                $logger->info("Command: {$cmd}");
+                $logger->info('Output:');
+
                 foreach ($output as $line) {
                     $logger->info($line);
                 }
             }
+
             if (is_readable($tmpfile)) {
                 unlink($tmpfile);
             }
+
             if (is_readable($tmpfile.'.map')) {
                 unlink($tmpfile.'.map');
             }
+
             exit($outputCode);
         }
 
