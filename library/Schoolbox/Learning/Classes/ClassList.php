@@ -87,6 +87,9 @@ class ClassList
 
             foreach ($this->user->getSubjectCollection() as $subject) {
                 $folder                       = $this->folderMapper->findForCampusAndClass($subject['campusCode'] ?? '', $subject['code']);
+                if (!$folder) {
+                    continue;
+                }
                 $folderList                   = $folderList->mergeUnique(new GenericCollection(Folder\Model::class, [$folder]), 'id');
                 $classTypes[$folder->getId()] = $subject['classType'] ?? '';
             }
