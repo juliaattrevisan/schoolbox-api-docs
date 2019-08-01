@@ -35,6 +35,7 @@
 
                 return {
                     eventId: metadata?.eventId,
+                    seriesId: metadata?.seriesId,
                     editable: metadata?.editable,
                     detail: metadata?.detail,
                     location: metadata?.location,
@@ -51,6 +52,7 @@
                     },
                     dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
                     booking: {
+                        isBooking: (data?.booking?.status || '').length,
                         status: data?.booking?.status,
                         related: data?.booking?.related || [],
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
@@ -173,19 +175,33 @@
             clickBookingButton: function($event) {
                 switch ($event.target.dataset.bookingAction) {
                     case 'modify':
-                        // Go straight to link
+                        // Follow link
                         break;
 
                     case 'cancel':
                     case 'approve':
                     case 'reject':
-                        // All these should have AJAX actions, so:
+                        // All these are AJAX actions, so POST their href.
+                        // Cancel action raises another dialog though...
+                        // If the event has a series that also raises a dialog.
                         $event.preventDefault();
+                        this.$refs.modifyBooking.open();
                         break;
 
                     default:
                         break;
                 }
+            },
+            confirmDeleteSelf: function () {
+                // Post the event's delete
+                this.$refs.modal.close();
+            },
+            confirmDeleteSeries: function () {
+                // Post the event's delete (series)
+                this.$refs.modal.close();
+            },
+            cancelDelete: function () {
+                this.$refs.modal.close();
             },
         },
     }
@@ -338,6 +354,59 @@
                 </div>
             </div>
         </template>
+
+        <!-- A modal within a modal you say? Sure, why not? -->
+        <reveal-modal ref="deleteEventModal">
+            <template v-if="eventExtendedProps.seriesId">
+                <h2>This {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }} is part of a series</h2>
+                <p>
+                    Would you like to delete only this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }},
+                    or all in the series?
+                </p>
+                <ul class="flex-list buttons">
+                    <li>
+                        <a href="#" class="button" @click.prevent="confirmDeleteSelf">
+                            Only this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="button" @click.prevent="confirmDeleteSeries">
+                            All {{ eventExtendedProps.booking.isBooking ? 'bookings' : 'events' }} in the series
+                        </a>
+                    </li>
+                    <li><a href="#" class="button" @click.prevent="cancelDelete">Cancel</a></li>
+                </ul>
+            </template>
+            <template v-else>
+                <h2>Please confirm</h2>
+                <p>Are you sure you wish to delete this {{ eventExtendedProps.booking.isBooking ? 'booking' : 'event' }}?</p>
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button submit" @click.prevent="confirmDeleteSelf">Yes</a></li>
+                    <li><a href="#" class="button" @click.prevent="cancelDelete">No</a></li>
+                </ul>
+            </template>
+        </reveal-modal>
+
+        <reveal-modal ref="approveBookingSeriesModal">
+            <h2>This booking is part of a series</h2>
+            <p>Would you like to approve only this booking, or all in the series?</p>
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button">Only this event</a></li>
+                <li><a href="#" class="button">All events in the series</a></li>
+                <li><a href="#" class="button">Cancel</a></li>
+            </ul>
+        </reveal-modal>
+
+        <reveal-modal ref="rejectBookingSeriesModal">
+            <h2>This booking is part of a series</h2>
+            <p>Would you like to reject only this booking, or all in the series?</p>
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button">Only this event</a></li>
+                <li><a href="#" class="button">All events in the series</a></li>
+                <li><a href="#" class="button">Cancel</a></li>
+            </ul>
+        </reveal-modal>
+
     </reveal-modal>
 </template>
 
