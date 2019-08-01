@@ -66,12 +66,23 @@ use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\CliTool;
 use Throwable;
+use function count;
+use function get_class;
+use function max;
+use function method_exists;
+use function min;
+use function preg_replace;
+use function sprintf;
+use function str_pad;
+use function str_repeat;
+use function strlen;
+use function strpos;
 
 class RecursiveUndeleter extends CliTool\App
 {
     // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
     // part of same action?
-    const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
+    private const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
 
     /**
      * Period in seconds, centered on parent deletedAt timestamp, that child models must be deleted within
@@ -105,6 +116,7 @@ class RecursiveUndeleter extends CliTool\App
     /** @var int[] */
     private $rootIds;
 
+    /** @var Database */
     private $database;
 
     /** @var Logger */
@@ -296,17 +308,22 @@ class RecursiveUndeleter extends CliTool\App
         }
     }
 
-    private function connectToDatabase()
+
+    /**
+     * Establish database connection
+     */
+    private function connectToDatabase(): void
     {
         $this->database = Database::getInstance();
     }
+
 
     /**
      * If the user specified all IDs ('*') on command line, load all ids for the specified mapper.
      *
      * Log error and exit if specified mapper does not have an ID field registered.
      */
-    private function checkRestoreAllRequested()
+    private function checkRestoreAllRequested(): void
     {
         $this->logger->debug("Examining IDs argument to see if user requested all ('*') root objects");
         if(1 === count($this->rootIds) && '*' === $this->rootIds[0]) {
@@ -327,7 +344,7 @@ class RecursiveUndeleter extends CliTool\App
     /**
      * Load an instance of the root mapper
      */
-    private function loadRootMapper()
+    private function loadRootMapper(): void
     {
         // Use the specified root table to find the root mapper
         /** @var IMapper $mapperClass */
@@ -358,7 +375,7 @@ class RecursiveUndeleter extends CliTool\App
     /**
      * Either successfully load all command line args, or print and error message and exit
      */
-    private function parseCommandLineArgs()
+    private function parseCommandLineArgs(): void
     {
         $errors = [];
         $errors = $this->getCommandLineExplicitDeletionDate($errors);
@@ -438,7 +455,7 @@ EXAMPLES:
      * @param string[] $errors
      * @return string[]
      */
-    private function getCommandLineIds(array $errors)
+    private function getCommandLineIds(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
@@ -481,7 +498,7 @@ EXAMPLES:
      * @param string[] $errors
      * @return string[]
      */
-    private function getCommandLineTimestampWindow(array $errors)
+    private function getCommandLineTimestampWindow(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
@@ -516,7 +533,7 @@ EXAMPLES:
      * @param string[] $errors
      * @return string[]
      */
-    private function getCommandLineTable(array $errors)
+    private function getCommandLineTable(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
@@ -555,7 +572,7 @@ EXAMPLES:
      * @param string[] $errors
      * @return string[]
      */
-    private function getCommandLineExplicitDeletionDate(array $errors)
+    private function getCommandLineExplicitDeletionDate(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
@@ -576,8 +593,8 @@ EXAMPLES:
         try {
             $this->explicitDeletionDate = new Alaress_Date_Format(strtotime($dateString), Alaress_Date_Format::TIMESTAMP);
         } catch (\Exception $e) {
-            echo self::COLOUR_RED."Could not generate a date from string: {$dateString}\n";
-            echo "{$e->getMessage()}\n".self::COLOUR_WHITE;
+            $this->logger->error("Could not generate a date from string: {$dateString}");
+            $this->logger->error($e->getMessage());
             exit(1);
         }
 
@@ -590,7 +607,7 @@ EXAMPLES:
      *
      * @param string $mapperClass
      */
-    private function checkRegistry($mapperClass)
+    private function checkRegistry($mapperClass): void
     {
         // check this mapper is in our registry
         if(!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
@@ -618,7 +635,7 @@ EXAMPLES:
      * @param string  $val
      * @return mixed[]
      */
-    private function getMapperClassAndForeignKeyFromRegistryPair(IMapper $parentMapper, $key, $val)
+    private function getMapperClassAndForeignKeyFromRegistryPair(IMapper $parentMapper, $key, $val): array
     {
         if(is_string($key)) {
             /** @var IMapper $key */
@@ -674,7 +691,7 @@ EXAMPLES:
      *
      * @param string $childMapperClass
      */
-    private function checkNoIdentifier($childMapperClass)
+    private function checkNoIdentifier($childMapperClass): void
     {
         $this->logger->debug(sprintf("Child mapper '%s' does not appear to have an identifier. Checking registry", $childMapperClass));
         $this->checkRegistry($childMapperClass);
@@ -697,7 +714,7 @@ EXAMPLES:
      * @param int[]   $ids
      * @throws Mapper\Exception
      */
-    private function findDeletedModels(IMapper $mapper, array $ids)
+    private function findDeletedModels(IMapper $mapper, array $ids): void
     {
         if(!$mapper->getIdentifierColumn()) {
             $this->logger->error(sprintf("Mapper '%s' does not appear to have an identifier column. Unable to fetch root models", get_class($mapper)));
@@ -733,7 +750,7 @@ EXAMPLES:
         // For each root model, recursively search for deleted children (matching the root's timestamp)
         foreach($rootModelsToTraverse as $rootModel){
             // Try to get deletedAt timespan
-            list($deletedAfter, $deletedBefore) = $this->getDeletedBetweenDates($rootModel);
+            [$deletedAfter, $deletedBefore] = $this->getDeletedBetweenDates($rootModel);
 
             // Enter recursive rabbit hole
             $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($rootModel), $deletedAfter, $deletedBefore);
@@ -750,7 +767,7 @@ EXAMPLES:
      * @param object $model
      * @return null[]|Alaress_Date_Format[]
      */
-    private function getDeletedBetweenDates($model)
+    private function getDeletedBetweenDates($model): array
     {
         $deletedAfter = $deletedBefore = null;
         if($this->explicitDeletionDate || method_exists($model, 'getDeletedAt')){
@@ -777,7 +794,7 @@ EXAMPLES:
     /**
      * Restores the soft-deleted models we found earlier
      */
-    private function restoreSoftDeletedModels()
+    private function restoreSoftDeletedModels(): void
     {
         /**  @var IMapper $mapperClass */
         foreach($this->softDeletedModels as $mapperClass => $models) {
@@ -807,7 +824,7 @@ EXAMPLES:
      *
      * @param object[][]|Collection[] $softDeletedModels
      */
-    private function printResults(array $softDeletedModels)
+    private function printResults(array $softDeletedModels): void
     {
         $maxIdFieldWidth = 100; // with two space chars adjacent
 
@@ -896,7 +913,7 @@ EXAMPLES:
      *
      * @param object[][]|Collection[] $softDeletedModels
      */
-    private function printDeletedAtDates(array $softDeletedModels)
+    private function printDeletedAtDates(array $softDeletedModels): void
     {
         $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
 
@@ -944,7 +961,7 @@ EXAMPLES:
      * @param         $model
      * @return string
      */
-    private function buildId(IMapper $mapper, $model)
+    private function buildId(IMapper $mapper, $model): string
     {
         // Does this model have an identifier?
         if($mapper->getIdentifierColumn()) {
@@ -984,7 +1001,7 @@ EXAMPLES:
      * @param array $softDeletedModels
      * @return object[][]|Collection[]
      */
-    private function buildDeDuplicatedResults(array $softDeletedModels)
+    private function buildDeDuplicatedResults(array $softDeletedModels): array
     {
         $deDuplicatedResults = [];
         /** @var IMapper $mapperClass */
@@ -1016,7 +1033,7 @@ EXAMPLES:
         Collection $deletedParentModels,
         Alaress_Date_Format $after = null,
         Alaress_Date_Format $before = null
-    ){
+    ): void {
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
 
@@ -1030,7 +1047,7 @@ EXAMPLES:
              * @var IMapper $childMapper
              * @var string  $foreignKeyColumn
              */
-            list($childMapper, $foreignKeyColumn) = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
+            [$childMapper, $foreignKeyColumn] = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
             $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
 
@@ -1057,7 +1074,7 @@ EXAMPLES:
             }
 
             if(null === $after && null === $before){
-                list($after, $before) = $this->getDeletedBetweenDates($deletedChildModels->first());
+                [$after, $before] = $this->getDeletedBetweenDates($deletedChildModels->first());
             }
 
             // Recurse!!
@@ -1076,7 +1093,7 @@ EXAMPLES:
      * @param IMapper                            $mapper
      * @param GenericCollection|ISoftDeletable[] $deletedModels
      */
-    private function registerDeletedModels(IMapper $mapper, GenericCollection $deletedModels)
+    private function registerDeletedModels(IMapper $mapper, GenericCollection $deletedModels): void
     {
         $mapperClass = get_class($mapper);
 
@@ -1095,7 +1112,7 @@ EXAMPLES:
      * @param int[] $ids
      * @return string
      */
-    private function getIdString(array $ids)
+    private function getIdString(array $ids): string
     {
         $string = '[';
         $first  = true;
