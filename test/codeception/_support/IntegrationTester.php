@@ -109,7 +109,7 @@ class IntegrationTester extends \Codeception\Actor
             public function run() : void{}
         };
 
-        $this->cli_kernel = new Kernel($app_class, false);
+        $this->cli_kernel = new Kernel($app_class, []);
     }
 
     /**
