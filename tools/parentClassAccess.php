@@ -1,7 +1,9 @@
 #!/usr/bin/php
 <?php
 /**
- * CLI Tool
+ * Student + Parents go into the same folder (group) in schoolbox
+ *
+ * Some schools want to put students into a folder, and also put those students' parents into the same folder
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
