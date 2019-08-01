@@ -14,7 +14,9 @@ use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AttachmentSpecification;
-use Schoolbox\Assessment\Rubric\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -94,19 +96,19 @@ class Importer
 
 
     /**
-     * @var DataModel\DataSource
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper
+     * @var RubricCapabilityMapper
      */
     private $rubricCapabilityMapper;
 
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper
+     * @var RubricIndicatorMapper
      */
     private $rubricIndicatorMapper;
 
@@ -154,21 +156,21 @@ class Importer
     /**
      * Constructor
      *
-     * @param User                      $currentUser
-     * @param IConfigLoader                                                      $config
-     * @param FolderMapper                                                       $folderMapper
-     * @param HomepageConfigMapper                                     $homepageConfigMapper
-     * @param HomepageTemplateMapper                                   $homepageTemplateMapper
-     * @param CourseConfigMapper                                       $courseConfigMapper
-     * @param CourseSpecMapper                                         $courseSpecMapper
-     * @param UnitSpecMapper                                           $unitSpecMapper
-     * @param RoleAccessMapper                                         $roleAccessMapper
-     * @param DataModel\DataSource                                     $rubricMapper
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper $rubricCapabilityMapper
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper  $rubricIndicatorMapper
-     * @param AssessmentDataSource                                     $assessmentDataSource
-     * @param NodeMapper                                               $nodeMapper
-     * @param ErrorMapper                                              $errorMapper
+     * @param User                   $currentUser
+     * @param IConfigLoader          $config
+     * @param FolderMapper           $folderMapper
+     * @param HomepageConfigMapper   $homepageConfigMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param CourseConfigMapper     $courseConfigMapper
+     * @param CourseSpecMapper       $courseSpecMapper
+     * @param UnitSpecMapper         $unitSpecMapper
+     * @param RoleAccessMapper       $roleAccessMapper
+     * @param RubricDataSource       $rubricMapper
+     * @param RubricCapabilityMapper $rubricCapabilityMapper
+     * @param RubricIndicatorMapper  $rubricIndicatorMapper
+     * @param AssessmentDataSource   $assessmentDataSource
+     * @param NodeMapper             $nodeMapper
+     * @param ErrorMapper            $errorMapper
      */
     public function __construct(
         User $currentUser,
@@ -180,9 +182,9 @@ class Importer
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
-        DataModel\DataSource $rubricMapper,
-        DataModel\Capability\Mapper $rubricCapabilityMapper,
-        DataModel\Indicator\Mapper $rubricIndicatorMapper,
+        RubricDataSource $rubricMapper,
+        RubricCapabilityMapper $rubricCapabilityMapper,
+        RubricIndicatorMapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper,
         ErrorMapper $errorMapper
