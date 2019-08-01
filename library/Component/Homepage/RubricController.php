@@ -14,7 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Indicator\Model[]
+     * @var Model[]
      */
     protected $criteria = [];
 

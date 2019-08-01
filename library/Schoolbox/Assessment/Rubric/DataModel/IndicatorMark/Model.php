@@ -121,7 +121,7 @@ class Model
 
 
     /**
-     * @return null|\Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model
+     * @return null|CapabilityMarkModel
      */
     public function getCapabilityMark(): ?CapabilityMarkModel
     {

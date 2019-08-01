@@ -8,6 +8,7 @@ namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 
@@ -26,7 +27,7 @@ class Model
 
 
     /**
-     * @var \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
+     * @var DescriptorModel
      */
     private $capability;
 
@@ -64,7 +65,7 @@ class Model
 
 
     /**
-     * @return \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model
+     * @return DescriptorModel
      */
     public function getCapability(): CapabilityModel
     {
@@ -73,7 +74,7 @@ class Model
 
 
     /**
-     * @param \Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model $capability
+     * @param DescriptorModel $capability
      * @return static
      */
     public function setCapability(CapabilityModel $capability): self

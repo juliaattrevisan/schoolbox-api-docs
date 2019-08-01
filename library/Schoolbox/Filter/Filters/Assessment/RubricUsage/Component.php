@@ -9,7 +9,7 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
 use ReflectionException;
-use Schoolbox\Assessment\Rubric\DataModel\Capability\Model;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
@@ -20,7 +20,7 @@ class Component extends Filter\BaseComponent
     /** @var Codec */
     private $codec;
 
-    /** @var GenericCollection|\Schoolbox\Assessment\Rubric\DataModel\Capability\Model[] */
+    /** @var GenericCollection|CapabilityModel[] */
     private $capabilities;
 
     /** @var bool */
@@ -38,16 +38,16 @@ class Component extends Filter\BaseComponent
 
 
     /**
-     * @param Filter\IDefinition                                                               $definition
-     * @param User                                                                             $user
-     * @param Filter\Page\Model                                                                $pageFilter
-     * @param null|GenericCollection|Filter\Selection\Model[]                                  $userSelections
-     * @param null|GenericCollection|Filter\Selection\Model[]                                  $urlOverrides
-     * @param Filter\Selection\Mapper                                                          $filterSelectionMapper
-     * @param Codec                                                                            $codec
-     * @param null|GenericCollection|\Schoolbox\Assessment\Rubric\DataModel\Capability\Model[] $capabilities
-     * @param bool                                                                             $showCapabilities
-     * @param bool                                                                             $showIndicators
+     * @param Filter\IDefinition                              $definition
+     * @param User                                            $user
+     * @param Filter\Page\Model                               $pageFilter
+     * @param null|GenericCollection|Filter\Selection\Model[] $userSelections
+     * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
+     * @param Filter\Selection\Mapper                         $filterSelectionMapper
+     * @param Codec                                           $codec
+     * @param null|GenericCollection|CapabilityModel[]        $capabilities
+     * @param bool                                            $showCapabilities
+     * @param bool                                            $showIndicators
      * @throws InvalidArgumentException If neither $capabilities or $indicators are supplied
      * @throws ReflectionException
      */
@@ -65,7 +65,7 @@ class Component extends Filter\BaseComponent
     ) {
         parent::__construct($definition, $user, $pageFilter, $userSelections, $urlOverrides, $filterSelectionMapper);
 
-        if (!$capabilities->isCollectionOf(Model::class)) {
+        if (!$capabilities->isCollectionOf(CapabilityModel::class)) {
             throw new InvalidArgumentException("Capability collection is of wrong type. Found: '{$capabilities->getElementClass()}'");
         }
 

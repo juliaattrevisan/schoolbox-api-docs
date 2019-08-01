@@ -105,7 +105,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var \Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper $capabilityMarkMapper */
+        /** @var CapabilityMarkMapper $capabilityMarkMapper */
         $capabilityMarkMapper = $this->getJoinMapper('capability_mark');
         /** @var ReturnedWorkMapper $submissionReturnMapper */
         $submissionReturnMapper = $this->getJoinMapper('capability_mark.submission_return');

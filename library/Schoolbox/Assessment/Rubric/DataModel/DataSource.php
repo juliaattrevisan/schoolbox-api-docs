@@ -1396,7 +1396,7 @@ class DataSource
         foreach ($srcCapabilityUsages as $srcCapabilityUsage) {
             $dstCapabilityUsage = clone $srcCapabilityUsage;
 
-            /** @var \Schoolbox\Assessment\Rubric\DataModel\Capability\Model $dstCapability */
+            /** @var CapabilityModel $dstCapability */
             $dstCapability = $dstCapabilities->getOffset($srcCapabilityUsage->getCapability()->getId());
 
             $dstCapabilityUsage->setCapability($dstCapability);
