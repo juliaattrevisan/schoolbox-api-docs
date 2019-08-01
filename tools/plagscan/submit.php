@@ -85,7 +85,7 @@ $app = new class extends CliTool\App{
 
                         /* Update the db with this new plagscan id */
                         if ($plagscanId) {
-                            $log->info("{$prefix}: transmission successful, document set to processing state:  {$currentDocument->getStudentSubmissionFileId()}");
+                            $log->info("{$prefix}: transmission successful, document set to processing state: " . Plagscan::STATUS_PROCESSING);
 
                             $currentDocument->setPlagscanId($plagscanId);
                             $currentDocument->setStatus(Plagscan::STATUS_PROCESSING);
