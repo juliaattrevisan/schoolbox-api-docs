@@ -226,7 +226,6 @@ class Controller extends BaseController
             foreach ($groupModels as $groupModel) {
                 $grouping = Util::normalizeName($groupModel->getName());
                 if ($proposed === $grouping) {
-                    // TODO localise
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricGroup|c} name already exists in this context'
