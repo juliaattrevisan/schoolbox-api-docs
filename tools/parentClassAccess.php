@@ -75,15 +75,13 @@ HELP;
             exit;
         }
 
-        $log = $this->getLogger();
-
         if (!$this->getOpt(self::OPT_SHORT_FILE)) {
-            $log->error('No import filename specified');
+            $this->getLogger()->error('No import filename specified');
             exit;
         }
 
         if (!file_exists($this->getOpt(self::OPT_SHORT_FILE))) {
-            $log->error('Specified import file not found');
+            $this->getLogger()->error('Specified import file not found');
             exit;
         }
 
@@ -122,7 +120,7 @@ HELP;
             fclose($handle);
         } else {
             // Couldn't read file
-            $log->error('Could not locate file to import.');
+            $this->getLogger()->error('Could not locate file to import.');
             exit;
         }
 
@@ -142,7 +140,7 @@ HELP;
                 $currentFolder = $folderMapper->findById($folderId);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $codeString = implode(',', $codes);
-                $log->warning("Failed to find folder with id: {$folderId}. Skipping adding users from '{$codeString}' to folder id {$folderId}");
+                $this->getLogger()->warning("Failed to find folder with id: {$folderId}. Skipping adding users from '{$codeString}' to folder id {$folderId}");
                 continue;
             }
 
@@ -151,7 +149,7 @@ HELP;
             if ($loadStudents) {
                 // Remove all students from specified classes
                 $students = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::STUDENT);
-                $log->notice("Removing student access from '{$folders[$folderId]->getTitle()}'");
+                $this->getLogger()->notice("Removing student access from '{$folders[$folderId]->getTitle()}'");
 
                 if ($this->perform()) {
                     foreach ($students as $student) {
@@ -165,7 +163,7 @@ HELP;
 
             // Remove all parents from specified classes
             $parents = $userAccessMapper->findUsersInCategory($folders[$folderId], Role::PARENT);
-            $log->notice("Removing parent access from '{$folders[$folderId]->getTitle()}'");
+            $this->getLogger()->notice("Removing parent access from '{$folders[$folderId]->getTitle()}'");
 
             if ($this->perform()) {
                 foreach ($parents as $parent) {
@@ -182,7 +180,7 @@ HELP;
                     continue;
                 }
 
-                $log->notice("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
+                $this->getLogger()->notice("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
                 /* Optionally install students
                  */
@@ -212,13 +210,13 @@ HELP;
         // Reload cache (if not dry run)
         if ($this->perform()) {
             /** @var WritableCache $cache */
-            $this->getDi()->values['logger'] = $log;
+            $this->getDi()->values['logger'] = $this->getLogger();
             $cache = $this->getDi()->get('subscriptionCache');
 
             try {
                 $cache->cacheAllUsers(INSTANCE_ID);
             } catch (UnderflowException $e) {
-                $log->notice($e->getMessage(), ['exception' => $e]);
+                $this->getLogger()->notice($e->getMessage(), ['exception' => $e]);
             }
         }
     }
@@ -262,9 +260,7 @@ HELP;
      */
     private function loadUserAccess($userMapper, $userAccessMapper, $externalId, $role, $folderId)
     {
-        $log = $this->getLogger();
         // This would typically happen for a non-existent spouse, just do nothing in this case
-
         if (empty($externalId)) {
             return;
         }
@@ -286,15 +282,15 @@ HELP;
                     $userAccessMapper->save($userAccess);
                 }
 
-                $log->notice(" Added:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
+                $this->getLogger()->notice(" Added:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
                 $usersAdded[$user->getId()] = true;
             } else {
-                $log->notice(" Skipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
+                $this->getLogger()->notice(" Skipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
             }
         } catch (MapperException $e) {
-            $log->error(" Error:    External {$role} user ID not found {$externalId}");
+            $this->getLogger()->error(" Error:    External {$role} user ID not found {$externalId}");
         } catch (UnexpectedValueException $e) {
-            $log->error(" Error:    {$e->getMessage()}");
+            $this->getLogger()->error(" Error:    {$e->getMessage()}");
         }
     }
 };
