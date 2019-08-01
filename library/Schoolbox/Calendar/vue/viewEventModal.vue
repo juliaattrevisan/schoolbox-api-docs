@@ -170,6 +170,23 @@
                 }
                 return base;
             },
+            clickBookingButton: function($event) {
+                switch ($event.target.dataset.bookingAction) {
+                    case 'modify':
+                        // Go straight to link
+                        break;
+
+                    case 'cancel':
+                    case 'approve':
+                    case 'reject':
+                        // All these should have AJAX actions, so:
+                        $event.preventDefault();
+                        break;
+
+                    default:
+                        break;
+                }
+            },
         },
     }
 </script>
@@ -269,6 +286,7 @@
                         </ul>
                     </div>
 
+                    <!-- Related bookings -->
                     <div v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.status">
                         <dl>
                             <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
@@ -276,36 +294,46 @@
                         </dl>
                     </div>
 
+
+                    <!-- Various buttons -->
                     <span v-if="eventExtendedProps.folder.id">
                         <a class="button icon-home"
                            :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
                     </span>
+
                     <span v-if="eventExtendedProps.links.view">
                         <a class="button icon-due-work"
                            :href="eventExtendedProps.links.view">View More Details</a>
                     </span>
+
                     <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.listButton">
                         <a class="button icon-group"
                            :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
                     </span>
+
                     <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.requestButton">
                         <a class="button icon-reply"
                            @click.prevent="toggleAttendance"
                            href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
                     </span>
+
                     <span v-if="eventExtendedProps.links.modify">
                         <a class="button icon-modify"
                            :href="eventExtendedProps.links.modify">Modify</a>
                     </span>
+
                     <span v-if="eventExtendedProps.links.delete">
                         <a class="button icon-delete"
                            :href="eventExtendedProps.links.delete">Delete</a>
                     </span>
 
-                    <div v-for="action in eventExtendedProps.booking.actions">
-                        <a :href="action.href"
-                           :class="buildBookingButtonClasses(action)">{{ action.label }}</a>
-                    </div>
+                    <!-- Booking buttons: handle random events -->
+                    <span v-for="action in eventExtendedProps.booking.actions">
+                        <a :class="buildBookingButtonClasses(action)"
+                           :data-booking-action="String(action.action)"
+                           @click="clickBookingButton($event)"
+                           :href="action.href || '#'">{{ action.label }}</a>
+                    </span>
 
                 </div>
             </div>
