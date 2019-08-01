@@ -72,6 +72,7 @@ class Controller extends BaseController
      * @param FolderMapper         $folderMapper
      * @param Capability\Mapper    $groupMapper
      * @param Indicator\Mapper     $criterionMapper
+     * @param RosettaStone         $rosettaStone
      */
     public function __construct(
         RubricDataSource $mapper,
@@ -141,7 +142,11 @@ class Controller extends BaseController
             $groupName  = $post->get('groupName');
             $critName   = $post->get('name');
             if(!$groupName){
-                $this->sendJSONError('Must supply a Group for new Criterion');
+                $this->sendJSONError(
+                    $this->rosettaStone->translateSentence(
+                        'Must supply {:rubricGroup|indef} {:rubricGroup} for new {:rubricCriterion}'
+                    )
+                );
                 return;
             }
 
@@ -153,7 +158,11 @@ class Controller extends BaseController
                 $groupModel = $this->groupMapper->findById($groupId);
                 // Surely this capability is in a folder?
                 if ($groupModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
-                    $this->sendJSONError('May only create folder-level indicators');
+                    $this->sendJSONError(
+                        $this->rosettaStone->translateSentence(
+                            'May only create folder-level {:rubricCriterion|p}'
+                        )
+                    );
                     return;
                 }
                 $folderId = $groupModel->getParentId();
@@ -166,8 +175,11 @@ class Controller extends BaseController
                 $normGroup = Util::normalizeName($criterionModel->getCapability()->getName());
                 $normName  = Util::normalizeName($criterionModel->getName());
                 if ($normGroup === $proposedGroup && $normName === $proposedName){
-                    // TODO localise!!!!!
-                    $this->sendJSONError("Indicator already exists in this Group");
+                    $this->sendJSONError(
+                        $this->rosettaStone->translateSentence(
+                            '{:rubricCriterion|c} already exists in this {:rubricGroup}'
+                        )
+                    );
                     return;
                 }
             }
@@ -215,7 +227,11 @@ class Controller extends BaseController
                 $grouping = Util::normalizeName($groupModel->getName());
                 if ($proposed === $grouping) {
                     // TODO localise
-                    $this->sendJSONError("Group name already exists in this context");
+                    $this->sendJSONError(
+                        $this->rosettaStone->translateSentence(
+                            '{:rubricGroup|c} name already exists in this context'
+                        )
+                    );
                     return;
                 }
             }
