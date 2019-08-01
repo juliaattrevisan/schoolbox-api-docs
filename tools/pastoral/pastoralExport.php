@@ -19,11 +19,36 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$app = new class extends CliTool\App{
+$app = new class extends CliTool\App {
+
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
 
     /** @inheritDoc */
     public function run(): void
     {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Syncs all pastoral care records within Schoolbox to the external pastoral care system, if one is configured.
+
+Usage: pastoralExport.php
+
+
+HELP;
+            exit;
+        }
+
         $log = $this->getLogger();
 
         // Only process if pastoral docman writeback is actually enabled in config

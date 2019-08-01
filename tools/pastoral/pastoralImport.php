@@ -13,6 +13,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\UserMapper;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -36,17 +37,6 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function run(): void
     {
-
-        /* command-line options
-         */
-        $importParentAccess = $this->getOpt('parent-access');
-        $importRecords      = $this->getOpt('add-records');
-        $importAttachments  = $this->getOpt('add-attachments');
-        $deleteRecords      = $this->getOpt('delete-records');
-        $defaultOwnerId     = $this->getOptAsInt('default-owner:');
-        /** @var ?int $userId The user conducting the import (used in logging) */
-        $userId             = $this->getOptAsInt('user:');
-
         /* Help
          */
         if ($this->getOpt('help')) {
@@ -54,7 +44,7 @@ $app = new class extends CliTool\App{
 
 Imports Pastoral records from external source. Primarily used if there are many records.
 
-Usage: php pastoralImport.php [--parent-access] [--add-records] [--add-attachments] [--user=1] [--default-owner=1]
+Usage: pastoralImport.php [--parent-access] [--add-records] [--add-attachments] [--user=1] [--default-owner=1]
     --parent-access:    give parents access to pastoral records
     --add-records:      import pastoral records
     --add-attachments:  import documents associated with pastoral records
@@ -68,14 +58,25 @@ HELP;
             exit(0);
         }
 
+        /* command-line options
+         */
+        $importParentAccess = $this->getOpt('parent-access');
+        $importRecords      = $this->getOpt('add-records');
+        $importAttachments  = $this->getOpt('add-attachments');
+        $deleteRecords      = $this->getOpt('delete-records');
+        $defaultOwnerId     = $this->getOptAsInt('default-owner:');
+        /** @var ?int $userId The user conducting the import (used in logging) */
+        $userId             = $this->getOptAsInt('user:');
+
         $log = $this->getLogger();
         $di = $this->getDi();
+
         if (!$userId) {
             $log->critical('Invalid user id. Specify a user to whom the pastoral import is associated for logging purposes (typically a superuser)');
             exit(0);
         }
 
-        $userMapper = new \Schoolbox\UserMapper();
+        $userMapper = new UserMapper();
 
         try {
             $user = $userMapper->findById($userId);
