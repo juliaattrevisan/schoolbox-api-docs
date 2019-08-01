@@ -97,7 +97,9 @@ HELP;
                         $classes[$row[0]] = [];
                     }
 
-                    for ($i = 1; $i < count($row); $i++) {
+                    $n = \count($row);
+
+                    for ($i = 1; $i < $n; $i++) {
                         $code = $row[$i];
                         if (strlen(trim($code)) > 0) {
                             $classes[$row[0]][] = $row[$i];
@@ -105,6 +107,7 @@ HELP;
                     }
                 }
             }
+
             fclose($handle);
         } else {
             // Couldn't read file
@@ -126,6 +129,7 @@ HELP;
                 $log->warning("Failed to find folder with id: {$folderId}. Skipping adding users from '{$codeString}' to folder id {$folderId}");
                 continue;
             }
+
             $folders[$folderId] = $currentFolder;
 
             if ($loadStudents) {
