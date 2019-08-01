@@ -17,6 +17,12 @@ $app = new class extends CliTool\App
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
+    /**
+     * Self-signed cert valid for this many days
+     * Default is 3650 days (10 years)
+     */
+    private const DURATION = 3650;
+
 
     /** @inheritdoc */
     public function getLongOpts(): array
@@ -65,7 +71,7 @@ HELP;
         $csr = openssl_csr_new($dn, $privkey, $config);
 
         // Generate a self-signed cert, valid for 3650 days (10 years)
-        $x509 = openssl_csr_sign($csr, null, $privkey, $days=3650, ['digest_alg' => 'sha256']);
+        $x509 = openssl_csr_sign($csr, null, $privkey, self::DURATION, ['digest_alg' => 'sha256']);
 
         // Save your private key, CSR and self-signed cert for later use
         openssl_csr_export($csr, $csrout);
