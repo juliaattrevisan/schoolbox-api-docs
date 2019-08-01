@@ -254,10 +254,10 @@ HELP;
      * @param UserMapper       $userMapper
      * @param UserAccessMapper $userAccessMapper
      * @param string|null      $externalId
-     * @param string           $role
+     * @param string           $roleType
      * @param int              $folderId
      */
-    private function loadUserAccess(UserMapper $userMapper, UserAccessMapper $userAccessMapper, ?string $externalId, string $role, int $folderId)
+    private function loadUserAccess(UserMapper $userMapper, UserAccessMapper $userAccessMapper, ?string $externalId, string $roleType, int $folderId)
     {
         // This would typically happen for a non-existent spouse, just do nothing in this case
         if (!strlen($externalId)) {
@@ -267,7 +267,7 @@ HELP;
         try {
             // Get primary contact
 
-            $user = $userMapper->findByExternalId($externalId, $role);
+            $user = $userMapper->findByExternalId($externalId, $roleType);
 
             if (!isset($usersAdded[$user->getId()])) {
                 // Give student access to the class
@@ -281,13 +281,13 @@ HELP;
                     $userAccessMapper->save($userAccess);
                 }
 
-                $this->getLogger()->notice(" Added:    {$role} '{$user->getFirstname()} {$user->getLastname()}'");
+                $this->getLogger()->notice(" Added:    {$roleType} '{$user->getFirstname()} {$user->getLastname()}'");
                 $usersAdded[$user->getId()] = true;
             } else {
-                $this->getLogger()->notice(" Skipping: {$role} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
+                $this->getLogger()->notice(" Skipping: {$roleType} '{$user->getFirstname()} {$user->getLastname()}' (Already Added To Folder)");
             }
         } catch (MapperException $e) {
-            $this->getLogger()->error(" Error:    External {$role} user ID not found {$externalId}");
+            $this->getLogger()->error(" Error:    External {$roleType} user ID not found {$externalId}");
         } catch (UnexpectedValueException $e) {
             $this->getLogger()->error(" Error:    {$e->getMessage()}");
         }
