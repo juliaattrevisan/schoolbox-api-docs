@@ -159,5 +159,5 @@ HELP;
     }
 };
 
-$kernel = new CliTool\Kernel($app);
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();
