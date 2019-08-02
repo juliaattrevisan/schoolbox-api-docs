@@ -16,7 +16,6 @@ use Schoolbox\MapperFactory;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Resource\Storage;
 use Alaress\Random;
-use Schoolbox\Application\Daemon;
 use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
@@ -181,5 +180,5 @@ HELP;
 };
 
 
-$kernel = new CliTool\Kernel($app, [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_ERRORS => E_ALL,]);
 $kernel->runApp();
