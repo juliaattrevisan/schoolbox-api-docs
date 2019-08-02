@@ -5,6 +5,9 @@
     import axios         from 'axios';
     import toQueryString from "./helper/toQueryString";
 
+    const EFFICIACY_SELF = 'self';
+    const EFFICIACY_SERIES = 'series';
+
     export default {
         name: "view-event-modal",
         props: ['event', 'toMoment', 'taskTypeId',],
@@ -205,60 +208,60 @@
             },
             // Event actions
             confirmEventDeleteSelf: function () {
-                this.eventDelete(false);
+                this.eventDelete(EFFICIACY_SELF);
             },
             confirmEventDeleteSeries: function () {
-                this.eventDelete(true);
+                this.eventDelete(EFFICIACY_SERIES);
             },
             confirmBookingDeleteSelf: function () {
-                this.bookingDelete(false);
+                this.bookingDelete(EFFICIACY_SELF);
             },
             confirmBookingDeleteSeries: function () {
-                this.bookingDelete(true);
+                this.bookingDelete(EFFICIACY_SERIES);
             },
             confirmBookingApproveSelf: function () {
-                this.bookingApprove(false);
+                this.bookingApprove(EFFICIACY_SELF);
             },
             confirmBookingApproveSeries: function () {
-                this.bookingApprove(true);
+                this.bookingApprove(EFFICIACY_SERIES);
             },
             confirmBookingRejectSelf: function () {
-                this.bookingReject(false);
+                this.bookingReject(EFFICIACY_SELF);
             },
             confirmBookingRejectSeries: function () {
-                this.bookingReject(true);
+                this.bookingReject(EFFICIACY_SERIES);
             },
-            eventDelete: function (series) {
+            eventDelete: function (efficacy) {
                 let data = {
                     id: this.eventExtendedProps.eventId,
-                    efficacy: series ? 'series' : 'self',
+                    efficacy: efficacy,
                 };
                 axios
                     .post(this.eventExtendedProps.links.delete, toQueryString(data))
                     .then(() => this.event.remove())
                     .finally(this.$refs.eventDeleteModal.close);
             },
-            bookingDelete: function (series) {
+            bookingDelete: function (efficacy) {
                 let data = {
-                    efficacy: series ? 'series' : 'self',
+                    efficacy: efficacy,
                 };
                 axios
                     .post(this.eventExtendedProps.booking.actions.cancel.href, toQueryString(data))
                     .then(() => this.event.remove())
                     .finally(this.$refs.bookingDeleteModal.close);
             },
-            bookingApprove: function (series) {
+            bookingApprove: function (efficacy) {
                 let data = {
-                    efficacy: series ? 'series' : 'self',
+                    efficacy: efficacy,
                 };
                 axios
                     .post(this.eventExtendedProps.booking.actions.approve.href, toQueryString(data))
                     .then(() => this.event.remove())
                     .finally(this.$refs.bookingApproveSeriesModal.close);
             },
-            bookingReject: function (series) {
+            bookingReject: function (efficacy) {
                 let data = {
-                    efficacy: series ? 'series' : 'self',
+                    efficacy: efficacy,
                 };
                 axios
                     .post(this.eventExtendedProps.booking.actions.reject.href, toQueryString(data))
