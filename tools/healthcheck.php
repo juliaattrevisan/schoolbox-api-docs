@@ -38,7 +38,6 @@ $app = new class extends CliTool\App
             echo <<<HELP
 
 Check access permissions to database tables and stored procedures in the external db.
-The external database must be enabled. 
 You only get visual feedback when you use verbose mode.
 
 Usage: healthcheck.php -vvv
