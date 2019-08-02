@@ -69,7 +69,6 @@
                     attendance: {
                         // Massage attendance data into something resembling usability
                         isAttendable: data?.attendance?.icon,
-                        isAttending: data?.attendance?.status !== '',
                         status: data?.attendance?.status,
                         actions: {
                             toggle: {
@@ -313,6 +312,7 @@
                                 : ATTENDANCE_ACTION_ADD
                             ;
                             self.event.setExtendedProp('data', eventData);
+                            self.$emit(EVENT_MODIFIED, self.event);
                         });
                 }
             },
@@ -399,6 +399,9 @@
                             <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
                                 {{ eventExtendedProps.reviewer.name }}
                             </a>
+                        </meta-item>
+                        <meta-item class="icon-class-list" v-if="eventExtendedProps.attendance.isAttendable && eventExtendedProps.attendance.status">
+                            Attendance: {{ eventExtendedProps.attendance.status }}
                         </meta-item>
                     </meta-list>
                     <article style="white-space: pre-line">
