@@ -1067,18 +1067,19 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // @see $this->validateFolderCodes()
 
         // If a campus code was provided, prefer exact match
+        // Codes are case-insensitive.
         if ($sisCampus !== null && $sisCampus !== '') {
-            $folderCodes = ["$sisCampus/$sisClass", $sisClass];
+            $folderCodes = [strtolower("$sisCampus/$sisClass"), strtolower($sisClass)];
         } else {
-            $folderCodes = [$sisClass];
+            $folderCodes = [strtolower($sisClass)];
         }
 
         $fcCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
-        $sql            = "
+        $sql = "
             SELECT f.id, fc.code
             FROM folder f
             JOIN folder_code fc on f.id = fc.folder_id
-            WHERE f.deleted_at IS NULL AND fc.deleted_at IS NULL AND fc.code IN ({$fcCodeBindings->getPlaceholder()})";
+            WHERE f.deleted_at IS NULL AND fc.deleted_at IS NULL AND lower(fc.code) IN ({$fcCodeBindings->getPlaceholder()})";
 
         $rows = $this->database->query($sql, $fcCodeBindings->getParams())->fetchAll(PDO::FETCH_NUM);
 
@@ -1089,7 +1090,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // The first in $folderCodes is preferred.
         foreach ($folderCodes as $folderCode) {
             foreach ($rows as [$rowFolderId, $rowFolderCode]) {
-                if ($folderCode === $rowFolderCode) {
+                if ($folderCode === strtolower($rowFolderCode)) {
                     try {
                         $folder = $this->findById($rowFolderId);
                     } catch (Exception $e) {
