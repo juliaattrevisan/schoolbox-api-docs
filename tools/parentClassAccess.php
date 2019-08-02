@@ -132,8 +132,7 @@ HELP;
             $this->getLogger()->warning('Performing assignation of parents to their students\' folders.');
         }
 
-        /* We only need to spawn these once
-         */
+        // We only need to spawn these once
         $externalUser = new \External_User();
         $externalClass = new \External_Class();
 
@@ -186,8 +185,7 @@ HELP;
 
                 $this->getLogger()->notice("Adding parents of '{$code}' students to '{$folders[$folderId]->getTitle()}'");
 
-                /* Optionally install students
-                 */
+                // Optionally install students
                 if ($loadStudents) {
                     $students = $externalClass->getStudents($code);
 
@@ -198,8 +196,7 @@ HELP;
                     }
                 }
 
-                /* Install parents
-                 */
+                // Install parents
                 $parents = $this->getParents($code, $externalClass, $externalUser);
 
                 if (is_array($parents)) {
