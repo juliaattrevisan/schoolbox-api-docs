@@ -179,7 +179,7 @@
                         if (this.eventExtendedProps.seriesId) {
                             this.$refs.bookingApproveSeriesModal.open();
                         } else {
-                            //
+                            this.bookingApprove(false);
                         }
                         break;
 
@@ -188,7 +188,7 @@
                         if (this.eventExtendedProps.seriesId) {
                             this.$refs.bookingRejectSeriesModal.open();
                         } else {
-                            //
+                            this.bookingReject(false);
                         }
                         break;
 
@@ -203,37 +203,67 @@
                         break;
                 }
             },
+            // Event actions
             confirmEventDeleteSelf: function () {
-                // Post the event's delete
-                this.$refs.eventDeleteModal.close();
+                this.eventDelete(false);
             },
             confirmEventDeleteSeries: function () {
-                // Post the event's delete (series)
-                this.$refs.eventDeleteModal.close();
+                this.eventDelete(true);
             },
             confirmBookingDeleteSelf: function () {
-                // Post the event's delete
-                this.$refs.bookingDeleteModal.close();
+                this.bookingDelete(false);
             },
             confirmBookingDeleteSeries: function () {
-                // Post the event's delete (series)
-                this.$refs.bookingDeleteModal.close();
+                this.bookingDelete(true);
             },
             confirmBookingApproveSelf: function () {
-                // Post the event's delete
-                this.$refs.bookingApproveSeriesModal.close();
+                this.bookingApprove(false);
             },
             confirmBookingApproveSeries: function () {
-                // Post the event's delete (series)
-                this.$refs.bookingApproveSeriesModal.close();
+                this.bookingApprove(true);
             },
             confirmBookingRejectSelf: function () {
-                // Post the event's delete
-                this.$refs.bookingRejectSeriesModal.close();
+                this.bookingReject(false);
             },
             confirmBookingRejectSeries: function () {
-                // Post the event's delete (series)
-                this.$refs.bookingRejectSeriesModal.close();
+                this.bookingReject(true);
+            },
+            eventDelete: function (series) {
+                let data = {
+                    id: this.eventExtendedProps.eventId,
+                    efficacy: series ? 'series' : 'self',
+                };
+                axios
+                    .post(this.eventExtendedProps.links.delete, toQueryString(data))
+                    .then(() => this.event.remove())
+                    .finally(this.$refs.eventDeleteModal.close);
+            },
+            bookingDelete: function (series) {
+                let data = {
+                    efficacy: series ? 'series' : 'self',
+                };
+                axios
+                    .post(this.eventExtendedProps.booking.actions.cancel.href, toQueryString(data))
+                    .then(() => this.event.remove())
+                    .finally(this.$refs.bookingDeleteModal.close);
+            },
+            bookingApprove: function (series) {
+                let data = {
+                    efficacy: series ? 'series' : 'self',
+                };
+                axios
+                    .post(this.eventExtendedProps.booking.actions.approve.href, toQueryString(data))
+                    .then(() => this.event.remove())
+                    .finally(this.$refs.bookingApproveSeriesModal.close);
+            },
+            bookingReject: function (series) {
+                let data = {
+                    efficacy: series ? 'series' : 'self',
+                };
+                axios
+                    .post(this.eventExtendedProps.booking.actions.reject.href, toQueryString(data))
+                    .then(() => this.event.remove())
+                    .finally(this.$refs.bookingRejectSeriesModal.close);
             },
         },
     }
@@ -372,7 +402,8 @@
 
                     <span v-if="eventExtendedProps.links.delete">
                         <a class="button icon-delete"
-                           :href="eventExtendedProps.links.delete">Delete</a>
+                           :href="eventExtendedProps.links.delete"
+                           @click.prevent="$refs.eventDeleteModal.open">Delete</a>
                     </span>
 
                     <!-- Booking buttons: handle random events -->
