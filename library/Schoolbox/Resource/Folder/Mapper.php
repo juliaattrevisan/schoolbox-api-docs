@@ -1087,9 +1087,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         }
 
         // The first in $folderCodes is preferred.
+        // Codes are case-insensitive.
         foreach ($folderCodes as $folderCode) {
             foreach ($rows as [$rowFolderId, $rowFolderCode]) {
-                if ($folderCode === $rowFolderCode) {
+                if (strtolower($folderCode) === strtolower($rowFolderCode)) {
                     try {
                         $folder = $this->findById($rowFolderId);
                     } catch (Exception $e) {
