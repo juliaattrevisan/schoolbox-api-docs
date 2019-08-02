@@ -23,28 +23,39 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['u:', 'U::', 'r::'];
+        return ['u:', 'U:', 'r:'];
     }
 
 
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['page::', 'skip-duplicates', 'enable-eportfolio', 'dry-run'];
+        return ['page:', 'skip-duplicates', 'enable-eportfolio', 'dry-run'];
     }
 
 
     /** @inheritDoc */
     public function run(): void
     {
-        $userId           = $this->getOpt('u:');
-        $toUserId         = $this->getOpt('U::');
-        $roleId           = $this->getOpt('r::');
-        $importPageId     = $this->getOpt('page::');
+        $userId           = $this->getOptAsInt('u:');
+        $toUserId         = $this->getOptAsInt('U:');
+        $roleId           = $this->getOptAsInt('r:');
+        $importPageId     = $this->getOptAsInt('page::');
         $skipDuplicates   = $this->getOpt('skip-duplicates');
         $enableEportfolio = $this->getOpt('enable-eportfolio');
         $dryRun           = $this->getOpt('dry-run');
-        if (!(isset($userId) && (isset($roleId) || isset($toUserId)))) {
+
+        // Check we got required options
+        $errors = false;
+        if ($userId === null) {
+            $this->getLogger()->error("You must specify a user to copy from using -u");
+            $errors = true;
+        }
+        if ($roleId === null && $toUserId === null) {
+            $this->getLogger()->error("You must specify either a role or user to copy to using -r or -U");
+            $errors = true;
+        }
+        if ($errors) {
             $this->renderHelpMessage();
             exit(1);
         }
