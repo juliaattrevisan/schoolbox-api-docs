@@ -174,55 +174,66 @@
             },
             clickBookingButton: function($event) {
                 switch ($event.target.dataset.bookingAction) {
-                    case 'modify':
-                        // Just follow the link
+                    case 'approve':
+                        $event.preventDefault();
+                        if (this.eventExtendedProps.seriesId) {
+                            this.$refs.bookingApproveSeriesModal.open();
+                        } else {
+                            //
+                        }
+                        break;
+
+                    case 'reject':
+                        $event.preventDefault();
+                        if (this.eventExtendedProps.seriesId) {
+                            this.$refs.bookingRejectSeriesModal.open();
+                        } else {
+                            //
+                        }
                         break;
 
                     case 'cancel':
                         $event.preventDefault();
-                        this.$refs.deleteEventModal.open();
+                        this.$refs.bookingDeleteModal.open();
                         break;
 
-                    case 'approve':
-                        $event.preventDefault();
-                        this.$refs.approveBookingModal.open();
-                        break;
-
-                    case 'reject':
-                        // All these are AJAX actions, so POST their href.
-                        // Cancel action raises another dialog though...
-                        // If the event has a series that also raises a dialog.
-                        $event.preventDefault();
-                        this.$refs.rejectBookingModal.open();
-                        break;
-
+                    case 'modify':
                     default:
+                        // Just follow the link
                         break;
                 }
             },
-            confirmDeleteSelf: function () {
+            confirmEventDeleteSelf: function () {
                 // Post the event's delete
-                this.$refs.deleteEventModal.close();
+                this.$refs.eventDeleteModal.close();
             },
-            confirmDeleteSeries: function () {
+            confirmEventDeleteSeries: function () {
                 // Post the event's delete (series)
-                this.$refs.deleteEventModal.close();
+                this.$refs.eventDeleteModal.close();
             },
-            confirmApproveSelf: function () {
+            confirmBookingDeleteSelf: function () {
                 // Post the event's delete
-                this.$refs.deleteEventModal.close();
+                this.$refs.bookingDeleteModal.close();
             },
-            confirmApproveSeries: function () {
+            confirmBookingDeleteSeries: function () {
                 // Post the event's delete (series)
-                this.$refs.deleteEventModal.close();
+                this.$refs.bookingDeleteModal.close();
             },
-            confirmRejectSelf: function () {
+            confirmBookingApproveSelf: function () {
                 // Post the event's delete
-                this.$refs.deleteEventModal.close();
+                this.$refs.bookingApproveSeriesModal.close();
             },
-            confirmRejectSeries: function () {
+            confirmBookingApproveSeries: function () {
                 // Post the event's delete (series)
-                this.$refs.deleteEventModal.close();
+                this.$refs.bookingApproveSeriesModal.close();
+            },
+            confirmBookingRejectSelf: function () {
+                // Post the event's delete
+                this.$refs.bookingRejectSeriesModal.close();
+            },
+            confirmBookingRejectSeries: function () {
+                // Post the event's delete (series)
+                this.$refs.bookingRejectSeriesModal.close();
             },
         },
     }
@@ -377,63 +388,63 @@
         </template>
 
         <!-- Modals within a modal you say? Sure, why not? -->
-        <reveal-modal ref="deleteEventModal">
+        <reveal-modal ref="eventDeleteModal">
             <template v-if="eventExtendedProps.seriesId">
                 <h2>This event is part of a series</h2>
                 <p>Would you like to delete only this event, or all in the series?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button" @click.prevent="confirmDeleteSelf">Only this event</a></li>
-                    <li><a href="#" class="button" @click.prevent="confirmDeleteSeries">All events in the series</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.deleteEventModal.close">Cancel</a></li>
+                    <li><a href="#" class="button" @click.prevent="confirmEventDeleteSelf">Only this event</a></li>
+                    <li><a href="#" class="button" @click.prevent="confirmEventDeleteSeries">All events in the series</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">Cancel</a></li>
                 </ul>
             </template>
             <template v-else>
                 <h2>Please confirm</h2>
                 <p>Are you sure you wish to delete this event?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button submit" @click.prevent="confirmDeleteSelf">Yes</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.deleteEventModal.close">No</a></li>
+                    <li><a href="#" class="button submit" @click.prevent="confirmEventDeleteSelf">Yes</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.eventDeleteModal.close">No</a></li>
                 </ul>
             </template>
         </reveal-modal>
 
-        <reveal-modal ref="deleteBookingModal">
+        <reveal-modal ref="bookingDeleteModal">
             <template v-if="eventExtendedProps.seriesId">
                 <h2>This booking is part of a series</h2>
                 <p>Would you like to delete only this booking, or all in the series?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button" @click.prevent="confirmDeleteSelf">Only this booking</a></li>
-                    <li><a href="#" class="button" @click.prevent="confirmDeleteSeries">All bookings in the series</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.deleteBookingModal.close">Cancel</a></li>
+                    <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSelf">Only this booking</a></li>
+                    <li><a href="#" class="button" @click.prevent="confirmBookingDeleteSeries">All bookings in the series</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">Cancel</a></li>
                 </ul>
             </template>
             <template v-else>
                 <h2>Please confirm</h2>
                 <p>Are you sure you wish to delete this booking?</p>
                 <ul class="flex-list buttons">
-                    <li><a href="#" class="button submit" @click.prevent="confirmDeleteSelf">Yes</a></li>
-                    <li><a href="#" class="button" @click.prevent="$refs.deleteBookingModal.close">No</a></li>
+                    <li><a href="#" class="button submit" @click.prevent="confirmBookingDeleteSelf">Yes</a></li>
+                    <li><a href="#" class="button" @click.prevent="$refs.bookingDeleteModal.close">No</a></li>
                 </ul>
             </template>
         </reveal-modal>
 
-        <reveal-modal ref="approveBookingSeriesModal">
+        <reveal-modal ref="bookingApproveSeriesModal">
             <h2>This booking is part of a series</h2>
             <p>Would you like to approve only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
-                <li><a href="#" class="button" @click.prevent="confirmApproveSelf">Only this event</a></li>
-                <li><a href="#" class="button" @click.prevent="confirmApproveSeries">All events in the series</a></li>
-                <li><a href="#" class="button" @click.prevent="$refs.approveBookingSeriesModal.close">Cancel</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmBookingApproveSelf">Only this event</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmBookingApproveSeries">All events in the series</a></li>
+                <li><a href="#" class="button" @click.prevent="$refs.bookingApproveSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
 
-        <reveal-modal ref="rejectBookingSeriesModal">
+        <reveal-modal ref="bookingRejectSeriesModal">
             <h2>This booking is part of a series</h2>
             <p>Would you like to reject only this booking, or all in the series?</p>
             <ul class="flex-list buttons">
-                <li><a href="#" class="button" @click.prevent="confirmRejectSelf">Only this event</a></li>
-                <li><a href="#" class="button" @click.prevent="confirmRejectSeries">All events in the series</a></li>
-                <li><a href="#" class="button" @click.prevent="$refs.rejectBookingSeriesModal.close">Cancel</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmBookingRejectSelf">Only this event</a></li>
+                <li><a href="#" class="button" @click.prevent="confirmBookingRejectSeries">All events in the series</a></li>
+                <li><a href="#" class="button" @click.prevent="$refs.bookingRejectSeriesModal.close">Cancel</a></li>
             </ul>
         </reveal-modal>
 
