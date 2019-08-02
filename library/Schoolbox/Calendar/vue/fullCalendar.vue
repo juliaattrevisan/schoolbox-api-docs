@@ -204,29 +204,6 @@
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
             },
-            toggleAttendance: function () {
-                // TODO get this to work
-                // var button = $(this);
-                //
-                // var data = config.getFormData(button);
-                //
-                // if (button.text() === config.text.rsvp) {
-                //     data['status'] = 'add';
-                // } else {
-                //     data['status'] = 'remove';
-                // }
-                //
-                // $.post(config.url, data, function (data) {
-                //     if (data.error == undefined) {
-                //         if (button.text() === config.text.rsvp) {
-                //             button.html(config.text.unattend);
-                //         }
-                //         else {
-                //             button.html(config.text.rsvp);
-                //         }
-                //     }
-                // });
-            },
             addEvent: function (event) {
                 this.$refs.fullCalendar.getApi().addEvent(event);
             },

@@ -30,7 +30,7 @@ class Javascript extends Base
         $hasStatus = false;
         $hasAttendanceRequestButton = false;
         $hasListButton = false;
-
+        $nextAttendanceAction = '';
         if ($this->getEvent()->canAttend()) {
             $hasIcon = true;
 
@@ -44,8 +44,10 @@ class Javascript extends Base
 
             if ($hasStatus) {
                 $hasAttendanceRequestButton = 'Unattend';
+                $nextAttendanceAction = 'remove';
             } else {
                 $hasAttendanceRequestButton = 'RSVP';
+                $nextAttendanceAction = 'add';
             }
         }
 
@@ -121,6 +123,7 @@ class Javascript extends Base
                 'attendance' => array(
                     'icon'          => $hasIcon,
                     'status'        => $hasStatus,
+                    'nextAction'    => $nextAttendanceAction,
                     'requestButton' => $hasAttendanceRequestButton,
                     'listButton'    => $hasListButton,
                 ),

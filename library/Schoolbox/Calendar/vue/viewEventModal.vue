@@ -11,6 +11,9 @@
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
 
+    const ATTENDANCE_ACTION_ADD = 'add';
+    const ATTENDANCE_ACTION_REMOVE = 'remove';
+
     export default {
         name: "view-event-modal",
         props: ['event', 'toMoment', 'taskTypeId',],
@@ -63,7 +66,26 @@
                         related: data?.booking?.related || [],
                         actions: (data?.booking?.buttons || []).filter(button => button?.href),
                     },
-                    attendance: data?.attendance,
+                    attendance: {
+                        // Massage attendance data into something resembling usability
+                        isAttendable: data?.attendance?.icon,
+                        isAttending: data?.attendance?.status !== '',
+                        status: data?.attendance?.status,
+                        actions: {
+                            toggle: {
+                                isAvailable: Boolean(data?.attendance?.listButton),
+                                href: '/service/attendance/setAttendance',
+                                text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
+                            },
+                            list: {
+                                isAvailable: Boolean(data?.attendance?.requestButton),
+                                href: '/calendar/attendance/list/' + String(metadata?.eventId),
+                            },
+                        },
+                        // nextAction: data?.attendance?.nextAction,
+                        // nextActionButton: data?.attendance?.listButton,
+                        // requestButton: data?.attendance?.requestButton,
+                    },
                     task: {
                         isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
                         completed: metadata?.completed,
@@ -215,8 +237,6 @@
             },
             confirmEventDeleteSeries: function () {
                 this.eventDelete(EFFICIACY_SERIES);
-                // Send a signal to the base calendar to reload events?
-                // I can't delete all events in a series from here.
             },
             confirmBookingDeleteSelf: function () {
                 this.bookingDelete(EFFICIACY_SELF);
@@ -276,6 +296,38 @@
                     .post(this.eventExtendedProps.booking.actions.reject.href, toQueryString(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
+            },
+            toggleAttendance: function () {
+                let eventData = Object.assign({}, this.event?.extendedProps?.data || {});
+                if (typeof eventData?.attendance === 'object') {
+                    eventData.attendance.nextAction = eventData.attendance.nextAction === ATTENDANCE_ACTION_ADD
+                        ? ATTENDANCE_ACTION_REMOVE
+                        : ATTENDANCE_ACTION_ADD
+                    ;
+                }
+                this.event.setExtendedProp('data', eventData);
+                this.$refs.modal.close();
+
+                // // TODO get this to work
+                // var button = $(this);
+                // var data = config.getFormData(button);
+                //
+                // if (button.text() === config.text.rsvp) {
+                //     data['status'] = 'add';
+                // } else {
+                //     data['status'] = 'remove';
+                // }
+                //
+                // $.post(config.url, data, function (data) {
+                //     if (data.error == undefined) {
+                //         if (button.text() === config.text.rsvp) {
+                //             button.html(config.text.unattend);
+                //         }
+                //         else {
+                //             button.html(config.text.rsvp);
+                //         }
+                //     }
+                // });
             },
         },
     }
@@ -376,13 +428,14 @@
                         </ul>
                     </div>
 
-                    <!-- Related bookings -->
-                    <div v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.status">
+                    <!--
+                    <div v-if="eventExtendedProps.attendance.isAttendable">
                         <dl>
                             <dd><p :class="eventExtendedProps.attendance.icon"></p></dd>
                             <dd class="rm"><p>{{ eventExtendedProps.attendance.status }}</p></dd>
                         </dl>
                     </div>
+                    -->
 
 
                     <!-- Various buttons -->
@@ -396,15 +449,15 @@
                            :href="eventExtendedProps.links.view">View More Details</a>
                     </span>
 
-                    <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.listButton">
+                    <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
                         <a class="button icon-group"
                            :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
                     </span>
 
-                    <span v-if="eventExtendedProps.attendance && eventExtendedProps.attendance.requestButton">
+                    <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
                         <a class="button icon-reply"
                            @click.prevent="toggleAttendance"
-                           href="#">{{ eventExtendedProps.attendance.requestButton }}</a>
+                           href="#">{{ eventExtendedProps.attendance.actions.toggle.text }}</a>
                     </span>
 
                     <span v-if="eventExtendedProps.links.modify">
