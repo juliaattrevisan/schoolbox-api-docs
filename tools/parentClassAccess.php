@@ -128,6 +128,7 @@ HELP;
 
         if (!$this->perform()) {
             $this->getLogger()->warning('Planning assignation of parents to their students\' folders.');
+            $this->getLogger()->warning('Provide --perform to update DB.');
         } else {
             $this->getLogger()->warning('Performing assignation of parents to their students\' folders.');
         }
@@ -179,7 +180,7 @@ HELP;
 
             // Add parents from class codes to the specified classes
             foreach ($codes as $code) {
-                if (!strlen($code)) {
+                if (trim($code ?? '') === '') {
                     continue;
                 }
 
