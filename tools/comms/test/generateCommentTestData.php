@@ -58,7 +58,7 @@ HELP;
         );
 
         $dataGenerator->generateTestData(
-            filter_var($opts['seed'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE)
+            filter_var($this->getOpt('seed:'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE)
         );
     }
 };
