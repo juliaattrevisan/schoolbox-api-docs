@@ -212,6 +212,8 @@
             },
             confirmEventDeleteSeries: function () {
                 this.eventDelete(EFFICIACY_SERIES);
+                // Send a signal to the base calendar to reload events?
+                // I can't delete all events in a series from here.
             },
             confirmBookingDeleteSelf: function () {
                 this.bookingDelete(EFFICIACY_SELF);
@@ -232,41 +234,41 @@
                 this.bookingReject(EFFICIACY_SERIES);
             },
             eventDelete: function (efficacy) {
+                this.$refs.eventDeleteModal.close();
                 let data = {
                     id: this.eventExtendedProps.eventId,
                     efficacy: efficacy,
                 };
-                axios
+                return axios
                     .post(this.eventExtendedProps.links.delete, toQueryString(data))
-                    .then(() => this.event.remove())
-                    .finally(this.$refs.eventDeleteModal.close);
+                    .then(() => this.event.remove());
             },
             bookingDelete: function (efficacy) {
+                this.$refs.bookingDeleteModal.close();
                 let data = {
                     efficacy: efficacy,
                 };
-                axios
+                return axios
                     .post(this.eventExtendedProps.booking.actions.cancel.href, toQueryString(data))
-                    .then(() => this.event.remove())
-                    .finally(this.$refs.bookingDeleteModal.close);
+                    .then(() => this.event.remove());
             },
             bookingApprove: function (efficacy) {
+                this.$refs.bookingApproveSeriesModal.close();
                 let data = {
                     efficacy: efficacy,
                 };
-                axios
+                return axios
                     .post(this.eventExtendedProps.booking.actions.approve.href, toQueryString(data))
-                    .then(() => this.event.remove())
-                    .finally(this.$refs.bookingApproveSeriesModal.close);
+                    .then(() => this.event.remove());
             },
             bookingReject: function (efficacy) {
+                this.$refs.bookingRejectSeriesModal.close();
                 let data = {
                     efficacy: efficacy,
                 };
-                axios
+                return axios
                     .post(this.eventExtendedProps.booking.actions.reject.href, toQueryString(data))
-                    .then(() => this.event.remove())
-                    .finally(this.$refs.bookingRejectSeriesModal.close);
+                    .then(() => this.event.remove());
             },
         },
     }
