@@ -227,7 +227,7 @@ abstract class App
      *
      * @return string
      */
-    protected function getToolFilename(): string
+    public function getToolFilename(): string
     {
         $scriptName = $_SERVER['SCRIPT_NAME'];
         $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);

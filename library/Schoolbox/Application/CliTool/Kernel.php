@@ -15,6 +15,7 @@ use function posix_geteuid;
 use function posix_getpwuid;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
+use function strpos;
 
 /**
  * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
@@ -91,7 +92,7 @@ class Kernel extends CliKernelAbstract
         \error_reporting($options[self::OPTION_ERRORS] ?? E_ALL ^ E_NOTICE);
         $this->checkServerApiEnvironment();
         $this->parseCommandLineOptions($app);
-        $this->checkSystemUserRootStatus($app->runAsRoot(), get_class($app));
+        $this->checkSystemUserRootStatus($app);
         $this->outStream = $this->getOutputStream();
 
 
@@ -166,29 +167,34 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * Checks that the kernel is being run by a user with root status equal to what the code specifies as being appropriate
+     * Checks that the App is being run by a user with root status equal to what the code specifies as being appropriate
      *
-     * @param bool|null $runAsRoot
-     * @param string    $appClass  The App's class name
+     * @param App $app
      * @throws \UnexpectedValueException
      */
-    private function checkSystemUserRootStatus(?bool $runAsRoot, string $appClass): void
+    private function checkSystemUserRootStatus(App $app): void
     {
+        $runAsRoot = $app->runAsRoot();
+
         // If not specified, or NULL, we are done.
         if (null === $runAsRoot) {
             return;
         }
         $isRoot = $this->isRunAsSuperuser();
 
+        $prefix = strpos(get_class($app), "class@anonymous") === 0
+            ? "The anonymous App used by script '{$app->getToolFilename()}'"
+            : sprintf("The App '%s'", get_class($app));
+
         if ($runAsRoot && !$isRoot) {
             throw new \UnexpectedValueException(sprintf(
-                "App requires to be run as system 'root' user, current user: '%s'",
+                "$prefix requires to be run as system 'root' user, current user: '%s'",
                 posix_getpwuid(posix_geteuid())['name'])
             );
         }
         if (!$runAsRoot && $isRoot) {
             $this->logger()->warning(
-                "This App '$appClass' is not designed to be run as root but is being run as root. " .
+                "$prefix is not designed to be run as root but is being run as root. " .
                 "If this is because this App has been invoked by an update script, this is probably fine, " .
                 "as the update/deployment system has post-execution tools to correct file ownership. " .
                 "If you are invoking this tool manually, you will need to manually fix the ownership of any files " .
