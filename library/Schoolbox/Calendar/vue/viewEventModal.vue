@@ -8,6 +8,9 @@
     const EFFICIACY_SELF = 'self';
     const EFFICIACY_SERIES = 'series';
 
+    const EVENT_MODIFIED = 'eventModified';
+    const EVENT_DELETED = 'eventDeleted';
+
     export default {
         name: "view-event-modal",
         props: ['event', 'toMoment', 'taskTypeId',],
@@ -241,7 +244,8 @@
                 };
                 return axios
                     .post(this.eventExtendedProps.links.delete, toQueryString(data))
-                    .then(() => this.event.remove());
+                    .then(() => this.event.remove())
+                    .then(() => this.$emit(EVENT_DELETED, this.event));
             },
             bookingDelete: function (efficacy) {
                 this.$refs.bookingDeleteModal.close();
@@ -250,7 +254,8 @@
                 };
                 return axios
                     .post(this.eventExtendedProps.booking.actions.cancel.href, toQueryString(data))
-                    .then(() => this.event.remove());
+                    .then(() => this.event.remove())
+                    .then(() => this.$emit(EVENT_DELETED, this.event));
             },
             bookingApprove: function (efficacy) {
                 this.$refs.bookingApproveSeriesModal.close();
@@ -259,7 +264,8 @@
                 };
                 return axios
                     .post(this.eventExtendedProps.booking.actions.approve.href, toQueryString(data))
-                    .then(() => this.event.remove());
+                    .then(() => this.event.remove())
+                    .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
             bookingReject: function (efficacy) {
                 this.$refs.bookingRejectSeriesModal.close();
@@ -268,7 +274,8 @@
                 };
                 return axios
                     .post(this.eventExtendedProps.booking.actions.reject.href, toQueryString(data))
-                    .then(() => this.event.remove());
+                    .then(() => this.event.remove())
+                    .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
         },
     }

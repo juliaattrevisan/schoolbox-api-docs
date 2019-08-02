@@ -233,13 +233,12 @@
             updateEvent: function (event) {
                 this.$refs.fullCalendar.getApi().addEvent(event);
             },
-            removeEvent: function (event) {
-                // RemoveEvent works on an event from FullCalendar
-                event.remove();
-            },
             isTask: function (event) {
                 return Number(event?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId;
-            }
+            },
+            reloadEvents: function () {
+                this.$refs.fullCalendar.getApi().refetchEvents();
+            },
         }
     }
 
@@ -266,7 +265,9 @@
         <view-event-modal ref="event"
                           :event="currentEvent"
                           :task-type-id="config.taskTypeId"
-                          :to-moment="toMoment" />
+                          :to-moment="toMoment"
+                          @eventModified="reloadEvents"
+                          @eventDeleted="reloadEvents" />
 
         <full-calendar
             ref="fullCalendar"
