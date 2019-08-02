@@ -1,17 +1,8 @@
 #!/usr/bin/php
 <?php
 /**
- * Folder Cleanup
- *
- * Folders that have no discernible parent id are considered orphans and are moved into a
- * folder titled "Lost & Found" ($folderName)
- *
- * Folders that are self-referential (cyclical) are also treated as orphans and moved into
- * this folder.
- *
- * @author      Steve Chan <steve.chan@schoolbox.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        http://www.schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://www.schoolbox.com.au/
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -19,6 +10,15 @@ use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
+/**
+ * Folder Cleanup
+ *
+ * Folders that have no discernible parent id are considered orphans and are moved into a
+ * folder titled "Lost & Found" ($folderName)
+ *
+ * Folders that are self-referential (cyclical) are also treated as orphans and moved into
+ * this folder.
+ */
 $app = new class extends CliTool\App
 {
     // --help: print help

@@ -1,14 +1,8 @@
 #!/usr/bin/php
 <?php
 /**
- * schema-check
- *
- * Finds schema columns that aren't known by their corresponding mappers (finds unmapped columns).
- * Originally used to identify deprecated columns.
- *
- * @author      Steve Chan <steve.chan@schoolbox.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        http://www.schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://www.schoolbox.com.au/
  */
 declare(strict_types=1);
 
@@ -17,6 +11,10 @@ use Schoolbox\IMapper;use Schoolbox\Mapper;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
+/**
+ * Finds schema columns that aren't known by their corresponding mappers (finds unmapped columns).
+ * Originally used to identify deprecated columns.
+ */
 $app = new class extends CliTool\App
 {
     // --help: print help
