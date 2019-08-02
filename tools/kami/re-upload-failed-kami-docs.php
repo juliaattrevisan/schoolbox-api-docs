@@ -40,10 +40,11 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-Reupload files to kami if they didn't get there the first time. These are in the student_submission_file_kami
-table and this tool only works if they have status "error" and error_message "Conversion failed".  
+Reupload files to kami if they Kami has reported the files failed to be converted.
+These are in the student_submission_file_kami table and this tool only works if
+they have status "error" and error_message "Conversion failed".
 
-Usage: re-upload-failed-kami-docs.php
+Usage: {$this->getToolFilename()}
 
 
 HELP;
