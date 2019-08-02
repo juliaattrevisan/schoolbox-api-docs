@@ -2,6 +2,8 @@
     import RevealModal from '@schoolbox/reveal-modal'
     import axios       from 'axios'
 
+    const EVENT_CREATED = 'eventCreated';
+
     export default {
         name: "create-event-modal",
         props: [
@@ -37,6 +39,7 @@
             },
             createNewEvent: function (form) {
                 let self = this;
+                self.$refs.modal.close();
                 axios.request({
                     url:          form.action,
                     data:         window.$(form).serialize(),
@@ -44,9 +47,7 @@
                     responseType: 'json',
                 }).then(function (response) {
                     // Add this event to the calendar
-                    self.$emit('eventCreated', response.data);
-                }).finally(function () {
-                    self.$refs.modal.close();
+                    self.$emit(EVENT_CREATED, response.data);
                 });
             },
             redirectToEventForm: function () {
