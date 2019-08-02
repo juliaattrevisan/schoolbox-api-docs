@@ -426,6 +426,9 @@ select.letter-grade-select {
                 }
             }
         }
+        label span {
+            margin-left: 1.25rem;
+        }
         textarea {
             min-height: 1rem;
         }
