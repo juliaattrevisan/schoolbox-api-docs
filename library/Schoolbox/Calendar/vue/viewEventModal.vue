@@ -82,9 +82,6 @@
                                 href: '/calendar/attendance/list/' + String(metadata?.eventId),
                             },
                         },
-                        // nextAction: data?.attendance?.nextAction,
-                        // nextActionButton: data?.attendance?.listButton,
-                        // requestButton: data?.attendance?.requestButton,
                     },
                     task: {
                         isTask: Number(metadata?.eventTypeId) === Number(this.taskTypeId),
@@ -298,36 +295,26 @@
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
             toggleAttendance: function () {
-                let eventData = Object.assign({}, this.event?.extendedProps?.data || {});
+                let self      = this,
+                    eventData = Object.assign({}, self.event?.extendedProps?.data || {});
+                self.$refs.modal.close();
                 if (typeof eventData?.attendance === 'object') {
-                    eventData.attendance.nextAction = eventData.attendance.nextAction === ATTENDANCE_ACTION_ADD
-                        ? ATTENDANCE_ACTION_REMOVE
-                        : ATTENDANCE_ACTION_ADD
-                    ;
-                }
-                this.event.setExtendedProp('data', eventData);
-                this.$refs.modal.close();
+                    let nextAction = eventData.attendance.nextAction,
+                        data = {
+                            status:      nextAction,
+                            'event[id]': self.eventExtendedProps.eventId,
+                        };
 
-                // // TODO get this to work
-                // var button = $(this);
-                // var data = config.getFormData(button);
-                //
-                // if (button.text() === config.text.rsvp) {
-                //     data['status'] = 'add';
-                // } else {
-                //     data['status'] = 'remove';
-                // }
-                //
-                // $.post(config.url, data, function (data) {
-                //     if (data.error == undefined) {
-                //         if (button.text() === config.text.rsvp) {
-                //             button.html(config.text.unattend);
-                //         }
-                //         else {
-                //             button.html(config.text.rsvp);
-                //         }
-                //     }
-                // });
+                    axios
+                        .post(self.eventExtendedProps.attendance.actions.toggle.href, toQueryString(data))
+                        .then(function () {
+                            eventData.attendance.nextAction = nextAction === ATTENDANCE_ACTION_ADD
+                                ? ATTENDANCE_ACTION_REMOVE
+                                : ATTENDANCE_ACTION_ADD
+                            ;
+                            self.event.setExtendedProp('data', eventData);
+                        });
+                }
             },
         },
     }
