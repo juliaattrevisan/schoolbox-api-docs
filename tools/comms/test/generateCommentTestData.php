@@ -48,6 +48,16 @@ HELP;
             exit;
         }
 
+        // "Are you sure?"
+        echo "This script will soft-delete any news article comments which exist.\n";
+        $answer = '';
+        while (!in_array($answer, ['y', 'n'])) {
+            $answer = strtolower($this->readLine("Do you still wish to run it? [y/n] "));
+        }
+        if ($answer !== 'y') {
+            exit;
+        }
+
         $dataGenerator = new DataGenerator(
             $this->getLogger(),
             Faker\Factory::create(),
