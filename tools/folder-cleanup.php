@@ -2,7 +2,7 @@
 <?php
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://www.schoolbox.com.au/
+ * @link      https://schoolbox.com.au/
  */
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
