@@ -1,11 +1,8 @@
 #!/usr/bin/php
 <?php
 /**
- * Generate test data for Comments in News
- *
- * @author      Steve Chan <steve.chan@schoolbox.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        http://www.schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://www.schoolbox.com.au/
  */
 declare(strict_types=1);
 
@@ -14,6 +11,9 @@ use Schoolbox\Discussion\Test\DataGenerator;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
+/**
+ * Generate test data for Comments in News
+ */
 $app = new class extends CliTool\App
 {
     // --help: print help
