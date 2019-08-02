@@ -9,8 +9,13 @@ namespace Schoolbox\Application\CliTool;
 
 use Alaress\Database\Connector\IConnector;
 use Aura\Di;
+use function floor;
+use function is_numeric;
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
+use function strrpos;
+use function substr;
+use UnexpectedValueException;
 
 /**
  * An App is a job/task/application that can be run by the CLI Kernel
@@ -146,7 +151,7 @@ abstract class App
      * If option DOES accept values:
      *     returns that value, or NULL if not specified
      * If option does NOT accept values:
-     *     returns true if specified once, or array if specified multiple times
+     *     returns false if not specified, true if specified once, or array if specified multiple times
      *
      * @param string $name Must have colon chars still suffixed for proper handling
      * @return mixed
@@ -166,6 +171,70 @@ abstract class App
 
         // Does not accept values, but specified at least once.
         return \is_array($this->appOptions[$name]) ? $this->appOptions[$name] : true;
+    }
+
+
+    /**
+     * Returns the command line option's value as an integer, or null if not specified.
+     *
+     * @param string   $name
+     * @param int|null $default
+     * @return int|null
+     * @throws UnexpectedValueException If option was provided but cannot be returned as an int
+     */
+    protected function getOptAsInt(string $name, ?int $default = null): ?int
+    {
+        $value = $this->getOptAsFloat($name);
+        if ($value === null) {
+            return $default;
+        }
+        if (($value - floor($value)) !== 0.0) {
+            throw new UnexpectedValueException(sprintf("Command line option '$name' is not a whole number. Found: '$value' (%s)", gettype($value)));
+        }
+        return (int)$value;
+    }
+
+
+    /**
+     * Returns the command line option's value as a float, or null if not specified.
+     *
+     * @param string     $name
+     * @param float|null $default
+     * @return float|null
+     * @throws UnexpectedValueException If option was provided but cannot be returned as an float
+     */
+    protected function getOptAsFloat(string $name, ?float $default = null): ?float
+    {
+        $value = $this->getOpt($name);
+        if ($value === null) {
+            return $default;
+        }
+        if (!is_numeric($value)) {
+            throw new UnexpectedValueException(sprintf("Command line option '$name' is not numeric. Found: '$value' (%s)", gettype($value)));
+        }
+        return (float)$value;
+    }
+
+
+    /**
+     * Returns the filename of of the script that invoked this App, suitable for generating help output.
+     *
+     * The following should all return "./myTool.php"
+     * * "./relative/path/to/myTool.php"
+     * * "relative/path/to/myTool.php"
+     * * "./../relative/path/to/myTool.php"
+     * * "/absolute/path/to/myTool.php"
+     *
+     * @return string
+     */
+    public function getToolFilename(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);
+        if ($lastIndex !== false) {
+            $scriptName = substr($scriptName, $lastIndex + 1);
+        }
+        return "./$scriptName";
     }
 
 

@@ -1,13 +1,17 @@
 #!/usr/bin/php
 <?php
 /**
- * 
+ * Builds Mapper and Model code from a db table
+ * This allows you to copypasta the output into a usable mapper and model class
+ *
+ * Usage: ./mapper-template.php -t=comms_news_article
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 require_once __DIR__ . '/../conf/core/require.php';
+
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
 $opts = getopt('t::');

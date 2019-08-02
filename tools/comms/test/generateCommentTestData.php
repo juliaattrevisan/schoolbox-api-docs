@@ -1,60 +1,65 @@
 #!/usr/bin/php
 <?php
 /**
- * Test data generator for comms comments.
- *
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 declare(strict_types=1);
 
-use Aura\Di;
-use Psr\Log\LoggerInterface as Logger;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliTool;
 use Schoolbox\Discussion\Test\DataGenerator;
-
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Comment Test Data Generator',
-    [
-        Daemon\Kernel::OPTION_LEVEL         => Monolog\Logger::DEBUG,
-        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => ['seed:'],
-    ]
-);
+/**
+ * Generate test data for Comments in News
+ */
+$app = new class extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
 
-// "Are you sure?"
-echo "This script will soft-delete any news article comments which exist.\n";
-$answer = '';
-while (!in_array($answer, ['y', 'n'])) {
-    $answer = strtolower(readline("Do you still wish to run it? [y/n] "));
-}
-
-if ($answer === 'n') {
-    exit;
-}
-
-
-/** @noinspection PhpUnhandledExceptionInspection */
-$kernel->run(new class extends Daemon\App {
-    /**
-     * Generate the test data.
-     *
-     * @param Di\Container  $di
-     * @param LoopInterface $loop
-     * @param Logger        $log
-     * @param array         $opts
-     * @param string        $flags
-     */
-    public function run(Di\Container $di, LoopInterface $loop, Logger $log, array $opts, string $flags): void
+    /** @inheritdoc */
+    public function getLongOpts(): array
     {
+        return [
+            'seed:',
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Mass-generate test (fake) comments.
+This script will soft-delete any news article comments which already exist.
+
+Usage: generateCommentTestData.php [--seed=1234]
+
+
+HELP;
+            exit;
+        }
+
+        // "Are you sure?"
+        echo "This script will soft-delete any news article comments which exist.\n";
+        $answer = '';
+        while (!in_array($answer, ['y', 'n'])) {
+            $answer = strtolower($this->readLine("Do you still wish to run it? [y/n] "));
+        }
+        if ($answer !== 'y') {
+            exit;
+        }
+
         $dataGenerator = new DataGenerator(
-            $log,
+            $this->getLogger(),
             Faker\Factory::create(),
             Schoolbox\UserMapper::getInstance(),
             Schoolbox\Comms\News\Mapper::getInstance(),
@@ -63,7 +68,12 @@ $kernel->run(new class extends Daemon\App {
         );
 
         $dataGenerator->generateTestData(
-            filter_var($opts['seed'] ?? null, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE)
+            filter_var($this->getOpt('seed:'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE)
         );
     }
-});
+};
+
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

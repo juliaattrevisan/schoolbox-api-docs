@@ -1,35 +1,74 @@
 #!/usr/bin/php
 <?php
 /**
- * Perform external database permission checks
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Alaress\Database\Connector\IConnector;
-use Schoolbox\Config;
+use Schoolbox\Application\CliTool;
+use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 
 require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
-$di = $kernel->getDependencyInjector();
+/**
+ * Perform external database permission checks
+ */
+$app = new class extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
-/** @var IConnector $databaseExternal */
-$databaseExternal = $di->get('databaseExternal');
 
-/** @var Config\Loader $configLoader */
-$configLoader = $di->get('config');
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
 
-echo "[" . date('Y-m-d H:i:s') . "] Running health check script\n";
 
-$healthCheck = new Healthcheck($databaseExternal, $configLoader);
-$healthCheck->run();
-$results = $healthCheck->results();
+    /**
+     * Run the cli tool
+     */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
 
-echo $results['log']."\n";
+Check access permissions to database tables and stored procedures in the external db.
+You only get visual feedback when you use verbose mode.
 
-if(isset($results['errors']) && count($results['errors']) > 0 ) {
-    echo "\n".implode("\n",$results['errors'])."\n";
-}
+Usage: healthcheck.php -vvv
+
+
+HELP;
+            exit;
+        }
+
+        $this->getLogger()->info('Running health check script');
+
+        if (!$this->getConfig()->get('external_enable')){
+            $this->getLogger()->warning('External Database is currently disabled');
+        }
+
+        /** @var SchoolboxDatabaseFactory $factory */
+        $factory = $this->getDi()->get('databaseFactory');
+        /** @var IConnector $databaseExternal */
+        $databaseExternal = $this->getDi()->get('databaseExternal');
+
+        $healthCheck = new Healthcheck($databaseExternal, $factory, $this->getConfig());
+        $healthCheck->run();
+        $results = $healthCheck->results();
+
+        $this->getLogger()->info($results['log']);
+
+        foreach ($results['errors'] ?? [] as $error) {
+            $this->getLogger()->error($error);
+        }
+    }
+};
+
+$kernel = new CliTool\Kernel($app);
+$kernel->runApp();

@@ -127,19 +127,21 @@ class Factory
     /**
      * Retrieve an appropriate external database connection based on the 'external_type' set in Schoolbox configuration
      *
-     * @param IConfigLoader $config Schoolbox configuration
-     *
+     * @param IConfigLoader $config         Schoolbox configuration
+     * @param bool          $ignoreDisabled If TRUE, always try to return an external connection
      * @return null|IConnector Return the external connector appropriate for the SIS
      * @throws DatabaseException
      * @throws InvalidArgumentException
      */
-    public function getExternalDatabase(IConfigLoader $config): ?IConnector
+    public function getExternalDatabase(IConfigLoader $config, bool $ignoreDisabled = false): ?IConnector
     {
-        if (!$config->get('external_enable')) {
+        if (!$ignoreDisabled && !$config->get('external_enable')) {
             return null;
         }
 
         switch ($config->get('external_type')) {
+            case null:
+                return null;
 
             // Schoolbox connector: just return internal DB
             case 'schoolbox':

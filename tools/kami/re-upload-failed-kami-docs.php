@@ -7,64 +7,78 @@
  * This *must* be deployed in a later release that the code-fix in SA-6354 to guarantee that this script
  * does not execute while we have old-format documents still asynchronously processing in Kami.
  *
- * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 use Alaress\Jitter\Jitter;
-use Aura\Di;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Alaress\Random;
 use Schoolbox\MapperFactory;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
-$kernel = new Daemon\Kernel(
-    "'Re-queue kami conversion errors'",
-    [
-        Daemon\Kernel::OPTION_ERRORS => E_ALL,
-    ]
-);
 
-$reQueue = new class() extends App
+$app = new class extends CliTool\App
 {
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
-    /**
-     * @inheritdoc
-     */
-    public function run(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
     {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Reupload files to kami if they Kami has reported the files failed to be converted.
+These are in the student_submission_file_kami table and this tool only works if
+they have status "error" and error_message "Conversion failed".
+
+Usage: {$this->getToolFilename()}
+
+
+HELP;
+            exit;
+        }
+
         /**
          * @var MapperFactory  $mapperFactory
          * @var Kami\Connector $kamiConnector
          * @var Kami\Mapper    $kamiMapper
          */
-        $mapperFactory = $di->get('mapperFactory');
-        $kamiConnector = $di->get('kamiConnector');
+        $mapperFactory = $this->getDi()->get('mapperFactory');
+        $kamiConnector = $this->getDi()->get('kamiConnector');
         $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
         $jitter        = new Jitter(new Random\FloatGenerator());
 
         try {
             // Ensure we are as up-to-date with Kami as possible
-            $statusChecker = new Kami\StatusUpdater($kamiConnector, $kamiMapper, $jitter, $log);
+            $statusChecker = new Kami\StatusUpdater($kamiConnector, $kamiMapper, $jitter, $this->getLogger());
             $statusChecker->checkProcessingDocumentsStatus(false, Kami\StatusUpdater::DEFAULT_MAX_SKIPS);
-            $log->info('');
+            $this->getLogger()->info('');
 
             // Re-queue any docs that are in 'error' because 'Conversion failed'
-            $requeueErrors = new Kami\ReQueueErrors($kamiConnector, $kamiMapper, $jitter, $log);
+            $requeueErrors = new Kami\ReQueueErrors($kamiConnector, $kamiMapper, $jitter, $this->getLogger());
             $requeueErrors->deleteAndReQueue(false, Kami\ReQueueErrors::DEFAULT_MAX_SKIPS, 'Conversion failed');
         } catch (Throwable $e) {
-            $log->error($e->getMessage(), ['exception'=>$e]);
+            $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
         }
     }
 };
 
 try {
-    $kernel->run($reQueue);
+    $kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_ERRORS => E_ALL,]);
+    $kernel->runApp();
     exit(0);
 } catch (Throwable $e) {
     exit(2);

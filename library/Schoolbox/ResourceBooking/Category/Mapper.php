@@ -11,6 +11,9 @@
 namespace Schoolbox\ResourceBooking\Category;
 use Schoolbox\Mapper as BaseMapper;
 
+/**
+ * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ */
 class Mapper extends BaseMapper {
 
     public function mapping() {

@@ -10,75 +10,49 @@
 declare(strict_types=1);
 
 use Alaress\Jitter\Jitter;
-use Aura\Di;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\MapperFactory;
 use Alaress\Random;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Application\CliTool;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$appOpts = [
-    'help',
-    'perform',
-    'dry-run',
-    'error-message:',
-    'max-attempts:',
-    'max-skips:',
-    'base-back-off:',
-    'timeout:',
-];
+$app = new class extends CliTool\App{
 
-$kernel = new Schoolbox\Application\Daemon\Kernel(
-    'Kami Error Re-Queue',
-    [
-        Daemon\Kernel::OPTION_ERRORS        => E_ALL,
-        Daemon\Kernel::OPTION_APP_LONG_OPTS => $appOpts,
-    ]
-);
-
-/** @noinspection PhpUnhandledExceptionInspection */
-$kernel->run(function (
-    Di\Container $di,
-    /** @noinspection PhpUnusedParameterInspection */
-    LoopInterface $loop,
-    LoggerInterface $log,
-    array $opts
-) {
-    $displayHelp  = isset($opts['help']);
-    $dryRun       = isset($opts['dry-run']);
-    $perform      = isset($opts['perform']);
-    $errorMessage = $opts['error-message'] ?? null;
-    $maxAttempts  = array_key_exists('max-attempts', $opts) ? (int)$opts['max-attempts'] : Kami\ReQueueErrors::DEFAULT_MAX_ATTEMPTS;
-    $maxSkips     = array_key_exists('max-skips', $opts) ? (int)$opts['max-skips'] : Kami\ReQueueErrors::DEFAULT_MAX_SKIPS;
-    $baseBackOff  = array_key_exists('base-back-off', $opts) ? (int)$opts['base-back-off'] : Kami\ReQueueErrors::DEFAULT_BASE_JITTER_BACK_OFF;
-    $timeout      = array_key_exists('timeout', $opts) ? (int)$opts['timeout'] : Kami\ReQueueErrors::DEFAULT_TIMEOUT;
-
-    $colourRed   = "\033[0;31m";
-    $colourWhite = "\033[0m";
-    if (!$dryRun && !$perform) {
-        echo "{$colourRed}Invalid syntax. You must specify the mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
-        $displayHelp = true;
-    }
-    if ($dryRun && $perform) {
-        echo "{$colourRed}Invalid syntax. You must specify only one mode using '--dry-run' or '--perform'{$colourWhite}\n\n";
-        $displayHelp = true;
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return [
+            'help',
+            'error-message:',
+            'max-attempts:',
+            'max-skips:',
+            'base-back-off:',
+            'timeout:',
+        ];
     }
 
-    if ($displayHelp) {
-        $maxAttempts       = Kami\ReQueueErrors::DEFAULT_MAX_ATTEMPTS;
-        $maxSkips          = Kami\ReQueueErrors::DEFAULT_MAX_SKIPS;
-        $baseJitterBackOff = Kami\ReQueueErrors::DEFAULT_BASE_JITTER_BACK_OFF;
-        $timeout           = Kami\ReQueueErrors::DEFAULT_TIMEOUT;
-        echo <<<HELP
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        $displayHelp  = $this->getOpt('help');
+        $errorMessage = $this->getOpt('error-message:');
+        $maxAttempts  = $this->getOptAsInt('max-attempts:', Kami\ReQueueErrors::DEFAULT_MAX_ATTEMPTS);
+        $maxSkips     = $this->getOptAsInt('max-skips:', Kami\ReQueueErrors::DEFAULT_MAX_SKIPS);
+        $baseBackOff  = $this->getOptAsInt('base-back-off:', Kami\ReQueueErrors::DEFAULT_BASE_JITTER_BACK_OFF);
+        $timeout      = $this->getOptAsInt('timeout:', Kami\ReQueueErrors::DEFAULT_TIMEOUT);
+
+        if ($displayHelp) {
+            $maxAttempts       = Kami\ReQueueErrors::DEFAULT_MAX_ATTEMPTS;
+            $maxSkips          = Kami\ReQueueErrors::DEFAULT_MAX_SKIPS;
+            $baseJitterBackOff = Kami\ReQueueErrors::DEFAULT_BASE_JITTER_BACK_OFF;
+            $timeout           = Kami\ReQueueErrors::DEFAULT_TIMEOUT;
+            echo <<<HELP
 Deletes any 'error' status documents from Kami and re-queues for uploading.
  
-Usage: requeue-errors.php --dry-run|--perform [--error-message=ERROR_MESSAGE][-v[v[v]]] [--max-attempts={$maxAttempts}] [--max-skips={$maxSkips}] [--base-back-off={$baseJitterBackOff}] [--timeout={$timeout}]
-    --dry-run:           If set, do not delete from Kami or update the status in Schoolbox
-    --perform:           If set, do delete in Kami and do update the status in Schoolbox
+Usage: requeue-errors.php [--perform] [--error-message=ERROR_MESSAGE][-v[v[v]]] [--max-attempts={$maxAttempts}] [--max-skips={$maxSkips}] [--base-back-off={$baseJitterBackOff}] [--timeout={$timeout}]
+    --perform:           If set, do delete in Kami and do update the status in Schoolbox (if absent, runs in dry-run mode)
     --error-message:     Optional. If set, only delete and re-queue documents that match ERROR_MESSAGE
     -v:                  Optional verbosity level, -vvv: most verbose.
                          Defaults to most verbose.
@@ -94,73 +68,75 @@ Usage: requeue-errors.php --dry-run|--perform [--error-message=ERROR_MESSAGE][-v
 
 
 HELP;
-        exit(0);
-    }
-
-    $runType = $dryRun ? 'dry' : 'live';
-    $negate  = $dryRun ? 'not ' : '';
-    $log->info("Performing {$runType} run - documents will {$negate}be deleted from Kami will {$negate}be updated in Schoolbox");
-    $log->debug(null === $errorMessage ? "Not filtering by 'error_message'" : sprintf("Filtering to error_message: '%s'", $errorMessage));
-    $log->debug(sprintf('Max attempts per document: %d', $maxAttempts));
-    $log->debug(sprintf('Max successive failures: %d', $maxSkips));
-    $log->debug(sprintf('Base jitter back off: %d ms', $baseBackOff));
-    $log->debug(sprintf('Timeout: %d ms', $timeout));
-
-
-    /**
-     * @var IConfigLoader     $config
-     * @var MapperFactory     $mapperFactory
-     * @var Kami\Mapper       $kamiMapper
-     */
-    $config        = $di->get('config');
-    $mapperFactory = $di->get('mapperFactory');
-    $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
-    $connector     = new Kami\Connector(new GuzzleHttp\Client(), $config->get('kami_api_key'), $config->get('site_school_code'));
-
-    if (!$connector->isEnabled()) {
-        $log->warning('Kami has not been enabled by puppet for this instance. Aborting');
-        exit(0);
-    }
-
-    $jitter        = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
-    $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $log);
-
-    // Ensure only one instance of tool is running at a time
-    $lockFile = "{$config->get('stream_dir')}/.kami_requeue_errors_".INSTANCE_ID.".lock";
-    $lock     = new Alaress_Lock($lockFile);
-    if (!$lock->acquire()) {
-        $log->warning('A errors-requeue instance is already running. Checking last mod time');
-        $lastModTime  = filemtime($lockFile);
-        $lastModDelta = time() - $lastModTime;
-
-        $kill = false;
-        if (!$lastModTime) {
-            $log->error('Unable to determine when lock file was last written');
-            $kill = true;
-        } elseif ($lastModDelta > $timeout) {
-            $log->error("Lock file last modified {$lastModDelta} seconds ago");
-            $kill = true;
+            exit(0);
         }
 
-        if ($kill) {
-            $log->error('Assuming process has timed out and killing it');
-            $lock->killProcess();
-            $lock->acquire();
-        } else {
-            $log->info('No instance has yet timed out - exiting');
-            exit(1);
-        }
-    }
+        $runType = $this->perform() ? 'live' : 'dry';
+        $negate  = $this->perform() ? ' ' : 'NOT ';
+        $this->getLogger()->info("Performing {$runType} run - documents will {$negate}be deleted from Kami and will {$negate}be updated in Schoolbox");
+        $this->getLogger()->debug(null === $errorMessage ? "Not filtering by 'error_message'" : sprintf("Filtering to error_message: '%s'", $errorMessage));
+        $this->getLogger()->debug(sprintf('Max attempts per document: %d', $maxAttempts));
+        $this->getLogger()->debug(sprintf('Max successive failures: %d', $maxSkips));
+        $this->getLogger()->debug(sprintf('Base jitter back off: %d ms', $baseBackOff));
+        $this->getLogger()->debug(sprintf('Timeout: %d ms', $timeout));
 
-    // Run the tool
-    $exitStatus = 0;
-    try {
-        $exitStatus = $requeueErrors->deleteAndReQueue($dryRun, $maxSkips, $errorMessage);
-    } catch (Throwable $e) {
-        $log->error($e->getMessage(), $e->getTrace());
-        $log->error($e->getTraceAsString());
-    } finally {
-        $lock->release();
+        /**
+         * @var MapperFactory     $mapperFactory
+         * @var Kami\Mapper       $kamiMapper
+         */
+        $mapperFactory = $this->getDi()->get('mapperFactory');
+        $kamiMapper    = $mapperFactory->get(Kami\Mapper::class);
+        $connector     = new Kami\Connector(new GuzzleHttp\Client(), $this->getConfig()->get('kami_api_key'), $this->getConfig()->get('site_school_code'));
+
+        if (!$connector->isEnabled()) {
+            $this->getLogger()->warning('Kami has not been enabled by puppet for this instance. Aborting');
+            exit(0);
+        }
+
+        $jitter        = new Jitter(new Random\FloatGenerator(), $maxAttempts, $baseBackOff);
+        $requeueErrors = new Kami\ReQueueErrors($connector, $kamiMapper, $jitter, $this->getLogger());
+
+        // Ensure only one instance of tool is running at a time
+        $lockFile = "{$this->getConfig()->get('stream_dir')}/.kami_requeue_errors_".INSTANCE_ID.".lock";
+        $lock     = new Alaress_Lock($lockFile);
+        if (!$lock->acquire()) {
+            $this->getLogger()->warning('A errors-requeue instance is already running. Checking last mod time');
+            $lastModTime  = filemtime($lockFile);
+            $lastModDelta = time() - $lastModTime;
+
+            $kill = false;
+            if (!$lastModTime) {
+                $this->getLogger()->error('Unable to determine when lock file was last written');
+                $kill = true;
+            } elseif ($lastModDelta > $timeout) {
+                $this->getLogger()->error("Lock file last modified {$lastModDelta} seconds ago");
+                $kill = true;
+            }
+
+            if ($kill) {
+                $this->getLogger()->error('Assuming process has timed out and killing it');
+                $lock->killProcess();
+                $lock->acquire();
+            } else {
+                $this->getLogger()->info('No instance has yet timed out - exiting');
+                exit(1);
+            }
+        }
+
+        // Run the tool
+        $exitStatus = 0;
+        try {
+            $exitStatus = $requeueErrors->deleteAndReQueue(!$this->perform(), $maxSkips, $errorMessage);
+        } catch (Throwable $e) {
+            $this->getLogger()->error($e->getMessage(), $e->getTrace());
+            $this->getLogger()->error($e->getTraceAsString());
+        } finally {
+            $lock->release();
+        }
+        exit($exitStatus);
     }
-    exit($exitStatus);
-});
+};
+
+
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+$kernel->runApp();

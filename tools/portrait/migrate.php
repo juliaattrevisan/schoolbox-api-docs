@@ -1,112 +1,143 @@
 #!/usr/bin/php
 <?php
 /**
- * Migrate portraits on the local filesystem into Storage
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
-use Psr\Log\LoggerInterface;
+use Schoolbox\Application\CliTool;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Application\Daemon;
+use Schoolbox\Resource\Storage\Mapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Daemon\Kernel(
-    'Migrate portraits from filesystem into Storage',
-    [
-        Daemon\Kernel::OPTION_LEVEL  => Monolog\Logger::DEBUG,
-        Daemon\Kernel::OPTION_ERRORS => E_ALL,
-    ]
-);
+/**
+ * Migrate portraits on the local filesystem into Storage
+ */
+$app = new class extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
-$kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
-    $db = Database::getInstance();
-    $storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
 
-    /** @var IConfigLoader $conf */
-    $conf  = $di->get('config');
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
 
-    /* Prepared statements
+
+    /**
+     * Run the cli tool
      */
-    $selectResult = $db->prepare('
-        SELECT id, synergy_id, firstname, lastname
-        FROM `user`
-        WHERE synergy_id = :externalId
-        LIMIT 1
-    ');
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
 
-    $updateResult = $db->prepare('
-        UPDATE `user`
-        SET portrait_hash = :hash
-        WHERE id = :id
-    ');
+Migrate portraits from filesystem portrait_dir into Storage and associate them
+with schoolbox user accounts
 
-    /* Schools upload pictures to this directory periodically
-     * This tool shoves them into storage
-     * This tool can be run repeatedly in cron to preserve schools' existing workflows
-     */
-    $portraitPath = $conf->get('portrait_dir');
+Usage: migrate.php
 
-    $dirhandle = opendir($portraitPath);
 
-    while ($file = readdir($dirhandle)) {
-        if (('.' === $file) || ('..' === $file)) {
-            continue;
+HELP;
+            exit;
         }
 
-        /* If it's an actual file, send it in
+        $db = Database::getInstance();
+        $storageMapper = Mapper::getInstance();
+
+        /** @var IConfigLoader $conf */
+        $conf  = $this->getConfig();
+
+        /* Prepared statements
          */
-        $info = pathinfo($file);
+        $selectResult = $db->prepare('
+            SELECT id, synergy_id, firstname, lastname
+            FROM `user`
+            WHERE synergy_id = :externalId
+            LIMIT 1
+        ');
 
-        /* Naming convention in schoolbox instructions suggests this as the externalId
+        $updateResult = $db->prepare('
+            UPDATE `user`
+            SET portrait_hash = :hash
+            WHERE id = :id
+        ');
+
+        /* Schools upload pictures to this directory periodically
+         * This tool shoves them into storage
+         * This tool can be run repeatedly in cron to preserve schools' existing workflows
          */
-        $externalId = $info['filename'];
+        $portraitPath = $conf->get('portrait_dir');
 
-        /* Find them classically
-         */
-        $selectResult->execute([
-            'externalId' => $externalId,
-        ]);
+        $dirhandle = opendir($portraitPath);
 
-        $user = $selectResult->fetch(\PDO::FETCH_ASSOC);
-
-        /* If a user was found, try to assign image
-         */
-        if ($user) {
-
-            try {
-                $path = "{$portraitPath}/{$file}";
-
-                /* Save it into brownhole
-                 */
-                $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
-
-                /* Update user with latest version
-                 */
-                $updateResult->execute([
-                    'hash' => $portrait->getHash(),
-                    'id' => $user['id']
-                ]);
-
-                $log->info("{$user['firstname']} {$user['lastname']} now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
-
-                /* Remove file when done
-                 */
-                unlink($path);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-
-                /* Something died in storage
-                 */
-                $log->critical("External id {$externalId} not saved; Storage error");
+        while ($file = readdir($dirhandle)) {
+            if (('.' === $file) || ('..' === $file)) {
+                continue;
             }
-        } else {
 
-            /* User not found; noop
+            /* If it's an actual file, send it in
              */
-            $log->warning("External id {$externalId} not found; skipped");
+            $info = pathinfo($file);
+
+            /* Naming convention in schoolbox instructions suggests this as the externalId
+             */
+            $externalId = $info['filename'];
+
+            /* Find them classically
+             */
+            $selectResult->execute([
+                'externalId' => $externalId,
+            ]);
+
+            $user = $selectResult->fetch(\PDO::FETCH_ASSOC);
+
+            /* If a user was found, try to assign image
+             */
+            if ($user) {
+
+                try {
+                    $path = "{$portraitPath}/{$file}";
+
+                    /* Save it into brownhole
+                     */
+                    $portrait = $storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
+
+                    /* Update user with latest version
+                     */
+                    $updateResult->execute([
+                        'hash' => $portrait->getHash(),
+                        'id' => $user['id']
+                    ]);
+
+                    $this->getLogger()->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) now has portrait image {$file} {$portrait->getHash()} ({$portrait->getSize()})");
+
+                    /* Remove file when done
+                     */
+                    unlink($path);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+
+                    /* Something died in storage
+                     */
+                    $this->getLogger()->critical("External id {$externalId} not saved; Storage error");
+                }
+            } else {
+
+                /* User not found; noop
+                 */
+                $this->getLogger()->warning("External id {$externalId} not found; skipped");
+            }
         }
     }
-});
+};
+
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+
+/** @noinspection PhpUnhandledExceptionInspection */
+(new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();

@@ -37,9 +37,13 @@ class External_DatabaseFactory
             if (empty($databaseName)) {
                 $databaseName = Config::get('external_type');
             }
-            // Enable school-specific connection classes
-            $databaseClasses[] = "External_".ucfirst($databaseName)."_".ucfirst(Config::get('site_location'))."_".$databaseType;
-            $databaseClasses[] = "External_".ucfirst($databaseName)."_".$databaseType;
+            if (empty($databaseName)) {
+                $databaseClasses[] = $offlineClass;
+            } else {
+                // Enable school-specific connection classes
+                $databaseClasses[] = "External_".ucfirst($databaseName)."_".ucfirst(Config::get('site_location'))."_".$databaseType;
+                $databaseClasses[] = "External_".ucfirst($databaseName)."_".$databaseType;
+            }
         }
 
         // Try each database class in order of definition

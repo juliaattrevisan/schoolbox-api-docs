@@ -1,36 +1,72 @@
 #!/usr/bin/php
 <?php
 /**
- * Export assessment data for Accellerus import
- *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-use Aura\Di;
 use Schoolbox\Learning\Assessment\Exporter\Exporter;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
 use Schoolbox\MapperFactory;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Application\CliTool;
 
 require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Schoolbox\Application\Daemon\Kernel('Assessment CSV');
 
-$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+/**
+ * Export assessment data for Accellerus import
+ */
+$app = new class extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
+
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+
     /**
-     * @var Assessment\MapperProxy $assessmentDataSource
-     * @var MapperFactory          $mapperFactory
-     * @var Filter\Mapper          $filterMapper
+     * Run the cli tool
      */
-    $mapperFactory        = $di->get('mapperFactory');
-    $filterMapper         = $mapperFactory->get(Filter\Mapper::class);
-    $assessmentMapper     = $mapperFactory->get(Assessment\Mapper::class);
-    $idFinder             = Filter\Filters\Assessment\IdFinder::getInstance($filterMapper, $assessmentMapper);
-    $assessmentDataSource = $di->get('assessmentDataSource');
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
 
-    $exporter = new Exporter($idFinder, $assessmentDataSource);
-    $exporter->generate(STDOUT);
-});
+Exports assessment results into a csv format containing: 
+(student's external id, folder code, assessment name, assessment item code, result)
+ 
+Contents relate only to assessments due in the current year.
+
+Usage: csv.php
+
+
+HELP;
+            exit;
+        }
+
+        /**
+         * @var Assessment\MapperProxy $assessmentDataSource
+         * @var MapperFactory          $mapperFactory
+         * @var Filter\Mapper          $filterMapper
+         */
+        $mapperFactory        = $this->getDi()->get('mapperFactory');
+        $filterMapper         = $mapperFactory->get(Filter\Mapper::class);
+        $assessmentMapper     = $mapperFactory->get(Assessment\Mapper::class);
+        $idFinder             = Filter\Filters\Assessment\IdFinder::getInstance($filterMapper, $assessmentMapper);
+        $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+
+        $exporter = new Exporter($idFinder, $assessmentDataSource);
+        $exporter->generate($this->getOutStream());
+    }
+};
+
+$kernel = new CliTool\Kernel($app);
+$kernel->runApp();

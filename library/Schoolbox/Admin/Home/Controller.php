@@ -10,7 +10,8 @@ namespace Schoolbox\Admin\Home;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
-use Schoolbox\IConfigLoader;
+use InvalidArgumentException;
+use Schoolbox\Database;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Config\ConfigMapper;
 use Proxy\Server as ProxyServer;
@@ -23,13 +24,23 @@ class Controller extends Base
     /** @var Kami\IConnector */
     private $kamiConnector;
 
+    /** @var Database\Factory */
+    private $databaseFactory;
+
+    /** @var null|IConnector */
+    private $databaseExternal;
+
 
     /**
-     * @param Kami\IConnector $kamiConnector
+     * @param Kami\IConnector  $kamiConnector
+     * @param Database\Factory $databaseFactory
+     * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
      */
-    public function __construct(Kami\IConnector $kamiConnector)
+    public function __construct(Kami\IConnector $kamiConnector, Database\Factory $databaseFactory, ?IConnector $databaseExternal)
     {
-        $this->kamiConnector = $kamiConnector;
+        $this->kamiConnector    = $kamiConnector;
+        $this->databaseFactory  = $databaseFactory;
+        $this->databaseExternal = $databaseExternal;
     }
 
 
@@ -259,16 +270,11 @@ class Controller extends Base
      */
     public function getHealthcheck()
     {
-        /** @var IConfigLoader $configMapper */
-        $configMapper = $this->getDi()->get('config');
-
         try {
-            /** @var IConnector $databaseExternal */
-            $databaseExternal = $this->getDi()->get('databaseExternal');
-            $healthCheck = new Healthcheck($databaseExternal, $configMapper);
+            $healthCheck = new Healthcheck($this->databaseExternal, $this->databaseFactory, $this->getConfigLoader());
             $healthCheck->run();
             $output = $healthCheck->results();
-        } catch (AlaressDatabaseException $e) {
+        } catch (InvalidArgumentException|AlaressDatabaseException $e) {
             $output = [
                 'errors' => [
                     $e->getMessage()

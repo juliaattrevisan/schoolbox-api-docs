@@ -1,7 +1,5 @@
-#!/usr/bin/php
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
@@ -24,7 +22,14 @@
  *  -v       | --verbose   verbosity:   how much activity will be logged.
  */
 
+namespace Schoolbox\Mapper;
+
 use Alaress\Lumberjack\Logger;
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
+use Database;
+use Eportfolio;
+use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork\SingleFile as ReturnedWorkFile;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
@@ -60,29 +65,26 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Application\CliTool;
+use Throwable;
+use function count;
+use function get_class;
+use function max;
+use function method_exists;
+use function min;
+use function preg_replace;
+use function sprintf;
+use function str_pad;
+use function str_repeat;
+use function strlen;
+use function strpos;
 
-require_once __DIR__ . '/../conf/core/require.php';
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Recursive Undeleter');
-
-$undeleter = new RecursiveUndeleter();
-$undeleter->run();
-
-class RecursiveUndeleter
+class RecursiveUndeleter extends CliTool\App
 {
-    const COLOUR_GREEN = "\033[0;32m";
-    const COLOUR_RED = "\033[0;31m";
-    const COLOUR_GREY = "\033[0;37m";
-    const COLOUR_YELLOW = "\033[0;33m";
-    const COLOUR_WHITE = "\033[0m";
-
-    const COLOUR_BOLD_GREEN = "\033[0;32m";
-    const COLOUR_BOLD_RED = "\033[0;31m";
-    const COLOUR_BOLD_GREY = "\033[0;37m";
-    const COLOUR_BOLD_YELLOW = "\033[0;33m";
 
     // To account for legacy non-synchronised deletedAt timestamps, how much allowance should we consider as being
     // part of same action?
-    const DEFAULT_DELETED_AT_WINDOW = 120 ; // default to 1 minute either side of root object's soft-delete timestamp
+    private const DEFAULT_DELETED_AT_WINDOW = 120; // default to 1 minute either side of root object's soft-delete timestamp
 
     /**
      * Period in seconds, centered on parent deletedAt timestamp, that child models must be deleted within
@@ -92,12 +94,6 @@ class RecursiveUndeleter
      */
     private $deletedAtWindow;
 
-    /**
-     * If false, identify soft-deleted items and print report, but don't actually restore anything
-     *
-     * @var bool
-     */
-    private $perform;
 
     /**
      * Command-line specified date to pretend the indicated root objects were deleted at.
@@ -119,12 +115,10 @@ class RecursiveUndeleter
     /** @var IMapper */
     private $rootMapper;
 
-    /** @var int */
-    private $logThreshold;
-
     /** @var int[] */
     private $rootIds;
 
+    /** @var Database */
     private $database;
 
     /** @var Logger */
@@ -163,7 +157,7 @@ class RecursiveUndeleter
             CourseImpl\Mapper::class,
             File\Mapper::class => 'category',
             LinkMapper::class  => 'category',
-            Assessment\Mapper::class => 'v_f.folder_id'
+            Assessment\Mapper::class => 'v_f.folder_id',
         ],
         FolderCode\Mapper::class        => [],
         CourseSpec\Mapper::class        => [
@@ -264,15 +258,28 @@ class RecursiveUndeleter
     ];
 
 
-    /**
-     * Public entry point
-     */
-    public function run()
+    /** @inheritDoc */
+    public function getShortOpts(): array
     {
+        return ['t:', 'i:', 'd:', 'w:'];
+    }
+
+
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return ['table:', 'id:', 'override:', 'window:'];
+    }
+
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        // TODO update all usages of '$this->logger' to '$this->getLogger()', this is an interim measure to limit the size of this PR
+        $this->logger = $this->getLogger();
+
         try {
-            $this->checkCLI();
             $this->parseCommandLineArgs();
-            $this->buildLogger();
             $this->loadRootMapper();
             $this->connectToDatabase();
             $this->checkRestoreAllRequested();
@@ -280,98 +287,79 @@ class RecursiveUndeleter
             $this->printResults($this->softDeletedModels);
             $this->printDeletedAtDates($this->softDeletedModels);
 
-            if($this->perform) {
+            if ($this->perform()) {
                 $this->restoreSoftDeletedModels();
             }
-        }
-        catch(PDOException $e) {
+        } catch (PDOException $e) {
             $this->logger->error($e->getMessage());
             $helpMsg =
                 "Most likely this is because the foreign key has a non-standard naming convention.\n" .
                 "Standard naming is `{child_table}`.`{parent_table}_{parent_table_identifier}`.\n" .
                 'If this is not the case, you need to specify the join column manually in the soft-delete registry.';
             $this->logger->error($helpMsg);
-        }
-        catch(Exception $e) {
-            // TODO remove this block when we drop PHP5 support
-            if($this->logger instanceof Logger) {
+        } catch (Throwable $e) {
+            if ($this->logger instanceof Logger) {
                 $this->logger->error($e->getMessage());
-            }
-            else {
-                echo "{$e->getMessage()}\n\n";
-            }
-            exit(1);
-        }
-        catch(Throwable $e) {
-            if($this->logger instanceof Logger) {
-                $this->logger->error($e->getMessage());
-            }
-            else {
+            } else {
                 echo "{$e->getMessage()}\n\n";
             }
             exit(1);
         }
     }
 
-    private function connectToDatabase()
+
+    /**
+     * Establish database connection
+     */
+    private function connectToDatabase(): void
     {
         $this->database = Database::getInstance();
     }
+
 
     /**
      * If the user specified all IDs ('*') on command line, load all ids for the specified mapper.
      *
      * Log error and exit if specified mapper does not have an ID field registered.
      */
-    private function checkRestoreAllRequested()
+    private function checkRestoreAllRequested(): void
     {
         $this->logger->debug("Examining IDs argument to see if user requested all ('*') root objects");
-        if(1 === count($this->rootIds) && '*' === $this->rootIds[0]) {
-            if(!$this->rootMapper->getIdentifierColumn()) {
+        if (1 === count($this->rootIds) && '*' === $this->rootIds[0]) {
+            if (!$this->rootMapper->getIdentifierColumn()) {
                 $this->logger->error(sprintf("Unable to find all IDs for root mapper '%s'. No ID column", get_class($this->rootMapper)));
                 exit(1);
             }
             $this->logger->info("User requested all ('*') root objects. Fetching all root IDs");
             $this->rootIds = $this->rootMapper->findAllIds(['deleted' => true]);
             $this->logger->debug(sprintf('Root IDs updated to %s', $this->getIdString($this->rootIds)));
-        }
-        else {
+        } else {
             $this->logger->debug("User did not request all ('*') root Ids");
         }
     }
 
 
     /**
-     * Build a logger with a threshold level dependent on whether user requested verbose mode
-     */
-    private function buildLogger()
-    {
-        $this->logger = new Logger(STDOUT, STDERR, $this->logThreshold);
-    }
-
-
-    /**
      * Load an instance of the root mapper
      */
-    private function loadRootMapper()
+    private function loadRootMapper(): void
     {
         // Use the specified root table to find the root mapper
         /** @var IMapper $mapperClass */
-        foreach(self::$softDeleteRegistry as $mapperClass => $children){
+        foreach (self::$softDeleteRegistry as $mapperClass => $children) {
 
             // A bit of house keeping to try to keep things in order
-            if(!class_exists($mapperClass)) {
+            if (!class_exists($mapperClass)) {
                 $this->logger->warning("Registry corruption detected. Mapper class does not exist: {$mapperClass}");
             }
 
             try {
                 $mapperInstance = $mapperClass::getInstance();
-                if($mapperInstance->getTable() === $this->rootTable){
+                if ($mapperInstance->getTable() === $this->rootTable) {
                     $this->rootMapper = $mapperInstance;
                     return;
                 }
-            }
-            catch(Exception $e) {
+            } catch (\Exception $e) {
                 $this->logger->warning($e->getMessage());
             }
         }
@@ -382,30 +370,15 @@ class RecursiveUndeleter
 
 
     /**
-     * Ensure running as CLI and exits if not
-     */
-    private function checkCLI()
-    {
-        if(PHP_SAPI !== 'cli') {
-            echo 'Must be run from Command Line Interface (CLI) only';
-            exit(1);
-        }
-    }
-
-
-    /**
      * Either successfully load all command line args, or print and error message and exit
      */
-    private function parseCommandLineArgs()
+    private function parseCommandLineArgs(): void
     {
-        $opts   = getopt('t:i:o:w:vp', ['table:', 'id:', 'override:', 'window:', 'verbose', 'perform']);
         $errors = [];
-        $this->getCommandLinePerform($opts);
-        $this->getCommandLineThreshold($opts);
-        $errors = $this->getCommandLineExplicitDeletionDate($errors, $opts);
-        $errors = $this->getCommandLineTable($errors, $opts);
-        $errors = $this->getCommandLineIds($errors, $opts);
-        $errors = $this->getCommandLineTimestampWindow($errors, $opts);
+        $errors = $this->getCommandLineExplicitDeletionDate($errors);
+        $errors = $this->getCommandLineTable($errors);
+        $errors = $this->getCommandLineIds($errors);
+        $errors = $this->getCommandLineTimestampWindow($errors);
 
         $red    = self::COLOUR_RED;
         $green  = self::COLOUR_GREEN;
@@ -414,14 +387,14 @@ class RecursiveUndeleter
 
         $dateFormat = Alaress_Date_Format::DATABASE_FORMAT;
 
-        if(count($errors)) {
+        if (count($errors)) {
             echo "\n{$red}Invalid syntax. You must: \n";
-            foreach($errors as $error) {
+            foreach ($errors as $error) {
                 echo "\t- $error\n";
             }
 
-            $file   = __FILE__;
-            $class  = __CLASS__;
+            $file  = $this->getToolFilename();
+            $class = __CLASS__;
             $table = 'folder';
 
             $helpMsg = "{$white}
@@ -446,7 +419,7 @@ DESCRIPTION
        {$yellow}-p, --perform{$white}
               *without* this flag, un-delete will only perform a dry-run
 
-       {$yellow}-o, --override=OVERRIDE_DATE{$white}
+       {$yellow}-d, --override=OVERRIDE_DATE{$white}
               Format: {$yellow}'{$dateFormat}'{$white}
               If specified, treat specified root objects as having been deleted at this date, regardless of when they
               were really deleted, whether they have a boolean soft-delete field, or whether they are deleted at all.
@@ -455,8 +428,8 @@ DESCRIPTION
        {$yellow}-w, --window=WINDOW{$white}
               duration in seconds in which to match deletedAt dates. Children deleted outside span will not be restored.
 
-       {$yellow}-v, --verbose{$white}
-              verbosity:   whether to print verbose output or not.
+       {$yellow}-v[v[v]]{$white}
+              verbosity: log with increasing verbosity.
 
 EXAMPLES:
        1. To undelete a soft-deleted folder with ID = 123:
@@ -477,38 +450,35 @@ EXAMPLES:
      * Get the IDs provided on command line
      *
      * @param string[] $errors
-     * @param array    $opts
      * @return string[]
      */
-    private function getCommandLineIds(array $errors, array $opts)
+    private function getCommandLineIds(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
-        if(isset($opts['i'], $opts['id'])) {
+        if ($this->getOpt('i:') !== null && $this->getOpt('id:') !== null) {
             $errors[] = "{$red}not specify IDs using both the short '{$yellow}-i{$red}' and long '{$yellow}--id{$red}' option syntax";
             return $errors;
         }
 
         $idString = null;
-        if(isset($opts['i'])) {
-            $idString = $opts['i'];
-        }
-        elseif(isset($opts['id'])) {
-            $idString = $opts['id'];
-        }
-        else {
+        if ($this->getOpt('i:') !== null) {
+            $idString = $this->getOpt('i:');
+        } elseif ($this->getOpt('id:') !== null) {
+            $idString = $this->getOpt('id:');
+        } else {
             $errors[] = "{$red}specify IDs using either the short '{$yellow}-i{$red}' or long '{$yellow}--id{$red}' option syntax";
             return $errors;
         }
 
-        if(!is_string($idString)) {
+        if (!is_string($idString)) {
             $errors[] = 'not specify the ID argument multiple times';
             return $errors;
         }
 
         // Ensure it only contains integers and commas
-        if('*' !== $idString && preg_match('/[^0-9,]/', $idString, $matches)) {
+        if ('*' !== $idString && preg_match('/[^0-9,]/', $idString, $matches)) {
             $errors[] = "only use integers and commas when specifying IDs - no spaces (or '*' for all)";
             return $errors;
         }
@@ -517,36 +487,35 @@ EXAMPLES:
         return $errors;
     }
 
+
     /**
      * Get the period in time in which to match deleted_at timestamps provided on command line
      *
      * @param string[] $errors
-     * @param array    $opts
      * @return string[]
      */
-    private function getCommandLineTimestampWindow(array $errors, array $opts)
+    private function getCommandLineTimestampWindow(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
-        if(isset($opts['w'], $opts['window'])) {
+        if ($this->getOpt('w:') !== null && $this->getOpt('window:') !== null) {
             $errors[] = "{$red}not specify timestamp window using both the short '{$yellow}-w{$red}' and long '{$yellow}--window{$red}' option syntax";
             return $errors;
         }
 
         $window = null;
-        if(isset($opts['w'])) {
-            $window = $opts['w'];
-        }
-        elseif(isset($opts['window'])) {
-            $window = $opts['window'];
+        if ($this->getOpt('w:') !== null) {
+            $window = $this->getOpt('w:');
+        } elseif ($this->getOpt('window:') !== null) {
+            $window = $this->getOpt('window:');
         }
 
-        if(null !== $window && preg_match('/\D+/', $window)){
+        if (null !== $window && preg_match('/\D+/', $window)) {
             $errors[] = 'use only integers (seconds) when specifying the deletedAt timestamp window width, eg \'120\'';
             return $errors;
         }
-        if(null === $window){
+        if (null === $window) {
             $this->deletedAtWindow = self::DEFAULT_DELETED_AT_WINDOW;
         } else {
             $this->deletedAtWindow = (int)$window;
@@ -556,48 +525,34 @@ EXAMPLES:
 
 
     /**
-     * Determine whether command line args indicate we should perform the actions or just do a dry-run
-     *
-     * @param array $opts
-     */
-    private function getCommandLinePerform(array $opts)
-    {
-        $this->perform = isset($opts['p']) || isset($opts['perform']);
-    }
-
-
-    /**
      * @param string[] $errors
-     * @param array $opts
      * @return string[]
      */
-    private function getCommandLineTable(array $errors, array $opts)
+    private function getCommandLineTable(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         // Did user provide both short and long options?
-        if(isset($opts['t'], $opts['table'])) {
+        if ($this->getOpt('t:') !== null && $this->getOpt('table:') !== null) {
             $errors[] = "{$red}specify database table using either the short '{$yellow}-t{$red}' or long '{$yellow}--table{$red}' option syntax, but not both";
             return $errors;
         }
         // Did user provide neither short nor long option
-        if(!isset($opts['t']) && !isset($opts['table'])) {
+        if ($this->getOpt('t:') === null && $this->getOpt('table:') === null) {
             $errors[] = "{$red}specify database table using either the short '{$yellow}-t{$red}' or long '{$yellow}--table{$red}' option syntax";
             return $errors;
         }
 
         // What table are we targeting?
-        $shortOpt = isset($opts['t']) ? $opts['t'] : null;
-        $longOpt  = isset($opts['table']) ? $opts['table'] : null;
+        $shortOpt = $this->getOpt('t:');
+        $longOpt  = $this->getOpt('table:');
 
-        if(is_string($shortOpt)) {
+        if (is_string($shortOpt)) {
             $this->rootTable = $shortOpt;
-        }
-        elseif(is_string($longOpt)) {
+        } elseif (is_string($longOpt)) {
             $this->rootTable = $longOpt;
-        }
-        else {
+        } else {
             $errors[] = 'not specify the database table option multiple times';
         }
         return $errors;
@@ -605,49 +560,34 @@ EXAMPLES:
 
 
     /**
-     * Determine the log verbosity from command line args
-     *
-     * @param array $opts
-     */
-    private function getCommandLineThreshold(array $opts)
-    {
-        $verboseOn  = 100; // max verbosity: EV-ER-Y-THING...
-        $verboseOff = 200; // mod verbosity: most things
-
-        $this->logThreshold = isset($opts['v']) || isset($opts['verbose']) ? $verboseOn : $verboseOff;
-    }
-
-
-    /**
-     * Did caller specify to
+     * Did caller specify to target a specific deletion date
      *
      * @param string[] $errors
-     * @param array    $opts
      * @return string[]
      */
-    private function getCommandLineExplicitDeletionDate(array $errors, array $opts)
+    private function getCommandLineExplicitDeletionDate(array $errors): array
     {
         $red    = self::COLOUR_RED;
         $yellow = self::COLOUR_YELLOW;
 
         // Did user provide both short and long options?
-        if (isset($opts['o'], $opts['override'])) {
-            $errors[] = "{$red}specify override deletion date using either the short '{$yellow}-o{$red}' or long '{$yellow}--override{$red}' option syntax, but not both";
+        if ($this->getOpt('d:') !== null && $this->getOpt('override:') !== null) {
+            $errors[] = "{$red}specify override deletion date using either the short '{$yellow}-d{$red}' or long '{$yellow}--override{$red}' option syntax, but not both";
             return $errors;
         }
 
         // Did user specify neither?
-        if (!isset($opts['o']) && !isset($opts['override'])) {
+        if ($this->getOpt('d:') === null && $this->getOpt('override:') === null) {
             return $errors;
         }
 
-        $dateString = isset($opts['o']) ? $opts['o'] : $opts['override'];
+        $dateString = $this->getOpt('d:') ?? $this->getOpt('override:');
 
         try {
-            $this->explicitDeletionDate = new Alaress_Date_Format($dateString, Alaress_Date_Format::DATABASE_FORMAT);
-        } catch (Exception $e) {
-            echo self::COLOUR_RED."Could not generate a date from string: {$dateString}\n";
-            echo "{$e->getMessage()}\n".self::COLOUR_WHITE;
+            $this->explicitDeletionDate = new Alaress_Date_Format(strtotime($dateString), Alaress_Date_Format::TIMESTAMP);
+        } catch (\Exception $e) {
+            $this->logger->error("Could not generate a date from string: {$dateString}");
+            $this->logger->error($e->getMessage());
             exit(1);
         }
 
@@ -660,10 +600,10 @@ EXAMPLES:
      *
      * @param string $mapperClass
      */
-    private function checkRegistry($mapperClass)
+    private function checkRegistry($mapperClass): void
     {
         // check this mapper is in our registry
-        if(!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
+        if (!array_key_exists($mapperClass, self::$softDeleteRegistry)) {
             $this->logger->error('Mapper is not registered in soft-delete registry. Unable to un-delete children');
             exit(1);
         }
@@ -672,7 +612,7 @@ EXAMPLES:
         $childMappers = self::$softDeleteRegistry[$mapperClass];
 
         // check this mapper is defined properly in our registry
-        if(!is_array($childMappers)) {
+        if (!is_array($childMappers)) {
             $this->logger->error('Mapper is registered in soft-delete registry, but children not defined. Unable to un-delete children');
             exit(1);
         }
@@ -688,16 +628,16 @@ EXAMPLES:
      * @param string  $val
      * @return mixed[]
      */
-    private function getMapperClassAndForeignKeyFromRegistryPair(IMapper $parentMapper, $key, $val)
+    private function getMapperClassAndForeignKeyFromRegistryPair(IMapper $parentMapper, $key, $val): array
     {
-        if(is_string($key)) {
+        if (is_string($key)) {
             /** @var IMapper $key */
             $childMapper = $key::getInstance();
-            $foreignKey = $val;
+            $foreignKey  = $val;
         } else {
             /** @var IMapper $val */
             $childMapper = $val::getInstance();
-            $foreignKey = "{$parentMapper->getTable()}_{$parentMapper->getIdentifierColumn()}";
+            $foreignKey  = "{$parentMapper->getTable()}_{$parentMapper->getIdentifierColumn()}";
         }
         return [$childMapper, $foreignKey];
     }
@@ -717,7 +657,7 @@ EXAMPLES:
         array $parentIds,
         Alaress_Date_Format $deletedAfter = null,
         Alaress_Date_Format $deletedBefore = null
-    ){
+    ) {
         $childModels = $childMapper
             ->findByColumn($foreignKeyColumn, $parentIds, ['deleted' => true])
             ->filter(function (ISoftDeletable $model) {
@@ -725,8 +665,8 @@ EXAMPLES:
             });
 
         // Do the child models have a timestamp (not boolean) soft-delete field, and we have dates to filter?
-        if($deletedAfter && $deletedBefore && $childModels->first() && method_exists($childModels->first(), 'getDeletedAt')){
-            $childModels = $childModels->filter(function($childModel) use ($deletedAfter, $deletedBefore){
+        if ($deletedAfter && $deletedBefore && $childModels->first() && method_exists($childModels->first(), 'getDeletedAt')) {
+            $childModels = $childModels->filter(function ($childModel) use ($deletedAfter, $deletedBefore) {
                 /** @var Mapper\Traits\Model\DeletedAtDate $childModel */
                 $deletedAt = $childModel->getDeletedAt();
                 return $deletedAt->between($deletedAfter, $deletedBefore);
@@ -744,13 +684,13 @@ EXAMPLES:
      *
      * @param string $childMapperClass
      */
-    private function checkNoIdentifier($childMapperClass)
+    private function checkNoIdentifier($childMapperClass): void
     {
         $this->logger->debug(sprintf("Child mapper '%s' does not appear to have an identifier. Checking registry", $childMapperClass));
         $this->checkRegistry($childMapperClass);
 
         // Ensure registry defines no child classes
-        if(count(self::$softDeleteRegistry[$childMapperClass])) {
+        if (count(self::$softDeleteRegistry[$childMapperClass])) {
             $this->logger->error(sprintf("Mapper '%s' does not have identifier, but has child mappers registered", $childMapperClass));
             exit(1);
         }
@@ -767,10 +707,10 @@ EXAMPLES:
      * @param int[]   $ids
      * @throws Mapper\Exception
      */
-    private function findDeletedModels(IMapper $mapper, array $ids)
+    private function findDeletedModels(IMapper $mapper, array $ids): void
     {
-        if(!$mapper->getIdentifierColumn()) {
-            $this->logger->error("Mapper '%s' does not appear to have an identifier column. Unable to fetch root models", get_class($mapper));
+        if (!$mapper->getIdentifierColumn()) {
+            $this->logger->error(sprintf("Mapper '%s' does not appear to have an identifier column. Unable to fetch root models", get_class($mapper)));
             error(1);
         }
 
@@ -778,9 +718,9 @@ EXAMPLES:
         $rootModels = $mapper->findByColumn($mapper->getIdentifierColumn(), $ids, ['deleted' => true]);
 
         $firstModel = $rootModels->first();
-        if($firstModel && !$firstModel instanceof ISoftDeletable && !$this->explicitDeletionDate) {
-            $this->logger->error("Mapper '%s' does not appear to be soft-deletable, and no override deletion"
-            . ' date specified. Unable to restore', get_class($mapper));
+        if ($firstModel && !$firstModel instanceof ISoftDeletable && !$this->explicitDeletionDate) {
+            $this->logger->error(sprintf("Mapper '%s' does not appear to be soft-deletable, and no override deletion"
+                . ' date specified. Unable to restore', get_class($mapper)));
             error(1);
         }
 
@@ -801,9 +741,9 @@ EXAMPLES:
         $rootModelsToTraverse = $this->explicitDeletionDate ? $rootModels : $deletedRootModels;
 
         // For each root model, recursively search for deleted children (matching the root's timestamp)
-        foreach($rootModelsToTraverse as $rootModel){
+        foreach ($rootModelsToTraverse as $rootModel) {
             // Try to get deletedAt timespan
-            list($deletedAfter, $deletedBefore) = $this->getDeletedBetweenDates($rootModel);
+            [$deletedAfter, $deletedBefore] = $this->getDeletedBetweenDates($rootModel);
 
             // Enter recursive rabbit hole
             $this->recursiveFindDeletedModels($mapper, $mapper->getModelAsCollection($rootModel), $deletedAfter, $deletedBefore);
@@ -820,10 +760,10 @@ EXAMPLES:
      * @param object $model
      * @return null[]|Alaress_Date_Format[]
      */
-    private function getDeletedBetweenDates($model)
+    private function getDeletedBetweenDates($model): array
     {
         $deletedAfter = $deletedBefore = null;
-        if($this->explicitDeletionDate || method_exists($model, 'getDeletedAt')){
+        if ($this->explicitDeletionDate || method_exists($model, 'getDeletedAt')) {
             /** @var Mapper\Traits\Model\DeletedAtDate $model */
             $deletedAt = $this->explicitDeletionDate ?: $model->getDeletedAt();
             $this->logger->info(
@@ -832,8 +772,8 @@ EXAMPLES:
                     $deletedAt->getDatabase()
                 )
             );
-            if($deletedAt instanceof Alaress_Date_Format && !$deletedAt instanceof Alaress_Date_NullDate){
-                $deletedAfter  = clone $deletedAt;
+            if ($deletedAt instanceof Alaress_Date_Format && !$deletedAt instanceof Alaress_Date_NullDate) {
+                $deletedAfter = clone $deletedAt;
                 $deletedAfter->addSeconds(-1 * $this->deletedAtWindow / 2);
 
                 $deletedBefore = clone $deletedAt;
@@ -847,13 +787,13 @@ EXAMPLES:
     /**
      * Restores the soft-deleted models we found earlier
      */
-    private function restoreSoftDeletedModels()
+    private function restoreSoftDeletedModels(): void
     {
         /**  @var IMapper $mapperClass */
-        foreach($this->softDeletedModels as $mapperClass => $models) {
+        foreach ($this->softDeletedModels as $mapperClass => $models) {
             $mapper      = $mapperClass::getInstance();
             $countModels = $models->count();
-            if(0 === $countModels) {
+            if (0 === $countModels) {
                 $this->logger->debug(
                     sprintf("No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
                         $mapper->getTable(),
@@ -877,7 +817,7 @@ EXAMPLES:
      *
      * @param object[][]|Collection[] $softDeletedModels
      */
-    private function printResults(array $softDeletedModels)
+    private function printResults(array $softDeletedModels): void
     {
         $maxIdFieldWidth = 100; // with two space chars adjacent
 
@@ -891,7 +831,7 @@ EXAMPLES:
 
         // Need to iterate first to find widest value in each column
         /** @var IMapper $mapperClass */
-        foreach($deDuplicatedResults as $mapperClass => $models) {
+        foreach ($deDuplicatedResults as $mapperClass => $models) {
             $count            = (string)count($models);
             $table            = $mapperClass::getInstance()->getTable();
             $rTrimMapperClass = preg_replace('/Mapper$/i', '', $mapperClass);
@@ -905,7 +845,7 @@ EXAMPLES:
 
         $reportWidth = 5 + $maxCountLength + $maxTableLength + $maxMapperClassLength + $maxIdsStringLength;
 
-        $runType       = $this->perform ? 'LIVE RUN' : 'DRY RUN';
+        $runType       = $this->perform() ? 'LIVE RUN' : 'DRY RUN';
         $runTypeLength = strlen($runType);
 
         $countLeadingHyphens  = (int)(($reportWidth - $runTypeLength - 4) / 2);
@@ -920,7 +860,7 @@ EXAMPLES:
             'COUNT', 'TABLE', 'MAPPER', 'IDS');
 
         // Print table rows
-        foreach($deDuplicatedResults as $mapperClass => $models) {
+        foreach ($deDuplicatedResults as $mapperClass => $models) {
             $count            = (string)count($models);
             $table            = $mapperClass::getInstance()
                                             ->getTable();
@@ -933,14 +873,14 @@ EXAMPLES:
             $countLineCharsAvailable = $maxIdsStringLength - 1;
 
             $countKeys = count($models->keys());
-            foreach($models->keys() as $idx => $id){
+            foreach ($models->keys() as $idx => $id) {
                 $isLast = $countKeys === ($idx + 1);
 
                 $idString = $isLast ? "{$id}" : "{$id},";
 
                 // Do we have room to print this id on this line?
                 $idLength = strlen($idString);
-                if($countLineCharsAvailable - $idLength < 0){
+                if ($countLineCharsAvailable - $idLength < 0) {
                     // No room. Terminate this line.
                     $report .= str_pad(" |\n", $countLineCharsAvailable + 3, ' ', STR_PAD_LEFT);
                     // print blank first 3 columns
@@ -966,39 +906,39 @@ EXAMPLES:
      *
      * @param object[][]|Collection[] $softDeletedModels
      */
-    private function printDeletedAtDates(array $softDeletedModels)
+    private function printDeletedAtDates(array $softDeletedModels): void
     {
         $deDuplicatedResults = $this->buildDeDuplicatedResults($softDeletedModels);
 
         /** @var IMapper $mapperClass */
         $firstLoop = true;
-        foreach($deDuplicatedResults as $mapperClass => $models) {
+        foreach ($deDuplicatedResults as $mapperClass => $models) {
             $firstModel = $models->first();
 
             // No models, or does not have a 'getDeletedAt()' method?
-            if(!$firstModel || !method_exists($firstModel, 'getDeletedAt')){
+            if (!$firstModel || !method_exists($firstModel, 'getDeletedAt')) {
                 continue;
             }
             $mapper = $mapperClass::getInstance();
 
-            if(!$firstLoop){
+            if (!$firstLoop) {
                 $this->logger->info('');
             }
             $this->logger->info(sprintf("Deleted at values for table '%s' (mapper '%s'):", $mapper->getTable(), $mapperClass));
 
             // Align ID columns. Right-align numeric, left align textual.
-            $longestId = 0;
+            $longestId  = 0;
             $rightAlign = true;
-            foreach($models as $model){
-                $id = $this->buildId($mapper, $model);
+            foreach ($models as $model) {
+                $id        = $this->buildId($mapper, $model);
                 $longestId = max($longestId, strlen($id));
-                if((string)(int) $id !== $id){
+                if ((string)(int)$id !== $id) {
                     $rightAlign = false;
                 }
             }
 
             $alignment = $rightAlign ? '' : '-';
-            foreach($models as $model){
+            foreach ($models as $model) {
                 $id = $this->buildId($mapper, $model);
                 /** @var Alaress_Date_Format $adf */
                 $adf = $model->getDeletedAt();
@@ -1014,10 +954,10 @@ EXAMPLES:
      * @param         $model
      * @return string
      */
-    private function buildId(IMapper $mapper, $model)
+    private function buildId(IMapper $mapper, $model): string
     {
         // Does this model have an identifier?
-        if($mapper->getIdentifierColumn()) {
+        if ($mapper->getIdentifierColumn()) {
             return (string)$mapper->getModelProperty($model, $mapper->getIdentifierProperty());
         }
 
@@ -1025,16 +965,16 @@ EXAMPLES:
         $mapping = $mapper->getMap();
         $id      = '';
         $first   = true;
-        foreach($mapping as $map) {
-            if(!isset($map['property'])) {
+        foreach ($mapping as $map) {
+            if (!isset($map['property'])) {
                 continue;
             }
             // Ignore soft-delete fields
-            if(false !== strpos(strtolower($map['property']), 'deleted')) {
+            if (false !== strpos(strtolower($map['property']), 'deleted')) {
                 continue;
             }
             $property = $map['property'];
-            if(!$first) {
+            if (!$first) {
                 $id .= '_';
             }
             $id    .= $mapper->getModelProperty($model, $property);
@@ -1054,15 +994,15 @@ EXAMPLES:
      * @param array $softDeletedModels
      * @return object[][]|Collection[]
      */
-    private function buildDeDuplicatedResults(array $softDeletedModels)
+    private function buildDeDuplicatedResults(array $softDeletedModels): array
     {
         $deDuplicatedResults = [];
         /** @var IMapper $mapperClass */
-        foreach($softDeletedModels as $mapperClass => $models) {
+        foreach ($softDeletedModels as $mapperClass => $models) {
             $deDuplicatedResults[$mapperClass] = new Collection();
             $mapper                            = $mapperClass::getInstance();
-            foreach($models as $model) {
-                $id = $this->buildId($mapper, $model);
+            foreach ($models as $model) {
+                $id                                     = $this->buildId($mapper, $model);
                 $deDuplicatedResults[$mapperClass][$id] = $model;
             }
         }
@@ -1086,7 +1026,7 @@ EXAMPLES:
         Collection $deletedParentModels,
         Alaress_Date_Format $after = null,
         Alaress_Date_Format $before = null
-    ){
+    ): void {
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
 
@@ -1095,12 +1035,12 @@ EXAMPLES:
         $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdString($parentIds)));
 
         // For each child entity of this parent entity
-        foreach($childMappers as $key => $val) {
+        foreach ($childMappers as $key => $val) {
             /**
              * @var IMapper $childMapper
              * @var string  $foreignKeyColumn
              */
-            list($childMapper, $foreignKeyColumn) = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
+            [$childMapper, $foreignKeyColumn] = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
             $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
 
@@ -1111,7 +1051,7 @@ EXAMPLES:
 
             // Does child model have primary key identifier? (weak entities like folderCode do not)
             $childModelIdentifier = $childMapper->getIdentifierColumn();
-            if(!$childModelIdentifier) {
+            if (!$childModelIdentifier) {
                 $this->checkNoIdentifier($val);
                 $this->logger->info(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
                 continue;
@@ -1121,13 +1061,13 @@ EXAMPLES:
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdString($childModelIds)));
 
-            if(0 === count($childModelIds)) {
+            if (0 === count($childModelIds)) {
                 $this->logger->debug('No children found, skipping...');
                 continue;
             }
 
-            if(null === $after && null === $before){
-                list($after, $before) = $this->getDeletedBetweenDates($deletedChildModels->first());
+            if (null === $after && null === $before) {
+                [$after, $before] = $this->getDeletedBetweenDates($deletedChildModels->first());
             }
 
             // Recurse!!
@@ -1146,12 +1086,12 @@ EXAMPLES:
      * @param IMapper                            $mapper
      * @param GenericCollection|ISoftDeletable[] $deletedModels
      */
-    private function registerDeletedModels(IMapper $mapper, GenericCollection $deletedModels)
+    private function registerDeletedModels(IMapper $mapper, GenericCollection $deletedModels): void
     {
         $mapperClass = get_class($mapper);
 
         // Do we yet have results for this mapper ?
-        if(!array_key_exists($mapperClass, $this->softDeletedModels)) {
+        if (!array_key_exists($mapperClass, $this->softDeletedModels)) {
             $this->softDeletedModels[$mapperClass] = new Collection;
         }
 
@@ -1165,12 +1105,12 @@ EXAMPLES:
      * @param int[] $ids
      * @return string
      */
-    private function getIdString(array $ids)
+    private function getIdString(array $ids): string
     {
         $string = '[';
         $first  = true;
-        foreach($ids as $id) {
-            if(!$first) {
+        foreach ($ids as $id) {
+            if (!$first) {
                 $string .= ',';
             }
             $string .= $id;

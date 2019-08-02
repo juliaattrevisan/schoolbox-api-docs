@@ -638,11 +638,13 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * Returns the session user if one exists (won't in Daemons and CLI Tools)
+     *
      * @return User
      */
-    public function getSessionUser()
+    public function getSessionUser(): ?User
     {
-        return $this->sessionData['user'];
+        return $this->sessionData['user'] ?? null;
     }
 
 

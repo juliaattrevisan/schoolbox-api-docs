@@ -1,124 +1,184 @@
 #!/usr/bin/php
 <?php
+/**
+ * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+use Aura\Di;
+use Psr\Log\LoggerInterface;
+use Schoolbox\Pastoral;
+use Schoolbox\Application\CliTool;
+
+require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  * Synergetic DocMan file uploader
  *
  * This script should be run regularly by cron, it picks up any pastoral care documents in the queue
  * and inserts them into the Synergetic DB
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
  */
+$app = new class extends CliTool\App
+{
+    // --help: print help
+    private const OPT_LONG_HELP = 'help';
 
-use Aura\Di\Container as Injector;
-use Psr\Log\LoggerInterface;
-use React\EventLoop\LoopInterface;
-use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
-use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
-use Schoolbox\Application\Daemon;
+    /** @var Pastoral\UploadQueue\Mapper */
+    private $pastoralUploadQueueMapper;
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Daemon\Kernel(
-    'DocMan',
-    [
-        Daemon\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG,
-    ]
-);
+    /** @var External_Pastoral */
+    private $externalPastoral;
 
-$kernel->run(function ($di, $loop, $log, $opts) {
+
+    /** @inheritdoc */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
+    /** @inheritDoc */
+    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
+    {
+        parent::setup($appOptions, $di, $outStream, $logger, $perform);
+
+        // Only process if pastoral docman writeback is actually enabled in config
+        if (!$this->getConfig()->get('external_pastoral_upload')) {
+            $this->getLogger()->info('Pastoral Attachment Upload is disabled in config; exiting');
+            exit;
+        }
+        $this->pastoralUploadQueueMapper = Pastoral\UploadQueue\Mapper::getInstance();
+        $this->externalPastoral          = new External_Pastoral();
+        return $this;
+    }
+
+
+    /** @inheritDoc */
+    public function run(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_HELP)) {
+            echo <<<HELP
+
+Upload Pastoral Care attachments into synergetic's docman functionality.
+
+Usage: pastoralUpload.php
+
+
+HELP;
+            exit;
+        }
+
+        $this->getLogger()->info('Uploading of pastoral files started');
+        $lock = $this->checkOverlappingExecution();
+        $this->uploadPending();
+        $lock->release();
+    }
+
 
     /**
-     * @var Injector $di
-     * @var LoopInterface $loop
-     * @var LoggerInterface $log
-     * @var array $opts
+     * Checks whether the execution of this App is overlapping with a prior execution.
+     *
+     * Returns the acquired lock
+     *
+     * @return Alaress_Lock
      */
+    private function checkOverlappingExecution(): Alaress_Lock
+    {
+        $lock = new Alaress_Lock('pastoral_upload.' . INSTANCE_ID . '.lock');
 
-    // Only process if pastoral docman writeback is actually enabled in config
+        if ($lock->acquire()) {
+            return $lock;
+        }
 
-    if (!$di->get('config')->get("external_pastoral_upload")) {
-        exit;
-    }
-
-    pcntl_signal(SIGCHLD, SIG_DFL);
-
-    $pastoralUploadQueueMapper = new PastoralUploadQueueMapper();
-
-    $lock = new Alaress_Lock('pastoral_upload.' . INSTANCE_ID . '.lock');
-
-    if (!$lock->acquire()) {
-        $log->critical("A pastoral uploader is already running, checking timeout.");
+        $this->getLogger()->critical('A pastoral uploader is already running, checking timeout.');
 
         // Check existing upload process for timeout (should never be more than uploaded more than once).
-        $timeout = intval($di->get('config')->get('pastoral_upload_timeout'));
-
+        $timeout = (int)$this->getConfig()->get('pastoral_upload_timeout');
         if ($timeout <= 0) {
-            $log->alert("Timeout of pastoral uploading is disabled.");
-            exit;
-        } elseif (($num_timed_out = $pastoralUploadQueueMapper->markProcessingAsFailed($timeout)) > 0) {
-            $log->warning("Processing of $num_timed_out pastoral upload(s) has timed out - marking these as failed, and continuing");
-            $lock->killProcess();
-            $lock->acquire();
-        } else {
-            $log->info("No pastoral uploader has timed out.");
+            $this->getLogger()->alert('Timeout of pastoral uploading is disabled.');
             exit;
         }
+
+        $countTimedOut = $this->pastoralUploadQueueMapper->markProcessingAsFailed($timeout);
+        if ($countTimedOut > 0) {
+            $nounAndVerb = $countTimedOut > 1 ? 'uploads have' : 'upload has';
+            $pronoun     = $countTimedOut > 1 ? 'these' : 'this';
+            $this->getLogger()->warning("Processing of $countTimedOut pastoral $nounAndVerb timed out - marking $pronoun as failed, and continuing");
+        } else {
+            $this->getLogger()->info('No pastoral uploads have timed out.');
+        }
+
+        $lock->killProcess();
+        if(!$lock->acquire()){
+            $this->getLogger()->critical('Still unable to acquire lock after attempt to kill locking process, exiting.');
+            exit(1);
+        }
+
+        return $lock;
     }
 
-    $log->info("Uploading of pastoral files started");
 
-    $pendingQueue = $pastoralUploadQueueMapper->getPending();
-
-    $failed = 0;
-    $success = 0;
-
-    /** @var PastoralUploadQueueModel $file */
-    foreach ($pendingQueue as $file) {
-
-        if (!empty($file->getStorage())) {
-            $hash = $file->getStorage()->getHash();
-
-            $log->info("Starting process of file '{$hash}'");
-
-            // Mark file as processing so another daemon get started and try to duplicate processing
-
-            $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PROCESSING);
-
+    /**
+     * Find and upload pending documents to external SIS
+     */
+    private function uploadPending(): void
+    {
+        $success = $failed = 0;
+        foreach ($this->pastoralUploadQueueMapper->getPending() as $pendingUpload) {
             try {
-                $pastoralUploadQueueMapper->save($file);
+                $this->processPendingUpload($pendingUpload) ? $success++ : $failed++;
             } catch (PDOException $e) {
-                $log->alert("File '{$hash}' failed:".$e->getMessage());
+                $this->getLogger()->error($e->getMessage(), ['exception' => $e]);
                 $failed++;
-                continue;
             }
-
-            // Upload file to DocMan
-
-            try {
-                $file->uploadPastoralDocument();
-                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
-            } catch (Exception $e) {
-                $log->error("$e", ['exception' => $e]);
-                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
-            }
-
-            if ($file->getStatus() === PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED) {
-                $log->error("Uploading of file '{$hash}' failed");
-                $failed++;
-            } else {
-                $log->info("Uploading of file '{$hash}' completed\n");
-                $success++;
-            }
-        } else {
-            $log->error("Uploading of upload queue item '{$file->getId()}' failed. No storage object found");
-            $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
         }
-
-        $pastoralUploadQueueMapper->save($file);
+        $this->getLogger()->info("Processing of pastoral upload completed: $success succeeded, $failed failed");
     }
 
-    $lock->release();
-    $log->info("Processing of pastoral upload completed: $success succeeded, $failed failed");
-});
+
+    /**
+     * Attempts to transmit a pending upload to the external system.
+     * Returns whether the transmission was successful.
+     *
+     * @param Pastoral\UploadQueue\Model $pendingUpload
+     * @return bool
+     */
+    private function processPendingUpload(Pastoral\UploadQueue\Model $pendingUpload): bool
+    {
+        if ($pendingUpload->getStorage() === null) {
+            $this->getLogger()->error("Uploading of upload queue item '{$pendingUpload->getId()}' failed. No storage object found");
+            $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED);
+            $this->pastoralUploadQueueMapper->save($pendingUpload);
+            return false;
+        }
+
+        $hash = $pendingUpload->getStorage()->getHash();
+        $this->getLogger()->info("Starting process of file '{$hash}'");
+
+        // Mark file as processing so another daemon get started and try to duplicate processing
+        $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_PROCESSING);
+        $this->pastoralUploadQueueMapper->save($pendingUpload);
+
+        // Upload file to DocMan
+        try {
+            $this->externalPastoral->uploadPastoralDocument($pendingUpload);
+            $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_COMPLETED);
+        } catch (Exception $e) {
+            $this->getLogger()->error($e, ['exception' => $e]);
+            $pendingUpload->setStatus(Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED);
+        }
+        $this->pastoralUploadQueueMapper->save($pendingUpload);
+
+        if ($pendingUpload->getStatus() === Pastoral\UploadQueue\Mapper::UPLOAD_STATUS_FAILED) {
+            $this->getLogger()->error("Uploading of file '{$hash}' failed");
+            return false;
+        }
+        $this->getLogger()->info("Uploading of file '{$hash}' completed");
+        return true;
+    }
+};
+
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]);
+$kernel->runApp();
