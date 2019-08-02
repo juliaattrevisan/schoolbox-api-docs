@@ -638,7 +638,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Returns the session user (if one exists, which it wont in Daemons and CLI Tools)
+     * Returns the session user if one exists (won't in Daemons and CLI Tools)
      *
      * @return User
      */
