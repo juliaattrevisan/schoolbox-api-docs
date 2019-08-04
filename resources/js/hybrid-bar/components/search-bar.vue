@@ -20,8 +20,8 @@
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)">
-                    <div class="card small-12" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
+                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
+                    <div class="card small-12">
                         <img v-bind:src="formatPortrait(result.id)">
                         <h3 class="name">{{ result.formattedName }}</h3>
                         <p class="meta">{{ formatMeta(result) }}</p>
@@ -99,7 +99,7 @@
             },
 
             onEnter: function(id) {
-                this.goToProfilePage(this.results[this.arrowCounter].id);
+                this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
             },
 
             lostFocus: function(event) {

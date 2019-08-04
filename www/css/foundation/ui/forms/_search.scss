@@ -112,6 +112,10 @@
             text-decoration: none !important; // forgive me, for I have sinned.
         }
     }
+
+    .is-active {
+        background-color: $content-ui-hover;
+    }
 }
 
 // When notifications are disabled
