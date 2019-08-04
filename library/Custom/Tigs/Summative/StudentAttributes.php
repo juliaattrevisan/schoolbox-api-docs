@@ -30,7 +30,8 @@ use function strtotime;
  * * Technically nothing should be due in Yr 12 Term 4, but we include it in Sem2 so the report will continue to show at this time.
  *
  * In the client data, Year12 students are soft-deleted at the end of year 12, and stay as year 12 in the DB.
- * In our test data, we don't delete students, and keep incrementing their year levels so we don't need to keep updating the test data
+ * In our test data, we don't delete students, and keep incrementing their year levels so we don't need to keep updating the test data.
+ * A request for the report of either scenario should 404.
  */
 class StudentAttributes
 {
