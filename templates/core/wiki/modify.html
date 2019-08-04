@@ -10,7 +10,8 @@
         $('#wikiForm').alaressValidate({
             rules: {
                 heading: {
-                    notInSlugList: {SLUG_LIST}
+                    notInSlugList: {SLUG_LIST},
+                    requiredNotBlank: true
                 }
             }
         });
