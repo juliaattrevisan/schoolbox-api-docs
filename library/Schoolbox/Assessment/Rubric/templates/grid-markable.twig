@@ -134,16 +134,6 @@
             markType  = $rb.find("[data-mark-type]").attr("data-mark-type"),
             dynagrade = {{ markType | json_encode | raw }};
 
-        $("[data-feedback-form]").validate(
-            {
-                errorPlacement: function (error, element) {
-                    var $nextEl = element.next("[data-use-descriptor-values]");
-                    error.insertAfter($nextEl);
-                }
-            }
-        );
-
-
         // Add validation rules for per-capability marks
         $("[data-group-mark]").each(function() {
 

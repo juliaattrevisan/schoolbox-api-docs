@@ -36,38 +36,33 @@
 
 {% if not readonly %}
     <script type="text/javascript">
-        $(function() {
-            input = $('#mark-{{ participant.user.id }}');
 
-            input.combobox({{ errors | json_encode | raw }});
-
-            input.change(function () {
-
-                $(this).closest('form').alaressValidate({
+        $(window).load(function () {
+            $("[data-feedback-form]").alaressValidate(
+                {
                     rules: {
                         mark: {
                             min: {
                                 depends: function () {
-                                    if ($.isNumeric($(this).val()) && $(this).val() < 0){
+                                    if ($.isNumeric($(this).val()) && $(this).val() < 0) {
                                         return true;
                                     }
                                 }
                             },
                             max: {
                                 depends: function () {
-                                    if ($.isNumeric($(this).val()) && $(this).val() > {{ limit }}) {
-                                        return {{ limit }};
+                                    if ($.isNumeric($(this).val()) && $(this).val() > $(this).attr('data-validation-limit')) {
+                                        return $(this).attr('data-validation-limit');
                                     }
-                                },
+                                }
                             }
                         }
                     },
                     messages: {
-                        mark: 'The grade must be between 0 and {{ limit }}.'
+                        mark: 'The grade must be between 0 and ' + $('input[name="mark"]').attr('data-validation-limit') + '.'
                     }
-                });
-
-            });
+                }
+            );
         });
     </script>
 {% endif %}
