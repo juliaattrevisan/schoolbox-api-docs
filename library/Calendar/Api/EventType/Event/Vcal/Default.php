@@ -186,7 +186,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
                             Sabre\VObject\Reader::OPTION_FORGIVING
                         );
                         if ($startTimestamp && $endTimestamp) {
-                            $allEvents->expand(
+                            $allEvents = $allEvents->expand(
                                 new DateTime('@' . $startTimestamp),
                                 new DateTime('@' . $endTimestamp)
                             );
