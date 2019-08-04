@@ -107,11 +107,10 @@ function useSAMLKerberos() {
     // Check if the user is in the IP whitelist
 
 
-    if (!IpUtils::checkIp(Session::getIP(), explode(',',Config::get('saml_krb_whitelist')))) {
+    if (!IpUtils::checkIp(Session::getIP(),  array_map('trim', explode(',',Config::get('saml_krb_whitelist'))))) {
         SAMLDebugLog("IP not in kerberos whitelist");
         return false;
     }
-    unset($tempsession);
 
     /**
      * Check if the users platform/browser supports kerberos

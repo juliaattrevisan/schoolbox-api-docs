@@ -175,7 +175,7 @@ class Controller extends Base
      */
     private function samlBlacklist(): bool
     {
-        $ipBlacklist = explode(',', $this->getConfigLoader()->get('saml_ip_blacklist'));
+        $ipBlacklist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_blacklist')));
         return IpUtils::checkIp(Session::getIP(), $ipBlacklist);
     }
 
@@ -185,7 +185,7 @@ class Controller extends Base
      */
     private function samlForce(): bool
     {
-        $ipWhitelist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_krb_whitelist')));
+        $ipWhitelist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_whitelist')));
         return IpUtils::checkIp(Session::getIP(), $ipWhitelist);
     }
 }
