@@ -273,7 +273,7 @@ class NesaScoreGraph extends BaseComponent
      */
     private function validateAssessments(array $assessmentData): void
     {
-        // Check students only participate in 1 NESA assessment per Folder per ReportPeriod
+        // Check students only participate in no more than 1 NESA assessment per Folder per ReportPeriod
         // (Note we are already in the context of a single ReportPeriod)
         /** @var int[][] $participationCountsPerFolder Indexed by folderId, studentId */
         $participationCountsPerFolder = [];
