@@ -48,7 +48,7 @@ class RoleCloner
         $this->cloneCategoryPermissions($source, $destination);
         $this->cloneSchoolNewsPermissions($source, $destination);
         $this->cloneSchoolCalendarPermissions($source, $destination);
-        $this->cloneTour($source, $destination);
+        $this->cloneTours($source, $destination);
     }
 
     /**
@@ -221,7 +221,7 @@ class RoleCloner
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneTour(Role $source, Role $destination): void
+    protected function cloneTours(Role $source, Role $destination): void
     {
         $this->clonePerms("
             DELETE FROM `tour_audience_role` WHERE `role_id` = ?
