@@ -3,14 +3,13 @@
  * Schoolbox user role mapper
  *
  * @author      James Leckie <james.leckie@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright   2019 Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au
  */
 
 namespace Schoolbox;
 
 use InvalidArgumentException;
-use Schoolbox\Tour\Audience\Model as TourAudience;
 
 /**
  * @method Role createModel($idValue = null)
@@ -40,14 +39,9 @@ class RoleMapper extends Mapper
         $this->uses('digest_schedule', self::TYPE_STRING);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, function (Role $model, Role $previous = null) {
-            $this->setTour($model, $previous);
-            return true;
-        });
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteUsersExists']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeletePastoralAccess']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteTour']);
     }
 
 
@@ -102,51 +96,5 @@ class RoleMapper extends Mapper
     {
         $escaped = $this->getDatabase()->escapeForLike($name);
         return $this->findByPredicates($this->getPredicateBuilder()->like('name', "%{$escaped}%"), $options);
-    }
-
-
-    /**
-     * Sets tours for a role, if it's a staff type role.
-     * @param Role      $role
-     * @param Role|null $previous
-     * @return bool
-     * @throws Mapper\Exception
-     */
-    public function setTour(Role $role, ?Role $previous): bool
-    {
-        if ($previous && $previous->isStaff() && !$role->isStaff()) {
-            $this->deleteTour($role);
-            return true;
-        }
-        if (!$role->isStaff()
-            || ($previous && $previous->isStaff() && $role->isStaff())) {
-            return true;
-        }
-
-        //TODO: who is the tour moderator?
-        $moderator = UserMapper::getInstance()->findByUsername('alaress');
-
-        $tours = \Schoolbox\Tour\Mapper::getInstance()->findAll();
-
-        foreach ($tours as $tour) {
-            $tourAudience = new TourAudience();
-            $tourAudience->setRole($role);
-            $tourAudience->setModerator($moderator);
-            $tourAudience->setTour($tour);
-            Tour\Audience\Mapper::getInstance()->save($tourAudience);
-        }
-        return true;
-    }
-
-
-    /**
-     * Deletes tours for a role.
-     * @param Role $role
-     * @return bool
-     */
-    public function deleteTour(Role $role): bool
-    {
-        Tour\Audience\Mapper::getInstance()->deleteByColumn('role_id', $role->getId());
-        return true;
     }
 }
