@@ -132,7 +132,9 @@ class Query
         $statement->execute([
             'firstAndLastName'  => $keyword,
             'lastname'          => $keyword,
-            'username'          => $keyword
+            'username'          => $keyword,
+            'sfirstname'        => $keyword,
+            'slastname'         => $keyword,
         ]);
 
         return $statement->fetchAll(\PDO::FETCH_COLUMN);
@@ -152,7 +154,9 @@ class Query
         $statement->execute([
             'firstAndLastName'  => $keyword,
             'lastname'          => $keyword,
-            'username'          => $keyword
+            'username'          => $keyword,
+            'sfirstname'        => $keyword,
+            'slastname'         => $keyword,
         ]);
 
         return (int) $statement->fetchColumn();
@@ -165,7 +169,10 @@ class Query
     {
         $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
         OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
-        OR username LIKE :username AND user.deleted_at IS NULL ';
+        OR username LIKE :username 
+        OR soundex(firstname) = soundex(:sfirstname) 
+        OR soundex(lastname) = soundex(:slastname) 
+        AND user.deleted_at IS NULL ';
 
         /**
          * When show_disabled_users flag is set to TRUE, disabled users will be shown in the result
