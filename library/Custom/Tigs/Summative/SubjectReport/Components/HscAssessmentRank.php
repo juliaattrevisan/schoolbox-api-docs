@@ -141,7 +141,7 @@ class HscAssessmentRank extends BaseComponent
         }
 
         // Check whether the component should be visible
-        if(!$this->deriveComponentVisibility($cohortAssessmentsPerClass[$this->folder->getId()])){
+        if (!$this->deriveComponentVisibility($cohortAssessmentsPerClass[$this->folder->getId()])) {
             return null;
         }
 

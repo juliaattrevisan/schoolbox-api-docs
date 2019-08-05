@@ -131,8 +131,7 @@ class HscAssessmentTasks extends BaseComponent
         // Does the set include an assessment imported to this class and in which the student is participating?
         $classAssessment = null;
         foreach ($cohortAssessments as $assessment) {
-            if (
-                $assessment->isParticipant($this->student) &&
+            if ($assessment->isParticipant($this->student) &&
                 (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
             ) {
                 $classAssessment = $assessment;

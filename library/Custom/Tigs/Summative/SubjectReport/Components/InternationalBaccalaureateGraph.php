@@ -419,8 +419,8 @@ class InternationalBaccalaureateGraph extends BaseComponent
         }
 
         // Check this folder has at least 1 IB Graph assessment
-         if (!count($ibAssessments[$this->folder->getId()]['assessments'])) {
-            $folderLink   = sprintf('<a href="/homepage/%d">%s</a>', $this->folder->getId(), $this->folder->getName());
+        if (!count($ibAssessments[$this->folder->getId()]['assessments'])) {
+            $folderLink = sprintf('<a href="/homepage/%d">%s</a>', $this->folder->getId(), $this->folder->getName());
             $errorMessage .= "No IB Graph assessment found for folder $folderLink\n";
         }
         if ($errorMessage) {
