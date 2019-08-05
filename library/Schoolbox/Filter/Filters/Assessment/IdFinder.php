@@ -645,10 +645,10 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_ON)) {
-            $pb->isTrue("$dueWorkAlias.rubric_group_marks");
+            $pb->isTrue("$dueWorkAlias.rubric_mark_per_capability");
         }
         if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_OFF)) {
-            $pb->isFalse("$dueWorkAlias.rubric_group_marks");
+            $pb->isFalse("$dueWorkAlias.rubric_mark_per_capability");
         }
 
         return ['('. implode(' OR ', $pb->getWhere()) . ')'];
