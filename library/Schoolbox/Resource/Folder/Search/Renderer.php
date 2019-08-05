@@ -9,6 +9,7 @@
 
 namespace Schoolbox\Resource\Folder\Search;
 
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
@@ -16,8 +17,6 @@ use Scrub;
 
 /* Folder specific
  */
-use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder;
 
 class Renderer extends Base
@@ -97,32 +96,10 @@ class Renderer extends Base
                     'FOLDER_TYPE' => $folderType,
                 ));
 
-                $userAccessMapper = new UserAccessMapper();
-                $userAccess = $userAccessMapper->findByColumnList(array(
-                    'uid' => $_SESSION['user']->getId(),
-                    'service' => UserAccess::SERVICE_HOMEPAGE,
-                    'sid' => $currentFolder->getId()
-                ));
-
-                $roleAccessMapper = new RoleAccessMapper();
-                $roleAccess = $roleAccessMapper->findByColumnList(array(
-                    'cid' => $currentFolder->getId(),
-                    'gid' => $_SESSION['user']->getRole()->getId(),
-                ));
-
-                /* Only show modify block for those with access >= 2
-                 */
-                if ($userAccess->count() && $roleAccess->count()) {
-                    $hasRoleAccess = ($roleAccess->first()->getType() >= 2);
-                    $hasUserAccess = ($userAccess->first()->getAccessLevel() >= 2);
-
-                    if ($hasRoleAccess && $hasUserAccess) {
-                        $this->getPage()->parse('modify_block', 'modify');
-                    } else {
-                        $this->getPage()->parse('modify_block', 'modify');
-                    }
-                } else {
+                if (Access::getInstance()->getFolderAccess($_SESSION['user'], $currentFolder->getId()) >= UserAccess::ACCESS_WRITE) {
                     $this->getPage()->parse('modify_block', 'modify');
+                } else {
+                    $this->getPage()->setVar('modify_block');
                 }
 
                 $this->getPage()->parse('folder_block', 'folder', true);

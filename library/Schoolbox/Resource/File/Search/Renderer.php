@@ -10,6 +10,8 @@
 namespace Schoolbox\Resource\File\Search;
 
 use Alaress_Byte_Format;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Model;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
@@ -51,6 +53,7 @@ class Renderer extends Base
         $this->getPage()->setFile('file_t', 'resource/file/search/results.html');
         $this->getPage()->setBlock('file_t', 'file', 'file_block');
         $this->getPage()->setBlock('file_t', 'see_more', 'see_more_block');
+        $this->getPage()->setBlock('file', 'modify', 'modify_block');
 
         $this->getPage()->setVar([
             'see_more_block' => ''
@@ -76,6 +79,12 @@ class Renderer extends Base
                 'FILE_CREATED'     => $currentFile->getCreatedAt()->getRelativeTime(),
                 'FILE_BREADCRUMB'  => $this->spawnBreadcrumbs($currentFile->getFolder()),
             ]);
+
+            if (Access::getInstance()->getFolderAccess($_SESSION['user'], $currentFile->getFolder()->getId()) >= UserAccess::ACCESS_WRITE) {
+                $this->getPage()->parse('modify_block', 'modify');
+            } else {
+                $this->getPage()->setVar('modify_block');
+            }
 
             $this->getPage()->parse('file_block', 'file', true);
         }
