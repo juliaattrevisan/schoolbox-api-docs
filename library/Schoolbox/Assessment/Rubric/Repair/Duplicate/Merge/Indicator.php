@@ -37,8 +37,8 @@ class Indicator extends Base
 
     private const FIND_CAPABILITY_INDICATORS_QUERY = '
         SELECT id, name
-        FROM   rubric_criterion
-        WHERE  rubric_group_id = :capabilityId
+        FROM   rubric_indicator
+        WHERE  rubric_capability_id = :capabilityId
         AND    deleted_at      IS NULL
         ORDER BY name, id
     ';
@@ -51,25 +51,25 @@ class Indicator extends Base
             rcu.submission_box_id AS box_id,
             a.id,
             a.title
-        FROM       rubric_criterion_usage rcu
+        FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box         sb ON rcu.submission_box_id = sb.id
         INNER JOIN assessment             a  ON sb.assessment_id = a.id
-        WHERE rcu.criterion_id = :indicatorId
+        WHERE rcu.rubric_indicator_id = :indicatorId
         AND   a.deleted_at IS NULL
     ';
 
     private const MERGE_INDICATOR_USAGE_QUERY = '
-        UPDATE rubric_criterion_usage
-        SET   criterion_id      = :originalIndicatorId
-        WHERE criterion_id      = :duplicateIndicatorId
+        UPDATE rubric_indicator_usage
+        SET   rubric_indicator_id      = :originalIndicatorId
+        WHERE rubric_indicator_id      = :duplicateIndicatorId
         AND   submission_box_id = :boxId
     ';
 
     private const MERGE_INDICATOR_DESCRIPTOR_QUERY = '
         UPDATE     rubric_descriptor rd
         INNER JOIN rubric_level      rl ON rd.level_id = rl.id
-        SET   rd.criterion_id = :originalIndicatorId
-        WHERE rd.criterion_id = :duplicateIndicatorId
+        SET   rd.rubric_indicator_id = :originalIndicatorId
+        WHERE rd.rubric_indicator_id = :duplicateIndicatorId
         AND   rl.box_id       = :boxId
     ';
 

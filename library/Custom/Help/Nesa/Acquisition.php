@@ -12,8 +12,9 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Database\Predicate\Builder;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as RubricCapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Mapper;
@@ -52,12 +53,12 @@ class Acquisition
     private $indicators;
 
     /**
-     * @var Rubric\RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
     /**
-     * @var DataModel\MapperProxy
+     * @var AssessmentDataSource
      */
     private $assessmentMapperProxy;
 
@@ -77,12 +78,12 @@ class Acquisition
      *
      * $involvement limits the number of Participants and Folders to hydrate
      *
-     * @param array                 $states     The Chosen States
-     * @param int                   $unaccreditedOnly
-     * @param array                 $indicators An array of indicator text
-     * @param Rubric\RubricMapper   $rubricMapper
-     * @param DataModel\MapperProxy $assessmentMapperProxy
-     * @param UserMapper            $userMapper
+     * @param array                $states     The Chosen States
+     * @param int                  $unaccreditedOnly
+     * @param array                $indicators An array of indicator text
+     * @param RubricDataSource     $rubricMapper
+     * @param AssessmentDataSource $assessmentMapperProxy
+     * @param UserMapper           $userMapper
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \UnderflowException
      */
@@ -90,8 +91,8 @@ class Acquisition
         array $states,
         int $unaccreditedOnly,
         array $indicators,
-        Rubric\RubricMapper $rubricMapper,
-        DataModel\MapperProxy $assessmentMapperProxy,
+        RubricDataSource $rubricMapper,
+        AssessmentDataSource $assessmentMapperProxy,
         UserMapper $userMapper
     ) {
         $this->states = $states;
@@ -161,8 +162,8 @@ class Acquisition
             FROM user_professionaldevelopment upd
             INNER JOIN `user` u ON upd.user_id = u.`id`
             INNER JOIN submission_return sr ON u.`id` = sr.`owner`
-            INNER JOIN rubric_group_mark rgm on sr.id = rgm.return_id
-            INNER JOIN rubric_group rg on rgm.rubric_group_id = rg.id
+            INNER JOIN rubric_capability_mark rgm on sr.id = rgm.return_id
+            INNER JOIN rubric_capability rg on rgm.rubric_capability_id = rg.id
             INNER JOIN userAccess ua ON ua.uid = u.`id` AND rg.parent_id = ua.`sid` AND rg.parent_type = :parentType
             INNER JOIN course_implementation ci ON ua.sid = ci.`folder_id` AND ua.service = :homepageService
             INNER JOIN course_specification cs ON ci.`course_specification_id` = cs.`id`
@@ -182,7 +183,7 @@ class Acquisition
 
         $statement->execute(array_merge([
             'homepageService' => UserAccess::SERVICE_HOMEPAGE,
-            'parentType'      => Rubric\Group::PARENT_TYPE_CATEGORY,
+            'parentType'      => RubricCapabilityModel::PARENT_TYPE_CATEGORY,
         ], $pb->getParams()));
 
         $hierarchy = [];

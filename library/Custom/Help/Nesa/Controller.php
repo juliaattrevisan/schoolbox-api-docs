@@ -10,9 +10,11 @@
 namespace Custom\Help\Nesa;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Error;
-use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\ProfessionalDevelopment;
@@ -34,7 +36,7 @@ class Controller extends Base
     private $courseSpecificationMapper;
 
     /**
-     * @var Rubric\RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -53,14 +55,14 @@ class Controller extends Base
      *
      * @param Error\Mapper                   $errorMapper
      * @param Specification\Mapper           $courseSpecificationMapper
-     * @param Rubric\RubricMapper            $rubricMapper
+     * @param RubricDataSource               $rubricMapper
      * @param ProfessionalDevelopment\Mapper $pdMapper
      * @param UserMapper                     $userMapper
      */
     public function __construct(
         Error\Mapper $errorMapper,
         Specification\Mapper $courseSpecificationMapper,
-        Rubric\RubricMapper $rubricMapper,
+        RubricDataSource $rubricMapper,
         ProfessionalDevelopment\Mapper $pdMapper,
         UserMapper $userMapper
     ) {
@@ -96,8 +98,8 @@ class Controller extends Base
         $selector = new Selector(
             Acquisition::NESA_COURSE_SPEC_ID,
             Specification\Unit\Mapper::getInstance(),
-            Rubric\CriterionMapper::getInstance(),
-            Rubric\DescriptorMapper::getInstance()
+            RubricIndicatorMapper::getInstance(),
+            RubricDescriptorMapper::getInstance()
         );
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@helpNesa/selector.twig', [
@@ -117,7 +119,7 @@ class Controller extends Base
     {
         $start = microtime(true);
 
-        /** @var DataModel\MapperProxy $assessmentMapperProxy */
+        /** @var AssessmentDataSource $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         $report = (new Report(
@@ -158,7 +160,7 @@ class Controller extends Base
      */
     public function postNesaCsv()
     {
-        /** @var DataModel\MapperProxy $assessmentMapperProxy */
+        /** @var AssessmentDataSource $assessmentMapperProxy */
         $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
 
         $report = (new Report(

@@ -8,11 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
 use InvalidArgumentException;
-use function preg_match;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use UnexpectedValueException;
+use function preg_match;
 
 /**
  * Responsible for mapping between a filter selection key and a capability id and optional indicator id
@@ -37,11 +37,11 @@ class Codec
 
 
     /**
-     * @param Group $capability
+     * @param CapabilityModel $capability
      * @return string
      * @throws InvalidArgumentException If capability ID not set
      */
-    public function encodeCapability(Group $capability): string
+    public function encodeCapability(CapabilityModel $capability): string
     {
         if (!$capability->getId()) {
             throw new InvalidArgumentException('Capability ID must be set');
@@ -51,17 +51,17 @@ class Codec
 
 
     /**
-     * @param Criterion $indicator
+     * @param IndicatorModel $indicator
      * @return string
      * @throws InvalidArgumentException If capability or indicator ID not set
      */
-    public function encodeIndicator(Criterion $indicator): string
+    public function encodeIndicator(IndicatorModel $indicator): string
     {
         if (!$indicator->getId()) {
             throw new InvalidArgumentException('Indicator ID must be set');
         }
 
-        return "{$this->encodeCapability($indicator->getGroup())}i{$indicator->getId()}";
+        return "{$this->encodeCapability($indicator->getCapability())}i{$indicator->getId()}";
     }
 
 

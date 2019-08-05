@@ -34,7 +34,7 @@ class Factory
 
 
     /**
-     * Port of `\Schoolbox\Assessment\Rubric\Criteria\Controller` methods used
+     * Port of `\Schoolbox\Assessment\Rubric\Manager\Controller` methods used
      * for creating a rowset for saving.
      *
      * Does not attempt to validate if the rowset is actually saveable.

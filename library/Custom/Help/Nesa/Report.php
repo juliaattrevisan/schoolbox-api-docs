@@ -13,19 +13,19 @@
  */
 namespace Custom\Help\Nesa;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\Assessment\DataModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\UserMapper;
 
 class Report
 {
     /**
-     * @var DataModel\MapperProxy
+     * @var AssessmentDataSource
      */
     private $assessmentMapperProxy;
 
     /**
-     * @var Rubric\RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -37,13 +37,13 @@ class Report
     /**
      * Report constructor.
      *
-     * @param DataModel\MapperProxy $assessmentMapperProxy
-     * @param Rubric\RubricMapper   $rubricMapper
-     * @param UserMapper            $userMapper
+     * @param AssessmentDataSource $assessmentMapperProxy
+     * @param RubricDataSource     $rubricMapper
+     * @param UserMapper           $userMapper
      */
     public function __construct(
-        DataModel\MapperProxy $assessmentMapperProxy,
-        Rubric\RubricMapper $rubricMapper,
+        AssessmentDataSource $assessmentMapperProxy,
+        RubricDataSource $rubricMapper,
         UserMapper $userMapper
     ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;

@@ -7,39 +7,39 @@
 
 namespace Schoolbox\Learning\Grades;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
-use function func_get_args;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
+use ReflectionException;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Page as FilterPage;
+use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Markbook\Markbook;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-use Schoolbox\Assessment\Term;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group as GradeGroup;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Filter;
-use Schoolbox\Filter\Page as FilterPage;
-use Schoolbox\Filter\Selection as FilterSelection;
-use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
-use Schoolbox\Learning\Assessment\DueWork;
-use \Schoolbox\Learning\Assessment\WorkType;
-use Alaress\Database\Predicate\InvalidColumnException;
-use LogicException;
 use TypeError;
 use UnexpectedValueException;
-use DomainException;
-use InvalidArgumentException;
-use ReflectionException;
+use function func_get_args;
 
 class Controller extends Base
 {
@@ -65,7 +65,7 @@ class Controller extends Base
     private $assessmentMapperProxy;
 
     /**
-     * @var RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -92,7 +92,7 @@ class Controller extends Base
      * @param Folder\Mapper                    $folderMapper
      * @param Term\Mapper                      $termMapper
      * @param GradeGroup\Model                 $defaultGradeGroup
-     * @param RubricMapper                     $rubricMapper
+     * @param RubricDataSource                 $rubricMapper
      * @param FilterSelection\Mapper           $filterSelectionMapper
      * @param Access                           $access
      * @param AssessmentFilters\IdFinder       $assessmentIdFinder
@@ -103,7 +103,7 @@ class Controller extends Base
         Folder\Mapper $folderMapper,
         Term\Mapper $termMapper,
         GradeGroup\Model $defaultGradeGroup,
-        RubricMapper $rubricMapper,
+        RubricDataSource $rubricMapper,
         FilterSelection\Mapper $filterSelectionMapper,
         Access $access,
         AssessmentFilters\IdFinder $assessmentIdFinder,

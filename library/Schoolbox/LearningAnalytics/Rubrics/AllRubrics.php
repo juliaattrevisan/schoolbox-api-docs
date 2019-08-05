@@ -7,10 +7,10 @@
 
 namespace Schoolbox\LearningAnalytics\Rubrics;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
-use Schoolbox\Assessment\Term;
 
 class AllRubrics
 {
@@ -44,7 +44,7 @@ class AllRubrics
      */
     public function __construct(GenericCollection $unitImplementations, Term\Model $term)
     {
-        $rubricMapper = RubricMapper::getInstance();
+        $rubricMapper = RubricDataSource::getInstance();
 
         $folderIds = $unitImplementations->map(function (UnitImplementation\Model $unitImpl) {
             return $unitImpl->getFolder()->getId();
@@ -59,8 +59,8 @@ class AllRubrics
             }
         }
 
-        $studentRubricMarks = $rubricMapper->getStudentMarksByCriteriaInFolder($folderIds, $term);
-        $allCriteria        = $rubricMapper->getAvailableCriteria($folderIds);
+        $studentRubricMarks = $rubricMapper->getStudentMarksByIndicatorInFolder($folderIds, $term);
+        $allCriteria        = $rubricMapper->getAvailableIndicators($folderIds);
 
         // Aggregate criteria by grouping+name
         $rubricData = [];

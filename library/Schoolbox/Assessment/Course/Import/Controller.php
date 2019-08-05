@@ -8,32 +8,32 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
-use Alaress\Web\Controller as Base;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Web\Controller as Base;
+use Component_ConfigDefinition;
+use Component_ConfigDefinitionMapper;
+use Component_ConfigMapper;
+use Component_Definition;
 use Component_Instance;
+use Component_InstanceMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpecification;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller as HomepageOutlineComponentController;
-use Component_Definition;
-use Component_InstanceMapper;
-use Component_ConfigDefinition;
-use Component_ConfigDefinitionMapper;
-use Component_ConfigMapper;
-use Schoolbox\Learning\Assessment\Replicator;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 
 class Controller extends Base\Base
 {
@@ -1125,14 +1125,14 @@ class Controller extends Base\Base
      */
     private function copyCriteria(array $sourceIds, int $destinationId): self
     {
-        $criteriaMapper = CriterionMapper::getInstance();
+        $criteriaMapper = Mapper::getInstance();
 
         // Save copy of criteria with class page as parent
         foreach ($criteriaMapper->findForFolder($sourceIds) as $criteria) {
             $criteriaMapper->findOrCreateOneForFolderByKey(
                 $destinationId,
                 $criteria->getName(),
-                $criteria->getGroup()->getName(),
+                $criteria->getCapability()->getName(),
                 false
             );
         }

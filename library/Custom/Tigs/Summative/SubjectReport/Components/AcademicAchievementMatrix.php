@@ -8,20 +8,20 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Alaress\Authorizer\Authorizer;
-use Custom\Tigs\Summative\SubjectReport\BaseComponent;
+use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
+use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
-use Schoolbox\Learning\Assessment\DueWork;
-use Aura\Router;
 use Schoolbox\Resource\Folder;
+use Schoolbox\User;
 
 /**
  * Builds a suitable data structure for rendering the AAM components
@@ -44,7 +44,7 @@ class AcademicAchievementMatrix extends BaseComponent
     /** @var int */
     private $aamWorkTypeId;
 
-    /** @var RubricMapper */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var Authorizer */
@@ -62,7 +62,7 @@ class AcademicAchievementMatrix extends BaseComponent
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param int               $aamWorkTypeId
-     * @param RubricMapper      $rubricMapper
+     * @param RubricDataSource  $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
      * @param string|null       $roleTypeOverride
@@ -76,7 +76,7 @@ class AcademicAchievementMatrix extends BaseComponent
         Visibility $visibility,
         User $viewer,
         int $aamWorkTypeId,
-        RubricMapper $rubricMapper,
+        RubricDataSource $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router,
         ?string $roleTypeOverride

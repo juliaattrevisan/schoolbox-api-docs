@@ -11,11 +11,10 @@
 
 namespace Custom\Help\Nesa;
 
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\DescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as RubricDescriptorModel;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class Selector
 {
@@ -30,12 +29,12 @@ class Selector
     private $unitSpecificationMapper;
 
     /**
-     * @var CriterionMapper
+     * @var RubricIndicatorMapper
      */
     private $criterionMapper;
 
     /**
-     * @var DescriptorMapper
+     * @var RubricDescriptorMapper
      */
     private $rubricDescriptorMapper;
 
@@ -44,14 +43,14 @@ class Selector
      *
      * @param int                     $courseSpecificationId The Teacher Course upon which we report
      * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param CriterionMapper         $criterionMapper
-     * @param DescriptorMapper $rubricDescriptorMapper
+     * @param RubricIndicatorMapper   $criterionMapper
+     * @param RubricDescriptorMapper  $rubricDescriptorMapper
      */
     public function __construct(
         int $courseSpecificationId,
         UnitSpecificationMapper $unitSpecificationMapper,
-        CriterionMapper $criterionMapper,
-        DescriptorMapper $rubricDescriptorMapper
+        RubricIndicatorMapper $criterionMapper,
+        RubricDescriptorMapper $rubricDescriptorMapper
     ) {
         $this->courseSpecificationId = $courseSpecificationId;
         $this->unitSpecificationMapper = $unitSpecificationMapper;
@@ -62,7 +61,7 @@ class Selector
     /**
      * Generate a list of descriptors that were specified in the course $courseSpecificationId
      *
-     * @return Rubric\Descriptor[]|\Schoolbox\GenericCollection
+     * @return RubricDescriptorModel[]|\Schoolbox\GenericCollection
      */
     public function generate()
     {
@@ -92,7 +91,7 @@ class Selector
             $criterionIds[] = $currentSpecCrit->getId();
         }
 
-        $allSpecDescriptors = $this->rubricDescriptorMapper->findByColumn('criterion_id', $criterionIds);
+        $allSpecDescriptors = $this->rubricDescriptorMapper->findByColumn('rubric_indicator_id', $criterionIds);
 
         /* $allSpecDescriptors is now a list of all the descriptors used in the course spec.
          * From here we can choose which descriptors we want to include in the report
@@ -104,7 +103,7 @@ class Selector
         $deduped = [];
 
         foreach ($allSpecDescriptors as $descriptorId => $current) {
-            $index = "{$current->getDescription()}{$current->getCriterion()->getName()}{$current->getCriterion()->getGroup()->getName()}";
+            $index = "{$current->getDescription()}{$current->getIndicator()->getName()}{$current->getIndicator()->getCapability()->getName()}";
 
             /* Mark it as seen so we can ignore it later
              */

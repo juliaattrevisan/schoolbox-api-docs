@@ -9,8 +9,8 @@ namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
 
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
 
@@ -38,46 +38,46 @@ class CodecTest extends TestCase
 
 
     /**
-     * @param Group $capability
+     * @param CapabilityModel $capability
      * @dataProvider providerEncodeInvalidCapability
      * @expectedException InvalidArgumentException
      */
-    public function testEncodeInvalidCapability(Group $capability): void
+    public function testEncodeInvalidCapability(CapabilityModel $capability): void
     {
         self::$codec->encodeCapability($capability);
     }
 
 
     /**
-     * @param Group  $capability
-     * @param string $expected
+     * @param CapabilityModel $capability
+     * @param string          $expected
      * @dataProvider providerEncodeCapability
      * @throws InvalidArgumentException
      */
-    public function testEncodeCapability(Group $capability, string $expected): void
+    public function testEncodeCapability(CapabilityModel $capability, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeCapability($capability));
     }
 
 
     /**
-     * @param Criterion $indicator
+     * @param IndicatorModel $indicator
      * @dataProvider providerEncodeInvalidIndicator
      * @expectedException InvalidArgumentException
      */
-    public function testEncodeInvalidIndicator(Criterion $indicator): void
+    public function testEncodeInvalidIndicator(IndicatorModel $indicator): void
     {
         self::$codec->encodeIndicator($indicator);
     }
 
 
     /**
-     * @param Criterion $indicator
-     * @param string    $expected
+     * @param IndicatorModel $indicator
+     * @param string         $expected
      * @dataProvider providerEncodeIndicator
      * @throws InvalidArgumentException
      */
-    public function testEncodeIndicator(Criterion $indicator, string $expected): void
+    public function testEncodeIndicator(IndicatorModel $indicator, string $expected): void
     {
         $this->assertSame($expected, self::$codec->encodeIndicator($indicator));
     }
@@ -141,9 +141,9 @@ class CodecTest extends TestCase
     public function providerEncodeCapability(): array
     {
         return [
-            [(new Group())->setId(1), 'c1',],
-            [(new Group())->setId(100), 'c100',],
-            [(new Group())->setId('999'), 'c999',],
+            [(new CapabilityModel())->setId(1), 'c1',],
+            [(new CapabilityModel())->setId(100), 'c100',],
+            [(new CapabilityModel())->setId('999'), 'c999',],
         ];
     }
 
@@ -158,7 +158,7 @@ class CodecTest extends TestCase
             $capability = clone $validCapability;
             foreach ($this->invalidIndicators() as $invalidIndicator) {
                 $indicator = clone $invalidIndicator;
-                $indicator->setGroup($capability);
+                $indicator->setCapability($capability);
                 $data[] = [$indicator];
             }
         }
@@ -168,7 +168,7 @@ class CodecTest extends TestCase
             $capability = clone $invalidCapability;
             foreach ($this->validIndicators() as $validIndicator) {
                 $indicator = clone $validIndicator;
-                $indicator->setGroup($capability);
+                $indicator->setCapability($capability);
                 $data[] = [$indicator];
             }
         }
@@ -180,11 +180,11 @@ class CodecTest extends TestCase
     public function providerEncodeIndicator(): array
     {
         return [
-            [(new Criterion())->setGroup((new Group())->setId(1))->setId(1), 'c1i1',],
-            [(new Criterion())->setGroup((new Group())->setId(1))->setId(100), 'c1i100',],
-            [(new Criterion())->setGroup((new Group())->setId(1))->setId(999), 'c1i999',],
-            [(new Criterion())->setGroup((new Group())->setId(100))->setId(100), 'c100i100',],
-            [(new Criterion())->setGroup((new Group())->setId(999))->setId(999), 'c999i999',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(1), 'c1i1',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(100), 'c1i100',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(1))->setId(999), 'c1i999',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(100))->setId(100), 'c100i100',],
+            [(new IndicatorModel())->setCapability((new CapabilityModel())->setId(999))->setId(999), 'c999i999',],
         ];
     }
 
@@ -241,51 +241,51 @@ class CodecTest extends TestCase
 
 
     /**
-     * @return Group[]
+     * @return CapabilityModel[]
      */
     private function invalidCapabilities(): array
     {
         return [
-            new Group(),
-            (new Group())->setId(null),
+            new CapabilityModel(),
+            (new CapabilityModel())->setId(null),
         ];
     }
 
 
     /**
-     * @return Group[]
+     * @return CapabilityModel[]
      */
     private function validCapabilities(): array
     {
         return [
-            (new Group())->setId(1),
-            (new Group())->setId(100),
-            (new Group())->setId('999'),
+            (new CapabilityModel())->setId(1),
+            (new CapabilityModel())->setId(100),
+            (new CapabilityModel())->setId('999'),
         ];
     }
 
 
     /**
-     * @return Criterion[]
+     * @return IndicatorModel[]
      */
     private function invalidIndicators(): array
     {
         return [
-            new Criterion(),
-            (new Criterion())->setId(null),
+            new IndicatorModel(),
+            (new IndicatorModel())->setId(null),
         ];
     }
 
 
     /**
-     * @return Criterion[]
+     * @return IndicatorModel[]
      */
     private function validIndicators(): array
     {
         return [
-            (new Criterion())->setId(1),
-            (new Criterion())->setId(100),
-            (new Criterion())->setId('999'),
+            (new IndicatorModel())->setId(1),
+            (new IndicatorModel())->setId(100),
+            (new IndicatorModel())->setId('999'),
         ];
     }
 }

@@ -8,20 +8,18 @@ declare(strict_types=1);
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use Alaress\Authorizer\Authorizer;
-use Custom\Tigs\Summative\SubjectReport\BaseComponent;
+use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
+use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Visibility;
-use Schoolbox\User;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
-use Aura\Router;
 use Schoolbox\Resource\Folder;
-use UnexpectedValueException;
+use Schoolbox\User;
 
 /**
  * Responsible for generating data that can be used by a template to render the
@@ -45,7 +43,7 @@ class AcademicAchievementSummary extends BaseComponent
     /** @var int */
     private $aasWorkTypeId;
 
-    /** @var RubricMapper */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var Authorizer */
@@ -63,7 +61,7 @@ class AcademicAchievementSummary extends BaseComponent
      * @param Visibility        $visibility
      * @param User              $viewer
      * @param int               $aasWorkTypeId
-     * @param RubricMapper      $rubricMapper
+     * @param RubricDataSource  $rubricMapper
      * @param Authorizer        $authorizer
      * @param Router\Router     $router
      * @param string|null       $roleTypeOverride
@@ -77,7 +75,7 @@ class AcademicAchievementSummary extends BaseComponent
         Visibility $visibility,
         User $viewer,
         int $aasWorkTypeId,
-        RubricMapper $rubricMapper,
+        RubricDataSource $rubricMapper,
         Authorizer $authorizer,
         Router\Router $router,
         ?string $roleTypeOverride

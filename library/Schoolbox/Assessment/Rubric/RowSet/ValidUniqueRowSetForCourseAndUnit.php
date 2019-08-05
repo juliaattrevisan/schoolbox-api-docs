@@ -8,7 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Rubric\RowSet;
 
 use Alaress\Specification\Base;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use TypeError;
@@ -38,7 +38,7 @@ class ValidUniqueRowSetForCourseAndUnit extends Base
 
 
     /**
-     * @var RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -48,12 +48,12 @@ class ValidUniqueRowSetForCourseAndUnit extends Base
      *
      * @param RosettaStone            $translator
      * @param UnitSpecificationMapper $unitSpecMapper
-     * @param RubricMapper            $rubricMapper
+     * @param RubricDataSource        $rubricMapper
      */
     public function __construct(
         RosettaStone $translator,
         UnitSpecificationMapper $unitSpecMapper,
-        RubricMapper $rubricMapper
+        RubricDataSource $rubricMapper
     ) {
         $this->translator     = $translator;
         $this->unitSpecMapper = $unitSpecMapper;
@@ -129,7 +129,7 @@ class ValidUniqueRowSetForCourseAndUnit extends Base
                 foreach ($units as $unit) {
                     $unitName = $unit['unitName'];
                     $folderId = $unit['folderId'];
-                    $errorMessage .= sprintf("<li><a href='/rubric/criteria/%s'>%s</a></li>",
+                    $errorMessage .= sprintf("<li><a href='/rubric/manager/%s'>%s</a></li>",
                         \Scrub::text($folderId),
                         \Scrub::text($unitName)
                     );

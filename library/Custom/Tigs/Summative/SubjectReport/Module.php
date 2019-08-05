@@ -9,26 +9,26 @@ namespace Custom\Tigs\Summative\SubjectReport;
 
 use Alaress;
 use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Alaress\Authorizer\Rule;
 use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\ParticipationReport\FolderFetcher;
 use Custom\Tigs\Summative\StudentAttributes;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use InvalidArgumentException;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Permission\Access\Access;
-use Schoolbox\Role;
-use Schoolbox\UserMapper;
-use InvalidArgumentException;
-use UnexpectedValueException;
 use Schoolbox\Mapper;
-use Schoolbox\User;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Textbox;
+use Schoolbox\Role;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 class Module extends Alaress\Module\Module
 {
@@ -89,7 +89,7 @@ class Module extends Alaress\Module\Module
         $injector->params[Controller::class] = [
             'externalUser'          => $injector->lazyGet('externalUser'),
             'assessmentMapperProxy' => $injector->get('assessmentDataSource'),
-            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
             'textboxMapper'         => $this->getMapperFactory()->getLazy(Textbox\Mapper::class),
             'visibility'            => $injector->lazy(function () {
                 /** @var Access $access */

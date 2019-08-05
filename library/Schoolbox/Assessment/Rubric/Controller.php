@@ -12,14 +12,14 @@ use Alaress\Json\Decorator\LinkDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress\Web\Template\DebugTwig;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Capability;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Rubric\Grid\Exporter\ArrayExporter;
 use Schoolbox\Assessment\Rubric\Grid\Factory as GridFactory;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Assessment\Rubric\Grid\Level;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -29,7 +29,7 @@ use Url;
 class Controller extends BaseController
 {
     /**
-     * @var RubricMapper
+     * @var RubricDataSource
      */
     private $mapper;
 
@@ -47,38 +47,47 @@ class Controller extends BaseController
 
 
     /**
-     * @var GroupMapper
+     * @var Capability\Mapper
      */
     private $groupMapper;
 
 
     /**
-     * @var CriterionMapper
+     * @var Indicator\Mapper
      */
     private $criterionMapper;
 
 
     /**
+     * @var RosettaStone
+     */
+    private $rosettaStone;
+
+
+    /**
      * Constructor
      *
-     * @param RubricMapper         $mapper
+     * @param RubricDataSource     $mapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param FolderMapper         $folderMapper
-     * @param GroupMapper          $groupMapper
-     * @param CriterionMapper      $criterionMapper
+     * @param Capability\Mapper    $groupMapper
+     * @param Indicator\Mapper     $criterionMapper
+     * @param RosettaStone         $rosettaStone
      */
     public function __construct(
-        RubricMapper $mapper,
+        RubricDataSource $mapper,
         AssessmentDataSource $assessmentDataSource,
         FolderMapper $folderMapper,
-        GroupMapper $groupMapper,
-        CriterionMapper $criterionMapper
+        Capability\Mapper $groupMapper,
+        Indicator\Mapper $criterionMapper,
+        RosettaStone $rosettaStone
     ) {
         $this->mapper               = $mapper;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->folderMapper         = $folderMapper;
         $this->groupMapper          = $groupMapper;
         $this->criterionMapper      = $criterionMapper;
+        $this->rosettaStone         = $rosettaStone;
     }
 
 
@@ -133,7 +142,11 @@ class Controller extends BaseController
             $groupName  = $post->get('groupName');
             $critName   = $post->get('name');
             if(!$groupName){
-                $this->sendJSONError('Must supply a Group for new Criterion');
+                $this->sendJSONError(
+                    $this->rosettaStone->translateSentence(
+                        'Must supply {:rubricGroup|indef} {:rubricGroup} for new {:rubricCriterion}'
+                    )
+                );
                 return;
             }
 
@@ -144,22 +157,29 @@ class Controller extends BaseController
             if ($groupId) {
                 $groupModel = $this->groupMapper->findById($groupId);
                 // Surely this capability is in a folder?
-                if ($groupModel->getParentType() !== Group::PARENT_TYPE_CATEGORY) {
-                    $this->sendJSONError('May only create folder-level indicators');
+                if ($groupModel->getParentType() !== Capability\Model::PARENT_TYPE_CATEGORY) {
+                    $this->sendJSONError(
+                        $this->rosettaStone->translateSentence(
+                            'May only create folder-level {:rubricCriterion|p}'
+                        )
+                    );
                     return;
                 }
                 $folderId = $groupModel->getParentId();
             }
 
-            $criterionModels = $this->criterionMapper->findByColumn('rubric_group_id', $groupId);
-            $proposedGroup   = $this->mapper->normaliseForComparison($groupName);
-            $proposedName    = $this->mapper->normaliseForComparison($critName);
+            $criterionModels = $this->criterionMapper->findByColumn('rubric_capability_id', $groupId);
+            $proposedGroup   = Util::normalizeName($groupName);
+            $proposedName    = Util::normalizeName($critName);
             foreach ($criterionModels as $criterionModel) {
-                $normGroup = $this->mapper->normaliseForComparison($criterionModel->getGroup()->getName());
-                $normName  = $this->mapper->normaliseForComparison($criterionModel->getName());
+                $normGroup = Util::normalizeName($criterionModel->getCapability()->getName());
+                $normName  = Util::normalizeName($criterionModel->getName());
                 if ($normGroup === $proposedGroup && $normName === $proposedName){
-                    // TODO localise!!!!!
-                    $this->sendJSONError("Indicator already exists in this Group");
+                    $this->sendJSONError(
+                        $this->rosettaStone->translateSentence(
+                            '{:rubricCriterion|c} already exists in this {:rubricGroup}'
+                        )
+                    );
                     return;
                 }
             }
@@ -172,7 +192,7 @@ class Controller extends BaseController
             );
 
             $group = (new \Schoolbox\Assessment\Rubric\RowSet\Capability())
-                ->setId($criterionModel->getGroup()->getId())
+                ->setId($criterionModel->getCapability()->getId())
                 ->setName($groupName);
 
             // Don't have to save anything yet
@@ -202,12 +222,15 @@ class Controller extends BaseController
 
             // Ensure the proposed Group name is not already in use.
             $groupModels = $this->groupMapper->findForFolder($folderId);
-            $proposed    = $this->mapper->normaliseForComparison($groupName);
+            $proposed    = Util::normalizeName($groupName);
             foreach ($groupModels as $groupModel) {
-                $grouping = $this->mapper->normaliseForComparison($groupModel->getName());
+                $grouping = Util::normalizeName($groupModel->getName());
                 if ($proposed === $grouping) {
-                    // TODO localise
-                    $this->sendJSONError("Group name already exists in this context");
+                    $this->sendJSONError(
+                        $this->rosettaStone->translateSentence(
+                            '{:rubricGroup|c} name already exists in this context'
+                        )
+                    );
                     return;
                 }
             }

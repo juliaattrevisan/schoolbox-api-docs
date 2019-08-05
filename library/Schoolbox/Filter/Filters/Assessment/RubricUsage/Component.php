@@ -7,20 +7,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
 
-use function array_merge;
 use InvalidArgumentException;
 use ReflectionException;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Group;
+use function array_merge;
 
 class Component extends Filter\BaseComponent
 {
     /** @var Codec */
     private $codec;
 
-    /** @var GenericCollection|Group[] */
+    /** @var GenericCollection|CapabilityModel[] */
     private $capabilities;
 
     /** @var bool */
@@ -45,7 +45,7 @@ class Component extends Filter\BaseComponent
      * @param null|GenericCollection|Filter\Selection\Model[] $urlOverrides
      * @param Filter\Selection\Mapper                         $filterSelectionMapper
      * @param Codec                                           $codec
-     * @param null|GenericCollection|Group[]                  $capabilities
+     * @param null|GenericCollection|CapabilityModel[]        $capabilities
      * @param bool                                            $showCapabilities
      * @param bool                                            $showIndicators
      * @throws InvalidArgumentException If neither $capabilities or $indicators are supplied
@@ -65,7 +65,7 @@ class Component extends Filter\BaseComponent
     ) {
         parent::__construct($definition, $user, $pageFilter, $userSelections, $urlOverrides, $filterSelectionMapper);
 
-        if (!$capabilities->isCollectionOf(Group::class)) {
+        if (!$capabilities->isCollectionOf(CapabilityModel::class)) {
             throw new InvalidArgumentException("Capability collection is of wrong type. Found: '{$capabilities->getElementClass()}'");
         }
 

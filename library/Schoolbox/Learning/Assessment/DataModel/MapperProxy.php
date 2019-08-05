@@ -7,12 +7,18 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Database\Predicate\Builder;
+use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Database\Predicate\SqlFunc\Coalesce;
 use Alaress_Date_Format;
+use DomainException;
+use InvalidArgumentException;
+use LogicException;
+use PDOException;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -28,20 +34,15 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImpleme
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
-use UnderflowException;
-use Schoolbox\Mapper\DefinitionException;
-use DomainException;
-use UnexpectedValueException;
-use Alaress\Database\Predicate\InvalidColumnException;
 use TypeError;
-use PDOException;
-use LogicException;
-use InvalidArgumentException;
+use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -820,7 +821,7 @@ class MapperProxy
             $dueWork = $assessable;
             if ($dueWork->getUseRubric()) {
                 // Rubric involved? Save the due work, and then persist rubric
-                $rubricMapper = SubmissionBox\Rubric\RubricMapper::getInstance();
+                $rubricMapper = RubricDataSource::getInstance();
 
                 // Need to compare the previously existing grid with the newly
                 // saved one, for invalidation purposes

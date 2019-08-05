@@ -8,28 +8,28 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
+use Component_ConfigDefinitionMapper;
+use Component_ConfigMapper;
+use Component_DefinitionMapper;
+use Component_InstanceMapper;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
+use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Mapper\Exception as MapperException;
-use Twig_Error_Loader;
-use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
-use \Component_DefinitionMapper;
-use \Component_InstanceMapper;
-use \Component_ConfigDefinitionMapper;
-use \Component_ConfigMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
-use Schoolbox\Learning\Assessment\Replicator;
-use Schoolbox\Learning\Assessment\Component\Homepage\Outline;
+use Twig_Error_Loader;
 
 class Module extends \Alaress\Module\Module
 {
@@ -106,7 +106,7 @@ class Module extends \Alaress\Module\Module
                 'replicator'                      => $injector->lazyNew(Replicator::class, [
                     'assessmentMapperProxy' => $injector->lazyGet('assessmentDataSource'),
                     'quizMapper'            => $this->getMapperFactory()->getLazy(QuizMapper::class),
-                    'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricMapper::class),
+                    'rubricMapper'          => $this->getMapperFactory()->getLazy(RubricDataSource::class),
                 ]),
                 'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
             ])

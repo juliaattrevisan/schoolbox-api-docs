@@ -7,26 +7,26 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use PDOException;
 use RangeException;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
+use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\DueWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Alaress_Date_Format;
-use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use UnexpectedValueException;
 
 class Controller extends Base
@@ -47,7 +47,7 @@ class Controller extends Base
     /** @var UserMapper */
     protected $userMapper;
 
-    /** @var Rubric\RubricMapper */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var ReturnedWorkMapper */
@@ -64,7 +64,7 @@ class Controller extends Base
      * @param AssessmentDataSource  $assessmentDataSource
      * @param ResponseDataSource    $responseDataSource
      * @param UserMapper            $userMapper
-     * @param Rubric\RubricMapper   $rubricMapper
+     * @param RubricDataSource      $rubricMapper
      * @param ReturnedWorkMapper    $returnedWorkMapper
      * @param Plagscan\Mapper       $plagscanMapper
      */
@@ -74,7 +74,7 @@ class Controller extends Base
         AssessmentDataSource $assessmentDataSource,
         ResponseDataSource $responseDataSource,
         UserMapper $userMapper,
-        Rubric\RubricMapper $rubricMapper,
+        RubricDataSource $rubricMapper,
         ReturnedWorkMapper $returnedWorkMapper,
         Plagscan\Mapper $plagscanMapper
     ) {

@@ -586,7 +586,7 @@ class IdFinder extends Filter\AbstractIdFinder
             // We need to examine, usage, how should we join?
             $otherAssessmentTypes = $aTypes && ($aTypes->count() > 1 || !$aTypes->keyExists(AssessmentType\Definition::KEY_DUE_WORK));
             $joinType             = $otherAssessmentTypes ? 'LEFT' : 'INNER';
-            $join                 = "$joinType JOIN rubric_group_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id";
+            $join                 = "$joinType JOIN rubric_capability_usage rgu ON $dueWorkAlias.id = rgu.submission_box_id";
         }
 
         $pb    = $this->getMapper()->getPredicateBuilder();
@@ -606,7 +606,7 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         foreach(array_unique($capabilityIds) as $uniqueCapId) {
-            $pb->equals('rgu.rubric_group_id', $uniqueCapId);
+            $pb->equals('rgu.rubric_capability_id', $uniqueCapId);
         }
 
         return [$join, '(' . implode(' OR ', $pb->getWhere()) . ')', $pb->getParams()];
@@ -645,10 +645,10 @@ class IdFinder extends Filter\AbstractIdFinder
         }
 
         if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_ON)) {
-            $pb->isTrue("$dueWorkAlias.rubric_group_marks");
+            $pb->isTrue("$dueWorkAlias.rubric_mark_per_capability");
         }
         if ($markPerCap->keyExists(MarkPerCap\Definition::KEY_OFF)) {
-            $pb->isFalse("$dueWorkAlias.rubric_group_marks");
+            $pb->isFalse("$dueWorkAlias.rubric_mark_per_capability");
         }
 
         return ['('. implode(' OR ', $pb->getWhere()) . ')'];

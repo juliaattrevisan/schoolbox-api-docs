@@ -8,16 +8,15 @@ namespace Custom\Help\Nesa;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use \Alaress\Twig\Loader\IChainLoader;
 
 
 class Module extends BaseModule
@@ -73,7 +72,7 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'courseSpecificationMapper' => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),
-            'rubricMapper' => $this->getMapperFactory()->getLazy(RubricMapper::class),
+            'rubricMapper' => $this->getMapperFactory()->getLazy(RubricDataSource::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class),
             'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class)
         ];

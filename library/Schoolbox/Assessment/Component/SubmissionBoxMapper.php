@@ -16,7 +16,7 @@ use PDOStatement;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\ActivityFactory;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
+use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
@@ -58,7 +58,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
         $this->uses('weight', self::TYPE_INTEGER); // TODO deprecated, lives on `assessment` table now
         $this->uses('max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
-        $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedPerRubricGroup');
+        $this->uses('rubric_mark_per_capability', self::TYPE_BOOLEAN, null, 'markedPerCapability');
         $this->uses('rubric_mark_range', self::TYPE_BOOLEAN, null, 'markedUsingRange');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
         $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
@@ -189,7 +189,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper
      */
     public function softDeleteRubricLevels(SubmissionBox $dueWork)
     {
-        Rubric\LevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
+        RubricLevelMapper::getInstance()->deleteByColumn('box_id', $dueWork->getId());
         return true;
     }
 

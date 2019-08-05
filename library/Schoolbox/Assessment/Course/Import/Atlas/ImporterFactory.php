@@ -9,12 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Component_InstanceMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper as RubricCriterionMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\GroupMapper as RubricGroupMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api\Attachment;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricGroupMapper;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricCriterionMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
@@ -62,7 +62,7 @@ class ImporterFactory
 
 
     /**
-     * @var RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
@@ -74,14 +74,14 @@ class ImporterFactory
      * @param IConfigLoader        $config
      * @param MapperFactory        $mapperFactory
      * @param AssessmentDataSource $assessmentDataSource
-     * @param RubricMapper         $rubricMapper
+     * @param RubricDataSource     $rubricMapper
      */
     public function __construct(
         User $user,
         IConfigLoader $config,
         MapperFactory $mapperFactory,
         AssessmentDataSource $assessmentDataSource,
-        RubricMapper $rubricMapper
+        RubricDataSource $rubricMapper
     ) {
         // I'm aware that passing a DI container (which the mapper factory
         // effectively is) is an anti-pattern, but is it less of one than

@@ -10,9 +10,9 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
-use Schoolbox\Assessment\Rubric\Module;
-use Schoolbox\Assessment\Rubric\Criteria\Module as CriteriaModule;
+use Schoolbox\Assessment\Rubric\Manager\Module as ManagerModule;
 use Schoolbox\Assessment\Rubric\Markbook\Module as RubricMarkbookModule;
+use Schoolbox\Assessment\Rubric\Module;
 
 class Rubric implements ModuleConfigInterface
 {
@@ -29,8 +29,8 @@ class Rubric implements ModuleConfigInterface
         $module = new Module($di);
         $module->init('/rubric');
 
-        $module = new CriteriaModule($di);
-        $module->init('/rubric/criteria');
+        $module = new ManagerModule($di);
+        $module->init('/rubric/manager');
 
         $module = new RubricMarkbookModule($di);
         $module->init('/rubricMarkbook');

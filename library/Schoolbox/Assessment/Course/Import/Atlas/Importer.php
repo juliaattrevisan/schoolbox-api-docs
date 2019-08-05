@@ -9,12 +9,14 @@ declare(strict_types=1);
 namespace Schoolbox\Assessment\Course\Import\Atlas;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Import\Atlas\Api;
 use Schoolbox\Assessment\Course\Import\Atlas\AttachmentHandler\IAttachmentHandler;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AssessmentSpecification;
 use Schoolbox\Assessment\Course\Import\Atlas\Validator\AttachmentSpecification;
+use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as RubricCapabilityMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\Grid\CapabilityUsage;
 use Schoolbox\Assessment\Rubric\Grid\Descriptor;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
@@ -94,19 +96,19 @@ class Importer
 
 
     /**
-     * @var Rubric\RubricMapper
+     * @var RubricDataSource
      */
     private $rubricMapper;
 
 
     /**
-     * @var Rubric\GroupMapper
+     * @var RubricCapabilityMapper
      */
     private $rubricCapabilityMapper;
 
 
     /**
-     * @var Rubric\CriterionMapper
+     * @var RubricIndicatorMapper
      */
     private $rubricIndicatorMapper;
 
@@ -163,9 +165,9 @@ class Importer
      * @param CourseSpecMapper       $courseSpecMapper
      * @param UnitSpecMapper         $unitSpecMapper
      * @param RoleAccessMapper       $roleAccessMapper
-     * @param Rubric\RubricMapper    $rubricMapper
-     * @param Rubric\GroupMapper     $rubricCapabilityMapper
-     * @param Rubric\CriterionMapper $rubricIndicatorMapper
+     * @param RubricDataSource       $rubricMapper
+     * @param RubricCapabilityMapper $rubricCapabilityMapper
+     * @param RubricIndicatorMapper  $rubricIndicatorMapper
      * @param AssessmentDataSource   $assessmentDataSource
      * @param NodeMapper             $nodeMapper
      * @param ErrorMapper            $errorMapper
@@ -180,9 +182,9 @@ class Importer
         CourseSpecMapper $courseSpecMapper,
         UnitSpecMapper $unitSpecMapper,
         RoleAccessMapper $roleAccessMapper,
-        Rubric\RubricMapper $rubricMapper,
-        Rubric\GroupMapper $rubricCapabilityMapper,
-        Rubric\CriterionMapper $rubricIndicatorMapper,
+        RubricDataSource $rubricMapper,
+        RubricCapabilityMapper $rubricCapabilityMapper,
+        RubricIndicatorMapper $rubricIndicatorMapper,
         AssessmentDataSource $assessmentDataSource,
         NodeMapper $nodeMapper,
         ErrorMapper $errorMapper

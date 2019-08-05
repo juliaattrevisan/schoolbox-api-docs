@@ -10,11 +10,11 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Application\Daemon;
+use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
+use Schoolbox\Filter;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\LogMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric;
-use Schoolbox\Filter;
-use Schoolbox\Application\Daemon;
 
 require __DIR__ . '/../../conf/core/require.php';
 
@@ -41,12 +41,12 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     $offendingMappers = [
         LogMapper::getInstance(),
         Filter\Selection\Mapper::getInstance(),
-        Rubric\CriterionMapper::getInstance(),
-        Rubric\DescriptorMapper::getInstance(),
-        Rubric\LevelMapper::getInstance(),
-        Rubric\DescriptorMarkMapper::getInstance(),
-        Rubric\ResultMapper::getInstance(),
-        Rubric\CriterionUsageMapper::getInstance(),
+        RubricDataModel\Indicator\Mapper::getInstance(),
+        RubricDataModel\Descriptor\Mapper::getInstance(),
+        RubricDataModel\Level\Mapper::getInstance(),
+        RubricDataModel\IndicatorMark\Mapper::getInstance(),
+        RubricDataModel\Result\Mapper::getInstance(),
+        RubricDataModel\IndicatorUsage\Mapper::getInstance(),
     ];
 
     $modelClasses = [];

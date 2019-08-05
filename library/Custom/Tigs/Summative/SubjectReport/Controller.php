@@ -21,24 +21,24 @@ use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentRank;
 use Custom\Tigs\Summative\SubjectReport\Components\HscAssessmentTasks;
 use Custom\Tigs\Summative\SubjectReport\Components\InternationalBaccalaureateGraph;
 use Custom\Tigs\Summative\SubjectReport\Components\NesaScoreGraph;
+use External_UserInterface;
 use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use PDO;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Collection;
+use Schoolbox\Filter\Filters;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\Role;
 use Schoolbox\User;
-use External_UserInterface;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
-use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnexpectedValueException;
-use Schoolbox\Filter\Filters;
-use PDO;
-use Schoolbox\Resource\Textbox;
 
 class Controller extends Web\Controller\Base
 {
@@ -52,7 +52,7 @@ class Controller extends Web\Controller\Base
     /** @var Assessment\MapperProxy */
     private $assessmentMapperProxy;
 
-    /** @var RubricMapper */
+    /** @var RubricDataSource */
     private $rubricMapper;
 
     /** @var Textbox\Mapper */
@@ -69,7 +69,7 @@ class Controller extends Web\Controller\Base
      * @param External_UserInterface $externalUser
      * @param CourseImpl\Mapper      $courseImplMapper
      * @param Assessment\MapperProxy $assessmentMapperProxy
-     * @param RubricMapper           $rubricMapper
+     * @param RubricDataSource       $rubricMapper
      * @param Textbox\Mapper         $textboxMapper
      * @param Visibility             $visibility
      * @param IConnector             $database
@@ -78,7 +78,7 @@ class Controller extends Web\Controller\Base
         External_UserInterface $externalUser,
         CourseImpl\Mapper $courseImplMapper,
         Assessment\MapperProxy $assessmentMapperProxy,
-        RubricMapper $rubricMapper,
+        RubricDataSource $rubricMapper,
         Textbox\Mapper $textboxMapper,
         Visibility $visibility,
         IConnector $database
