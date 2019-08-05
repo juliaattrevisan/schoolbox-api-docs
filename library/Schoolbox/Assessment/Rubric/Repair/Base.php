@@ -57,7 +57,15 @@ abstract class Base extends CliTool\App
 
 
     // Query for finding capabilities to repair within a folder.
-    protected const FIND_CAPABILITIES_QUERY = "
+    protected const FIND_CAPABILITIES_QUERY_V1 = "
+        SELECT id, name
+        FROM   rubric_group
+        WHERE  parent_type = 'category'
+        AND    parent_id   = :folderId
+        AND    deleted_at  IS NULL
+        ORDER BY name, id
+    ";
+    protected const FIND_CAPABILITIES_QUERY_V2 = "
         SELECT id, name
         FROM   rubric_capability
         WHERE  parent_type = 'category'
@@ -232,16 +240,15 @@ abstract class Base extends CliTool\App
      */
     private function verifyRunnable(): bool
     {
-        $this->log->notice('Verifying `rubric_capability` table exists...');
+        $this->log->notice('Checking `rubric_capability` table exists...');
         $query = $this->db->prepareQuery(self::VERIFY_RUNNABLE_QUERY);
         $query->execute();
         if ($query->rowCount() > 0) {
-            $this->log->notice('`rubric_capability` table exists: continuing');
+            $this->log->notice('`rubric_capability` table exists: running with v2 queries');
             return true;
         }
-        $this->log->warning('`rubric_capability` table does not exist: stopping');
-        $this->log->warning('(This is likely occurring due to an update that has not run yet: this will run later)');
-        return false;
+        $this->log->notice('`rubric_capability` table does not exist: running with v1 queries');
+        return true;
     }
 
 
@@ -275,7 +282,7 @@ abstract class Base extends CliTool\App
         $this->findFoldersQuery
             = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
         $this->findCapabilitiesQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY);
+            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY_V2);
     }
 
 
