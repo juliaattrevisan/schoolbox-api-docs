@@ -138,18 +138,20 @@ class Controller extends Base
      */
     public function search()
     {
-        $minQueryStringLength = User\Search\Query::MIN_SEARCH_LENGTH;
-        $result = [
-            'message' => 'Invalid argument, query string length must at least be ' . $minQueryStringLength
-        ];
-
         $keyword = $this->request->query['keyword'];
 
-        if ($keyword !== null && \strlen($keyword) >= $minQueryStringLength) {
-            $userSearchService = new User\Search\Query($this->di->get('databaseInternal'));
-            $result = $userSearchService->fetchResults($keyword);
-        } else {
-            $this->getResponse()->status->set(422);
+        if ($keyword !== null) {
+            try {
+                $userSearchService = new User\Search\Query($this->di->get('databaseInternal'));
+                $result = $userSearchService->fetchResults($keyword);
+            } catch (\Exception $exception) {
+                // noop
+                $result = [
+                    'message' => $exception->getMessage()
+                ];
+
+                $this->getResponse()->status->set(422);
+            }
         }
 
         $this->getResponse()->content->set(

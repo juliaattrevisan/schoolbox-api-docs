@@ -31,44 +31,32 @@ class Query
     /**
      * @var int
      */
-    private $limit;
-
-    /**
-     * @var int
-     */
-    private $minSearchLength;
-
-    /**
-     * @var string
-     */
-    private $sortBy;
-
-    /**
-     * @var string
-     */
-    private $sortMethod;
+    protected $limit = self::AUTOSUGGEST_LIMIT;
 
     /**
      * Query constructor.
      *
      * @param IConnector $db
-     * @param int        $limit
-     * @param int        $minSearchLength
-     * @param string     $sortBy
-     * @param string     $sortMethod
      */
-    public function __construct(
-        IConnector $db,
-        int $limit = self::AUTOSUGGEST_LIMIT,
-        int $minSearchLength = self::MIN_SEARCH_LENGTH,
-        string $sortBy = 'lastname',
-        string $sortMethod = 'ASC'
-    ) {
-        $this->db               = $db;
-        $this->limit            = $limit;
-        $this->minSearchLength  = $minSearchLength;
-        $this->sortBy           = $sortBy;
-        $this->sortMethod       = $sortMethod;
+    public function __construct(IConnector $db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @param int $limit
+     */
+    public function setLimit(int $limit): void
+    {
+        $this->limit = $limit;
     }
 
     /**
@@ -85,9 +73,12 @@ class Query
             'totalCount'    => 0,
         ];
 
-        if ($keyword !== '' && \strlen($keyword) >= $this->minSearchLength && $this->getUserIdsByKeyword($keyword)) {
-            $result['results']      = $this->getUserData($this->getUserIdsByKeyword($keyword));
-            $result['totalCount']   = $this->getTotalCount($keyword);
+        if ($keyword !== '' && \strlen($keyword) >= $this->minSearchLength) {
+            $searchString = '%' . $keyword . '%';
+            if ($this->getUserIdsByKeyword($searchString)) {
+                $result['results'] = $this->getUserData($this->getUserIdsByKeyword($searchString));
+                $result['totalCount'] = $this->getTotalCount($searchString);
+            }
         }
 
         return $result;
@@ -107,10 +98,21 @@ class Query
         foreach ($users as $key => $user) {
             $result[$key]['id']             = $user->getId();
             $result[$key]['externalId']     = $user->getExternalId();
+            $result[$key]['firstname']      = $user->getFirstname();
+            $result[$key]['lastname']       = $user->getLastname();
             $result[$key]['formattedName']  = $user->formatName();
             $result[$key]['metadata']       = $user->formatMetadata();
             $result[$key]['year']           = $user->getYear();
         }
+
+        /**
+         * Sort the result by lastname and firstname
+         */
+        array_multisort(
+           array_column($result, 'lastname'), SORT_ASC,
+            array_column($result, 'firstname'), SORT_ASC,
+            $result
+        );
 
         return $result;
     }
@@ -122,10 +124,18 @@ class Query
      */
     private function getUserIdsByKeyword(string $keyword): array
     {
-        return $this->executeQuery(
-            'SELECT id FROM user' . $this->getWhereStatement() . ' ORDER BY ' . $this->sortBy . ' ' . $this->sortMethod . ' LIMIT 0 , ' . $this->limit,
-            '%' . $keyword . '%'
-        )->fetchAll(\PDO::FETCH_COLUMN);
+        $statement = $this->db->prepareQuery(
+            'SELECT id FROM user ' . $this->getWhereStatement() .
+            ' ORDER BY firstname, lastname ASC LIMIT 0, ' . $this->limit
+        );
+
+        $statement->execute([
+            'firstAndLastName'  => $keyword,
+            'lastname'          => $keyword,
+            'username'          => $keyword
+        ]);
+
+        return $statement->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**
@@ -135,7 +145,17 @@ class Query
      */
     private function getTotalCount(string $keyword): int
     {
-        return (int) $this->executeQuery('SELECT COUNT(*) FROM user' . $this->getWhereStatement(), '%' . $keyword . '%')->fetchColumn();
+        $statement = $this->db->prepareQuery(
+            'SELECT COUNT(*) FROM user ' . $this->getWhereStatement()
+        );
+
+        $statement->execute([
+            'firstAndLastName'  => $keyword,
+            'lastname'          => $keyword,
+            'username'          => $keyword
+        ]);
+
+        return (int) $statement->fetchColumn();
     }
 
     /**
@@ -145,30 +165,16 @@ class Query
     {
         $whereStatement = ' WHERE CONCAT_WS(" ",title,firstname,lastname) LIKE :firstAndLastName 
         OR CONCAT_WS(" ",title,lastname) LIKE :lastname 
-        OR username LIKE :username AND user.deleted_at IS NULL';
+        OR username LIKE :username AND user.deleted_at IS NULL ';
 
+        /**
+         * When show_disabled_users flag is set to TRUE, disabled users will be shown in the result
+         * Otherwise, only active users will be shown
+         */
         if (!ConfigMapper::getInstance()->get('show_disabled_users')) {
             $whereStatement .= ' AND user.enabled = 1';
         }
 
         return $whereStatement;
-    }
-
-    /**
-     * @param string $queryString
-     * @param string $keyword
-     *
-     * @return \Alaress\Database\Statement\Query\IQuery
-     */
-    private function executeQuery(string $queryString, string $keyword)
-    {
-        $statement = $this->db->prepareQuery($queryString);
-        $statement->execute([
-            'firstAndLastName'  => $keyword,
-            'lastname'          => $keyword,
-            'username'          => $keyword
-        ]);
-
-        return $statement;
     }
 }
