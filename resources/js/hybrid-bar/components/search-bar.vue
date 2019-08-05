@@ -62,7 +62,7 @@
                 results: [],
                 isOpen: false,
                 isLoading: true,
-                minKeywordLenght: 3,
+                minKeywordLength: 2,
                 totalCount: 0,
                 arrowCounter: -1, // Want to automatically select the first result? set this to 0
                 paths: {
@@ -79,7 +79,7 @@
             onChange:  _.debounce(function (e) {
                 var self = this;
 
-                if (self.keyword.length >= self.minKeywordLenght) {
+                if (self.keyword.length >= self.minKeywordLength) {
                     self.isOpen = true;
                     self.isLoading = true;
                     self.results = [];

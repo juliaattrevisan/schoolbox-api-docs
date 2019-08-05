@@ -19,11 +19,6 @@ class Query
     public const AUTOSUGGEST_LIMIT = 5;
 
     /**
-     * Minimum search length before the query get's executed
-     */
-    public const MIN_SEARCH_LENGTH = 3;
-
-    /**
      * @var IConnector
      */
     private $db;
@@ -109,7 +104,7 @@ class Query
          * Sort the result by lastname and firstname
          */
         array_multisort(
-           array_column($result, 'lastname'), SORT_ASC,
+            array_column($result, 'lastname'), SORT_ASC,
             array_column($result, 'firstname'), SORT_ASC,
             $result
         );
