@@ -12,7 +12,7 @@
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
-               @keydown.ctrl.enter="onEnter"
+               @keydown.enter.prevent="onEnter"
                v-click-outside="lostFocus"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
@@ -20,7 +20,7 @@
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i">
+                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
                     <div class="card small-12">
                         <img v-bind:src="formatPortrait(result.id)">
                         <h3 class="name">{{ result.formattedName }}</h3>
@@ -94,13 +94,17 @@
             },
 
             onArrowUp: function() {
-                if (this.arrowCounter > 0) {
+                if (this.arrowCounter > -1) {
                     this.arrowCounter = this.arrowCounter - 1;
                 }
             },
 
             onEnter: function(id) {
-                this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
+                if (this.arrowCounter > 0) {
+                    this.goToPath(this.paths.userPage + this.results[this.arrowCounter].id);
+                } else {
+                    document.getElementById('search').submit();
+                }
             },
 
             lostFocus: function(event) {
