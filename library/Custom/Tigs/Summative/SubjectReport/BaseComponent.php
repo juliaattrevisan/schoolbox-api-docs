@@ -109,6 +109,19 @@ class BaseComponent
 
 
     /**
+     * Returns whether we should display errors
+     *
+     * @return bool
+     */
+    protected function showErrors(): bool
+    {
+        $effectiveRole = $this->roleTypeOverride ?? $this->viewer->getRole()->getType();
+
+        return $effectiveRole === Role::STAFF;
+    }
+
+
+    /**
      * Returns whether an assessable is due within this component's report's window
      *
      * @param IAssessable $assessable

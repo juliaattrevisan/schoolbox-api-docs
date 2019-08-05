@@ -704,6 +704,7 @@ class CliPdfGenerator extends CliTool\App
 
         // @see https://wkhtmltopdf.org/usage/wkhtmltopdf.txt for list of options
         $snappy = new Pdf('/usr/local/bin/wkhtmltopdf');
+        $snappy->setTimeout(120); // TODO expose as CLI option
         $snappy->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
         $snappy->setOption('orientation', 'Landscape');
         $snappy->setOption('disable-external-links', true);

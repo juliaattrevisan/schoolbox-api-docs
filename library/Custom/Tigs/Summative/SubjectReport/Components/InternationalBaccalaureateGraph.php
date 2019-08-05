@@ -7,12 +7,9 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
-use Alaress\Authorizer\Authorizer;
-use Aura\Router;
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use InvalidArgumentException;
-use LogicException;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\GenericCollection;
@@ -26,6 +23,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnexpectedValueException;
+use Alaress\Authorizer\Authorizer;
+use Aura\Router;
+use LogicException;
 
 /**
  * Builds a suitable data structure for rendering the MYP/DP Graph component.
@@ -138,13 +138,14 @@ class InternationalBaccalaureateGraph extends BaseComponent
         $studentComment = null;
         $error       = null;
         $header      = $this->generateHeader();
-        $showComponent = true; // If exceptions occur, we need to show component so we can see those errors
         try {
             [$markData, $studentMark, $studentComment, $showComponent] = $this->collateMarks($this->collateAssessments());
         } catch (UnexpectedValueException $e) {
             $error = $e->getMessage();
+            $showComponent = $this->showErrors();
         } catch (MapperException $e) {
             $error = $e->getMessage();
+            $showComponent = $this->showErrors();
         }
 
         $context = [
@@ -268,7 +269,7 @@ class InternationalBaccalaureateGraph extends BaseComponent
      *               2: the comment this student received, if any
      *               3: Whether we should show this component at all
      * @throws \Schoolbox\Mapper\Exception
-     * @throws UnexpectedValueException if a folder has more or less than one MYP/DP assessment
+     * @throws UnexpectedValueException If a invalid data found
      * @throws Router\Exception\RouteNotFound
      */
     private function collateMarks(array $ibAssessments): array
@@ -276,116 +277,187 @@ class InternationalBaccalaureateGraph extends BaseComponent
         $markData    = self::BASE_MARKS;
         $studentMark = null;
         $studentComment = null;
-        $showComponent = false;
-        foreach ($ibAssessments as $folderId => $folderAssessments) {
-            /**
-             * @var Folder\Model    $folder
-             * @var DueWork\Model[] $assessments
-             */
-            $folder      = $folderAssessments['folder'];
-            $assessments = $folderAssessments['assessments'];
-            $count       = \count($assessments);
 
-            // No folder can have multiple assessments, and the current folder must have a single assessment
-            if ($count > 1 || ($count === 0 && $folderId === $this->folder->getId())) {
-                throw new UnexpectedValueException(
-                    sprintf(
-                        'A folder must have exactly one MYP/DP assessment. Folder "%s" contains %d.',
-                        $folder->getTitle(),
-                        $count
-                    )
-                );
-            }
+        $this->validateAssessments($ibAssessments);
+        $showComponent = $this->deriveComponentVisibility($ibAssessments);
 
-            /** @var IAssessable $assessment */
-            $assessment = current($assessments);
-            if (!$assessment) {
+        foreach ($ibAssessments as $folderId => $folderData) {
+            if (!$showComponent) {
                 continue;
             }
+            /** @var DueWork\Model $assessment */
+            foreach ($folderData['assessments'] as $assessment) {
 
-            // Assessment not visible to the viewer? Show no results
-            if (!$this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)) {
-                continue;
-            }
-
-
-            // Feedback not visible to the viewer? Show no results
-            if (!$this->isFeedbackVisibleToUser($assessment)) {
-                continue;
-            }
-
-            // Is viewer permitted to see this assessment and its grades, and assessment is for this folder?
-            if ($this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                $showComponent = true;
-            }
-
-            foreach ($assessment->getAllParticipants() as $participant) {
-
-                // What kind of assessment is this?
-                $mark     = null;
-                $feedback = $participant->getAuthoritativeFeedback(true);
-                if (!$feedback) {
-                    // No visible feedback for this user?
-                    // Show nothing, but this is not an error
-                    continue;
-                }
-                if ($this->getAttributes()->isMyp()) {
-                    $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
-                    $rawStudentMark = $markedGrid->calculateScaledMark();
-                    // Finagle student mark from rubric grid
-                    if ($rawStudentMark === 0.0) {
-                        // The call to calculateScaledMark() currently returns 0.0 for an unmarked rubric. It should probably return NULL
-                        // so we can distinguish between an unmarked rubric, and a rubric with a mark of 0.0. However that change is pretty deep.
-                        // Instead, since we know this rubric cannot have a mark of 0 (because all descriptor values are 1-8), we'll just compensate
-                        // for it here by assuming this means the rubric is unmarked.
-                        $mark = null;
-                    } elseif ($rawStudentMark <= 5.0) {
-                        $mark = 1;
-                    } elseif ($rawStudentMark <= 9.0) {
-                        $mark = 2;
-                    } elseif ($rawStudentMark <= 14.0) {
-                        $mark = 3;
-                    } elseif ($rawStudentMark <= 18.0) {
-                        $mark = 4;
-                    } elseif ($rawStudentMark <= 23.0) {
-                        $mark = 5;
-                    } elseif ($rawStudentMark <= 27.0) {
-                        $mark = 6;
-                    } elseif ($rawStudentMark <= 32.0) {
-                        $mark = 7;
-                    } else {
-                        throw $this->generateException($participant, "Invalid rubric total: {$rawStudentMark}");
-                    }
-                } else {
-                    $mark = $feedback->getHumanReadableMark();
-                    if (preg_match('#(\d)#', $mark, $matches)) {
-                        $mark = (int)$matches[1];
-                    } else {
-                        $mark = null;
-                    }
-                }
-
-                // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
-                // has participation record in a different class in this cohort.
-                if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
-                    $studentMark = $mark;
-                    $studentComment = $feedback->getComment();
-                }
-
-                // NULL marks do not contribute
-                if (null === $mark) {
+                // Ignores marks from assessments where grades not visible to viewer's RoleType
+                if (!$this->isFeedbackVisibleToUser($assessment)) {
                     continue;
                 }
 
-                // Ensure mark is valid
-                if (0 === $mark || $mark > 7) {
-                    throw $this->generateException($participant, "Invalid mark found: {$mark}. Required 1-7");
-                }
+                // Collate marks
+                foreach ($assessment->getAllParticipants() as $participant) {
 
-                $markData[$mark]++;
+                    // What kind of assessment is this?
+                    $mark     = null;
+                    $feedback = $participant->getAuthoritativeFeedback(true);
+                    if (!$feedback) {
+                        // No visible feedback for this user?
+                        // Show nothing, but this is not an error
+                        continue;
+                    }
+                    if ($this->getAttributes()->isMyp()) {
+                        $markedGrid     = $this->rubricMapper->retrieveMarkedGrid($feedback);
+                        $rawStudentMark = $markedGrid->calculateScaledMark();
+                        // Finagle student mark from rubric grid
+                        if ($rawStudentMark === 0.0) {
+                            // The call to calculateScaledMark() currently returns 0.0 for an unmarked rubric. It should probably return NULL
+                            // so we can distinguish between an unmarked rubric, and a rubric with a mark of 0.0. However that change is pretty deep.
+                            // Instead, since we know this rubric cannot have a mark of 0 (because all descriptor values are 1-8), we'll just compensate
+                            // for it here by assuming this means the rubric is unmarked.
+                            $mark = null;
+                        } elseif ($rawStudentMark <= 5.0) {
+                            $mark = 1;
+                        } elseif ($rawStudentMark <= 9.0) {
+                            $mark = 2;
+                        } elseif ($rawStudentMark <= 14.0) {
+                            $mark = 3;
+                        } elseif ($rawStudentMark <= 18.0) {
+                            $mark = 4;
+                        } elseif ($rawStudentMark <= 23.0) {
+                            $mark = 5;
+                        } elseif ($rawStudentMark <= 27.0) {
+                            $mark = 6;
+                        } elseif ($rawStudentMark <= 32.0) {
+                            $mark = 7;
+                        } else {
+                            throw $this->generateException($participant, "Invalid rubric total: {$rawStudentMark}");
+                        }
+                    } else {
+                        $mark = $feedback->getHumanReadableMark();
+                        if (preg_match('#(\d)#', $mark, $matches)) {
+                            $mark = (int)$matches[1];
+                        } else {
+                            $mark = null;
+                        }
+                    }
+
+                    // Only care about student's mark in current folder. This caters for case where student does not yet have mark in this class, but
+                    // has participation record in a different class in this cohort.
+                    if ($participant->getUser()->getId() === $this->student->getId() && $this->folder->getId() === $assessment->getContext()->getFolder()->getId()) {
+                        $studentMark    = $mark;
+                        $studentComment = $feedback->getComment();
+                    }
+
+                    // NULL marks do not contribute
+                    if (null === $mark) {
+                        continue;
+                    }
+
+                    // Ensure mark is valid
+                    if (0 === $mark || $mark > 7) {
+                        throw $this->generateException($participant, "Invalid mark found: {$mark}. Required 1-7");
+                    }
+
+                    $markData[$mark]++;
+                }
             }
         }
         return [$markData, $studentMark, $studentComment, $showComponent];
+    }
+
+
+    /**
+     * Ensures the assessments have been configured correctly
+     * * Cohort students may only participate in 0:1 IB assessment per Folder per ReportPeriod
+     * * This class must have at least 1 IB assessment
+     *
+     * @param array         $ibAssessments
+     * @throws UnexpectedValueException If invalid data detected
+     * @var Folder\Model    $ibAssessments [folderId]['folder']
+     * @var DueWork\Model[] $ibAssessments [folderId]['assessments']
+     * @var array           $ibAssessments [folderId]
+     */
+    private function validateAssessments(array $ibAssessments): void
+    {
+        // Check students only participate in 1 IB assessment per Folder per ReportPeriod
+        // (Note we are already in the context of a single ReportPeriod)
+        /** @var int[][] $participationCountsPerFolder Indexed by folderId, studentId */
+        $participationCountsPerFolder = [];
+        foreach ($ibAssessments as $folderId => $folderData) {
+            $participationCountsPerFolder[$folderId] = [];
+            /** @var DueWork\Model[] $cohortClassAssessments */
+            $cohortClassAssessments = $folderData['assessments'];
+            foreach ($cohortClassAssessments as $cohortClassAssessment) {
+                foreach ($cohortClassAssessment->getAllParticipants() as $participant) {
+                    if ($participant->isExcluded()) {
+                        continue;
+                    }
+                    $studentId = $participant->getUser()->getId();
+                    if (!array_key_exists($studentId, $participationCountsPerFolder[$folderId])) {
+                        $participationCountsPerFolder[$folderId][$studentId] = 0;
+                    }
+                    $participationCountsPerFolder[$folderId][$studentId]++;
+                }
+            }
+        }
+
+        // Build participation count error messages
+        $participationCountErrors = [];
+        foreach ($participationCountsPerFolder as $folderId => $participationCounts) {
+            $folder          = $ibAssessments[$folderId]['folder'];
+            $folderLink      = sprintf('<a href="/homepage/%d">%s</a>', $folder->getId(), $folder->getTitle());
+            foreach ($participationCounts as $studentId => $count) {
+                if ($count >= 2) {
+                    $participationCountErrors[] = "$folderLink: Student: $studentId, Count: $count";
+                }
+            }
+        }
+
+        $errorMessage = '';
+        if (count($participationCountErrors)) {
+            $errorMessage .= "Invalid data. Students may only participate in 1 <strong>IB Graph</strong> assessment per class per report period.<br>\n";
+            $errorMessage .= implode("<br>\n", $participationCountErrors);
+        }
+
+        // Check this folder has at least 1 IB Graph assessment
+        if (!count($ibAssessments[$this->folder->getId()]['assessments'])) {
+            $folderLink = sprintf('<a href="/homepage/%d">%s</a>', $this->folder->getId(), $this->folder->getName());
+            $errorMessage .= "No IB Graph assessment found for folder $folderLink\n";
+        }
+        if ($errorMessage) {
+            throw new UnexpectedValueException($errorMessage);
+        }
+    }
+
+
+    /**
+     * Returns whether we should render the component.
+     *
+     * Component visibility is derived from the assessment which:
+     * * belongs to the current class, and
+     * * where the student is participating
+     *
+     * Component is visible if:
+     * * Assessment is visible (ignoring SIVO), and
+     * * Assessment feedback is visible to user
+     *
+     * @param array         $ibAssessments
+     * @return bool
+     * @var Folder\Model    $ibAssessments [folderId]['folder']
+     * @var DueWork\Model[] $ibAssessments [folderId]['assessments']
+     * @var array           $ibAssessments [folderId]
+     */
+    private function deriveComponentVisibility(array $ibAssessments): bool
+    {
+        /** @var DueWork\Model $assessment */
+        foreach ($ibAssessments[$this->folder->getId()]['assessments'] ?? [] as $assessment) {
+            if (!$assessment->isParticipant($this->student)) {
+                continue;
+            }
+            return
+                $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false) &&
+                $this->isFeedbackVisibleToUser($assessment);
+        }
+        return false;
     }
 
 
