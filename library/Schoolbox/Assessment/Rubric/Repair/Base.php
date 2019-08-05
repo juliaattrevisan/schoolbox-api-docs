@@ -81,6 +81,14 @@ abstract class Base extends CliTool\App
 
 
     /**
+     * Should the v1 or v2 queries be used?
+     *
+     * @var bool
+     */
+    protected $useV2Queries;
+
+
+    /**
      * Query for finding folders which may contain a capability.
      *
      * @var IQuery
@@ -234,11 +242,11 @@ abstract class Base extends CliTool\App
 
 
     /**
-     * Can this tool even be run?
+     * Determines whether v2 queries are used.
      *
      * @return bool
      */
-    private function verifyRunnable(): bool
+    private function determineV2QueryUsage(): bool
     {
         $this->log->notice('Checking `rubric_capability` table exists...');
         $query = $this->db->prepareQuery(self::VERIFY_RUNNABLE_QUERY);
@@ -248,7 +256,7 @@ abstract class Base extends CliTool\App
             return true;
         }
         $this->log->notice('`rubric_capability` table does not exist: running with v1 queries');
-        return true;
+        return false;
     }
 
 
@@ -300,10 +308,7 @@ abstract class Base extends CliTool\App
     public function run(): void
     {
         $this->setupDependencies();
-        if (!$this->verifyRunnable()) {
-            $this->log->warning('Not running due to above issues: skipping');
-            return;
-        }
+        $this->useV2Queries = $this->determineV2QueryUsage();
         $this->setupCommonQueries();
         $this->setupQueries();
 
