@@ -3,13 +3,13 @@ CREATE OR REPLACE VIEW v_rubric AS
 
 SELECT
     -- Assessment fields
-    a.id                         AS assessment_id,
-    a.title                      AS assessment_title,
-    sb.mark_type                 AS assessment_mark_type,
-    sb.max_mark                  AS assessment_max_mark,
-    sb.submission_grade_group_id AS assessment_grade_group_id,
-    sb.rubric_group_marks        AS assessment_mark_per_capability,
-    a.weight                     AS assessment_weight,
+    a.id                          AS assessment_id,
+    a.title                       AS assessment_title,
+    sb.mark_type                  AS assessment_mark_type,
+    sb.max_mark                   AS assessment_max_mark,
+    sb.submission_grade_group_id  AS assessment_grade_group_id,
+    sb.rubric_mark_per_capability AS assessment_mark_per_capability,
+    a.weight                      AS assessment_weight,
 
     -- Rubric capability fields
     rg.id                        AS capability_id,
