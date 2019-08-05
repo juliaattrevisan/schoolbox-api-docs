@@ -429,13 +429,18 @@ select.letter-grade-select {
         .rb-criterion-name {
             padding-left: 1.25rem;
         }
+        .rb-group-summary {
+            padding-left: 1.5rem;
+        }
         label span {
             margin-left: 1.25rem;
         }
         .rb-description,
-        .rb-group-summary,
         .rb-value {
             margin-left: 1.5rem;
+        }
+        select {
+            padding: 0 1.5rem;
         }
         textarea {
             min-height: 1rem;
