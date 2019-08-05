@@ -1,5 +1,4 @@
 .global-search {
-    background: $navigation-background;
     margin: 0;
     position: absolute;
     right: $tabbar-icon-width;
@@ -91,6 +90,7 @@
         @extend .meta;
         margin: 0;
         padding: .5rem;
+        text-align: left;
     }
 
     .result-meta .list-item {
@@ -104,6 +104,7 @@
         font-size: rem-calc(($base-font-size - 2));
         font-style: normal;
         line-height: inherit;
+        text-align: center;
 
         &:hover {
             background-color: $content-ui-hover;
