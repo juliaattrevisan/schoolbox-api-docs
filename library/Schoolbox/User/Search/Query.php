@@ -19,7 +19,7 @@ class Query
     public const AUTOSUGGEST_LIMIT = 5;
 
     /**
-     * Minimum search length before the query qet's executed
+     * Minimum search length before the query get's executed
      */
     public const MIN_SEARCH_LENGTH = 3;
 
