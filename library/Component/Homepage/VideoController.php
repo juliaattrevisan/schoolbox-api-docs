@@ -176,16 +176,20 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             try {
                 $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
 
-                if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()) {
-                    if ($this->isVisibleToCurrentUser($video)) {
-                        $this->defaultVideo = $video;
-                    } else {
-                        $this->defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
-                    }
+                if ($video->isComplete()
+                    && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()
+                    && $this->isVisibleToCurrentUser($video)) {
+                    $this->defaultVideo = $video;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
                 // passthru: figure out which video later
             }
+        }
+
+        // If default video is not set, try playing the first one,
+        // as config('video') can be empty.
+        if (null === $this->defaultVideo && \count($this->outputList)) {
+            $this->defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
         }
 
         if (null !== $this->defaultVideo) {
