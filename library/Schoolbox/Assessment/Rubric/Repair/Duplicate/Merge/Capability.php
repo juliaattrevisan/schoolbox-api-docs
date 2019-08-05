@@ -168,16 +168,36 @@ class Capability extends Base
     protected function setupQueries(): void
     {
         $this->findCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITY_INDICATORS_QUERY_V2
+                    : self::FIND_CAPABILITY_INDICATORS_QUERY_V1
+            );
         $this->mergeCapabilityIndicatorQuery
-            = $this->db->prepareQuery(self::MERGE_CAPABILITY_INDICATOR_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_CAPABILITY_INDICATOR_QUERY_V2
+                    : self::MERGE_CAPABILITY_INDICATOR_QUERY_V1
+            );
 
         $this->findCapabilityUsagesQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_USAGES_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITY_USAGES_QUERY_V2
+                    : self::FIND_CAPABILITY_USAGES_QUERY_V1
+            );
         $this->mergeCapabilityUsageQuery
-            = $this->db->prepareQuery(self::MERGE_CAPABILITY_USAGE_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_CAPABILITY_USAGE_QUERY_V2
+                    : self::MERGE_CAPABILITY_USAGE_QUERY_V1
+            );
         $this->mergeCapabilityMarkQuery
-            = $this->db->prepareQuery(self::MERGE_CAPABILITY_MARK_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_CAPABILITY_MARK_QUERY_V2
+                    : self::MERGE_CAPABILITY_MARK_QUERY_V1
+            );
     }
 
 

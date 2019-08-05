@@ -147,14 +147,30 @@ class Indicator extends Base
     protected function setupQueries(): void
     {
         $this->findCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITY_INDICATORS_QUERY_V2
+                    : self::FIND_CAPABILITY_INDICATORS_QUERY_V1
+            );
 
         $this->findIndicatorUsagesQuery
-            = $this->db->prepareQuery(self::FIND_INDICATOR_USAGES_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_INDICATOR_USAGES_QUERY_V2
+                    : self::FIND_INDICATOR_USAGES_QUERY_V1
+            );
         $this->mergeIndicatorUsageQuery
-            = $this->db->prepareQuery(self::MERGE_INDICATOR_USAGE_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_INDICATOR_USAGE_QUERY_V2
+                    : self::MERGE_INDICATOR_USAGE_QUERY_V1
+            );
         $this->mergeIndicatorDescriptorQuery
-            = $this->db->prepareQuery(self::MERGE_INDICATOR_DESCRIPTOR_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_INDICATOR_DESCRIPTOR_QUERY_V2
+                    : self::MERGE_INDICATOR_DESCRIPTOR_QUERY_V1
+            );
     }
 
 

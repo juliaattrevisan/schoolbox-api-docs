@@ -118,12 +118,24 @@ class Indicator extends Base
     protected function setupQueries(): void
     {
         $this->deleteIndicatorQuery
-            = $this->db->prepareQuery(self::DELETE_INDICATOR_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::DELETE_INDICATOR_QUERY_V2
+                    : self::DELETE_INDICATOR_QUERY_V1
+        );
 
         $this->findCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITY_INDICATORS_QUERY_V2
+                    : self::FIND_CAPABILITY_INDICATORS_QUERY_V1
+            );
         $this->countIndicatorUsagesQuery
-            = $this->db->prepareQuery(self::COUNT_INDICATOR_USAGES_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::COUNT_INDICATOR_USAGES_QUERY_V2
+                    : self::COUNT_INDICATOR_USAGES_QUERY_V1
+            );
     }
 
 

@@ -290,7 +290,11 @@ abstract class Base extends CliTool\App
         $this->findFoldersQuery
             = $this->db->prepareQuery(self::FIND_FOLDERS_QUERY);
         $this->findCapabilitiesQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITIES_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITIES_QUERY_V2
+                    : self::FIND_CAPABILITIES_QUERY_V1
+            );
     }
 
 

@@ -118,12 +118,24 @@ class Capability extends Base
     protected function setupQueries(): void
     {
         $this->deleteCapabilityQuery
-            = $this->db->prepareQuery(self::DELETE_CAPABILITY_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::DELETE_CAPABILITY_QUERY_V2
+                    : self::DELETE_CAPABILITY_QUERY_V1
+            );
 
         $this->countCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(self::COUNT_CAPABILITY_INDICATORS_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::COUNT_CAPABILITY_INDICATORS_QUERY_V2
+                    : self::COUNT_CAPABILITY_INDICATORS_QUERY_V1
+            );
         $this->countCapabilityUsagesQuery
-            = $this->db->prepareQuery(self::COUNT_CAPABILITY_USAGES_QUERY_V2);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::COUNT_CAPABILITY_USAGES_QUERY_V2
+                    : self::COUNT_CAPABILITY_USAGES_QUERY_V1
+            );
     }
 
 
