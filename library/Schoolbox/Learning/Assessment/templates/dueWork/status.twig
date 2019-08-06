@@ -148,40 +148,40 @@
 {% block action_bar %}
 
     {#
-    If there's any files, rubric marks, or crocoodoc annotated doc
+    If there's any files, rubric marks, or kami docs
     attached to the feedback - tell the user that this feedback also includes those.
     #}
-    {% if (latestFeedback.allFiles.count > 0) or (rubricMarks[participant.user.id] and latestFeedback) %}
+    {% set hasKami = latestFeedback and latestFeedback.hasResponseWithKamiDocs %}
+    {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
+    {% set hasRubricMarks = rubricMarks[participant.user.id]|default(false) %}
 
-        {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
+    {% if hasKami or fileCount or hasRubricMarks %}
+        {% set meta = [] %}
 
-        {% if (latestFeedback and latestFeedback.response.allFiles.count > 0) or
-        (not latestFeedback and participant.findMostRecentResponse().allFiles.count > 0) %}
-            {% if latestFeedback %}
-                {% set allFiles = latestFeedback.response.allFiles %}
-            {% else %}
-                {% set allFiles = participant.findMostRecentResponse().allFiles %}
-            {% endif %}
+        {# Kami #}
+        {% if hasKami %}
+            {% set meta = meta|merge(['annotated document']) %}
         {% endif %}
 
         {# Rubric #}
-        {% if rubricMarks[participant.user.id] %}
-            {% set attachedMsg = attachedMsg ~ 'rubric' %}
+        {% if hasRubricMarks %}
+            {% set meta = meta|merge(['rubric']) %}
         {% endif %}
 
         {# Files #}
-        {% if latestFeedback.allFiles.count > 0 %}
-            {% if rubricMarks[participant.user.id] %}
-                {% set attachedMsg = attachedMsg ~ ' and ' %}
-            {% endif %}
-
-            {% set attachedMsg = attachedMsg ~ latestFeedback.allFiles.count ~ ' file' %}
-
-            {% if latestFeedback.allFiles.count > 1 %}
-                {% set attachedMsg = attachedMsg ~ 's' %}
-            {% endif %}
+        {% if fileCount %}
+            {% set meta = meta|merge(['file' ~ (fileCount > 1 ? 's' : '') ]) %}
         {% endif %}
 
+        {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
+        {% for mataLabel in meta %}
+            {% set attachedMsg = attachedMsg ~ mataLabel %}
+            {% if loop.revindex0 > 1 %}
+                {% set attachedMsg = attachedMsg ~ ', ' %}
+            {% elseif loop.revindex0 == 1 %}
+                {% set attachedMsg = attachedMsg ~ ' and ' %}
+            {% endif %}
+        {% endfor %}
         {% set attachedMsg = attachedMsg ~ '</a>.' %}
     {% endif %}
 

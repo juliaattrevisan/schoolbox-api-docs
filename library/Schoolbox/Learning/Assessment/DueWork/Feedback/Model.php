@@ -12,10 +12,14 @@ namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 use UnexpectedValueException;
 
+/**
+ * @method DueWork\Response\Model getResponse()
+ */
 class Model extends AbstractFeedback implements ISelfAssessableFeedback
 {
 
@@ -186,5 +190,34 @@ class Model extends AbstractFeedback implements ISelfAssessableFeedback
             && ($this->getNormalisedMark() === null)
             && ($this->getHumanReadableMark() === null || trim($this->getHumanReadableMark()) === '')
             && ($this->getComment() === null || trim($this->getComment()) === '');
+    }
+
+
+    /**
+     * Returns whether this feedback may represent kami comments
+     *
+     * For now, we cannot know this conclusively in SB without hitting the Kami API.
+     *
+     * Returns TRUE if feedback is for a submission that has files that have been sent to Kami,
+     * regardless of whether those Kami docs have actually been annotated
+     *
+     * @return bool
+     */
+    public function hasResponseWithKamiDocs(): bool
+    {
+        $response = $this->getResponse();
+        // Floating feedback?
+        if (!$response) {
+            // Cannot have annotations associated
+            return false;
+        }
+        foreach ($response->getAllFiles() as $responseFile) {
+            $kami = $responseFile->getKami();
+            if ($kami && $kami->isStatusDone()) {
+                // There *may* be comments here
+                return true;
+            }
+        }
+        return false;
     }
 }
