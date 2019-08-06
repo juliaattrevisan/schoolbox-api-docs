@@ -209,7 +209,7 @@ class User extends DeprecatedModel
      *
      * @return array|bool
      */
-    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'lastname', $sort_dir = 'ASC')
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null)
     {
         // test for exact search, and if so return those results instead
         if (preg_match('#".+"#', $keyword)) {
@@ -219,11 +219,13 @@ class User extends DeprecatedModel
         }
         // Don't allow LIKE searches on keywords < 3 chars long
         $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
-        if (mb_strlen($keyword, 'UTF-8') >= 3) {
+        if (mb_strlen($keyword, 'UTF-8') >= 2) {
             $wherePart .= sprintf(
                 " OR CONCAT_WS(' ',title,firstname,lastname) LIKE '%1\$s'
                 OR CONCAT_WS(' ',title,lastname) LIKE '%1\$s'
-                OR username LIKE '%1\$s'",
+                OR username LIKE '%1\$s' 
+                OR soundex(firstname) = soundex('%1\$s') 
+                OR soundex(lastname) = soundex('%1\$s') ",
                 $this->db->quote('%' . $this->db->escapeForLike($keyword) . '%')
             );
         }
@@ -252,7 +254,7 @@ class User extends DeprecatedModel
             LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
             WHERE $wherePart
         ";
-        $query .= " ORDER BY `$sort_by` $sort_dir
+        $query .= " ORDER BY firstname, lastname ASC
                         LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
