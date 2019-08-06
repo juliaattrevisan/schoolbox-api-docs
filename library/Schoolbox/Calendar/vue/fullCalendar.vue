@@ -234,7 +234,10 @@
                       :translations="config.translations"
                       :token="config.token" />
 
-        <filter-modal ref="filter" />
+        <filter-modal ref="filter"
+                      :event-types="config.eventTypes"
+                      :groups="config.groups"
+                      :campuses="config.campuses" />
 
         <create-event-modal ref="createEvent"
                             :event="newEvent"

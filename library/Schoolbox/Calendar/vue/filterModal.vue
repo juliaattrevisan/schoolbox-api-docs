@@ -3,6 +3,11 @@
 
     export default {
         name: "filter-modal",
+        props: [
+            'eventTypes',
+            'groups',
+            'campuses',
+        ],
         components: {RevealModal},
         methods: {
             open() {
@@ -33,10 +38,15 @@
                             <legend>Groups</legend>
                             <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
                             <label for="groupsSelectAll">Select all</label>
-                            <!-- BEGIN filter_group -->
-                            <input type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" class="applyFilters"/>
-                            <label for="group{GROUP_ID}">{GROUP_NAME}</label>
-                            <!-- END filter_group -->
+
+                            <template v-for="group in groups">
+                                <input type="checkbox"
+                                       name="group"
+                                       :id="'group' + String(group.id)"
+                                       :value="'group' + String(group.id)"
+                                       class="applyFilters" />
+                                <label :for="'group' + String(group.id)">{{ group.name }}</label>
+                            </template>
                         </fieldset>
                     </div>
                     <div class="small-6 large-3 columns">
@@ -44,10 +54,15 @@
                             <legend>Campus</legend>
                             <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
                             <label for="campusSelectAll">Select all</label>
-                            <!-- BEGIN filter_campus -->
-                            <input type="checkbox" name="campus" id="campus{CAMPUS_ID}" value="campus{CAMPUS_ID}" class="applyFilters"/>
-                            <label for="campus{CAMPUS_ID}">{CAMPUS_NAME}</label>
-                            <!-- END filter_campus -->
+
+                            <template v-for="campus in campuses">
+                                <input type="checkbox"
+                                       name="group"
+                                       :id="'campus' + String(campus.id)"
+                                       :value="'campus' + String(campus.id)"
+                                       class="applyFilters" />
+                                <label :for="'campus' + String(campus.id)">{{ campus.name }}</label>
+                            </template>
                         </fieldset>
                     </div>
                     <div class="small-6 large-3 columns">
@@ -55,10 +70,17 @@
                             <legend>Event</legend>
                             <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
                             <label for="eventTypeSelectAll">Select all</label>
-                            <!-- BEGIN filter_event_type -->
-                            <input type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" value="type{EVENT_TYPE_ID}" class="applyFilters"/>
-                            <label for="eventType{EVENT_TYPE_ID}" style="background-color:{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</label>
-                            <!-- END filter_event_type -->
+
+
+                            <template v-for="eventType in eventTypes">
+                                <input type="checkbox"
+                                       name="group"
+                                       :id="'eventType' + String(eventType.id)"
+                                       :value="'type' + String(eventType.id)"
+                                       class="applyFilters" />
+                                <label :for="'eventType' + String(eventType.id)"
+                                       :style="{backgroundColor: eventType.color}">{{ eventType.name }}</label>
+                            </template>
                         </fieldset>
                     </div>
                 </fieldset>
