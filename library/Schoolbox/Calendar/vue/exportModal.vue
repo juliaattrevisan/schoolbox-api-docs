@@ -1,5 +1,6 @@
 <script>
-    import RevealModal from '@schoolbox/reveal-modal'
+    import RevealModal   from '@schoolbox/reveal-modal'
+    import toQueryString from "./helper/toQueryString";
 
     export default {
         name: "export-modal",
@@ -8,6 +9,7 @@
             'groups',
             'campuses',
             'translations',
+            'token',
         ],
         data() {
             return {
@@ -27,7 +29,21 @@
         },
         computed: {
             exportUrl() {
-                return 'bbbbbb';
+                let values = Object.assign({}, this.form);
+
+                // Add token to object
+                values.token = this.token;
+
+                // remove unused fields
+                if (values['export'] !== 'group') {
+                    delete values.group;
+                }
+
+                if (values['export'] !== 'campus') {
+                    delete values.campus;
+                }
+
+                return window.location.protocol + '//' + window.location.host + '/calendar/export.php?' + toQueryString(values);
             },
         },
     }
@@ -105,7 +121,7 @@
         <reveal-modal ref="feedUrlModal">
             <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
             <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-            <div class="alert-box">{{ exportUrl }}</div>
+            <div class="alert-box">{{ exportUrl }}&amp;type=csv</div>
         </reveal-modal>
     </reveal-modal>
 </template>

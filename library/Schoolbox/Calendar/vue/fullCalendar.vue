@@ -229,7 +229,8 @@
                       :event-types="config.eventTypes"
                       :groups="config.groups"
                       :campuses="config.campuses"
-                      :translations="config.translations" />
+                      :translations="config.translations"
+                      :token="config.token" />
 
         <reveal-modal ref="filter">
             ccc
