@@ -907,66 +907,21 @@
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
-<div id="calendar-export" class="reveal-modal small" data-reveal aria-hidden="true" role="dialog">
-    <form class="top" action="#" id="calendar-export-form">
-        <section>
-            <fieldset class="content radiolist">
-                <input type="radio" name="export" value="all" id="export-all" checked />
-                <label for="export-all" class="c">All events</label>
-                <input type="radio" name="export" value="personal" id="export-personal" />
-                <label for="export-personal">Personal events only</label>
-                <input type="radio" name="export" value="timetable" id="export-timetable" />
-                <label for="export-timetable">Timetable classes</label>
-                <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
-                <label for="export-timetableday">Timetable days</label>
-                <input type="radio" name="export" value="duework" id="export-duework" />
-                <label for="export-duework">{TPL_LOCAL_DUEWORK_PC}</label>
-                <input type="radio" name="export" value="resources" id="export-resources" />
-                <label for="export-resources">Resource Booking</label>
-                <input type="radio" name="export" value="external" id="export-external" />
-                <label for="export-external">External events</label>
-                <!-- BEGIN has_eotc_events_all -->
-                <input type="radio" name="export" value="eotc_all" id="export-eotc-all" />
-                <label for="export-eotc-all">{TPL_LOCAL_EOTC_PC}</label>
-                <!-- END has_eotc_events_all -->
-                <input type="radio" name="export" value="campus" id="export-campus" />
-                <label for="export-campus">Events for campus:
-                    <select name="campus">
-                        <option value="">-- select --</option>
-                        <!-- BEGIN export_campus -->
-                        <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
-                        <!-- END export_campus -->
-                    </select>
-                </label>
-                <input type="radio" name="export" value="group" id="export-group" />
-                <label for="export-group">Events for group:
-                    <select name="group">
-                        <option value="">-- select --</option>
-                        <!-- BEGIN export_group -->
-                        <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
-                        <!-- END export_group -->
-                    </select>
-                </label>
-                <input type="radio" name="export" value="event_type" id="export-type" />
-                <label for="export-type">Events by type:
-                    <select name="event_type">
-                        <option value="">-- select --</option>
-                        <!-- BEGIN export_type -->
-                        <option label="{EXPORT_TYPE_NAME}" value="{EXPORT_TYPE_ID}">{EXPORT_TYPE_NAME}</option>
-                        <!-- END export_type -->
-                    </select>
-                </label>
-            </fieldset>
-        </section>
-        <div class="component-action">
-            <section>
-                <input type="submit" id="open-calendar-export-dialog" value="Generate URL" />
-                <input type="submit" id="download-calendar-export" value="Download CSV" />
-            </section>
-        </div>
-    </form>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
+<!-- BEGIN has_eotc_events_all -->
+
+<!-- END has_eotc_events_all -->
+
+<!-- BEGIN export_campus -->
+
+<!-- END export_campus -->
+
+<!-- BEGIN export_group -->
+
+<!-- END export_group -->
+
+<!-- BEGIN export_type -->
+
+<!-- END export_type -->
 
 <div class="reveal-modal" data-reveal aria-labelledby="calendar-export-dialog-text" aria-hidden="true" role="dialog" id="calendar-export-dialog">
 	<h2 id="calendar-export-dialog-text">Live Feed URL</h2>
