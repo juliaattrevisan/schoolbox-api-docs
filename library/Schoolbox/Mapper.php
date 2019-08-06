@@ -2111,9 +2111,10 @@ abstract class Mapper implements IMapper, Serializable
                 ksort($params);
 
                 // the query itself gets cached by the DB class, but we also want to cache the params
-                $hash = sha1(sprintf('%s[%s]',
+                $hash = sha1(sprintf('%s[%s][%s]',
                     $statement->queryString,
-                    implode(',', $params)
+                    implode(',', $params),
+                    implode(',', $options)
                 ));
 
                 $c = $this->selectCache->get($hash, [ $statement ]);
