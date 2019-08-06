@@ -165,7 +165,7 @@ $allow-sidebar-stash: $large-up;
 
   .left-small {
     width: $tabbar-height;
-    z-index: 100;
+    z-index: 1001;
 
     .menu-icon {
       width: $tabbar-height;
