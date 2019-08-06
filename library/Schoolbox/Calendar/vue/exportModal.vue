@@ -28,6 +28,7 @@
             },
         },
         computed: {
+            window: () => window,
             exportUrl() {
                 let values = Object.assign({}, this.form);
 
@@ -43,7 +44,11 @@
                     delete values.campus;
                 }
 
-                return window.location.protocol + '//' + window.location.host + '/calendar/export.php?' + toQueryString(values);
+                return this.window.location.protocol
+                    + '//'
+                    + this.window.location.host
+                    + '/calendar/export.php?'
+                    + toQueryString(values);
             },
         },
     }
