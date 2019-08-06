@@ -2114,7 +2114,7 @@ abstract class Mapper implements IMapper, Serializable
                 $hash = sha1(sprintf('%s[%s][%s]',
                     $statement->queryString,
                     implode(',', $params),
-                    implode(',', $options)
+                    \serialize($options)
                 ));
 
                 $c = $this->selectCache->get($hash, [ $statement ]);
