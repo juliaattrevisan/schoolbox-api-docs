@@ -4,7 +4,9 @@
     export default {
         name: "export-modal",
         props: [
-            'eventTypes'
+            'eventTypes',
+            'groups',
+            'campuses',
         ],
         components: {RevealModal},
         methods: {
@@ -57,9 +59,9 @@
                     <label for="export-campus">Events for campus:
                         <select name="campus">
                             <option value="">-- select --</option>
-                            <!-- BEGIN export_campus -->
-                            <option label="{EXPORT_CAMPUS_NAME}" value="{EXPORT_CAMPUS_ID}">{EXPORT_CAMPUS_NAME}</option>
-                            <!-- END export_campus -->
+                            <option v-for="campus in campuses" :value="campus.id">
+                                {{ campus.name }}
+                            </option>
                         </select>
                     </label>
 
@@ -67,9 +69,9 @@
                     <label for="export-group">Events for group:
                         <select name="group">
                             <option value="">-- select --</option>
-                            <!-- BEGIN export_group -->
-                            <option label="{EXPORT_GROUP_NAME}" value="{EXPORT_GROUP_ID}">{EXPORT_GROUP_NAME}</option>
-                            <!-- END export_group -->
+                            <option v-for="group in groups" :value="group.id">
+                                {{ group.name }} <template v-if="group.code">({{ group.code }})</template>
+                            </option>
                         </select>
                     </label>
 

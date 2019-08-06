@@ -226,7 +226,9 @@
 <template>
     <div>
         <export-modal ref="export"
-                      :event-types="config.eventTypes" />
+                      :event-types="config.eventTypes"
+                      :groups="config.groups"
+                      :campuses="config.campuses" />
 
         <reveal-modal ref="filter">
             ccc
