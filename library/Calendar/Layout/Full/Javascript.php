@@ -14,6 +14,7 @@
  */
 
 use EOTC\ConfigMapper as EOTCConfigMapper;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Collection;
 
@@ -117,7 +118,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 
         /* Render event types to choose from
          */
-        /** @var Collection $allTypes */
+        /** @var Collection|EventType[] $allTypes */
         $allTypes   = EventTypeMapper::getInstance()->findAll();
         $eventTypes = [];
 
@@ -133,8 +134,9 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
                         'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
                     ]);
                     $eventTypes[] = [
-                        'id'   => $currentType->getId(),
-                        'name' => $currentType->getType(),
+                        'id'    => $currentType->getId(),
+                        'name'  => $currentType->getType(),
+                        'color' => $currentType->getColor(),
                     ];
 
                     $this->getPage()->parse('event_type_block', 'event_type', true);
