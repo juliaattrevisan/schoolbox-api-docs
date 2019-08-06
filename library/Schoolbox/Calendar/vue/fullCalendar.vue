@@ -225,7 +225,8 @@
 
 <template>
     <div>
-        <export-modal ref="export" />
+        <export-modal ref="export"
+                      :event-types="config.eventTypes" />
 
         <reveal-modal ref="filter">
             ccc

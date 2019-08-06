@@ -3,6 +3,9 @@
 
     export default {
         name: "export-modal",
+        props: [
+            'eventTypes'
+        ],
         components: {RevealModal},
         methods: {
             open() {
@@ -19,7 +22,7 @@
 
 <template>
     <reveal-modal ref="modal">
-        <form class="top" action="#" id="calendar-export-form">
+        <form class="top" action="#" ref="exportForm">
             <section>
                 <fieldset class="content radiolist">
 
@@ -74,9 +77,9 @@
                     <label for="export-type">Events by type:
                         <select name="event_type">
                             <option value="">-- select --</option>
-                            <!-- BEGIN export_type -->
-                            <option label="{EXPORT_TYPE_NAME}" value="{EXPORT_TYPE_ID}">{EXPORT_TYPE_NAME}</option>
-                            <!-- END export_type -->
+                            <option v-for="eventType in eventTypes" :value="eventType.id">
+                                {{ eventType.name }}
+                            </option>
                         </select>
                     </label>
                 </fieldset>
