@@ -51,7 +51,7 @@
 
 <template>
     <reveal-modal ref="modal">
-        <form class="top" action="#" ref="exportForm">
+        <form class="top" action="/calendar/export.php" ref="exportForm">
             <section>
                 <fieldset class="content radiolist">
 
@@ -111,6 +111,9 @@
                 </fieldset>
             </section>
 
+            <input type="hidden" name="format" value="csv" />
+            <input type="hidden" name="token" :value="token" />
+
             <ul class="flex-list buttons">
                 <li><button class="icon-rss" @click.prevent="$refs.feedUrlModal.open">Generate URL</button></li>
                 <li><input type="submit" class="icon-download" value="Download CSV" /></li>
@@ -121,7 +124,7 @@
         <reveal-modal ref="feedUrlModal">
             <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
             <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-            <div class="alert-box">{{ exportUrl }}&amp;type=csv</div>
+            <div class="alert-box">{{ exportUrl }}</div>
         </reveal-modal>
     </reveal-modal>
 </template>
