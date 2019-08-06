@@ -204,6 +204,20 @@ abstract class Calendar_Layout_Full_Abstract
 
         $category_list = $this->getCategoryList();
         $campus_list = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
+
+        // Shoehorn the above into JSON-encoded vars
+        $this->getPage()->setVar('GROUPS_JSON', json_encode($category_list));
+        $this->getPage()->setVar(
+            'CAMPUSES_JSON',
+            json_encode(
+                array_map(
+                    function ($v) { return ['id' => $v['CAMPUS_ID'], 'name' => $v['CAMPUS_NAME']]; },
+                    $campus_list
+                )
+            )
+        );
+
+
         $this->getPage()->dropDown(
             'export_group',
             $category_list,
