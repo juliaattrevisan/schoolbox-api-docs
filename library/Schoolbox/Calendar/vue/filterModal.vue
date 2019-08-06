@@ -14,13 +14,21 @@
             open() {
                 this.$refs.modal.open();
             },
+            applyFilters() {
+                // I guess this posts a msg back to the fullcalendar component,
+                // with the selected filters.
+                // The events are already loaded regardless of whether the
+                // filters exclude them: the event's visibility just needs to be
+                // updated.
+                this.$refs.modal.close();
+            },
         },
     }
 </script>
 
 <template>
     <reveal-modal ref="modal">
-        <form>
+        <form @submit.prevent="applyFilters" action="#">
             <section>
                 <fieldset class="content filter-list">
                     <div class="small-6 large-3 columns">
@@ -77,7 +85,6 @@
                             <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
                             <label for="eventTypeSelectAll">Select all</label>
 
-
                             <template v-for="eventType in eventTypes">
                                 <input type="checkbox"
                                        name="group"
@@ -91,8 +98,8 @@
                     </div>
                 </fieldset>
             </section>
+            <input type="submit" value="Apply Filters" />
         </form>
-        <a href="#" id="applyFilters" class="button submit">Apply Filters</a>
     </reveal-modal>
 </template>
 
