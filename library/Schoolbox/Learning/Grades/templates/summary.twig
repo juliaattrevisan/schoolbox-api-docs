@@ -49,7 +49,7 @@
                 } only %}
 
                 {% include 'sub/subjectSelector.twig' with {
-                    folders:        folders,
+                    subjects:        folders,
                     route:          'learningGrades.getGradesForSubject',
                     routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code}
                 } only %}

@@ -200,6 +200,12 @@ class Controller extends Base
             }
         }
 
+        try{
+            $yearUrl = $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $viewee->getId()]);
+        } catch (RouteNotFound $e) {
+            $yearUrl = null;
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
@@ -208,6 +214,7 @@ class Controller extends Base
             'markbooks'        => $markbooks,
             'showOverallGrade' => $showOverallGrade,
             'mailHandle'       => $this->getSession()->get('mailhandle'),
+            'yearUrl'          => $yearUrl,
         ])->setTab('grade'));
     }
 
