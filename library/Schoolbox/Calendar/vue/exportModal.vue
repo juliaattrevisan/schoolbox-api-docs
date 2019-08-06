@@ -9,6 +9,11 @@
                 this.$refs.modal.open();
             },
         },
+        computed: {
+            exportUrl() {
+                return 'bbbbbb';
+            },
+        },
     }
 </script>
 
@@ -87,8 +92,7 @@
         <reveal-modal ref="feedUrlModal">
             <h2 id="calendar-export-dialog-text">Live Feed URL</h2>
             <p class="meta">Use the following address to subscribe your favourite calendar application to a live feed.</p>
-            <div id="calendar-export-dialog-url" class="alert-box"></div>
-            <button id="copy-button" data-clipboard-target="calendar-export-dialog-url" class="button icon-copy">Copy to Clipboard</button>
+            <div class="alert-box">{{ exportUrl }}</div>
         </reveal-modal>
     </reveal-modal>
 </template>
