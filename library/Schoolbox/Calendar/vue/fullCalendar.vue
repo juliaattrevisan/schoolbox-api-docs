@@ -12,11 +12,13 @@
     import MetaItem                 from '@schoolbox/meta/item'
     import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
+    import ExportModal              from "./exportModal";
     import axios                    from 'axios'
     import toQueryString            from "./helper/toQueryString";
 
     export default {
         components: {
+            ExportModal,
             CreateEventModal,
             ViewEventModal,
             MetaItem,
@@ -223,9 +225,7 @@
 
 <template>
     <div>
-        <reveal-modal ref="export">
-            bbb
-        </reveal-modal>
+        <export-modal ref="export" />
 
         <reveal-modal ref="filter">
             ccc
