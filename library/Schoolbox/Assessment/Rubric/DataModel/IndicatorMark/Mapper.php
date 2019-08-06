@@ -9,7 +9,9 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorMark;
 
 use PDO;
+use PDOException;
 use PDOStatement;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Mapper as CapabilityMarkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as DescriptorMapper;
@@ -162,30 +164,49 @@ class Mapper extends BaseMapper
         return $statement->rowCount();
     }
 
+
     /**
-     * Get a list of students who have some form of rubric marked for an assessment
+     * Returns the ids of students whose most recent instructor-given feedback for the specified assessment has rubric marks.
+     *
+     * Includes draft feedback. This is to align with the feedback that is rendered on the QuickMark (aka DueWork Status) page.
      *
      * @param int $assessment_id
-     * @return array
+     * @return bool[]
+     * @throws PDOException
      */
-    public function findMarkedByAssessment($assessment_id)
+    public function findMarkedByAssessment($assessment_id): array
     {
         $query = "
-            SELECT            sr.owner AS student_id, COUNT(rm.id)
-            FROM              rubric_indicator_mark rm
-            INNER JOIN        rubric_descriptor rd ON rd.id = rm.descriptor_id
-            INNER JOIN        rubric_level rl ON rl.id = rd.level_id
-            INNER JOIN        submission_box sb ON sb.id = rl.box_id
-            INNER JOIN        assessment a ON a.id = sb.assessment_id
-            LEFT JOIN         submission_return sr ON sr.box_id = sb.id
-            WHERE             valid = 1 AND a.id = :assessmentId AND sr.deleted_at IS NULL
-            GROUP BY          sr.owner
+            SELECT sr.owner AS student_id
+            FROM submission_return sr
+            JOIN submission_box sb on sr.box_id = sb.id
+            JOIN (
+                -- find most recent feedback (including drafts)
+                SELECT sr.owner, MAX(sr.updated_at) AS max_updated_at
+                FROM submission_return sr
+                JOIN submission_box sb on sr.box_id = sb.id
+                WHERE
+                      sb.assessment_id = :assessment_id_1 AND
+                      sr.review_route = :review_route_1 AND
+                      sr.deleted_at IS NULL
+                GROUP BY sr.owner
+            ) t1 ON t1.owner = sr.owner AND t1.max_updated_at = sr.updated_at
+            JOIN rubric_group_mark rgm on sr.id = rgm.return_id
+            WHERE
+                sb.assessment_id = :assessment_id_2 AND
+                sr.review_route = :review_route_2 AND
+                sr.deleted_at IS NULL AND
+                rgm.valid = 1
+            GROUP BY sr.owner
         ";
-        $stmt = $this->database->prepare($query);
+        $stmt  = $this->database->prepare($query);
         $stmt->execute([
-            'assessmentId' => $assessment_id
+            'assessment_id_1' => $assessment_id,
+            'assessment_id_2' => $assessment_id,
+            'review_route_1'  => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
+            'review_route_2'  => ReturnedWork::REVIEW_ROUTE_INSTRUCTOR,
         ]);
-        $rowset = $stmt->fetchAll();
+        $rowset      = $stmt->fetchAll();
         $rubricMarks = [];
         foreach ($rowset as $row) {
             $rubricMarks[$row['student_id']] = true;
