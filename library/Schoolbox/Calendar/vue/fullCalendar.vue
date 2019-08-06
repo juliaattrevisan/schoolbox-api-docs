@@ -235,6 +235,7 @@
                       :token="config.token" />
 
         <filter-modal ref="filter"
+                      :sources="config.sources"
                       :event-types="config.eventTypes"
                       :groups="config.groups"
                       :campuses="config.campuses" />

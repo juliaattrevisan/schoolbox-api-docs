@@ -32,6 +32,9 @@
                     ? this.toMoment(this.event.date).format(this.event.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma')
                     : '';
             },
+            nonTaskEventTypes() {
+                return this.eventTypes.filter(v => !v.isTaskType);
+            },
         },
         methods: {
             open() {
@@ -89,7 +92,7 @@
                         <label>
                             Event Type
                             <select name="type" v-model="event.type">
-                                <option v-for="eventType in eventTypes" :value="eventType.id">
+                                <option v-for="eventType in nonTaskEventTypes" :value="eventType.id">
                                     {{ eventType.name }}
                                 </option>
                             </select>

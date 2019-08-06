@@ -4,6 +4,7 @@
     export default {
         name: "filter-modal",
         props: [
+            'sources',
             'eventTypes',
             'groups',
             'campuses',
@@ -27,10 +28,15 @@
                             <legend>Sources</legend>
                             <input type="checkbox" class="select_all" id="sourceSelectAll" checked />
                             <label for="sourceSelectAll">Select all</label>
-                            <!-- BEGIN filter_source -->
-                            <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" class="applyFilters"/>
-                            <label for="source{SOURCE_ID}">{SOURCE_NAME}</label>
-                            <!-- END filter_source -->
+
+                            <template v-for="source in sources">
+                                <input type="checkbox"
+                                       name="source"
+                                       :id="'source' + String(source.id)"
+                                       :value="'source' + String(source.id)"
+                                       class="applyFilters" />
+                                <label :for="'source' + String(source.id)">{{ source.name }}</label>
+                            </template>
                         </fieldset>
                     </div>
                     <div class="small-6 large-3 columns">

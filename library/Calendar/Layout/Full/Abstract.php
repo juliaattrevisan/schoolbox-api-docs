@@ -8,6 +8,8 @@
  */
 
 use Calendar\Api\ModuleChecker;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -173,7 +175,8 @@ abstract class Calendar_Layout_Full_Abstract
         $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
 
         // select all types
-        $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
+        /** @var EventType[] $typeList */
+        $typeList = EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {
             $selected['group'] = $_SESSION['calendarFilter']['groups'];
             $selected['campus'] = $_SESSION['calendarFilter']['campus'];
@@ -202,8 +205,8 @@ abstract class Calendar_Layout_Full_Abstract
 
         $this->setSelected($selected);
 
-        $category_list = $this->getCategoryList();
-        $campus_list = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
+        $categoryList = $this->getCategoryList();
+        $campusList = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
 
         // Shoehorn the above into JSON-encoded vars
         $this->getPage()->setVar(
@@ -215,7 +218,7 @@ abstract class Calendar_Layout_Full_Abstract
                         $v['type'] = (int)$v['type'];
                         return $v;
                     },
-                    $category_list
+                    $categoryList
                 )
             )
         );
@@ -223,77 +226,119 @@ abstract class Calendar_Layout_Full_Abstract
             'CAMPUSES_JSON',
             json_encode(
                 array_map(
-                    function ($v) { return ['id' => (int)$v['CAMPUS_ID'], 'name' => $v['CAMPUS_NAME']]; },
-                    $campus_list
+                    function ($v) {
+                        return [
+                            'id'   => (int)$v['CAMPUS_ID'],
+                            'name' => $v['CAMPUS_NAME']
+                        ];
+                    },
+                    $campusList
+                )
+            )
+        );
+        $this->getPage()->setVar(
+            'EVENT_TYPES_JSON',
+            json_encode(
+                $typeList->map(
+                    function (EventType $v) {
+                        return [
+                            'id'         => $v->getId(),
+                            'name'       => $v->getType(),
+                            'color'      => $v->getColor(),
+                            'isTaskType' => $v->isTaskType(),
+                        ];
+                    }
+                )
+            )
+        );
+        $this->getPage()->setVar(
+            'SOURCES_JSON',
+            json_encode(
+                array_map(
+                    function ($v) {
+                        return [
+                            'id'    => $v['id'],
+                            'name'  => $v['name'],
+                        ];
+                    },
+                    $sourceList
                 )
             )
         );
 
 
-        $this->getPage()->dropDown(
-            'export_group',
-            $category_list,
-            [],
-            TEMPLATE_content,
-            array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
-        );
-        $this->getPage()->dropDown(
-            'export_campus',
-            $campus_list,
-            [],
-            TEMPLATE_content,
-            array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
-        );
-        $this->getPage()->dropDown(
-            'export_type',
-            $typeList,
-            [],
-            TEMPLATE_content,
-            array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
-        );
-        // Might need special PHPLibs here
-        $this->getPage()->checkList(
-            'filter_source',
-            $sourceList,
-            $selected['source'],
-            TEMPLATE_content,
-            array('name' => 'SOURCE_NAME', 'id' => 'SOURCE_ID')
-        );
-
-        //Bastardise the folder names to get the codes in
-        //Better than changing checkList()
-        foreach ($category_list as $key => $value) {
-            if (!empty($category_list[$key]['code'])) {
-                $category_list[$key]['name'] = $category_list[$key]['name'] . ' (' . $category_list[$key]['code'] . ')';
+        // output task type too
+        foreach ($typeList as $type) {
+            if ($type->isTaskType()) {
+                $this->getPage()->setVar('TASK_TYPE_ID', $type->getId());
             }
         }
-        $this->getPage()->checkList(
-            'filter_group',
-            $category_list,
-            $selected['group'],
-            TEMPLATE_content,
-            array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
-        );
-        $this->getPage()->checkList(
-            'filter_campus',
-            $campus_list,
-            $selected['campus'],
-            TEMPLATE_content,
-            array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
-        );
-        $this->getPage()->checkList(
-            'filter_event_type',
-            $typeList,
-            $selected['event_type'],
-            TEMPLATE_content,
-            array(
-                'type'  => 'EVENT_TYPE_NAME',
-                'id'    => 'EVENT_TYPE_ID',
-                'color' => 'EVENT_TYPE_COLOUR'
-            )
-        );
-        $this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));
-        $this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $this->getSelectedDate())));
+
+
+//        $this->getPage()->dropDown(
+//            'export_group',
+//            $categoryList,
+//            [],
+//            TEMPLATE_content,
+//            array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
+//        );
+//        $this->getPage()->dropDown(
+//            'export_campus',
+//            $campusList,
+//            [],
+//            TEMPLATE_content,
+//            array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
+//        );
+//        $this->getPage()->dropDown(
+//            'export_type',
+//            $typeList,
+//            [],
+//            TEMPLATE_content,
+//            array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
+//        );
+//        // Might need special PHPLibs here
+//        $this->getPage()->checkList(
+//            'filter_source',
+//            $sourceList,
+//            $selected['source'],
+//            TEMPLATE_content,
+//            array('name' => 'SOURCE_NAME', 'id' => 'SOURCE_ID')
+//        );
+//
+//        //Bastardise the folder names to get the codes in
+//        //Better than changing checkList()
+//        foreach ($categoryList as $key => $value) {
+//            if (!empty($categoryList[$key]['code'])) {
+//                $categoryList[$key]['name'] = $categoryList[$key]['name'] . ' (' . $categoryList[$key]['code'] . ')';
+//            }
+//        }
+//        $this->getPage()->checkList(
+//            'filter_group',
+//            $categoryList,
+//            $selected['group'],
+//            TEMPLATE_content,
+//            array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
+//        );
+//        $this->getPage()->checkList(
+//            'filter_campus',
+//            $campusList,
+//            $selected['campus'],
+//            TEMPLATE_content,
+//            array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
+//        );
+//        $this->getPage()->checkList(
+//            'filter_event_type',
+//            $typeList,
+//            $selected['event_type'],
+//            TEMPLATE_content,
+//            array(
+//                'type'  => 'EVENT_TYPE_NAME',
+//                'id'    => 'EVENT_TYPE_ID',
+//                'color' => 'EVENT_TYPE_COLOUR'
+//            )
+//        );
+//        $this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));
+//        $this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $this->getSelectedDate())));
     }
 
     /* Getters/Setters
