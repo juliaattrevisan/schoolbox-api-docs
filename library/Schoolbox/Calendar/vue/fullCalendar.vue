@@ -228,7 +228,8 @@
         <export-modal ref="export"
                       :event-types="config.eventTypes"
                       :groups="config.groups"
-                      :campuses="config.campuses" />
+                      :campuses="config.campuses"
+                      :translations="config.translations" />
 
         <reveal-modal ref="filter">
             ccc

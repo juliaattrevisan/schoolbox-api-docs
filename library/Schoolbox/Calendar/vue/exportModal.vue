@@ -7,6 +7,7 @@
             'eventTypes',
             'groups',
             'campuses',
+            'translations',
         ],
         components: {RevealModal},
         methods: {
@@ -40,9 +41,8 @@
                     <input type="radio" name="export" value="timetabledays" id="export-timetableday" />
                     <label for="export-timetableday">Timetable days</label>
 
-                    <!-- need to pass in translation table? -->
                     <input type="radio" name="export" value="duework" id="export-duework" />
-                    <label for="export-duework">{TPL_LOCAL_DUEWORK_PC}</label>
+                    <label for="export-duework">{{ translations.dueWork.proper }}</label>
 
                     <input type="radio" name="export" value="resources" id="export-resources" />
                     <label for="export-resources">Resource Booking</label>
@@ -50,11 +50,9 @@
                     <input type="radio" name="export" value="external" id="export-external" />
                     <label for="export-external">External events</label>
 
-                    <!-- need to pass in translation table + EOTC status -->
                     <input type="radio" name="export" value="eotc_all" id="export-eotc-all" />
-                    <label for="export-eotc-all">{TPL_LOCAL_EOTC_PC}</label>
+                    <label for="export-eotc-all">{{ translations.eotc.proper }}</label>
 
-                    <!-- need to pass in campi, groups, types -->
                     <input type="radio" name="export" value="campus" id="export-campus" />
                     <label for="export-campus">Events for campus:
                         <select name="campus">
