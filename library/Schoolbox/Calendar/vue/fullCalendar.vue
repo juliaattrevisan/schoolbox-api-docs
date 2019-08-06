@@ -51,7 +51,7 @@
                 /* Show loading div right in the middle
                  */
                 if (isLoading === true) {
-                    window.$.magnificPopup.open({
+                    this.window.$.magnificPopup.open({
                         showCloseBtn: false,
                         items: {
                             src: "<div class='preview loader'></div>",
@@ -64,7 +64,7 @@
                 else {
                     /* Hide loading div
                      */
-                    window.$.magnificPopup.close();
+                    this.window.$.magnificPopup.close();
 
                     // // update any tasks that have been completed by strikethrough-ing them
                     // $(this).find('input[type=checkbox]').each(function () {
@@ -131,7 +131,7 @@
 
                 // Mangle the event using old-fashioned jQuery
                 // TODO don't do this
-                let $element = window.$(eventRenderInfo.el),
+                let $element = this.window.$(eventRenderInfo.el),
                     inner    = $element.find('.fc-content'),
                     title    = $element.find('.fc-title'),
                     content  = $element.find('.fc-event-content');
