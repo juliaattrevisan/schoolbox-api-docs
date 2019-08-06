@@ -115,36 +115,5 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
             'USER_TOKEN'               => $this->getUser()->getKey(),
         ]);
-
-//        /* Render event types to choose from
-//         */
-//        /** @var Collection|EventType[] $allTypes */
-//        $allTypes   = EventTypeMapper::getInstance()->findAll();
-//        $eventTypes = [];
-//
-//        if ($allTypes->count()) {
-//            foreach ($allTypes as $currentType) {
-//                if ($currentType->isTaskType()) {
-//                    $this->getPage()->setVar([
-//                        'TASK_TYPE_ID' => $currentType->getId(),
-//                    ]);
-//                } else {
-//                    $this->getPage()->setVar([
-//                        'EVENT_TYPE_ID' => $currentType->getId(),
-//                        'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
-//                    ]);
-//                    $eventTypes[] = [
-//                        'id'    => $currentType->getId(),
-//                        'name'  => $currentType->getType(),
-//                        'color' => $currentType->getColor(),
-//                    ];
-//
-//                    $this->getPage()->parse('event_type_block', 'event_type', true);
-//                }
-//            }
-//        } else {
-//            $this->getPage()->setVar('event_type_block', '');
-//        }
-//        $this->getPage()->setVar('EVENT_TYPES_JSON', json_encode($eventTypes));
     }
 }
