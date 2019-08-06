@@ -48,6 +48,7 @@ class RoleCloner
         $this->cloneCategoryPermissions($source, $destination);
         $this->cloneSchoolNewsPermissions($source, $destination);
         $this->cloneSchoolCalendarPermissions($source, $destination);
+        $this->cloneTours($source, $destination);
     }
 
     /**
@@ -212,6 +213,26 @@ class RoleCloner
     ", [
             'src'  => $source->getId(),
             'dest' => $destination->getId()
+        ]);
+    }
+
+    /**
+     * Clones tours.
+     * @param Role $source
+     * @param Role $destination
+     */
+    protected function cloneTours(Role $source, Role $destination): void
+    {
+        $this->clonePerms("
+            DELETE FROM `tour_audience_role` WHERE `role_id` = ?
+        ", "
+            INSERT INTO `tour_audience_role` (moderator_user_id, tour_uuid, role_id)
+            SELECT moderator_user_id, tour_uuid, :dest
+            FROM `tour_audience_role`
+            WHERE `role_id` = :src
+        ", [
+            'src'  => $source->getId(),
+            'dest' => $destination->getId(),
         ]);
     }
 
