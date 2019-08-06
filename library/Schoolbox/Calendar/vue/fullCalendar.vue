@@ -13,18 +13,20 @@
     import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
     import ExportModal              from "./exportModal";
+    import FilterModal              from "./filterModal";
     import axios                    from 'axios'
     import toQueryString            from "./helper/toQueryString";
 
     export default {
         components: {
+            FilterModal,
             ExportModal,
             CreateEventModal,
             ViewEventModal,
             MetaItem,
             MetaList,
             FullCalendar,
-            RevealModal
+            RevealModal,
         },
         data() {
             return {
@@ -232,9 +234,7 @@
                       :translations="config.translations"
                       :token="config.token" />
 
-        <reveal-modal ref="filter">
-            ccc
-        </reveal-modal>
+        <filter-modal ref="filter" />
 
         <create-event-modal ref="createEvent"
                             :event="newEvent"
