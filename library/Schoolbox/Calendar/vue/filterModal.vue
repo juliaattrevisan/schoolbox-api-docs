@@ -32,10 +32,10 @@
                             <template v-for="source in sources">
                                 <input type="checkbox"
                                        name="source"
-                                       :id="'source' + String(source.id)"
-                                       :value="'source' + String(source.id)"
+                                       :id="'source' + source.ids.join(',')"
+                                       :value="'source' + source.ids.join(',')"
                                        class="applyFilters" />
-                                <label :for="'source' + String(source.id)">{{ source.name }}</label>
+                                <label :for="'source' + source.ids.join(',')">{{ source.name }}</label>
                             </template>
                         </fieldset>
                     </div>

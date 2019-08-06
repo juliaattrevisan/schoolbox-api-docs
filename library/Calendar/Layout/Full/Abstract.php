@@ -256,8 +256,9 @@ abstract class Calendar_Layout_Full_Abstract
             json_encode(
                 array_map(
                     function ($v) {
+                        // Source IDs are comma-separated? How did this happen?
                         return [
-                            'id'    => $v['id'],
+                            'ids'   => array_map('intval', explode(',', $v['id'])),
                             'name'  => $v['name'],
                         ];
                     },
