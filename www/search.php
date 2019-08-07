@@ -146,7 +146,9 @@ if ($enabled) {
             $this->parse('type_block', 'type', true);
             $this->parse('result_block', 'result', true);
         } else {
-            $config['renderer']->renderTab($count);
+            if ($count[$typeName] > 0) {
+                $config['renderer']->renderTab($count);
+            }
         }
     }
 
