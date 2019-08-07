@@ -331,6 +331,9 @@ $allow-sidebar-stash: $large-up;
 	 * This is the currently-logged-in user's dom element
 	 * Appears when you click a guy's username in the left menu
 	 */
+
+  z-index: 1002;
+
   .account-menu-mobile {
     color: $accounts-menu-text-colour;
     background-color: transparent;
