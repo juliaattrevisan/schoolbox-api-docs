@@ -59,10 +59,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle): bool
     {
         $configuredForecastLimit = $this->getConfig('size');
+
         // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option, so we have to fall back to default
-        $forecastLimit = (null === $configuredForecastLimit || 0 === (int)$configuredForecastLimit)
-            ? self::DEFAULT_FORECAST_LIMIT
-            : (int)$configuredForecastLimit;
+        $forecastLimit = (int)$configuredForecastLimit ?: self::DEFAULT_FORECAST_LIMIT;
+
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit++;
 
