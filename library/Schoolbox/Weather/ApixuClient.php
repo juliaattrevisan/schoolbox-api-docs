@@ -101,7 +101,7 @@ class ApixuClient
      * @param array $responseData
      * @return array
      */
-    private function parseWeatherData($responseData) : array
+    private function parseWeatherData(array $responseData) : array
     {
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
@@ -157,7 +157,7 @@ class ApixuClient
      * @param int $timestamp
      * @return string
      */
-    private function getDayOfWeek($timestamp) {
+    private function getDayOfWeek(int $timestamp) {
         if (\Alaress_Date_Format::newFromTimestamp($timestamp)->getDateOnly() === \Alaress_Date_Format::now()->getDateOnly()) {
             return 'Now';
         }
