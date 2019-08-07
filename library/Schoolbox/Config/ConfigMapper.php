@@ -101,7 +101,6 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
     public const _CLOUDWORK_OAUTH_CLIENT_ID         = self::PREFIX_CLOUDWORK_OAUTH . 'client_id';
     public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
-    public const _CANVAS_DATA_DB_NAME               = 'canvas_data_db_name';
     public const _CANVAS_DATA_API_KEY               = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
 
@@ -261,7 +260,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
             case self::FIELD_BOOLEAN:
             case self::FIELD_CHECKBOX:
                 return $value === null ? null : (bool)$value;
-                break;
+            default:
         }
         return $value;
     }
