@@ -32,7 +32,12 @@ class Indicator extends Base
 {
     /**************************** Capability queries ***************************/
 
-    private const DELETE_INDICATOR_QUERY = '
+    private const DELETE_INDICATOR_QUERY_V1 = '
+        UPDATE rubric_criterion
+        SET    deleted_at = :now
+        WHERE  id         = :indicatorId
+    ';
+    private const DELETE_INDICATOR_QUERY_V2 = '
         UPDATE rubric_indicator
         SET    deleted_at = :now
         WHERE  id         = :indicatorId
@@ -41,7 +46,14 @@ class Indicator extends Base
 
     /**************************** Indicator queries ***************************/
 
-    private const FIND_CAPABILITY_INDICATORS_QUERY = '
+    private const FIND_CAPABILITY_INDICATORS_QUERY_V1 = '
+        SELECT id, name
+        FROM   rubric_criterion
+        WHERE  rubric_group_id = :capabilityId
+        AND    deleted_at      IS NULL
+        ORDER BY name, id
+    ';
+    private const FIND_CAPABILITY_INDICATORS_QUERY_V2 = '
         SELECT id, name
         FROM   rubric_indicator
         WHERE  rubric_capability_id = :capabilityId
@@ -52,7 +64,15 @@ class Indicator extends Base
 
     /**************************** Usage queries ***************************/
 
-    private const COUNT_INDICATOR_USAGES_QUERY = '
+    private const COUNT_INDICATOR_USAGES_QUERY_V1 = '
+        SELECT COUNT(*)
+        FROM       rubric_criterion_usage rcu
+        INNER JOIN submission_box         sb ON rcu.submission_box_id = sb.id
+        INNER JOIN assessment             a  ON sb.assessment_id = a.id
+        WHERE rcu.criterion_id = :indicatorId
+        AND   a.deleted_at IS NULL
+    ';
+    private const COUNT_INDICATOR_USAGES_QUERY_V2 = '
         SELECT COUNT(*)
         FROM       rubric_indicator_usage rcu
         INNER JOIN submission_box         sb ON rcu.submission_box_id = sb.id
@@ -98,12 +118,24 @@ class Indicator extends Base
     protected function setupQueries(): void
     {
         $this->deleteIndicatorQuery
-            = $this->db->prepareQuery(self::DELETE_INDICATOR_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::DELETE_INDICATOR_QUERY_V2
+                    : self::DELETE_INDICATOR_QUERY_V1
+        );
 
         $this->findCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITY_INDICATORS_QUERY_V2
+                    : self::FIND_CAPABILITY_INDICATORS_QUERY_V1
+            );
         $this->countIndicatorUsagesQuery
-            = $this->db->prepareQuery(self::COUNT_INDICATOR_USAGES_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::COUNT_INDICATOR_USAGES_QUERY_V2
+                    : self::COUNT_INDICATOR_USAGES_QUERY_V1
+            );
     }
 
 

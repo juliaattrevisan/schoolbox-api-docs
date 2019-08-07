@@ -35,7 +35,14 @@ class Indicator extends Base
 {
     /**************************** Indicator queries ***************************/
 
-    private const FIND_CAPABILITY_INDICATORS_QUERY = '
+    private const FIND_CAPABILITY_INDICATORS_QUERY_V1 = '
+        SELECT id, name
+        FROM   rubric_criterion
+        WHERE  rubric_group_id = :capabilityId
+        AND    deleted_at      IS NULL
+        ORDER BY name, id
+    ';
+    private const FIND_CAPABILITY_INDICATORS_QUERY_V2 = '
         SELECT id, name
         FROM   rubric_indicator
         WHERE  rubric_capability_id = :capabilityId
@@ -46,7 +53,18 @@ class Indicator extends Base
 
     /**************************** Usage merging queries ***************************/
 
-    private const FIND_INDICATOR_USAGES_QUERY = '
+    private const FIND_INDICATOR_USAGES_QUERY_V1 = '
+        SELECT
+            rcu.submission_box_id AS box_id,
+            a.id,
+            a.title
+        FROM       rubric_criterion_usage rcu
+        INNER JOIN submission_box         sb ON rcu.submission_box_id = sb.id
+        INNER JOIN assessment             a  ON sb.assessment_id = a.id
+        WHERE rcu.criterion_id = :indicatorId
+        AND   a.deleted_at IS NULL
+    ';
+    private const FIND_INDICATOR_USAGES_QUERY_V2 = '
         SELECT
             rcu.submission_box_id AS box_id,
             a.id,
@@ -58,14 +76,27 @@ class Indicator extends Base
         AND   a.deleted_at IS NULL
     ';
 
-    private const MERGE_INDICATOR_USAGE_QUERY = '
+    private const MERGE_INDICATOR_USAGE_QUERY_V1 = '
+        UPDATE rubric_criterion_usage
+        SET   criterion_id      = :originalIndicatorId
+        WHERE criterion_id      = :duplicateIndicatorId
+        AND   submission_box_id = :boxId
+    ';
+    private const MERGE_INDICATOR_USAGE_QUERY_V2 = '
         UPDATE rubric_indicator_usage
         SET   rubric_indicator_id      = :originalIndicatorId
         WHERE rubric_indicator_id      = :duplicateIndicatorId
         AND   submission_box_id = :boxId
     ';
 
-    private const MERGE_INDICATOR_DESCRIPTOR_QUERY = '
+    private const MERGE_INDICATOR_DESCRIPTOR_QUERY_V1 = '
+        UPDATE     rubric_descriptor rd
+        INNER JOIN rubric_level      rl ON rd.level_id = rl.id
+        SET   rd.criterion_id = :originalIndicatorId
+        WHERE rd.criterion_id = :duplicateIndicatorId
+        AND   rl.box_id       = :boxId
+    ';
+    private const MERGE_INDICATOR_DESCRIPTOR_QUERY_V2 = '
         UPDATE     rubric_descriptor rd
         INNER JOIN rubric_level      rl ON rd.level_id = rl.id
         SET   rd.rubric_indicator_id = :originalIndicatorId
@@ -116,14 +147,30 @@ class Indicator extends Base
     protected function setupQueries(): void
     {
         $this->findCapabilityIndicatorsQuery
-            = $this->db->prepareQuery(self::FIND_CAPABILITY_INDICATORS_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_CAPABILITY_INDICATORS_QUERY_V2
+                    : self::FIND_CAPABILITY_INDICATORS_QUERY_V1
+            );
 
         $this->findIndicatorUsagesQuery
-            = $this->db->prepareQuery(self::FIND_INDICATOR_USAGES_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::FIND_INDICATOR_USAGES_QUERY_V2
+                    : self::FIND_INDICATOR_USAGES_QUERY_V1
+            );
         $this->mergeIndicatorUsageQuery
-            = $this->db->prepareQuery(self::MERGE_INDICATOR_USAGE_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_INDICATOR_USAGE_QUERY_V2
+                    : self::MERGE_INDICATOR_USAGE_QUERY_V1
+            );
         $this->mergeIndicatorDescriptorQuery
-            = $this->db->prepareQuery(self::MERGE_INDICATOR_DESCRIPTOR_QUERY);
+            = $this->db->prepareQuery(
+                $this->useV2Queries
+                    ? self::MERGE_INDICATOR_DESCRIPTOR_QUERY_V2
+                    : self::MERGE_INDICATOR_DESCRIPTOR_QUERY_V1
+            );
     }
 
 
