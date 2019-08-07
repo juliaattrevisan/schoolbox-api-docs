@@ -317,14 +317,19 @@
             :plugins="calendarPlugins"
             :views="{
                 timeGridDay: {
-                    // dateDisplayFormats.momentJsDateLong: figure out how to inject this
                     titleFormat: config.dateDisplayFormats.momentJsDateLong
                 },
                 timeGridWeek: {
-                    columnFormat: 'ddd D/M'
+                    columnHeaderFormat: 'ddd D/M'
                 }
             }"
-            event-time-format="h(:mm)a"
+            :event-time-format="{
+                hour: 'numeric',
+                hour12: true,
+                minute: '2-digit',
+                meridiem: 'short',
+                omitZeroMinute: true,
+            }"
             content-height="auto"
             :custom-buttons="{
                 customExport: {
