@@ -30,6 +30,11 @@ class ApixuClient
      */
     private $apiUrl;
 
+    /**
+     * ApixuClient constructor.
+     * @param string $apiKey
+     * @param string $apiUrl
+     */
     public function __construct(string $apiKey, string $apiUrl)
     {
         $this->apiKey = $apiKey;
