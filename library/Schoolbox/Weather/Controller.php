@@ -16,6 +16,7 @@ use Component_InstanceMapper;
 
 class Controller extends Base
 {
+    // TODO these global defaults should come from the database. This will be addressed in SA-7986
     private const DEFAULT_LOCATION = 'Melbourne, Australia';
     private const DEFAULT_FORECAST_LIMIT = 5;
 

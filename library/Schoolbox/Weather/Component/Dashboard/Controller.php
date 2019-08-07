@@ -15,9 +15,7 @@ use SitePage;
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-    // TODO these defaults are actually stored in the DB; should we be looking at the instead?
-    // select * from schoolbox.component_config_definition where component_definition_id=5
-    // see default_value field (only forecast limit is set but could easily update the other one)
+    // TODO these global defaults should come from the database. This will be addressed in SA-7986
     private const DEFAULT_LOCATION = 'Melbourne, Australia';
     private const DEFAULT_FORECAST_LIMIT = 3;
 
