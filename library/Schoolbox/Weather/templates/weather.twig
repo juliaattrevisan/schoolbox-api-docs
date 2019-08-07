@@ -96,19 +96,4 @@ Weather details page (linked from dashboard component)
         </div>
     </div>
 
-    <div class="row">
-        <div class="small-12 medium-6 island">
-            <h2 class="subheader">Weather around Australia</h2>
-            <section>
-                <ul class="information-list">
-                    {% for region in regions %}
-                        <li class="row content">
-                            <a href="{{routeLookup('weather.getWeatherDetails')}}?location={{region}}">{{ region }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </div>
-    </div>
-
 {% endif %}

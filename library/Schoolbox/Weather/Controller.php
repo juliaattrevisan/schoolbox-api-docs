@@ -19,17 +19,6 @@ class Controller extends Base
     private const DEFAULT_LOCATION = 'Melbourne, Australia';
     private const DEFAULT_FORECAST_LIMIT = 5;
 
-    private const AUS_CITIES = [
-        'Melbourne',
-        'Sydney',
-        'Canberra',
-        'Perth',
-        'Adelaide',
-        'Darwin',
-        'Hobart',
-        'Brisbane'
-    ];
-
     /**
      * @api GET /weather
      */
@@ -38,7 +27,6 @@ class Controller extends Base
         $location = $_GET['location'] ?: self::DEFAULT_LOCATION;
         $apixuClient = new ApixuClient($this->getConfigLoader()->get('weather_api_key'), $this->getConfigLoader()->get('weather_api_url'));
         $twigData = $apixuClient->getForecast(self::DEFAULT_FORECAST_LIMIT, $location);
-        $twigData['regions'] = self::AUS_CITIES;
         $this->getResponse()->content->set($this->buildHtmlOutput('@weather/weather.twig', $twigData));
     }
 }
