@@ -12,20 +12,24 @@
                 text:         '',
                 state:        STATE_HIDDEN,
                 fadeDuration: 2000,
+                hidden:       true,
             };
         },
         methods: {
             activate(text) {
-                this.text  = text;
-                this.state = STATE_PENDING;
+                this.text   = text;
+                this.state  = STATE_PENDING;
+                this.hidden = false;
             },
             timeout(text, successful, duration, fadeDuration) {
+                let self = this;
                 this.text         = text;
                 this.state        = successful ? STATE_DONE : STATE_FAILED;
                 this.fadeDuration = fadeDuration;
                 setTimeout(
                     function () {
-                        this.state = STATE_HIDDEN;
+                        this.state  = STATE_HIDDEN;
+                        this.hidden = true;
                     },
                     duration
                 )
@@ -49,13 +53,13 @@
 </script>
 
 <template>
-    <transition name="fade" duration="{ leave: fadeDuration }">
-        <div ref="toast" v-if="!isHidden" :class="{toast: true, alert: isFailed, done: isDone}">
+    <transition name="fade" duration="{ enter: fadeDuration, leave: fadeDuration }">
+        <div ref="toast" v-if="!isHidden" :class="{toast: true, alert: isFailed, success: isDone}" :style="{opacity: 1}">
             {{ text }}
         </div>
     </transition>
 </template>
 
 <style scoped>
-    /* Styles are in a global scss file for now: there they may stay */
+    /* Styles are in a global scss file for now: there they may stay. But override the default opacity */
 </style>
