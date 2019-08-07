@@ -21,18 +21,19 @@ class ApixuClient
     private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
     private const NOW = 'Now';
 
-    /*
-     * @var string $apiKey
+    /**
+     * @var string
      */
     private $apiKey;
 
-    /*
-     * @var string $apiUrl
+    /**
+     * @var string
      */
     private $apiUrl;
 
     /**
      * ApixuClient constructor.
+     *
      * @param string $apiKey
      * @param string $apiUrl
      */
@@ -161,7 +162,8 @@ class ApixuClient
      * @param int $timestamp
      * @return string
      */
-    private function getDayOfWeek(int $timestamp) {
+    private function getDayOfWeek(int $timestamp): string
+    {
         if (\Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(\Alaress_Date_Format::now())) {
             return self::NOW;
         }
