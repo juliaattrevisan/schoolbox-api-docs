@@ -1,10 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: dbaker-alaress
- * Date: 21/11/18
- * Time: 2:59 PM
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
+
+declare(strict_types=1);
 
 namespace Schoolbox\Weather;
 
