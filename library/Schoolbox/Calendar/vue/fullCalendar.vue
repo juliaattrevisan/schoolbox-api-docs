@@ -71,21 +71,6 @@
                      */
                     // this.$refs.toast.timeout('Done', true, 3000, 2000);
                     this.window.$.magnificPopup.close();
-
-                    // // update any tasks that have been completed by strikethrough-ing them
-                    // $(this).find('input[type=checkbox]').each(function () {
-                    //     var self = $(this);
-                    //
-                    //     if (self.prop('checked')) {
-                    //         self.siblings('.fc-title').addClass('strike')
-                    //     }
-                    // });
-                    //
-                    // // // reapply filters
-                    // // c.filters.organise(c, ["campus", "groups", "sources"], false);
-                    //
-                    // // update datepicker
-                    // $('#datepicker').datepicker('setDate', FullCalendarMoment.toMoment(this.getDate(), this).format('DD-MM-YYYY'))
                 }
             },
             events: function (fetchInfo, callback) {

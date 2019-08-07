@@ -139,7 +139,6 @@
                         data:   qs.stringify({id: this.eventExtendedProps.eventId}),
                         params: {
                             action: 'Delete',
-                            // TODO add efficacy, redirects, etc?
                         },
                     };
                 axios
