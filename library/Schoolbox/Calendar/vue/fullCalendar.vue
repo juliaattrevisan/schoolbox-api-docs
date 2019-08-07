@@ -107,15 +107,16 @@
                         callback(response.data.filter(function (v) {
                             return 'start' in v;
                         }));
-
-                        // There should be no need to preserve state change on loading events
-                        // /* Save state to the db every time you change tabs
-                        //  */
-                        // // TODO restore this
-                        // $.post('/calendar/changeState', {calendarView: fc.view.type});
                     }
                 );
                 // Fail callback: consider a message saying something failed
+            },
+            viewSkeletonRender: function (info) {
+                // Preserve most recent view for this user
+                axios.post(
+                    '/calendar/changeState',
+                    toQueryString({calendarView: info.view.type})
+                );
             },
             eventRender: function (eventRenderInfo) {
                 let calEvent = eventRenderInfo.event,
@@ -361,6 +362,7 @@
             :first-day="config.firstDay"
             :events="events"
             :event-render="eventRender"
+            :view-skeleton-render="viewSkeletonRender"
             @loading="onLoading"
             @dateClick="onDateClick"
             @eventClick="onEventClick"
