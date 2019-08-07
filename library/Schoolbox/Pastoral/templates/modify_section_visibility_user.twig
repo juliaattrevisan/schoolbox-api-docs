@@ -71,7 +71,11 @@
 
             {# Callback when user added from modal #}
 
-            window.modalUserAdded = function (user, permission = 1) {
+            window.modalUserAdded = function (user, permission) {
+
+                // this line will check if the argument is undefined, null, or false
+                // if so set it to 1, otherwise set it to it's original value
+                var permission = permission || 1;
 
                 {# Only add if they don't already exist in the table #}
 
