@@ -64,7 +64,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             ? self::DEFAULT_FORECAST_LIMIT
             : (int)$configuredForecastLimit;
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
-        $forecastLimit+=1;
+        $forecastLimit++;
 
         $configuredLocation = $this->getConfig('url');
         $location = (null === $configuredLocation || '' === $configuredLocation)
