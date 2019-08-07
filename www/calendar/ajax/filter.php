@@ -6,8 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-// don't bother trying if fList and view are't set
-if(!(isset($_POST['fList']) && isset($_POST['view']))) {
+// don't bother trying if filters isn't set
+if (!isset($_POST['filters'])) {
     http_response_code(400);
     die('Not enough data supplied');
 }
@@ -37,4 +37,4 @@ foreach ($_POST['filters'] as $filterType => $filterValues) {
     }
 }
 
-die($response ? 'Updated successfully' : 'Error updating');
+die('Updated successfully');

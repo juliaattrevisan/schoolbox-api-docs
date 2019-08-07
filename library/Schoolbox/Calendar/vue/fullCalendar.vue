@@ -287,13 +287,10 @@
             updateSelectedFilters: function (selectedFilters) {
                 // The selected filters in config are read-only and passed by reference.
                 // TODO pass it by value into the filter modal, and update in this method
-                let fullCalendar = this.$refs.fullCalendar.getApi(),
-                    data         = { filters: this.config.selectedFilters, };
-                fullCalendar.rerenderEvents();
+                this.$refs.fullCalendar.getApi().rerenderEvents();
 
                 // Preserve the filters that were selected
-                console.log(data);
-                console.log(qs.stringify(data));
+                axios.post('/calendar/ajax/filter', qs.stringify({ filters: this.config.selectedFilters, }))
             },
         }
     }
