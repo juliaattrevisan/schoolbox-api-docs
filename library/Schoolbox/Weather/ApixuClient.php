@@ -78,20 +78,20 @@ class ApixuClient
 
         // Attempt to json decode the response body
         try{
-            $decoded_response = json_decode($response, true);
+            $decodedResponse = json_decode($response, true);
         } catch (\RuntimeException $e){
             throw new \DomainException('Unable to read Weather API response', $response, $e);
         }
 
 
         // If this is an array, we can assume we got some data back
-        if (\is_array($decoded_response)) {
-            return $decoded_response;
+        if (\is_array($decodedResponse)) {
+            return $decodedResponse;
         }
 
         // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
         // with a HTML payload. This happens for example if you hit a login wall, which redirected you to a login page.
-        throw new \DomainException("Unable to decode Weather API response: {$decoded_response}", $response);
+        throw new \DomainException("Unable to decode Weather API response: {$decodedResponse}", $response);
     }
 
 
