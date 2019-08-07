@@ -35,7 +35,7 @@
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist sources">
                             <legend>Sources</legend>
-                            <input type="checkbox" class="select_all" id="sourceSelectAll" checked />
+                            <input type="checkbox" class="select_all" id="sourceSelectAll" />
                             <label for="sourceSelectAll">Select all</label>
 
                             <template v-for="source in sources">
@@ -43,6 +43,7 @@
                                        name="source"
                                        :id="'source' + source.ids.join(',')"
                                        :value="'source' + source.ids.join(',')"
+                                       v-model="selectedFilters.source"
                                        class="applyFilters" />
                                 <label :for="'source' + source.ids.join(',')">{{ source.name }}</label>
                             </template>
@@ -51,7 +52,7 @@
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist groups">
                             <legend>Groups</legend>
-                            <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
+                            <input type="checkbox" class="select_all" id="groupsSelectAll" />
                             <label for="groupsSelectAll">Select all</label>
 
                             <template v-for="group in groups">
@@ -59,6 +60,7 @@
                                        name="group"
                                        :id="'group' + String(group.id)"
                                        :value="'group' + String(group.id)"
+                                       v-model="selectedFilters.group"
                                        class="applyFilters" />
                                 <label :for="'group' + String(group.id)">{{ group.name }}</label>
                             </template>
@@ -67,7 +69,7 @@
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist campus">
                             <legend>Campus</legend>
-                            <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
+                            <input type="checkbox" class="select_all"  id="campusSelectAll" />
                             <label for="campusSelectAll">Select all</label>
 
                             <template v-for="campus in campuses">
@@ -75,6 +77,7 @@
                                        name="group"
                                        :id="'campus' + String(campus.id)"
                                        :value="'campus' + String(campus.id)"
+                                       v-model="selectedFilters.campus"
                                        class="applyFilters" />
                                 <label :for="'campus' + String(campus.id)">{{ campus.name }}</label>
                             </template>
@@ -83,14 +86,15 @@
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist events">
                             <legend>Event</legend>
-                            <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
+                            <input type="checkbox" id="eventTypeSelectAll" class="select_all" />
                             <label for="eventTypeSelectAll">Select all</label>
 
                             <template v-for="eventType in eventTypes">
                                 <input type="checkbox"
                                        name="group"
                                        :id="'eventType' + String(eventType.id)"
-                                       :value="'type' + String(eventType.id)"
+                                       :value="'eventType' + String(eventType.id)"
+                                       v-model="selectedFilters.eventType"
                                        class="applyFilters" />
                                 <label :for="'eventType' + String(eventType.id)"
                                        :style="{backgroundColor: eventType.color}">{{ eventType.name }}</label>
