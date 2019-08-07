@@ -16,6 +16,8 @@
     $.alaressValidate.defaultErrorPlacement = function(error, element) {
         if (element.is('[data-radio-block]')) {
             element.parents('fieldset').find('div.error-placeholder').html(error);
+        } else if (element.is('.selectized')) {
+            error.insertAfter(element.closest('div, fieldset').find('.selectize-control'));
         } else if (element.is('[type="checkbox"], [type="radio"]')) {
             var parentSearch;
 
