@@ -1,0 +1,112 @@
+{#
+Weather details page (linked from dashboard component)
+
+@param bool weatherAvailable
+@param string weatherLocation
+@param array today
+@param array forecastDays
+#}
+
+{% if weatherAvailable %}
+
+    <div class="row">
+        <div class="small-12 columns">
+            <h1>Weather for {{ weatherLocation }}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Currently</h2>
+            <p class="meta">Last updated: {{ today.lastUpdated }}</p>
+            <section>
+                <div class="row collapse">
+                    <ul class="weather-list">
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <div class="weather-summary">
+                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" />
+                                    <p class="meta">{{ today.weatherSummary }}</p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Temperature</h3>
+
+                                <div class="temperature">
+                                    <p class="temperature-forecast">
+                                        <span class="meta">Currently {{ today.currentTemp }}&deg;C</span>
+                                        <span class="hot">Hi {{ today.highTemp }}&deg;C</span>
+                                        <span class="cold">Lo {{ today.lowTemp }}&deg;C</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Wind</h3>
+                                <p class="meta">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
+                            </div>
+                        </li>
+
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <h3>Humidity</h3>
+                                <p class="meta">{{ today.humidity }}%</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            <h2 class="subheader">Forecast</h2>
+
+            <section>
+                <div class="row collapse">
+                    <ul class="weather-list">
+                        {% for forecastDay in forecastDays %}
+                            <li class="weather-forecast">
+                                <div class="weather-card">
+                                    <h3>{{ forecastDay.day }}</h3>
+                                    <div class="weather-summary">
+                                        <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
+                                        <p class="meta">{{ forecastDay.weatherSummary }}</p>
+                                    </div>
+                                    <p class="temperature">
+                                        <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
+                                        <span class="cold">Lo {{ forecastDay.lowTemp }}&deg;C</span>
+                                    </p>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    {#<div class="row"></div>#}
+    {#<div class="small-12 medium-6 columns">#}
+    {#<h2 class="subheader">Weather supplied by</h2>#}
+    {#<section class="content">#}
+    {#<div class="content">#}
+    {#<a href="{{ apiProvider.url }}" target="_blank"><img alt="{{ apiProvider.name }}" src="{{ apiProvider.logo }}" />{{ apiProvider.name }}</a>#}
+    {#</div>#}
+    {#</div>#}
+    {#</div>#}
+
+{% else %}
+
+    <div data-alert="" class="alert-box alert">
+        Weather forecast is temporarily unavailable.
+    </div>
+
+{% endif %}

@@ -1,0 +1,180 @@
+<?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Weather;
+
+/**
+ * Class ApixuClient
+ * Helper class for making API calls to the Apixu weather API.
+ *
+ * @package Schoolbox\Weather
+ */
+class ApixuClient
+{
+    private const PROVIDER_NAME = 'Apixu';
+    private const PROVIDER_URL = 'https://apixu.com';
+    private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
+    private const NOW = 'Now';
+
+    /**
+     * @var string
+     */
+    private $apiKey;
+
+    /**
+     * @var string
+     */
+    private $apiUrl;
+
+    /**
+     * ApixuClient constructor.
+     *
+     * @param string $apiKey
+     * @param string $apiUrl
+     */
+    public function __construct(string $apiKey, string $apiUrl)
+    {
+        $this->apiKey = $apiKey;
+        $this->apiUrl = $apiUrl;
+    }
+
+    /**
+     * Get the data from the API in a JSON format usable by Twig
+     *
+     * @param int $forecastLimit   How many days to forecast - configurable in component settings
+     * @param string $location     City to get weather for - configurable in component settings
+     *
+     * @return array
+     */
+    public function getForecast(int $forecastLimit, string $location) : array
+    {
+        try {
+            $response = $this->makeRequest($forecastLimit, $location);
+            $twigData = $this->parseWeatherData($response);
+        } catch (\Exception $e) {
+            return ['weatherAvailable' => false];
+        }
+
+        return $twigData;
+    }
+
+    /**
+     * Find $forecastLimit days worth of information about $location
+     *
+     * @param int $forecastLimit   How many days to forecast - configurable in component settings
+     * @param string $location     City to get weather for - configurable in component settings
+     *
+     * @return array
+     * @throws \DomainException
+     */
+    private function makeRequest(int $forecastLimit, string $location) : array
+    {
+        $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
+
+        // Cache the request
+        $cache = new \Alaress_Weather_Cache();
+        $cache->init($this->apiUrl . $requestUrl);
+        $response = $cache->getStreamContents();
+
+        // Attempt to json decode the response body
+        try{
+            $decodedResponse = json_decode($response, true);
+        } catch (\RuntimeException $e){
+            throw new \DomainException('Unable to read Weather API response', $response, $e);
+        }
+
+
+        // If this is an array, we can assume we got some data back
+        if (\is_array($decodedResponse)) {
+            return $decodedResponse;
+        }
+
+        // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
+        // with a HTML payload. This happens for example if you hit a login wall, which redirected you to a login page.
+        throw new \DomainException("Unable to decode Weather API response: {$decodedResponse}", $response);
+    }
+
+
+    /**
+     * Given a raw JSON response from the API, turn it into a data structure we can use
+     *
+     * @param array $responseData
+     * @return array
+     */
+    private function parseWeatherData(array $responseData) : array
+    {
+        /* If the api wasn't correctly configured, $responseData returns an array
+         * containing an error message
+         */
+        if (isset($responseData['error'])) {
+            return [];
+        }
+
+        $twigData = [
+            'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
+            'apiProvider' => [
+                'url' => self::PROVIDER_URL,
+                'name' => self::PROVIDER_NAME,
+                'logo' => self::PROVIDER_LOGO
+            ]
+        ];
+
+        $todayLastUpdated = \Alaress_Date_Format::newFromTimestamp($responseData['current']['last_updated_epoch'])->getRelativeTime();
+
+        $twigData['today'] = [
+            'day' => $this->getDayOfWeek($responseData['current']['last_updated_epoch']),
+            'weatherSummary' => $responseData['current']['condition']['text'],
+            'weatherIcon' => $responseData['current']['condition']['icon'],
+            'currentTemp' => $responseData['current']['temp_c'],
+            'humidity' => $responseData['current']['humidity'],
+            'windSpeed' => $responseData['current']['wind_kph'],
+            'windDirection' => $responseData['current']['wind_dir'],
+            'lastUpdated' => $todayLastUpdated
+        ];
+
+        foreach($responseData['forecast']['forecastday'] as $forecastDay) {
+            // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
+            if ($this->getDayOfWeek($forecastDay['date_epoch']) === self::NOW) {
+                $twigData['today']['lowTemp'] = $forecastDay['day']['mintemp_c'];
+                $twigData['today']['highTemp'] = $forecastDay['day']['maxtemp_c'];
+                continue;
+            }
+
+            $dayForecast = [
+                'day' => $this->getDayOfWeek($forecastDay['date_epoch']),
+                'weatherSummary' => $forecastDay['day']['condition']['text'],
+                'weatherIcon' => $forecastDay['day']['condition']['icon'],
+                'lowTemp' => $forecastDay['day']['mintemp_c'],
+                'highTemp' => $forecastDay['day']['maxtemp_c']
+            ];
+
+            $twigData['forecastDays'][] = $dayForecast;
+
+        }
+
+        // If we've reached this code path, we successfully retrieved the weather data.
+        $twigData['weatherAvailable'] = true;
+
+        return $twigData;
+    }
+
+    /**
+     * Given a unix timestamp, get a string representing the day of the week.
+     *
+     * @param int $timestamp
+     * @return string
+     */
+    private function getDayOfWeek(int $timestamp): string
+    {
+        if (\Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(\Alaress_Date_Format::now())) {
+            return self::NOW;
+        }
+
+        return \Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
+    }
+}
