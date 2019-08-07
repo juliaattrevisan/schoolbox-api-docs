@@ -42,7 +42,7 @@
                                 <input type="checkbox"
                                        name="source"
                                        :id="'source' + source.ids.join(',')"
-                                       :value="'source' + source.ids.join(',')"
+                                       :value="source.ids"
                                        v-model="selectedFilters.source"
                                        class="applyFilters" />
                                 <label :for="'source' + source.ids.join(',')">{{ source.name }}</label>
@@ -59,7 +59,7 @@
                                 <input type="checkbox"
                                        name="group"
                                        :id="'group' + String(group.id)"
-                                       :value="'group' + String(group.id)"
+                                       :value="group.id"
                                        v-model="selectedFilters.group"
                                        class="applyFilters" />
                                 <label :for="'group' + String(group.id)">{{ group.name }}</label>
@@ -76,7 +76,7 @@
                                 <input type="checkbox"
                                        name="group"
                                        :id="'campus' + String(campus.id)"
-                                       :value="'campus' + String(campus.id)"
+                                       :value="campus.id"
                                        v-model="selectedFilters.campus"
                                        class="applyFilters" />
                                 <label :for="'campus' + String(campus.id)">{{ campus.name }}</label>
@@ -93,7 +93,7 @@
                                 <input type="checkbox"
                                        name="group"
                                        :id="'eventType' + String(eventType.id)"
-                                       :value="'eventType' + String(eventType.id)"
+                                       :value="eventType.id"
                                        v-model="selectedFilters.eventType"
                                        class="applyFilters" />
                                 <label :for="'eventType' + String(eventType.id)"
