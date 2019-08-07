@@ -20,6 +20,7 @@ provision_script = default["provision_script"]
 data_source = default["data_source"]
 data_filename = default["data_filename"]
 enable_xdebug = default["enable_xdebug"]
+bridged_network_interface = default["bridged_network_interface"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -61,6 +62,9 @@ if File.file?('vagrant.yaml')
   if !conf["enable_xdebug"].nil?
     enable_xdebug = conf["enable_xdebug"]
   end
+  if !conf["bridged_network_interface"].nil?
+    bridged_network_interface = conf["bridged_network_interface"]
+  end
 
 end
 
@@ -72,7 +76,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.network :private_network, ip: private_network_ip
 
   if public_network
-    config.vm.network :public_network
+    if bridged_network_interface
+        config.vm.network "public_network", bridge: "#{bridged_network_interface}"
+    else
+        config.vm.network :public_network
+    end
   end
 
   config.vm.provider :virtualbox do |vb|
