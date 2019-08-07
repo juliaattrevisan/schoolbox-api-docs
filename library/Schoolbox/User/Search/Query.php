@@ -121,7 +121,7 @@ class Query
     {
         $statement = $this->db->prepareQuery(
             'SELECT id FROM user ' . $this->getWhereStatement() .
-            ' ORDER BY firstname, lastname ASC LIMIT 0, ' . $this->limit
+            ' ORDER BY lastname, firstname ASC LIMIT 0, ' . $this->limit
         );
 
         $statement->execute([

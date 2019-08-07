@@ -204,8 +204,6 @@ class User extends DeprecatedModel
      * @param int    $offset
      * @param int    $limit
      * @param null   $count
-     * @param string $sort_by
-     * @param string $sort_dir
      *
      * @return array|bool
      */
@@ -215,7 +213,7 @@ class User extends DeprecatedModel
         if (preg_match('#".+"#', $keyword)) {
             // strip the prepended and appended quote characters
             $keyword = substr($keyword, 1, strlen($keyword) - 2);
-            return $this->searchExact($keyword, $offset, $limit, $count, $sort_by, $sort_dir);
+            return $this->searchExact($keyword, $offset, $limit, $count);
         }
         // Don't allow LIKE searches on keywords < 3 chars long
         $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
@@ -254,7 +252,7 @@ class User extends DeprecatedModel
             LEFT JOIN `luCampus` ON `userCampus`.campus = `luCampus`.id
             WHERE $wherePart
         ";
-        $query .= " ORDER BY firstname, lastname ASC
+        $query .= " ORDER BY lastname, firstname ASC
                         LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*) FROM `user` LEFT JOIN `groups` ON `user`.group_id = `groups`.id WHERE $wherePart";
@@ -271,17 +269,13 @@ class User extends DeprecatedModel
      * @param int    $offset
      * @param int    $limit
      * @param null   $count
-     * @param string $sort_by
-     * @param string $sort_dir
      * @return array|bool
      */
     public function searchExact(
         $keyword,
         $offset = 0,
         $limit = 20,
-        &$count = null,
-        $sort_by = 'lastname',
-        $sort_dir = 'ASC'
+        &$count = null
     ) {
         $keyword = $this->db->quote($keyword);
 
@@ -308,7 +302,7 @@ class User extends DeprecatedModel
                     OR lastname = '$keyword'
                     OR username = '$keyword' )
                     $wherePart
-                    ORDER BY `$sort_by` $sort_dir
+                    ORDER BY lastname, firstname ASC
                     LIMIT $offset, $limit;";
         // retreive count
         $count_query = "SELECT COUNT(*)
