@@ -16,6 +16,7 @@
 use EOTC\ConfigMapper as EOTCConfigMapper;
 use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\Collection;
 
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
@@ -89,24 +90,8 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         }
 
         // Translate old calendar view to new one
-        $calendarView = null;
-        switch ($_SESSION['user']->getCalendarView()) {
-            case 'week':
-            case 'agendaWeek':
-                $calendarView = 'timeGridWeek';
-                break;
-
-            case 'day':
-            case 'agendaDay':
-                $calendarView = 'timeGridDay';
-                break;
-
-            case 'month':
-            case 'list':
-            default:
-                $calendarView = 'dayGridMonth';
-                break;
-        }
+        $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$_SESSION['user']->getCalendarView()]
+            ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
         $this->getPage()->setVar([
             'CALENDAR_USER_ID'         => $this->getUser()->getId(),
