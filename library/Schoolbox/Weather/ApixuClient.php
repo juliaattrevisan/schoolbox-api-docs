@@ -19,6 +19,7 @@ class ApixuClient
     private const PROVIDER_NAME = 'Apixu';
     private const PROVIDER_URL = 'https://apixu.com';
     private const PROVIDER_LOGO = 'https://cdn.apixu.com/v2/images/logo.png';
+    private const NOW = 'Now';
 
     /*
      * @var string $apiKey
@@ -130,7 +131,7 @@ class ApixuClient
 
         foreach($responseData['forecast']['forecastday'] as $forecastDay) {
             // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
-            if ($this->getDayOfWeek($forecastDay['date_epoch']) === 'Now') {
+            if ($this->getDayOfWeek($forecastDay['date_epoch']) === self::NOW) {
                 $twigData['today']['lowTemp'] = $forecastDay['day']['mintemp_c'];
                 $twigData['today']['highTemp'] = $forecastDay['day']['maxtemp_c'];
                 continue;
@@ -162,7 +163,7 @@ class ApixuClient
      */
     private function getDayOfWeek(int $timestamp) {
         if (\Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(\Alaress_Date_Format::now())) {
-            return 'Now';
+            return self::NOW;
         }
 
         return \Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
