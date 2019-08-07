@@ -275,6 +275,9 @@
                 // Preserve the filters that were selected
                 axios.post('/calendar/ajax/filter', qs.stringify({ filters: this.config.selectedFilters, }))
             },
+            dayTitleFormat(dateObject) {
+                return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
+            },
         }
     }
 
@@ -316,10 +319,11 @@
             ref="fullCalendar"
             :plugins="calendarPlugins"
             :views="{
-                timeGridDay: {
-                    titleFormat: config.dateDisplayFormats.momentJsDateLong
+                day: {
+                    titleFormat: dayTitleFormat,
+                    columnHeader: false
                 },
-                timeGridWeek: {
+                week: {
                     columnHeaderFormat: 'ddd D/M'
                 }
             }"
