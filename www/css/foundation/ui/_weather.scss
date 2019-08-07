@@ -54,3 +54,43 @@
     }
   }
 }
+
+/* TODO: This already existed in _content.scss
+ * You probably weren't aware this existed lol
+ *
+ * I've moved it here for you to untangle, since it seems you've reimplemented it
+ * There's some kind of interplay between the two .weather-list implementations
+ */
+
+/* Weekly Weather display
+ */
+.weather-list {
+  @include information-list;
+  &.active {
+    background-color: $row-hover-background;
+  }
+  li {
+    text-align: center;
+  }
+}
+
+.weather-list-summary {
+  @include information-list;
+  .active {
+    background-color: $row-hover-background;
+  }
+}
+
+/* Separate for usage in component view
+ */
+.temperature {
+  text-align: center;
+
+  .hot {
+    color: $hot-color;
+    margin-right: 1rem;
+  }
+  .cold {
+    color: $cold-color;
+  }
+}
