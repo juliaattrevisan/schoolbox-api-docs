@@ -28,16 +28,12 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     private const OPT_LONG_HELP        = 'help';              // print help
     private const OPT_LONG_DB_USER     = 'db-user:';
     private const OPT_LONG_DB_PASSWORD = 'db-password:';
-    private const OPT_LONG_DB_HOST     = 'db-host:';
 
     /** @var string */
     private $dbUser;
 
     /** @var string */
     private $dbPassword;
-
-    /** @var string */
-    private $dbHost;
 
     /** @inheritdoc */
     public function runAsRoot(): ?bool
@@ -60,7 +56,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             self::OPT_LONG_HELP,
             self::OPT_LONG_DB_USER,
             self::OPT_LONG_DB_PASSWORD,
-            self::OPT_LONG_DB_HOST,
         ];
     }
 
@@ -74,10 +69,13 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
 
         $dbName = 'canvas_data_' . INSTANCE_ID;
+        $dbHost = SQL_host;
         $dbCredentialFile = '/root/.my.cnf';
 
         // Check whether credential is provided by option
         $credentialProvided = $this->parseAppOptions();
+
+        $this->parseMySqlConfig();
 
         // Use .my.cnf, if the file is accessible and credential is not provided.
         if (!$credentialProvided && file_exists($dbCredentialFile)) {
@@ -86,15 +84,17 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             if (!$credentialProvided) {
                 $this->promptForCredential();
             }
-            $op = "-u {$this->dbUser} -p{$this->dbPassword} -h {$this->dbHost}";
+            $op = "-u {$this->dbUser} -p{$this->dbPassword} -h {$dbHost}";
         }
 
         // Check whether the database already exists.
-        $return = shell_exec("mysql {$op} -e \"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{$dbName}';\"");
-
-        if (null !== $return) {
+        $rootDbConnection = new \Alaress\Database\Connector\Base(new \Alaress\Database\Broker\Mysql\Broker());
+        try {
+            $result = $rootDbConnection->connect($dbHost, $dbName, $this->dbUser, $this->dbPassword);
             $this->getLogger()->info("Database {$dbName} already exists.");
             exit(CliKernelAbstract::EXIT_STATUS_OK);
+        } catch (\Alaress\Database\Exception $e) {
+            // Expected
         }
 
         if ($this->perform()) {
@@ -113,11 +113,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     private function parseAppOptions(): bool
     {
-        $this->dbUser = $this->getOpt(self::OPT_LONG_DB_USER) ?? null;
-        $this->dbPassword = $this->getOpt(self::OPT_LONG_DB_PASSWORD) ?? null;
-        $this->dbHost = $this->getOpt(self::OPT_LONG_DB_HOST) ?? null;
-
-        return ($this->dbUser && $this->dbPassword && $this->dbHost);
+        $this->dbUser = $this->getOpt(self::OPT_LONG_DB_USER);
+        $this->dbPassword = $this->getOpt(self::OPT_LONG_DB_PASSWORD);
+        return ($this->dbUser && $this->dbPassword);
     }
 
     /**
@@ -138,11 +136,28 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->getLogger()->error('A database password must be provided');
             exit(1);
         }
+    }
 
-        $this->dbHost = $this->readLine('Enter a database host: ');
-        if (!$this->dbHost) {
-            $this->getLogger()->error('A database host must be provided');
-            exit(1);
+    /**
+     * Parse config file
+     */
+    private function parseMySqlConfig(): void
+    {
+        $dbCredentialFile = '/root/.my.cnf';
+        $handle = fopen($dbCredentialFile, 'r');
+        while ($line = fgets($handle)) {
+            $conf = explode('=', $line);
+            if (\count($conf) != 2) {
+                continue;
+            }
+            if (trim($conf[0]) === 'user') {
+                $this->dbUser = trim($conf[1]);
+                continue;
+            }
+            if (trim($conf[0]) === 'password') {
+                $this->dbPassword = trim($conf[1]);
+                continue;
+            }
         }
     }
 
@@ -174,9 +189,6 @@ OPTIONS:
         
     $yellow--db-password=DB_PASSWORD$white
         Password to access schoolbox database
-        
-    $yellow--db-host=DB_HOST$white
-        Schoolbox database host
 ";
         \fwrite(STDOUT, $help);
     }
