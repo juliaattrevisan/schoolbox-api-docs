@@ -220,6 +220,10 @@
             reloadEvents: function () {
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
+            updateSelectedFilters: function (selectedFilters) {
+                console.log(selectedFilters);
+                console.log(this.config.selectedFilters);
+            },
         }
     }
 
@@ -239,7 +243,8 @@
                       :sources="config.sources"
                       :event-types="config.eventTypes"
                       :groups="config.groups"
-                      :campuses="config.campuses" />
+                      :campuses="config.campuses"
+                      @filterChanged="updateSelectedFilters" />
 
         <create-event-modal ref="createEvent"
                             :event="newEvent"

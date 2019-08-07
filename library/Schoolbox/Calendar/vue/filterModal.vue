@@ -1,6 +1,8 @@
 <script>
     import RevealModal from "@schoolbox/reveal-modal";
 
+    const FILTER_CHANGED = 'filterChanged';
+
     export default {
         name: "filter-modal",
         props: [
@@ -21,6 +23,11 @@
                 // The events are already loaded regardless of whether the
                 // filters exclude them: the event's visibility just needs to be
                 // updated.
+
+                // Hopefully selectedFilters isn't passed by reference:
+                // I don't want to apply filters till I click this button.
+                // (Turns out they are: I'll have to think of something else)
+                this.$emit(FILTER_CHANGED, this.selectedFilters);
                 this.$refs.modal.close();
             },
         },
