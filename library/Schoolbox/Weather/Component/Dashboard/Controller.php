@@ -66,10 +66,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
         $forecastLimit++;
 
-        $configuredLocation = $this->getConfig('url');
-        $location = (null === $configuredLocation || '' === $configuredLocation)
-            ? self::DEFAULT_LOCATION
-            : $this->getConfig('url');
+        $location = trim($this->getConfig('url')) ?: self::DEFAULT_LOCATION;
 
         $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
