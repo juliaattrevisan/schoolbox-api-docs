@@ -287,7 +287,13 @@
             updateSelectedFilters: function (selectedFilters) {
                 // The selected filters in config are read-only and passed by reference.
                 // TODO pass it by value into the filter modal, and update in this method
-                this.$refs.fullCalendar.getApi().rerenderEvents();
+                let fullCalendar = this.$refs.fullCalendar.getApi(),
+                    data         = { filters: this.config.selectedFilters, };
+                fullCalendar.rerenderEvents();
+
+                // Preserve the filters that were selected
+                console.log(data);
+                console.log(toQueryString(data));
             },
         }
     }

@@ -18,6 +18,23 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = new SitePage();
 $calHandler = new Calendar();
 
-$response = $calHandler->updateFilters($_POST['fList'], $_POST['view']);
+//$response = $calHandler->updateFilters($_POST['fList'], $_POST['view']);
+$_SESSION['calendarFilter'] = [];
+foreach ($_POST['filters'] as $filterType => $filterValues) {
+    switch ($filterType) {
+        case 'campus':
+        case 'eventType':
+        case 'group':
+            $_SESSION['calendarFilter'][$filterType] = array_map('intval', $filterValues);
+            break;
+
+        case 'source':
+            $_SESSION['calendarFilter'][$filterType] = [];
+            foreach ($filterValues as $filterValue) {
+                $_SESSION['calendarFilter'][$filterType][] = array_map('intval', $filterValue);
+            };
+            break;
+    }
+}
 
 die($response ? 'Updated successfully' : 'Error updating');

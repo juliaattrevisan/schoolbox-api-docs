@@ -46,10 +46,12 @@
                 index++;
             });
 
-            $.post('/calendar/ajax/filter', {
-                view: 'list',
-                fList: fList
-            });
+            // This will be broken now I've changed this endpoint.
+            // This entire page will be part of the main calendar soon anyway.
+            // $.post('/calendar/ajax/filter', {
+            //     view: 'list',
+            //     fList: fList
+            // });
         }
 
         $('[data-update-filter]').change(function() {
