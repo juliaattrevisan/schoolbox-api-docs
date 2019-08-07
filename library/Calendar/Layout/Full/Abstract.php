@@ -188,10 +188,10 @@ abstract class Calendar_Layout_Full_Abstract
         // Load what is selected: default to selecting everything
         /** @var EventType[] $typeList */
         if (isset($_SESSION['calendarFilter'])) {
-            $selected['group']      = $_SESSION['calendarFilter']['groups'];
-            $selected['campus']     = $_SESSION['calendarFilter']['campus'];
-            $selected['event_type'] = $_SESSION['calendarFilter']['events'];
-            $selected['source']     = $_SESSION['calendarFilter']['sources'];
+            $selected['group']     = $_SESSION['calendarFilter']['groups'];
+            $selected['campus']    = $_SESSION['calendarFilter']['campus'];
+            $selected['eventType'] = $_SESSION['calendarFilter']['events'];
+            $selected['source']    = $_SESSION['calendarFilter']['sources'];
         } else {
             // select everything
             if (count($this->getCategoryList())) {
@@ -204,7 +204,7 @@ abstract class Calendar_Layout_Full_Abstract
             $selected['campus'] = array_map('intval', $_SESSION['campus']);
 
             foreach ($typeList as $type) {
-                $selected['event_type'][] = $type->getId();
+                $selected['eventType'][] = $type->getId();
             }
 
             // select all sources
