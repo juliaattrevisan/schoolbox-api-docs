@@ -14,11 +14,22 @@
         var section = 'all';
         var pageNumber = 1;
 
+
         if (window.location.hash.length > 1) {
             var params = $.fn.fetchHash();
 
+            var registeredTabs = [];
+
+            // Get rendered tabs
+            $('.sub-nav dd a').each(function( index ) {
+                registeredTabs[index] = $(this).attr('data-section');
+            });
+
             if (params.length) {
-                section = params[0];
+                // If the provided hash is not registered on the rendered tabs, always go back to all (as the default)
+                if (registeredTabs.includes(params[0])) {
+                    section = params[0];
+                }
             }
 
             if (params.length > 1) {
