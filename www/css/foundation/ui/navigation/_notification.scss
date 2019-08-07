@@ -47,7 +47,7 @@ $allow-notification-stash: $xlarge-up;
 .right-off-canvas-menu {
     background-color: $off-canvas-background;
     flex: 0 0 $off-canvas-width;
-    z-index: 1001;
+    z-index: 1002;
 
     &[data-unread="0"] {
         ul.off-canvas-list {

@@ -7,6 +7,7 @@
 
 namespace Schoolbox\User;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -29,7 +30,6 @@ class Controller extends Base
 
     /** @var Logger\Mapper */
     private $assumeUserLogMapper;
-
 
     /**
      * @param UserAccessMapper $userAccessMapper
@@ -130,5 +130,35 @@ class Controller extends Base
 
         // Return a json encoded array :)
         $this->getResponse()->content->set($this->buildJsonOutput($parentEmails));
+    }
+
+    /**
+     * Returns a JSON array of users based on keyword
+     *
+     * @api /user/search
+     */
+    public function search()
+    {
+        $keyword = $this->request->query['keyword'];
+
+        if ($keyword !== null) {
+            try {
+                /** @var IConnector $db */
+                $db = $this->di->get('databaseInternal');
+                $userSearchService = new User\Search\Query($db);
+                $result = $userSearchService->fetchResults($keyword);
+            } catch (\Exception $exception) {
+                // noop
+                $result = [
+                    'message' => $exception->getMessage()
+                ];
+            }
+        }
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                $result
+            )
+        );
     }
 }

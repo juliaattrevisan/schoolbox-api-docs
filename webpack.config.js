@@ -3,7 +3,8 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
-    // news: "./src/index.js"
+    hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
+    clickoutside: path.resolve(__dirname, 'resources/js/click-outside/index.js')
   },
   output: {
     path: path.resolve(__dirname, "www/javascript/components"),
@@ -20,7 +21,14 @@ module.exports = {
       },
       {
         test: /\.vue$/,
-        loader: 'vue-loader'
+        loader: 'vue-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
+      {
+        test: /\.css$/,
+        use: ['vue-style-loader', 'css-loader']
       }
     ]
   },
@@ -31,6 +39,6 @@ module.exports = {
     extensions: ['*', '.js', '.vue', '.json']
   },
   plugins: [
-      new VueLoaderPlugin()
+    new VueLoaderPlugin()
   ]
 };

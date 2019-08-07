@@ -127,7 +127,6 @@
 
         {% endif %}
         {{ scripts.header | raw }}
-
     {% endblock mainHeader %}
 
     {##
@@ -222,10 +221,7 @@
 
                         {% block search %}
                             {% if user.current.id %}
-                                <form id="search" class="global-search" action="/search" method="get">
-                                    <input id="search-field" type="text" name="keyword" placeholder="Search"/>
-                                    <label data-jsubmit for="search-field" class="icon-search no-text"></label>
-                                </form>
+                                <search-bar></search-bar>
                             {% endif %}
                         {% endblock search %}
 
@@ -275,18 +271,6 @@
                 <script type="text/javascript">
                     Foundation.global.namespace = '';
                     $(document).foundation();
-
-                    $(function () {
-                        var s = $('#search');
-
-                        s.on('focus blur', 'input', function (e) {
-                            if (e.type === 'focusin') {
-                                s.addClass('focus');
-                            } else {
-                                s.removeClass('focus');
-                            }
-                        });
-                    });
                 </script>
                 {% set user_role = user.current.role.name | escape('js') %}
                 {{ config.site_analytics | replace({'{USER_ROLE}':user_role}) | raw }}
@@ -384,5 +368,7 @@
         <a href="#" class="exit-off-canvas"></a>
     </div>
 </div>
+
+<script src="/javascript/components/hybridbar.bundle.js"></script>
 </body>
 </html>
