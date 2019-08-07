@@ -114,7 +114,8 @@
                 // Fail callback: consider a message saying something failed
             },
             eventRender: function (eventRenderInfo) {
-                let calEvent = eventRenderInfo.event;
+                let calEvent = eventRenderInfo.event,
+                    self     = this;
 
                 // Always render placeholders in the most basic manner
                 if (calEvent.id === 'placeholder') {
@@ -137,8 +138,6 @@
                     inner    = $element.find('.fc-content'),
                     title    = $element.find('.fc-title'),
                     content  = $element.find('.fc-event-content');
-
-                // title.text(calEvent?.title || '');
 
                 // If appropriate, indicate this event can be attended
                 if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
@@ -164,7 +163,67 @@
 
                 // Apply the visible class?
                 $element.addClass(calEvent?.extendedProps?.data?.styles?.visible);
-                return true;
+
+                // Ensure that this event matches the selected filters.
+                // For all of them, match against the event's class names.
+                let eventFilters    = {},
+                    isEventRendered = true;
+                calEvent.classNames.forEach(function (className) {
+                    let match = className.match(/^([a-z]+)(\d+)/i);
+                    if (match) {
+                        let prefix = match[1],
+                            id     = Number(match[2]);
+                        if (!eventFilters[prefix]) {
+                            eventFilters[prefix] = [];
+                        }
+                        eventFilters[prefix].push(id);
+                    }
+                });
+
+
+                // All of the event's attributes must match at least one selected.
+                // If it doesn't, don't render it.
+                Object.keys(eventFilters).forEach(function (prefix) {
+                    let ids                = eventFilters[prefix],
+                        matchesAnyInFilter = true;
+                    ids.forEach(function (id) {
+                        // Check id against the list of selected filters.
+                        // (Sources have multiple IDs per source: only check one)
+                        switch (prefix) {
+                            case 'source':
+                                if (!self.config.selectedFilters.source.flat().includes(id)) {
+                                    matchesAnyInFilter = false;
+                                }
+                                break;
+
+                            case 'type':
+                                if (!self.config.selectedFilters.eventType.includes(id)) {
+                                    matchesAnyInFilter = false;
+                                }
+                                break;
+
+                            case 'group':
+                                if (!self.config.selectedFilters.group.includes(id)) {
+                                    matchesAnyInFilter = false;
+                                }
+                                break;
+
+                            case 'campus':
+                                if (!self.config.selectedFilters.campus.includes(id)) {
+                                    matchesAnyInFilter = false;
+                                }
+                                break;
+
+                            default:
+                                break;
+                        }
+                    });
+                    if (!matchesAnyInFilter) {
+                        isEventRendered = false;
+                    }
+                });
+
+                return isEventRendered;
             },
             onDateClick: function (dateClickInfo) {
                 let [firstEventType] = this.config.eventTypes;
@@ -221,8 +280,9 @@
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
             updateSelectedFilters: function (selectedFilters) {
-                console.log(selectedFilters);
-                console.log(this.config.selectedFilters);
+                // The selected filters in config are read-only and passed by reference.
+                // TODO pass it by value into the filter modal, and update in this method
+                this.$refs.fullCalendar.getApi().rerenderEvents();
             },
         }
     }
