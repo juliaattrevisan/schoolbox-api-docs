@@ -107,7 +107,7 @@ class Javascript extends Base
             'author'    => $event->getAuthorName(),
             'authorId'  => $event->getAuthorId(),
             'level'     => $event->getEventClasses(),
-            'completed' => '',
+            'completed' => false,
             'folderName'=> $assessable->getContext()->getFolder()->getTitle(),
             'folderId'  => $assessable->getContext()->getFolder()->getId(),
             'workType'  => $workType ? $workType->getName() : null,

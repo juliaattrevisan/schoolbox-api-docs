@@ -86,7 +86,7 @@ class Javascript extends Base
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),
                     'level'       => $this->getEvent()->getEventClasses(),
-                    'completed'   => $this->getEvent()->getCompleted(),
+                    'completed'   => (bool)$this->getEvent()->getCompleted(),
                 ),
                 'links'      => array(
                     'category' => array(
