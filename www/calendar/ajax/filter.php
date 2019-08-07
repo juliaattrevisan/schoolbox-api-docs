@@ -19,7 +19,12 @@ $page = new SitePage();
 $calHandler = new Calendar();
 
 //$response = $calHandler->updateFilters($_POST['fList'], $_POST['view']);
-$_SESSION['calendarFilter'] = [];
+$_SESSION['calendarFilter'] = [
+    'campus'    => [],
+    'eventType' => [],
+    'group'     => [],
+    'source'    => [],
+];
 foreach ($_POST['filters'] as $filterType => $filterValues) {
     switch ($filterType) {
         case 'campus':

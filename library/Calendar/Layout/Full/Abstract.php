@@ -188,10 +188,10 @@ abstract class Calendar_Layout_Full_Abstract
         // Load what is selected: default to selecting everything
         /** @var EventType[] $typeList */
         if (isset($_SESSION['calendarFilter'])) {
-            $selected['group']     = $_SESSION['calendarFilter']['groups'];
-            $selected['campus']    = $_SESSION['calendarFilter']['campus'];
-            $selected['eventType'] = $_SESSION['calendarFilter']['events'];
-            $selected['source']    = $_SESSION['calendarFilter']['sources'];
+            $selected['group']     = $_SESSION['calendarFilter']['group']      ?? [];
+            $selected['campus']    = $_SESSION['calendarFilter']['campus']     ?? [];
+            $selected['eventType'] = $_SESSION['calendarFilter']['eventType']  ?? [];
+            $selected['source']    = $_SESSION['calendarFilter']['source']     ?? [];
         } else {
             // select everything
             if (count($this->getCategoryList())) {

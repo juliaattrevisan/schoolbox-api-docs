@@ -194,33 +194,31 @@
                     ids.forEach(function (id) {
                         // Check id against the list of selected filters.
                         // (Sources have multiple IDs per source: only check one)
+                        // (If they've selected nothing: treat that as selecting everything?)
+                        let keyspace = [];
                         switch (prefix) {
                             case 'source':
-                                if (!self.config.selectedFilters.source.flat().includes(id)) {
-                                    matchesAnyInFilter = false;
-                                }
+                                keyspace = (self.config.selectedFilters?.source || []).flat();
                                 break;
 
                             case 'type':
-                                if (!self.config.selectedFilters.eventType.includes(id)) {
-                                    matchesAnyInFilter = false;
-                                }
+                                keyspace = self.config.selectedFilters?.eventType || [];
                                 break;
 
                             case 'group':
-                                if (!self.config.selectedFilters.group.includes(id)) {
-                                    matchesAnyInFilter = false;
-                                }
+                                keyspace = self.config.selectedFilters?.group || [];
                                 break;
 
                             case 'campus':
-                                if (!self.config.selectedFilters.campus.includes(id)) {
-                                    matchesAnyInFilter = false;
-                                }
+                                keyspace = self.config.selectedFilters?.campus || [];
                                 break;
 
                             default:
-                                break;
+                                // Ignore this one
+                                return;
+                        }
+                        if (keyspace.length > 0 && !keyspace.includes(id)) {
+                            matchesAnyInFilter = false;
                         }
                     });
                     if (!matchesAnyInFilter) {
