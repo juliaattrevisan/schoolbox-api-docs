@@ -1,6 +1,6 @@
 <script>
-    import RevealModal   from '@schoolbox/reveal-modal'
-    import toQueryString from "./helper/toQueryString";
+    import RevealModal from '@schoolbox/reveal-modal'
+    import qs          from 'qs';
 
     export default {
         name: "export-modal",
@@ -48,7 +48,7 @@
                     + '//'
                     + this.window.location.host
                     + '/calendar/export.php?'
-                    + toQueryString(values);
+                    + qs.stringify(values);
             },
         },
     }

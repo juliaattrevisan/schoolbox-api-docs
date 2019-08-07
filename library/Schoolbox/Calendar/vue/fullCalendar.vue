@@ -16,7 +16,7 @@
     import ExportModal              from "./exportModal";
     import FilterModal              from "./filterModal";
     import axios                    from 'axios'
-    import toQueryString            from "./helper/toQueryString";
+    import qs                       from "qs";
 
     export default {
         components: {
@@ -115,7 +115,7 @@
                 // Preserve most recent view for this user
                 axios.post(
                     '/calendar/changeState',
-                    toQueryString({calendarView: info.view.type})
+                    qs.stringify({calendarView: info.view.type})
                 );
             },
             eventRender: function (eventRenderInfo) {
@@ -256,7 +256,7 @@
                         end:     this.toMoment(event.end).format(),
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/ajax/update', toQueryString(data));
+                axios.post('/calendar/ajax/update', qs.stringify(data));
             },
             onEventDrop: function (eventDropInfo) {
                 let event = eventDropInfo.event,
@@ -267,7 +267,7 @@
                         allDay:      event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/ajax/update', toQueryString(data));
+                axios.post('/calendar/ajax/update', qs.stringify(data));
             },
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
@@ -293,7 +293,7 @@
 
                 // Preserve the filters that were selected
                 console.log(data);
-                console.log(toQueryString(data));
+                console.log(qs.stringify(data));
             },
         }
     }

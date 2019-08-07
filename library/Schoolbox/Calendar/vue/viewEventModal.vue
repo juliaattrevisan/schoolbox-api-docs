@@ -1,9 +1,9 @@
 <script>
-    import RevealModal   from '@schoolbox/reveal-modal'
-    import MetaList      from '@schoolbox/meta/list'
-    import MetaItem      from '@schoolbox/meta/item'
-    import axios         from 'axios';
-    import toQueryString from "./helper/toQueryString";
+    import RevealModal from '@schoolbox/reveal-modal'
+    import MetaList    from '@schoolbox/meta/list'
+    import MetaItem    from '@schoolbox/meta/item'
+    import axios       from 'axios';
+    import qs          from 'qs';
 
     const EFFICIACY_SELF = 'self';
     const EFFICIACY_SERIES = 'series';
@@ -109,7 +109,7 @@
                     },
                     request = {
                         url:          form.action,
-                        data:         toQueryString(data),
+                        data:         qs.stringify(data),
                         method:       form.method,
                         responseType: 'json',
                     };
@@ -136,7 +136,7 @@
                     request = {
                         url:    '/calendar/modifyForm.php',
                         method: 'post',
-                        data:   toQueryString({id: this.eventExtendedProps.eventId}),
+                        data:   qs.stringify({id: this.eventExtendedProps.eventId}),
                         params: {
                             action: 'Delete',
                             // TODO add efficacy, redirects, etc?
@@ -259,7 +259,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.links.delete, toQueryString(data))
+                    .post(this.eventExtendedProps.links.delete, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_DELETED, this.event));
             },
@@ -269,7 +269,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.booking.actions.cancel.href, toQueryString(data))
+                    .post(this.eventExtendedProps.booking.actions.cancel.href, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_DELETED, this.event));
             },
@@ -279,7 +279,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.booking.actions.approve.href, toQueryString(data))
+                    .post(this.eventExtendedProps.booking.actions.approve.href, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
@@ -289,7 +289,7 @@
                     efficacy: efficacy,
                 };
                 return axios
-                    .post(this.eventExtendedProps.booking.actions.reject.href, toQueryString(data))
+                    .post(this.eventExtendedProps.booking.actions.reject.href, qs.stringify(data))
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
@@ -305,7 +305,7 @@
                         };
 
                     axios
-                        .post(self.eventExtendedProps.attendance.actions.toggle.href, toQueryString(data))
+                        .post(self.eventExtendedProps.attendance.actions.toggle.href, qs.stringify(data))
                         .then(function () {
                             eventData.attendance.nextAction = nextAction === ATTENDANCE_ACTION_ADD
                                 ? ATTENDANCE_ACTION_REMOVE
