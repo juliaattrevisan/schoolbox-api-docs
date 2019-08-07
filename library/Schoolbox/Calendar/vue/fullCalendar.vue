@@ -54,9 +54,10 @@
             onLoading:  function (isLoading) {
                 /* Show loading div right in the middle
                  */
+                // TODO find a non-jQuery dependent way to do this
                 if (isLoading === true) {
                     // this.$refs.toast.activate('Loading...');
-                    this.window.$.magnificPopup.open({
+                    this.window.jQuery.magnificPopup.open({
                         showCloseBtn: false,
                         items: {
                             src: "<div class='preview loader'></div>",
@@ -70,7 +71,7 @@
                     /* Hide loading div
                      */
                     // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                    this.window.$.magnificPopup.close();
+                    this.window.jQuery.magnificPopup.close();
                 }
             },
             events: function (fetchInfo, callback) {
@@ -123,8 +124,8 @@
                 }
 
                 // Mangle the event using old-fashioned jQuery
-                // TODO don't do this
-                let $element = this.window.$(eventRenderInfo.el),
+                // TODO don't depend on jQuery for this
+                let $element = this.window.jQuery(eventRenderInfo.el),
                     inner    = $element.find('.fc-content'),
                     title    = $element.find('.fc-title'),
                     content  = $element.find('.fc-event-content');
@@ -142,7 +143,7 @@
                 // If this event is a task, alter the state of the checkbox accordingly.
                 if (this.isTask(calEvent)) {
                     inner.prepend(
-                        $('<input type="checkbox" name="completed" class="plain" />')
+                        this.window.jQuery('<input type="checkbox" name="completed" class="plain" />')
                             .attr('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId)
                     );
                     if (Boolean(calEvent?.extendedProps?.data?.meta?.completed)) {
