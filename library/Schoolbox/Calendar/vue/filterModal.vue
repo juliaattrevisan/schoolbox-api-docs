@@ -42,6 +42,7 @@
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist sources">
                             <legend>Sources</legend>
+                            <!-- TODO get the select-alls working -->
                             <input type="checkbox" class="select_all" id="sourceSelectAll" />
                             <label for="sourceSelectAll">Select all</label>
 
