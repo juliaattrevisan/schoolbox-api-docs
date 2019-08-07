@@ -376,7 +376,7 @@ class External_Tass_User implements External_UserInterface
             return [];
         }
         if ($user->getRole()->isStudent()) {
-            $sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, student.year_grp, sub_desc, sub_type
+            $sql = "SELECT class, studsub.cmpy_code, semester, studsub.sub_code, ISNULL(student.year_grp,subtab.year_grp) as year_grp, sub_desc, sub_type
                     FROM studsub
                     JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                     JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
@@ -386,7 +386,7 @@ class External_Tass_User implements External_UserInterface
                     ORDER BY studsub.sub_code ASC, studsub.class ASC
             ";
         } else if ($user->getRole()->isStaff()) {
-            $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, tchsub.year_grp, sub_desc, sub_type
+            $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, ISNULL(tchsub.year_grp,subtab.year_grp) as year_grp, sub_desc, sub_type
                     FROM tchsub
                     JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
                     WHERE tch_code = '$externalId'
