@@ -158,7 +158,7 @@ class ApixuClient
      * @return string
      */
     private function getDayOfWeek(int $timestamp) {
-        if (\Alaress_Date_Format::newFromTimestamp($timestamp)->getDateOnly() === \Alaress_Date_Format::now()->getDateOnly()) {
+        if (\Alaress_Date_Format::newFromTimestamp($timestamp)->isSameDay(\Alaress_Date_Format::now())) {
             return 'Now';
         }
 
