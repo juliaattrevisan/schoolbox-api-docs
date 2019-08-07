@@ -22,6 +22,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
     private const DEFAULT_FORECAST_LIMIT = 3;
 
     /**
+     * @var array $weatherPayload
+     */
+    private $weatherPayload;
+
+
+    /**
      * Controller constructor.
      *
      * @param Component_Instance $instance
@@ -32,19 +38,32 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
-        $location = (null === $this->getConfig('url') || '' === $this->getConfig('url')) ? self::DEFAULT_LOCATION : $this->getConfig('url');
-        $this->setComponentName('Weather in ' . $location);
     }
 
 
     /**
      * Get the data to put into the template
-     * // TODO not sure what to use this for
      *
      * @return bool
      */
     public function execute(): bool
     {
+        $location = trim($this->getConfig('url')) ?: self::DEFAULT_LOCATION;
+        $this->setComponentName('Weather in ' . $location);
+
+        // Number of days of forecast to show.
+        // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option, so we have to fall back to default
+        $forecastLimit = (int)$this->getConfig('size') ?: self::DEFAULT_FORECAST_LIMIT;
+
+        // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
+        $forecastLimit++;
+
+        $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
+        $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
+        $apixuClient = new ApixuClient($apiKey, $apiUrl);
+
+        $this->weatherPayload = $apixuClient->getForecast($forecastLimit, $location);
+
         return true;
     }
 
@@ -58,20 +77,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        $configuredForecastLimit = $this->getConfig('size');
-
-        // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option, so we have to fall back to default
-        $forecastLimit = (int)$configuredForecastLimit ?: self::DEFAULT_FORECAST_LIMIT;
-
-        // 'days' param includes today, so we have to increment this by 1 to mimic previous API behavior
-        $forecastLimit++;
-
-        $location = trim($this->getConfig('url')) ?: self::DEFAULT_LOCATION;
-
-        $apiKey = $this->getConfigMapper()->getConfigLoader()->get('weather_api_key');
-        $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
-        $apixuClient = new ApixuClient($apiKey, $apiUrl);
-        $data = $apixuClient->getForecast($forecastLimit, $location);
-        return $this->renderTwigTemplate($templateHandle, '@weatherDashboard/component.twig', $data);
+        return $this->renderTwigTemplate($templateHandle, '@weatherDashboard/component.twig', $this->weatherPayload);
     }
 }
