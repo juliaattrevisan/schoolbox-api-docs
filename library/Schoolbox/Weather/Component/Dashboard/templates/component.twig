@@ -1,6 +1,10 @@
 {#
  # Weather dashboard component version 2
- #}
+ # @param int componentInstanceId
+ # @param bool weatherUnavailable
+ # @param array today
+ # @param array forecastDays
+#}
 
 <div id="weather-container-{{ componentInstanceId }}">
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
