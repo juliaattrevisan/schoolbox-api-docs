@@ -4,6 +4,7 @@
     export default {
         name: "filter-modal",
         props: [
+            'selectedFilters',
             'sources',
             'eventTypes',
             'groups',

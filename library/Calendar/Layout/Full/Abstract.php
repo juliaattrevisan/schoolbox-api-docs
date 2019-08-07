@@ -171,27 +171,37 @@ abstract class Calendar_Layout_Full_Abstract
      */
     protected function setupMovementButtons()
     {
-        // Load sources
-        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
+        // Load sources, types
+        $typeList   = EventTypeMapper::getInstance()->findAll();
+        $sourceList = array_map(
+            function ($v) {
+                // Source IDs are comma-separated? How did this happen?
+                return [
+                    'ids'   => array_map('intval', explode(',', $v['id'])),
+                    'name'  => $v['name'],
+                ];
+            },
+            Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker)
+        );
 
-        // select all types
+
+        // Load what is selected: default to selecting everything
         /** @var EventType[] $typeList */
-        $typeList = EventTypeMapper::getInstance()->findAll();
         if (isset($_SESSION['calendarFilter'])) {
-            $selected['group'] = $_SESSION['calendarFilter']['groups'];
-            $selected['campus'] = $_SESSION['calendarFilter']['campus'];
+            $selected['group']      = $_SESSION['calendarFilter']['groups'];
+            $selected['campus']     = $_SESSION['calendarFilter']['campus'];
             $selected['event_type'] = $_SESSION['calendarFilter']['events'];
-            $selected['source'] = $_SESSION['calendarFilter']['sources'];
+            $selected['source']     = $_SESSION['calendarFilter']['sources'];
         } else {
-            // select all groups
+            // select everything
             if (count($this->getCategoryList())) {
                 foreach ($this->getCategoryList() as $cat) {
-                    $selected['group'][] = $cat['id'];
+                    $selected['group'][] = (int)$cat['id'];
                 }
             }
 
             // select all campuses
-            $selected['campus'] = $_SESSION['campus'];
+            $selected['campus'] = array_map('intval', $_SESSION['campus']);
 
             foreach ($typeList as $type) {
                 $selected['event_type'][] = $type->getId();
@@ -199,7 +209,7 @@ abstract class Calendar_Layout_Full_Abstract
 
             // select all sources
             foreach ($sourceList as $source) {
-                $selected['source'][] = $source['id'];
+                $selected['source'][] = $source['ids'];
             }
         }
 
@@ -251,21 +261,7 @@ abstract class Calendar_Layout_Full_Abstract
                 )
             )
         );
-        $this->getPage()->setVar(
-            'SOURCES_JSON',
-            json_encode(
-                array_map(
-                    function ($v) {
-                        // Source IDs are comma-separated? How did this happen?
-                        return [
-                            'ids'   => array_map('intval', explode(',', $v['id'])),
-                            'name'  => $v['name'],
-                        ];
-                    },
-                    $sourceList
-                )
-            )
-        );
+        $this->getPage()->setVar('SOURCES_JSON', json_encode($sourceList));
 
 
         // output task type too
@@ -274,6 +270,10 @@ abstract class Calendar_Layout_Full_Abstract
                 $this->getPage()->setVar('TASK_TYPE_ID', $type->getId());
             }
         }
+
+
+        // Output selected filters as JSON
+        $this->getPage()->setVar('SELECTED_FILTERS_JSON', json_encode($selected));
     }
 
     /* Getters/Setters
