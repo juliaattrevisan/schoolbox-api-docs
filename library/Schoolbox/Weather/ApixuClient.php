@@ -62,13 +62,16 @@ class ApixuClient
     }
 
     /**
+     * Find $forecastLimit days worth of information about $location
+     *
      * @param int $forecastLimit   How many days to forecast - configurable in component settings
      * @param string $location     City to get weather for - configurable in component settings
      *
-     * @return mixed
+     * @return array
      * @throws \DomainException
      */
-    private function makeRequest(int $forecastLimit, string $location) {
+    private function makeRequest(int $forecastLimit, string $location) : array
+    {
         $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
 
         // Cache the request
