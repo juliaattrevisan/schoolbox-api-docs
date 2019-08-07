@@ -165,31 +165,6 @@ class ApixuClient
             return 'Now';
         }
 
-        $day = \Alaress_Date_Format::newFromTimestamp($timestamp)->getWeekDayNumber();
-
-        switch($day) {
-            case \Alaress_Date_Format::MONDAY:
-                $dayOfWeek = 'Mon';
-                break;
-            case \Alaress_Date_Format::TUESDAY:
-                $dayOfWeek = 'Tue';
-                break;
-            case \Alaress_Date_Format::WEDNESDAY:
-                $dayOfWeek = 'Wed';
-                break;
-            case \Alaress_Date_Format::THURSDAY:
-                $dayOfWeek = 'Thu';
-                break;
-            case \Alaress_Date_Format::FRIDAY:
-                $dayOfWeek = 'Fri';
-                break;
-            case \Alaress_Date_Format::SATURDAY:
-                $dayOfWeek = 'Sat';
-                break;
-            default:
-                $dayOfWeek = 'Sun';
-        }
-
-        return $dayOfWeek;
+        return \Alaress_Date_Format::newFromTimestamp($timestamp)->getUsingFormat('D');
     }
 }
