@@ -215,7 +215,7 @@ class User extends DeprecatedModel
             $keyword = substr($keyword, 1, strlen($keyword) - 2);
             return $this->searchExact($keyword, $offset, $limit, $count);
         }
-        // Don't allow LIKE searches on keywords < 3 chars long
+        // Don't allow LIKE searches on keywords < 2 chars long
         $wherePart = sprintf("( synergy_id = '%s'", $this->db->quote($keyword));
         if (mb_strlen($keyword, 'UTF-8') >= 2) {
             $wherePart .= sprintf(

@@ -18,15 +18,12 @@ class Query
      */
     public const AUTOSUGGEST_LIMIT = 5;
 
+    public const MIN_SEARCH_LENGTH = 2;
+
     /**
      * @var IConnector
      */
     private $db;
-
-    /**
-     * @var int
-     */
-    protected $limit = self::AUTOSUGGEST_LIMIT;
 
     /**
      * Query constructor.
@@ -36,22 +33,6 @@ class Query
     public function __construct(IConnector $db)
     {
         $this->db = $db;
-    }
-
-    /**
-     * @return int
-     */
-    public function getLimit(): int
-    {
-        return $this->limit;
-    }
-
-    /**
-     * @param int $limit
-     */
-    public function setLimit(int $limit): void
-    {
-        $this->limit = $limit;
     }
 
     /**
@@ -68,10 +49,11 @@ class Query
             'totalCount'    => 0,
         ];
 
-        if ($keyword !== '' && \strlen($keyword) >= $this->minSearchLength) {
+        if ($keyword !== '' && \strlen($keyword) >= self::MIN_SEARCH_LENGTH) {
             $searchString = '%' . $keyword . '%';
-            if ($this->getUserIdsByKeyword($searchString)) {
-                $result['results'] = $this->getUserData($this->getUserIdsByKeyword($searchString));
+            $userIds = $this->getUserIdsByKeyword($searchString);
+            if ($userIds) {
+                $result['results'] = $this->getUserData($userIds);
                 $result['totalCount'] = $this->getTotalCount($searchString);
             }
         }
@@ -121,7 +103,7 @@ class Query
     {
         $statement = $this->db->prepareQuery(
             'SELECT id FROM user ' . $this->getWhereStatement() .
-            ' ORDER BY lastname, firstname ASC LIMIT 0, ' . $this->limit
+            ' LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute([

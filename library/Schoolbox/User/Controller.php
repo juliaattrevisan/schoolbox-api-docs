@@ -7,6 +7,7 @@
 
 namespace Schoolbox\User;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -142,15 +143,15 @@ class Controller extends Base
 
         if ($keyword !== null) {
             try {
-                $userSearchService = new User\Search\Query($this->di->get('databaseInternal'));
+                /** @var IConnector $db */
+                $db = $this->di->get('databaseInternal');
+                $userSearchService = new User\Search\Query($db);
                 $result = $userSearchService->fetchResults($keyword);
             } catch (\Exception $exception) {
                 // noop
                 $result = [
                     'message' => $exception->getMessage()
                 ];
-
-                $this->getResponse()->status->set(422);
             }
         }
 
