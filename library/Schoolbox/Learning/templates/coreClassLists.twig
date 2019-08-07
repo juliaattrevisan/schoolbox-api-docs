@@ -68,10 +68,10 @@ Data:
 
                             {% block meta %}
                             <p class="meta">
-                                <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight"
+                                <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
                                       title="English as a second language">
                                 </span>
-                                <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning"
+                                <span v-if="student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
                                       :title="specialNeeds">
                                 </span>
                                 <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert"
