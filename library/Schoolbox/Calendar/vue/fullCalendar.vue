@@ -10,6 +10,7 @@
     import RevealModal              from '@schoolbox/reveal-modal'
     import MetaList                 from '@schoolbox/meta/list'
     import MetaItem                 from '@schoolbox/meta/item'
+    import Toast                    from "@schoolbox/toast";
     import ViewEventModal           from './viewEventModal';
     import CreateEventModal         from './createEventModal';
     import ExportModal              from "./exportModal";
@@ -19,6 +20,7 @@
 
     export default {
         components: {
+            Toast,
             FilterModal,
             ExportModal,
             CreateEventModal,
@@ -53,6 +55,7 @@
                 /* Show loading div right in the middle
                  */
                 if (isLoading === true) {
+                    // this.$refs.toast.activate('Loading...');
                     this.window.$.magnificPopup.open({
                         showCloseBtn: false,
                         items: {
@@ -66,6 +69,7 @@
                 else {
                     /* Hide loading div
                      */
+                    // this.$refs.toast.timeout('Done', true, 3000, 2000);
                     this.window.$.magnificPopup.close();
 
                     // // update any tasks that have been completed by strikethrough-ing them
@@ -363,6 +367,8 @@
             @eventResize="onEventResize"
             @eventDrop="onEventDrop"
         />
+
+        <toast ref="toast"></toast>
     </div>
 </template>
 
