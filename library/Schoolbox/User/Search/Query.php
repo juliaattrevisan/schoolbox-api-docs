@@ -70,7 +70,7 @@ class Query
     {
         $result = [];
 
-        $users = UserMapper::getInstance()->findByColumn('id', $userIds);
+        $users = UserMapper::getInstance()->findByColumn('id', $userIds, ['order'=>['lastname'=>'ASC', 'firstname' => 'ASC']]);
         
         foreach ($users as $key => $user) {
             $result[$key]['id']             = $user->getId();
@@ -81,15 +81,6 @@ class Query
             $result[$key]['metadata']       = $user->formatMetadata();
             $result[$key]['year']           = $user->getYear();
         }
-
-        /**
-         * Sort the result by lastname and firstname
-         */
-        array_multisort(
-            array_column($result, 'lastname'), SORT_ASC,
-            array_column($result, 'firstname'), SORT_ASC,
-            $result
-        );
 
         return $result;
     }
