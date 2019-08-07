@@ -55,7 +55,7 @@ class ApixuClient
             $response = $this->makeRequest($forecastLimit, $location);
             $twigData = $this->parseWeatherData($response);
         } catch (\Exception $e) {
-            return ['weatherUnavailable' => true];
+            return ['weatherAvailable' => false];
         }
 
         return $twigData;
@@ -149,7 +149,7 @@ class ApixuClient
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
-        $twigData['weatherUnavailable'] = false;
+        $twigData['weatherAvailable'] = true;
 
         return $twigData;
     }

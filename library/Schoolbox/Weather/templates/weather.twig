@@ -1,17 +1,14 @@
 {#
 Weather details page (linked from dashboard component)
 
-@param bool weatherUnavailable
+@param bool weatherAvailable
 @param string weatherLocation
 @param array today
 @param array forecastDays
 #}
 
-{% if weatherUnavailable %}
-    <div data-alert="" class="alert-box alert">
-        Weather forecast is temporarily unavailable.
-    </div>
-{% else %}
+{% if weatherAvailable %}
+
     <div class="row">
         <div class="small-12 columns">
             <h1>Weather for {{ weatherLocation }}</h1>
@@ -94,6 +91,12 @@ Weather details page (linked from dashboard component)
                 </div>
             </section>
         </div>
+    </div>
+
+{% else %}
+
+    <div data-alert="" class="alert-box alert">
+        Weather forecast is temporarily unavailable.
     </div>
 
 {% endif %}
