@@ -68,27 +68,26 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        // Information
         $dbName = 'canvas_data_' . INSTANCE_ID;
         $dbHost = SQL_host;
         $dbCredentialFile = '/root/.my.cnf';
 
         // Check whether credential is provided by option
-        $credentialProvided = $this->parseAppOptions();
+        if (!$this->parseAppOptions() && !$this->parseMySqlConfig($dbCredentialFile)) {
+            $this->promptForCredential();
+        }
 
-        $this->parseMySqlConfig();
-
-        // Use .my.cnf, if the file is accessible and credential is not provided.
-        if (!$credentialProvided && file_exists($dbCredentialFile)) {
-            $op = "--defaults-extra-file={$dbCredentialFile}";
-        } else {
-            if (!$credentialProvided) {
-                $this->promptForCredential();
-            }
-            $op = "-u {$this->dbUser} -p{$this->dbPassword} -h {$dbHost}";
+        // Check whether the credential is correct by connecting to schoolbox database.
+        $rootDbConnection = new \Alaress\Database\Connector\Base(new \Alaress\Database\Broker\Mysql\Broker());
+        try {
+            $result = $rootDbConnection->connect($dbHost, SQL_db, $this->dbUser, $this->dbPassword);
+        } catch (\Alaress\Database\Exception $e) {
+            $this->getLogger()->warning('Could not connect to schoolbox db using the credentials provided: ' . $e->getMessage());
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
 
         // Check whether the database already exists.
-        $rootDbConnection = new \Alaress\Database\Connector\Base(new \Alaress\Database\Broker\Mysql\Broker());
         try {
             $result = $rootDbConnection->connect($dbHost, $dbName, $this->dbUser, $this->dbPassword);
             $this->getLogger()->info("Database {$dbName} already exists.");
@@ -99,7 +98,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
         if ($this->perform()) {
             // Create database.
-            passthru("mysql {$op} -e \"CREATE DATABASE {$dbName} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\"", $result);
+            exec("mysql -u {$this->dbUser} -p{$this->dbPassword} -h {$dbHost} -e \"CREATE DATABASE {$dbName} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\" 2>&1", $out, $result);
+            if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
+                $this->getLogger()->warning("Error creating database {$dbName}:" . implode(',', $out));
+                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+            }
             $this->getLogger()->info("Database {$dbName} has been created.");
         } else {
             $this->getLogger()->info("Creating a database {$dbName}");
@@ -139,26 +142,23 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     }
 
     /**
-     * Parse config file
+     * Parses config file and sets db user and db password
+     *
+     * @param string $dbCredentialFile
+     * @return bool
      */
-    private function parseMySqlConfig(): void
+    private function parseMySqlConfig(string $dbCredentialFile): bool
     {
-        $dbCredentialFile = '/root/.my.cnf';
-        $handle = fopen($dbCredentialFile, 'r');
-        while ($line = fgets($handle)) {
-            $conf = explode('=', $line);
-            if (\count($conf) != 2) {
-                continue;
-            }
-            if (trim($conf[0]) === 'user') {
-                $this->dbUser = trim($conf[1]);
-                continue;
-            }
-            if (trim($conf[0]) === 'password') {
-                $this->dbPassword = trim($conf[1]);
-                continue;
-            }
+        if (!is_readable($dbCredentialFile)) {
+            return false;
         }
+        $dbCredentials = \parse_ini_file($dbCredentialFile);
+        if (!$dbCredentials) {
+            return false;
+        }
+        $this->dbUser = $dbCredentials['user'];
+        $this->dbPassword = $dbCredentials['password'];
+        return $this->dbUser && $this->dbPassword;
     }
 
     /**
