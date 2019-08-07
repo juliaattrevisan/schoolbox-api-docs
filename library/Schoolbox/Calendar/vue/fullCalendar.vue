@@ -179,7 +179,6 @@
                     ids.forEach(function (id) {
                         // Check id against the list of selected filters.
                         // (Sources have multiple IDs per source: only check one)
-                        // (If they've selected nothing: treat that as selecting everything?)
                         let keyspace = [];
                         switch (prefix) {
                             case 'source':
@@ -202,7 +201,7 @@
                                 // Ignore this one
                                 return;
                         }
-                        if (keyspace.length > 0 && !keyspace.includes(id)) {
+                        if (!keyspace.includes(id)) {
                             matchesAnyInFilter = false;
                         }
                     });
