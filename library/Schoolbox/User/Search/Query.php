@@ -103,7 +103,7 @@ class Query
     {
         $statement = $this->db->prepareQuery(
             'SELECT id FROM user ' . $this->getWhereStatement() .
-            ' LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
+            ' ORDER BY lastname, firstname ASC LIMIT 0, ' . self::AUTOSUGGEST_LIMIT
         );
 
         $statement->execute([
