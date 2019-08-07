@@ -108,6 +108,13 @@ class ApixuClient
      */
     private function parseWeatherData(array $responseData) : array
     {
+        /* If the api wasn't correctly configured, $responseData returns an array
+         * containing an error message
+         */
+        if (isset($responseData['error'])) {
+            return [];
+        }
+
         $twigData = [
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
             'apiProvider' => [
