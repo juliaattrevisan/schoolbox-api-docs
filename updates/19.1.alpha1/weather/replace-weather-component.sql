@@ -1,1 +1,1 @@
-UPDATE `component_definition` SET `class`='Schoolbox\\Weather\\Component\\Dashboard\\Controller' WHERE `id`='5';
+UPDATE `component_definition` SET `class`='Schoolbox\\Weather\\Component\\Dashboard\\Controller' WHERE `class`='Component_Dashboard_WeatherController';
