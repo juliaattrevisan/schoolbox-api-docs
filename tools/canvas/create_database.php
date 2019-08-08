@@ -105,7 +105,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
             $this->getLogger()->info("Database {$canvasDb} has been created.");
-            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"GRANT ALL ON {$canvasDb}.* to {$dbSchoolboxUser};\" 2>&1", $out, $result);
+            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"GRANT ALL ON {$canvasDb}.* to '{$dbSchoolboxUser}'@'{$dbHost}';\" 2>&1", $out, $result);
             if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
                 $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}:" . implode(',', $out));
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
