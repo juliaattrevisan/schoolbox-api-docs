@@ -27,6 +27,8 @@ class PipeCollection
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var SessionValidator */
+    protected $validator;
 
     /**
      * @param SessionValidator $validator

@@ -57,8 +57,9 @@ class SessionValidator
      * Extracts a user from a Redis remember-me and returns the associated username
      *
      * @param string $rememberMe
-     * @throws CommunicationException
      * @return int
+     * @throws SessionException
+     * @throws CommunicationException
      */
     public function findUserIdByRememberMe(string $rememberMe): int
     {
