@@ -230,7 +230,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
                 $overrides
             );
         }
-        return new Panel($route, $filterComponents);
+        return new Panel($page, $route, $filterComponents);
     }
 
 

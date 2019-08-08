@@ -2,7 +2,6 @@
 Usage:
     filterPanel: FilterPanel - a filter panel that can filter and AJAX in the report
     courseSpec:  CourseSpec
-    page:        string      - which filtered page this is. One of the Filter\Page\Model::PAGE_* constants
 #}
 <script type="text/javascript" src="/javascript/shared/submissions/jquery.marksheet.js"></script>
 <script type="text/javascript" src="/javascript/shared/submissions/task/jquery.progressTickForm.js"></script>
@@ -19,8 +18,7 @@ Usage:
 {% include '@filters/panel.twig' with {
     contentId: reportContentId,
     panel:     filterPanel,
-    quickload: true,
-    page:      'courseMarkbook'
+    quickload: true
 } only %}
 
 {% autoescape 'js' %}

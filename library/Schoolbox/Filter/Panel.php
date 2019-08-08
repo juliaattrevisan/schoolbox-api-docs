@@ -18,6 +18,12 @@ use Schoolbox\GenericCollection;
  */
 class Panel
 {
+    /**
+     * Which filtered page this is. One of the Filter\Page\Model::PAGE_* constants
+     *
+     * @var string
+     */
+    private $page;
 
     /**
      * @var string
@@ -33,13 +39,24 @@ class Panel
 
 
     /**
+     * @param string                         $page
      * @param string                         $route      The route to send the filter selections to
      * @param GenericCollection|IComponent[] $components The set of filters to display in this panel instance
      */
-    public function __construct($route, GenericCollection $components)
+    public function __construct(string $page, string $route, GenericCollection $components)
     {
+        $this->page       = $page;
         $this->route      = $route;
         $this->components = $components;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getPage(): string
+    {
+        return $this->page;
     }
 
 

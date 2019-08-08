@@ -1,7 +1,6 @@
 {#
     folder       Folder\Model
     filterPanel  Filter\Panel
-    page         string         An identifier for this filterable page
 #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning', '/learning/classes'], [folder.name, '/homepage/' ~ folder.id], ['Rubric Markbook']) }}
@@ -40,8 +39,7 @@
 {% include '@filters/panel.twig' with {
     contentId: reportContentId,
     panel:     filterPanel,
-    quickload: true,
-    page:      page
+    quickload: true
 } only %}
 
 {# TODO move to filter SASS #}

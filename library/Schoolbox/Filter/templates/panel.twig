@@ -7,7 +7,6 @@ Usage:
     quickload bool        - if true, fill contentId with .innerHTML instead of jQuery.html()
                             When true, any JavaScript must be applied on the "filterContentLoaded"
                             event of the contentId element.
-    page:     string      - which filtered page this is. One of the Filter\Page\Model::PAGE_* constants
 
     ? TODO convert to JS plugin that is executed against the panel element (so it can get with $this), and takes contentPanelId as single arg
 #}
@@ -253,7 +252,7 @@ Usage:
                     var optionVal = decodedSelections[filterId][optionKey];
 
                     // TODO SA-7041 insert a callback here so invokers can apply page-specific logic. This JS should not need to know about caller's idiosyncrasies
-                    if({% if 'courseMarkbook' == page %}1{% else %}0{% endif %}) {
+                    if({% if 'courseMarkbook' == panel.page %}1{% else %}0{% endif %}) {
                         // (eg course-markbook page needs to always send unit and folder selections, even if optionVal is 0)
                         // TODO SA-7041 The course-markbook-specific callback needs to know the filterDefinition.id of unit and folder
                         nestedObj[filterId][optionKey] = optionVal;
