@@ -27,6 +27,8 @@ class PipeCollection
     /** @var LoggerInterface */
     protected $log;
 
+    /** @var SessionValidator */
+    protected $validator;
 
     /**
      * @param SessionValidator $validator
@@ -57,9 +59,11 @@ class PipeCollection
                 throw new SessionException('No session or remember-me token, no user.');
             }
 
-            // give preference to remember-me, since it lasts longer (and doesn't throw exceptions)
-            if (!$userId = $this->validator->findUserIdByRememberMe($remember)) {
+            //Try the users session, if that fails, fall back to remember me
+            try {
                 $userId = $this->validator->findUserIdBySessionId($sessionId);
+            } catch (SessionException $e) {
+                $userId = $this->validator->findUserIdByRememberMe($remember);
             }
         } catch (SessionException $e) {
             $this->unregisterPipe($socketKey);
