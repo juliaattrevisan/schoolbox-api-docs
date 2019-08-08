@@ -6,9 +6,9 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-
+               @blur="isFocused=false"
+               @focusout="isFocused=false"
                @focus="isFocused=true"
-
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
