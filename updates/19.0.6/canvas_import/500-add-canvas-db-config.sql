@@ -9,7 +9,7 @@ VALUES (
     null,
     (SELECT lct.id FROM lu_config_type lct WHERE lct.type = 'External DB'),
     'true',
-    'false',
+    'true',
     'false',
     'settings'
 );
@@ -26,7 +26,7 @@ VALUES (
    null,
    (SELECT lct.id FROM lu_config_type lct WHERE lct.type = 'External DB'),
    'true',
-   'false',
+   'true',
    'false',
    'settings'
 );
