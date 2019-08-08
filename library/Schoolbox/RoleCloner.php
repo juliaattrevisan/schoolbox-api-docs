@@ -1,10 +1,11 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+declare(strict_types=1);
 
 namespace Schoolbox;
 
@@ -30,8 +31,9 @@ class RoleCloner
     /**
      * @param Role $source
      * @param Role $destination
+     * @throws Mapper\Exception
      */
-    public function cloneRole(Role $source, Role $destination)
+    public function cloneRole(Role $source, Role $destination): void
     {
         // copy params (leave name and ID alone)
         $destination->setType($source->getType());
@@ -46,7 +48,6 @@ class RoleCloner
         $this->cloneTopNav($source, $destination);
         $this->cloneDashboard($source, $destination);
         $this->cloneCategoryPermissions($source, $destination);
-        $this->cloneSchoolNewsPermissions($source, $destination);
         $this->cloneSchoolCalendarPermissions($source, $destination);
         $this->cloneTours($source, $destination);
     }
@@ -55,7 +56,7 @@ class RoleCloner
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneSideNav(Role $source, Role $destination)
+    protected function cloneSideNav(Role $source, Role $destination): void
     {
         $this->clonePerms("
             DELETE FROM `menu_side_role` WHERE `role_id` = ?
@@ -65,16 +66,16 @@ class RoleCloner
             FROM `menu_side_role`
             WHERE `role_id` = :src
         ", [
-                'src'  => $source->getId(),
-                'dest' => $destination->getId()
-            ]);
+            'src'  => $source->getId(),
+            'dest' => $destination->getId(),
+        ]);
     }
 
     /**
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneTopNav(Role $source, Role $destination)
+    protected function cloneTopNav(Role $source, Role $destination): void
     {
         $this->clonePerms("
             DELETE FROM `menu_top_role` WHERE `role_id` = ?
@@ -85,14 +86,15 @@ class RoleCloner
             WHERE `role_id` = :src
         ", [
             'src'  => $source->getId(),
-            'dest' => $destination->getId()
+            'dest' => $destination->getId(),
         ]);
     }
+
     /**
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneDashboard(Role $source, Role $destination)
+    protected function cloneDashboard(Role $source, Role $destination): void
     {
         // most of the select query stays the same
         $queryString = "
@@ -103,7 +105,7 @@ class RoleCloner
     ";
 
         // delete old dashboard
-        $this->db->query("DELETE ci, cci $queryString", [ $destination->getId() ]);
+        $this->db->query("DELETE ci, cci $queryString", [$destination->getId()]);
 
         // replicate target dashboard
 
@@ -128,7 +130,7 @@ class RoleCloner
         SELECT ci.id inst_id, cci.`component_config_definition_id` defn_id, `value`
         $queryString
         ORDER BY inst_id ASC
-    ", [ $source->getId() ]);
+    ", [$source->getId()]);
 
         // index by inst_id
         $instances = [];
@@ -145,7 +147,7 @@ class RoleCloner
             // insert the new instance
             $insertInstStmt->execute([
                 'dest'    => $destination->getId(),
-                'inst_id' => $instId
+                'inst_id' => $instId,
             ]);
 
             // retrieve the new instanceId we just created
@@ -157,7 +159,7 @@ class RoleCloner
                     $insertConfStmt->execute([
                         'ccd' => $defnId,
                         'ci'  => $newInstId,
-                        'val' => $value
+                        'val' => $value,
                     ]);
                 }
             }
@@ -169,27 +171,18 @@ class RoleCloner
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneCategoryPermissions(Role $source, Role $destination)
+    protected function cloneCategoryPermissions(Role $source, Role $destination): void
     {
-        $this->permClone($source, $destination, 'perms', [ 'cid', ':dest', '`type`' ]);
+        $this->permClone($source, $destination, 'perms', ['cid', ':dest', '`type`']);
     }
 
     /**
      * @param Role $source
      * @param Role $destination
      */
-    protected function cloneSchoolNewsPermissions(Role $source, Role $destination)
+    protected function cloneSchoolCalendarPermissions(Role $source, Role $destination): void
     {
-        $this->permClone($source, $destination, 'newsGroup', [ 'id', ':dest' ]);
-    }
-
-    /**
-     * @param Role $source
-     * @param Role $destination
-     */
-    protected function cloneSchoolCalendarPermissions(Role $source, Role $destination)
-    {
-        $this->permClone($source, $destination, 'event_group', [ 'event_id', ':dest' ], 'group_id');
+        $this->permClone($source, $destination, 'event_group', ['event_id', ':dest'], 'group_id');
     }
 
     /**
@@ -199,7 +192,7 @@ class RoleCloner
      * @param array  $select
      * @param string $field
      */
-    protected function permClone(Role $source, Role $destination, $table, array $select, $field = 'gid')
+    protected function permClone(Role $source, Role $destination, $table, array $select, $field = 'gid'): void
     {
         $selects = implode(', ', $select);
 
@@ -212,7 +205,7 @@ class RoleCloner
         WHERE `$field` = :src
     ", [
             'src'  => $source->getId(),
-            'dest' => $destination->getId()
+            'dest' => $destination->getId(),
         ]);
     }
 
@@ -239,12 +232,12 @@ class RoleCloner
     /**
      * @param string $deleteQuery
      * @param string $insertQuery
-     * @param array $args
+     * @param array  $args
      */
-    protected function clonePerms($deleteQuery, $insertQuery, $args)
+    protected function clonePerms($deleteQuery, $insertQuery, $args): void
     {
         // clear old perms
-        $this->db->query($deleteQuery, [ $args['dest'] ]);
+        $this->db->query($deleteQuery, [$args['dest']]);
 
         // insert new perms
         $this->db->query($insertQuery, $args);
