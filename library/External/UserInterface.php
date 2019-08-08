@@ -20,53 +20,54 @@ interface External_UserInterface extends External\IConnector
     /**
      * Get student info for $externalUserId
      *
-     * StudentID
-     * StudentGiven1
-     * StudentSurname
-     * StudentBirthDate
-     * StudentTutorName
-     * StudentHeadOfHouse
-     * HeadOfHouseID
-     * StudentFormStaffName
-     * StudentTutorDescription
-     * TeacherFormID
-     * StudentForm
-     * TeacherTutorID
-     * StudentTutor
-     * FormDescription
-     * StudentHouseDescription
-     * StudentHouse
-     * StudentYearLevel
-     * StudentYearLevelCoordinator
-     * YearLevelCoordID
-     * StudentLockerBook
-     * StudentEmergencyName
-     * StudentEmergencyPhone
-     * StudentEmergencyPhoneAlt
-     * StudentEmergency2Name
-     * StudentEmergency2Phone
-     * StudentEmergency2PhoneAlt
-     * StudentEmergency3Name
-     * StudentEmergency3Phone
-     * StudentEmergency3PhoneAlt
-     * StudentMedicalAlert
-     * StudentMobilePhone
-     * StudentSpecialNeedsFlag
-     * EnglishSecondFlag: string. '0' => false, '1' => true, '' => unknown
-     * StudentStudiesCode
-     * CourtOrderType
-     * AlertMessage
-     * StudentBoarder
-     * Comment
-     * StudentEnrolmentDate
-     * StudentLeavingDate
-     * StudentIBFlag
-     * countIndividualEducationPlans
+     * @param string $externalUserId
+     * @return array
+     * @internal string return['StudentID']
+     * @internal string return['StudentGiven1']
+     * @internal string return['StudentSurname']
+     * @internal string return['StudentBirthDate']
+     * @internal string return['StudentTutorName']
+     * @internal string return['StudentHeadOfHouse']
+     * @internal string return['HeadOfHouseID']
+     * @internal string return['StudentFormStaffName']
+     * @internal string return['StudentTutorDescription']
+     * @internal string return['TeacherFormID']
+     * @internal string return['StudentForm']
+     * @internal string return['TeacherTutorID']
+     * @internal string return['StudentTutor']
+     * @internal string return['FormDescription']
+     * @internal string return['StudentHouseDescription']
+     * @internal string return['StudentHouse']
+     * @internal string return['StudentYearLevel']
+     * @internal string return['StudentYearLevelCoordinator']
+     * @internal string return['YearLevelCoordID']
+     * @internal string return['StudentLockerBook']
+     * @internal string return['StudentEmergencyName']
+     * @internal string return['StudentEmergencyPhone']
+     * @internal string return['StudentEmergencyPhoneAlt']
+     * @internal string return['StudentEmergency2Name']
+     * @internal string return['StudentEmergency2Phone']
+     * @internal string return['StudentEmergency2PhoneAlt']
+     * @internal string return['StudentEmergency3Name']
+     * @internal string return['StudentEmergency3Phone']
+     * @internal string return['StudentEmergency3PhoneAlt']
+     * @internal string return['StudentMedicalAlert']
+     * @internal string return['StudentMobilePhone']
+     * @internal string return['StudentSpecialNeedsFlag']        '0' => false, '1' => true, '' => unknown
+     * @internal string return['EnglishSecondFlag]               '0' => false, '1' => true, '' => unknown
+     * @internal string return['StudentStudiesCode']
+     * @internal string return['CourtOrderType']
+     * @internal string return['AlertMessage']
+     * @internal string return['StudentBoarder']
+     * @internal string return['Comment']
+     * @internal string return['StudentEnrolmentDate']
+     * @internal string return['StudentLeavingDate']
+     * @internal string return['StudentIBFlag']
+     * @internal string return['countIndividualEducationPlans']
      *
      * @importance high - used on student profile page
      *
-     * @param string $externalUserId
-     * @return array
+
      */
     public function getStudent(string $externalUserId): array;
 
