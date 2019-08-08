@@ -1,12 +1,24 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
+{#
+Usage:
+    filterPanel: FilterPanel - a filter panel that can filter and AJAX in calendar data
+#}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(['Learning'], [locale.assessment.proper ~ ' Calendar']) }}
 
 <div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">{{ locale.assessment }} Calendar</h2>
+    <div class="small-12 columns">
+        <h1>{{ locale.assessment.proper }} Calendar</h1>
         <section class="content">
-            <p style="font-size:5rem">Calendar Goes Here</p>
+            {% set reportContentId = 'calendarDataTODO' %}
+
+            {% include '@filters/panel.twig' with {
+                contentId: reportContentId,
+                panel:     filterPanel,
+                quickload: true
+            } only %}
         </section>
+
+        <div id="{{ reportContentId }}"></div>
     </div>
 </div>
-

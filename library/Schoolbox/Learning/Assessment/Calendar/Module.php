@@ -14,7 +14,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -33,14 +34,14 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-         */
-        $getPerms = new Rule\All(
+        // Only staff can visit the page and request a report
+        $routePerms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasRole(Role::STAFF)
         );
 
-        $this->register('GET', '', 'getReport', $getPerms);
+        $this->register('GET', '', 'getReport', $routePerms);
+        $this->register('POST', '', 'postReport', $routePerms);
     }
 
 
@@ -70,13 +71,19 @@ class Module extends BaseModule
      * init time.
      *
      * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
+                /** @var RosettaStone $rosettaStone */
+                $rosettaStone = $injector->get('l10n');
+                return new Filter\Filters\Assessment\FactoryFactory(
+                    $this->getMapperFactory(),
+                    $rosettaStone
+                );
+            }),
             'rosettaStone' => $injector->lazyGet('l10n'),
         ];
     }
