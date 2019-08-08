@@ -101,6 +101,8 @@ class ConfigMapper extends Mapper implements IConfigLoader
     public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
     public const _CLOUDWORK_OAUTH_CLIENT_ID         = self::PREFIX_CLOUDWORK_OAUTH . 'client_id';
     public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
+    public const _CANVAS_DATA_API_KEY               = 'canvas_data_api_key';
+    public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
 
     /** @var array */
     protected $cache = array();
@@ -167,6 +169,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
             null,
             [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH,]
         );
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
     }
 
 
@@ -204,14 +207,7 @@ class ConfigMapper extends Mapper implements IConfigLoader
 
         // Perform this common action without the overhead of hydration
         foreach ($this->database->query("SELECT `name`, `value`, field_id FROM `{$this->getTable()}`") as $row) {
-            $value = $row['value'];
-            switch ($row['field_id']) {
-                case self::FIELD_BOOLEAN:
-                case self::FIELD_CHECKBOX:
-                    $value = (bool)$value;
-                    break;
-            }
-            $this->cache[$row['name']] = $value;
+            $this->cache[$row['name']] = $this->hydrateValue((int)$row['field_id'], $row['value']);
         }
     }
 
@@ -227,6 +223,19 @@ class ConfigMapper extends Mapper implements IConfigLoader
     }
 
 
+    /**
+     * Post save callback to ensure cache is updated
+     *
+     * @param Config $model
+     * @return bool
+     */
+    protected function updateCache(Config $model): bool
+    {
+        $this->cache[$model->getName()] = $this->hydrateValue($model->getFieldId(), $model->getValue());
+        return true;
+    }
+
+
     protected function getSelectString(): string
     {
         return "
@@ -235,6 +244,25 @@ class ConfigMapper extends Mapper implements IConfigLoader
           INNER JOIN lu_config_field lcf on config.field_id = lcf.id
           LEFT  JOIN lu_config_type  lct on config.type_id  = lct.id
         ";
+    }
+
+
+    /**
+     * Light-weight hydration to respect boolean fields
+     *
+     * @param int   $fieldId
+     * @param mixed $value
+     * @return mixed
+     */
+    private function hydrateValue(int $fieldId, $value)
+    {
+        switch ($fieldId) {
+            case self::FIELD_BOOLEAN:
+            case self::FIELD_CHECKBOX:
+                return $value === null ? null : (bool)$value;
+            default:
+        }
+        return $value;
     }
 
 
