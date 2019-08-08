@@ -6,14 +6,14 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @blur="isFocused=false"
-               @focusout="isFocused=false"
-               @focus="isFocused=true"
+               @focus="onFocus"
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
                v-click-outside="lostFocus"
+               @blur="isFocused=false"
+               @focusout="isFocused=false"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
@@ -110,6 +110,20 @@
             lostFocus: function(event) {
                 this.isFocused = false;
                 this.arrowCounter = -1;
+
+                document.querySelector('.left-small').removeAttribute('style');
+            },
+
+            onFocus: function(event) {
+                var offCanvasWrap = document.getElementById('off-canvas-wrap');
+
+                if (offCanvasWrap.classList.contains('move-right')) {
+                    offCanvasWrap.classList.remove('move-right');
+                }
+
+                document.querySelector('.left-small').style.zIndex = 1000;
+
+                this.isFocused=true
             },
 
             goToPath: function(path) {
