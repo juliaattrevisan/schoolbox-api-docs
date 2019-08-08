@@ -43,23 +43,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         return !$video->getFile()->getHidden() || $this->getContentPermission() > UserAccess::ACCESS_READ;
     }
 
-    /**
-     * Return the first visible video in a list, or null if no visible videos.
-     *
-     * @param Collection $videoList
-     *
-     * @return ResourceVideo|null
-     */
-    private function findFirstVisibleVideoIn(Collection $videoList): ?ResourceVideo
-    {
-        foreach ($videoList as $video) {
-            if ($this->isVisibleToCurrentUser($video)) {
-                return $video;
-            }
-        }
-
-        return null;
-    }
 
     /**
      * Build the empty state phpliberties
@@ -186,13 +169,10 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             }
         }
 
-        // If default video is not set, try playing the first one,
-        // as config('video') can be empty.
-        if (null === $this->defaultVideo && \count($this->outputList)) {
-            $this->defaultVideo = $this->findFirstVisibleVideoIn($this->outputList);
-        }
-
-        if (null !== $this->defaultVideo) {
+        /* If defaultVideo is null, then we couldn't display the video that was originally chosen in the component config
+         * We must look for an alternative among the others in $outputList
+         */
+        if (null === $this->defaultVideo) {
             // Show the first video that has completed encoding
             foreach ($this->outputList as $video) {
                 /** @var ResourceVideo $video */
