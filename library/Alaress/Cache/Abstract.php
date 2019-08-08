@@ -108,12 +108,17 @@ abstract class Alaress_Cache_Abstract
      * Setup method
      *
      * @param string     $url
-     * @return self
      * @param null|array $params
      * @return self
+     * @return self
+     * @throws \InvalidArgumentException
      */
     public function init(string $url, ?array $params = null): \Alaress_Cache_Abstract
     {
+        if ('' === trim($url)) {
+            throw new \InvalidArgumentException('Empty url provided');
+        }
+
         $this->url = $url;
 
         /* Logging class handles verbosity and any logging
@@ -137,6 +142,7 @@ abstract class Alaress_Cache_Abstract
      * Get contents of a stream using a lockfile-based mechanism
      *
      * @return void
+     * @throws InvalidArgumentException
      */
     protected function retrieveStreamContents(): void
     {
@@ -179,6 +185,7 @@ abstract class Alaress_Cache_Abstract
      * Sam's new cache update :P
      *
      * @return Alaress_Cache_Abstract
+     * @throws InvalidArgumentException
      */
     protected function newCacheUpdate(): \Alaress_Cache_Abstract
     {
@@ -211,6 +218,7 @@ abstract class Alaress_Cache_Abstract
      * Save stream contents from the url
      *
      * @return bool
+     * @throws InvalidArgumentException
      */
     protected function saveStreamContents(): bool
     {
@@ -253,7 +261,9 @@ abstract class Alaress_Cache_Abstract
      */
     private function remove($file): \Alaress_Cache_Abstract
     {
-        @unlink($file);
+        if (file_exists($file)) {
+            @unlink($file);
+        }
 
         return $this;
     }
@@ -401,9 +411,9 @@ abstract class Alaress_Cache_Abstract
      *
      * @return string
      */
-    public function getStreamContents(): string
+    public function getStreamContents(): ?string
     {
-        return file_get_contents($this->cachedFile);
+        return file_exists($this->cachedFile) ? file_get_contents($this->cachedFile) : null;
     }
 
 
