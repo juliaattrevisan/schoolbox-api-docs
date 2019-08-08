@@ -6,12 +6,13 @@
 </template>
 
 <script>
-    import ucid from 'ucid';
+    let ucid = 0;
     export default {
         name: "reveal-modal",
-        mixins: [
-            ucid,
-        ],
+        beforeCreate() {
+            this.ucid = ucid.toString();
+            ucid++;
+        },
         data() {
             return {
                 elementId: 'reveal-modal-' + String(this.ucid)
