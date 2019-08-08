@@ -359,7 +359,11 @@
 
                         $('#alert-dialog').on('click', 'a.action', function (e) {
                             e.preventDefault();
-                        })
+                        });
+
+                        $('#profile-drop').on('click', function(e) {
+                            $(".global-search").removeClass( "focus" );
+                        });
                     });
                 </script>
                 {% endautoescape %}
