@@ -30,10 +30,10 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     private const OPT_LONG_DB_PASSWORD = 'db-password:';
 
     /** @var string */
-    private $dbUser;
+    private $dbRootUser;
 
     /** @var string */
-    private $dbPassword;
+    private $dbRootPassword;
 
     /** @inheritdoc */
     public function runAsRoot(): ?bool
@@ -69,8 +69,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
 
         // Information
-        $dbName = 'canvas_data_' . INSTANCE_ID;
+        $canvasDb = 'canvas_data_' . INSTANCE_ID;
         $dbHost = SQL_host;
+        $dbSchoolboxUser = SQL_user;
         $dbCredentialFile = '/root/.my.cnf';
 
         // Check whether credential is provided by option
@@ -81,7 +82,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         // Check whether the credential is correct by connecting to schoolbox database.
         $rootDbConnection = new \Alaress\Database\Connector\Base(new \Alaress\Database\Broker\Mysql\Broker());
         try {
-            $result = $rootDbConnection->connect($dbHost, SQL_db, $this->dbUser, $this->dbPassword);
+            $result = $rootDbConnection->connect($dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
         } catch (\Alaress\Database\Exception $e) {
             $this->getLogger()->warning('Could not connect to schoolbox db using the credentials provided: ' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
@@ -89,8 +90,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
         // Check whether the database already exists.
         try {
-            $result = $rootDbConnection->connect($dbHost, $dbName, $this->dbUser, $this->dbPassword);
-            $this->getLogger()->info("Database {$dbName} already exists.");
+            $result = $rootDbConnection->connect($dbHost, $canvasDb, $this->dbRootUser, $this->dbRootPassword);
+            $this->getLogger()->info("Database {$canvasDb} already exists.");
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         } catch (\Alaress\Database\Exception $e) {
             // Expected
@@ -98,19 +99,19 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
         if ($this->perform()) {
             // Create database.
-            exec("mysql -u {$this->dbUser} -p{$this->dbPassword} -h {$dbHost} -e \"CREATE DATABASE {$dbName} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\" 2>&1", $out, $result);
+            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"CREATE DATABASE {$canvasDb} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\" 2>&1", $out, $result);
             if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
-                $this->getLogger()->warning("Error creating database {$dbName}:" . implode(',', $out));
+                $this->getLogger()->warning("Error creating database {$canvasDb}:" . implode(',', $out));
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
-            $this->getLogger()->info("Database {$dbName} has been created.");
-            exec("mysql -u {$this->dbUser} -p{$this->dbPassword} -h {$dbHost} -e \"GRANT ALL ON {$dbName}.* to {$this->dbUser};\" 2>&1", $out, $result);
+            $this->getLogger()->info("Database {$canvasDb} has been created.");
+            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"GRANT ALL ON {$canvasDb}.* to {$dbSchoolboxUser};\" 2>&1", $out, $result);
             if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
-                $this->getLogger()->warning("Error granting access to {$this->dbUser}:" . implode(',', $out));
+                $this->getLogger()->warning("Error granting access to {$this->dbRootUser}:" . implode(',', $out));
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
         } else {
-            $this->getLogger()->info("Creating a database {$dbName}");
+            $this->getLogger()->info("Creating a database {$canvasDb}");
         }
     }
 
@@ -121,9 +122,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     private function parseAppOptions(): bool
     {
-        $this->dbUser = $this->getOpt(self::OPT_LONG_DB_USER);
-        $this->dbPassword = $this->getOpt(self::OPT_LONG_DB_PASSWORD);
-        return ($this->dbUser && $this->dbPassword);
+        $this->dbRootUser = $this->getOpt(self::OPT_LONG_DB_USER);
+        $this->dbRootPassword = $this->getOpt(self::OPT_LONG_DB_PASSWORD);
+        return ($this->dbRootUser && $this->dbRootPassword);
     }
 
     /**
@@ -133,14 +134,14 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     private function promptForCredential(): void
     {
-        $this->dbUser = $this->readLine('Enter a database root username: ');
-        if (!$this->dbUser) {
+        $this->dbRootUser = $this->readLine('Enter a database root username: ');
+        if (!$this->dbRootUser) {
             $this->getLogger()->error('A database username must be provided');
             exit(1);
         }
 
-        $this->dbPassword = $this->readLine('Enter a database password: ');
-        if (!$this->dbPassword) {
+        $this->dbRootPassword = $this->readLine('Enter a database password: ');
+        if (!$this->dbRootPassword) {
             $this->getLogger()->error('A database password must be provided');
             exit(1);
         }
@@ -161,9 +162,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         if (!$dbCredentials) {
             return false;
         }
-        $this->dbUser = $dbCredentials['user'];
-        $this->dbPassword = $dbCredentials['password'];
-        return $this->dbUser && $this->dbPassword;
+        $this->dbRootUser = $dbCredentials['user'];
+        $this->dbRootPassword = $dbCredentials['password'];
+        return $this->dbRootUser && $this->dbRootPassword;
     }
 
     /**
