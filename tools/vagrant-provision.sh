@@ -165,6 +165,9 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-fil
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL database";
 mysql --defaults-extra-file=/root/.my.cnf -e "DROP DATABASE IF EXISTS schoolbox";
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox MySQL user";
+mysql --defaults-extra-file=/root/.my.cnf -e "DROP USER IF EXISTS 'schoolboxvagrant'@'localhost'";
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing current Schoolbox Data directory";
 rm /vagrant/data/* -fR;
 
@@ -186,10 +189,15 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value=
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='$external_db_db' WHERE name='external_db_db'";
 mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_school_code'";
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
+mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox conf file";
 cp -f /vagrant/www/conf/tarball.conf.php /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
-sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
+sed -i -E "s/^define\(['\"]SQL_user['\"].+$/define\(\"SQL_user\", \"schoolboxvagrant\"\);/g" /vagrant/www/conf/conf.php;
+sed -i 's/xxxxxx/abc123/g' /vagrant/www/conf/conf.php;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
 cd $cachedir;

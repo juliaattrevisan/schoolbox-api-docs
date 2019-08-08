@@ -36,8 +36,8 @@ class TestConnector extends TestCase
         $result = $schoolbox->connect(
             '192.168.36.10',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
 
         $this->assertTrue($result, "Failed to connect to Schoolbox database");
@@ -62,8 +62,8 @@ class TestConnector extends TestCase
         $connectorOriginal->connect(
             '192.168.36.10',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
 
         $connectorSerialized = serialize($connectorOriginal);

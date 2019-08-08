@@ -79,8 +79,8 @@ trait TestConnectorTrait
         return $this->schoolbox->connect(
             '192.168.36.10',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
     }
 

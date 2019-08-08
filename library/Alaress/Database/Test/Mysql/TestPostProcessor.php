@@ -52,8 +52,8 @@ class TestPostProcessor extends TestCase
         $schoolbox->connect(
             '192.168.36.10',
             'schoolbox',
-            'root',
-            'tnp879'
+            'schoolboxvagrant',
+            'abc123'
         );
 
         $schoolbox->addPostProcessor([$this, 'trimWhitespace']);
