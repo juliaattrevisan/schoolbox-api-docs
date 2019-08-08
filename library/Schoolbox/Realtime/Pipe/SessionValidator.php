@@ -60,30 +60,27 @@ class SessionValidator
      * @throws CommunicationException
      * @return int
      */
-    public function findUserIdByRememberMe($rememberMe)
+    public function findUserIdByRememberMe(string $rememberMe): int
     {
-        try {
-            // redis will unfortunately respond with the username, not the id -_-
-            $username = $this->findUser($rememberMe, 'remember-me token', '');
+        // redis will unfortunately respond with the username, not the id -_-
+        $username = $this->findUser($rememberMe, 'remember-me token', '');
 
-            if (empty($this->userIdCache[$username])) {
-                // *sigh*
-                $id = (int)$this->database
-                    ->executeQuery(
-                        'SELECT `id` FROM `user` WHERE `username` = :username LIMIT 0, 1',
-                        [ 'username' => $username ]
-                    )
-                    ->fetchColumn()
-                ;
-
-                $this->userIdCache[$username] = $id;
+        if (empty($this->userIdCache[$username])) {
+            // *sigh*
+            $id = (int)$this->database
+                ->executeQuery(
+                    'SELECT `id` FROM `user` WHERE `username` = :username LIMIT 0, 1',
+                    [ 'username' => $username ]
+                )
+                ->fetchColumn()
+            ;
+            if($id == 0) {
+                throw new SessionException('User not found');
             }
-
-            return $this->userIdCache[$username];
-        } catch (SessionException $e) {
-            // this method must be safe to use
-            return 0;
+            $this->userIdCache[$username] = $id;
         }
+
+        return $this->userIdCache[$username];
     }
 
 
@@ -95,7 +92,7 @@ class SessionValidator
      * @throws CommunicationException
      * @return int
      */
-    public function findUserIdBySessionId($sessionId)
+    public function findUserIdBySessionId(string $sessionId): int
     {
         try {
             // note that objects DO NOT correctly unserialize
