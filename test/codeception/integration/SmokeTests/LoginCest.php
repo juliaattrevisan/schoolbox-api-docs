@@ -1,6 +1,10 @@
 <?php
 
+namespace SmokeTests;
+
+use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -13,7 +17,7 @@ class LoginCest {
      *
      * @param IntegrationTester $i
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function LoginLocalUser(IntegrationTester $i){
 
@@ -21,7 +25,7 @@ class LoginCest {
         $user='alaress';
         $password='alaress';
         #WHEN
-        /** @var GuzzleHttp\Psr7\Response $response */
+        /** @var Response $response */
         $response = $i->loginUser($user, $password);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
@@ -36,7 +40,7 @@ class LoginCest {
      *
      * @param IntegrationTester $i
      *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      */
     public function LoginForgotPassword(IntegrationTester $i){
 
@@ -44,7 +48,7 @@ class LoginCest {
         $user_email='alaress@schoolbox.com.au';
         $user_username='alaress';
         #WHEN
-        /** @var GuzzleHttp\Psr7\Response $response */
+        /** @var Response $response */
         $response = $i->loginForgotPasswordUsername($user_username);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
@@ -54,7 +58,7 @@ class LoginCest {
         $i->assertArrayNotHasKey(1, $redirect_history_status, 'I expect there is only one redirect in the history of this request');
 
         #WHEN
-        /** @var GuzzleHttp\Psr7\Response $response */
+        /** @var Response $response */
         $response = $i->loginForgotPasswordEmail($user_email);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');

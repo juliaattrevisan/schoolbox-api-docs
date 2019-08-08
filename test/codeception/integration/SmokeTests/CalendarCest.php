@@ -1,6 +1,10 @@
 <?php
 
+namespace SmokeTests;
+
+use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd

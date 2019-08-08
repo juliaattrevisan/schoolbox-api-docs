@@ -1,6 +1,10 @@
 <?php
 
+namespace SmokeTests;
+
+use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -25,6 +29,7 @@ class AssessmentCest {
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\External\Exception
      */
     public function SmokeAssessmentPOST(IntegrationTester $i){
         #GIVEN
@@ -38,6 +43,7 @@ class AssessmentCest {
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
 
         #WHEN
+        /** @var Response $response */
         $response = $i->createAssessmentOnHomepage($assessment_title,$homePageId);
         $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
@@ -51,7 +57,7 @@ class AssessmentCest {
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' Edit it';
         $i->createAssessmentOnHomepage($assessment_title, $homePageId);
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title, $homePageId);
+        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
         $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
         $update_response = $i->updateAssessmentOnHomepage($homePageId, $assessmentPageId, $assessment_title);
 

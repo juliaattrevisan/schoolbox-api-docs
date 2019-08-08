@@ -1132,13 +1132,19 @@ trait GuzzleActions
      */
     public function addDefaultUsersToHomepage($homepage_id)
     {
+
         if (!isset($this->client))
         {
             $this->initGuzzleClient();
         }
 
-        $this->addUsersToHomepageGroup($homepage_id, [230, 151]);
-        $this->setHomepageGroupUserPermission($homepage_id, ['151'=>3]);
+        /** @var User $student */
+        $student = $this->getUser('drhodes');
+        /** @var User $teacher */
+        $teacher = $this->getUser('zsmith');
+
+        $this->addUsersToHomepageGroup($homepage_id, [$student->getId(), $teacher->getId()]);
+        $this->setHomepageGroupUserPermission($homepage_id, [$teacher->getId()=>3]);
     }
 
     /**
@@ -1447,6 +1453,9 @@ trait GuzzleActions
             $this->initGuzzleClient();
         }
 
+        /** @var User $student */
+        $student = $this->getUser('drhodes');
+
         //https://vagrant.dev.schoolbox.cloud/rubric/determineMarkInvalidation
         $this->guzzle_headers['Referer'] = 'https://'.VAGRANT_DOMAIN.'/learning/assessment/'.$assignmentID.'/modify?returnUrl=';
 
@@ -1486,8 +1495,8 @@ trait GuzzleActions
             'rb['.$assignmentID.'][level][0][name]'=>'',
             'rb['.$assignmentID.'][level][1][id]'=>'',
             'rb['.$assignmentID.'][level][1][name]'=>'',
-            'participant-include[230]'=>1,
-            'participant-plan[230]'=>0,
+            'participant-include['.$student->getId().']'=>1,
+            'participant-plan['.$student->getId().']'=>0,
             'curriculumCodes[]'
         ];
 
@@ -1523,6 +1532,9 @@ trait GuzzleActions
         {
             $this->initGuzzleClient();
         }
+
+        /** @var User $student */
+        $student = $this->getUser('drhodes');
 
         //https://vagrant.dev.schoolbox.cloud/learning/assessments/381
         $this->guzzle_headers['Referer'] = 'https://'.VAGRANT_DOMAIN.'/learning/assessment/'.$assignmentID.'/modify?returnUrl=';
@@ -1562,8 +1574,8 @@ trait GuzzleActions
             'rb['.$assignmentID.'][level][0][name]'=>'',
             'rb['.$assignmentID.'][level][1][id]'=>'',
             'rb['.$assignmentID.'][level][1][name]'=>'',
-            'participant-include[230]'=>1,
-            'participant-plan[230]'=>0,
+            'participant-include['.$student->getId().']'=>1,
+            'participant-plan['.$student->getId().']'=>0,
             'curriculumCodes[]',
             'part-2'=>1
         ];
@@ -1600,6 +1612,9 @@ trait GuzzleActions
         {
             $this->initGuzzleClient();
         }
+
+        /** @var User $student */
+        $student = $this->getUser('drhodes');
 
         $this->guzzle_headers['Referer'] = 'https://'.VAGRANT_DOMAIN.'/learning/folders/'.$HomePageID.'/new?returnUrl=';
 
@@ -1743,8 +1758,8 @@ trait GuzzleActions
             'formField'=>'rb',
             'rb'=>$rubySkeleton,
             'curriculumCodes'=>[],
-            'participant-include[230]'=>1,
-            'participant-plan[230]'=>0,
+            'participant-include['.$student->getId().']'=>1,
+            'participant-plan['.$student->getId().']'=>0,
             'part-2'=>1
         ];
 

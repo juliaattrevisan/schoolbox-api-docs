@@ -33,7 +33,7 @@ use Schoolbox\Application\CliTool\App;
 use Schoolbox\Pastoral\Mapper as PastoralRecordMapper;
 
 class SchoolboxActionsConstants {
-    const HOMEPAGE_COMPONENT_POSITION = ['left'=>'1','right'=>'2','top'=>'3'];
+    public const HOMEPAGE_COMPONENT_POSITION = ['left'=>'1','right'=>'2','top'=>'3'];
 }
 
 trait SchoolboxActions
@@ -269,12 +269,14 @@ trait SchoolboxActions
     /**
      * getFirstHomepageIdByTitle gets the ID of the first homepage that matches the title
      *
+     * @throws \Schoolbox\External\Exception
      * @throws Exception if no instance of model is found
      * @throws Exception\Deleted if the model was found but has been deleted
      *
      * @param string $title
      *
      * @return int
+     *
      */
     function getFirstHomepageIdByTitle($title)
     {
