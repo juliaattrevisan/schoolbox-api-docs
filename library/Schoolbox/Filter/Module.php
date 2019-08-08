@@ -48,6 +48,7 @@ class Module extends AlaressModule
                 case Page\Model::PAGE_RUBRIC_MARK_BOOK:
                 case Page\Model::PAGE_GRADES:
                 case Page\Model::PAGE_UPCOMING_ASSESSMENTS:
+                case Page\Model::PAGE_ASSESSMENT_CALENDAR:
                     /** @var RosettaStone $rosettaStone */
                     $rosettaStone = $this->getInjector()->get('l10n');
                     return ['factoryFactory' => new Filters\Assessment\FactoryFactory(
