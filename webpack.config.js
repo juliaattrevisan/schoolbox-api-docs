@@ -20,7 +20,21 @@ module.exports = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env'],
+            presets: [
+                [
+                    '@babel/preset-env',
+                    {
+                        targets: {
+                            browsers: [
+                                "defaults",
+                                "IE 11"
+                            ],
+                        },
+                        useBuiltIns: 'usage',
+                        corejs: 3
+                    }
+                ]
+            ],
             plugins: [
                 "@babel/plugin-proposal-optional-chaining",
                 "@babel/plugin-transform-object-assign",
