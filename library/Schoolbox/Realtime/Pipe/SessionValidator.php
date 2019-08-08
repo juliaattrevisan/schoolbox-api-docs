@@ -75,7 +75,7 @@ class SessionValidator
                 )
                 ->fetchColumn()
             ;
-            if($id == 0) {
+            if ($id === 0) {
                 throw new SessionException('User not found');
             }
             $this->userIdCache[$username] = $id;
