@@ -44,8 +44,10 @@ class Controller extends Base
      * Display the calendar itself
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @api   GET /learning/assessment/calendar
+     * @level 19.1
      */
-    public function getReport()
+    public function getReport(): void
     {
         $pageTitle = sprintf('%s Calendar', $this->rosettaStone->translate('assessment', false, true));
 
