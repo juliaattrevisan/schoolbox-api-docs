@@ -104,6 +104,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
             $this->getLogger()->info("Database {$dbName} has been created.");
+            exec("mysql -u {$this->dbUser} -p{$this->dbPassword} -h {$dbHost} -e \"GRANT ALL ON {$dbName}.* to {$this->dbUser};\" 2>&1", $out, $result);
+            if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
+                $this->getLogger()->warning("Error granting access to {$this->dbUser}:" . implode(',', $out));
+                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+            }
         } else {
             $this->getLogger()->info("Creating a database {$dbName}");
         }
@@ -128,7 +133,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     private function promptForCredential(): void
     {
-        $this->dbUser = $this->readLine('Enter a database username: ');
+        $this->dbUser = $this->readLine('Enter a database root username: ');
         if (!$this->dbUser) {
             $this->getLogger()->error('A database username must be provided');
             exit(1);
@@ -183,6 +188,9 @@ SYNOPSIS:
 OPTIONS:
     $yellow-h, --help$white
         Print this help and exit
+        
+    $yellow-p, --perform$white
+        If set, updates DB - otherwise, performs a dry run
         
     $yellow--db-user=DB_USER$white
         Username to access schoolbox database
