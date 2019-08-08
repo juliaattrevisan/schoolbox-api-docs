@@ -98,6 +98,16 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
 
         if ($this->perform()) {
+            # Vagrant and on-premises use 'localhost'. Cloud uses '%' wildcard as PHP and MySQL are on different hosts
+            # ORDER BY to prefer '%' over 'localhost' if both are available (they shouldn't be)
+            $sql = "SELECT Host FROM mysql.user WHERE User = '{$dbSchoolboxUser}' ORDER BY Host LIMIT 1";
+            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} --silent --skip-column-names -e \"{$sql}\" 2>&1", $out, $result);
+            if ($result || !count($out)) {
+                $this->getLogger()->warning("Error fetching allowed host for {$dbSchoolboxUser}:" . implode(',', $out));
+                exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
+            }
+            $allowedHost = $out[0];
+
             // Create database.
             exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"CREATE DATABASE {$canvasDb} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\" 2>&1", $out, $result);
             if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
@@ -105,7 +115,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
             $this->getLogger()->info("Database {$canvasDb} has been created.");
-            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"GRANT ALL ON {$canvasDb}.* to '{$dbSchoolboxUser}'@'{$dbHost}';\" 2>&1", $out, $result);
+
+            // Grant permissions to schoolbox user to new database
+            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$dbHost} -e \"GRANT ALL ON {$canvasDb}.* to '{$dbSchoolboxUser}'@'{$allowedHost}';\" 2>&1", $out, $result);
             if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
                 $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}:" . implode(',', $out));
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
