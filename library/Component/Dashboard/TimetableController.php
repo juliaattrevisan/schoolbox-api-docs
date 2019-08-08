@@ -287,8 +287,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
             'isCurrent'  => $isCurrent,
         ];
 
-        foreach ($period['class'] as $class) {
-            $periodContext['classes'][] = $this->buildClassContext($campusList, $campusId, $period, $now, $class);
+        if (is_array($period['class'])) {
+            foreach ($period['class'] as $class) {
+                $periodContext['classes'][] = $this->buildClassContext($campusList, $campusId, $period, $now, $class);
+            }
         }
         return $periodContext;
     }
