@@ -10,6 +10,7 @@ namespace Config\Modules;
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Schoolbox\Assessment\Course;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Learning\Assessment\Calendar\Module as AssessmentCalendarModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
@@ -53,7 +54,9 @@ class Learning extends ModuleLoader
 
         /* Assessment Calendar is behind a feature flag
          */
-        if ($kernel->getDependencyInjector()->get('config')->get('assessment_calendar_enabled')) {
+        /** @var IConfigLoader $config */
+        $config = $kernel->getDependencyInjector()->get('config');
+        if ($config->get('assessment_calendar_enabled')) {
             $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
         }
     }
