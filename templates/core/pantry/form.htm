@@ -2,6 +2,19 @@
 <script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
 <script type="text/javascript">
     Dropzone.autoDiscover = false;
+    $(function() {
+        $('#demoForm').alaressValidate({
+            rules: {
+                url: {
+                    isURL: true
+                }
+            },
+            errorPlacement: function (error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        });
+    });
+
 </script>
 <!-- END custom_head -->
 
@@ -31,7 +44,7 @@
             <li class="icon-info">Looking for <a href="/pantry/form-progressive">progressive forms</a>?</li>
         </ul>
         <h2 class="subheader">You can update your datums here</h2>
-        <form action="#">
+        <form action="#" id="demoForm">
             <section>
                 <fieldset class="content">
                     <legend>In Most Cases, Single Column Works Best</legend>
@@ -42,21 +55,19 @@
                         </p>
                     </div>
                     <div class="small-12 columns">
-                        <label>Input Label
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
-                            <input type="text" placeholder="Put some text here" />
-                        </label>
+                        <label class="required" for="text">Input Label</label>
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                        <input type="text" name="text" id="text" placeholder="Put some text here" required />
                     </div>
                     <div class="small-12 columns">
-                        <label>Input Number
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
-                            <input type="number" value="20" required />
-                        </label>
+                        <label class="required">Input Number</label>
+                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
+                        <input type="number" name="number" id="number" value="20" required />
                     </div>
                     <div class="small-12 columns">
-                        <label>Input Group</label>
+                        <label class="required">Input Group</label>
                         <div class="input-group">
-                            <input type="text" placeholder="https://" />
+                            <input type="text" name="url" id="url" placeholder="https://" required />
                             <a href="#" class="button icon-folder">Browser Resources</a>
                         </div>
                     </div>
@@ -484,13 +495,13 @@
                     </legend>
 
                     <div class="column small-12">
-                        <label>Single Selectize AutoSuggest</label>
-                        <input id='user' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                        <label class="required">Single Selectize AutoSuggest</label>
+                        <input id='user' name="user" type='text' value='' placeholder="Search Students" data-selectizeuser required />
                     </div>
 
                     <div class="column small-12">
-                        <label>Multi-Select Selectize</label>
-                        <input id='users' name="userId" type='text' value='' placeholder="Search Students" data-selectizeuser required />
+                        <label class="required">Multi-Select Selectize</label>
+                        <input id='users' name="users" type='text' value='' placeholder="Search Students" data-selectizeuser required />
                         <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
                         <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
                         <script type="text/javascript">
@@ -580,11 +591,11 @@
                     </div>
 
                     <div class="column small-12 medium-6">
-                        <label>Date only:
+                        <label class="required">Date only:</label>
                             <input type="text"
                                    id="datepicker-date"
-                                   data-datepicker>
-                        </label>
+                                   data-datepicker required>
+
                     </div>
 
                     <div class="column small-12 medium-6">

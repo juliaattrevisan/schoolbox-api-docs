@@ -136,6 +136,11 @@ label {
 		content: ' *';
 		color: $alert-color;
 	}
+	&.error {
+		display: block;
+		font-style: italic;
+		width: 100%;
+	}
 }
 
 input,
