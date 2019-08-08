@@ -341,7 +341,7 @@
                        name="completed"
                        type="checkbox"
                        value="1"
-                       :checked="eventExtendedProps.completed"
+                       :checked="eventExtendedProps.task.completed"
                 />
                 <label for="modifyTaskBubbleCompleted" class="checkbox-label">
                     Complete
