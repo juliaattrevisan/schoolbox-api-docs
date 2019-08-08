@@ -14,13 +14,14 @@
                v-click-outside="lostFocus"
                @blur="isFocused=false"
                @focusout="isFocused=false"
+               maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
+                <a class="link-row" @click="goToPath(paths.userPage + result.id)" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
                     <div class="card small-12">
                         <img v-bind:src="formatPortrait(result.id)">
                         <h3 class="name">{{ result.formattedName }}</h3>
@@ -39,7 +40,7 @@
             <li class="result-meta" v-if="!isLoading && !results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @mousedown.left="goToPath(paths.searchPage + keyword + '#all')">
+            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @click="goToPath(paths.searchPage + keyword + '#all')" @mousedown.left="goToPath(paths.searchPage + keyword + '#all')">
                 <result-meta>
                     Search everything for "{{ keyword }}"
                 </result-meta>
