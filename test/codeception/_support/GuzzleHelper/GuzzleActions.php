@@ -36,7 +36,7 @@ trait GuzzleActions
     /**
      * initGuzzleClient initializes the HTTP Guzzle client used to send off curl requests.
      */
-    function initGuzzleClient()
+    public function initGuzzleClient()
     {
         $this->client = new Client(['base_uri' => 'https://'.VAGRANT_DOMAIN, 'timeout' => 5.0, 'cookies' => true]);
         $this->guzzle_headers=[ 'Host' => VAGRANT_DOMAIN,
@@ -52,6 +52,35 @@ trait GuzzleActions
     }
 
     /**
+     * prepareGuzzleUrl prepares the Guzzle response history into an array we can use to check the history of redirects
+     *
+     * @param \GuzzleHttp\Psr7\Response $response
+     *
+     * @return array #array[[$URL => $STATUS_CODE]]
+     */
+    public function prepareGuzzleRedirectHistoryToArray(Response $response):array
+    {
+        $returnURLs = $response->getHeader('X-Guzzle-Redirect-History');
+        $returnCodes = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $lastReturnCode = ''.$response->getStatusCode();
+
+        if (isset($returnCodes) && $returnCodes !== [])
+        {
+            $counter=0;
+            $array_of_redirects=[];
+            while ($counter < count($returnCodes))
+            {
+                $array_of_redirects[] = [$returnURLs[$counter] => $returnCodes[$counter]];
+                $counter++;
+            }
+            $array_of_redirects[]=['-' =>$lastReturnCode];
+            return $array_of_redirects;
+        }
+
+        return [['-' =>$lastReturnCode]];
+    }
+
+    /**
      * waitForUserMessage waits for a message in the redis server
      *
      * @param User $user
@@ -61,7 +90,7 @@ trait GuzzleActions
      *
      * @return Schoolbox\Pastoral\Model
      */
-    function waitForUserMessage($user, $time_created, $filter, $timeout=10){
+    public function waitForUserMessage($user, $time_created, $filter, $timeout=10){
         $factory = new ListFactory(INSTANCE_ID, Redis::getClientInstance());
 
         // load the data into your hat, and pull out a rabbit
@@ -109,7 +138,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function loginUser($username, $password, $redirect=true)
     {
@@ -152,7 +181,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function loginForgotPasswordUsername($username, $redirect=true)
     {
@@ -190,7 +219,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function loginForgotPasswordEmail($email)
     {
@@ -205,7 +234,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createNewCourseSpec($name, $parent_folder)
     {
@@ -243,7 +272,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createNewUnitSpec($name, $course)
     {
@@ -287,7 +316,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function saveCourseSpec($course_name, $unit_name, $parentId, $course_spec, $unit)
     {
@@ -326,7 +355,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createHomepage($title)
     {
@@ -341,7 +370,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createClass($title, $code)
     {
@@ -358,7 +387,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createFolder($title, $template=-1, $parent_folder=null, $code='')
     {
@@ -418,7 +447,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function importCourseSpecToClass($course_spec_id, $class_page_id){
         if (!isset($this->client))
@@ -455,7 +484,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function importUnitSpecToClassCourse($course_spec_id, $class_page_id){
         if (!isset($this->client))
@@ -506,7 +535,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function importDueWorkToClassCourseUnit($course_spec_id, $class_page_id){
         if (!isset($this->client))
@@ -566,7 +595,7 @@ trait GuzzleActions
      * @param array $confidential_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
      * @param array $blocked_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
      *
-     * @return array
+     * @return Response
      *@throws GuzzleException
      *
      */
@@ -623,6 +652,7 @@ trait GuzzleActions
     /**
      * modifyPastoralCareRecord fire off Curl to modify an existing record
      *
+     * @throws GuzzleException
      *
      * @param string $heading
      * @param string $pastoral_record_id
@@ -632,8 +662,7 @@ trait GuzzleActions
      * @param array $blocked_viewers [$viewer_type => id] eg. ['role' => 1, 'user' => 124]
      * @param int $duplicate_record_to ID of the student the record needs to be duplicated to.
      *
-     * @return array
-     *@throws GuzzleException
+     * @return Response
      *
      */
     public function modifyPastoralCareRecord($heading, $pastoral_record_id, $student_id, $public_viewers, $confidential_viewers, $blocked_viewers, $duplicate_record_to=null)
@@ -702,7 +731,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createPastoralCareRecordComment($pastoral_record_id, $student_id, $comment, $confidential=false)
     {
@@ -745,7 +774,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createPersonalCalendarEventViaCalendar($event_title, $user_id)
     {
@@ -787,7 +816,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function modifyCalendarEventWithLevel($event_title, $user_id, $level_data, $id='')
     {
@@ -851,7 +880,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createPersonalCalendarEvent($event_title, $user_id)
     {
@@ -873,7 +902,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createCampusCalendarEventWithAttendance($event_title, $user_id, $roles, $campuses)
     {
@@ -896,7 +925,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createGroupCalendarEvent($event_title, $user_id, $event_groups)
     {
@@ -919,7 +948,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createCampusCalendarEvent($event_title, $user_id, $roles, $campuses)
     {
@@ -940,7 +969,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function editPersonalCalendarEvent($event_title, $user_id)
     {
@@ -962,7 +991,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function RSVPtoEvent($event_id)
     {
@@ -999,7 +1028,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function ApproveAttendeeOnRSVPEvent($event_id, $user_ids)
     {
@@ -1047,7 +1076,7 @@ trait GuzzleActions
      * @throws Exception
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function addUsersToHomepageGroup($homepage_id, $user_ids)
     {
@@ -1091,7 +1120,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function setHomepageGroupUserPermission($homepage_id, $user_id_permission_array)
     {
@@ -1157,7 +1186,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function addComponentToHomepage($element_id, $homepage_id, $location)
     {
@@ -1215,7 +1244,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function addTextBoxToTextComponent($homepage_id, $text_component, $text, $heading)
     {
@@ -1260,7 +1289,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function deleteTextBoxToTextComponent($homepage_id, $heading)
     {
@@ -1304,7 +1333,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createAssessemnt($contexttype, $contextId, $folderId, $title, $assessmentType)
     {
@@ -1376,7 +1405,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createAssessmentOnHomepage($title, $HomePageID)
     {
@@ -1393,7 +1422,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createAssessmentOnCourseUnitSpec($title, $unit_id, $unit_folder_id)
     {
@@ -1410,7 +1439,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createAssessmentProjectOnCourseUnitSpec($title, $unit_id, $unit_folder_id)
     {
@@ -1427,7 +1456,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createAssessmentOnProject($title, $project_id, $unit_folder_id)
     {
@@ -1444,7 +1473,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function determineMarkInvalidation($HomePageID, $assignmentID, $assignmentTitle)
     {
@@ -1524,7 +1553,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function updateAssessmentOnHomepage($HomePageID, $assignmentID, $assignmentTitle)
     {
@@ -1603,7 +1632,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createAssessementForHomepageWithRubric($title, $HomePageID)
     {
@@ -1792,11 +1821,11 @@ trait GuzzleActions
      * @param int $assessmentID
      * @param int $user_id
      *
-     * @return array
-     *@throws GuzzleException
+     * @return Response
+     * @throws GuzzleException
      *
      */
-    public function submitAssessment($assessmentID, $user_id): ?array
+    public function submitAssessment($assessmentID, $user_id): ?Response
     {
         if (!isset($this->client))
         {
@@ -1837,7 +1866,7 @@ trait GuzzleActions
      * @param int $user_marking_id
      * @param int $student_submitting_id
      *
-     * @return array
+     * @return Response
      *@throws GuzzleException
      *
      */
@@ -1887,7 +1916,7 @@ trait GuzzleActions
      * @param int $user_marking_id
      * @param int $student_submitting_id
      *
-     * @return array
+     * @return Response
      *
      * @throws GuzzleException
      * @throws \Exception
@@ -1953,7 +1982,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function draftNews($title)
     {
@@ -2003,7 +2032,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function createNewsToModerate($title, $news_id)
     {
@@ -2051,7 +2080,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function publishModeratedNewsByID($news_id)
     {
@@ -2093,7 +2122,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function saveNewsByIDforLater($news_id)
     {
@@ -2133,7 +2162,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function rejectNewsByID($news_id)
     {
@@ -2176,7 +2205,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function deleteNewsByID($news_id)
     {
@@ -2220,7 +2249,7 @@ trait GuzzleActions
      *
      * @throws GuzzleException
      *
-     * @return array
+     * @return Response
      */
     public function publishNewsForm($title, $news_id)
     {

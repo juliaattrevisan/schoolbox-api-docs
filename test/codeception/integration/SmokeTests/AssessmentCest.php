@@ -2,9 +2,11 @@
 
 namespace SmokeTests;
 
+use GuzzleHttp\Exception\GuzzleException;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
+use Schoolbox\External\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -25,13 +27,13 @@ class AssessmentCest {
      *
      * @param IntegrationTester $i
      *
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws GuzzleException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\External\Exception
+     * @throws Deleted
+     * @throws Exception
      */
-    public function SmokeAssessmentPOST(IntegrationTester $i){
+    public function SmokeAssessmentPOST(IntegrationTester $i):void
+    {
         #GIVEN
         $i->loginAdmin(); #we logged in as alaress
         $homepage_title='Testing Home Page for Assessment';
@@ -45,14 +47,16 @@ class AssessmentCest {
         #WHEN
         /** @var Response $response */
         $response = $i->createAssessmentOnHomepage($assessment_title,$homePageId);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'303'],
+            ['-'=>'200']
+        ];
 
         #THEN
         $i->comment('Created homepage and added assessment to it');
-        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected after I create an assessment.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId, $redirect_history[0], 'I expect we get redirected to the homepage our assessment is on.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
+
+
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' Edit it';
@@ -60,11 +64,12 @@ class AssessmentCest {
         $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
         $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
         $update_response = $i->updateAssessmentOnHomepage($homePageId, $assessmentPageId, $assessment_title);
+        $expectedUrlsReturned= [['-'=>'200']];
 
         #THEN
         $i->comment('Updated Assessment');
-        $i->assertEquals(200, $determine_mark_response->getStatusCode(), 'I expect that we get a 200 after mark validation on assessment update.');
-        $i->assertEquals(200, $update_response->getStatusCode(), 'I expect that we get a 200 after updating assessment.');
+        $i->checkCurlReturn($expectedUrlsReturned, $determine_mark_response);
+        $i->checkCurlReturn($expectedUrlsReturned, $update_response);
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
@@ -72,7 +77,7 @@ class AssessmentCest {
 
         #THEN
         $i->comment('Create Assessment with rubric for a homepage');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after creating an assessment with rubric.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
@@ -81,7 +86,7 @@ class AssessmentCest {
 
         #THEN
         $i->comment('Submit assessment on behalf of student');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after submitting assessment on behalf of student.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
@@ -92,7 +97,7 @@ class AssessmentCest {
         $response = $i->markAssessmentWithRubric($assessmentPageId, $admin->getId(), $student->getId());
         $i->comment('Mark assessment with rubric');
 
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after marking assessement with rubric');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
@@ -101,7 +106,7 @@ class AssessmentCest {
 
         #THEN
         $i->comment('Mark normal assessment');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after marking assesssment.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         ##To Do - Submit reflection on assessment.
 

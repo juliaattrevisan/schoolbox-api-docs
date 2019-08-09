@@ -12,8 +12,5 @@ use Schoolbox\Resource\Storage\HashGenerator;
 class Integration extends \Codeception\Module
 {
 
-    /**
-     * Define custom actions here
-     */
 
 }

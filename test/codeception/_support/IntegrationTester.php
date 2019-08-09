@@ -31,4 +31,34 @@ class IntegrationTester extends \Codeception\Actor
 
     use SchoolboxHelper\SchoolboxActions;
 
+    /**
+     * checkCurlReturn checks the return values against the actual values that have been returned during the test.
+     *
+     * @param array $expectedReturn  #array[[$URL => $STATUS_CODE]]
+     * @param \GuzzleHttp\Psr7\Response $response
+     */
+    public function checkCurlReturn(array $expectedReturn, \GuzzleHttp\Psr7\Response $response):void
+    {
+        $redirectHistoryArray = $this->prepareGuzzleRedirectHistoryToArray($response);
+
+        if (count($expectedReturn) == count($redirectHistoryArray))
+        {
+            $numberOfReturnUrls = 0;
+            while ($numberOfReturnUrls < count($redirectHistoryArray))
+            {
+                if (!array_key_exists('-', $expectedReturn[$numberOfReturnUrls]))
+                {
+                    $this->assertEquals($expectedReturn[$numberOfReturnUrls], $redirectHistoryArray[$numberOfReturnUrls], 'Expect a redirect');
+                } else {
+                    $this->assertEquals($expectedReturn[$numberOfReturnUrls], $redirectHistoryArray[$numberOfReturnUrls], 'Expect last return code');
+                }
+
+                $numberOfReturnUrls++;
+            }
+        } else
+        {
+            $this->assertEquals(count($expectedReturn), count($redirectHistoryArray), 'Action path of request has less steps then the expected amount of steps');
+        }
+    }
+
 }

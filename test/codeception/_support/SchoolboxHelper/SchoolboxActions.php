@@ -25,7 +25,7 @@ use Component_Definition;
 use Component_DefinitionMapper;
 use Component_InstanceMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Application\CliTool\Kernel;
@@ -51,7 +51,7 @@ trait SchoolboxActions
     function initDatabase()
     {
         $this->database=Database::getInstance();
-        $this->database->connect('mysql:host=localhost;dbname=schoolbox', 'root', 'tnp879');
+        $this->database->connect(SQL_dsn, SQL_user, SQL_passwd);
     }
 
     /**

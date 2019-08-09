@@ -5,6 +5,7 @@ namespace SmokeTests;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
+use SchoolboxHelper\SchoolboxActionsConstants;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -29,6 +30,7 @@ class HomePageCest {
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \Schoolbox\External\Exception
      */
     public function SmokeHomepagePOST(IntegrationTester $i){
         #GIVEN
@@ -75,7 +77,7 @@ class HomePageCest {
         #WHEN
         $text_component_class=$i->getComponentByClass('Component_Homepage_TextBoxController');
         $text='<p>This is test Text</p>';
-        $response = $i->addComponentToHomepage($text_component_class->getId(), $homePageId, SchoolboxHelper\SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top']);
+        $response = $i->addComponentToHomepage($text_component_class->getId(), $homePageId, SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top']);
         $i->comment('Added the Text component to Homepage.');
 
         #THEN
