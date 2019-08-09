@@ -142,7 +142,7 @@ class EventConnector extends EventMapper
             $event->setPublishDate($publishDate);
 
             $event->setAttendance(0);
-            $event->setCompleted(0);
+            $event->setCompleted(false);
 
             $collection->add($event);
         }
@@ -405,7 +405,7 @@ class EventConnector extends EventMapper
                 }
 
                 $event->setAttendance(0);
-                $event->setCompleted(0);
+                $event->setCompleted(false);
 
                 /* Custom data
                  */

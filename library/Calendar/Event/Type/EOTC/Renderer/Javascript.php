@@ -114,7 +114,7 @@ class Javascript extends Base
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),
                     'level'       => $this->getEvent()->getDerivedEventLevel(),
-                    'completed'   => (bool)$this->getEvent()->getCompleted(),
+                    'completed'   => $this->getEvent()->getCompleted(),
                 ),
                 'links'      => array(
                     'category' => array(

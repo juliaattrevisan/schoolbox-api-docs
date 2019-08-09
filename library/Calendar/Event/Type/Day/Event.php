@@ -285,9 +285,9 @@ class Event extends EventBase
     /**
      * Set completed
      *
-     * @param int $completed
+     * @param bool $completed
      */
-    public function setCompleted($completed)
+    public function setCompleted(bool $completed)
     {
         $this->completed = $completed;
     }
@@ -295,9 +295,9 @@ class Event extends EventBase
     /**
      * Get completed
      *
-     * @return int
+     * @return bool
      */
-    public function getCompleted()
+    public function getCompleted(): bool
     {
         return $this->completed;
     }
