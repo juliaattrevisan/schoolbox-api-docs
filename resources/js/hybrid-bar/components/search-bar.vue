@@ -6,7 +6,7 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @focus="onFocus"
+               @focus="onFocusOrOver"
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
@@ -14,6 +14,7 @@
                v-click-outside="lostFocus"
                @blur="isFocused=false"
                @focusout="isFocused=false"
+               @mouseover="onFocusOrOver"
                maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
@@ -108,23 +109,31 @@
                 }
             },
 
+            // Method gets called when the user clicked outside this component e.g: clicking in the profile icon and etc.
             lostFocus: function(event) {
                 this.isFocused = false;
-                this.arrowCounter = -1;
+                this.arrowCounter = -1; // Reset arrow pointer to none
 
+                // Remove z-index that was injected
                 document.querySelector('.left-small').removeAttribute('style');
             },
 
-            onFocus: function(event) {
-                var offCanvasWrap = document.getElementById('off-canvas-wrap');
+            // This method gets called when the user clicked or do a mouseover this component
+            onFocusOrOver: function(event) {
 
-                if (offCanvasWrap.classList.contains('move-right')) {
-                    offCanvasWrap.classList.remove('move-right');
+                if (event.type === 'focus') {
+                    var offCanvasWrap = document.getElementById('off-canvas-wrap');
+
+                    // If left nav is unpinned and currently open, close it
+                    if (offCanvasWrap.classList.contains('move-right')) {
+                        offCanvasWrap.classList.remove('move-right');
+                    }
+
+                    this.isFocused = true;
                 }
 
+                // Unfortunately, we'll need to do this when the nav is unpinned
                 document.querySelector('.left-small').style.zIndex = 1000;
-
-                this.isFocused=true
             },
 
             goToPath: function(path) {
