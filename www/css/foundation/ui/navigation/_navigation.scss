@@ -705,3 +705,7 @@ $allow-sidebar-stash: $large-up;
 .second-nav li {
   display: none;
 }
+
+.search-is-active {
+  z-index: 1000 !important;
+}

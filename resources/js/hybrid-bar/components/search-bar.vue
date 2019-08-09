@@ -6,15 +6,16 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-               @focus="onFocusOrOver"
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
+               @focus="onFocusOverOrOut"
+               @mouseover="onFocusOverOrOut"
+               @mouseout="onFocusOverOrOut"
                v-click-outside="lostFocus"
                @blur="isFocused=false"
                @focusout="isFocused=false"
-               @mouseover="onFocusOrOver"
                maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
@@ -113,11 +114,13 @@
                 this.isFocused = false;
                 this.arrowCounter = -1; // Reset arrow pointer to none
 
-                // Remove z-index that was injected
-                document.querySelector('#menu-toggle').removeAttribute('style');
+                /**
+                 * Revert back the z-index value back to the default value of 1001
+                 */
+                document.querySelector('#menu-toggle').classList.remove('search-is-active');
             },
 
-            onFocusOrOver: function(event) {
+            onFocusOverOrOut: function(event) {
 
                 if (event.type === 'focus') {
                     var offCanvasWrap = document.getElementById('off-canvas-wrap');
@@ -131,11 +134,10 @@
                 }
 
                 /**
-                 * Unfortunately, we'll need to do this when the nav is unpinned.
                  * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime the user
-                 * does a focus/mouseover in the searchbar, we'll need decrease the z-index to 1000.
-                */
-                document.querySelector('#menu-toggle').style.zIndex = 1000;
+                 * does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the search-is-active class
+                 */
+                document.querySelector('#menu-toggle').classList.add('search-is-active');
             },
 
             goToPath: function(path) {
