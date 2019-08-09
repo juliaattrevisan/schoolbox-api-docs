@@ -109,16 +109,14 @@
                 }
             },
 
-            // Method gets called when the user clicked outside this component e.g: clicking in the profile icon and etc.
             lostFocus: function(event) {
                 this.isFocused = false;
                 this.arrowCounter = -1; // Reset arrow pointer to none
 
                 // Remove z-index that was injected
-                document.querySelector('.left-small').removeAttribute('style');
+                document.querySelector('#menu-toggle').removeAttribute('style');
             },
 
-            // This method gets called when the user clicked or do a mouseover this component
             onFocusOrOver: function(event) {
 
                 if (event.type === 'focus') {
@@ -132,8 +130,12 @@
                     this.isFocused = true;
                 }
 
-                // Unfortunately, we'll need to do this when the nav is unpinned
-                document.querySelector('.left-small').style.zIndex = 1000;
+                /**
+                 * Unfortunately, we'll need to do this when the nav is unpinned.
+                 * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime the user
+                 * does a focus/mouseover in the searchbar, we'll need decrease the z-index to 1000.
+                */
+                document.querySelector('#menu-toggle').style.zIndex = 1000;
             },
 
             goToPath: function(path) {
