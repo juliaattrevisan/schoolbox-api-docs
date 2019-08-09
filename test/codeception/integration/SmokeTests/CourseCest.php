@@ -58,10 +58,11 @@ class CourseCest {
         $course_spec = $i->getFirstCourseByTitle($title);
         $unit_name=$title.' EmptyUnit';
         $response = $i->createNewUnitSpec($unit_name, $course_spec);
+        $expectedUrlsReturned= [['-'=>'200']];
         $i->comment('Created unit spec for course');
 
         #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 okay after creation.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $unit = $i->getFirstUnitByTitle($unit_name);
