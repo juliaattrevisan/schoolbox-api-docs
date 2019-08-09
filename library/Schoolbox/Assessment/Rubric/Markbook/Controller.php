@@ -141,7 +141,6 @@ class Controller extends Base
                 [
                     'folder'      => $folder,
                     'filterPanel' => $filterPanel,
-                    'page'        => $page,
                 ]
             )->setTab('submission')->setTitle('Rubric Markbook for ' . $folder->getName())
         );

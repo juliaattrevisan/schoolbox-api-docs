@@ -267,7 +267,6 @@ class Controller extends Base
             'currentTerm'     => $term,
             'children'        => $this->getUser()->getChildren(),
             'filterPanel'     => $filterPanel,
-            'filteredPage'    => Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
             'filterIdSlugMap' => $this->buildFilterIdSlugMap($filterPanel),
         ];
 

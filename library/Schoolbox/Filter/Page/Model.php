@@ -1,6 +1,5 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
@@ -28,6 +27,7 @@ class Model
     public const PAGE_RUBRIC_MARK_BOOK    = 'rubricMarkbook';
     public const PAGE_LEARNING_ANALYTICS  = 'analytics';
     public const PAGE_UPCOMING_ASSESSMENTS= 'dueWorkCal';
+    public const PAGE_ASSESSMENT_CALENDAR = 'assessmentCal';
 
 
     /**
@@ -101,6 +101,9 @@ class Model
                 Role::STAFF,
                 Role::PARENT,
                 Role::STUDENT,
+            ],
+            self::PAGE_ASSESSMENT_CALENDAR => [
+                Role::STAFF,
             ],
         ];
     }

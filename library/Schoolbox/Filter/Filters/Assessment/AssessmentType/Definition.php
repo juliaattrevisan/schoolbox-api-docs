@@ -67,6 +67,7 @@ class Definition extends Filter\AbstractDefinition
             Filter\Page\Model::PAGE_CLASS_MARK_BOOK,
             Filter\Page\Model::PAGE_COURSE_MARK_BOOK,
             Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS,
+            Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR,
         ];
     }
 

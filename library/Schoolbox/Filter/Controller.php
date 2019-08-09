@@ -1,6 +1,5 @@
 <?php
 /**
- * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
@@ -236,14 +235,16 @@ class Controller extends BaseController
      */
     private function buildFilteredPageLabels(): array
     {
+        $assessmentLocalised = $this->rosettaStone->translate('assessment', true, true);
         return [
-            Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$this->rosettaStone->translate('assessment', true, true)}",
+            Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$assessmentLocalised}",
             Page\Model::PAGE_GRADES               => 'Grades',
             Page\Model::PAGE_CLASS_MARK_BOOK      => 'Class Markbook',
             Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
             Page\Model::PAGE_RUBRIC_MARK_BOOK     => 'Rubric Markbook',
             Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
             Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
+            Page\Model::PAGE_ASSESSMENT_CALENDAR  => "{$assessmentLocalised} Calendar",
         ];
     }
 }
