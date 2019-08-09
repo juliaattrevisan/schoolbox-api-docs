@@ -39,7 +39,7 @@ class CalendarCest {
         #WHEN
         $event_title='Personal event for user '.$admin->getId().'. On full Calendar.';
         $response = $i->createPersonalCalendarEventViaCalendar($event_title, $admin->getId());
-        $expectedUrlsReturned=[['-'=>'200']];
+        $expectedUrlsReturned=[[GuzzleConstants::NO_REDIRECT=>'200']];
 
         #THEN
         $i->comment('Create calendar event from full calander');
@@ -50,7 +50,7 @@ class CalendarCest {
         $response = $i->createPersonalCalendarEvent($event_title, $admin->getId());
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -65,7 +65,7 @@ class CalendarCest {
         $response = $i->createGroupCalendarEvent($event_title, $admin->getId(), $groups_effected);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -85,7 +85,7 @@ class CalendarCest {
         $response = $i->createCampusCalendarEvent($event_title, $admin->getId(), $roles_effected, $campuses_effected);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -99,7 +99,7 @@ class CalendarCest {
         $response = $i->editPersonalCalendarEvent($event_title, $admin->getId());
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -119,7 +119,7 @@ class CalendarCest {
         $i->createCampusCalendarEventWithAttendance($event_title, $admin->getId(), $roles_effected, $campuses_effected);
         $event = $i->getCalendarEventByTitle($event_title);
         $response = $i->RSVPtoEvent($event->getId());
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
 
         #THEN
         $i->comment('Create campus calendar event then RCVP to it.');
@@ -132,7 +132,7 @@ class CalendarCest {
         $response = $i->ApproveAttendeeOnRSVPEvent($event->getId(), $users_to_approve);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/'.$event->getId()=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
 
         #THEN

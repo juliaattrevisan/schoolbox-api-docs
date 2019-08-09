@@ -2,6 +2,7 @@
 
 namespace SmokeTests;
 
+use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
@@ -45,7 +46,7 @@ class HomePageCest {
         $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Create homepage :'.$homePageId);
 
@@ -56,7 +57,7 @@ class HomePageCest {
         $response = $i->addUsersToHomepageGroup($homePageId, [$student->getId(), $admin->getId(), $teacher->getId()]);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePageId=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Add users to homepage ID:'.$homePageId);
 
@@ -67,7 +68,7 @@ class HomePageCest {
         $response = $i->setHomepageGroupUserPermission($homePageId, [$student->getId()=>1, $teacher->getId()=>2, $admin->getId()=>3]);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePageId=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Change permission for group users on homepage ID:'.$homePageId);
 
@@ -78,7 +79,7 @@ class HomePageCest {
         $text_component_class=$i->getComponentByClass('Component_Homepage_TextBoxController');
         $text='<p>This is test Text</p>';
         $response = $i->addComponentToHomepage($text_component_class->getId(), $homePageId, SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top']);
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Added the Text component to Homepage.');
 
         #THEN
@@ -91,7 +92,7 @@ class HomePageCest {
         $response = $i->deleteTextBoxToTextComponent($homePageId, $heading);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Delete a text input we freshly created.');
 
@@ -104,7 +105,7 @@ class HomePageCest {
         $response = $i->addTextBoxToTextComponent($homePageId, $homepage_text_component, $text, $heading);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'302'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('create a fresh text input into the text component');
 

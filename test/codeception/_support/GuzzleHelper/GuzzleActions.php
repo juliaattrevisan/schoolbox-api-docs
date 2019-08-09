@@ -20,6 +20,10 @@ use Schoolbox\User;
 
 const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
 
+class GuzzleConstants{
+    const NO_REDIRECT = '-';
+}
+
 
 trait GuzzleActions
 {
@@ -73,7 +77,7 @@ trait GuzzleActions
                 $array_of_redirects[] = [$returnURLs[$counter] => $returnCodes[$counter]];
                 $counter++;
             }
-            $array_of_redirects[]=['-' =>$lastReturnCode];
+            $array_of_redirects[]=[GuzzleConstants::NO_REDIRECT =>$lastReturnCode];
             return $array_of_redirects;
         }
 

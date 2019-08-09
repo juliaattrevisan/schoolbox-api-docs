@@ -2,6 +2,7 @@
 
 namespace SmokeTests;
 
+use GuzzleHelper\GuzzleConstants;
 use GuzzleHttp\Exception\GuzzleException;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
@@ -49,7 +50,7 @@ class AssessmentCest {
         $response = $i->createAssessmentOnHomepage($assessment_title,$homePageId);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -64,7 +65,7 @@ class AssessmentCest {
         $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
         $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
         $update_response = $i->updateAssessmentOnHomepage($homePageId, $assessmentPageId, $assessment_title);
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
 
         #THEN
         $i->comment('Updated Assessment');

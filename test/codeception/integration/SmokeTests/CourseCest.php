@@ -2,6 +2,7 @@
 
 namespace SmokeTests;
 
+use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
@@ -47,7 +48,7 @@ class CourseCest {
         $response = $i->createNewCourseSpec($title, $course_folder);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/course/list'=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Created folder and created a course in it');
 
@@ -58,7 +59,7 @@ class CourseCest {
         $course_spec = $i->getFirstCourseByTitle($title);
         $unit_name=$title.' EmptyUnit';
         $response = $i->createNewUnitSpec($unit_name, $course_spec);
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Created unit spec for course');
 
         #THEN
@@ -69,7 +70,7 @@ class CourseCest {
         $response = $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/course/list'=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Save newly created course');
 
@@ -87,7 +88,7 @@ class CourseCest {
         $response = $i->createAssessmentOnCourseUnitSpec('Assessment for course due work', $unit->getId(), $unit_folder->getId());
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/course/modify/'.$course_spec->getId()=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('create an assessment in a new course + unit spec');
 
@@ -100,7 +101,7 @@ class CourseCest {
         $project_assessment_id=$i->getFirstAssessmentIdByTitle($project_name);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$project_assessment_id.'/status'=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('create an project in a the course unit spec');
 
@@ -111,7 +112,7 @@ class CourseCest {
         $response = $i->createAssessmentOnProject('Assessment for project in course', $project_assessment_id, $unit_folder->getId());
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$project_assessment_id.'/status'=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('create an assessment in the new projects');
 
@@ -122,7 +123,7 @@ class CourseCest {
         $response = $i->saveCourseSpec($title, $unit_name, $course_folder->getId(), $course_spec, $unit);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/course/list'=>'303'],
-            ['-'=>'200']
+            [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         $i->comment('Save newly created course that contains a unit spec with assessment');
 
@@ -157,19 +158,19 @@ class CourseCest {
 
         #WHEN
         $response = $i->importCourseSpecToClass($course_spec->getId(), $classPageId);
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Importing course spec to class step 1.');
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
         #WHEN
         $response = $i->importUnitSpecToClassCourse($course_spec->getId(), $classPageId);
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Importing unit spec to class course step 2.');
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
         #WHEN
         $response = $i->importDueWorkToClassCourseUnit($course_spec->getId(), $classPageId);
-        $expectedUrlsReturned= [['-'=>'200']];
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Importing all the due work into units of the source in class step 3.');
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
