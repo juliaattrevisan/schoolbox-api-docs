@@ -39,22 +39,23 @@ class CalendarCest {
         #WHEN
         $event_title='Personal event for user '.$admin->getId().'. On full Calendar.';
         $response = $i->createPersonalCalendarEventViaCalendar($event_title, $admin->getId());
+        $expectedUrlsReturned=[['-'=>'200']];
 
         #THEN
         $i->comment('Create calendar event from full calander');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after creating event on full calendar screen.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $event_title='Personal event for user '.$admin->getId().'. On create version of modify event.';
         $response = $i->createPersonalCalendarEvent($event_title, $admin->getId());
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
+            ['-'=>'200']
+        ];
 
         #THEN
         $i->comment('Create calendar event from edit event - Personal event');
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I create a calendar personal event via editinng event.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $groups_effected= [
@@ -62,14 +63,14 @@ class CalendarCest {
         ];
         $event_title='Group event for a group. On create version of modify event.';
         $response = $i->createGroupCalendarEvent($event_title, $admin->getId(), $groups_effected);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
+            ['-'=>'200']
+        ];
 
         #THEN
         $i->comment('Create calendar event from edit event - Group event');
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I create a calendar group event via editinng event.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $roles_effected= [
@@ -82,28 +83,28 @@ class CalendarCest {
         ];
         $event_title='Campus event for 2 roles and all the campuses. On create version of modify event.';
         $response = $i->createCampusCalendarEvent($event_title, $admin->getId(), $roles_effected, $campuses_effected);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
+            ['-'=>'200']
+        ];
 
         #THEN
         $i->comment('Create calendar event from edit event - Campus event');
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I create a calendar campus event via editinng event.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $admin = $i->getUser('alaress');
         $event_title='Personal event for user '.$admin->getId().'. Edited Test.';
         $i->createPersonalCalendarEventViaCalendar($event_title, $admin->getId());
         $response = $i->editPersonalCalendarEvent($event_title, $admin->getId());
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId()=>'302'],
+            ['-'=>'200']
+        ];
 
         #THEN
         $i->comment('Create personal calendar event then edit the personal event.');
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I edit a personal event.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/full/19-07-2019/'.$admin->getId(), $redirect_history[0], 'I expect we get redirected to the calendar month our event is on.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $event_title='Campus event for administrators and teachers '.$admin->getId().'. RCVP Test.';
@@ -118,23 +119,24 @@ class CalendarCest {
         $i->createCampusCalendarEventWithAttendance($event_title, $admin->getId(), $roles_effected, $campuses_effected);
         $event = $i->getCalendarEventByTitle($event_title);
         $response = $i->RSVPtoEvent($event->getId());
+        $expectedUrlsReturned= [['-'=>'200']];
 
         #THEN
         $i->comment('Create campus calendar event then RCVP to it.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after sending an RSVP to the event.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         $users_to_approve=[
             $admin->getId()
         ];
         $response = $i->ApproveAttendeeOnRSVPEvent($event->getId(), $users_to_approve);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/'.$event->getId()=>'302'],
+            ['-'=>'200']
+        ];
 
         #THEN
         $i->comment('Approve attendees on event.');
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after we approve attendance.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/'.$event->getId(), $redirect_history[0], 'I expect we get redirected to the event we have added attendance to.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 }
