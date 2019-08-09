@@ -27,12 +27,12 @@ class LoginCest {
         #WHEN
         /** @var Response $response */
         $response = $i->loginUser($user, $password);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
+            ['-'=>'200']
+        ];
         #THEN
-        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected from the login page.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/', $redirect_history[0], 'I expect that we get redirected to the main index page.');
-        $i->assertArrayNotHasKey(1, $redirect_history_status, 'I expect there is only one redirect in the history of this request');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 
     /**
@@ -50,21 +50,21 @@ class LoginCest {
         #WHEN
         /** @var Response $response */
         $response = $i->loginForgotPasswordUsername($user_username);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
+            ['-'=>'200']
+        ];
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected from the login page.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/passwordReset', $redirect_history[0], 'I expect that we get redirected to the main index page.');
-        $i->assertArrayNotHasKey(1, $redirect_history_status, 'I expect there is only one redirect in the history of this request');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
         /** @var Response $response */
         $response = $i->loginForgotPasswordEmail($user_email);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
+            ['-'=>'200']
+        ];
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected from the login page.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/passwordReset', $redirect_history[0], 'I expect that we get redirected to the main index page.');
-        $i->assertArrayNotHasKey(1, $redirect_history_status, 'I expect there is only one redirect in the history of this request');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 }
