@@ -178,6 +178,30 @@ class GenericCollection extends Collection
         return false;
     }
 
+    /**
+     * Asserts that this collection is a collection of the specified type.
+     *
+     * Respects interface and class hierarchies.
+     *
+     * @param string $elementType
+     * @throws UnexpectedValueException
+     */
+    public function assertCollectionOf(string $elementType): void
+    {
+        try {
+            if (!$this->isCollectionOf($elementType)) {
+                throw new UnexpectedValueException(
+                    "These elements '{$this->elementType}' are not instance of '$elementType'"
+                );
+            }
+        } catch (ReflectionException $e) {
+            throw new UnexpectedValueException(
+                "These elements '{$this->elementType}' are not instance of '$elementType'",
+                0,
+                $e
+            );
+        }
+    }
 
     /**
      * Ensures the $item is of the specified type
