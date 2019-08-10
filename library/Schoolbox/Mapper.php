@@ -523,12 +523,16 @@ abstract class Mapper implements IMapper, Serializable
             foreach ($mapper->map as $map) {
                 $propertyName = $map['property'];
 
+                // We don't hydrate the model for:
+                // * many-many join (Where this entity A and other B have a N:N cardinality)
+                // * reverse multi-join (Where this entity A and other B have a 1:N cardinality)
                 if (empty($map['column'])) {
                     // check for multijoin
                     if (!(isset($map['join']) && isset($mapper->joins[$map['join']]['multi']))) {
                         throw new Exception("Column must be declared if no multijoin set for it: " . json_encode($map));
                     }
-                } else {
+                    // Don't hydrate reverse multi joins on model instantiation
+                } elseif (!(isset($map['join']) && $map['type'] === self::TYPE_COLLECTION && ($map['join_def']['reverse'] ?? false))) {
                     $columnName = $map['column'];
 
                     if (!empty($alias)) {
@@ -3410,16 +3414,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         // create a new, blank model
-        $model = new $this->model;
-
-        // Ensure any model Collections are instantiated
-        foreach ($this->map as $map){
-            if($map['hydrator'] instanceof Column\Collection){
-                $this->setModelProperty($model, $map['property'], null);
-            }
-        }
-
-        return $model;
+        return new $this->model;
     }
 
     /**
