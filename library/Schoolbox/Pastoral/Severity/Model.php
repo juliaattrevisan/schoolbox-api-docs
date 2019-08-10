@@ -9,18 +9,18 @@ namespace Schoolbox\Pastoral\Severity;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Sequential;
 
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, Sequential
 {
     use Id;
+    use HasSequence;
     use DeletedAtDate;
 
     /** @var string */
     protected $name;
-
-    /** @var int */
-    protected $order;
 
     /** @var bool $dashboard */
     protected $dashboard;
@@ -52,9 +52,7 @@ class Model implements ISoftDeletable
      */
     public function setOrder($order)
     {
-        $this->order = $order;
-
-        return $this;
+        return $this->setSequence($order);
     }
 
     /**
@@ -62,7 +60,7 @@ class Model implements ISoftDeletable
      */
     public function getOrder()
     {
-        return $this->order;
+        return $this->getSequence();
     }
 
     /**

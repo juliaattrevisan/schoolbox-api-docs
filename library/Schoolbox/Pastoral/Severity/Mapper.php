@@ -54,4 +54,10 @@ class Mapper extends BaseMapper
 
         return true;
     }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['order' => 'ASC'];
+    }
 }
