@@ -2153,7 +2153,7 @@ abstract class Mapper implements IMapper, Serializable
             'limit'   => null,
             'offset'  => null,
             'deleted' => false,
-            'order'   => array(),
+            'order'   => $this->getDefaultOrderByParams(),
         );
         $options      = array_merge($defaults, $options);
         $quoted_table = $this->database->quoteIdentifier($this->table);
@@ -2223,6 +2223,20 @@ abstract class Mapper implements IMapper, Serializable
         return $statement;
     }
 
+    /**
+     * Returns the default order by clause (if any), this mapper should apply to queries.
+     * Any 'order' option passed to mapper methods will override (not merge with) this default.
+     *
+     * Eg,
+     *  If this mapper's default is ['sequence' => 'ASC] and we call $mapper->findAll(['order' => ['name' => 'ASC']])
+     *  Then final order by will be ['name' => 'ASC'], rather than ['name' => 'ASC', 'sequence' => 'ASC]
+     *
+     * @return array
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return [];
+    }
 
     /**
      * Returns an 'ORDER BY' clause
