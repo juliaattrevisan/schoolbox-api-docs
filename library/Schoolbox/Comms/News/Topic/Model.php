@@ -10,11 +10,14 @@
 namespace Schoolbox\Comms\News\Topic;
 
 use Alaress\Json\SerializeTrait;
+use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Sequential;
 
-class Model implements \Alaress\Json\Serializable
+class Model implements \Alaress\Json\Serializable, Sequential
 {
     use Id;
+    use HasSequence;
     use SerializeTrait;
 
     /** @var string */
@@ -22,9 +25,6 @@ class Model implements \Alaress\Json\Serializable
 
     /** @var string */
     private $slug;
-
-    /** @var int */
-    private $sequence;
 
     /**
      * @param $name
@@ -73,27 +73,6 @@ class Model implements \Alaress\Json\Serializable
     {
         return $this->slug;
     }
-
-    /**
-     * @param int $sequence
-     * @return $this
-     */
-    public function setSequence($sequence): self
-    {
-        $this->sequence = $sequence;
-        return $this;
-    }
-
-    /**
-     * Sequence may not always be set if you just...accept the defaults
-     *
-     * @return int|null
-     */
-    public function getSequence(): ?int
-    {
-        return $this->sequence;
-    }
-
 
     /**
      * @return array
