@@ -14,7 +14,12 @@ case "$1" in
         useradd -m alaress 2> /dev/null || true;
     ;;
     upgrade)
-        # We cannot reference a file in the package from a prinst script, so need to inline it here
+        # If a schoolbox DB backup script has been previously shipped, use it
+        if [ -f /usr/share/schoolbox/tools/backup-database.sh ]; then
+            /usr/share/schoolbox/tools/backup-database.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
+        fi
+
+         # We cannot reference a file in the package from a prinst script, so need to inline it here
         echo 'Taking Schoolbox offline...' | tee -a /var/log/schoolbox/upgrade.log;
         maintenanceFileName="/usr/share/schoolbox/.maintenance";
         # Does maintenance file already exist
@@ -35,10 +40,6 @@ case "$1" in
         # Production servers use 'open_file_cache', need to reload to detect file change
         nginx -s reload | tee -a /var/log/schoolbox/upgrade.log;
 
-        # If a schoolbox DB backup script has been previously shipped, use it
-        if [ -f /usr/share/schoolbox/tools/backup-database.sh ]; then
-            /usr/share/schoolbox/tools/backup-database.sh 2>&1 | tee -a /var/log/schoolbox/upgrade.log;
-        fi
         # Ensure the alaress user exists
         useradd -m alaress 2> /dev/null || true;
         # Stop all daemons for consistency (upstart|systemd)
