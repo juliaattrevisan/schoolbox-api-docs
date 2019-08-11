@@ -1,0 +1,51 @@
+#!/usr/bin/php
+<?php
+/**
+ * Usage: ./cleanup.php [-p] [-vvv]
+ *
+ * A tool that will remove all UPS logs older than 1 month
+ *
+ *  -p          perform: *without* this flag, will only do a dry run
+ *  -v[v[v]]    verbosity: how much activity will be logged
+ *
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+use Monolog\Logger;
+use Schoolbox\Application\CliTool;
+use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
+
+require_once __DIR__ . '/../conf/core/require.php';
+
+$kernel = new CliTool\Kernel(new class extends CliTool\App
+{
+    public function run(): void
+    {
+        $removeDate = Alaress_Date_Format::newFromTimestamp(srtotime('-1 month'));
+        $logMapper = Schoolbox\Sync\Log\Mapper::getInstance();
+
+        $storageDeleter = new RelationalDelete($this->getLogger());
+
+
+        $loggerMessageSufix = !$this->perform() ? '[Dry run mode]' : '[Delete mode]';
+
+        $this->getLogger()->info('Starting UPS log cleanup on: ' . $loggerMessageSufix);
+        $this->getLogger()->info('Removing all UPS logs older than: ' . $removeDate->getDatabase());
+
+
+        $pb = $logMapper->getPredicateBuilder();
+        $pb->lessThan('created_at', $removeDate->getDatabase() );
+        $removeLogs = $logMapper->findByPredicates($pb);
+
+        foreach($removeLogs as $log) {
+            $storageDeleter->remove($log->getHash(),!$this->perform());
+            $logMapper->delete($log);
+        }
+
+        exit(0);
+    }
+
+}, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+
+$kernel->runApp();
