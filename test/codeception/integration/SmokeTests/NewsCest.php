@@ -2,6 +2,7 @@
 
 namespace SmokeTests;
 
+use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
@@ -56,12 +57,12 @@ class NewsCest {
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
         $response = $i->createNewsToModerate($title, $news_id_matches[1]);
         $i->comment('Pushed draft to moderation');
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1]=>'302'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft to be moderated.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just pushed to moderation.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         $title = 'Smoke Test News Title Publish Form Path';
         $response = $i->draftNews($title);
@@ -70,12 +71,12 @@ class NewsCest {
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
         $response = $i->publishNewsForm($title, $news_id_matches[1]);
         $i->comment('Publish Draft through update');
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1]=>'302'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish the draft directly.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published the draft directly.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         $title = 'Smoke Test News Title Publish Moderate Path';
         $response = $i->draftNews($title);
@@ -84,12 +85,12 @@ class NewsCest {
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
         $response = $i->publishModeratedNewsByID($news_id_matches[1]);
         $i->comment('Publish Draft with the ID');
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1]=>'302'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
         #THEN
-        $i->assertEquals(302, $redirect_history_status[0], 'I expect that we get redirected after I publish via moderate.');
-        $i->assertEquals('https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1], $redirect_history[0], 'I expect that we get redirected to the news article we just published via moderate.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         $title = 'Smoke Test News Title Reject By ID';
         $response = $i->draftNews($title);
@@ -99,9 +100,10 @@ class NewsCest {
 
         $i->createNewsToModerate($title, $news_id_matches[1]);
         $response = $i->rejectNewsByID($news_id_matches[1]);
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Rejected a Moderation waiting News Article');
-        #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get 200 after rejection of article.');
+        #THEN;
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         $title = 'Smoke Test News Title Save for later';
         $response = $i->draftNews($title);
@@ -110,9 +112,10 @@ class NewsCest {
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
         $i->publishModeratedNewsByID($news_id_matches[1]);
         $response = $i->saveNewsByIDforLater($news_id_matches[1]);
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
         $i->comment('Saved news article for later');
         #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after save news for later.');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         $title = 'Smoke Test News Title Delete, I should not exist';
         $response = $i->draftNews($title);
@@ -121,8 +124,12 @@ class NewsCest {
         preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
         $i->publishModeratedNewsByID($news_id_matches[1]);
         $response = $i->deleteNewsByID($news_id_matches[1]);
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/news'=>'302'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
         $i->comment('Deleted a News Article');
         #THEN
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after delete news executed on "'.$title.'".');
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 }

@@ -57,7 +57,8 @@ class IntegrationTester extends \Codeception\Actor
             }
         } else
         {
-            $this->assertEquals(count($expectedReturn), count($redirectHistoryArray), 'Action path of request has less steps then the expected amount of steps');
+
+            $this->assertEquals(count($expectedReturn), count($redirectHistoryArray), 'Action path of request has less steps then the expected amount of steps. '.print_r($expectedReturn).' compared to '.print_r($redirectHistoryArray));
         }
     }
 
