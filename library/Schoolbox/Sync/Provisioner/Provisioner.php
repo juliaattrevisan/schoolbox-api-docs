@@ -268,7 +268,10 @@ class Provisioner
                     } else {
                         $level = Logger::INFO;
                         $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
-                        $context = array_merge($commonContext,['externalUser'=> (array) $externalUser]);
+                        $context = $commonContext;
+                        $this->logger->log($level, $message, $context);
+                        ++$skipped;
+                        continue;
                     }
 
                     try {
@@ -283,8 +286,8 @@ class Provisioner
                             $this->logger->debug("User record saved", $commonContext);
                         }
 
-
                         $this->logger->log($level, $message, $context);
+
 
                         if ($action == 'update') {
                             ++$updated;
