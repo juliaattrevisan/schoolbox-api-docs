@@ -22,7 +22,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 {
     public function run(): void
     {
-        $removeDate = Alaress_Date_Format::newFromTimestamp(srtotime('-1 month'));
+        $removeDate = Alaress_Date_Format::newFromTimestamp(strtotime('-1 month'));
         $logMapper = Schoolbox\Sync\Log\Mapper::getInstance();
 
         $storageDeleter = new RelationalDelete($this->getLogger());
@@ -39,8 +39,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $removeLogs = $logMapper->findByPredicates($pb);
 
         foreach($removeLogs as $log) {
-            $storageDeleter->remove($log->getHash(),!$this->perform());
-            $logMapper->delete($log);
+            $this->getLogger()->info('Removing log file created on: '.$log->getCreatedAt()->getDatabase());
+            $storageDeleter->remove($log->getStorage()->getHash(),!$this->perform());
+            if($this->perform()) {
+                $logMapper->delete($log);
+            }
         }
 
         exit(0);

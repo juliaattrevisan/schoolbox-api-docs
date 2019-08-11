@@ -266,6 +266,8 @@ abstract class App
 
 
     /**
+     * Returns true if user provided -p on CLI or forcePerform has been specified by app
+     *
      * @return bool
      */
     protected function perform(): bool
