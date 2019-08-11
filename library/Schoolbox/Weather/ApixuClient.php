@@ -77,9 +77,13 @@ class ApixuClient
         $requestUrl = "forecast.json?q={$location}&days={$forecastLimit}&key={$this->apiKey}";
 
         // Cache the request
-        $cache = new \Alaress_Weather_Cache();
-        $cache->init($this->apiUrl . $requestUrl);
-        $response = $cache->getStreamContents();
+        try {
+            $cache = new \Alaress_Weather_Cache();
+            $cache->init($this->apiUrl . $requestUrl);
+            $response = $cache->getStreamContents();
+        } catch (\InvalidArgumentException $e) {
+            throw new \DomainException('Invalid Weather API endpoint');
+        }
 
         // Attempt to json decode the response body
         try{
@@ -87,7 +91,6 @@ class ApixuClient
         } catch (\RuntimeException $e){
             throw new \DomainException('Unable to read Weather API response', $response, $e);
         }
-
 
         // If this is an array, we can assume we got some data back
         if (\is_array($decodedResponse)) {
