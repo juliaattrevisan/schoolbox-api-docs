@@ -46,8 +46,8 @@ class Mapper extends BaseMapper implements Receiver
     /**
      * @param int $idValue
      *
-     * @throws MapperException
      * @return Model
+     * @throws MapperException
      */
     public function createModel($idValue = null)
     {
@@ -81,13 +81,12 @@ class Mapper extends BaseMapper implements Receiver
 
         $requireSafety = true;
 
-        if (isset($this->sessionData['user']) ) {
+        if (isset($this->sessionData['user'])) {
             $user = $this->sessionData['user'];
             if ($user instanceof User) {
                 $requireSafety = $user->isSuperuser() == false;
             }
-        }
-        else if(PHP_SAPI == 'cli') {
+        } elseif (PHP_SAPI == 'cli') {
             $requireSafety = false;
         }
 
@@ -317,9 +316,9 @@ class Mapper extends BaseMapper implements Receiver
     /**
      * Accept a new file upload
      *
-     * @param string      $basename
-     * @param string      $tempLocation
-     * @param bool        $public
+     * @param string $basename
+     * @param string $tempLocation
+     * @param bool   $public
      *
      * @return Model
      * @throws MapperException
@@ -383,7 +382,7 @@ class Mapper extends BaseMapper implements Receiver
     public function getManager()
     {
         if ($this->manager === null) {
-            $factory       = new FilesystemFactory();
+            $factory = new FilesystemFactory();
             $this->manager = new Manager(
                 $factory->build($this->config_loader->get('storage_dir')),
                 new Alaress_Byte_Format()

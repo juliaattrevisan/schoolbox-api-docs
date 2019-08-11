@@ -44,8 +44,8 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
     {
         // TODO these should be injectable for all custom hydrators
         $this->externalUserHandler = new External_User();
-        $this->userMapper          = UserMapper::getInstance();
-        $this->campusMapper        = CampusMapper::getInstance();
+        $this->userMapper = UserMapper::getInstance();
+        $this->campusMapper = CampusMapper::getInstance();
     }
 
     /**
@@ -87,13 +87,13 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                     $message = "No child campuses found to assign to parent {$previous->getFullName()} ({$previous->getExternalId()})";
                     $context = [];
                 } else {
-                    $message = "Assigning child campuses to parent {$previous->getFullName()} ({$previous->getExternalId()}): ".
-                        implode(',',$previous->getCampusCollection()->getColumnValues('name'));
+                    $message = "Assigning child campuses to parent {$previous->getFullName()} ({$previous->getExternalId()}): " .
+                        implode(',', $previous->getCampusCollection()->getPropertyValues('name'));
                     $context = [
                         'diff' => [
                             'old' => $oldCampuses,
-                            'new' => $newCampuses
-                        ]
+                            'new' => $newCampuses,
+                        ],
                     ];
                 }
                 $this->log(Logger::INFO, $message, $input, $previous, $context);

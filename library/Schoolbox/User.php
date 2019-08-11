@@ -262,7 +262,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     public function __clone()
     {
         $this->campusCollection = clone $this->campusCollection;
-        if($this->accessList instanceof Collection) {
+        if ($this->accessList instanceof Collection) {
             $this->accessList = clone $this->accessList;
         }
     }

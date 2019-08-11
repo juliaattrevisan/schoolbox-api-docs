@@ -16,14 +16,11 @@ use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
 use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Ruleset;
-use Schoolbox\Sync\Provisioner\User;
-use Schoolbox\Sync\Provisioner\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Collection;
 
@@ -102,12 +99,12 @@ class Provisioner
     /**
      * Constructor
      *
-     * @param Ruleset\Factory $rulesetFactory
-     * @param Grammar\Factory $grammarFactory
-     * @param ISync $externalUserSource
-     * @param UserMapper $userMapper
+     * @param Ruleset\Factory          $rulesetFactory
+     * @param Grammar\Factory          $grammarFactory
+     * @param ISync                    $externalUserSource
+     * @param UserMapper               $userMapper
      * @param CacheableLoggerInterface $logger
-     * @param Log\Mapper $logMapper
+     * @param Log\Mapper               $logMapper
      */
     public function __construct(
         Ruleset\Factory $rulesetFactory,
@@ -116,8 +113,7 @@ class Provisioner
         UserMapper $userMapper,
         CacheableLoggerInterface $logger,
         Log\Mapper $logMapper
-    )
-    {
+    ) {
         $this->rulesetFactory = $rulesetFactory;
         $this->grammarFactory = $grammarFactory;
         $this->externalUserSource = $externalUserSource;
@@ -130,7 +126,7 @@ class Provisioner
     /**
      * Set the logger from outside this class.
      *
-     * @param  LoggerInterface $logger
+     * @param LoggerInterface $logger
      * @return $this
      */
     public function setLogger(LoggerInterface $logger)
@@ -142,7 +138,7 @@ class Provisioner
     /**
      * Runs the UPS.
      *
-     * @param bool $update If true, updates - otherwise, performs a dry run.
+     * @param bool   $update      If true, updates - otherwise, performs a dry run.
      * @param string $forRoleType If set, provisions this role type
      *                            (and only this role type) regardless of if
      *                            it's enabled or not.
@@ -162,7 +158,7 @@ class Provisioner
             try {
                 $ruleset = $this->rulesetFactory->produceRuleset($roleType, $this->logger, $this->grammarFactory);
             } catch (\Exception $e) {
-                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", [ 'exception'=>$e ]);
+                $this->logger->alert("Invalid ruleset detected for '{$roleType}'; skipping.", ['exception' => $e]);
                 $this->logMapper->flush($this->logger);
                 continue;
             }
@@ -194,7 +190,7 @@ class Provisioner
 
                     // this is the context that needs to be applied to every log message while working with a user, for filtering
                     $commonContext = [
-                        'externalUserId' => $externalUserId
+                        'externalUserId' => $externalUserId,
                     ];
 
                     // Get the currently stored user
@@ -255,11 +251,15 @@ class Provisioner
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
                     // get a diff of the access list aswell
-                    if( $newGroups = count($internalUser->getAccessList()->diffBy($originalUser->getAccessList(), 'serviceIdentifier')) ) {
-                        $diff['accessList'] = ['old' => count($originalUser->getAccessList()), 'new' => '+'.$newGroups];
+                    if ($newGroups = count($internalUser->getAccessList()->diffBy($originalUser->getAccessList(), 'serviceIdentifier'))) {
+                        $diff['accessList'] = [
+                            'old' => count($originalUser->getAccessList()),
+                            'new' => '+' . $newGroups,
+                        ];
                     }
 
-                    $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})" : $originalUser->formatName()." ({$internalUser->getExternalID()})";
+                    $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})"
+                        : $originalUser->formatName() . " ({$internalUser->getExternalID()})";
 
                     if (count($diff)) {
                         $level = Logger::NOTICE;
@@ -287,7 +287,6 @@ class Provisioner
                         }
 
                         $this->logger->log($level, $message, $context);
-
 
                         if ($action == 'update') {
                             ++$updated;
@@ -391,8 +390,8 @@ class Provisioner
      * mapper to throw error during live-run.
      *
      * @param \Schoolbox\Sync\Provisioner\User $internalUser
-     * @throws UnexpectedValueException if multiple new users were created with same username
      * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if multiple new users were created with same username
      */
     protected function verifyUniqueNewUserUsername(User $internalUser)
     {
