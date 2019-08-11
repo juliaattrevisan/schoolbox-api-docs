@@ -81,11 +81,14 @@ class Mapper extends BaseMapper implements Receiver
 
         $requireSafety = true;
 
-        if (isset($this->sessionData['user'])) {
+        if (isset($this->sessionData['user']) ) {
             $user = $this->sessionData['user'];
             if ($user instanceof User) {
                 $requireSafety = $user->isSuperuser() == false;
             }
+        }
+        else if(PHP_SAPI == 'cli') {
+            $requireSafety = false;
         }
 
         if ($requireSafety) {
