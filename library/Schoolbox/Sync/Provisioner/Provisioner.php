@@ -16,6 +16,7 @@ use Schoolbox\External\Normalise;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar;
@@ -168,7 +169,7 @@ class Provisioner
 
             if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
 
-                $this->logger->warning("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
+                $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
                 $created = $updated = $skipped = $errors = 0;
 
@@ -185,7 +186,7 @@ class Provisioner
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
-                        $this->logger->error("Cannot process user: no externalUserId in record");
+                        $this->logger->error("Cannot process user: User must have an External ID");
                         ++$skipped;
                         ++$errors;
                         continue;
@@ -217,6 +218,9 @@ class Provisioner
                      */
                     $preserved = new Collection();
 
+                    $originalUser = clone $internalUser;
+
+
                     /* Don't blow away any UserAccess::ACCESS_FULL settings
                      */
                     foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
@@ -231,54 +235,41 @@ class Provisioner
 
                     $commonContext['action'] = $action;
 
-                    $originalUser = clone $internalUser;
 
                     // Run this user through the hydrators
                     try {
                         $ruleset->hydrate($externalUser, $internalUser);
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
-                        $this->logger->notice("Skipping user: " . $e->getMessage(), $commonContext);
+                        $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
                         ++$skipped;
                         continue;
 
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
-                        $this->logger->error("Error provisioning user: " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
+                        $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
                         ++$skipped;
-                        ++$errors;
                         continue;
                     }
 
                     // get a diff of the original user and what we've ended up with
                     $diff = $this->userMapper->diff($originalUser, $internalUser, ['old', 'new']);
-
-                    $originalName = ($action == 'create') ? "New user ({$internalUser->formatName()})" : $originalUser->formatName();
-
-                    if (count($diff)
-                        || count($internalUser->getUserAccessRead())
-                        || count($internalUser->getUserAccessWrite())
-                        || count($internalUser->getUserAccessRemove())
-                    ) {
-                        $level = Logger::NOTICE;
-                        $message = $update ? "Preparing to $action $originalName" : "$originalName would have been {$action}d";
-                        $context = array_merge($commonContext, ['diff' => $diff]);
-
-                        if ($action == 'update') {
-                            ++$updated;
-                        } else {
-                            ++$created;
-                        }
-
-                    } else {
-                        $level = Logger::DEBUG;
-                        $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': data is unchanged';
-                        $context = $commonContext;
-
-                        ++$skipped;
+                    // get a diff of the access list aswell
+                    if( $newGroups = count($internalUser->getAccessList()->diffBy($originalUser->getAccessList(), 'serviceIdentifier')) ) {
+                        $diff['accessList'] = ['old' => count($originalUser->getAccessList()), 'new' => '+'.$newGroups];
                     }
 
-                    $this->logger->log($level, $message, $context);
+                    $originalName = ($action == 'create') ? "New user {$internalUser->formatName()} ({$internalUser->getExternalId()})" : $originalUser->formatName()." ({$internalUser->getExternalID()})";
+
+                    if (count($diff)) {
+                        $level = Logger::NOTICE;
+                        $message = $update ? "$originalName $action" : "$originalName would have been {$action}d";
+                        $context = array_merge($commonContext, ['diff' => $diff]);
+                    } else {
+                        $level = Logger::INFO;
+                        $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
+                        $context = array_merge($commonContext,['externalUser'=> (array) $externalUser]);
+                    }
 
                     try {
                         if (!$update) {
@@ -291,16 +282,29 @@ class Provisioner
                             $this->logger->debug("User record passes sanity check", $commonContext);
                             $this->logger->debug("User record saved", $commonContext);
                         }
+
+
+                        $this->logger->log($level, $message, $context);
+
+                        if ($action == 'update') {
+                            ++$updated;
+                        } else {
+                            ++$created;
+                        }
+
                     } catch (UnexpectedValueException $e) {
-                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, ['error' => $e]));
+                        $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
+                        ++$skipped;
                         continue;
                     } catch (\Exception $e) {
-                        $this->logger->error("User record save failed!", array_merge($commonContext, ['error' => $e->getMessage()]));
+                        $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
+                        ++$skipped;
+
                     }
                 }
 
                 // end of a strat - save the result
-                $this->logger->warning("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
+                $this->logger->info("SUMMARY: $created users created, $updated users updated, $skipped users skipped");
                 $this->logMapper->flush($this->logger);
             }
         }

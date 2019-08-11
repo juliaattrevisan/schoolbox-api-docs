@@ -60,7 +60,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
 
         $this->receiver = $receiver;
 
-        $handler = new StreamHandler($this->file);
+        $handler = new StreamHandler($this->file, Logger::INFO);
 
         // default to JSON formatting
         if (!$formatter) {

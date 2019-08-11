@@ -84,10 +84,11 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                 $previous->setCampusCollection($this->campusMapper->findByColumn('id', $newCampuses));
 
                 if (empty($newCampuses)) {
-                    $message = "No child campuses found to assign to parent";
+                    $message = "No child campuses found to assign to parent {$previous->getFullName()} ({$previous->getExternalId()})";
                     $context = [];
                 } else {
-                    $message = "Assigning child campuses to parent";
+                    $message = "Assigning child campuses to parent {$previous->getFullName()} ({$previous->getExternalId()}): ".
+                        implode(',',$previous->getCampusCollection()->getColumnValues('name'));
                     $context = [
                         'diff' => [
                             'old' => $oldCampuses,
