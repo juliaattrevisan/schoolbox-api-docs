@@ -16,7 +16,7 @@ use Monolog\Logger;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Resource\Storage\RelationalDelete\RelationalDelete;
 
-require_once __DIR__ . '/../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
 $kernel = new CliTool\Kernel(new class extends CliTool\App
 {
