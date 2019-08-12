@@ -166,6 +166,10 @@
                 if (endDate != null) {
                     momentEnd = this.toMoment(endDate);
                     if (allDay) {
+                        // Event end dates in FullCalendar are exclusive.
+                        // This means that all-day events from the event source
+                        // have had their end date incremented by one day:
+                        // roll it back for rendering the user-visible end.
                         end = momentEnd.subtract(1, 'd').format(format);
                     } else {
                         end = momentEnd.format(format);
