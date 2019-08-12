@@ -181,10 +181,10 @@
                         // Between two different days - show the whole timespan
                         return start + " – " + end;
                     }
-                } else {
-                    // Start and end are the same - just show the start
-                    return start;
                 }
+
+                // Otherwise start and end are the same - just show the start
+                return start;
             },
             buildBookingButtonClasses: function(action) {
                 let base = {
