@@ -114,7 +114,7 @@
                 this.arrowCounter = -1; // Reset arrow pointer to none
 
                 /**
-                 * Revert back the z-index value back to the default value of 1001
+                 * Revert back the z-index value back to the default value of 100s1
                  */
                 document.querySelector('#menu-toggle').classList.remove('search-is-active');
             },
@@ -133,8 +133,19 @@
                 }
 
                 /**
-                 * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime the user
-                 * does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the search-is-active class
+                 * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
+                 * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
+                 * search-is-active class
+                 *
+                 * Unfortunately, we can't just remove this class especially when the left menu is unpinned.
+                 * Reason is: If the user does a mouseover in the input field, mouseout gets triggered.
+                 * And if we remove this injected class, when we do a mouseover, the hamburgermenu will overlap with the
+                 * text in the search field.
+                 *
+                 * Since we don't have the whole chrome in VueJS yet, for now, we'll need to do this in a not so elegant way as this component
+                 * doesn't have the ability to communicate with the rest of the chrome elements yet.
+                 *
+                 * TODO: Convert the whole chrome to VueJS to prevent/minimise this kinds of implementation
                  */
                 document.querySelector('#menu-toggle').classList.add('search-is-active');
             },
