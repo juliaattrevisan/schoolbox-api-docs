@@ -26,21 +26,27 @@ if (isset($_POST['resize']) && $_POST['resize']) {
     /* If you are resizing an event in the week view the new start
      * and end times are expressed as a date string
      */
-    $startTime = new Alaress_Date_Format(strtotime($_POST['start']), 'U');
-    $endTime   = new Alaress_Date_Format(strtotime($_POST['end']), 'U');
+    $startTime = Alaress_Date_Format::newFromTimestamp(strtotime($_POST['start']));
+    $endTime   = Alaress_Date_Format::newFromTimestamp(strtotime($_POST['end']));
+    // Is the resized event an all-day event?
+    // Set its end time back one day to account for FullCalendar treating end
+    // dates as exclusive
+    // (and thus reporting the end day one day after its appears to end)
+    if ($event['allday']) {
+        $startTime = $startTime->startOfDay();
+        $endTime   = $endTime->addDays(-1)->startOfDay();
+    }
+
 } else {
     /* Otherwise you are moving an event on the Month view, which makes
      * the new datetime transfer as a difference value -_-
      */
-//    $dayDelta    = $_POST['dayDelta'];
     $minuteDelta = $_POST['minuteDelta'];
 
-    $startTime = new Alaress_Date_Format(strtotime($event['start_datetime']), 'U');
-//    $startTime->addDays($dayDelta);
+    $startTime = Alaress_Date_Format::newFromTimestamp(strtotime($_POST['start_datetime']));
     $startTime->addMinutes($minuteDelta);
 
-    $endTime = new Alaress_Date_Format(strtotime($event['end_datetime']), 'U');
-//    $endTime->addDays($dayDelta);
+    $endTime = Alaress_Date_Format::newFromTimestamp(strtotime($_POST['end_datetime']));
     $endTime->addMinutes($minuteDelta);
 }
 
