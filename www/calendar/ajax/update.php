@@ -43,10 +43,10 @@ if (isset($_POST['resize']) && $_POST['resize']) {
      */
     $minuteDelta = $_POST['minuteDelta'];
 
-    $startTime = Alaress_Date_Format::newFromTimestamp(strtotime($_POST['start_datetime']));
+    $startTime = Alaress_Date_Format::newFromTimestamp(strtotime($event['start_datetime']));
     $startTime->addMinutes($minuteDelta);
 
-    $endTime = Alaress_Date_Format::newFromTimestamp(strtotime($_POST['end_datetime']));
+    $endTime = Alaress_Date_Format::newFromTimestamp(strtotime($event['end_datetime']));
     $endTime->addMinutes($minuteDelta);
 }
 
