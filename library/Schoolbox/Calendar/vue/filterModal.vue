@@ -170,7 +170,3 @@
         </form>
     </reveal-modal>
 </template>
-
-<style scoped>
-
-</style>

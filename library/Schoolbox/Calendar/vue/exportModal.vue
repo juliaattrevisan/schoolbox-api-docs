@@ -133,7 +133,3 @@
         </reveal-modal>
     </reveal-modal>
 </template>
-
-<style scoped>
-
-</style>

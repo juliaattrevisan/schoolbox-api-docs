@@ -142,7 +142,3 @@
         </div>
     </reveal-modal>
 </template>
-
-<style scoped>
-
-</style>
