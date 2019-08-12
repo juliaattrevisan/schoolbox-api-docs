@@ -705,3 +705,8 @@ $allow-sidebar-stash: $large-up;
 .second-nav li {
   display: none;
 }
+
+// Injected when the search bar is hovered or focused and gets removed when the user clicked on other elements
+.search-is-active {
+  z-index: 1000 !important;
+}

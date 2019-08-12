@@ -202,7 +202,7 @@
             </div>
             <div class="hybrid-bar hide-for-print" id="hybrid-bar" {% if user.no_header %}style="display:none"{% endif %}>
                 <nav class="tab-bar">
-                    <section class="left-small">
+                    <section class="left-small" id="menu-toggle">
                         <a class="left-off-canvas-toggle menu-icon" id="left-off-canvas-toggle"><span></span></a>
                     </section>
 
@@ -359,7 +359,11 @@
 
                         $('#alert-dialog').on('click', 'a.action', function (e) {
                             e.preventDefault();
-                        })
+                        });
+
+                        $('#profile-drop').on('click', function(e) {
+                            $(".global-search").removeClass( "focus" );
+                        });
                     });
                 </script>
                 {% endautoescape %}

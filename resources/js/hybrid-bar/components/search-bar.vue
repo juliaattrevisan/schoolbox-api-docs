@@ -6,21 +6,23 @@
                placeholder="Search"
                autocomplete="off"
                v-model.trim="keyword"
-
-               @focus="isFocused=true"
-
                @input="onChange"
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
+               @focus="onFocusOver"
+               @mouseover="onFocusOver"
                v-click-outside="lostFocus"
+               @blur="isFocused=false"
+               @focusout="isFocused=false"
+               maxlength="2048"
         />
         <ul class="results information-list" v-show="isFocused && isOpen">
             <li class="result-meta" v-if="results.length && results.length !== totalCount" @click.prevent>
                 <result-meta>Showing {{ results.length }} of {{ totalCount }} matching users</result-meta>
             </li>
             <li v-for="(result, i) in results" :key="i" class="result">
-                <a class="link-row" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
+                <a class="link-row" @click="goToPath(paths.userPage + result.id)" @mousedown.left="goToPath(paths.userPage + result.id)" v-bind:class="{ 'is-active': i === arrowCounter }" @mouseover="arrowCounter = i" @mouseleave="arrowCounter = -1">
                     <div class="card small-12">
                         <img v-bind:src="formatPortrait(result.id)">
                         <h3 class="name">{{ result.formattedName }}</h3>
@@ -39,7 +41,7 @@
             <li class="result-meta" v-if="!isLoading && !results.length">
                 <result-meta>No users were found matching "{{ keyword }}"</result-meta>
             </li>
-            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @mousedown.left="goToPath(paths.searchPage + keyword + '#all')">
+            <li class="result-meta with-bg" v-if="!isLoading && !results.length" @click="goToPath(paths.searchPage + keyword + '#all')" @mousedown.left="goToPath(paths.searchPage + keyword + '#all')">
                 <result-meta>
                     Search everything for "{{ keyword }}"
                 </result-meta>
@@ -109,7 +111,43 @@
 
             lostFocus: function(event) {
                 this.isFocused = false;
-                this.arrowCounter = -1;
+                this.arrowCounter = -1; // Reset arrow pointer to none
+
+                /**
+                 * Revert back the z-index value back to the default value of 1001
+                 */
+                document.querySelector('#menu-toggle').classList.remove('search-is-active');
+            },
+
+            onFocusOver: function(event) {
+
+                if (event.type === 'focus') {
+                    var offCanvasWrap = document.getElementById('off-canvas-wrap');
+
+                    // If left nav is unpinned and currently open, close it
+                    if (offCanvasWrap.classList.contains('move-right')) {
+                        offCanvasWrap.classList.remove('move-right');
+                    }
+
+                    this.isFocused = true;
+                }
+
+                /**
+                 * The hamburger menu's default z-index is 1001 and to ensure that the icon won't be visible everytime
+                 * the user does a mouse focus/over in the searchbar, let's convert the z-index to 1000 by adding the
+                 * search-is-active class
+                 *
+                 * Unfortunately, we can't just remove this class especially when the left menu is unpinned.
+                 * Reason is: If the user does a mouseover in results row, mouseout gets triggered.
+                 * And if we remove this injected class, when we do a mouseover, the hamburger menu will overlap with
+                 * the text in the search field.
+                 *
+                 * Since we don't have the whole chrome in VueJS yet, for now, we'll need to do this in a not so elegant
+                 * way as this component doesn't have the ability to communicate with the rest of the chrome elements yet.
+                 *
+                 * TODO: Convert the whole chrome to VueJS to prevent/minimise this kinds of implementation
+                 */
+                document.querySelector('#menu-toggle').classList.add('search-is-active');
             },
 
             goToPath: function(path) {
