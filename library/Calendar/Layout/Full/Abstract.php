@@ -194,10 +194,8 @@ abstract class Calendar_Layout_Full_Abstract
             $selected['source']    = $_SESSION['calendarFilter']['source']     ?? [];
         } else {
             // select everything
-            if (count($this->getCategoryList())) {
-                foreach ($this->getCategoryList() as $cat) {
-                    $selected['group'][] = (int)$cat['id'];
-                }
+            foreach ($this->getCategoryList() as $cat) {
+                $selected['group'][] = (int)$cat['id'];
             }
 
             // select all campuses
