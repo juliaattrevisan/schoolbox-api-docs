@@ -90,7 +90,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         }
 
         // Translate old calendar view to new one
-        $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$_SESSION['user']->getCalendarView()]
+        $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->viewer->getCalendarView()]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
         $this->getPage()->setVar([
