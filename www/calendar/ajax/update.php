@@ -63,7 +63,7 @@ if (isset($_POST['allDay'])) {
 }
 if ($updatedEvent['allday']) {
     $updatedEvent['start_datetime'] = $startTime->getDatabaseDate().' 00:00:00';
-    $updatedEvent['end_datetime']   = $endTime->getDatabase().' 00:00:00';
+    $updatedEvent['end_datetime']   = $endTime->getDatabaseDate().' 00:00:00';
 }
 
 if (isset($_POST['title']) && isset($_POST['detail'])) {
