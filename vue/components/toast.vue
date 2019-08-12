@@ -59,7 +59,3 @@
         </div>
     </transition>
 </template>
-
-<style scoped>
-    /* Styles are in a global scss file for now: there they may stay. But override the default opacity */
-</style>

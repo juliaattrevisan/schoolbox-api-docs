@@ -9,7 +9,3 @@
         name: "meta-item"
     }
 </script>
-
-<style scoped>
-
-</style>

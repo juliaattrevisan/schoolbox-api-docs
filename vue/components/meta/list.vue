@@ -9,7 +9,3 @@
         name: "meta-list"
     }
 </script>
-
-<style scoped>
-
-</style>
