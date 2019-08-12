@@ -10,9 +10,8 @@
                @keydown.down="onArrowDown"
                @keydown.up="onArrowUp"
                @keydown.enter.prevent="onEnter"
-               @focus="onFocusOverOrOut"
-               @mouseover="onFocusOverOrOut"
-               @mouseout="onFocusOverOrOut"
+               @focus="onFocusOver"
+               @mouseover="onFocusOver"
                v-click-outside="lostFocus"
                @blur="isFocused=false"
                @focusout="isFocused=false"
@@ -120,7 +119,7 @@
                 document.querySelector('#menu-toggle').classList.remove('search-is-active');
             },
 
-            onFocusOverOrOut: function(event) {
+            onFocusOver: function(event) {
 
                 if (event.type === 'focus') {
                     var offCanvasWrap = document.getElementById('off-canvas-wrap');
