@@ -5,8 +5,8 @@
     import axios       from 'axios';
     import qs          from 'qs';
 
-    const EFFICIACY_SELF = 'self';
-    const EFFICIACY_SERIES = 'series';
+    const EFFICACY_SELF = 'self';
+    const EFFICACY_SERIES = 'series';
 
     const EVENT_MODIFIED = 'eventModified';
     const EVENT_DELETED = 'eventDeleted';
@@ -228,28 +228,28 @@
             },
             // Event actions
             confirmEventDeleteSelf: function () {
-                this.eventDelete(EFFICIACY_SELF);
+                this.eventDelete(EFFICACY_SELF);
             },
             confirmEventDeleteSeries: function () {
-                this.eventDelete(EFFICIACY_SERIES);
+                this.eventDelete(EFFICACY_SERIES);
             },
             confirmBookingDeleteSelf: function () {
-                this.bookingDelete(EFFICIACY_SELF);
+                this.bookingDelete(EFFICACY_SELF);
             },
             confirmBookingDeleteSeries: function () {
-                this.bookingDelete(EFFICIACY_SERIES);
+                this.bookingDelete(EFFICACY_SERIES);
             },
             confirmBookingApproveSelf: function () {
-                this.bookingApprove(EFFICIACY_SELF);
+                this.bookingApprove(EFFICACY_SELF);
             },
             confirmBookingApproveSeries: function () {
-                this.bookingApprove(EFFICIACY_SERIES);
+                this.bookingApprove(EFFICACY_SERIES);
             },
             confirmBookingRejectSelf: function () {
-                this.bookingReject(EFFICIACY_SELF);
+                this.bookingReject(EFFICACY_SELF);
             },
             confirmBookingRejectSeries: function () {
-                this.bookingReject(EFFICIACY_SERIES);
+                this.bookingReject(EFFICACY_SERIES);
             },
             eventDelete: function (efficacy) {
                 this.$refs.eventDeleteModal.close();
