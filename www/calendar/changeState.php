@@ -11,10 +11,10 @@ use Schoolbox\UserMapper;
 
 /* Must be one of these options (there might be consts somewhere else)
 */
-if (!\array_key_exists($_POST['calendarView'], ViewNameMapping::MAP_STORED_TO_FC)) {
+if (!\array_key_exists($_POST['calendarView'], ViewNameMapping::MAP_FC_TO_STORED)) {
     return;
 }
-$storedView = ViewNameMapping::MAP_STORED_TO_FC[$_POST['calendarView']];
+$storedView = ViewNameMapping::MAP_FC_TO_STORED[$_POST['calendarView']];
 
 $userMapper = UserMapper::getInstance();
 $user = $userMapper->findById($_SESSION['user']->getId());
