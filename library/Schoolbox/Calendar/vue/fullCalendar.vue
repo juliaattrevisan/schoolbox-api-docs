@@ -29,8 +29,8 @@
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_EXPORT = '/calendar/export.php';
 
-    const URL_ATTENDANCE_LIST = '/service/attendance/setAttendance';
-    const URL_ATTENDANCE_TOGGLE = '/calendar/attendance/list/';
+    const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
+    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
