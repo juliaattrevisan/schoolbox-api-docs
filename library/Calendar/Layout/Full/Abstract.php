@@ -173,16 +173,7 @@ abstract class Calendar_Layout_Full_Abstract
     {
         // Load sources, types
         $typeList   = EventTypeMapper::getInstance()->findAll();
-        $sourceList = array_map(
-            function ($v) {
-                // Source IDs are comma-separated? How did this happen?
-                return [
-                    'ids'   => array_map('intval', explode(',', $v['id'])),
-                    'name'  => $v['name'],
-                ];
-            },
-            Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker)
-        );
+        $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
 
 
         // Load what is selected: default to selecting everything

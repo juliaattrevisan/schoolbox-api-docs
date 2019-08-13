@@ -151,6 +151,9 @@ $campus_list = $calendarHandler->getFilterCampusList($user->getId());
 // Load sources
 
 $moduleChecker = new ModuleChecker(ConfigMapper::getInstance());
+
+// This will be broken now getSourceListForCalendar returns ids as a list.
+// Doesn't matter, this is going away.
 $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($moduleChecker);
 
 // Select all types
