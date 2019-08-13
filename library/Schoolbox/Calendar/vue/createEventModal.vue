@@ -94,7 +94,7 @@
                       class="top"
                 >
                     <input name="userId" type="hidden" :value="userId" />
-                    <input name="allDay" type="hidden" :value="event.allDay ? 1 : 0" />
+                    <input name="allDay" type="hidden" :value="Number(event.allDay)" />
                     <input name="date"   type="hidden" :value="formDate" />
 
                     <section>
@@ -129,7 +129,7 @@
                       @submit.prevent="createNewEvent($refs.createTaskForm)"
                 >
                     <input name="userId" type="hidden" :value="userId" />
-                    <input name="allDay" type="hidden" :value="event.allDay ? 1 : 0" />
+                    <input name="allDay" type="hidden" :value="Number(event.allDay)" />
                     <input name="date"   type="hidden" :value="formDate" />
                     <input name="type"   type="hidden" :value="taskTypeId" />
 
