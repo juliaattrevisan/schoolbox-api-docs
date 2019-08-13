@@ -51,7 +51,8 @@
                 {% include 'sub/subjectSelector.twig' with {
                     subjects:        folders,
                     route:          'learningGrades.getGradesForSubject',
-                    routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code}
+                    routeArgs:      {viewee: user, userId: student.id, term: term, termCode: term.code},
+                    year:           year
                 } only %}
             </div>
         </div>
@@ -66,23 +67,31 @@
             {% for folder in folders %}
                 <ul class="subject-list group">
                     <li class="subject-group">
+                        {% if year is empty %}
                         <a href="{{ routeLookup('learningGrades.getGradesForSubject', {userId: student.id, subjectId: folder.id, termCode: term.code}) }}" class="flex-grade link-row" title="View {{ locale.grades.properPlural }}">
-                            <div class="small-12 content sibling">
-                                <h3 class="no-margin">
-                                    {{ folder.name }}
-                                    <span class="meta">
+                            {% else %}
+                            <h4 class="flex-grade link-row" >
+                                {% endif %}
+                                <div class="small-12 content sibling">
+                                    <h3 class="no-margin">
+                                        {{ folder.name }}
+                                        <span class="meta">
                                     {% for code in folder.codes %}
                                         ({{ code.code }}){% if not loop.last %},{% endif %}
                                     {% endfor %}
                                 </span>
-                                </h3>
-                            </div>
-                            {% if showOverallGrade %}
-                                <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}-bg no-margin">
-                                    <span>{{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}</span>
+                                    </h3>
                                 </div>
-                            {% endif %}
+                                {% if showOverallGrade %}
+                                    <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[student.id].meanNormalised) }}-bg no-margin">
+                                        <span>{{ markbooks[folder.id].studentStatistics[student.id].weightedMean }}</span>
+                                    </div>
+                                {% endif %}
+                        {% if year is empty %}
                         </a>
+                    {% else %}
+                        </h4>
+                        {% endif %}
                     </li>
                     {% for teacher in folder.teachers %}
                         <li class="actions-small-1">
