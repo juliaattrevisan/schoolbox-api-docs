@@ -34,6 +34,8 @@
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
+
+    // TODO let display formats be configurable
     const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
     const FORMAT_DISPLAY_TIME = 'h:mma';
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
