@@ -61,7 +61,7 @@
             }
         },
         computed: {
-            window: () => window,
+            jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
             isNewEventSubmittable: function () {
                 return this.newEvent.title && this.newEvent.title.length !== 0;
@@ -101,7 +101,7 @@
                 // TODO find a non-jQuery dependent way to do this
                 if (isLoading === true) {
                     // this.$refs.toast.activate('Loading...');
-                    this.window.jQuery.magnificPopup.open({
+                    this.jQuery.magnificPopup.open({
                         showCloseBtn: false,
                         items: {
                             src: "<div class='preview loader'></div>",
@@ -115,7 +115,7 @@
                     /* Hide loading div
                      */
                     // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                    this.window.jQuery.magnificPopup.close();
+                    this.jQuery.magnificPopup.close();
                 }
             },
             events: function (fetchInfo, callback) {
@@ -169,7 +169,7 @@
 
                 // Mangle the event using old-fashioned jQuery
                 // TODO don't depend on jQuery for this
-                let $element = this.window.jQuery(eventRenderInfo.el),
+                let $element = this.jQuery(eventRenderInfo.el),
                     inner    = $element.find('.fc-content'),
                     title    = $element.find('.fc-title'),
                     content  = $element.find('.fc-event-content');
@@ -187,7 +187,7 @@
                 // If this event is a task, alter the state of the checkbox accordingly.
                 if (this.isTask(calEvent)) {
                     inner.prepend(
-                        this.window.jQuery('<input type="checkbox" name="completed" class="plain" />')
+                        this.jQuery('<input type="checkbox" name="completed" class="plain" />')
                             .attr('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId)
                     );
                     if (Boolean(calEvent?.extendedProps?.data?.meta?.completed)) {
