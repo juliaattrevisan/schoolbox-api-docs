@@ -63,7 +63,7 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
-            isNewEventSubmittable: function () {
+            isNewEventSubmittable() {
                 return this.newEvent.title && this.newEvent.title.length !== 0;
             },
             urls() {
@@ -89,15 +89,29 @@
             },
         },
         methods: {
-            onExportClick: function () {
+            /**
+             * Open the export modal.
+             */
+            onExportClick() {
                 this.$refs.export.open();
             },
-            onFilterClick: function () {
+
+            /**
+             * Open the filter modal.
+             */
+            onFilterClick() {
                 this.$refs.filter.open();
             },
-            onLoading:  function (isLoading) {
-                /* Show loading div right in the middle
-                 */
+
+            /**
+             * Event loading callback: show a spinner whilst events are loading,
+             * remove the spinner once they have finished.
+             * @see https://fullcalendar.io/docs/loading
+             *
+             * @param isLoading True when events start loading,
+             *                  false once they are finished.
+             */
+            onLoading(isLoading) {
                 // TODO find a non-jQuery dependent way to do this
                 if (isLoading === true) {
                     // this.$refs.toast.activate('Loading...');
@@ -108,17 +122,20 @@
                             type: 'inline'
                         }
                     });
-                }
-                /* Has finished loading
-                 */
-                else {
-                    /* Hide loading div
-                     */
+                } else {
                     // this.$refs.toast.timeout('Done', true, 3000, 2000);
                     this.jQuery.magnificPopup.close();
                 }
             },
-            events: function (fetchInfo, callback) {
+
+            /**
+             * Event source.
+             * @see https://fullcalendar.io/docs/events-function
+             *
+             * @param fetchInfo The time span of the events to fetch
+             * @param callback  A function to call with the list of events.
+             */
+            events(fetchInfo, callback) {
                 var self = this;
                 axios.get(
                     URL_EVENT_SOURCE,
@@ -141,14 +158,30 @@
                 );
                 // Fail callback: consider a message saying something failed
             },
-            viewSkeletonRender: function (info) {
-                // Preserve most recent view for this user
+
+            /**
+             * Callback for when the calendar view changes: preserve the
+             * newly selected view for this user.
+             * @see https://fullcalendar.io/docs/viewSkeletonRender
+             *
+             * @param info
+             */
+            viewSkeletonRender(info) {
                 axios.post(
                     URL_STATE_CHANGE,
                     qs.stringify({calendarView: info.view.type})
                 );
             },
-            eventRender: function (eventRenderInfo) {
+
+            /**
+             * Event render callback: manually tweaks the event's rendering, and
+             * can also conditionally show/hide the event.
+             * @see https://fullcalendar.io/docs/eventRender
+             *
+             * @param eventRenderInfo
+             * @return {boolean}
+             */
+            eventRender(eventRenderInfo) {
                 let calEvent = eventRenderInfo.event,
                     self     = this;
 
@@ -257,7 +290,15 @@
 
                 return isEventRendered;
             },
-            onDateClick: function (dateClickInfo) {
+
+            /**
+             * Click a date on the calendar callback: opens the create event
+             * modal for the clicked date.
+             * @see https://fullcalendar.io/docs/dateClick
+             *
+             * @param dateClickInfo
+             */
+            onDateClick(dateClickInfo) {
                 let [firstEventType] = this.config.eventTypes;
                 this.newEvent = {
                     date:        dateClickInfo.date,
@@ -268,13 +309,29 @@
                 };
                 this.$refs.createEvent.open();
             },
-            onEventClick: function (eventInfo) {
+
+            /**
+             * Click an event on the calendar callback: opens the view event
+             * modal for the event.
+             * @see https://fullcalendar.io/docs/eventClick
+             *
+             * @param eventInfo
+             */
+            onEventClick(eventInfo) {
                 // Ideally the current event would be a part of the modal,
                 // not this component, but :shrug:
                 this.currentEvent = eventInfo.event;
                 this.$refs.event.open();
             },
-            onEventResize: function (eventResizeInfo) {
+
+            /**
+             * Resize event callback: persist the change to the event's start
+             * and end dates.
+             * @see https://fullcalendar.io/docs/eventResize
+             *
+             * @param eventResizeInfo
+             */
+            onEventResize(eventResizeInfo) {
                 let event = eventResizeInfo.event,
                     data  = {
                         eventId: event?.extendedProps?.data?.meta?.eventId,
@@ -285,7 +342,15 @@
                 // Apply and then remove the "loading" class
                 axios.post(URL_EVENT_UPDATE, qs.stringify(data));
             },
-            onEventDrop: function (eventDropInfo) {
+
+            /**
+             * Drop event callback: persist the change to the event's start
+             * and end dates.
+             * @see https://fullcalendar.io/docs/eventDrop
+             *
+             * @param eventDropInfo
+             */
+            onEventDrop(eventDropInfo) {
                 let event = eventDropInfo.event,
                     delta = toDuration(eventDropInfo.delta),
                     data  = {
@@ -296,29 +361,68 @@
                 // Apply and then remove the "loading" class
                 axios.post(URL_EVENT_UPDATE, qs.stringify(data));
             },
-            toMoment: function (date) {
+
+            /**
+             * Helper function for converting a Date object to a Moment object.
+             * @see https://fullcalendar.io/docs/moment-plugins
+             *
+             * @param date
+             */
+            toMoment(date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
             },
-            addEvent: function (event) {
+
+            /**
+             * Callback for adding an event to the calendar.
+             * @see https://fullcalendar.io/docs/Calendar-addEvent
+             *
+             * @param event
+             */
+            addEvent(event) {
                 this.$refs.fullCalendar.getApi().addEvent(event);
             },
-            updateEvent: function (event) {
-                this.$refs.fullCalendar.getApi().addEvent(event);
-            },
-            isTask: function (event) {
+
+            /**
+             * Is the given event a task or not? This affects how it's rendered.
+             *
+             * @param event
+             * @return {boolean}
+             */
+            isTask(event) {
                 return Number(event?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId;
             },
-            reloadEvents: function () {
+
+            /**
+             * Callback for reloading the calendar's events. May be used when
+             * a series of events is deleted, as the calendar no longer knows
+             * whether an event should be rendered even if it wasn't deleted.
+             * @see https://fullcalendar.io/docs/Calendar-refetchEvents
+             */
+            reloadEvents() {
                 this.$refs.fullCalendar.getApi().refetchEvents();
             },
-            updateSelectedFilters: function (selectedFilters) {
+
+            /**
+             * Callback for when the filters have been updated: rerender events
+             * (thus hiding events which don't match the new filters) and
+             * persist the filters selected.
+             *
+             * @param selectedFilters
+             */
+            updateSelectedFilters(selectedFilters) {
                 // The selected filters in config are read-only and passed by reference.
                 // TODO pass it by value into the filter modal, and update in this method
                 this.$refs.fullCalendar.getApi().rerenderEvents();
-
-                // Preserve the filters that were selected
                 axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
             },
+
+            /**
+             * Helper for rendering the title of the day view.
+             * Without this the calendar renders the date twice for some reason.
+             *
+             * @param dateObject
+             * @return {*}
+             */
             dayTitleFormat(dateObject) {
                 return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
             },
