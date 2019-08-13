@@ -16,7 +16,13 @@
 
     export default {
         name: "view-event-modal",
-        props: ['event', 'toMoment', 'taskTypeId',],
+        props: [
+            'event',
+            'toMoment',
+            'taskTypeId',
+            'eventModifyFormUrl',
+            'eventUpdateUrl',
+        ],
         components: {
             MetaItem,
             MetaList,
@@ -326,7 +332,7 @@
 <template>
     <reveal-modal ref="modal">
         <template v-if="eventExtendedProps.editable && eventExtendedProps.task.isTask">
-            <form ref="updateForm" method="post" action="/calendar/ajax/update" @submit.prevent="updateEvent">
+            <form ref="updateForm" method="post" :action="eventUpdateUrl" @submit.prevent="updateEvent">
                 <input ref="eventIdInput"
                        name="eventId"
                        type="hidden"

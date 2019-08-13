@@ -24,7 +24,8 @@
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
     const URL_EVENT_CREATE = '/calendar/ajax/create';
-    const URL_EVENT_MODIFY = '/calendar/modify.php';
+    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+    const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_EXPORT = '/calendar/export.php';
 
     export default {
@@ -55,7 +56,8 @@
             urls() {
                 return {
                     create: URL_EVENT_CREATE,
-                    modify: URL_EVENT_MODIFY,
+                    modifyForm: URL_EVENT_MODIFY_FORM,
+                    update: URL_EVENT_UPDATE,
                     export: URL_EVENT_EXPORT,
                 };
             },
@@ -324,13 +326,15 @@
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
-                            :event-modify-url="urls.modify"
+                            :event-modify-url="urls.modifyForm"
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"
                           :event="currentEvent"
                           :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
+                          :event-modify-form-url="urls.modifyForm"
+                          :event-update-url="urls.update"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents" />
 

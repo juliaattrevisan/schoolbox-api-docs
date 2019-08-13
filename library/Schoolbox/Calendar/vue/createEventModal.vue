@@ -20,7 +20,7 @@
             // TODO why do I have to pass this method around?
             'toMoment',
             'eventCreateUrl',
-            'eventModifyUrl',
+            'eventModifyFormUrl',
         ],
         components: {
             RevealModal,
@@ -64,7 +64,7 @@
             redirectToEventForm() {
                 // Use jQuery's form serialize for now: replace later
                 this.window.location.href =
-                    this.eventModifyUrl
+                    this.eventModifyFormUrl
                     + '?from=inline&returnTo=calendar&'
                     + this.window.jQuery(this.$refs.createEventForm).serialize();
             },
