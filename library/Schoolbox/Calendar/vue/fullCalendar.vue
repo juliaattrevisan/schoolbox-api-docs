@@ -63,9 +63,6 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
-            isNewEventSubmittable() {
-                return this.newEvent.title && this.newEvent.title.length !== 0;
-            },
             urls() {
                 return {
                     create: URL_EVENT_CREATE,

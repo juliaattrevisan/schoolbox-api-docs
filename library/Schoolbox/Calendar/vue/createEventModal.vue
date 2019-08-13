@@ -25,9 +25,19 @@
         },
         computed: {
             window: () => window,
-            isNewEventSubmittable: function () {
+
+            /**
+             * Can the event form be submitted?
+             */
+            isFormSubmittable() {
                 return this.event.title && this.event.title.length !== 0;
             },
+
+            /**
+             * The event's date, as submitted via the form.
+             *
+             * @return {string}
+             */
             formDate() {
                 return this.event.date
                     ? this.toMoment(this.event.date).format(
@@ -37,6 +47,12 @@
                     )
                     : '';
             },
+
+            /**
+             * The event's date, as displayed on the modal.
+             *
+             * @return {string}
+             */
             displayDate() {
                 return this.event.date
                     ? this.toMoment(this.event.date).format(
@@ -46,14 +62,31 @@
                     )
                     : '';
             },
+
+            /**
+             * All event types that are not tasks.
+             *
+             * @return {Array}
+             */
             nonTaskEventTypes() {
                 return this.eventTypes.filter(v => !v.isTaskType);
             },
         },
         methods: {
+            /**
+             * Open this modal.
+             */
             open() {
                 this.$refs.modal.open();
             },
+
+            /**
+             * Post the event creation form.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             *
+             * @param form The form that's being submitted
+             */
             createNewEvent(form) {
                 let self = this;
                 self.$refs.modal.close();
@@ -67,8 +100,12 @@
                     self.$emit(EVENT_CREATED, response.data);
                 });
             },
+
+            /**
+             * Redirect the browser to the full event modify form.
+             */
             redirectToEventForm() {
-                // Use jQuery's form serialize for now: replace later
+                // TODO don't use jQuery form serialize
                 this.window.location.href =
                     this.eventModifyFormUrl
                     + '?from=inline&returnTo=calendar&'
@@ -117,7 +154,7 @@
                     <ul class="flex-list buttons">
                         <li><button @click.prevent="redirectToEventForm($event)">Edit Event</button></li>
                         <li><input type="submit"
-                                   :disabled="!isNewEventSubmittable"
+                                   :disabled="!isFormSubmittable"
                                    value="Create Event" /></li>
                     </ul>
                 </form>
@@ -149,7 +186,7 @@
                     <div class="row">
                         <div class="small-12 columns no-pad">
                             <input type="submit"
-                                   :disabled="!isNewEventSubmittable"
+                                   :disabled="!isFormSubmittable"
                                    value="Create Task" />
                         </div>
                     </div>
