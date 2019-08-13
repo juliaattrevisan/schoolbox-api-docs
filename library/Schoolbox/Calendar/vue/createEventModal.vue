@@ -7,8 +7,8 @@
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
 
-    const FORMAT_DISPLAY_DATE = 'DD-MM-YYYY';
-    const FORMAT_DISPLAY_DATETIME = 'DD-MM-YYYY HH:mm';
+    const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
+    const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
 
     export default {
         name: "create-event-modal",
