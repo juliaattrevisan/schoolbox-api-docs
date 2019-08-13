@@ -28,6 +28,9 @@
     const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
     const URL_EVENT_EXPORT = '/calendar/export.php';
 
+    const URL_ATTENDANCE_LIST = '/service/attendance/setAttendance';
+    const URL_ATTENDANCE_TOGGLE = '/calendar/attendance/list/';
+
     export default {
         components: {
             Toast,
@@ -60,6 +63,8 @@
                     modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
                     update: URL_EVENT_UPDATE,
                     export: URL_EVENT_EXPORT,
+                    attendanceList: URL_ATTENDANCE_LIST,
+                    attendanceToggle: URL_ATTENDANCE_TOGGLE,
                 };
             },
         },
@@ -337,6 +342,8 @@
                           :event-modify-form-url="urls.modifyForm"
                           :event-modify-form-action-url="urls.modifyFormAction"
                           :event-update-url="urls.update"
+                          :attendance-list-url="urls.attendanceList"
+                          :attendance-toggle-url="urls.attendanceToggle"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents" />
 

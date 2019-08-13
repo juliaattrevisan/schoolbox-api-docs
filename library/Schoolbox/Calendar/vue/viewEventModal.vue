@@ -23,6 +23,8 @@
             'eventModifyFormUrl',
             'eventModifyFormActionUrl',
             'eventUpdateUrl',
+            'attendanceListUrl',
+            'attendanceToggleUrl',
         ],
         components: {
             MetaItem,
@@ -80,12 +82,12 @@
                         actions: {
                             toggle: {
                                 isAvailable: Boolean(data?.attendance?.listButton),
-                                href: '/service/attendance/setAttendance',
+                                href: this.attendanceToggleUrl,
                                 text: data?.attendance?.nextAction === ATTENDANCE_ACTION_ADD ? 'RSVP' : 'Unattend',
                             },
                             list: {
                                 isAvailable: Boolean(data?.attendance?.requestButton),
-                                href: '/calendar/attendance/list/' + String(metadata?.eventId),
+                                href: this.attendanceListUrl + String(metadata?.eventId),
                             },
                         },
                     },
@@ -451,7 +453,7 @@
 
                     <span v-if="eventExtendedProps.attendance.actions.list.isAvailable">
                         <a class="button icon-group"
-                           :href="'/calendar/attendance/list/' + String(eventExtendedProps.eventId)">Attendees</a>
+                           :href="attendanceListUrl + String(eventExtendedProps.eventId)">Attendees</a>
                     </span>
 
                     <span v-if="eventExtendedProps.attendance.actions.toggle.isAvailable">
