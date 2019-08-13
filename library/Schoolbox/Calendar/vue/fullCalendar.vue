@@ -25,6 +25,7 @@
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
     const URL_EVENT_CREATE = '/calendar/ajax/create';
     const URL_EVENT_MODIFY = '/calendar/modify.php';
+    const URL_EVENT_EXPORT = '/calendar/export.php';
 
     export default {
         components: {
@@ -55,6 +56,7 @@
                 return {
                     create: URL_EVENT_CREATE,
                     modify: URL_EVENT_MODIFY,
+                    export: URL_EVENT_EXPORT,
                 };
             },
         },
@@ -304,7 +306,8 @@
                       :groups="config.groups"
                       :campuses="config.campuses"
                       :translations="config.translations"
-                      :token="config.token" />
+                      :token="config.token"
+                      :event-export-url="urls.export" />
 
         <filter-modal ref="filter"
                       :selected-filters="config.selectedFilters"

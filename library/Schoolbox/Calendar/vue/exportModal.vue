@@ -10,6 +10,7 @@
             'campuses',
             'translations',
             'token',
+            'eventExportUrl',
         ],
         data() {
             return {
@@ -47,7 +48,8 @@
                 return this.window.location.protocol
                     + '//'
                     + this.window.location.host
-                    + '/calendar/export.php?'
+                    + this.eventExportUrl
+                    + '?'
                     + qs.stringify(values);
             },
         },
@@ -56,7 +58,7 @@
 
 <template>
     <reveal-modal ref="modal">
-        <form class="top" action="/calendar/export.php" ref="exportForm">
+        <form class="top" :action="eventExportUrl" ref="exportForm">
             <section>
                 <fieldset class="content radiolist">
 
