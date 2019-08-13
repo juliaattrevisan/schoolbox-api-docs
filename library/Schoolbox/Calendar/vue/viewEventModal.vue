@@ -326,8 +326,11 @@
                                 ? ATTENDANCE_ACTION_REMOVE
                                 : ATTENDANCE_ACTION_ADD
                             ;
+                            eventData.attendance.status = nextAction === ATTENDANCE_ACTION_ADD
+                                ? 'Pending'
+                                : ''
+                            ;
                             self.event.setExtendedProp('data', eventData);
-                            self.$emit(EVENT_MODIFIED, self.event);
                         });
                 }
             },
