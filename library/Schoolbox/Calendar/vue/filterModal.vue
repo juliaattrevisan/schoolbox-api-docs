@@ -19,9 +19,16 @@
         },
         components: {RevealModal},
         methods: {
+            /**
+             * Open the modal.
+             */
             open() {
                 this.$refs.modal.open();
             },
+
+            /**
+             * Apply the selected filters, and close the modal.
+             */
             applyFilters() {
                 // I guess this posts a msg back to the fullcalendar component,
                 // with the selected filters.
@@ -35,6 +42,14 @@
                 this.$emit(FILTER_CHANGED, this.selected);
                 this.$refs.modal.close();
             },
+
+            /**
+             * Are all the options for the given filter key selected?
+             * If so, the "select all" checkbox will be checked.
+             *
+             * @param filterKey
+             * @return {boolean}
+             */
             allSelected(filterKey) {
                 // Naivest implementation: check length
                 switch (filterKey) {
@@ -49,20 +64,29 @@
                     default:
                         return false;
                 }
-                // Select-alls:
-                // Initial state: selected if all are selected
-                // On check: set all to selected
-                // On uncheck: set all to deselected
             },
+
+            /**
+             * On-check callback for select all checkboxes: sets all options
+             * for the filter key on/off.
+             *
+             * @param $event
+             * @param filterKey
+             */
             toggleSelectAll($event, filterKey) {
-                // Checked? Copy all values from allFilters to selectedFilter
-                // Unchecked: Clear all values
                 if ($event.target.checked) {
                     this.selected[filterKey] = this.getAllIds(filterKey);
                 } else {
                     this.selected[filterKey] = [];
                 }
             },
+
+            /**
+             * Get all IDs available for the given filter key.
+             *
+             * @param filterKey
+             * @return {Array}
+             */
             getAllIds(filterKey) {
                 switch (filterKey) {
                     case 'source':
@@ -74,7 +98,7 @@
                     case 'eventType':
                         return this.eventTypes.map(v => v.id);
                     default:
-                        return false;
+                        return [];
                 }
             }
         },

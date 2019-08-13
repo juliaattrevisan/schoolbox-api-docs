@@ -24,12 +24,21 @@
         },
         components: {RevealModal},
         methods: {
+            /**
+             * Open this modal.
+             */
             open() {
                 this.$refs.modal.open();
             },
         },
         computed: {
             window: () => window,
+
+            /**
+             * The export events URL.
+             *
+             * @return {string}
+             */
             exportUrl() {
                 let values = Object.assign({}, this.form);
 
