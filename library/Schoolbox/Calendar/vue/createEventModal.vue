@@ -45,7 +45,7 @@
                 self.$refs.modal.close();
                 axios.request({
                     url:          form.action,
-                    data:         window.$(form).serialize(),
+                    data:         this.window.jQuery(form).serialize(),
                     method:       form.method,
                     responseType: 'json',
                 }).then(function (response) {
@@ -56,7 +56,7 @@
             redirectToEventForm: function () {
                 // Use jQuery's form serialize for now: replace later
                 window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
-                    + window.$(this.$refs.createEventForm).serialize();
+                    + this.window.jQuery(this.$refs.createEventForm).serialize();
             },
         },
     }
