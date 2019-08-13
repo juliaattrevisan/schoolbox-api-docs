@@ -291,9 +291,7 @@ class Report
 
 
     /**
-     * Returns all course implementations imported to the specified folder.
-     *
-     * Also loads units, assessments. and participation for all users
+     * Loads assessments and participation for all users into the specified course implementations
      *
      * @param GenericCollection|CourseImpl\Model[] $courseImplsWithUnits
      * @throws \Alaress\Database\Predicate\InvalidColumnException
