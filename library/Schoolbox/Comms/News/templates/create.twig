@@ -233,8 +233,8 @@
 
                         <template v-if="canCreateComplex">
                             <dl class="tabs text-center" role="tablist">
-                                <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Simple Audience</a></dd>
-                                <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Complex Audience</a></dd>
+                                <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Audience</a></dd>
+                                <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Composite Audience</a></dd>
                             </dl>
                         </template>
 
@@ -296,7 +296,7 @@
                         <div v-show="pageShow.intersect" class="reveal-modal-tab-content">
                             <div class="row">
                                 <div class="small-12 columns">
-                                    <p class="meta">Choose audience types and select the appropriate tickboxes to create a complex audience. E.g. Parents and Students only in the Senior Campus.</p>
+                                    <p class="meta">Choose audience types and select the appropriate tickboxes to create a composite audience. E.g. Parents and Students only in the Senior Campus.</p>
                                     <div class="alert-box alert" v-if="isTooManyAdvancedSelections">
                                         Too many selections. Please deselect some options.
                                     </div>
@@ -729,8 +729,8 @@
     // into the BrickManager so it can supply it to Bricks that it creates.
     var entityTypeLabelMap = {
         composite: { // -_-
-            singular: 'Complex Audience',
-            plural: 'Complex Audience'
+            singular: 'Composite Audience',
+            plural: 'Composite Audience'
         }
     };
     for (var entityType in audienceOptions) {
