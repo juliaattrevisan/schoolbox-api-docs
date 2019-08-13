@@ -37,6 +37,7 @@
     const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
     const FORMAT_DISPLAY_TIME = 'h:mma';
     const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
+    const FORMAT_DISPLAY_WEEK_DAY = 'ddd D/M';
 
     export default {
         components: {
@@ -81,6 +82,7 @@
                     displayDate: FORMAT_DISPLAY_DATE,
                     displayTime: FORMAT_DISPLAY_TIME,
                     displayDatetime: FORMAT_DISPLAY_DATETIME,
+                    displayWeekDay: FORMAT_DISPLAY_WEEK_DAY,
                 };
             },
         },
@@ -379,7 +381,7 @@
                     columnHeader: false
                 },
                 week: {
-                    columnHeaderFormat: 'ddd D/M'
+                    columnHeaderFormat: formats.displayWeekDay
                 }
             }"
             :event-time-format="{
