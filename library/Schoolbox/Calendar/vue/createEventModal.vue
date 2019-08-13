@@ -102,7 +102,7 @@
 
                         <label>
                             Event Title
-                            <input name="title" type="text" v-model="event.title" />
+                            <input name="title" type="text" v-model.trim="event.title" />
                         </label>
 
                         <label>
@@ -138,7 +138,7 @@
 
                         <label>
                             Task
-                            <input name="title" type="text" v-model="event.title" />
+                            <input name="title" type="text" v-model.trim="event.title" />
                         </label>
 
                         <label class="detail">
