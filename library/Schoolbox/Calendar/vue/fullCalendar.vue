@@ -57,6 +57,7 @@
                 return {
                     create: URL_EVENT_CREATE,
                     modifyForm: URL_EVENT_MODIFY_FORM,
+                    modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
                     update: URL_EVENT_UPDATE,
                     export: URL_EVENT_EXPORT,
                 };
@@ -334,6 +335,7 @@
                           :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
                           :event-modify-form-url="urls.modifyForm"
+                          :event-modify-form-action-url="urls.modifyFormAction"
                           :event-update-url="urls.update"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents" />

@@ -21,6 +21,7 @@
             'toMoment',
             'taskTypeId',
             'eventModifyFormUrl',
+            'eventModifyFormActionUrl',
             'eventUpdateUrl',
         ],
         components: {
@@ -43,8 +44,8 @@
                     if (data?.custom?.modifyLink) {
                         modifyLink = data?.custom?.modifyLink;
                     } else if (metadata?.eventId) {
-                        modifyLink = '/calendar/modify.php?eventID=' + metadata?.eventId + '&returnTo=calendar';
-                        deleteLink = '/calendar/modifyForm.php?action=Delete&id=' + metadata?.eventId + '&returnTo=calendar';
+                        modifyLink = this.eventModifyFormUrl + '?eventID=' + metadata?.eventId + '&returnTo=calendar';
+                        deleteLink = this.eventModifyFormActionUrl + '?action=Delete&id=' + metadata?.eventId + '&returnTo=calendar';
                     }
                 }
 
@@ -140,7 +141,7 @@
                 // and all that
                 let self    = this,
                     request = {
-                        url:    '/calendar/modifyForm.php',
+                        url:    this.eventModifyFormActionUrl,
                         method: 'post',
                         data:   qs.stringify({id: this.eventExtendedProps.eventId}),
                         params: {
