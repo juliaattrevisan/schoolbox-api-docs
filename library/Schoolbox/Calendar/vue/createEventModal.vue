@@ -21,6 +21,10 @@
             'toMoment',
             'eventCreateUrl',
             'eventModifyFormUrl',
+            'formatFormDate',
+            'formatFormDatetime',
+            'formatDisplayDate',
+            'formatDisplayDatetime',
         ],
         components: {
             RevealModal,
@@ -32,12 +36,20 @@
             },
             formDate() {
                 return this.event.date
-                    ? this.toMoment(this.event.date).format(this.event.allDay ? FORMAT_FORM_DATE : FORMAT_FORM_DATETIME)
+                    ? this.toMoment(this.event.date).format(
+                        this.event.allDay
+                            ? this.formatFormDate
+                            : this.formatFormDatetime
+                    )
                     : '';
             },
             displayDate() {
                 return this.event.date
-                    ? this.toMoment(this.event.date).format(this.event.allDay ? FORMAT_DISPLAY_DATE : FORMAT_DISPLAY_DATETIME)
+                    ? this.toMoment(this.event.date).format(
+                        this.event.allDay
+                            ? this.formatDisplayDate
+                            : this.formatDisplayDatetime
+                    )
                     : '';
             },
             nonTaskEventTypes() {

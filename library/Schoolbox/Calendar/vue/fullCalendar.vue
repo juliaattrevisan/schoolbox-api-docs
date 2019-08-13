@@ -20,6 +20,7 @@
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
+
     const URL_EVENT_SOURCE = '/calendar/ajax/full';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
@@ -30,6 +31,12 @@
 
     const URL_ATTENDANCE_LIST = '/service/attendance/setAttendance';
     const URL_ATTENDANCE_TOGGLE = '/calendar/attendance/list/';
+
+    const FORMAT_FORM_DATE = 'DD-MM-YYYY';
+    const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
+    const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
+    const FORMAT_DISPLAY_TIME = 'h:mma';
+    const FORMAT_DISPLAY_DATETIME = 'ddd Do MMM, h:mma';
 
     export default {
         components: {
@@ -65,6 +72,15 @@
                     export: URL_EVENT_EXPORT,
                     attendanceList: URL_ATTENDANCE_LIST,
                     attendanceToggle: URL_ATTENDANCE_TOGGLE,
+                };
+            },
+            formats() {
+                return {
+                    formDate: FORMAT_FORM_DATE,
+                    formDatetime: FORMAT_FORM_DATETIME,
+                    displayDate: FORMAT_DISPLAY_DATE,
+                    displayTime: FORMAT_DISPLAY_TIME,
+                    displayDatetime: FORMAT_DISPLAY_DATETIME,
                 };
             },
         },
@@ -333,6 +349,10 @@
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
                             :event-modify-url="urls.modifyForm"
+                            :format-form-date="formats.formDate"
+                            :format-form-datetime="formats.formDatetime"
+                            :format-display-date="formats.displayDate"
+                            :format-display-datetime="formats.displayDatetime"
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"
