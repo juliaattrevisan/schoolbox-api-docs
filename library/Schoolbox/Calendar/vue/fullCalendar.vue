@@ -18,6 +18,11 @@
     import axios                    from 'axios'
     import qs                       from "qs";
 
+    const URL_STATE_CHANGE = '/calendar/changeState';
+    const URL_EVENT_SOURCE = '/calendar/ajax/full';
+    const URL_EVENT_UPDATE = '/calendar/ajax/update';
+    const URL_EVENT_FILTER = '/calendar/ajax/filter';
+
     export default {
         components: {
             Toast,
@@ -77,7 +82,7 @@
             events: function (fetchInfo, callback) {
                 var self = this;
                 axios.get(
-                    '/calendar/ajax/full',
+                    URL_EVENT_SOURCE,
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'
@@ -100,7 +105,7 @@
             viewSkeletonRender: function (info) {
                 // Preserve most recent view for this user
                 axios.post(
-                    '/calendar/changeState',
+                    URL_STATE_CHANGE,
                     qs.stringify({calendarView: info.view.type})
                 );
             },
@@ -239,7 +244,7 @@
                         end:     this.toMoment(event.end).format(),
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/ajax/update', qs.stringify(data));
+                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
             },
             onEventDrop: function (eventDropInfo) {
                 let event = eventDropInfo.event,
@@ -250,7 +255,7 @@
                         allDay:      event.allDay,
                     };
                 // Apply and then remove the "loading" class
-                axios.post('/calendar/ajax/update', qs.stringify(data));
+                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
             },
             toMoment: function (date) {
                 return toMoment(date, this.$refs.fullCalendar.getApi());
@@ -273,7 +278,7 @@
                 this.$refs.fullCalendar.getApi().rerenderEvents();
 
                 // Preserve the filters that were selected
-                axios.post('/calendar/ajax/filter', qs.stringify({ filters: this.config.selectedFilters, }))
+                axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
             },
             dayTitleFormat(dateObject) {
                 return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
