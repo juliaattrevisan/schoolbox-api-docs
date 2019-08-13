@@ -4,6 +4,15 @@
 
     const EVENT_CREATED = 'eventCreated';
 
+    const FORMAT_FORM_DATE = 'DD-MM-YYYY';
+    const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
+
+    const FORMAT_DISPLAY_DATE = 'DD-MM-YYYY';
+    const FORMAT_DISPLAY_DATETIME = 'DD-MM-YYYY HH:mm';
+
+    const URL_EVENT_CREATE = '/calendar/ajax/create';
+    const URL_EVENT_MODIFY = '/calendar/modify.php';
+
     export default {
         name: "create-event-modal",
         props: [
@@ -24,12 +33,12 @@
             },
             formDate() {
                 return this.event.date
-                    ? this.toMoment(this.event.date).format(this.event.allDay ? 'DD-MM-YYYY' : 'DD-MM-YYYY HH:mm')
+                    ? this.toMoment(this.event.date).format(this.event.allDay ? FORMAT_FORM_DATE : FORMAT_FORM_DATETIME)
                     : '';
             },
             displayDate() {
                 return this.event.date
-                    ? this.toMoment(this.event.date).format(this.event.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma')
+                    ? this.toMoment(this.event.date).format(this.event.allDay ? FORMAT_DISPLAY_DATE : FORMAT_DISPLAY_DATETIME)
                     : '';
             },
             nonTaskEventTypes() {
@@ -40,7 +49,7 @@
             open() {
                 this.$refs.modal.open();
             },
-            createNewEvent: function (form) {
+            createNewEvent(form) {
                 let self = this;
                 self.$refs.modal.close();
                 axios.request({
@@ -53,9 +62,10 @@
                     self.$emit(EVENT_CREATED, response.data);
                 });
             },
-            redirectToEventForm: function () {
+            redirectToEventForm() {
                 // Use jQuery's form serialize for now: replace later
-                window.location.href = '/calendar/modify.php?from=inline&returnTo=calendar&'
+                this.window.location.href =
+                    '/calendar/modify.php?from=inline&returnTo=calendar&'
                     + this.window.jQuery(this.$refs.createEventForm).serialize();
             },
         },
