@@ -352,7 +352,7 @@
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
                             :event-create-url="urls.create"
-                            :event-modify-url="urls.modifyForm"
+                            :event-modify-form-url="urls.modifyForm"
                             :format-form-date="formats.formDate"
                             :format-form-datetime="formats.formDatetime"
                             :format-display-date="formats.displayDate"
