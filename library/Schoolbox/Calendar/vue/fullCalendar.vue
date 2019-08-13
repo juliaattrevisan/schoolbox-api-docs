@@ -364,6 +364,9 @@
                           :event-update-url="urls.update"
                           :attendance-list-url="urls.attendanceList"
                           :attendance-toggle-url="urls.attendanceToggle"
+                          :format-display-date="formats.displayDate"
+                          :format-display-time="formats.displayTime"
+                          :format-display-datetime="formats.displayDatetime"
                           @eventModified="reloadEvents"
                           @eventDeleted="reloadEvents" />
 

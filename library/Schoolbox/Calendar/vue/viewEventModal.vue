@@ -25,6 +25,9 @@
             'eventUpdateUrl',
             'attendanceListUrl',
             'attendanceToggleUrl',
+            'formatDisplayDate',
+            'formatDisplayTime',
+            'formatDisplayDatetime',
         ],
         components: {
             MetaItem,
@@ -166,7 +169,7 @@
                 if (!startDate) {
                     return '';
                 }
-                let format      = allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma',
+                let format      = allDay ? this.formatDisplayDate : this.formatDisplayDatetime,
                     momentStart = this.toMoment(startDate),
                     start       = momentStart.format(format),
                     momentEnd   = null,
@@ -189,7 +192,7 @@
                     // Start and end aren't the same - stitch them together.
                     if (!allDay && momentStart.isSame(momentEnd, 'day')) {
                         // Between two times on the same day - show the timespan but only one date
-                        return start + " – " + momentEnd.format('h:mma');
+                        return start + " – " + momentEnd.format(this.formatDisplayTime);
                     } else {
                         // Between two different days - show the whole timespan
                         return start + " – " + end;
