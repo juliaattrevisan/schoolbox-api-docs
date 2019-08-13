@@ -205,6 +205,9 @@ class Model implements ISoftDeletable
     /** @var Plan\Model[]|GenericCollection */
     private $plans;
 
+    /** @var null|string */
+    private $externalId;
+
     /**
      * Constructor
      */
@@ -789,5 +792,23 @@ class Model implements ISoftDeletable
             }
         }
         return null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getExternalId(): ?string
+    {
+        return $this->externalId;
+    }
+
+    /**
+     * @param string|null $externalId
+     * @return $this
+     */
+    public function setExternalId(?string $externalId): self
+    {
+        $this->externalId = $externalId;
+        return $this;
     }
 }

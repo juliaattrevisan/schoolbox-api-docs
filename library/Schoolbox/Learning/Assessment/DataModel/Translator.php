@@ -278,7 +278,8 @@ class Translator
             ->setCreatedAt($domainObject->getCreatedAt())
             ->setUpdatedAt($domainObject->getUpdatedAt())
             ->setDeletedAt($domainObject->getDeletedAt())
-            ->setCurriculumNodes($domainObject->getCurriculumNodes());
+            ->setCurriculumNodes($domainObject->getCurriculumNodes())
+            ->setExternalId($domainObject->getExternalId());
 
         $dataModel->setAssessmentModel($assessmentModel);
 
@@ -410,7 +411,8 @@ class Translator
                      ->setDescription($assessmentModel->getDescription())
                      ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
                      ->setDeletedAt($assessmentModel->getDeletedAt())
-                     ->setCurriculumNodes($assessmentModel->getCurriculumNodes());
+                     ->setCurriculumNodes($assessmentModel->getCurriculumNodes())
+                     ->setExternalId($assessmentModel->getExternalId());
 
         // Non-nullable properties
         $markScheme = $this->markSchemeFactory->spawnMarkSchemeFor($domainObject);

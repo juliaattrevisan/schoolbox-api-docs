@@ -1,7 +1,7 @@
 <?php
 /**
- * @copyright   Copyright 2019, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au
  */
 declare(strict_types=1);
 
@@ -19,7 +19,7 @@ use UnexpectedValueException;
 /**
  * Responsible for fetching data from canvas into staging database
  */
-class SchemaImporter
+class DataRestorer
 {
 
     /** @var IConnector */
@@ -50,19 +50,21 @@ class SchemaImporter
     }
 
     /**
-     * Import schema from schema json file.
+     * Creates schema from schema json file.
      * @param string $schemaFile
      */
-    public function importFromFile(string $schemaFile): void
+    public function restoreSchema(string $schemaFile): void
     {
         $errors = false;
         $schemaContainer = json_decode(file_get_contents($schemaFile), true);
         $schema = $schemaContainer['schema'];
 
-        foreach ($schema as $tableName => $tableData) {
+        foreach ($schema as $tableIndex => $tableData) {
             $columns = $tableData['columns'];
+            $tableName = $tableData['tableName'];
             $description = str_replace('"', '\"', $tableData['description'] ?? '');
 
+            // https://dev.mysql.com/doc/workbench/en/wb-migration-database-postgresql-typemapping.html
             $indexes = [];
             $columnsSqlArray = [];
             $type = null;
@@ -72,7 +74,8 @@ class SchemaImporter
                         $type = 'BIGINT';
                         break;
                     case 'boolean':
-                        $type = 'BOOLEAN';
+                        // The dump data comes in as either 'true' or 'false'.
+                        $type = 'VARCHAR(8)';
                         break;
                     case 'date':
                         $type = 'DATE';
@@ -84,13 +87,8 @@ class SchemaImporter
                         $type = 'DOUBLE';
                         break;
                     case 'enum':
-                        unset($matches);
-                        if (preg_match("/[^']*('[a-zA-Z_]+'(?:,\s*'[a-zA-Z_]+')*)/", $column['description'], $matches)) {
-                            $type = "ENUM ({$matches[1]})";
-                        } else {
-                            $type = "VARCHAR(128)";
-                            $this->log->warning(sprintf('Unable to parse enums from "%s", falling back to %s', $column['description'], $type));
-                        }
+                        // It's not possible to get all enum values without the dump data.
+                        $type = "VARCHAR(128)";
                         break;
                     case 'guid':
                         $type = 'CHAR(36)';
@@ -100,10 +98,11 @@ class SchemaImporter
                         $type = 'INT';
                         break;
                     case 'text':
-                        $type = 'TEXT';
+                        $type = 'LONGTEXT';
                         break;
                     case 'timestamp':
-                        $type = 'TIMESTAMP NULL';  // suppress automatic timestamp initialisation and updating https://dev.mysql.com/doc/refman/5.5/en/timestamp-initialization.html
+                        $type = 'DATETIME';
+//                        $type = 'TIMESTAMP NULL';  // suppress automatic timestamp initialisation and updating https://dev.mysql.com/doc/refman/5.5/en/timestamp-initialization.html
                         break;
                     case 'varchar':
                         $type = "VARCHAR({$column['length']})";
@@ -158,6 +157,48 @@ class SchemaImporter
 
         if ($errors) {
             throw new UnexpectedValueException("Errors were encountered parsing json schema file");
+        }
+    }
+
+    /**
+     * Stores data from the data file in the data dir to tables
+     * @param $dataDir
+     */
+    public function restoreTableData($dataDir)
+    {
+        if (!$dh = @opendir($dataDir)) {
+            return;
+        }
+
+        while (false !== ($tableFile = readdir($dh))) {
+            // TODO: do better way
+            $posExt = strpos($tableFile, '.gz');
+            if (!$posExt) {
+                continue;
+            }
+            $tableName = substr($tableFile, 0, $posExt);
+            $this->log->debug("Loading  {$dataDir}/{$tableName}");
+
+            exec("gunzip {$dataDir}/{$tableFile}");
+
+            $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
+            $res = $this->canvasDb->execute($sql);
+
+            $sql = "LOAD DATA INFILE '{$dataDir}/{$tableName}' INTO TABLE {$this->canvasDbName}.{$tableName}";
+            try {
+                $res = $this->canvasDb->execute($sql);
+            } catch (Exception $e) {
+                $this->log->warning("Loading data failed for {$dataDir}/{$tableName}: " . $e->getMessage());
+            }
+            $warnings = $this->canvasDb->executeQuery('show warnings')->fetchAll();
+            if (count($warnings) > 0) {
+                $this->log->warning("MySQL warning occurred while loading {$dataDir}/{$tableName}");
+                foreach ($warnings as $warning) {
+                    $this->log->warning(implode(': ', $warning));
+                }
+            }
+
+            exec("gzip {$dataDir}/{$tableName}");
         }
     }
 }

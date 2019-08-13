@@ -43,6 +43,7 @@ use Alaress\Database\Predicate\InvalidColumnException;
  */
 class Mapper extends BaseMapper
 {
+    public const COL_EXTERNAL_ID = 'external_id';
     /**
      * @inheritdoc
      * @throws BaseMapper\Exception If unable to derive an ID for mapped joins
@@ -65,6 +66,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->uses(self::COL_EXTERNAL_ID, self::TYPE_STRING);
         // Type joins (what type of assessment is this?)
         // * task
         // * due work

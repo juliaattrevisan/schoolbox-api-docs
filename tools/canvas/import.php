@@ -7,7 +7,8 @@
 declare(strict_types=1);
 
 use External\Canvas\Sync\DataFetcher;
-use External\Canvas\Sync\SchemaImporter;
+use External\Canvas\Sync\DataRestorer;
+use External\Canvas\Sync\Importer;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
@@ -56,17 +57,49 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
 
-        // Fetch schema
+        $tempDir = $this->createTempDir();
         $fetcher = new DataFetcher(
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET),
-            $this->createTempDir()
+            $tempDir,
+            $this->getLogger()
         );
-        $schemaFile = $fetcher->fetch();
 
-        $schemaImporter = new SchemaImporter($db, $this->getLogger(), $this->canvasDbName);
-        $schemaImporter->importFromFile($schemaFile);
+        // Fetch schema
+        $this->getLogger()->debug('Getting schema');
+        $schemaFile = $fetcher->fetchSchema();
 
+        // Create schema in the staging database
+        $dataRestorer = new DataRestorer($db, $this->getLogger(), $this->canvasDbName);
+        $this->getLogger()->debug('Importing schema from json file:' . $schemaFile);
+        $dataRestorer->restoreSchema($schemaFile);
+
+        // Fetch data file URLs and download data files
+        $this->getLogger()->debug('Getting latest data url');
+        $dumpFile = $fetcher->fetchDataUrl();
+        $this->getLogger()->debug('Downloading latest data');
+        $fetcher->downloadDataFiles($dumpFile);
+
+        // Store downloaded data to tables in the staging database
+        $this->getLogger()->debug('Restoring data to tables');
+        $dataRestorer->restoreTableData($tempDir);
+
+        // Import data in the canvas staging database to schoolbox database
+        $this->getLogger()->debug('Converting and importing canvas data to schoolbox database');
+        /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $assessmentMapperProxy */
+        $assessmentMapperProxy = $this->getDi()->get('assessmentDataSource');
+        /** @var \External_ClassInterface $externalClass */
+        $externalClass = $this->getDi()->get('externalClass');
+
+        $importer   = new Importer(
+            $externalClass,
+            $this->getDatabaseInternal(),
+            $this->buildCanvasDbConnection(),
+            $assessmentMapperProxy,
+            $this->getConfig(),
+            $this->getLogger()
+        );
+        $importer->import();
     }
 
     /**
