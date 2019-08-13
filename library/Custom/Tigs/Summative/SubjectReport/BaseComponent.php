@@ -26,10 +26,18 @@ class BaseComponent
     /** @var StudentAttributes */
     private $attributes;
 
-    /** @var int $semesterFrom */
+    /**
+     * @deprecated Move this logic internal to component
+     * @todo Move this logic internal to component
+     * @var int $semesterFrom
+     */
     protected $semesterFrom = 0;
 
-    /** @var int $semesterTo */
+    /**
+     * @deprecated Move this logic internal to component
+     * @todo Move this logic internal to component
+     * @var int $semesterTo
+     */
     protected $semesterTo = 0;
 
     /** @var User */
@@ -207,6 +215,8 @@ class BaseComponent
 
 
     /**
+     * @deprecated Move this logic internal to component
+     * @todo Move this logic internal to component
      * Implicitly specify the semester of the report
      * @param int $semesterFrom
      * @param int|null $semesterTo

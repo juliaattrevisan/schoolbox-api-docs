@@ -35,6 +35,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
+use function array_key_exists;
 use function strnatcasecmp;
 use UnexpectedValueException;
 use Schoolbox\Filter\Filters;
@@ -567,7 +568,19 @@ class Report
 
 
     /**
-     * Builds IB Grade Graph report data.
+     * Returns IB Grade Graph report data for Sem1 and optionally Sem2.
+     *
+     * Returns null if not relevant to student.
+     *
+     * Return structure:
+     * @internal string     return['error']                       Optional. Info about why this component could not be built
+     * @internal array      return['sem']
+     * @internal null|array return['sem'][idx]                   Where idx is [1,2] and represents data for a semester. Null if don't show component
+     * @internal string     return['sem'][idx]['header']
+     * @internal string     return['sem'][idx]['data']           Mark data
+     * @internal string     return['sem'][idx]['studentMark']    Student's mark
+     * @internal string     return['sem'][idx]['studentComment'] Student's comment
+     * @internal string     return['sem'][idx]['useComment']     Whether we should just render the student comment instead of the graph
      *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
@@ -583,6 +596,7 @@ class Report
      * @throws \LogicException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \UnderflowException
+     * @throws \Alaress\Database\Exception
      */
     private function buildInternationalBaccalaureateGraphData(
         Folder\Model $folder,
@@ -596,62 +610,67 @@ class Report
         // * DP-Y11-S2, DP-Y12-S1 + DP-Y12-S2
         $yearLevel = $attributes->getCurriculumYearLevel();
         $semester  = $attributes->getCurriculumSemester();
-        $semesters = [$semester];
-        if (12 === $yearLevel && 2 === $semester && $attributes->isDp()) {
-            $semesters = [2, 1];
+        if (2 === $semester && $attributes->isMyp()) {
+            $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
+            $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
+            $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
+            // Only ever interested in Sem2 for MYP FAL
+            $semesterFrom = 2;
+            $semesterTo   = 2;
+        } elseif ((12 === $yearLevel || 2 === $semester) && $attributes->isDp()) {
+            $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
+            $errorMsg     = 'Cannot render DP Report components. Work type not set.';
+            $errorMsgLink = 'Set DP Report Work Type';
+            if(11 === $yearLevel){
+                // Only interested in Sem2 for Yr 11 DP
+                $semesterFrom = 2;
+                $semesterTo   = 2;
+            } else {
+                // Always show Sem1, show Sem2 if report is for Sem2
+                $semesterFrom = 1;
+                $semesterTo   = $semester;
+            }
+        } else {
+            // Component is not relevant for this report.
+            return null;
+        }
+
+        try {
+            $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
+        } catch (UnexpectedValueException $e) {
+            return ['error' => $e->getMessage()];
         }
 
         // Find relevant assessments and participation and insert into units
         $reports = [];
-        foreach ($semesters as $reportSemester) {
-            if (2 === $reportSemester && $attributes->isMyp()) {
-                $configName   = Config::_TIGS_WORK_TYPE_MYP_FINAL_ACHIEVEMENT_LEVELS;
-                $errorMsg     = 'Cannot render MYP Report components. Work type not set.';
-                $errorMsgLink = 'Set MYP Final Achievement Levels Work Type';
-            } elseif ((12 === $yearLevel || 2 === $reportSemester) && $attributes->isDp()) {
-                $configName   = Config::_TIGS_WORK_TYPE_DIPLOMA_PROGRAMME_REPORT_GRADE;
-                $errorMsg     = 'Cannot render DP Report components. Work type not set.';
-                $errorMsgLink = 'Set DP Report Work Type';
-            } else {
-                // Component is not relevant for this report.
-                continue;
-            }
 
-            try {
-                $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
-            } catch (UnexpectedValueException $e) {
-                $reports[] = ['error' => $e->getMessage()];
-                continue;
-            }
-
-            $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-            $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $reportSemester));
-            $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
-            foreach ($assessables as $assessable) {
-                $unitImpl                                                                        = $assessable->getBaseContext();
-                $baseAssessable                                                                  = $assessable->getBaseAssessable();
-                $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
-            }
-
-            $ib = new InternationalBaccalaureateGraph(
-                $cohortUnitImpls,
-                $student,
-                $attributes,
-                $this->visibility,
-                $this->viewer,
-                $workTypeId,
-                $this->rubricMapper,
-                $this->authorizer,
-                $this->router,
-                $folder,
-                $roleTypeOverride
-            );
-            $ib->setSemesters($reportSemester);
-            $context = $ib->toContext();
-            if ($context['showComponent']) {
-                $reports[] = $context;
-            }
+        $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
+        $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $semesterFrom, $semesterTo));
+        $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
+        foreach ($assessables as $assessable) {
+            $unitImpl                                                                        = $assessable->getBaseContext();
+            $baseAssessable                                                                  = $assessable->getBaseAssessable();
+            $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
         }
+
+        $ib = new InternationalBaccalaureateGraph(
+            $cohortUnitImpls,
+            $student,
+            $attributes,
+            $this->visibility,
+            $this->viewer,
+            $workTypeId,
+            $this->rubricMapper,
+            $this->authorizer,
+            $this->router,
+            $folder,
+            $roleTypeOverride
+        );
+        $context = $ib->toContext();
+        if ($context['showComponent']) { // TODO move this inside compoent
+            $reports[] = $context;
+        }
+
 
         return $reports;
     }
@@ -901,31 +920,21 @@ class Report
      * @param GenericCollection $unitImpls
      * @param int               $workTypeId
      * @param StudentAttributes $attributes
-     * @param int|null $semesterFrom
-     * @param int|null $semesterTo
+     * @param int|null          $semesterFrom
+     * @param int|null          $semesterTo
      * @return array
      * @throws Predicate\InvalidColumnException
+     * @throws \Alaress\Database\Exception
      * @throws \UnderflowException
      */
-    private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes, ?int $semesterFrom = null, ?int $semesterTo = null): array
+    private function findAssessmentIds(GenericCollection $unitImpls, int $workTypeId, StudentAttributes $attributes, int $semesterFrom, int $semesterTo): array
     {
         if (!\count($unitImpls)) {
             return [];
         }
-
-        $semesters = $attributes->getCurriculumSemesters();
-        if ($semesterFrom && \key_exists($semesterFrom, $semesters)) {
-            $searchStart = $semesters[$semesterFrom]->getStart();
-            if ($semesterTo && \key_exists($semesterTo, $semesters)) {
-                $searchFinish = $semesters[$semesterTo]->getFinish();
-            } else {
-                // if semesterTo is not set, use the same semester as semesterFrom
-                $searchFinish = $semesters[$semesterFrom]->getFinish();
-            }
-        } else {
-            $searchStart = $attributes->getCurriculumSemesterStart();
-            $searchFinish = $attributes->getCurriculumSemesterFinish();
-        }
+        $semesters    = $attributes->getCurriculumSemesters();
+        $searchStart  = $semesters[$semesterFrom]->getStart();
+        $searchFinish = $semesters[$semesterTo]->getFinish();
 
         $pb = (new Predicate\Builder(new \Alaress\Database\Quoter\Mysql\Quoter(), ''))
             ->isNull('a.deleted_at')
