@@ -9,7 +9,7 @@
 namespace Page;
 
 use AcceptanceTester;
-use const GuzzleHelper\VAGRANT_DOMAIN;
+use Page\Common;
 
 /**
  * Login page object
@@ -73,16 +73,17 @@ class Login
     }
 
     /**
-     * Default login payload for the purposes of doing a curl request
+     * Default login request details, including payload for doing a curl.
+     * @return array
      */
-    public function getDefaultLoginRequest()
+    static public function getDefaultLoginRequest():array
     {
         $request_details = [
             'method' => 'POST',
-            'page' => 'https://'.VAGRANT_DOMAIN.'/login/',
+            'page' => 'https://'.Common::VAGRANT_DOMAIN.'/login/',
             'payload' => [
                 'headers' => [
-                    'Referer' => 'https://'.VAGRANT_DOMAIN.'/login/'
+                    'Referer' => 'https://'.Common::VAGRANT_DOMAIN.'/login/'
                 ],
                 'form_params' => [
                     'page' => '/login/',
@@ -96,14 +97,18 @@ class Login
         return $request_details;
     }
 
-    public function getDefaultForgotPasswordRequest()
+    /**
+     * Default forgot password request details, including payload for doing a curl.
+     * @return array
+     */
+    static public function getDefaultForgotPasswordRequest():array
     {
         $request_details = [
             'method' => 'POST',
-            'page' => 'https://'.VAGRANT_DOMAIN.'/passwordReset/createRequest',
+            'page' => 'https://'.Common::VAGRANT_DOMAIN.'/passwordReset/createRequest',
             'payload' => [
                 'headers' => [
-                    'Referer' => 'https://'.VAGRANT_DOMAIN.'/passwordReset'
+                    'Referer' => 'https://'.Common::VAGRANT_DOMAIN.'/passwordReset'
                 ],
                 'form_params' => [
                     'email' => 'username'

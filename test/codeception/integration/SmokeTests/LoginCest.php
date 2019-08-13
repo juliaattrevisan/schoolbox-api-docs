@@ -26,17 +26,18 @@ class LoginCest {
         #GIVEN
         $user='alaress';
         $password='alaress';
-        $defaultLoginRequest = $loginPage->getDefaultLoginRequest();
-        $defaultLoginRequest['payload']['form_params']['username']=$user;
-        $defaultLoginRequest['payload']['form_params']['password']=$password;
+        $loginRequest = $loginPage->getDefaultLoginRequest();
 
         #WHEN
+        $loginRequest['payload']['form_params']['username']=$user;
+        $loginRequest['payload']['form_params']['password']=$password;
         /** @var Response $response */
-        $response = $i->sendCurlRequest($defaultLoginRequest['method'], $defaultLoginRequest['page'], $defaultLoginRequest['payload'], true);
+        $response = $i->sendCurlRequest($loginRequest['method'], $loginRequest['page'], $loginRequest['payload'], true);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
             ['-'=>'200']
         ];
+
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
@@ -53,28 +54,29 @@ class LoginCest {
         #GIVEN
         $user_email='alaress@schoolbox.com.au';
         $user_username='alaress';
-        $defaultForgotPasswordRequest = $loginPage->getDefaultForgotPasswordRequest();
+        $forgotPasswordRequest = $loginPage->getDefaultForgotPasswordRequest();
 
         #WHEN
-        $defaultForgotPasswordRequest['payload']['form_params']['email']=$user_email;
+        $forgotPasswordRequest['payload']['form_params']['email']=$user_email;
         /** @var Response $response */
-        $response = $i->sendCurlRequest($defaultForgotPasswordRequest['method'], $defaultForgotPasswordRequest['page'], $defaultForgotPasswordRequest['payload'], true);
+        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
             ['-'=>'200']
         ];
+
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
-
         #WHEN
-        $defaultForgotPasswordRequest['payload']['form_params']['email']=$user_username;
+        $forgotPasswordRequest['payload']['form_params']['email']=$user_username;
         /** @var Response $response */
-        $response = $i->sendCurlRequest($defaultForgotPasswordRequest['method'], $defaultForgotPasswordRequest['page'], $defaultForgotPasswordRequest['payload'], true);
+        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
             ['-'=>'200']
         ];
+
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
