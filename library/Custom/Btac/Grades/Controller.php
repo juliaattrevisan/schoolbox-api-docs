@@ -10,7 +10,7 @@ class Controller extends \Schoolbox\Learning\Grades\Controller
 {
     /**
      * @api   GET /learning/grades-year/{userId}/year/{year}
-     * @level 165
+     * @since 165
      * @param User $viewee
      * @param int  $year
      * @throws ServiceNotFound If unable to find mail handler service

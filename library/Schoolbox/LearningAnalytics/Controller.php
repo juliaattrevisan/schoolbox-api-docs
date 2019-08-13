@@ -57,7 +57,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}
-     * @level 165
+     * @since 165
      *
      * @param int $courseSpecId
      * @throws RouteNotFound
@@ -74,7 +74,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/term/{termCode}
-     * @level 165
+     * @since 165
      *
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
@@ -92,7 +92,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/task/{submissionTypeId}
-     * @level 165
+     * @since 165
      *
      * @param int $courseSpecId
      * @param int $submissionTypeId
@@ -114,7 +114,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/task/{submissionTypeId}/term/{termCode}
-     * @level 165
+     * @since 165
      *
      * @param CourseSpecification             $courseSpecification
      * @param Collection|UnitImplementation[] $unitImplsInTerm
@@ -138,7 +138,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}
-     * @level 165
+     * @since 165
      *
      * @param int $courseSpecId
      * @param int $folderId
@@ -160,7 +160,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/term/{termCode}
-     * @level 165
+     * @since 165
      *
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification
@@ -184,7 +184,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{submissionTypeId}
-     * @level 165
+     * @since 165
      *
      * @param int $courseSpecId
      * @param int $folderId
@@ -208,7 +208,7 @@ class Controller extends Base
 
     /**
      * @api   GET /learning/analytics/course/{courseSpecId}/class/{folderId}/task/{submissionTypeId}/term/{termCode}
-     * @level 165
+     * @since 165
      *
      * @param Folder                          $classFolder
      * @param CourseSpecification             $courseSpecification

@@ -160,7 +160,7 @@ class Controller extends Base\Base
      * Returns a HTML fragment of UnitSpecs belonging to the specified CourseSpec.
      *
      * @api   POST /course/import/classes
-     * @level 160
+     * @since 160
      * @var int      $_POST [course_spec_id]    The course to import
      * @var string   $_POST ['import_folders']  CSV folder ids to import to
      * @var null|int $_POST ['component_id']    The component to import into
@@ -216,7 +216,7 @@ class Controller extends Base\Base
      * Searches by both name and class code
      *
      * @api   GET /course/import/classes
-     * @level 160
+     * @since 160
      * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function searchClasses()
@@ -262,7 +262,7 @@ class Controller extends Base\Base
      * Returns a HTML fragment containing a list of Assessments, grouped by UnitImpl
      *
      * @api   POST /course/import/units
-     * @level 160
+     * @since 160
      *
      * @var string   $_POST ['encodedReturnUrl']         Optional. Return URL set by caller.
      * @var string   $_POST ['action']                   {'import'|'modify'}
@@ -433,7 +433,7 @@ class Controller extends Base\Base
      * Do the actual import and create all relevant database entries.
      *
      * @api   POST /course/import/activities
-     * @level 160
+     * @since 160
      * @var          $_GET  $query
      * @var string   $query [Redirect::RETURN_URL]                              Optional return URL set by caller
      * @var          $_POST $post
@@ -860,7 +860,7 @@ class Controller extends Base\Base
      * Modify the Unit information for a previously imported Course
      *
      * @api   GET /course/import/{courseImplId}/modify
-     * @level 165
+     * @since 165
      *
      * @param CourseImplementation\Model $courseImpl
      * @throws MapperException
@@ -942,7 +942,7 @@ class Controller extends Base\Base
      * View a list of courses associated with a homepage
      *
      * @api   GET /course/import/management/{folderId}
-     * @level 165
+     * @since 165
      *
      * @param int $folderId
      * @throws MapperException
@@ -1036,7 +1036,7 @@ class Controller extends Base\Base
      * Deletes a Course import, along with ALL of its associated data
      *
      * @api   DELETE /course/import/{courseImplId}
-     * @level 165
+     * @since 165
      * @param CourseImplementation\Model $courseImpl
      * @throws Base\Exception
      */
@@ -1081,7 +1081,7 @@ class Controller extends Base\Base
      * is not being displayed in a CourseOutline component.
      *
      * @api   POST /course/import/{courseImplId}/restore
-     * @level 165
+     * @since 165
      * @param CourseImplementation\Model $courseImpl
      * @throws MapperException
      * @throws \PDOException

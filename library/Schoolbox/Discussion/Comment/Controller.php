@@ -50,7 +50,7 @@ class Controller extends BaseController
      * TODO implement this endpoint
      *
      * @api   GET /discussion/{contextType}/{contextId}/comments/{id}/comments
-     * @level 190
+     * @since 190
      *
      * @param Model $comment
      * @throws NotFound This is not yet implemented
@@ -66,7 +66,7 @@ class Controller extends BaseController
      * Delete a comment.
      *
      * @api   DELETE /discussion/{contextType}/{contextId}/comments/{id}
-     * @level 190
+     * @since 190
      *
      * @param Model $comment
      * @throws MapperException

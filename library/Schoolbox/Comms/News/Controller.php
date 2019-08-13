@@ -174,7 +174,7 @@ class Controller extends Base
      * Provide form to create a news article
      *
      * @api   GET /news/create
-     * @level 18.1
+     * @since 18.1
      *
      * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -265,7 +265,7 @@ class Controller extends Base
      * Implemented so that it can be permissioned uniquely to creating news.
      *
      * @api   GET /news/create/folder/{folderId:\d+}
-     * @level 18.1
+     * @since 18.1
      *
      * @param int $folderId
      * @throws RouteNotFound
@@ -287,7 +287,7 @@ class Controller extends Base
      * Create a news article
      *
      * @api   POST /news/create
-     * @level 18.1
+     * @since 18.1
      *
      * @throws InvalidArgumentException
      * @throws MapperException
@@ -313,7 +313,7 @@ class Controller extends Base
      * Provide form to update a news article
      *
      * @api   GET /news/{articleId}/update
-     * @level 18.1
+     * @since 18.1
      *
      * @param Model $article
      * @throws InvalidArgumentException
@@ -357,7 +357,7 @@ class Controller extends Base
      * It may change the approved subState, eg AwaitingPublication/Published/Expired
      *
      * @api   POST /news/{articleId}
-     * @level 18.1
+     * @since 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -465,7 +465,7 @@ class Controller extends Base
      * Delete an article
      *
      * @api POST /news/{articleId}/delete
-     * @level 18.1
+     * @since 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -531,7 +531,7 @@ class Controller extends Base
      * Associate this article with a discussion thread (passed in $post['discussionThreadId']).
      *
      * @api POST /news/{articleId}/associateWithThread/{discussionThreadId}
-     * @level 19.0
+     * @since 19.0
      *
      * @param Model $article
      * @throws MapperException                            if save, or retrieval of the thread, failed
@@ -559,7 +559,7 @@ class Controller extends Base
      * Get a list of available news topics that can be assigned to an article
      *
      * @api GET /news/topics
-     * @level 18.1
+     * @since 18.1
      */
     public function getTopics(): void
     {
@@ -571,7 +571,7 @@ class Controller extends Base
      * Load a news article so you can read its contents (the detail screen)
      *
      * @api   GET /news/{articleId}
-     * @level 18.1
+     * @since 18.1
      *
      * @param Model $article
      * @throws MapperException
@@ -762,7 +762,7 @@ class Controller extends Base
      * Get a list of articles audienced to you
      *
      * @api GET /news
-     * @level 18.1
+     * @since 18.1
      *
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -906,7 +906,7 @@ class Controller extends Base
      * @throws Exception
      * @throws Unauthorized
      * @api   GET /news/archive{/year,month}
-     * @level 18.1
+     * @since 18.1
      */
     public function getArchive(int $year = null, int $month = null): void
     {
@@ -1056,7 +1056,7 @@ class Controller extends Base
      * This is the central piece of the puzzle
      *
      * @api GET /news/list
-     * @level 18.1
+     * @since 18.1
      *
      * @deprecated Article lists should now be done on the front-end, with an XHR calls
      *
@@ -1278,7 +1278,7 @@ class Controller extends Base
      * Compute the recipients so author can identify
      *
      * @api /news/:articleId/recipients
-     * @level 18.1
+     * @since 18.1
      *
      * @param Model $article
      * @throws \Alaress\Database\Predicate\InvalidColumnException

@@ -98,7 +98,7 @@ class Controller extends Web\Controller\Base
      *
      * @api   GET /modules/custom/tigs/summative/subject/user/{userId}/folder/{folderId}{/reportDate}
      *            Where {reportDate} is anything recognised by strtotime()
-     * @level 18.1.0
+     * @since 18.1.0
      * @param User         $user
      * @param Folder\Model $folder
      * @param string|null  $reportDate

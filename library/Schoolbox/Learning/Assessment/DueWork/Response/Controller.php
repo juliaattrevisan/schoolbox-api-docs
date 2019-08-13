@@ -88,7 +88,7 @@ class Controller extends Base
      * Get the contents of a particular $response for the purposes of Self Reflection
      *
      * @api   GET /learning/assessments/:assessmentId/:studentId/responses/self/:responseId
-     * @level 18.0
+     * @since 18.0
      *
      * @param DueWork $assessment
      * @param User    $student
@@ -323,12 +323,12 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/standard.twig', $data));
     }
-    
+
     /**
      * Display a kami document in an iFrame
      *
      * @api   /learning/kami/{kamiId}
-     * @level 17.5
+     * @since 17.5
      * @param Kami\Model $kami
      * @param Model      $response
      * @throws Kami\Exception\ApiException
@@ -485,7 +485,7 @@ class Controller extends Base
 
     /**
      * @api   DELETE /assessments/:assessmentId/response/:responseId
-     * @level 165
+     * @since 165
      * @param IAssessable $assessment
      * @param Model $response
      */

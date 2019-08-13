@@ -32,7 +32,7 @@ class Controller extends Base
     /**
      * @param SingleFile\Model $file
      * @api   /learning/feedback/file/{fileId}/delete
-     * @level 17.0
+     * @since 17.0
      */
     public function deleteFile(SingleFile\Model $file)
     {

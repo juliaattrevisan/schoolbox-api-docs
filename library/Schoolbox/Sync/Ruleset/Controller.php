@@ -165,7 +165,7 @@ class Controller extends Base {
 
     /**
      * @api   /adminv2/sync/logs
-     * @level 156
+     * @since 156
      *
      * @return void
      */
@@ -189,7 +189,7 @@ class Controller extends Base {
 
     /**
      * @api   /adminv2/sync/log/{logId}
-     * @level 156
+     * @since 156
      *
      * @param int $logId
      * @return void
@@ -202,7 +202,7 @@ class Controller extends Base {
 
     /**
      * @api   /adminv2/ups/log/{logId}.{format}
-     * @level 156
+     * @since 156
      *
      * @param int    $logId
      * @param string $format

@@ -373,7 +373,7 @@ class Controller extends BaseController
      * Update a folders details
      *
      * @api POST /resource/folder/update
-     * @level 156
+     * @since 156
      * @var int|null $_POST['categoryID'] If absent, this is an INSERT, if present, an UPDATE
      * @var string   $_POST['name']
      * @var int      $_POST['parent']

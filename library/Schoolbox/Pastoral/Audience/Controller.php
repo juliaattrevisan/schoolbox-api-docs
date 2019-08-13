@@ -63,7 +63,7 @@ class Controller extends Base
      * Display default audiences for pastoral types and sub-types
      *
      * @api   GET /pastoral/management/audience
-     * @level 18.2
+     * @since 18.2
      */
     public function getAudiences(): void
     {
@@ -79,7 +79,7 @@ class Controller extends Base
 
     /**
      * @api   GET /pastoral/management/audience/type/{typeId}/modify
-     * @level 18.2
+     * @since 18.2
      * @param Pastoral\Type\Model $type
      * @throws InvalidColumnException
      */
@@ -93,7 +93,7 @@ class Controller extends Base
      * Edit the defaults for a particular type and subtype
      *
      * @api   GET /pastoral/management/audience/subtype/{subtypeId}/modify
-     * @level 18.2
+     * @since 18.2
      * @param Pastoral\SubType\Model $subType
      * @throws InvalidColumnException
      */
@@ -107,7 +107,7 @@ class Controller extends Base
      * Edit the defaults for a particular type and subtype
      *
      * @api   GET /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
-     * @level 18.2
+     * @since 18.2
      * @param Pastoral\Type\Model         $type
      * @param Pastoral\SubType\Model|null $subType
      * @throws InvalidColumnException
@@ -152,7 +152,7 @@ class Controller extends Base
 
     /**
      * @api   POST /pastoral/management/audience/type/{typeId}/modify
-     * @level 18.2
+     * @since 18.2
      * @param Pastoral\Type\Model $type
      * @throws MapperException
      * @throws MapperException\Deleted
@@ -168,7 +168,7 @@ class Controller extends Base
 
     /**
      * @api   POST /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
-     * @level 18.2
+     * @since 18.2
      * @param Pastoral\SubType\Model $subType
      * @throws MapperException
      * @throws MapperException\Deleted

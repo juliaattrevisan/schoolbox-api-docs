@@ -22,7 +22,7 @@ class Controller extends ConfigController
     /**
      * Renders an admin settings page for settings with the specified type
      *
-     * @level 18.1
+     * @since 18.1
      * @api   GET /adminv2/setting/{typeLabel}
      *
      * @param string $typeLabel The human-friendly type label stored in lu_config_type
@@ -66,7 +66,7 @@ class Controller extends ConfigController
 
 
     /**
-     * @level 18.1
+     * @since 18.1
      * @api   POST /adminv2/setting/{typeLabel}
      *
      * @param string $typeLabel

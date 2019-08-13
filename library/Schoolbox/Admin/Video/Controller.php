@@ -25,7 +25,7 @@ class Controller extends Base
      * Display tree
      *
      * @api   GET /adminv2/video
-     * @level 165
+     * @since 165
      */
     public function getIndex()
     {
@@ -54,7 +54,7 @@ class Controller extends Base
      * Display log for particular video
      *
      * @api   GET /adminv2/video/:id
-     * @level 165
+     * @since 165
      * @param VideoQueue $queue
      */
     public function getLog($queue) {

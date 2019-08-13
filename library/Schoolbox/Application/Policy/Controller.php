@@ -14,7 +14,7 @@ class Controller extends Base
     /**
      * Schoolbox policy page, can be accessed with and without a session
      * @api   GET /policy
-     * @level 18.2
+     * @since 18.2
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */

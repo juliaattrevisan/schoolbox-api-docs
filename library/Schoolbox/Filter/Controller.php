@@ -59,7 +59,7 @@ class Controller extends BaseController
      * Display a summary of filter configurations for Admins
      *
      * @api   GET /adminv2/filters
-     * @level 17.0
+     * @since 17.0
      * @throws ServiceNotFound
      */
     public function getIndex(): void
@@ -80,7 +80,7 @@ class Controller extends BaseController
      * Display a page where admins can alter default filter selections
      *
      * @api   GET /adminv2/filters/{pageKey}
-     * @level 17.0
+     * @since 17.0
      * @param IFactoryFactory $factoryFactory The factory responsible for the entity filtered by this page
      * @param string          $page
      * @throws ServiceNotFound

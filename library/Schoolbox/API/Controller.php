@@ -77,7 +77,7 @@ class Controller extends Base
      *
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
      * @api          /api/register/{provider}
-     * @level        145
+     * @since        145
      *
      * @param string $provider
      */
@@ -151,7 +151,7 @@ class Controller extends Base
      * a JWT, without registering an app.
      *
      * @api   /api/session
-     * @level 190
+     * @since 190
      */
     public function initSession(): void
     {

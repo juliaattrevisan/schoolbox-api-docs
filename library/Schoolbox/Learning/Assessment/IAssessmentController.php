@@ -22,7 +22,7 @@ interface IAssessmentController
      * It shows the functionality of the common "assessment component" logic for any context
      *
      * @api GET /learning/{contextType}/{contextId}/assessments?user&readOnly
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      */
@@ -32,7 +32,7 @@ interface IAssessmentController
      * Get the form for creating a new assessment in a particular context
      *
      * @api   GET /learning/{contextType}/{contextId}/assessments/new?type
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      */
@@ -42,7 +42,7 @@ interface IAssessmentController
      * Create a new assessment in the given context
      *
      * @api   POST /learning/{:contextType}/{:contextId}/assessments
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      * @throws Web\Controller\Exception
@@ -51,7 +51,7 @@ interface IAssessmentController
 
     /**
      * @api   POST /learning/assessments/:assessmentId
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @return void
@@ -60,7 +60,7 @@ interface IAssessmentController
 
     /**
      * @api   PATCH /learning/assessments/:assessmentId
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @return mixed
@@ -69,7 +69,7 @@ interface IAssessmentController
 
     /**
      * @api   GET /learning/assessments/:assessmentId/modify
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @return void
@@ -78,7 +78,7 @@ interface IAssessmentController
 
     /**
      * @api   POST /learning/assessments/:assessmentId/delete
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @return void
@@ -87,7 +87,7 @@ interface IAssessmentController
 
     /**
      * @api   GET /learning/assessments/:assessmentId/modify
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @return void
@@ -96,7 +96,7 @@ interface IAssessmentController
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -107,7 +107,7 @@ interface IAssessmentController
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -118,7 +118,7 @@ interface IAssessmentController
 
     /**
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @param User        $student

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -44,7 +44,7 @@ class Controller extends AbstractController
 
     /**
      * @api GET /resources/link/:linkId/info
-     * @level 150
+     * @since 150
      *
      * @param int $linkId
      */
@@ -134,4 +134,4 @@ class Controller extends AbstractController
         // find out if we have access to the requested folder
         return Access::getInstance()->getFolderAccess($this->getUser(), $folderId);
     }
-} 
+}

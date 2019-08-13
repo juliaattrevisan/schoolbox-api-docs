@@ -31,7 +31,7 @@ class Controller extends Base
     /**
      * Provides a form that users can use to submit support requests or feedback via.  Can be accessed without session
      * @api   GET /feedback
-     * @level 18.2
+     * @since 18.2
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -52,7 +52,7 @@ class Controller extends Base
     /**
      * Thank you page after submitting feedback, can be accessed with and without a session
      * @api   GET /feedback/thank-you
-     * @level 18.2
+     * @since 18.2
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */

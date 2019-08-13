@@ -61,7 +61,7 @@ class Controller extends BaseController
      * View the rubric criteria form for a folder.
      *
      * @api   GET /rubric/manager/{folderId}
-     * @level 181
+     * @since 181
      * @param FolderModel $folder
      */
     public function getForm(FolderModel $folder): void
@@ -87,7 +87,7 @@ class Controller extends BaseController
      * Save the rubric criteria for a folder.
      *
      * @api   POST /rubric/manager/{folderId}
-     * @level 181
+     * @since 181
      * @param FolderModel $folder
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException

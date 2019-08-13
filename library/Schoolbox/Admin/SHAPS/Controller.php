@@ -90,7 +90,7 @@ class Controller extends Base
      * Renders a list of all staff in your Schoolbox instance, and whether or not they are provisioned on Help.
      *
      * @api   /adminv2/shaps/provisioning
-     * @level 18.1
+     * @since 18.1
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws InvalidArgumentException
      */
@@ -132,7 +132,7 @@ class Controller extends Base
      * Renders a list of staff in your Schoolbox instance that are also provisioned on Help.
      *
      * @api GET /adminv2/shaps/provisioning/provisioned
-     * @level 18.1
+     * @since 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
@@ -172,7 +172,7 @@ class Controller extends Base
      * Renders a list of staff in your Schoolbox instance that are NOT provisioned on Help.
      *
      * @api GET /adminv2/shaps/provisioning/unprovisioned
-     * @level 18.1
+     * @since 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
@@ -211,7 +211,7 @@ class Controller extends Base
      * Renders a selectize for searching users in your Schoolbox instance to see if they are provisioned.
      *
      * @api GET /adminv2/shaps/provisioning/search
-     * @level 18.1
+     * @since 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -231,7 +231,7 @@ class Controller extends Base
      * Selectize gives us the user's Id
      *
      * @api   GET /adminv2/shaps/provisioning/{userId}
-     * @level 18.1
+     * @since 18.1
      *
      * @param string $userId
      * @throws \InvalidArgumentException
@@ -268,7 +268,7 @@ class Controller extends Base
      * Renders a list of all courses available for your school on Help, and the users enrolled in each.
      *
      * @api GET /adminv2/shaps/courses
-     * @level 18.1
+     * @since 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \InvalidArgumentException
@@ -294,7 +294,7 @@ class Controller extends Base
      * Renders a search form for finding users to view their enrolments.
      *
      * @api GET /adminv2/shaps/courses/search
-     * @level 18.1
+     * @since 18.1
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
@@ -310,7 +310,7 @@ class Controller extends Base
      * TODO placeholder method for when we actually implement this
      *
      * @api   GET /adminv2/shaps/courses/courses/{userId}
-     * @level 18.1
+     * @since 18.1
      *
      * @param string $userID
      * @throws \Schoolbox\Mapper\Exception
@@ -382,7 +382,7 @@ class Controller extends Base
      * Post users to SHAPS
      *
      * @api   POST /adminv2/shaps/provision/
-     * @level 181
+     * @since 181
      * @throws InvalidArgumentException                If unable to instantiate a guzzle client
      */
     public function postProvision(): void

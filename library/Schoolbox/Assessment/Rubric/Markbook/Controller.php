@@ -114,7 +114,7 @@ class Controller extends Base
      * Renders a filter panel and placeholder that will asynchronously load the rubric report
      *
      * @api   GET /learning/rubricMarkbook/{folderId}
-     * @level 190
+     * @since 190
      * @param Folder\Model $folder Folder for this class
      * @throws Database\Predicate\InvalidColumnException
      * @throws InvalidArgumentException
@@ -151,7 +151,7 @@ class Controller extends Base
      * Displays a list of rubric marks for students and learners associated with the specified folder
      *
      * @api   POST /learning/rubricMarkbook/{folderId}
-     * @level 190
+     * @since 190
      * @param Folder\Model $folder Folder for this class
      * @throws Database\Exception
      * @throws Database\Predicate\InvalidColumnException
