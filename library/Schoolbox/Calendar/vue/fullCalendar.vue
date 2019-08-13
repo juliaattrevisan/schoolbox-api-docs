@@ -18,10 +18,13 @@
     import axios                    from 'axios'
     import qs                       from "qs";
 
+    // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
     const URL_EVENT_SOURCE = '/calendar/ajax/full';
     const URL_EVENT_UPDATE = '/calendar/ajax/update';
     const URL_EVENT_FILTER = '/calendar/ajax/filter';
+    const URL_EVENT_CREATE = '/calendar/ajax/create';
+    const URL_EVENT_MODIFY = '/calendar/modify.php';
 
     export default {
         components: {
@@ -47,6 +50,12 @@
             config: () => window.fullCalendarConfig,
             isNewEventSubmittable: function () {
                 return this.newEvent.title && this.newEvent.title.length !== 0;
+            },
+            urls() {
+                return {
+                    create: URL_EVENT_CREATE,
+                    modify: URL_EVENT_MODIFY,
+                };
             },
         },
         methods: {
@@ -311,6 +320,8 @@
                             :task-type-id="config.taskTypeId"
                             :event-types="config.eventTypes"
                             :to-moment="toMoment"
+                            :event-create-url="urls.create"
+                            :event-modify-url="urls.modify"
                             @eventCreated="addEvent" />
 
         <view-event-modal ref="event"

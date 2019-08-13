@@ -10,9 +10,6 @@
     const FORMAT_DISPLAY_DATE = 'DD-MM-YYYY';
     const FORMAT_DISPLAY_DATETIME = 'DD-MM-YYYY HH:mm';
 
-    const URL_EVENT_CREATE = '/calendar/ajax/create';
-    const URL_EVENT_MODIFY = '/calendar/modify.php';
-
     export default {
         name: "create-event-modal",
         props: [
@@ -22,6 +19,8 @@
             'taskTypeId',
             // TODO why do I have to pass this method around?
             'toMoment',
+            'eventCreateUrl',
+            'eventModifyUrl',
         ],
         components: {
             RevealModal,
@@ -65,7 +64,8 @@
             redirectToEventForm() {
                 // Use jQuery's form serialize for now: replace later
                 this.window.location.href =
-                    '/calendar/modify.php?from=inline&returnTo=calendar&'
+                    this.eventModifyUrl
+                    + '?from=inline&returnTo=calendar&'
                     + this.window.jQuery(this.$refs.createEventForm).serialize();
             },
         },
@@ -83,7 +83,7 @@
             <div class="content active" id="createEventPanel" aria-hidden="false">
                 <form ref="createEventForm"
                       method="post"
-                      action="/calendar/ajax/create"
+                      :action="eventCreateUrl"
                       @submit.prevent="createNewEvent($refs.createEventForm)"
                       class="top"
                 >
@@ -119,7 +119,7 @@
             <div class="content" id="createTaskPanel" aria-hidden="true" tabindex="-1">
                 <form ref="createTaskForm"
                       method="post"
-                      action="/calendar/ajax/create"
+                      :action="eventCreateUrl"
                       @submit.prevent="createNewEvent($refs.createTaskForm)"
                 >
                     <input name="userId" type="hidden" :value="userId" />
