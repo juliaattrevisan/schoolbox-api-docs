@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -8,6 +9,7 @@
 namespace Page;
 
 use AcceptanceTester;
+use const GuzzleHelper\VAGRANT_DOMAIN;
 
 /**
  * Login page object
@@ -68,5 +70,47 @@ class Login
     public function verifyLoginFailure()
     {
         $this->tester->see("The username or password you typed is incorrect, please try again.");
+    }
+
+    /**
+     * Default login payload for the purposes of doing a curl request
+     */
+    public function getDefaultLoginRequest()
+    {
+        $request_details = [
+            'method' => 'POST',
+            'page' => 'https://'.VAGRANT_DOMAIN.'/login/',
+            'payload' => [
+                'headers' => [
+                    'Referer' => 'https://'.VAGRANT_DOMAIN.'/login/'
+                ],
+                'form_params' => [
+                    'page' => '/login/',
+                    'username' => 'username',
+                    'password' => 'password',
+                    'Submit'=> 'Login'
+                ]
+            ]
+        ];
+
+        return $request_details;
+    }
+
+    public function getDefaultForgotPasswordRequest()
+    {
+        $request_details = [
+            'method' => 'POST',
+            'page' => 'https://'.VAGRANT_DOMAIN.'/passwordReset/createRequest',
+            'payload' => [
+                'headers' => [
+                    'Referer' => 'https://'.VAGRANT_DOMAIN.'/passwordReset'
+                ],
+                'form_params' => [
+                    'email' => 'username'
+                ]
+            ]
+        ];
+
+        return $request_details;
     }
 }

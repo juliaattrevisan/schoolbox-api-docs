@@ -4,6 +4,13 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Codeception\TestInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Psr7\Response;
+use const GuzzleHelper\VAGRANT_DOMAIN;
+
 /**
  * Inherited Methods
  * @method void wantToTest($text)
@@ -60,6 +67,62 @@ class IntegrationTester extends \Codeception\Actor
 
             $this->assertEquals(count($expectedReturn), count($redirectHistoryArray), 'Action path of request has less steps then the expected amount of steps. '.print_r($expectedReturn).' compared to '.print_r($redirectHistoryArray));
         }
+    }
+
+    /** @var CookieJar $client_cookie_jar */
+    public $client_cookie_jar;
+
+    public $guzzle_headers=[];
+
+    public $redirect_settings;
+
+    public function _before(TestInterface $test)
+    {
+        $this->initGuzzleClient2();
+    }
+
+    public function initGuzzleClient2()
+    {
+        if (!isset($this->redirect_settings)) {
+            $this->guzzle_headers = [
+                'Host'         => VAGRANT_DOMAIN,
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept'       => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+            ];
+            $this->redirect_settings = [
+                'max'             => 5,
+                'referer'         => true,
+                'protocols'       => ['http', 'https'],
+                'track_redirects' => true
+            ];
+            $this->client_cookie_jar = new CookieJar();
+        }
+    }
+
+    /**
+     * loginUser fire off Curl to login user.
+     *
+     * @param string $username
+     * @param string $password
+     * @param bool $redirect if the request should follow the redirect.
+     *
+     * @throws GuzzleException
+     *
+     * @return Response
+     */
+    public function sendCurlRequest($method, $uri, $params, $redirect)
+    {
+        $this->initGuzzleClient2();
+
+        if ($redirect) {
+            $params['allow_redirects'] = $this->redirect_settings;
+        } else {
+            $params['allow_redirects'] = false;
+        }
+
+        $params['cookies'] = $this->client_cookie_jar;
+
+        return $this->sendRequestCurl($method, $uri, $params);
     }
 
 }

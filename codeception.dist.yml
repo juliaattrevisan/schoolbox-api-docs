@@ -34,6 +34,11 @@ suites:
             enabled:
                 - \Helper\Integration
                 - Asserts
+                - PhpBrowser:
+                    url: 'http://vagrant.dev.schoolbox.cloud'
+                    auth: ['alaress', 'alaress']
+                    curl:
+                      CURLOPT_RETURNTRANSFER: true
                 - Db:
                       dsn: "mysql:host=localhost;dbname=schoolbox"
                       user: "root"

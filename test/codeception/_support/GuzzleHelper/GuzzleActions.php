@@ -31,11 +31,11 @@ trait GuzzleActions
     public $client;
 
     /** @var CookieJar $client_cookie_jar */
-    public $client_cookie_jar;
+    #public $client_cookie_jar;
 
-    public $guzzle_headers=[];
+    #public $guzzle_headers=[];
 
-    public $redirect_settings;
+    #public $redirect_settings;
 
     /**
      * initGuzzleClient initializes the HTTP Guzzle client used to send off curl requests.
