@@ -98,10 +98,10 @@
                             <template v-for="source in sources">
                                 <input type="checkbox"
                                        name="source"
-                                       :id="'source' + source.ids.join(',')"
+                                       :id="'source' + String(source.ids)"
                                        :value="source.ids"
                                        v-model="selected.source" />
-                                <label :for="'source' + source.ids.join(',')">{{ source.name }}</label>
+                                <label :for="'source' + String(source.ids)">{{ source.name }}</label>
                             </template>
                         </fieldset>
                     </div>
