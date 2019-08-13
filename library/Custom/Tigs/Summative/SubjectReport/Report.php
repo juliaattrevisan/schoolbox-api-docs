@@ -150,7 +150,7 @@ class Report
         if (1 !== \count($courseSpecs)) {
             // Don't bother loading model graph if we have 0 or multiple courses imported to this folder.
             // We can't render the page in this case because we rely on a single course-textbox being available.
-            // It may be ok to import the same courseSpec multiple times, because each import may be a discrete subset of units.
+            // It may be ok to import the same courseSpec multiple times, because each import may be a discrete subset of assessments.
             $error = \sprintf('There must be exactly 1 course imported to the class. Found %d.', $courseSpecs->count());
             $route = $this->getRouteIfAuthorized('courseImport.getManagement', ['folderId' => $folder->getId(), 'folder' => $folder], $this->viewer);
             if ($route) {
