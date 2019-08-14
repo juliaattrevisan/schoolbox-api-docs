@@ -165,33 +165,6 @@
             },
 
             /**
-             * Delete a single event.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             */
-            deleteEvent() {
-                // Handle event deletion (series dialog, confirmation)
-                // and all that
-                let self    = this,
-                    request = {
-                        url:    this.eventModifyFormActionUrl,
-                        method: 'post',
-                        data:   qs.stringify({id: this.eventExtendedProps.eventId}),
-                        params: {
-                            action: 'Delete',
-                        },
-                    };
-                axios
-                    .request(request)
-                    .then(function () {
-                        // Remove this event to the calendar
-                        self.event.remove();
-                    }).finally(function () {
-                        self.$refs.modal.close();
-                    });
-            },
-
-            /**
              * Open this modal.
              */
             open() {
@@ -518,7 +491,7 @@
                     <li><input ref="eventSubmit"
                                type="submit"
                                value="Update Task" /></li>
-                    <li><button @click.prevent="deleteEvent">Delete Task</button></li>
+                    <li><button @click.prevent="$refs.eventDeleteModal.open">Delete Task</button></li>
                 </ul>
             </form>
         </template>
