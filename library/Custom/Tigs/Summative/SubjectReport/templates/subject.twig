@@ -124,7 +124,7 @@ Data:
     <div class="row">
         <div class="column small-12 medium-6">
             {% if ibGraphData %}
-                {% for ibData in ibGraphData %}
+                {% for ibData in ibGraphData.data %}
                     {% include '@tigsSubjectReport/components/internationalBaccalaureateGraph.twig' with ibData|merge(extraComponentData) only %}
                 {% endfor %}
             {% elseif hscRankData %}

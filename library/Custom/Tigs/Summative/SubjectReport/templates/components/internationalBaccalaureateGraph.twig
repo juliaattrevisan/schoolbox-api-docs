@@ -2,17 +2,18 @@
 Renders a MYP/DP graph.
 
 Data:
+    semester             int           - the semester this belongs to
     error:               string        - Optional. If present, the reason why we can't render the component
     studentMark:         int|null      - Optional. The student's mark for the IB graph assessment
     studentComment:      string|null   - Optional. The student's comment for the IB graph assessment
     data:                array         - The results to render. key: column, value: height
     useComment:          bool          - Whether to render the student's comment, instead of the graph
-    showComponent:       bool          - Whether the component should be shown at all (used by including template)
     showErrors:          bool          - Should we render errors?
     dataAttributeError   string        - A string to apply as a data attribute to error alerts
 #}
 {% import '@learning/macro/urgency.twig' as urgency %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(studentMark / 7 * 100) ~ '-bg' %}
+{% set graphId = 'ib-graph' ~ semester %}
 
 <div class="ib-graph-wrap">
 <h2 class="subheader ib-graph-heading">{{ header }}</h2>
@@ -60,7 +61,7 @@ Data:
                     data.push(column);
                 }
 
-                $("#ib-graph").highcharts({
+                $("#{{ graphId }}").highcharts({
                     legend: {
                         enabled: false
                     },
@@ -105,7 +106,7 @@ Data:
             });
         </script>
         {% endautoescape %}
-        <div id="ib-graph" class="grade-graph"></div>
+        <div id="{{ graphId }}" class="grade-graph"></div>
     {% endif %}
 {% endif %}
 </div>

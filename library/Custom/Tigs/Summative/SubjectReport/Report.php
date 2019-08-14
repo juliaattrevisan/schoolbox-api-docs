@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport;
 
+use Alaress\Database;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
 use Alaress\Web;
@@ -35,7 +36,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use function array_key_exists;
 use function strnatcasecmp;
 use UnexpectedValueException;
 use Schoolbox\Filter\Filters;
@@ -139,6 +139,7 @@ class Report
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnderflowException
+     * @throws Database\Exception
      */
     public function getReport(User $user, Folder\Model $folder, StudentAttributes $attributes, ?string $roleTypeOverride): array
     {
@@ -574,13 +575,14 @@ class Report
      *
      * Return structure:
      * @internal string     return['error']                       Optional. Info about why this component could not be built
-     * @internal array      return['sem']
-     * @internal null|array return['sem'][idx]                   Where idx is [1,2] and represents data for a semester. Null if don't show component
-     * @internal string     return['sem'][idx]['header']
-     * @internal string     return['sem'][idx]['data']           Mark data
-     * @internal string     return['sem'][idx]['studentMark']    Student's mark
-     * @internal string     return['sem'][idx]['studentComment'] Student's comment
-     * @internal string     return['sem'][idx]['useComment']     Whether we should just render the student comment instead of the graph
+     * @internal array      return['data']
+     * @internal null|array return['data'][idx]                   Where idx is [1,2] and represents data for a semester. Null if don't show component
+     * @internal string     return['data'][idx]['header']
+     * @internal string     return['data'][idx]['data']           Mark data
+     * @internal string     return['data'][idx]['studentMark']    Student's mark
+     * @internal string     return['data'][idx]['studentComment'] Student's comment
+     * @internal string     return['data'][idx]['useComment']     Whether we should just render the student comment instead of the graph
+     * @internal int        return['data'][idx]['semester']       The semester the data belongs to
      *
      * @param Folder\Model      $folder
      * @param StudentAttributes $attributes
@@ -638,12 +640,10 @@ class Report
         try {
             $workTypeId = $this->checkWorkType($configName, $errorMsg, $errorMsgLink);
         } catch (UnexpectedValueException $e) {
-            return ['error' => $e->getMessage()];
+            return $this->showErrorsToViewer($roleTypeOverride) ? ['error' => $e->getMessage()] : null;
         }
 
         // Find relevant assessments and participation and insert into units
-        $reports = [];
-
         $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
         $assessables     = $this->assessmentMapperProxy->findAllByIds($this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $semesterFrom, $semesterTo));
         $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
@@ -653,26 +653,46 @@ class Report
             $cohortUnitImpls[$unitImpl->getId()]->getAssessables()[$baseAssessable->getId()] = $baseAssessable;
         }
 
-        $ib = new InternationalBaccalaureateGraph(
-            $cohortUnitImpls,
-            $student,
-            $attributes,
-            $this->visibility,
-            $this->viewer,
-            $workTypeId,
-            $this->rubricMapper,
-            $this->authorizer,
-            $this->router,
-            $folder,
-            $roleTypeOverride
-        );
-        $context = $ib->toContext();
-        if ($context['showComponent']) { // TODO move this inside compoent
-            $reports[] = $context;
+        $semesters = [];
+        foreach([2,1] as $candidate){
+            if($candidate === $semesterFrom || $candidate === $semesterTo){
+                $semesters[] = $candidate;
+            }
         }
 
+        $reports = [];
+        foreach($semesters as $semester){
+            $ib = new InternationalBaccalaureateGraph(
+                $cohortUnitImpls,
+                $student,
+                $attributes,
+                $this->visibility,
+                $this->viewer,
+                $workTypeId,
+                $this->rubricMapper,
+                $this->authorizer,
+                $this->router,
+                $folder,
+                $roleTypeOverride
+            );
+            $reports['data'][$semester] = $ib->toContext($semester);
+        }
 
         return $reports;
+    }
+
+
+    /**
+     * Returns whether errors should be displayed to report viewer
+     *
+     * @param string|null $roleTypeOverride
+     * @return bool
+     */
+    private function showErrorsToViewer(?string $roleTypeOverride): bool
+    {
+        $effectiveRole = $roleTypeOverride ?? $this->viewer->getRole()->getType();
+
+        return $effectiveRole === Role::STAFF;
     }
 
 
@@ -730,7 +750,7 @@ class Report
             }
 
             $cohortUnitImpls = $this->findCohortUnitImpls($courseSpec);
-            $ids = $this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, $reportSemester);
+            $ids = $this->findAssessmentIds($cohortUnitImpls, $workTypeId, $attributes, 1, $attributes->getCurriculumSemester());
             $assessables = $this->assessmentMapperProxy->findAllByIds($ids);
             $this->assessmentMapperProxy->loadParticipantsIntoAssessmentCollection($assessables);
             foreach ($assessables as $assessable) {

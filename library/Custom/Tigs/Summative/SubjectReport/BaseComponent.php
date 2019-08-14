@@ -130,22 +130,25 @@ class BaseComponent
 
 
     /**
-     * Returns whether an assessable is due within this component's report's window
+     * Returns whether an assessable is due within this component's report's (semester or year) window
      *
      * @param IAssessable $assessable
+     * @param int|null    $semester   If present, filter to this semester, otherwise filter to year
      * @return bool
      */
-    protected function isDueWithinReportWindow(IAssessable $assessable): bool
+    protected function isDueWithinReportWindow(IAssessable $assessable, int $semester = null): bool
     {
-        // If a valid semester is not provided, use semester from attribute.
         $semesters = $this->attributes->getCurriculumSemesters();
-        if (!\key_exists($this->semesterFrom, $semesters) || !\key_exists($this->semesterTo, $semesters)) {
-            $this->setSemesters($this->attributes->getCurriculumSemester());
-        }
 
-        $dueDate      = $assessable->getDueAt();
-        $reportStart  = $semesters[$this->semesterFrom]->getStart();
-        $reportFinish = $semesters[$this->semesterTo]->getFinish();
+        $reportStart = $semester === null
+            ? $this->attributes->getCurriculumYearStart()
+            : $semesters[$semester]->getStart();
+
+        $reportFinish = $semester === null
+            ? $this->attributes->getCurriculumYearFinish()
+            : $semesters[$semester]->getFinish();
+
+        $dueDate = $assessable->getDueAt();
 
         return $dueDate->gte($reportStart) && $dueDate->lte($reportFinish);
     }
