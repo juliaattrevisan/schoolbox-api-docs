@@ -6,14 +6,18 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
     `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `external_id` VARCHAR(64)  NOT NULL,
     `gender`      VARCHAR(25)  Null,
-    `title`       VARCHAR(45)  NULL,
-    `firstname`   VARCHAR(250) NULL,
-    `lastname`    VARCHAR(250) NULL,
-    `email`       VARCHAR(60)  NULL,
+    `title`       VARCHAR(255) NULL,
+    `firstname`   VARCHAR(255) NULL,
+    `lastname`    VARCHAR(255) NULL,
+    `email`       VARCHAR(255) NULL,
+    'created_at'  DATE         NULL,
+    'updated_at'  DATE         NULL,
+    'deleted_at'  DATE         NULL,
     PRIMARY KEY (`id`)
 )
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8;
+    ENGINE=InnoDB DEFAULT
+    CHARSET=utf8mb4
+    COLLATE=utf8mb4_unicode_ci;
 
 /*
  Table structure for `sis_user_profile_parent`
@@ -24,7 +28,10 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
     `mobile`              VARCHAR(45)  NULL,
     `phone_home`          VARCHAR(45)  NULL,
     `phone_work`          VARCHAR(45)  NULL,
-    `email`               VARCHAR(60)  NULL,
+    `email`               VARCHAR(255) NULL,
+    'created_at'          DATE         NULL,
+    'updated_at'          DATE         NULL,
+    'deleted_at'          DATE         NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
@@ -34,44 +41,44 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8;
+    ENGINE=InnoDB DEFAULT
+    CHARSET=utf8mb4
+    COLLATE=utf8mb4_unicode_ci;
 
 /*
   Table structure for `sis_user_profile_student`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 (
-    `sis_user_profile_id`       INT UNSIGNED  NOT NULL,
-    `date_of_birth`             VARCHAR(45)   NULL,
-    `ib`                        TINYINT(1)    NULL,
-    `individual_learning_plans` TINYINT(1)    NULL,
-    `esl`                       TINYINT(1)    NULL,
-    `head_of_house_id`          VARCHAR(64)   NULL,
-    `head_of_house`             VARCHAR(250)  NULL,
-    `house`                     VARCHAR(250)  NULL,
-    `house_description`         VARCHAR(500)  NULL,
-    `form_name`                 VARCHAR(250)  NULL,
-    `form_description`          VARCHAR(250)  NULL,
-    `teacher_form_id`           VARCHAR(64)   NULL,
-    `teacher_form_name`         VARCHAR(250)  NULL,
-    `tutor_id`                  VARCHAR(64)   NULL,
-    `tutor_name`                VARCHAR(250)  NULL,
-    `tutor_group`               VARCHAR(250)  NULL,
-    `tutor_description`         VARCHAR(250)  NULL,
-    `year_level`                VARCHAR(255)  NULL,
-    `year_level_coord_id`       VARCHAR(64)   NULL,
-    `year_level_coordinator`    VARCHAR(250)  NULL,
-    `medical_alert`             VARCHAR(1000) NULL,
-    `alert_message`             VARCHAR(500)  NULL,
-    `mobile`                    VARCHAR(45)   NULL,
-    `special_needs`             TINYINT(1)    NULL,
-    `studies_code`              VARCHAR(45)   NULL,
-    `court_order_type`          VARCHAR(250)  NULL,
-    `boarding_status`           TINYINT(1)    NULL,
-    `comment`                   VARCHAR(1000) NULL,
-    `enrolment_date`            VARCHAR(45)   NULL,
-    `leaving_date`              VARCHAR(45)   NULL,
+    `sis_user_profile_id`         INT UNSIGNED  NOT NULL,
+    `date_of_birth`               DATE          NULL,
+    `ib`                          TINYINT(1)    NULL,
+    `individual_learning_plans`   TINYINT(1)    NULL,
+    `esl`                         TINYINT(1)    NULL,
+    `head_of_house_id`            VARCHAR(64)   NULL,
+    `head_of_house_name`          VARCHAR(255)  NULL,
+    `house_name`                  VARCHAR(255)  NULL,
+    `house_description`           VARCHAR(255)  NULL,
+    `form_name`                   VARCHAR(255)  NULL,
+    `form_description`            VARCHAR(255)  NULL,
+    `teacher_form_id`             VARCHAR(64)   NULL,
+    `teacher_form_name`           VARCHAR(255)  NULL,
+    `tutor_id`                    VARCHAR(64)   NULL,
+    `tutor_name`                  VARCHAR(255)  NULL,
+    `tutor_group`                 VARCHAR(255)  NULL,
+    `tutor_description`           VARCHAR(255)  NULL,
+    `year_level`                  VARCHAR(255)  NULL,
+    `year_level_coordinator_id`   VARCHAR(64)   NULL,
+    `year_level_coordinator_name` VARCHAR(255)  NULL,
+    `mobile`                      VARCHAR(45)   NULL,
+    `special_needs`               TINYINT(1)    NULL,
+    `studies_code`                VARCHAR(45)   NULL,
+    `boarding_status`             TINYINT(1)    NULL,
+    `enrolment_date`              DATE          NULL,
+    `leaving_date`                DATE          NULL,
+    'created_at'                  DATE          NULL,
+    'updated_at'                  DATE          NULL,
+    'deleted_at'                  DATE          NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
@@ -82,7 +89,8 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
             ON UPDATE NO ACTION
 )
     ENGINE = InnoDB
-    DEFAULT CHARSET = utf8;
+    DEFAULT CHARSET = utf8mb4
+    COLLATE = utf8mb4_unicode_ci;
 
 /*
   Table structure for `sis_user_profile_staff`
@@ -90,15 +98,18 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
 (
     `sis_user_profile_id`  INT UNSIGNED NOT NULL,
-    `category`             VARCHAR(250) NULL,
-    `position_title`       VARCHAR(250) NULL,
+    `category`             VARCHAR(255) NULL,
+    `position_title`       VARCHAR(255) NULL,
     `position_description` VARCHAR(500) NULL,
-    `department`           VARCHAR(250) NULL,
-    `phone`                VARCHAR(45)  NULL,
-    `room`                 VARCHAR(250) NULL,
-    `building`             VARCHAR(250) NULL,
-    `work_email`           VARCHAR(60)  NULL,
-    `campus`               VARCHAR(250) NULL,
+    `department`           VARCHAR(255) NULL,
+    `phone_work`           VARCHAR(45)  NULL,
+    `room`                 VARCHAR(255) NULL,
+    `building`             VARCHAR(255) NULL,
+    `work_email`           VARCHAR(255)  NULL,
+    `campus_name`          VARCHAR(255) NULL,
+    'created_at'           DATE         NULL,
+    'updated_at'           DATE         NULL,
+    'deleted_at'           DATE         NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
@@ -108,8 +119,31 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8;
+    ENGINE=InnoDB DEFAULT
+    CHARSET=utf8mb4
+    COLLATE=utf8mb4_unicode_ci;
+
+/*
+  Table structure for `sis_user_profile_alerts`
+*/
+CREATE TABLE IF NOT EXISTS `sis_user_profile_alerts` (
+    `id`                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `sis_user_profile_id`  INT UNSIGNED NOT NULL,
+    `type`                 ENUM('medical', 'legal', 'general') NULL,
+    `body`                 TEXT         NULL,
+    'created_at'           DATE         NULL,
+    'updated_at'           DATE         NULL,
+    'deleted_at'           DATE         NULL,
+    PRIMARY KEY (`id`, `sis_user_profile_id`),
+    UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
+    CONSTRAINT `fk1_sis_user_profile_alerts`
+        FOREIGN KEY (`sis_user_profile_id`)
+            REFERENCES `sis_user_profile` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION)
+    ENGINE=InnoDB DEFAULT
+    CHARSET=utf8mb4
+    COLLATE=utf8mb4_unicode_ci;
 
 /*
   Table structure for `sis_profile_relation`
@@ -133,5 +167,6 @@ CREATE TABLE IF NOT EXISTS `sis_profile_relation`
             ON DELETE NO ACTION
             ON UPDATE NO ACTION
 )
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8;
+    ENGINE=InnoDB DEFAULT
+    CHARSET=utf8mb4
+    COLLATE=utf8mb4_unicode_ci;
