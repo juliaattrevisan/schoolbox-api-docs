@@ -38,16 +38,6 @@
             window: () => window,
 
             /**
-             * Can the event form be submitted?
-             *
-             * @return {boolean}
-             */
-            isFormSubmittable() {
-                // Can't data bind because FullCalendar events are read-only.
-                return (this.$refs.eventTitleInput?.value || '').replace(/\s+/).length > 0;
-            },
-
-            /**
              * Generate extended properties for the component's event.
              *
              * TODO simplify this format
@@ -128,12 +118,13 @@
         },
         methods: {
             /**
-             * Can the task form be submitted?
+             * Update whether the form can be submitted.
              *
-             * @return {boolean}
+             * It can be submitted if the title contains at least one non-space
+             * character.
              */
-            isTaskSubmittable() {
-                return this.$refs.eventTitleInput.value.length !== 0;
+            updateFormSubmittable() {
+                this.$refs.eventSubmit.disabled = this.$refs.eventTitleInput.value.trim().length === 0;
             },
 
             /**
@@ -147,7 +138,7 @@
                     data = {
                         eventId:   this.eventExtendedProps.eventId,
                         completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
-                        title:     this.$refs.eventTitleInput.value,
+                        title:     this.$refs.eventTitleInput.value.trim(),
                         detail:    this.$refs.eventDetailInput.value,
                     },
                     request = {
@@ -508,6 +499,8 @@
                            name="title"
                            type="text"
                            :value="event.title"
+                           @change="updateFormSubmittable"
+                           @keyup="updateFormSubmittable"
                     />
                 </label>
 
@@ -516,12 +509,14 @@
                     <textarea ref="eventDetailInput"
                               name="detail"
                               :value="eventExtendedProps.detail"
+                              @change="updateFormSubmittable"
+                              @keyup="updateFormSubmittable"
                     ></textarea>
                 </label>
 
                 <ul class="flex-list buttons">
-                    <li><input type="submit"
-                               :disabled="!isTaskSubmittable"
+                    <li><input ref="eventSubmit"
+                               type="submit"
                                value="Update Task" /></li>
                     <li><button @click.prevent="deleteEvent">Delete Task</button></li>
                 </ul>
