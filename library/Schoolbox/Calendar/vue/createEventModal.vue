@@ -28,6 +28,8 @@
 
             /**
              * Can the event form be submitted?
+             *
+             * @return {boolean}
              */
             isFormSubmittable() {
                 return this.event.title && this.event.title.length !== 0;
