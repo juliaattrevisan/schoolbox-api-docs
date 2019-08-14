@@ -18,9 +18,7 @@ class Integration extends \Codeception\Module
 
     public function sendRequestCurl($method, $uri, $params)
     {
-        $headers= ['Host' => VAGRANT_DOMAIN,
-                   'Content-Type'=>'application/x-www-form-urlencoded; charset=UTF-8',
-                   'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        $headers= [
                    'Referer' => $params['headers']['Referer']
                    ];
         $params['headers']=$headers;

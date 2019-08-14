@@ -5,6 +5,7 @@
  */
 
 use Codeception\TestInterface;
+use Payload\Login as LoginPayload;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\GuzzleException;
@@ -102,15 +103,14 @@ class IntegrationTester extends \Codeception\Actor
     /**
      * loginUser fire off Curl to login user.
      *
-     * @param string $username
-     * @param string $password
+     * @param string $method
+     * @param string $uri
+     * @param array $params  parameters used by guzzle, in this case PHPbrowsers guzzle. [headers => [], form_data => []]
      * @param bool $redirect if the request should follow the redirect.
-     *
-     * @throws GuzzleException
      *
      * @return Response
      */
-    public function sendCurlRequest($method, $uri, $params, $redirect)
+    public function sendCurlRequest( string $method, string $uri, array $params, bool $redirect, string $step_message=''):Response
     {
         $this->initGuzzleClient2();
 
@@ -122,7 +122,22 @@ class IntegrationTester extends \Codeception\Actor
 
         $params['cookies'] = $this->client_cookie_jar;
 
+        if ($step_message != '')
+        {
+            $this->amGoingTo($step_message);
+        }
+
         return $this->sendRequestCurl($method, $uri, $params);
     }
 
+
+    public function loginAdmin2()
+    {
+        $loginPayload = new LoginPayload();
+        $loginPayload->setUsername('alaress');
+        $loginPayload->setPassword('alaress');
+        $loginRequest = $loginPayload->payloadToArray();
+
+        $this->sendCurlRequest($loginRequest['method'], $loginRequest['page'], $loginRequest['payload'], false);
+    }
 }

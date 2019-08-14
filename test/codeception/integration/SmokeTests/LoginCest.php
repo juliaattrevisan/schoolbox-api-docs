@@ -5,7 +5,8 @@ namespace SmokeTests;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
-use Page\Login as LoginPage;
+use Payload\Login as LoginPayload;
+use Payload\ForgotPassword as ForgotPassPayload;
 use const GuzzleHelper\VAGRANT_DOMAIN;
 
 /**
@@ -21,16 +22,18 @@ class LoginCest {
      *
      * @throws GuzzleException
      */
-    public function LoginLocalUser(IntegrationTester $i, LoginPage $loginPage){
+    public function LoginLocalUser(IntegrationTester $i, LoginPayload $loginPayload){
 
         #GIVEN
         $user='alaress';
         $password='alaress';
-        $loginRequest = $loginPage->getDefaultLoginRequest();
+
 
         #WHEN
-        $loginRequest['payload']['form_params']['username']=$user;
-        $loginRequest['payload']['form_params']['password']=$password;
+        $loginPayload->setUsername($user);
+        $loginPayload->setPassword($password);
+        $loginRequest = $loginPayload->payloadToArray();
+
         /** @var Response $response */
         $response = $i->sendCurlRequest($loginRequest['method'], $loginRequest['page'], $loginRequest['payload'], true);
         $expectedUrlsReturned= [
@@ -49,17 +52,19 @@ class LoginCest {
      *
      * @throws GuzzleException
      */
-    public function LoginForgotPassword(IntegrationTester $i, LoginPage $loginPage){
+    public function LoginForgotPassword(IntegrationTester $i, ForgotPassPayload $forgotPasswordPayload){
 
         #GIVEN
         $user_email='alaress@schoolbox.com.au';
         $user_username='alaress';
-        $forgotPasswordRequest = $loginPage->getDefaultForgotPasswordRequest();
+
 
         #WHEN
-        $forgotPasswordRequest['payload']['form_params']['email']=$user_email;
+        $forgotPasswordPayload->setEmailOrUsername($user_email);
+        $forgotPasswordRequest = $forgotPasswordPayload->payloadToArray();
+
         /** @var Response $response */
-        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true);
+        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true, 'Send request for forgotten password with email');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
             ['-'=>'200']
@@ -69,9 +74,11 @@ class LoginCest {
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
-        $forgotPasswordRequest['payload']['form_params']['email']=$user_username;
+        $forgotPasswordPayload->setEmailOrUsername($user_username);
+        $forgotPasswordRequest = $forgotPasswordPayload->payloadToArray();
+
         /** @var Response $response */
-        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true);
+        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true, 'Send request for forgotten password with username');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
             ['-'=>'200']
