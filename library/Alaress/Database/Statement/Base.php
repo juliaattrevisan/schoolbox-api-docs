@@ -80,7 +80,8 @@ abstract Class Base implements IStatement
     {
         $result = [];
 
-        while ($row = $this->statement->fetch($fetchStyle)) {
+        // If using PDO::FETCH_COLUMN, the row value may be falsy (eg int 0), need to test for explicit FALSE
+        while (($row = $this->statement->fetch($fetchStyle)) !== false) {
             foreach ($this->broker->getPostProcessors() as $callable) {
                  $row = call_user_func($callable, $row);
             }
