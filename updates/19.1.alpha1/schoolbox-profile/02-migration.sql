@@ -17,9 +17,9 @@ INSERT INTO `sis_user_profile` (external_id, gender, title, firstname, lastname,
 INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `ib`, `individual_learning_plans`, `esl`,
                                         `head_of_house_id`, `head_of_house_name`, `house_name`, `house_description`, `form_name`, `form_description`, `teacher_form_id`, `teacher_form_name`,
                                         `tutor_id`, `tutor_name`, `tutor_group`, `tutor_description`, `year_level`, `year_level_coordinator_id`, `year_level_coordinator_name`,
-                                        `mobile`, `special_needs`, `studies_code`, `boarding_status`, `enrolment_date`, `leaving_date`, created_at, updated_at, deleted_at)
+                                        `mobile`, `special_needs`, `studies_code`, `boarding_status`, `alert_medical`,`alert_comment`,`alert_message`,`alert_legal`,`enrolment_date`, `leaving_date`, created_at, updated_at, deleted_at)
     SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`, NULL, NULL,`user`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-           `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, `user`.`boarding_status`, NULL, NULL, NOW(), NOW(), NULL
+           `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, `user`.`boarding_status`, NULL, NULL, NULL, NULL, NULL, NULL, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`

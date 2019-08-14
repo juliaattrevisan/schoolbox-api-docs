@@ -50,35 +50,39 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 (
-    `sis_user_profile_id`         INT UNSIGNED NOT NULL,
-    `date_of_birth`               DATE         NULL,
-    `ib`                          TINYINT(1)   NULL,
-    `individual_learning_plans`   TINYINT(1)   NULL,
-    `esl`                         TINYINT(1)   NULL,
-    `head_of_house_id`            VARCHAR(64)  NULL,
-    `head_of_house_name`          VARCHAR(255) NULL,
-    `house_name`                  VARCHAR(255) NULL,
-    `house_description`           VARCHAR(255) NULL,
-    `form_name`                   VARCHAR(255) NULL,
-    `form_description`            VARCHAR(255) NULL,
-    `teacher_form_id`             VARCHAR(64)  NULL,
-    `teacher_form_name`           VARCHAR(255) NULL,
-    `tutor_id`                    VARCHAR(64)  NULL,
-    `tutor_name`                  VARCHAR(255) NULL,
-    `tutor_group`                 VARCHAR(255) NULL,
-    `tutor_description`           VARCHAR(255) NULL,
-    `year_level`                  VARCHAR(255) NULL,
-    `year_level_coordinator_id`   VARCHAR(64)  NULL,
-    `year_level_coordinator_name` VARCHAR(255) NULL,
-    `mobile`                      VARCHAR(45)  NULL,
-    `special_needs`               TINYINT(1)   NULL,
-    `studies_code`                VARCHAR(45)  NULL,
-    `boarding_status`             TINYINT(1)   NULL,
-    `enrolment_date`              DATE         NULL,
-    `leaving_date`                DATE         NULL,
-    'created_at'                  DATETIME     NOT NULL,
-    'updated_at'                  DATETIME     NOT NULL,
-    'deleted_at'                  DATETIME     NULL,
+    `sis_user_profile_id`         INT UNSIGNED  NOT NULL,
+    `date_of_birth`               DATE          NULL,
+    `ib`                          TINYINT(1)    NULL,
+    `individual_learning_plans`   TINYINT(1)    NULL,
+    `esl`                         TINYINT(1)    NULL,
+    `head_of_house_id`            VARCHAR(64)   NULL,
+    `head_of_house_name`          VARCHAR(255)  NULL,
+    `house_name`                  VARCHAR(255)  NULL,
+    `house_description`           VARCHAR(255)  NULL,
+    `form_name`                   VARCHAR(255)  NULL,
+    `form_description`            VARCHAR(255)  NULL,
+    `teacher_form_id`             VARCHAR(64)   NULL,
+    `teacher_form_name`           VARCHAR(255)  NULL,
+    `tutor_id`                    VARCHAR(64)   NULL,
+    `tutor_name`                  VARCHAR(255)  NULL,
+    `tutor_group`                 VARCHAR(255)  NULL,
+    `tutor_description`           VARCHAR(255)  NULL,
+    `year_level`                  VARCHAR(255)  NULL,
+    `year_level_coordinator_id`   VARCHAR(64)   NULL,
+    `year_level_coordinator_name` VARCHAR(255)  NULL,
+    `mobile`                      VARCHAR(45)   NULL,
+    `special_needs`               TINYINT(1)    NULL,
+    `studies_code`                VARCHAR(45)   NULL,
+    `boarding_status`             TINYINT(1)    NULL,
+    'alert_medical'               VARCHAR(1024) NULL,
+    'alert_comment'               VARCHAR(1024) NULL,
+    'alert_message'               VARCHAR(1024) NULL,
+    'alert_legal'                 VARCHAR(1024) NULL,
+    `enrolment_date`              DATE          NULL,
+    `leaving_date`                DATE          NULL,
+    'created_at'                  DATETIME      NOT NULL,
+    'updated_at'                  DATETIME      NOT NULL,
+    'deleted_at'                  DATETIME      NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
@@ -114,30 +118,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
     PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_staff`
-        FOREIGN KEY (`sis_user_profile_id`)
-            REFERENCES `sis_user_profile` (`id`)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION
-)
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4
-    COLLATE = utf8mb4_unicode_ci;
-
-/*
-  Table structure for `sis_user_profile_alerts`
-*/
-CREATE TABLE IF NOT EXISTS `sis_user_profile_alerts`
-(
-    `id`                  INT UNSIGNED                         NOT NULL AUTO_INCREMENT,
-    `sis_user_profile_id` INT UNSIGNED                         NOT NULL,
-    `type`                ENUM ('medical', 'legal', 'general') NULL,
-    `body`                TEXT                                 NULL,
-    'created_at'          DATETIME                             NOT NULL,
-    'updated_at'          DATETIME                             NOT NULL,
-    'deleted_at'          DATETIME                             NULL,
-    PRIMARY KEY (`id`, `sis_user_profile_id`),
-    UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
-    CONSTRAINT `fk1_sis_user_profile_alerts`
         FOREIGN KEY (`sis_user_profile_id`)
             REFERENCES `sis_user_profile` (`id`)
             ON DELETE NO ACTION
