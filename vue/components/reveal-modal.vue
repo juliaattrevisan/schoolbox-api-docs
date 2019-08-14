@@ -20,17 +20,24 @@
         },
         mounted() {
             // How do I find the dialog in the DOM? ID probably needs to be unique
-            this.dialog = this.$('#' + this.elementId);
+            this.modal = this.jQuery('#' + this.elementId);
         },
         computed: {
-            $: function () { return window.jQuery; },
+            jQuery: () => window.jQuery,
         },
         methods: {
+            /**
+             * Open this modal.
+             */
             open() {
-                this.dialog.foundation('reveal', 'open');
+                this.modal.foundation('reveal', 'open');
             },
+
+            /**
+             * Close this modal.
+             */
             close() {
-                this.dialog.foundation('reveal', 'close');
+                this.modal.foundation('reveal', 'close');
             },
         },
     }

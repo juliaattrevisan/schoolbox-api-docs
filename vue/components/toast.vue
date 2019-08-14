@@ -16,11 +16,26 @@
             };
         },
         methods: {
+            /**
+             * Activate this toast.
+             *
+             * @param text The text to put in it
+             */
             activate(text) {
                 this.text   = text;
                 this.state  = STATE_PENDING;
                 this.hidden = false;
             },
+
+            /**
+             * Display this toast with a timeout.
+             *
+             * @param text         The text to put in it
+             * @param successful   Was the operation that displays this toast
+             *                     a success? Change the style if it wasn't.
+             * @param duration     How long should the toast show?
+             * @param fadeDuration How long to wait before the toast disappears?
+             */
             timeout(text, successful, duration, fadeDuration) {
                 let self = this;
                 this.text         = text;
@@ -28,8 +43,8 @@
                 this.fadeDuration = fadeDuration;
                 setTimeout(
                     function () {
-                        this.state  = STATE_HIDDEN;
-                        this.hidden = true;
+                        self.state  = STATE_HIDDEN;
+                        self.hidden = true;
                     },
                     duration
                 )
