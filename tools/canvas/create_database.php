@@ -22,5 +22,5 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Tool grants all perms on this database to the schoolbox user (eg schoolbox or schoolboxdev)
  * If database already exists, this warns user and exits, it does not overwrite it.
  */
-$kernel = new CliTool\Kernel(new CliDatabaseCreator(), null, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
+$kernel = new CliTool\Kernel(new CliDatabaseCreator(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 $kernel->runApp();

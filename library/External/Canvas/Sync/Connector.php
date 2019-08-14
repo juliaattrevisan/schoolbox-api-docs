@@ -71,7 +71,7 @@ class Connector
         $url = 'https://' . self::API_HOST . $command;
 
         // Generate signature
-        $hmac = $this->hmac_signature($timestamp, $command, $queryParams);
+        $hmac = $this->getHmacSignature($timestamp, $command, $queryParams);
 
         $client = new Client();
         $options = [
@@ -94,11 +94,11 @@ class Connector
      * @param array $queryParams
      * @return string
      */
-    private function hmac_signature($timestamp, $path, $queryParams = [])
+    private function getHmacSignature($timestamp, $path, $queryParams = [])
     {
         ksort($queryParams);
         $parts = ['GET', self::API_HOST, '', '', $path, http_build_query($queryParams), $timestamp, $this->apiSecret];
         $message = implode("\n", $parts);
-        return base64_encode(hash_hmac('sha256', $message, $this->apiSecret, TRUE));
+        return base64_encode(hash_hmac('sha256', $message, $this->apiSecret, true));
     }
 }

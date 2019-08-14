@@ -48,6 +48,12 @@ class CliDatabaseCreator extends CliTool\App
         ];
     }
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
+
     /** @inheritdoc */
     public function run(): void
     {

@@ -59,10 +59,12 @@ class CliImporter extends CliTool\App
             }
         } catch (\Alaress\Database\Exception $e) {
             $this->getLogger()->warning(
-                sprintf('Unable to connect to database %s: %s. Use tools/canvas/create_database.php to create database.',
+                sprintf(
+                    'Unable to connect to database %s: %s. Use tools/canvas/create_database.php to create database.',
                     $this->getCanvasDbName(),
                     $e->getMessage()
-                ));
+                )
+            );
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
 
@@ -166,9 +168,9 @@ class CliImporter extends CliTool\App
             $tableDataFile = fopen("$tempDir/$tableName.gz", 'w');
             try {
                 $response = $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
-                $this->getLogger()->debug("downloading $tableName to $tableDataFile");
+                $this->getLogger()->debug("downloading $tableName to $tempDir/$tableName.gz");
             } catch (GuzzleException $e) {
-                $this->getLogger()->warning("Failed to download $tableDataFile: " . $e->getMessage());
+                $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: " . $e->getMessage());
             }
         }
     }

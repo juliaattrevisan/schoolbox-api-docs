@@ -14,5 +14,5 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Command line application for syncing canvas-data
  */
-$kernel = new CliTool\Kernel(new CliImporter(), false);
+$kernel = new CliTool\Kernel(new CliImporter());
 $kernel->runApp();
