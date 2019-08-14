@@ -6,6 +6,8 @@ use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
+use Page\Common;
+use Payload\CreateNews as NewsPayload;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -13,123 +15,276 @@ use GuzzleHttp\Exception\GuzzleException;
  */
 
 class NewsCest {
-    /**
-     * Smoke test news post forms include following actions:
-     * Draft news
-     * Publish news to moderate section
-     * Publish news instatly without moderation
-     * Publish news from moderation
-     * Reject news that was to be moderated
-     * Save news for later
-     * Create and delete news artivle
-     *
-     * Each of these in the future itteration should be split into sepperate test functions.
+
+    /** Create draft news using curl request
      *
      * @param IntegrationTester $i
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function SmokeNewsPOST(IntegrationTester $i){
-
+    public function createDraftNews(IntegrationTester $i, NewsPayload $newsPayload){
         #GIVEN
-        $i->loginAdmin();
-        #The regex matches: https://vagrant,dev.echoolbox.cloud/news/<atricle_id>?returnUrl=Lw%253D%253D
-        $return_page_url_regex_pattern='/https:\/\/vagrant\.dev\.schoolbox\.cloud\/news\/\d+\?returnUrl=Lw%253D%253D/';
-        $capture_new_news_id='/news\/(\d+)\?returnUrl/';
-        $title = 'Smoke Test News Title Draft';
-        #WHEN
-        /** @var GuzzleHttp\Psr7\Response $response */
-        $response = $i->draftNews($title);
-        $i->comment('Created a draft');
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
-        $redirect_history_status = $response->getHeader('X-Guzzle-Redirect-Status-History');
-        #THEN
-        $i->assertEquals(303, $redirect_history_status[0], 'I expect that we get redirected from the create news page when draft is auto submitted.');
-        $i->assertRegExp($return_page_url_regex_pattern, $redirect_history[0], 'I expect that we get redirected to the main index page.');
-        $i->assertEquals(200, $response->getStatusCode(), 'I expect that we get a 200 after redirection.');
+        $i->loginAdmin2();
+        $timestamp=time();
+        $title = 'Smoke Test News Title Draft at '.$timestamp;
 
-        $title = 'Smoke Test News Title Moderate';
-        $response = $i->draftNews($title);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
         #WHEN
-        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $response = $i->createNewsToModerate($title, $news_id_matches[1]);
-        $i->comment('Pushed draft to moderation');
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $response = $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], true, 'Send request to create draft news');
+        $draft_article=$i->getNewsArticleByTitle($title);
+
         $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1]=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$draft_article->getId().'?returnUrl=Lw%253D%253D'=>'303'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
+
+        #THEN
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
+
+    /** Publish draft news into moderation using curl request
+     *
+     *  Fires off a create step.
+     *
+     * @param IntegrationTester $i
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function publishDraftToModerate(IntegrationTester $i, NewsPayload $newsPayload){
+        #GIVEN
+        $i->loginAdmin2();
+        $timestamp=time();
+        $title = 'Smoke Test News Title Moderate at '.$timestamp;
+
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], false, 'Send request to create draft news');
+        $article_id=$i->getNewsArticleByTitle($title)->getId();
+
+        #WHEN
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/submit');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->removeFormParam('draft');
+        $newsPayload->removeFormParam('returnUrl');
+        $moderateDraftRequest = $newsPayload->payloadToArray();
+
+        $response = $i->sendCurlRequest($moderateDraftRequest['method'], $moderateDraftRequest['page'], $moderateDraftRequest['payload'], true, 'Send request to publish draft news to moderate');
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
 
-        $title = 'Smoke Test News Title Publish Form Path';
-        $response = $i->draftNews($title);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+    /** Publish draft news using curl request
+     *
+     *  Fires off a create step.
+     *
+     * @param IntegrationTester $i
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function publishNewsFromDraft(IntegrationTester $i, NewsPayload $newsPayload){
+        #GIVEN
+        $i->loginAdmin2();
+        $timestamp=time();
+        $title = 'Smoke Test News Title Publish Form Draft at '.$timestamp;
+
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], false, 'Send request to create draft news');
+        $article_id=$i->getNewsArticleByTitle($title)->getId();
+
         #WHEN
-        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $response = $i->publishNewsForm($title, $news_id_matches[1]);
-        $i->comment('Publish Draft through update');
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/accept');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->removeFormParam('draft');
+        $newsPayload->removeFormParam('returnUrl');
+        $publishFromDraftRequest = $newsPayload->payloadToArray();
+
+        $response = $i->sendCurlRequest($publishFromDraftRequest['method'], $publishFromDraftRequest['page'], $publishFromDraftRequest['payload'], true, 'Send request to publish draft news');
         $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1]=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
 
-        $title = 'Smoke Test News Title Publish Moderate Path';
-        $response = $i->draftNews($title);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+    /** Accept news in moderate using curl request
+     *
+     *  Fires off a create step and putting the news into moderation
+     *
+     * @param IntegrationTester $i
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function publishNewsFromModerate(IntegrationTester $i, NewsPayload $newsPayload){
+        #GIVEN
+        $i->loginAdmin2();
+        $timestamp=time();
+        $title = 'Smoke Test News Title Publish Form Moderate at '.$timestamp;
+
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], false, 'Send request to create draft news');
+        $article_id=$i->getNewsArticleByTitle($title)->getId();
+
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/submit');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->removeFormParam('draft');
+        $newsPayload->removeFormParam('returnUrl');
+        $moderateDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($moderateDraftRequest['method'], $moderateDraftRequest['page'], $moderateDraftRequest['payload'], false, 'Send request to publish draft news to moderate');
+
         #WHEN
-        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $response = $i->publishModeratedNewsByID($news_id_matches[1]);
-        $i->comment('Publish Draft with the ID');
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/accept');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->clearAllFormParams();
+        $newsPayload->setFormParam('articleID', $article_id);
+        $moderateAcceptRequest = $newsPayload->payloadToArray();
+        $response = $i->sendCurlRequest($moderateAcceptRequest['method'], $moderateAcceptRequest['page'], $moderateAcceptRequest['payload'], true, 'Send request to accept news from moderate');
         $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/news/'.$news_id_matches[1]=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
 
-        $title = 'Smoke Test News Title Reject By ID';
-        $response = $i->draftNews($title);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+    /** Reject news in moderate using curl request
+     *
+     *  Fires off a create step and putting the news into moderation
+     *
+     * @param IntegrationTester $i
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function rejectNewsFromModerate(IntegrationTester $i, NewsPayload $newsPayload){
+        #GIVEN
+        $i->loginAdmin2();
+        $timestamp=time();
+        $title = 'Smoke Test News Title Reject from Moderate at '.$timestamp;
+
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], false, 'Send request to create draft news');
+        $article_id=$i->getNewsArticleByTitle($title)->getId();
+
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/submit');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->removeFormParam('draft');
+        $newsPayload->removeFormParam('returnUrl');
+        $moderateDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($moderateDraftRequest['method'], $moderateDraftRequest['page'], $moderateDraftRequest['payload'], false, 'Send request to publish draft news to moderate');
+
         #WHEN
-        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-
-        $i->createNewsToModerate($title, $news_id_matches[1]);
-        $response = $i->rejectNewsByID($news_id_matches[1]);
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/reject');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->clearAllFormParams();
+        $newsPayload->setFormParam('articleID', $article_id);
+        $newsPayload->setFormParam('rejectReason', 'The reason is valid');
+        $moderateRejectRequest = $newsPayload->payloadToArray();
+        $response = $i->sendCurlRequest($moderateRejectRequest['method'], $moderateRejectRequest['page'], $moderateRejectRequest['payload'], true, 'Send request to reject news from moderate');
         $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
-        $i->comment('Rejected a Moderation waiting News Article');
+
         #THEN;
         $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
 
-        $title = 'Smoke Test News Title Save for later';
-        $response = $i->draftNews($title);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+    /** Save news for later using curl request
+     *
+     *  Fires off a create step and publish step for news.
+     *
+     * @param IntegrationTester $i
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function saveNewsForLater(IntegrationTester $i, NewsPayload $newsPayload){
+        #GIVEN
+        $i->loginAdmin2();
+        $timestamp=time();
+        $title = 'Smoke Test News Title Save news for later at '.$timestamp;
+
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], false, 'Send request to create draft news');
+        $article_id=$i->getNewsArticleByTitle($title)->getId();
+
+        $newsPayload->setPage('/news/moderation/'.$article_id.'/accept');
+        $newsPayload->setReferer('/news/'.$article_id.'/update');
+        $newsPayload->removeFormParam('draft');
+        $newsPayload->removeFormParam('returnUrl');
+        $publishFromDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($publishFromDraftRequest['method'], $publishFromDraftRequest['page'], $publishFromDraftRequest['payload'], false, 'Send request to publish draft news');
+
         #WHEN
-        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $i->publishModeratedNewsByID($news_id_matches[1]);
-        $response = $i->saveNewsByIDforLater($news_id_matches[1]);
+        $newsPayload->setPage('/news/saved/'.$article_id.'/add');
+        $newsPayload->setReferer('/news');
+        $newsPayload->clearAllFormParams();
+        $saveNewsForLaterRequest= $newsPayload->payloadToArray();
+        $response = $i->sendCurlRequest($saveNewsForLaterRequest['method'], $saveNewsForLaterRequest['page'], $saveNewsForLaterRequest['payload'], true, 'Send request to save news for later');
         $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
-        $i->comment('Saved news article for later');
-        #THEN
+        #THEN;
         $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
 
-        $title = 'Smoke Test News Title Delete, I should not exist';
-        $response = $i->draftNews($title);
-        $redirect_history = $response->getHeader('X-Guzzle-Redirect-History');
+    /** Delete news using curl request
+     *
+     *  Fires off a create step and publish step for news.
+     *
+     * @param IntegrationTester $i
+     * @param NewsPayload       $newsPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function deleteNews(IntegrationTester $i, NewsPayload $newsPayload)
+    {
+        #GIVEN
+        $i->loginAdmin2();
+        $timestamp = time();
+        $title = 'Smoke Test News Title Delete, I should not exist. at ' . $timestamp;
+
+        $newsPayload->setNewsTitle($title);
+        $createDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($createDraftRequest['method'], $createDraftRequest['page'], $createDraftRequest['payload'], false, 'Send request to create draft news');
+        $article_id = $i->getNewsArticleByTitle($title)->getId();
+
+        $newsPayload->setPage('/news/moderation/' . $article_id . '/accept');
+        $newsPayload->setReferer('/news/' . $article_id . '/update');
+        $newsPayload->removeFormParam('draft');
+        $newsPayload->removeFormParam('returnUrl');
+        $publishFromDraftRequest = $newsPayload->payloadToArray();
+        $i->sendCurlRequest($publishFromDraftRequest['method'], $publishFromDraftRequest['page'], $publishFromDraftRequest['payload'], false, 'Send request to publish draft news');
+
         #WHEN
-        preg_match($capture_new_news_id, $redirect_history[0],$news_id_matches);
-        $i->publishModeratedNewsByID($news_id_matches[1]);
-        $response = $i->deleteNewsByID($news_id_matches[1]);
+        $newsPayload->setPage('/news/' . $article_id . '/delete');
+        $newsPayload->setReferer('/news/' . $article_id . '/update');
+        $newsPayload->clearAllFormParams();
+        $newsPayload->setFormParam('articleID', $article_id);
+        $deleteNewsRequest = $newsPayload->payloadToArray();
+        $response = $i->sendCurlRequest($deleteNewsRequest['method'], $deleteNewsRequest['page'], $deleteNewsRequest['payload'], true, 'Send request to delete news');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/news'=>'302'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
-        $i->comment('Deleted a News Article');
-        #THEN
+
+        #THEN;
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 }
