@@ -30,7 +30,7 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
  Migrate data from user to sis_profile_user_parent table of the new schema
  */
 INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `email`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, NULL, NULL, NULL, `user`.`email_pass`, NOW(), NOW(), NULL
+    SELECT `sis_user_profile`.`id`, NULL, NULL, NULL, `user`.`local_email`, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
