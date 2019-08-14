@@ -11,18 +11,11 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use Schoolbox\Resource\Storage\HashGenerator;
 
-const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
-
 class Integration extends \Codeception\Module
 {
 
     public function sendRequestCurl($method, $uri, $params)
     {
-        $headers= [
-                   'Referer' => $params['headers']['Referer']
-                   ];
-        $params['headers']=$headers;
-
         #_request($method, $uri, $params);
         return $this->getModule('PhpBrowser')->guzzle->request($method, $uri, $params);
     }

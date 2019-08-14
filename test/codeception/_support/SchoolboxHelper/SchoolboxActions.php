@@ -235,7 +235,7 @@ trait SchoolboxActions
      *
      * @return
      */
-    function getNewsArticle($title, $latest_id=true){
+    function getNewsArticleByTitle($title){
 
         if(!isset($this->database)) {
             $this->initDatabase();

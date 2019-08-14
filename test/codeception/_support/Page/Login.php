@@ -9,7 +9,6 @@
 namespace Page;
 
 use AcceptanceTester;
-use Page\Common;
 
 /**
  * Login page object
@@ -72,50 +71,4 @@ class Login
         $this->tester->see("The username or password you typed is incorrect, please try again.");
     }
 
-    /**
-     * Default login request details, including payload for doing a curl.
-     * @return array
-     */
-    static public function getDefaultLoginRequest():array
-    {
-        $request_details = [
-            'method' => 'POST',
-            'page' => 'https://'.Common::VAGRANT_DOMAIN.'/login/',
-            'payload' => [
-                'headers' => [
-                    'Referer' => 'https://'.Common::VAGRANT_DOMAIN.'/login/'
-                ],
-                'form_params' => [
-                    'page' => '/login/',
-                    'username' => 'username',
-                    'password' => 'password',
-                    'Submit'=> 'Login'
-                ]
-            ]
-        ];
-
-        return $request_details;
-    }
-
-    /**
-     * Default forgot password request details, including payload for doing a curl.
-     * @return array
-     */
-    static public function getDefaultForgotPasswordRequest():array
-    {
-        $request_details = [
-            'method' => 'POST',
-            'page' => 'https://'.Common::VAGRANT_DOMAIN.'/passwordReset/createRequest',
-            'payload' => [
-                'headers' => [
-                    'Referer' => 'https://'.Common::VAGRANT_DOMAIN.'/passwordReset'
-                ],
-                'form_params' => [
-                    'email' => 'username'
-                ]
-            ]
-        ];
-
-        return $request_details;
-    }
 }
