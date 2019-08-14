@@ -139,10 +139,10 @@
                     <section>
                         <h3>On <span>{{ displayDate }}</span></h3>
 
-                        <label>
+                        <label class="required" for="createEventBubbleTitle">
                             Event Title
-                            <input name="title" type="text" v-model.trim="event.title" />
                         </label>
+                        <input id="createEventBubbleTitle" name="title" type="text" v-model.trim="event.title" />
 
                         <label>
                             Event Type
@@ -175,10 +175,10 @@
                     <section>
                         <h3>Due <span>{{ displayDate }}</span></h3>
 
-                        <label>
+                        <label class="required" for="createTaskBubbleTitle">
                             Task
-                            <input name="title" type="text" v-model.trim="event.title" />
                         </label>
+                        <input id="createTaskBubbleTitle" name="title" type="text" v-model.trim="event.title" />
 
                         <label class="detail">
                             Note

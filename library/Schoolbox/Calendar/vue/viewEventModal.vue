@@ -466,16 +466,17 @@
                     Complete
                 </label>
 
-                <label>
+                <label class="required" for="modifyTaskBubbleTitle">
                     Task
-                    <input ref="eventTitleInput"
-                           name="title"
-                           type="text"
-                           :value="event.title"
-                           @change="updateFormSubmittable"
-                           @keyup="updateFormSubmittable"
-                    />
                 </label>
+                <input id="modifyTaskBubbleTitle"
+                       ref="eventTitleInput"
+                       name="title"
+                       type="text"
+                       :value="event.title"
+                       @change="updateFormSubmittable"
+                       @keyup="updateFormSubmittable"
+                />
 
                 <label class="detail">
                     Note
