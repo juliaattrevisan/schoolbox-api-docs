@@ -36,7 +36,27 @@
         },
         computed: {
             window: () => window,
-            eventExtendedProps: function () {
+
+            /**
+             * Can the event form be submitted?
+             *
+             * @return {boolean}
+             */
+            isFormSubmittable() {
+                // Can't data bind because FullCalendar events are read-only.
+                return (this.$refs.eventTitleInput?.value || '').replace(/\s+/).length > 0;
+            },
+
+            /**
+             * Generate extended properties for the component's event.
+             *
+             * TODO simplify this format
+             * (This format this is a mess necessitated by the mess that is the
+             *  events API.)
+             *
+             * @return {Object}
+             */
+            eventExtendedProps() {
                 // Also need to render the event's buttons
                 let event      = this.event,
                     data       = event?.extendedProps?.data,
@@ -107,10 +127,21 @@
             }
         },
         methods: {
-            isTaskSubmittable: function () {
+            /**
+             * Can the task form be submitted?
+             *
+             * @return {boolean}
+             */
+            isTaskSubmittable() {
                 return this.$refs.eventTitleInput.value.length !== 0;
             },
-            updateEvent: function () {
+
+            /**
+             * Persist changes to the event.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             */
+            updateEvent() {
                 let self = this,
                     form = self.$refs.updateForm,
                     data = {
@@ -141,7 +172,13 @@
                         self.$refs.modal.close();
                     });
             },
-            deleteEvent: function () {
+
+            /**
+             * Delete a single event.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             */
+            deleteEvent() {
                 // Handle event deletion (series dialog, confirmation)
                 // and all that
                 let self    = this,
@@ -162,10 +199,23 @@
                         self.$refs.modal.close();
                     });
             },
+
+            /**
+             * Open this modal.
+             */
             open() {
                 this.$refs.modal.open();
             },
-            determineDateSpan: function (startDate, endDate, allDay) {
+
+            /**
+             * Determine how to render the start and end date as date range.
+             *
+             * @param startDate
+             * @param endDate
+             * @param allDay
+             * @return {string}
+             */
+            determineDateSpan(startDate, endDate, allDay) {
                 if (!startDate) {
                     return '';
                 }
@@ -202,7 +252,14 @@
                 // Otherwise start and end are the same - just show the start
                 return start;
             },
-            buildBookingButtonClasses: function(action) {
+
+            /**
+             * Build the map of classes to render for a resource booking button.
+             *
+             * @param action
+             * @return {Object}
+             */
+            buildBookingButtonClasses(action) {
                 let base = {
                     button: true
                 };
@@ -211,7 +268,13 @@
                 }
                 return base;
             },
-            clickBookingButton: function($event) {
+
+            /**
+             * Handle the clicking of a booking button.
+             *
+             * @param $event
+             */
+            clickBookingButton($event) {
                 switch ($event.target.dataset.bookingAction) {
                     case 'approve':
                         $event.preventDefault();
@@ -242,32 +305,72 @@
                         break;
                 }
             },
-            // Event actions
-            confirmEventDeleteSelf: function () {
+
+            /**
+             * Confirm deletion of a single event.
+             */
+            confirmEventDeleteSelf() {
                 this.eventDelete(EFFICACY_SELF);
             },
-            confirmEventDeleteSeries: function () {
+
+            /**
+             * Confirm deletion of a series of events.
+             */
+            confirmEventDeleteSeries() {
                 this.eventDelete(EFFICACY_SERIES);
             },
-            confirmBookingDeleteSelf: function () {
+
+            /**
+             * Confirm deletion of a single booking.
+             */
+            confirmBookingDeleteSelf() {
                 this.bookingDelete(EFFICACY_SELF);
             },
-            confirmBookingDeleteSeries: function () {
+
+            /**
+             * Confirm deletion of a series of bookings.
+             */
+            confirmBookingDeleteSeries() {
                 this.bookingDelete(EFFICACY_SERIES);
             },
-            confirmBookingApproveSelf: function () {
+
+            /**
+             * Confirm approval of a single booking.
+             */
+            confirmBookingApproveSelf() {
                 this.bookingApprove(EFFICACY_SELF);
             },
-            confirmBookingApproveSeries: function () {
+
+            /**
+             * Confirm approval of a series of bookings.
+             */
+            confirmBookingApproveSeries() {
                 this.bookingApprove(EFFICACY_SERIES);
             },
-            confirmBookingRejectSelf: function () {
+
+            /**
+             * Confirm rejection of a single booking.
+             */
+            confirmBookingRejectSelf() {
                 this.bookingReject(EFFICACY_SELF);
             },
-            confirmBookingRejectSeries: function () {
+
+            /**
+             * Confirm rejection of a series of bookings.
+             */
+            confirmBookingRejectSeries() {
                 this.bookingReject(EFFICACY_SERIES);
             },
-            eventDelete: function (efficacy) {
+
+            /**
+             * Delete an event from the database.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             *
+             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+             * @return {Promise}
+             */
+            eventDelete(efficacy) {
                 this.$refs.eventDeleteModal.close();
                 let data = {
                     id: this.eventExtendedProps.eventId,
@@ -278,7 +381,16 @@
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_DELETED, this.event));
             },
-            bookingDelete: function (efficacy) {
+
+            /**
+             * Delete a booking from the database.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             *
+             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+             * @return {Promise}
+             */
+            bookingDelete(efficacy) {
                 this.$refs.bookingDeleteModal.close();
                 let data = {
                     efficacy: efficacy,
@@ -288,7 +400,16 @@
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_DELETED, this.event));
             },
-            bookingApprove: function (efficacy) {
+
+            /**
+             * Approve a booking.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             *
+             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+             * @return {Promise}
+             */
+            bookingApprove(efficacy) {
                 this.$refs.bookingApproveSeriesModal.close();
                 let data = {
                     efficacy: efficacy,
@@ -298,7 +419,16 @@
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
-            bookingReject: function (efficacy) {
+
+            /**
+             * Reject a booking.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             *
+             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+             * @return {Promise}
+             */
+            bookingReject(efficacy) {
                 this.$refs.bookingRejectSeriesModal.close();
                 let data = {
                     efficacy: efficacy,
@@ -308,7 +438,13 @@
                     .then(() => this.event.remove())
                     .then(() => this.$emit(EVENT_MODIFIED, this.event));
             },
-            toggleAttendance: function () {
+
+            /**
+             * Toggle your attendance on/off for an event.
+             *
+             * TODO consider whether this should be in the base FullCalendar component
+             */
+            toggleAttendance() {
                 let self      = this,
                     eventData = Object.assign({}, self.event?.extendedProps?.data || {});
                 self.$refs.modal.close();
