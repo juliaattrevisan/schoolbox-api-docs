@@ -103,16 +103,20 @@ class IntegrationTester extends \Codeception\Actor
     /**
      * loginUser fire off Curl to login user.
      *
-     * @param string $method
-     * @param string $uri
-     * @param array $params  parameters used by guzzle, in this case PHPbrowsers guzzle. [headers => [], form_data => []]
+     * @param \Payload\Base $requestDetails  request details for the curl request.
      * @param bool $redirect if the request should follow the redirect.
      *
      * @return Response
      */
-    public function sendCurlRequest( string $method, string $uri, array $params, bool $redirect, string $step_message=''):Response
+    public function sendCurlRequest( \Payload\Base $requestDetails, bool $redirect, string $step_message=''):Response
     {
         $this->initGuzzleClient2();
+
+        $requestDetailsArray = $requestDetails->payloadToArray();
+
+        $method = $requestDetailsArray['method'];
+        $page = $requestDetailsArray['page'];
+        $params = $requestDetailsArray['payload'];
 
         if ($redirect) {
             $params['allow_redirects'] = $this->redirect_settings;
@@ -127,7 +131,7 @@ class IntegrationTester extends \Codeception\Actor
             $this->amGoingTo($step_message);
         }
 
-        return $this->sendRequestCurl($method, $uri, $params);
+        return $this->sendRequestCurl($method, $page, $params);
     }
 
 
@@ -138,6 +142,6 @@ class IntegrationTester extends \Codeception\Actor
         $loginPayload->setPassword('alaress');
         $loginRequest = $loginPayload->payloadToArray();
 
-        $this->sendCurlRequest($loginRequest['method'], $loginRequest['page'], $loginRequest['payload'], false);
+        $this->sendCurlRequest($loginRequest, false);
     }
 }

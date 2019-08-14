@@ -32,10 +32,9 @@ class LoginCest {
         #WHEN
         $loginPayload->setUsername($user);
         $loginPayload->setPassword($password);
-        $loginRequest = $loginPayload->payloadToArray();
 
         /** @var Response $response */
-        $response = $i->sendCurlRequest($loginRequest['method'], $loginRequest['page'], $loginRequest['payload'], true);
+        $response = $i->sendCurlRequest($loginPayload, true);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
             ['-'=>'200']
@@ -61,10 +60,9 @@ class LoginCest {
 
         #WHEN
         $forgotPasswordPayload->setEmailOrUsername($user_email);
-        $forgotPasswordRequest = $forgotPasswordPayload->payloadToArray();
 
         /** @var Response $response */
-        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true, 'Send request for forgotten password with email');
+        $response = $i->sendCurlRequest($forgotPasswordPayload, true, 'Send request for forgotten password with email');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
             ['-'=>'200']
@@ -75,10 +73,9 @@ class LoginCest {
 
         #WHEN
         $forgotPasswordPayload->setEmailOrUsername($user_username);
-        $forgotPasswordRequest = $forgotPasswordPayload->payloadToArray();
 
         /** @var Response $response */
-        $response = $i->sendCurlRequest($forgotPasswordRequest['method'], $forgotPasswordRequest['page'], $forgotPasswordRequest['payload'], true, 'Send request for forgotten password with username');
+        $response = $i->sendCurlRequest($forgotPasswordPayload, true, 'Send request for forgotten password with username');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
             ['-'=>'200']
