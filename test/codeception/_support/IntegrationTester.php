@@ -140,8 +140,7 @@ class IntegrationTester extends \Codeception\Actor
         $loginPayload = new LoginPayload();
         $loginPayload->setUsername('alaress');
         $loginPayload->setPassword('alaress');
-        $loginRequest = $loginPayload->payloadToArray();
 
-        $this->sendCurlRequest($loginRequest, false);
+        $this->sendCurlRequest($loginPayload, false);
     }
 }
