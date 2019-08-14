@@ -23,6 +23,13 @@ class Base
 
     public function __construct()
     {
+        /**
+         * Example code for setting various parts of the payload in classes that extend this.
+         * $this->setPage('/page_we_desplay');
+         * $this->setReferer('/page_where_we_came_from');
+         * $this->setFormParam('attributeKey1', 'attributeData1');
+         * $this->setFormParam('attributeKey2', 'attributeData2');
+         */
     }
 
     protected function setPageURL(string $page)
