@@ -200,12 +200,7 @@ class Controller extends Base
             }
         }
 
-        try{
-            $yearUrl = $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $viewee->getId()]);
-        } catch (RouteNotFound $e) {
-            $yearUrl = null;
-        }
-
+        $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningGrades/summary.twig', [
             'student'          => $viewee,
             'term'             => $term,
@@ -290,11 +285,7 @@ class Controller extends Base
             }
         }
 
-        try{
-            $yearUrl = $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $viewee->getId()]);
-        } catch (RouteNotFound $e) {
-            $yearUrl = null;
-        }
+        $yearUrl = $this->getYearUrl($viewee->getId());
 
         // Squish this mess out
 
@@ -377,12 +368,7 @@ class Controller extends Base
         // Get folders for drop-down.
         $folders = $this->findFoldersWithStudentInteractions($viewee, $term);
 
-        try{
-            $yearUrl = $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $viewee->getId()]);
-        } catch (RouteNotFound $e) {
-            $yearUrl = null;
-        }
-
+        $yearUrl = $this->getYearUrl($viewee->getId());
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@learningGrades/gradesOuter.twig', [
                 'student'            => $viewee,
@@ -409,8 +395,8 @@ class Controller extends Base
      */
     public function getCustomGradesYear(User $viewee, int $year)
     {
-        $from = new \Alaress_Date_Format("{$year}-01-01 00:00:00", \Alaress_Date_Format::DATABASE_FORMAT);
-        $to = new \Alaress_Date_Format("{$year}-12-31 23:59:59", \Alaress_Date_Format::DATABASE_FORMAT);
+        $from = (new \Alaress_Date_Format())->setYear($year)->startOfYear();
+        $to = (new \Alaress_Date_Format())->setYear($year)->endOfYear();
         $assessments = $this->getAssessmentMapperProxy()->findAllByStudentBetweenDates($viewee, false, $from, $to);
 
         //If we are looking at the year, no term is specified.
@@ -731,5 +717,18 @@ class Controller extends Base
     protected function getTermMapper(): Term\Mapper
     {
         return $this->termMapper;
+    }
+
+    /**
+     * @param int $vieweeId
+     * @return false|string|null
+     */
+    private function getYearUrl(int $vieweeId)
+    {
+        try{
+            return $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $vieweeId]);
+        } catch (RouteNotFound $e) {
+            return null;
+        }
     }
 }
