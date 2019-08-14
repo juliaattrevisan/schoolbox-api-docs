@@ -88,7 +88,7 @@ class DataRestorer
                         break;
                     case 'enum':
                         // It's not possible to get all enum values without the dump data.
-                        $type = "VARCHAR(128)";
+                        $type = 'VARCHAR(128)';
                         break;
                     case 'guid':
                         $type = 'CHAR(36)';
@@ -102,10 +102,12 @@ class DataRestorer
                         break;
                     case 'timestamp':
                         $type = 'DATETIME';
-//                        $type = 'TIMESTAMP NULL';  // suppress automatic timestamp initialisation and updating https://dev.mysql.com/doc/refman/5.5/en/timestamp-initialization.html
+                        // $type = 'TIMESTAMP NULL';  // suppress automatic timestamp initialisation and updating https://dev.mysql.com/doc/refman/5.5/en/timestamp-initialization.html
                         break;
                     case 'varchar':
-                        $type = "VARCHAR({$column['length']})";
+                        // There found a case where storing 330 chars when length is 256. Doubling it for now.
+                        $length = (int)$column['length'] * 2;
+                        $type = "VARCHAR({$length})";
                         break;
                     default:
                         $type = strtoupper($column['type']);
@@ -162,43 +164,26 @@ class DataRestorer
 
     /**
      * Stores data from the data file in the data dir to tables
-     * @param $dataDir
+     * @param $tableName
+     * @param $tableFile
      */
-    public function restoreTableData($dataDir)
+    public function restoreTableData($tableName, $tableFile): void
     {
-        if (!$dh = @opendir($dataDir)) {
-            return;
+        $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
+        $this->canvasDb->execute($sql);
+
+        $sql = "LOAD DATA INFILE '$tableFile' INTO TABLE {$this->canvasDbName}.{$tableName}";
+        try {
+            $this->canvasDb->execute($sql);
+        } catch (Exception $e) {
+            $this->log->warning("Loading data failed for $tableFile: " . $e->getMessage());
         }
-
-        while (false !== ($tableFile = readdir($dh))) {
-            // TODO: do better way
-            $posExt = strpos($tableFile, '.gz');
-            if (!$posExt) {
-                continue;
+        $warnings = $this->canvasDb->executeQuery('show warnings')->fetchAll();
+        if (count($warnings) > 0) {
+            $this->log->warning("MySQL warning occurred while loading $tableFile");
+            foreach ($warnings as $warning) {
+                $this->log->warning(implode(': ', $warning));
             }
-            $tableName = substr($tableFile, 0, $posExt);
-            $this->log->debug("Loading  {$dataDir}/{$tableName}");
-
-            exec("gunzip {$dataDir}/{$tableFile}");
-
-            $sql = "TRUNCATE {$this->canvasDbName}.{$tableName}";
-            $res = $this->canvasDb->execute($sql);
-
-            $sql = "LOAD DATA INFILE '{$dataDir}/{$tableName}' INTO TABLE {$this->canvasDbName}.{$tableName}";
-            try {
-                $res = $this->canvasDb->execute($sql);
-            } catch (Exception $e) {
-                $this->log->warning("Loading data failed for {$dataDir}/{$tableName}: " . $e->getMessage());
-            }
-            $warnings = $this->canvasDb->executeQuery('show warnings')->fetchAll();
-            if (count($warnings) > 0) {
-                $this->log->warning("MySQL warning occurred while loading {$dataDir}/{$tableName}");
-                foreach ($warnings as $warning) {
-                    $this->log->warning(implode(': ', $warning));
-                }
-            }
-
-            exec("gzip {$dataDir}/{$tableName}");
         }
     }
 }
