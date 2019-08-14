@@ -103,7 +103,9 @@ class CliImporter extends CliTool\App
             // Create schema in the staging database
             $dataRestorer = new DataRestorer($db, $this->getLogger(), $this->getCanvasDbName());
             $this->getLogger()->debug('Importing schema from json file:' . $schemaFile);
-            $dataRestorer->restoreSchema($schemaFile);
+            $schemaContainer = json_decode(file_get_contents($schemaFile), true);
+            $schema = $schemaContainer['schema'];
+            $dataRestorer->restoreSchema($schema);
 
             // Store downloaded data to tables in the staging database
             $this->getLogger()->debug('Restoring data to tables');

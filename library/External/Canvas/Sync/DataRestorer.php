@@ -51,13 +51,11 @@ class DataRestorer
 
     /**
      * Creates schema from schema json file.
-     * @param string $schemaFile
+     * @param array $schema
      */
-    public function restoreSchema(string $schemaFile): void
+    public function restoreSchema(array $schema): void
     {
         $errors = false;
-        $schemaContainer = json_decode(file_get_contents($schemaFile), true);
-        $schema = $schemaContainer['schema'];
 
         foreach ($schema as $tableIndex => $tableData) {
             $columns = $tableData['columns'];
