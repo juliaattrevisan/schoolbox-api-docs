@@ -110,7 +110,7 @@ class Calendar_Api_Config_Mapper extends BaseMapper
             try {
                 if($moduleChecker->isEnabled($config)){
                     $sourceList[] = [
-                        'id'   => $record->getId(),
+                        'id'   => (int)$record->getId(),
                         'name' => $config->getLabel()
                     ];
                 }
@@ -126,23 +126,15 @@ class Calendar_Api_Config_Mapper extends BaseMapper
                 $id   = $item['id'];
                 $name = $item['name'];
                 if (!array_key_exists($name, $carry)) {
-                    $carry[$name]       = $item;
-                    $carry[$name]['id'] = [];
+                    $carry[$name]        = $item;
+                    $carry[$name]['ids'] = [];
                 }
-                $carry[$name]['id'][] = $id;
+                $carry[$name]['ids'][] = $id;
                 return $carry;
             },
             []
         );
 
-        // Join the IDs for each source together.
-        $sourceList = array_map(
-            function ($v) {
-                $v['id'] = implode(',', $v['id']);
-                return $v;
-            },
-            $sourceList
-        );
         return array_values($sourceList);
     }
 

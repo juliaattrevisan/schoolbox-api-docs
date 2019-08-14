@@ -4,18 +4,35 @@
   "author": "Schoolbox Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {
+    "@fullcalendar/core": "^4.2.0",
+    "@fullcalendar/daygrid": "^4.2.0",
+    "@fullcalendar/interaction": "^4.2.0",
+    "@fullcalendar/list": "^4.2.0",
+    "@fullcalendar/moment": "^4.2.0",
+    "@fullcalendar/resource-common": "^4.2.0",
+    "@fullcalendar/resource-daygrid": "^4.2.0",
+    "@fullcalendar/resource-timegrid": "^4.2.0",
+    "@fullcalendar/timegrid": "^4.2.0",
+    "@fullcalendar/vue": "^4.2.2",
     "@types/classnames": "^2.2.9",
     "axios": "0.18.0",
     "classnames": "^2.2.6",
+    "core-js": "^3.1.4",
     "es6-object-assign": "1.1.0",
     "lodash": "4.17.11",
+    "moment": "^2.24.0",
     "promise-polyfill": "8.1.0",
+    "qs": "^6.7.0",
+    "ucid": "^1.0.0",
     "vue": "2.6.10",
     "vue-style-loader": "^4.1.2",
     "vuejs-paginate": "2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
+    "@babel/plugin-proposal-optional-chaining": "^7.2.0",
+    "@babel/plugin-transform-object-assign": "^7.2.0",
+    "@babel/plugin-transform-shorthand-properties": "^7.2.0",
     "@babel/preset-env": "^7.5.5",
     "babel-loader": "^8.0.6",
     "bower": "^1.8.4",
@@ -29,6 +46,8 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-shell": "^2.0.0",
     "jit-grunt": "^0.10.0",
+    "node-sass": "^4.12.0",
+    "sass-loader": "^7.1.0",
     "shelljs": "^0.2.6",
     "source-map-loader": "^0.2.4",
     "vue-loader": "^15.7.1",
@@ -42,13 +61,31 @@
     "url": "git://github.com/alaress/schoolbox.git"
   },
   "scripts": {
-    "build": "webpack --config webpack.config.js --mode=development",
-    "watch": "webpack --config webpack.config.js --mode=development --watch",
-    "publish": "webpack --config webpack.config.js --mode=production"
+    "build": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development",
+    "watch": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch",
+    "watch-poll": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=development --watch --watch-poll=1000",
+    "publish": "./node_modules/.bin/webpack-cli --config webpack.config.js --mode=production"
   },
   "babel": {
     "presets": [
-      "@babel/preset-env"
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "browsers": [
+              "defaults",
+              "IE 11"
+            ]
+          },
+          "useBuiltIns": "usage",
+          "corejs": 3
+        }
+      ]
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-optional-chaining",
+      "@babel/plugin-transform-object-assign",
+      "@babel/plugin-transform-shorthand-properties"
     ]
   }
 }

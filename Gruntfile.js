@@ -153,10 +153,22 @@ var jsSrc = {
         'www/javascript/shared/masonry/jquery.masonry.js',
         'www/javascript/shared/masonry/jquery.masonry.spectrum.js'
     ],
-    fullcalendar: [
+    fullCalendar: [
         // System for displaying calendars and associated popups
-        'www/javascript/components/fullcalendar/dist/fullcalendar.js',
-        'www/javascript/shared/calendar/jquery.fullcalendar.js'
+        'node_modules/@fullcalendar/core/main.js',
+        'node_modules/@fullcalendar/daygrid/main.js',
+        'node_modules/@fullcalendar/interaction/main.js',
+        'node_modules/@fullcalendar/list/main.js',
+        'node_modules/@fullcalendar/moment/main.js',
+        'node_modules/@fullcalendar/timegrid/main.js',
+        // Consider removing the below
+        // 'www/javascript/shared/calendar/jquery.fullcalendar.js'
+    ],
+    fullCalendarResource: [
+        // System for displaying resource calendars
+        'node_modules/@fullcalendar/resource-common/main.js',
+        'node_modules/@fullcalendar/resource-daygrid/main.js',
+        'node_modules/@fullcalendar/resource-timegrid/main.js'
     ],
     vue: [ // Death to jQuery!
         'node_modules/es6-object-assign/dist/object-assign-auto.js',
@@ -168,7 +180,8 @@ var jsSrc = {
 var jsDest = {
     main: 'www/javascript/components/<%= pkg.name %>.min.js',
     masonry: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
-    fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
+    fullCalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
+    fullCalendarResource: 'www/javascript/components/<%= pkg.name %>-fullcalendar-resource.min.js',
     vue: 'www/javascript/components/<%= pkg.name %>-vue.min.js'
 };
 
@@ -201,14 +214,28 @@ module.exports = function(grunt) {
                 src: jsSrc.masonry,
                 dest: jsDest.masonry
             },
-            fullcalendar: {
-                src: jsSrc.fullcalendar,
-                dest: jsDest.fullcalendar
+            fullCalendar: {
+                src: jsSrc.fullCalendar,
+                dest: jsDest.fullCalendar
+            },
+            fullCalendarResource: {
+                src: jsSrc.fullCalendarResource,
+                dest: jsDest.fullCalendarResource
+            },
+            fullCalendarCss: {
+                src: [
+                    'node_modules/@fullcalendar/core/main.css',
+                    'node_modules/@fullcalendar/daygrid/main.css',
+                    'node_modules/@fullcalendar/list/main.css',
+                    'node_modules/@fullcalendar/timegrid/main.css'
+                ],
+                dest: 'www/css/demo/fullcalendar.css'
             },
             vue: {
                 src: jsSrc.vue,
                 dest: jsDest.vue
-            }
+            },
+
         },
         uglify: {
             options: {
@@ -224,9 +251,13 @@ module.exports = function(grunt) {
                 src: jsSrc.masonry,
                 dest: jsDest.masonry
             },
-            fullcalendar: {
-                src: jsSrc.fullcalendar,
-                dest: jsDest.fullcalendar
+            fullCalendar: {
+                src: jsSrc.fullCalendar,
+                dest: jsDest.fullCalendar
+            },
+            fullCalendarResource: {
+                src: jsSrc.fullCalendarResource,
+                dest: jsDest.fullCalendarResource
             },
             vue: {
                 src: jsSrc.vue,

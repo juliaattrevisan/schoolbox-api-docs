@@ -4,3 +4,14 @@
 # git add composer.lock
 # git rebase --continue
 composer.lock binary
+
+# and npm-shrinkwrap.json conflicts:
+# git reset HEAD npm-shrinkwrap.json
+# vagrant ssh
+# cd /vagrant
+# rm -rf node_modules/*
+# npm install
+# npm shrinkwrap --dev
+# git add npm-shrinkwrap.json
+# git rebase --continue
+npm-shrinkwrap.json binary

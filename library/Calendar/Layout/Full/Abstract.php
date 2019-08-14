@@ -8,6 +8,8 @@
  */
 
 use Calendar\Api\ModuleChecker;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -169,105 +171,98 @@ abstract class Calendar_Layout_Full_Abstract
      */
     protected function setupMovementButtons()
     {
-        // Load sources
+        // Load sources, types
+        $typeList   = EventTypeMapper::getInstance()->findAll();
         $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
 
-        // select all types
-        $typeList = \Schoolbox\Calendar\EventTypeMapper::getInstance()->findAll();
+
+        // Load what is selected: default to selecting everything
+        /** @var EventType[] $typeList */
         if (isset($_SESSION['calendarFilter'])) {
-            $selected['group'] = $_SESSION['calendarFilter']['groups'];
-            $selected['campus'] = $_SESSION['calendarFilter']['campus'];
-            $selected['event_type'] = $_SESSION['calendarFilter']['events'];
-            $selected['source'] = $_SESSION['calendarFilter']['sources'];
+            $selected['group']     = $_SESSION['calendarFilter']['group']      ?? [];
+            $selected['campus']    = $_SESSION['calendarFilter']['campus']     ?? [];
+            $selected['eventType'] = $_SESSION['calendarFilter']['eventType']  ?? [];
+            $selected['source']    = $_SESSION['calendarFilter']['source']     ?? [];
         } else {
-            // select all groups
-            if (count($this->getCategoryList())) {
-                foreach ($this->getCategoryList() as $cat) {
-                    $selected['group'][] = $cat['id'];
-                }
+            // select everything
+            foreach ($this->getCategoryList() as $cat) {
+                $selected['group'][] = (int)$cat['id'];
             }
 
             // select all campuses
-            $selected['campus'] = $_SESSION['campus'];
+            $selected['campus'] = array_map('intval', $_SESSION['campus']);
 
             foreach ($typeList as $type) {
-                $selected['event_type'][] = $type->getId();
+                $selected['eventType'][] = $type->getId();
             }
 
             // select all sources
             foreach ($sourceList as $source) {
-                $selected['source'][] = $source['id'];
+                $selected['source'][] = $source['ids'];
             }
         }
 
         $this->setSelected($selected);
 
-        $category_list = $this->getCategoryList();
-        $campus_list = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
-        $this->getPage()->dropDown(
-            'export_group',
-            $category_list,
-            [],
-            TEMPLATE_content,
-            array('name' => 'EXPORT_GROUP_NAME', 'id' => 'EXPORT_GROUP_ID')
-        );
-        $this->getPage()->dropDown(
-            'export_campus',
-            $campus_list,
-            [],
-            TEMPLATE_content,
-            array('CAMPUS_NAME' => 'EXPORT_CAMPUS_NAME', 'CAMPUS_ID' => 'EXPORT_CAMPUS_ID')
-        );
-        $this->getPage()->dropDown(
-            'export_type',
-            $typeList,
-            [],
-            TEMPLATE_content,
-            array('type' => 'EXPORT_TYPE_NAME', 'id' => 'EXPORT_TYPE_ID')
-        );
-        // Might need special PHPLibs here
-        $this->getPage()->checkList(
-            'filter_source',
-            $sourceList,
-            $selected['source'],
-            TEMPLATE_content,
-            array('name' => 'SOURCE_NAME', 'id' => 'SOURCE_ID')
-        );
+        $categoryList = $this->getCategoryList();
+        $campusList = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
 
-        //Bastardise the folder names to get the codes in
-        //Better than changing checkList()
-        foreach ($category_list as $key => $value) {
-            if (!empty($category_list[$key]['code'])) {
-                $category_list[$key]['name'] = $category_list[$key]['name'] . ' (' . $category_list[$key]['code'] . ')';
-            }
-        }
-        $this->getPage()->checkList(
-            'filter_group',
-            $category_list,
-            $selected['group'],
-            TEMPLATE_content,
-            array('name' => 'GROUP_NAME', 'id' => 'GROUP_ID')
-        );
-        $this->getPage()->checkList(
-            'filter_campus',
-            $campus_list,
-            $selected['campus'],
-            TEMPLATE_content,
-            array('name' => 'CAMPUS_NAME', 'id' => 'CAMPUS_ID')
-        );
-        $this->getPage()->checkList(
-            'filter_event_type',
-            $typeList,
-            $selected['event_type'],
-            TEMPLATE_content,
-            array(
-                'type'  => 'EVENT_TYPE_NAME',
-                'id'    => 'EVENT_TYPE_ID',
-                'color' => 'EVENT_TYPE_COLOUR'
+        // Shoehorn the above into JSON-encoded vars
+        $this->getPage()->setVar(
+            'GROUPS_JSON',
+            json_encode(
+                array_map(
+                    function ($v) {
+                        $v['id']   = (int)$v['id'];
+                        $v['type'] = (int)$v['type'];
+                        return $v;
+                    },
+                    $categoryList
+                )
             )
         );
-        $this->getPage()->setVar('BACK', date("j-n-Y", strtotime("-1 week", $this->getSelectedDate())));
-        $this->getPage()->setVar('FORWARD', date("j-n-Y", strtotime("+1 week", $this->getSelectedDate())));
+        $this->getPage()->setVar(
+            'CAMPUSES_JSON',
+            json_encode(
+                array_map(
+                    function ($v) {
+                        return [
+                            'id'   => (int)$v['CAMPUS_ID'],
+                            'name' => $v['CAMPUS_NAME']
+                        ];
+                    },
+                    $campusList
+                )
+            )
+        );
+        $this->getPage()->setVar(
+            'EVENT_TYPES_JSON',
+            json_encode(
+                $typeList->map(
+                    function (EventType $v) {
+                        return [
+                            'id'         => $v->getId(),
+                            'name'       => $v->getType(),
+                            'color'      => $v->getColor(),
+                            'isTaskType' => $v->isTaskType(),
+                        ];
+                    }
+                )
+            )
+        );
+        $this->getPage()->setVar('SOURCES_JSON', json_encode($sourceList));
+
+
+        // output task type too
+        foreach ($typeList as $type) {
+            if ($type->isTaskType()) {
+                $this->getPage()->setVar('TASK_TYPE_ID', $type->getId());
+            }
+        }
+
+
+        // Output selected filters as JSON
+        $this->getPage()->setVar('SELECTED_FILTERS_JSON', json_encode($selected));
     }
 
     /* Getters/Setters

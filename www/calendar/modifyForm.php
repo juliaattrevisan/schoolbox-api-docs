@@ -218,7 +218,7 @@ switch ($_REQUEST['action']) {
          * Check event exists
          */
         try {
-            $event = $eventMapper->findById($_REQUEST['id']);
+            $event = $eventMapper->findById($_POST['id']);
         } catch (\Exception $e) {
             error(160);
         }

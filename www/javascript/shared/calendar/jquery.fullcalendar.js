@@ -7,19 +7,30 @@
 // http://stackoverflow.com/questions/1026069/capitalize-the-first-letter-of-string-in-javascript
 String.prototype.capitalise = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 /**
  * Calendar object constructor
+ *
  * @param id
+ * @param bubbleId
+ * @param opts
+ * @returns {Calendar}
  * @constructor
  */
 function Calendar(id, bubbleId, opts) {
-    var self = this
-    this.id = id
-    this.dom = $('#'+id)
-    this.bubble = new Bubble(this, bubbleId)
-    this.suppress = false
+    var self = this;
+    this.id = id;
+    this.dom = $('#'+id);
+
+    /**
+     * The FullCalendar instance.
+     *
+     * @type {FullCalendar.Calendar}
+     */
+    this.fullCalendar = null;
+    this.bubble = new Bubble(this, bubbleId);
+    this.suppress = false;
 
     // default options
     this.options = {
@@ -54,11 +65,12 @@ function Calendar(id, bubbleId, opts) {
             viewSettingsOptionsSelector: '.fc-month-button, .fc-agendaWeek-button, .fc-agendaDay-button'
         },
         fullCalendar: {
+            plugins: ['interaction', 'dayGrid', 'list', 'moment', 'timeGrid'],
             views: {
-                day: {
+                timeGridDay: {
                     titleFormat: dateDisplayFormats.momentJsDateLong
                 },
-                week: {
+                timeGridWeek: {
                     columnFormat: 'ddd D/M'
                 }
             },
@@ -66,7 +78,7 @@ function Calendar(id, bubbleId, opts) {
             header: {
                 left: 'prev,today,next',
                 center: 'title',
-                right: 'month,agendaWeek,agendaDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
             buttonText: {
                 prev:     '', // ◀
@@ -78,7 +90,7 @@ function Calendar(id, bubbleId, opts) {
                 week:     'week',
                 day:      'day'
             },
-            date: null,
+            // date: null,
             month: null,
             year: null,
             eventLimit: true,
@@ -103,11 +115,12 @@ function Calendar(id, bubbleId, opts) {
 
             /**
              * Generic action for when an event is clicked
-             * @param calEvent
-             * @param jsEvent
-             * @param view
+             * @param eventInfo
              */
-            eventClick: function(calEvent, jsEvent, view) {
+            eventClick: function(eventInfo) {
+
+                var calEvent = eventInfo.event,
+                    jsEvent  = eventInfo.jsEvent;
 
                 // Did this event come from a checkbox?
                 // If so do nothing, those events are handled elsewhere.
@@ -116,11 +129,11 @@ function Calendar(id, bubbleId, opts) {
                 }
 
                 // setup data to be displayed
-                var data = $.extend(true, {}, calEvent.data.meta)
+                var data = $.extend(true, {}, calEvent.extendedProps.data.meta);
 
                 // Prefix booking status for bookings
-                if (calEvent.data.booking) {
-                    data.bookingStatus = calEvent.data.booking.status.name;
+                if (calEvent.extendedProps.data.booking) {
+                    data.bookingStatus = calEvent.extendedProps.data.booking.status.name;
                     $('[data-event-modal-field="bookingStatus"]').show();
 
                     data.note = calEvent.title
@@ -133,24 +146,25 @@ function Calendar(id, bubbleId, opts) {
                 data.title = data.note;
 
                 // Format the date of this event
-                var format = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma'
-                var start = calEvent.start.format(format);
-                var end   = null;
+                var format      = calEvent.allDay ? 'ddd Do MMM' : 'ddd Do MMM, h:mma',
+                    momentStart = FullCalendarMoment.toMoment(calEvent.start, self.fullCalendar),
+                    start       = momentStart.format(format),
+                    momentEnd   = null,
+                    end         = null;
                 if (calEvent.end != null) {
+                    momentEnd = FullCalendarMoment.toMoment(calEvent.end, self.fullCalendar);
                     if (calEvent.allDay) {
-                        end = moment(calEvent.end).subtract(1, 'd').format(format);
+                        end = momentEnd.subtract(1, 'd').format(format);
                     } else {
-                        end = calEvent.end.format(format);
+                        end = momentEnd.format(format);
                     }
                 }
 
-                if (end && start != end) {
+                if (momentEnd && !momentStart.isSame(momentEnd)) {
                     // Start and end aren't the same - stitch them together.
-                    if (!calEvent.allDay
-                        && calEvent.start.format('YYYYMMDD') === calEvent.end.format('YYYYMMDD')
-                    ) {
+                    if (!calEvent.allDay && momentStart.isSame(momentEnd, 'day')) {
                         // Between two times on the same day - show the timespan but only one date
-                        data.date = start + " – " + calEvent.end.format('h:mma');
+                        data.date = start + " – " + momentEnd.format('h:mma');
                     } else {
                         // Between two different days - show the whole timespan
                         data.date = start + " – " + end;
@@ -163,13 +177,13 @@ function Calendar(id, bubbleId, opts) {
                 // Links to Modify Screen
                 if (calEvent.editable == true) {
                     var url = '';
-                    if ((calEvent.data.custom != undefined) && (calEvent.data.custom.modifyLink != undefined) && (calEvent.data.custom.modifyLink.length)) {
-                        url = calEvent.data.custom.modifyLink;
+                    if ((calEvent.extendedProps.data.custom != undefined) && (calEvent.extendedProps.data.custom.modifyLink != undefined) && (calEvent.extendedProps.data.custom.modifyLink.length)) {
+                        url = calEvent.extendedProps.data.custom.modifyLink;
                         data.deleteLink = '';
                     }
                     else {
-                        url = '/calendar/modify.php?eventID=' + calEvent.data.meta.eventId + '&returnTo=calendar';
-                        var deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.data.meta.eventId + '&returnTo=calendar';
+                        url = '/calendar/modify.php?eventID=' + calEvent.extendedProps.data.meta.eventId + '&returnTo=calendar';
+                        var deleteUrl = '/calendar/modifyForm.php?action=Delete&id=' + calEvent.extendedProps.data.meta.eventId + '&returnTo=calendar';
                         data.deleteLink = '<a class="button icon-delete" data-interaction="delete" href="' + deleteUrl + '">Delete</a>';
                     }
 
@@ -183,10 +197,10 @@ function Calendar(id, bubbleId, opts) {
                 // Group events: have a go to homepage link
                 data.homepageLink = '';
                 try {
-                    if (calEvent.data.links.category.id > 0) {
+                    if (calEvent.extendedProps.data.links.category.id > 0) {
                         data.homepageLink =
                             $('<a class="button icon-home">Go to homepage</a>')
-                                .attr('href', '/homepage/' + String(calEvent.data.links.category.id));
+                                .attr('href', '/homepage/' + String(calEvent.extendedProps.data.links.category.id));
                     }
                 }
                 catch (e) {}
@@ -194,16 +208,16 @@ function Calendar(id, bubbleId, opts) {
                 // Submission History Link
                 data.moreDetailsLink = '';
                 try {
-                    if(calEvent.data.custom.moreDetailsLink.length > 0) {
+                    if(calEvent.extendedProps.data.custom.moreDetailsLink.length > 0) {
                         data.moreDetailsLink =
                             $('<a class="button icon-due-work">View More Details</a>')
-                                .attr('href', calEvent.data.custom.moreDetailsLink);
+                                .attr('href', calEvent.extendedProps.data.custom.moreDetailsLink);
                     }
                 }
                 catch (e) {}
 
-                if ('attendance' in calEvent.data) {
-                    $.each(calEvent.data.attendance, function(k, v) {
+                if ('attendance' in calEvent.extendedProps.data) {
+                    $.each(calEvent.extendedProps.data.attendance, function(k, v) {
                         data['attendance' + k.capitalise()] = v
                     })
 
@@ -211,7 +225,7 @@ function Calendar(id, bubbleId, opts) {
                     if (data.attendanceListButton.toString() == 'true') {
                         data.attendanceIcon = ''
                         data.attendanceListButton = '<a class="button icon-group" href="/calendar/attendance/list/'
-                            + calEvent.data.meta.eventId + '">Attendees</a>'
+                            + calEvent.extendedProps.data.meta.eventId + '">Attendees</a>'
                     }
                     // Attend/Unattend butonye
                     if (data.attendanceRequestButton.toString() != 'false') {
@@ -221,14 +235,14 @@ function Calendar(id, bubbleId, opts) {
 
                 data.bookingActions = [];
                 data.relatedBookings = [];
-                if (calEvent.data.booking) {
+                if (calEvent.extendedProps.data.booking) {
                     // Booking butonyes (if available)
-                    if (calEvent.data.booking.buttons) {
-                        $.each(calEvent.data.booking.buttons, function() {
+                    if (calEvent.extendedProps.data.booking.buttons) {
+                        $.each(calEvent.extendedProps.data.booking.buttons, function() {
                             if (this.href) {
                                 data.bookingActions.push(
                                     $('<a class="button" />')
-                                        .data('seriesId', calEvent.data.meta.seriesId)
+                                        .data('seriesId', calEvent.extendedProps.data.meta.seriesId)
                                         .addClass(this.class)
                                         .attr('data-booking-button', 'booking-'+this.action)
                                         .attr('href', this.href)
@@ -244,18 +258,18 @@ function Calendar(id, bubbleId, opts) {
                     }
 
                     // Booking reviewer (if available)
-                    if (calEvent.data.booking.reviewer) {
-                        data.reviewer   = calEvent.data.booking.reviewer.name;
-                        data.reviewerId = calEvent.data.booking.reviewer.id;
+                    if (calEvent.extendedProps.data.booking.reviewer) {
+                        data.reviewer   = calEvent.extendedProps.data.booking.reviewer.name;
+                        data.reviewerId = calEvent.extendedProps.data.booking.reviewer.id;
                     }
 
                     // Related bookings
-                    data.relatedBookings = calEvent.data.booking.related;
+                    data.relatedBookings = calEvent.extendedProps.data.booking.related;
                 }
 
                 data.start = calEvent.start;
                 data.end   = calEvent.end;
-                if ('placeholder' in calEvent.data) {
+                if ('placeholder' in calEvent.extendedProps.data) {
                     data.placeholder = true;
                 }
 
@@ -278,8 +292,7 @@ function Calendar(id, bubbleId, opts) {
             dateFormat: 'dd-mm-yy',
             onSelect: function(dateText, inst) {
                 // Use fullcalendar to load events instead of redirecting to a new page.
-                self.dom.fullCalendar(
-                    'gotoDate',
+                self.fullCalendar.gotoDate(
                     moment().year(inst.currentYear).month(inst.currentMonth).date(inst.currentDay)
                 )
             },
@@ -295,19 +308,19 @@ function Calendar(id, bubbleId, opts) {
             showAnim: 'slideDown'
         },
         x: true
-    }
+    };
     this.filters = {
 
         interaction: function(cal) {
 
             // Only set up interactions that actually exist
-            var calendarControls = $(cal.options.filter.parentSelector)
-            var exportControls   = $(cal.options.filter.exportSelector)
+            var calendarControls = $(cal.options.filter.parentSelector);
+            var exportControls   = $(cal.options.filter.exportSelector);
 
             // show the filter 'dialog' when the button is clicked
             cal.dom.on('click', cal.options.filter.btnSelector, function() {
                 return false
-            })
+            });
 
             // Show the export filter, if it exists
             if (cal.options.filter.exportButtonSelector) {
@@ -339,8 +352,8 @@ function Calendar(id, bubbleId, opts) {
 
             if (cal.options.filter.viewSettingsOptionsSelector) {
                 cal.dom.on('click', cal.options.filter.viewSettingsOptionsSelector, function() {
-                    cal.filters.organise(cal, ["campus", "groups", "sources"])
-                    
+                    cal.filters.organise(cal, ["campus", "groups", "sources"]);
+
                     return false
                 })
             }
@@ -396,7 +409,7 @@ function Calendar(id, bubbleId, opts) {
 
             //
             // Get events, put an 'is_rendered' field on them.
-            var events = cal.dom.fullCalendar('clientEvents');
+            var events = cal.fullCalendar.getEvents();
             $.each(events, function(event_no, event) {
                 var isRendered = true;
 
@@ -404,8 +417,8 @@ function Calendar(id, bubbleId, opts) {
                 // (type is the string prefix of the class: for "group14"
                 //  it will be "group".)
                 var groupedClasses = {};
-                if (event.className.forEach) {
-                    event.className.forEach(function(className) {
+                if (event.classNames.forEach) {
+                    event.classNames.forEach(function(className) {
                         var prefix = className.replace(/^([a-z]+).*/i, '$1');
                         if (!groupedClasses[prefix]) {
                             groupedClasses[prefix] = []
@@ -461,107 +474,115 @@ function Calendar(id, bubbleId, opts) {
                 );
             }
             else {
-                cal.dom.fullCalendar('rerenderEvents');
+                cal.fullCalendar.rerenderEvents();
             }
 
             // only send data to the server if we actually need to
             if(performAjax && cal.options.filter.ajax) {
-                var view = cal.dom.fullCalendar('getView').name;
-                if (view) {
-                    cal.post(cal.options.filter.ajax, {fList: flist, view: view}, null, false);
-                }
+                // var view = cal.fullCalendar.view.type;
+                // if (view) {
+                //     cal.post(cal.options.filter.ajax, {fList: flist, view: view}, null, false);
+                // }
             }
         }
     };
 
     // preserve the filter and fullCalendar specs
-    var filter = $.extend({}, this.options.filter, opts.filter)
-    var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar)
-    var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker)
-    var bubble = $.extend({}, this.options.bubble, opts.bubble)
+    var filter = $.extend({}, this.options.filter, opts.filter);
+    var fullCalendar = $.extend({}, this.options.fullCalendar, opts.fullCalendar);
+    var datepicker   = $.extend({}, this.options.datepicker,   opts.datepicker);
+    var bubble = $.extend({}, this.options.bubble, opts.bubble);
 
     // perform the merge
-    $.extend(this.options,opts)
+    $.extend(this.options,opts);
 
     // rewrite the preserved submerge back into the options
-    this.options.filter = filter
-    this.options.fullCalendar = fullCalendar
-    this.options.datepicker   = datepicker
-    this.options.bubble = bubble
+    this.options.filter = filter;
+    this.options.fullCalendar = fullCalendar;
+    this.options.datepicker   = datepicker;
+    this.options.bubble = bubble;
 
-    if(this.options.filter.enabled) {
-        this.filters.interaction(this)
-    }
-
-    return this
+    return this;
 }
 
 /**
  * Initialise the calendar
  */
 Calendar.prototype.init = function() {
-    var c = this
-    this.dom.fullCalendar(this.options.fullCalendar)
-    /* Button for list view
-     */
-    var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
-    var baseButton  = headerRight.find('.fc-button').first();
-    if (this.options.filter.listViewButton) {
-        headerRight.prepend(
-            baseButton.clone()
-                .html('list')
-                .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
-                .addClass(' fc-corner-left')
-                .attr('id','fc-button-list')
-        );
+    var c = this;
+    this.fullCalendar = new FullCalendar.Calendar(
+        this.dom[0],
+        this.options.fullCalendar
+    );
+    this.fullCalendar.render();
+
+    if (this.options.filter.enabled) {
+        this.filters.interaction(this)
     }
 
-    if(this.options.filter.enabled) {
-        // mash the filters in (if they're enabled)
-        if (this.options.filter.btnSelector) {
-            headerRight.prepend(
-                baseButton.clone()
-                    .html('filters')
-                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
-                    .attr('id','fc-button-filter')
-                    .attr('data-reveal-id',this.options.filter.parentSelector.substr(1))
-            );
-        }
-        if (this.options.filter.exportButtonSelector) {
-            headerRight.append(
-                baseButton.clone()
-                    .html('export')
-                    .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
-                    .addClass('fc-button-filter fc-corner-left fc-corner-right')
-                    .attr('id','fc-button-export')
-                    .attr('data-reveal-id',this.options.filter.exportSelector.substr(1))
-            );
-        }
-    }
-    // and now make all the buttons on the header look the way they're meant to
-    var header = this.dom.find('.fc-toolbar')
-    header.addClass('calendar-controls')
-    header.find('.fc-button').each(function() {
-        var self = $(this)
-        self.addClass('filter-change');
-    })
-    header.find('.fc-right .fc-button').each(function() {
-        var self = $(this)
-        self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
-    })
+    // // this.dom.fullCalendar(this.options.fullCalendar);
+    // /* Button for list view
+    //  * TODO use Fullcalendar's list view instead
+    //  */
+    // var headerRight = this.dom.find('.fc-toolbar .fc-right .fc-button-group');
+    // var baseButton  = headerRight.find('.fc-button').first();
+    // if (this.options.filter.listViewButton) {
+    //     headerRight.prepend(
+    //         baseButton.clone()
+    //             .html('list')
+    //             .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active no-icon')
+    //             .addClass(' fc-corner-left')
+    //             .attr('id','fc-button-list')
+    //     );
+    // }
+    // Do this using custom buttons instead
+    // if (this.options.filter.enabled) {
+    //     // mash the filters in (if they're enabled)
+    //     if (this.options.filter.btnSelector) {
+    //         headerRight.prepend(
+    //             baseButton.clone()
+    //                 .html('filters')
+    //                 .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
+    //                 .addClass('fc-button-filter fc-corner-left fc-corner-right')
+    //                 .attr('id','fc-button-filter')
+    //                 .attr('data-reveal-id',this.options.filter.parentSelector.substr(1))
+    //         );
+    //     }
+    //     if (this.options.filter.exportButtonSelector) {
+    //         headerRight.append(
+    //             baseButton.clone()
+    //                 .html('export')
+    //                 .removeClass('fc-month-button fc-agendaWeek-button fc-agendaDay-button fc-state-active')
+    //                 .addClass('fc-button-filter fc-corner-left fc-corner-right')
+    //                 .attr('id','fc-button-export')
+    //                 .attr('data-reveal-id',this.options.filter.exportSelector.substr(1))
+    //         );
+    //     }
+    // }
+    //
+    // // and now make all the buttons on the header look the way they're meant to
+    // var header = this.dom.find('.fc-toolbar');
+    // header.addClass('calendar-controls');
+    // header.find('.fc-button').each(function() {
+    //     var self = $(this);
+    //     self.addClass('filter-change');
+    // });
+    // header.find('.fc-right .fc-button').each(function() {
+    //     var self = $(this);
+    //     self.addClass('filter-change '+self.text()).html('<span></span>'+self.html())
+    // });
 
 
     /* Special case for list view, it's the only button with an anchor
      */
     $('#fc-button-list').removeAttr('unselectable').removeClass('list filters').click(function(event) {
         event.preventDefault();
-        window.location.href = '/calendar/list/' + c.options.userId + '/' + c.dom.fullCalendar('getDate').format('DD-MM-YYYY');
+        window.location.href = '/calendar/list/' + c.options.userId + '/' + moment(c.fullCalendar.getDate()).format('DD-MM-YYYY');
     });
 
-    // mash in the datepicker
-    var headerCenter = header.find('.fc-center')
-    headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>')
+    // // mash in the datepicker
+    // var headerCenter = header.find('.fc-center');
+    // headerCenter.prepend('<div id="jqdp" class="datepicker-box"><input type="hidden" id="datepicker"/></div>');
 
     // Event creation form listeners
     $.each(this.getForms(), function(k, v) {
@@ -570,7 +591,7 @@ Calendar.prototype.init = function() {
                 this.submit(function(event) {
                     event.preventDefault();
                     var form = $(this);
-                    var data = form.serialize()
+                    var data = form.serialize();
 
                     // Create and render a placeholder event
                     var placeholderEvent = {
@@ -586,13 +607,15 @@ Calendar.prototype.init = function() {
                         placeholderEvent.start = moment(form.find('input[name="date"]').val(), "DD-MM-YYYY HH:mm");
                         placeholderEvent.end   = moment(placeholderEvent.start).add(1, 'h');
                     }
-                    c.dom.fullCalendar('renderEvent', placeholderEvent);
+                    placeholderEvent.start = placeholderEvent.start.toDate();
+                    placeholderEvent.end   = placeholderEvent.end.toDate();
+                    var eventObject = c.fullCalendar.addEvent(placeholderEvent);
 
                     c.ccreate(data, function(responseText) {
                         if (responseText.length) {
                             // Remove the placeholder and render the actual event
-                            c.dom.fullCalendar('removeEvents', 'placeholder');
-                            c.dom.fullCalendar('renderEvent', JSON.parse(responseText), true);
+                            eventObject.remove();
+                            c.fullCalendar.addEvent(JSON.parse(responseText));
                         }
                         c.bubble.hide();
                     });
@@ -620,22 +643,26 @@ Calendar.prototype.init = function() {
                             // instead of adding a new one.
                             var newEvent = JSON.parse(responseText);
                             var eventId  = newEvent.data.meta.eventId;
-                            c.dom.fullCalendar('removeEvents', matchEvents(eventId));
-                            c.dom.fullCalendar('renderEvent', newEvent);
+
+
+                            // TODO call event.remove instead
+                            // c.fullCalendar.remove(placeholderEvent);
+                            // c.dom.fullCalendar('removeEvents', matchEvents(eventId));
+                            c.fullCalendar.addEvent(newEvent);
                         }
                         c.bubble.hide();
                     })
                 })
             }
         }
-    })
+    });
 
     // Allow datepicker options to be set in options, too.
     // (Get default date out of full calendar.)
     $('#datepicker').datepicker(c.options.datepicker);
 
-    return this
-}
+    return this;
+};
 
 /**
  * A more sementically-correct version of getForm({no args})
@@ -979,7 +1006,7 @@ function calendarDate(datetime) {
  * @return {String}
  */
 function calendarDateOnly(datetime) {
-    return datetime.format('ddd, Do MMM')
+    return moment(datetime).format('ddd, Do MMM')
     //return $j.fullCalendar.formatDate(datetime, 'ddd, dS MMM')
 }
 
@@ -989,6 +1016,6 @@ function calendarDateOnly(datetime) {
  * @return {String}
  */
 function calendarTime(datetime) {
-    return datetime.format('h:mma')
+    return moment(datetime).format('h:mma')
     //return $j.fullCalendar.formatDate(datetime, 'h:mmtt')
 }

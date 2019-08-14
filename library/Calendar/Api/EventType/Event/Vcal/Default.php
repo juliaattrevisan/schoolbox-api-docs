@@ -328,7 +328,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
         $event->setIsEditable(false);
 
         $event->setAttendance(0);
-        $event->setCompleted(0);
+        $event->setCompleted(false);
 
         /* Give the calendar_connector id so this event knows where it came from
          * This allows you to create an event detail screen in Mobile

@@ -14,7 +14,9 @@
  */
 
 use EOTC\ConfigMapper as EOTCConfigMapper;
+use Schoolbox\Calendar\EventType;
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\Collection;
 
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
@@ -87,36 +89,16 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             ]);
         }
 
+        // Translate old calendar view to new one
+        $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->viewer->getCalendarView()]
+            ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
+
         $this->getPage()->setVar([
-            'CALENDAR_USER_ID' => $this->getUser()->getId(),
-            'CALENDAR_VIEW' =>  ($_SESSION['user']->getCalendarView() !== 'list') ? $_SESSION['user']->getCalendarView() : 'month',
+            'CALENDAR_USER_ID'         => $this->getUser()->getId(),
+            'CALENDAR_VIEW'            => $calendarView,
             'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
-            'CALENDAR_START_DAY' => Config::get('calendar_start_day') ? : 0,
-            'USER_TOKEN' => $this->getUser()->getKey(),
+            'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
+            'USER_TOKEN'               => $this->getUser()->getKey(),
         ]);
-
-        /* Render event types to choose from
-         */
-        /** @var Collection $allTypes */
-        $allTypes = EventTypeMapper::getInstance()->findAll();
-
-        if ($allTypes->count()) {
-            foreach ($allTypes as $currentType) {
-                if ($currentType->isTaskType()) {
-                    $this->getPage()->setVar([
-                        'TASK_TYPE_ID' => $currentType->getId(),
-                    ]);
-                } else {
-                    $this->getPage()->setVar([
-                        'EVENT_TYPE_ID' => $currentType->getId(),
-                        'EVENT_TYPE_NAME' => Scrub::text($currentType->getType()),
-                    ]);
-
-                    $this->getPage()->parse('event_type_block', 'event_type', true);
-                }
-            }
-        } else {
-            $this->getPage()->setVar('event_type_block', '');
-        }
     }
 }

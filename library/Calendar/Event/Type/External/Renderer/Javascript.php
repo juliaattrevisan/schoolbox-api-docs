@@ -64,6 +64,7 @@ class Javascript extends Base
                     'author'      => $this->getEvent()->getAuthorName(),
                     'authorId'    => $this->getEvent()->getAuthorId(),
                     'level'       => $this->getEvent()->getEventClasses(),
+                    'completed'   => false,
                 ),
                 // Do I need this? TODO
 
