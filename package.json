@@ -15,7 +15,7 @@
     "@fullcalendar/timegrid": "^4.2.0",
     "@fullcalendar/vue": "^4.2.2",
     "@types/classnames": "^2.2.9",
-    "axios": "0.18.0",
+    "axios": "0.18.1",
     "classnames": "^2.2.6",
     "core-js": "^3.1.4",
     "es6-object-assign": "1.1.0",
