@@ -50,7 +50,7 @@ class PastoralCest
         $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
         $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
         $pastoralRecPayload->setHeading($heading);
-        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Created pastoral record for student #' . $student_drhodes->getId());
+        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Send request create pastoral record for student #' . $student_drhodes->getId());
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
@@ -86,13 +86,13 @@ class PastoralCest
         $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
         $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
         $pastoralRecPayload->setHeading($heading);
-        $i->sendCurlRequest($pastoralRecPayload, false, 'Created pastoral record for student #' . $student_drhodes->getId());
+        $i->sendCurlRequest($pastoralRecPayload, false, 'Send request create pastoral record for student #' . $student_drhodes->getId());
         $pastoral_record = $i->getPastoralRecordByTitle($heading);
 
         #WHEN
         $pastoralRecPayload->setUpdateRecord($pastoral_record->getId());
         $pastoralRecPayload->setFormParam('body_public', '<p>automated public statement - Edited</p>');
-        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Modified pastoral record for student #' . $student_drhodes->getId());
+        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Send request modify pastoral record for student #' . $student_drhodes->getId());
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
@@ -129,13 +129,13 @@ class PastoralCest
         $pastoralRecPayload->setViewer('role', $teacher_role->getId(), 'public');
         $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
         $pastoralRecPayload->setHeading($heading);
-        $i->sendCurlRequest($pastoralRecPayload, false, 'Created pastoral record for student #' . $student_drhodes->getId());
+        $i->sendCurlRequest($pastoralRecPayload, false, 'Send request create pastoral record for student #' . $student_drhodes->getId());
         $pastoral_record = $i->getPastoralRecordByTitle($heading);
 
         #WHEN
         $pastoralRecPayload->setUpdateRecord($pastoral_record->getId());
         $pastoralRecPayload->setDupicateToUser($student_duplicate_target->getId());
-        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Duplicate pastoral record for student #' . $student_drhodes->getId() . ' to student #' . $student_duplicate_target->getId());
+        $response = $i->sendCurlRequest($pastoralRecPayload, true, 'Send request duplicate pastoral record for student #' . $student_drhodes->getId() . ' to student #' . $student_duplicate_target->getId());
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
@@ -173,13 +173,13 @@ class PastoralCest
         $pastoralRecPayload->setViewer('user', $teacher->getId(), 'confidential');
 
         $pastoralRecPayload->setHeading($heading);
-        $i->sendCurlRequest($pastoralRecPayload, false, 'Created pastoral record for student #' . $student_drhodes->getId());
+        $i->sendCurlRequest($pastoralRecPayload, false, 'Send request create pastoral record for student #' . $student_drhodes->getId());
         $pastoral_record = $i->getPastoralRecordByTitle($heading);
 
         #WHEN
         $pastoralCommentPayload->setStudentAndRecordIds($student_drhodes->getId(), $pastoral_record->getId());
         $pastoralCommentPayload->setPublicComment('A very public comment');
-        $response = $i->sendCurlRequest($pastoralCommentPayload, true, 'Add comment to student #' . $student_drhodes->getId() . ' record # ' . $pastoral_record->getId());
+        $response = $i->sendCurlRequest($pastoralCommentPayload, true, 'Send request add comment to student #' . $student_drhodes->getId() . ' record # ' . $pastoral_record->getId());
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
@@ -191,7 +191,7 @@ class PastoralCest
 
         #WHEN
         $pastoralCommentPayload->setPrivateComment('A very private comment');
-        $response = $i->sendCurlRequest($pastoralCommentPayload, true, 'Add private comment to student #' . $student_drhodes->getId() . ' record # ' . $pastoral_record->getId());
+        $response = $i->sendCurlRequest($pastoralCommentPayload, true, 'Send request add private comment to student #' . $student_drhodes->getId() . ' record # ' . $pastoral_record->getId());
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
