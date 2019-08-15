@@ -23,8 +23,8 @@ class CliImporter extends CliTool\App
 {
     use CanvasDatabaseTrait;
 
-    private const OPT_SHORT_HELP       = 'h';                 // print help
-    private const OPT_LONG_HELP        = 'help';              // print help
+    private const OPT_SHORT_HELP = 'h';                 // print help
+    private const OPT_LONG_HELP  = 'help';              // print help
 
     /** @inheritdoc */
     public function getShortOpts(): array
@@ -49,6 +49,12 @@ class CliImporter extends CliTool\App
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
             exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
+        if ($this->perform()) {
+            $this->getLogger()->info('Running in perform mode (-p): changes will be written to database');
+        } else {
+            $this->getLogger()->info('Running in dry-run mode: use -p to write changes to database');
         }
 
         // Get DB
@@ -77,7 +83,7 @@ class CliImporter extends CliTool\App
 
         $tempDir = $this->createTempDir();
         $dumpFile = $tempDir . '/dump.json';
-        $schemaFile = $tempDir . '/dump.json';
+        $schemaFile = $tempDir . '/schema.json';
         $connector = new CanvasConnector(
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY),
             $this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
@@ -85,11 +91,11 @@ class CliImporter extends CliTool\App
 
         // Fetch latest dump
         try {
-            $this->getLogger()->debug('Getting latest data url');
+            $this->getLogger()->info('Getting latest data urls.');
             $dumpResponse = $connector->fetchLatestDump();
             $this->storeTempFile($dumpResponse, $dumpFile);
             $dump = json_decode($dumpResponse, true);
-            $this->getLogger()->debug("Getting schema version {$dump[$connector::SCHEMA_VERSION]}");
+            $this->getLogger()->info("Getting schema version {$dump[$connector::SCHEMA_VERSION]}.");
             $schemaResponse = $connector->fetchSchema($dump[$connector::SCHEMA_VERSION]);
             $this->storeTempFile($schemaResponse, $schemaFile);
         } catch (Exception $e) {
@@ -98,35 +104,36 @@ class CliImporter extends CliTool\App
         }
 
         // Download data files
-        $this->getLogger()->debug('Downloading latest data');
+        $this->getLogger()->info('Downloading latest data.');
         $this->downloadDataFiles($dump['artifactsByTable'], $tempDir);
 
         if ($this->perform()) {
             // Create schema in the staging database
             $dataRestorer = new DataRestorer($db, $this->getLogger(), $this->getCanvasDbName());
-            $this->getLogger()->debug('Importing schema from json file:' . $schemaFile);
+            $this->getLogger()->info("Importing schema from json file: $schemaFile.");
             $schemaContainer = json_decode(file_get_contents($schemaFile), true);
             $schema = $schemaContainer['schema'];
             $dataRestorer->restoreSchema($schema);
 
             // Store downloaded data to tables in the staging database
-            $this->getLogger()->debug('Restoring data to tables');
-            if (!$dh = @opendir($tempDir)) {
-                $this->getLogger()->warning("Failed to open directory $tempDir");
+            $this->getLogger()->info('Restoring data to tables.');
+            $tableGzFiles = scandir($tempDir);
+            if (!$tableGzFiles || !count($tableGzFiles)) {
+                $this->getLogger()->warning("Failed to open directory $tempDir.");
                 exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
             }
-            while (false !== ($tableGzFile = readdir($dh))) {
+            foreach ($tableGzFiles as $tableGzFile) {
                 $posExt = strpos($tableGzFile, '.gz');
                 if (!$posExt) {
                     continue;
                 }
                 $tableName = substr($tableGzFile, 0, $posExt);
                 $tableFile = "$tempDir/$tableName";
-                $this->getLogger()->debug("Loading  $tableFile");
+                $this->getLogger()->debug("Loading $tableFile.");
 
-                exec("gunzip $tempDir/$tableGzFile");
+                exec("gunzip " . escapeshellarg("$tempDir/$tableGzFile"));
                 $dataRestorer->restoreTableData($tableName, $tableFile);
-                exec("gzip $tableFile");
+                exec("gzip " . escapeshellarg($tableFile));
             }
         }
     }
@@ -168,9 +175,9 @@ class CliImporter extends CliTool\App
             $tableDataFile = fopen("$tempDir/$tableName.gz", 'w');
             try {
                 $response = $client->get($tableFile['url'], ['save_to' => $tableDataFile]);
-                $this->getLogger()->debug("downloading $tableName to $tempDir/$tableName.gz");
+                $this->getLogger()->debug("Downloading $tableName to $tempDir/$tableName.gz.");
             } catch (GuzzleException $e) {
-                $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: " . $e->getMessage());
+                $this->getLogger()->warning("Failed to download $tempDir/$tableName.gz: {$e->getMessage()}");
             }
         }
     }

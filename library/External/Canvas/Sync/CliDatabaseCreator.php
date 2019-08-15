@@ -7,10 +7,12 @@ declare(strict_types=1);
 
 namespace External\Canvas\Sync;
 
+use Alaress\Database\Exception;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Alaress\Database\Connector\Base;
 use Alaress\Database\Broker\Mysql\Broker;
+use PDO;
 
 /**
  * Command line application for syncing canvas-data
@@ -63,8 +65,14 @@ class CliDatabaseCreator extends CliTool\App
             exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
 
+        if ($this->perform()) {
+            $this->getLogger()->info('Running in perform mode (-p): changes will be written to database');
+        } else {
+            $this->getLogger()->info('Running in dry-run mode: use -p to write changes to database');
+        }
+
         // Information
-        $canvasDb = $this->getCanvasDbName();
+        $canvasDbName = $this->getCanvasDbName();
         $dbSchoolboxUser = SQL_user;
         $dbCredentialFile = '/root/.my.cnf';
 
@@ -74,50 +82,59 @@ class CliDatabaseCreator extends CliTool\App
         }
 
         // Check whether the credential is correct by connecting to schoolbox database.
-        $rootDbConnection = new Base(new Broker());
+        $rootDb = new Base(new Broker());
         try {
-            $result = $rootDbConnection->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
-        } catch (\Alaress\Database\Exception $e) {
+            $result = $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
+        } catch (Exception $e) {
             $this->getLogger()->warning('Could not connect to schoolbox db using the credentials provided: ' . $e->getMessage());
             exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
 
         // Check whether the database already exists.
         try {
-            $result = $rootDbConnection->connect($this->dbHost, $canvasDb, $this->dbRootUser, $this->dbRootPassword);
-            $this->getLogger()->info("Database {$canvasDb} already exists.");
+            $rootDb->connect($this->dbHost, $canvasDbName, $this->dbRootUser, $this->dbRootPassword);
+            $this->getLogger()->info("Database {$canvasDbName} already exists.");
             exit(CliKernelAbstract::EXIT_STATUS_OK);
-        } catch (\Alaress\Database\Exception $e) {
+        } catch (Exception $e) {
             // Expected
         }
 
         if ($this->perform()) {
+            $rootDb->connect($this->dbHost, SQL_db, $this->dbRootUser, $this->dbRootPassword);
+
             # Vagrant and on-premises use 'localhost'. Cloud uses '%' wildcard as PHP and MySQL are on different hosts
             # ORDER BY to prefer '%' over 'localhost' if both are available (they shouldn't be)
-            $sql = "SELECT Host FROM mysql.user WHERE User = '{$dbSchoolboxUser}' ORDER BY Host LIMIT 1";
-            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$this->dbHost} --silent --skip-column-names -e \"{$sql}\" 2>&1", $out, $result);
-            if ($result || !count($out)) {
-                $this->getLogger()->warning("Error fetching allowed host for {$dbSchoolboxUser}:" . implode(',', $out));
+            $allowedHosts = $rootDb->executeQuery(
+                "SELECT Host FROM mysql.user WHERE User = :user ORDER BY Host LIMIT 1",
+                ['user' => $dbSchoolboxUser]
+            )->fetch(PDO::FETCH_COLUMN);
+            if (!$allowedHosts || !count($allowedHosts)) {
+                $this->getLogger()->warning("Error fetching allowed host for {$dbSchoolboxUser}.");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
-            $allowedHost = $out[0];
 
             // Create database.
-            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$this->dbHost} -e \"CREATE DATABASE {$canvasDb} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\" 2>&1", $out, $result);
-            if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
-                $this->getLogger()->warning("Error creating database {$canvasDb}:" . implode(',', $out));
+            try {
+                $rootDb->execute(
+                    "CREATE DATABASE {$rootDb->quoteIdentifier($canvasDbName)} CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
+                );
+            } catch (Exception $e) {
+                $this->getLogger()->warning("Error creating database {$canvasDbName}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
-            $this->getLogger()->info("Database {$canvasDb} has been created.");
+            $this->getLogger()->info("Database {$canvasDbName} has been created.");
 
             // Grant permissions to schoolbox user to new database
-            exec("mysql -u {$this->dbRootUser} -p{$this->dbRootPassword} -h {$this->dbHost} -e \"GRANT ALL ON {$canvasDb}.* to '{$dbSchoolboxUser}'@'{$allowedHost}';\" 2>&1", $out, $result);
-            if ($result !== CliKernelAbstract::EXIT_STATUS_OK) {
-                $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}:" . implode(',', $out));
+            try {
+                $rootDb->execute(
+                    "GRANT ALL ON {$rootDb->quoteIdentifier($canvasDbName)}.* to {$rootDb->quoteIdentifier($dbSchoolboxUser)}@{$rootDb->quoteIdentifier($allowedHosts[0])}"
+                );
+            } catch (Exception $e) {
+                $this->getLogger()->warning("Error granting access to {$dbSchoolboxUser}: {$e->getMessage()}");
                 exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
             }
         } else {
-            $this->getLogger()->info("Creating a database {$canvasDb}");
+            $this->getLogger()->info("Database {$canvasDbName} would have been created: run with -p flag to actually create database");
         }
     }
 
@@ -146,7 +163,7 @@ class CliDatabaseCreator extends CliTool\App
             exit(1);
         }
 
-        $this->dbRootPassword = $this->readLine('Enter a database password: ');
+        $this->dbRootPassword = $this->readPassword('Enter a database password: ');
         if (!$this->dbRootPassword) {
             $this->getLogger()->error('A database password must be provided');
             exit(1);

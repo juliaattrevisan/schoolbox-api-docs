@@ -62,7 +62,7 @@ trait CanvasDatabaseTrait
             ['db_name' => $this->getCanvasDbName()]
         )->fetchAll(PDO::FETCH_COLUMN);
         foreach ($tables as $table) {
-            $db->executeQuery("DROP TABLE IF EXISTS $table");
+            $db->executeQuery("DROP TABLE IF EXISTS {$db->quoteIdentifier($table)}");
         }
         $db->executeQuery('SET FOREIGN_KEY_CHECKS = 1');
     }
