@@ -156,7 +156,6 @@ class EventRecurrenceMapper
             $previous = $this->getEventMapper()->findOneByColumn(
                 $this->getEventMapper()->getIdentifierColumn(),
                 $event->getId(),
-                [],
                 ['cache' => false]
             );
 

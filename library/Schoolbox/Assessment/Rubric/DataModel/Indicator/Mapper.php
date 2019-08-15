@@ -299,7 +299,6 @@ class Mapper extends BaseMapper {
                 'g.parent_type' => $parentType,
                 'g.parent_id'   => $parentId,
             ],
-            [],
             ['cache' => $cache,]
         );
     }

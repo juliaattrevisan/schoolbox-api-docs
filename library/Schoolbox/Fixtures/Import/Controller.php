@@ -619,7 +619,7 @@ class Controller extends Base
 //                } else {
 //                    try {
 //                        /** @var Season $season */
-//                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+//                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], $this->disableCache);
 //                    } catch (MapperException $e) {
 //                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
 //                        $error = true;
@@ -650,7 +650,7 @@ class Controller extends Base
 //                    // Find the sport associated with the division, and create if doesn't exist
 //
 //                    try {
-//                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
+//                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], $this->disableCache);
 //                    } catch (MapperException $e) {
 //                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
 //                        $sport = new Sport();
@@ -665,7 +665,7 @@ class Controller extends Base
 //                            'sport_id' => $sport->getId(),
 //                            'season_id' => $season->getId(),
 //                            'name' => $row[3]
-//                        ], [], $this->disableCache);
+//                        ], $this->disableCache);
 //                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Division '{$row[3]}'");
 //                    } catch (MapperException $e) {
 //                        $division = new Division();
@@ -692,7 +692,7 @@ class Controller extends Base
 //                            $this->getDivisionUserMapper()->findOneByColumnList([
 //                                'division_id' => $division->getId(),
 //                                'user_id' => $player
-//                            ], [], $this->disableCache);
+//                            ], $this->disableCache);
 //                        } catch (MapperException $e) {
 //                            $user = new User();
 //                            $user->setId($player);
