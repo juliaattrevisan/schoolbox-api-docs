@@ -17,12 +17,14 @@ class Base
                 'Accept'        => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Referer'       => 'https://'.self::VAGRANT_DOMAIN
             ],
-            'form_params' => []
+            'form_params' => [],
+            'query' => []
         ]
     ];
 
     public function __construct()
     {
+        unset($this->structure['payload']['query']);
         /**
          * Example code for setting various parts of the payload in classes that extend this.
          * $this->setPage('/page_we_desplay');
