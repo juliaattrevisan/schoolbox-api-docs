@@ -19,20 +19,21 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
                                         `year_level_coordinator_id`, `year_level_coordinator_name`,`mobile`, `studies_code`,`alert_medical`,`alert_comment`,
                                         `alert_message`,`alert_legal`,`enrolment_date`,`leaving_date`, `ib`, `individual_learning_plans`,`esl`, `special_needs`,
                                         `boarding_status`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, NULL, NULL,`user`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
            `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,`user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`,
     NULL, `user`.`boarding_status` , NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
              JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
+             JOIN `house`  ON `user`.`house` = `house`.`id`
     WHERE `groups`.`group_type` = 'student';
 
 /*
  Migrate data from user to sis_profile_user_parent table of the new schema
  */
 INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `email`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, NULL, NULL, NULL, `user`.`local_email`, NOW(), NOW(), NULL
+    SELECT `sis_user_profile`.`id`, NULL, NULL, NULL, `user`.`alt_email`, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
