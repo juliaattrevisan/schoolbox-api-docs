@@ -32,12 +32,6 @@ class PastoralRecord extends Base
         $this->setFormParam('id', '');
         $this->setFormParam('student_id', '??');
         $this->setFormParam('heading', 'someHeading');
-
-
-        $level_data= [
-            'level' => 1,
-            'campus[]' => 1
-        ];
     }
 
     public function setHeading(string $heading)
