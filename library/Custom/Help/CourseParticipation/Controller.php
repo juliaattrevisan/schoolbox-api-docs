@@ -110,7 +110,7 @@ class Controller extends Base
 
     /**
      * @api   GET /api/course-participation/apitest
-     * @level 170
+     * @since 170
      *
      * @throws ServiceNotFound
      */
@@ -139,7 +139,7 @@ class Controller extends Base
 
     /**
      * @api   GET /api/course-participation/{schoolCode:\w+}/digest
-     * @level 170
+     * @since 170
      *
      * @param string $schoolCode
      */
@@ -165,7 +165,7 @@ class Controller extends Base
 
     /**
      * @api   POST /api/course-participation/apitest
-     * @level 170
+     * @since 170
      */
     public function postApiTest()
     {
@@ -210,7 +210,7 @@ class Controller extends Base
 
     /**
      * @api   GET /api/course-participation/ecc
-     * @level 170
+     * @since 170
      *
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
@@ -267,7 +267,7 @@ class Controller extends Base
 
     /**
      * @api   POST /api/course-participation/{schoolCode}/courses
-     * @level 170
+     * @since 170
      *
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
@@ -353,7 +353,7 @@ class Controller extends Base
 
     /**
      * @api   GET /api/course-participation/{schoolCode}/users
-     * @level 170
+     * @since 170
      *
      * @param string $schoolCode
      * @throws Mapper\DefinitionException
@@ -382,7 +382,7 @@ class Controller extends Base
 
     /**
      * @api   POST /api/course-participation/{schoolCode}/users
-     * @level 170
+     * @since 170
      *
      * @param string $schoolCode
      * @throws Mapper\DefinitionException

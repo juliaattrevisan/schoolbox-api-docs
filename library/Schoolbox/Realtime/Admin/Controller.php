@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -283,7 +283,7 @@ class Controller extends BaseController
      * Shows the message configuration form
      *
      * @api   GET /adminv2/messages/configure{/roletype}
-     * @level 150
+     * @since 150
      *
      * @param string $roletype
      */
@@ -307,7 +307,7 @@ class Controller extends BaseController
                    ->findAll()
                    ->indexBy('id')
                    ->getAll();
-        
+
         //Filtering out disabled modules
         //   Modules            => Related Notifications
         $checkEnabled = Array(
@@ -354,7 +354,7 @@ class Controller extends BaseController
 
     /**
      * @api   GET /adminv2/messages/configure/custom
-     * @level 150
+     * @since 150
      */
     public function customConfig()
     {
@@ -404,7 +404,7 @@ class Controller extends BaseController
      * Note: roletype is actually ignored...
      *
      * @api   POST /adminv2/messages/configure{/roletype}
-     * @level 155
+     * @since 155
      */
     public function saveConfig()
     {

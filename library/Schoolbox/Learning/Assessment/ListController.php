@@ -94,7 +94,7 @@ class ListController extends Web\Controller\Base
      * It shows the functionality of the common "assessment component" logic for any context
      *
      * @api GET /learning/{contextType}/{contextId}/assessments?user&readOnly
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      */
@@ -146,7 +146,7 @@ class ListController extends Web\Controller\Base
      * Create a new assessment in the given context
      *
      * @api   POST /learning/{:contextType}/{:contextId}/assessments
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      * @throws Web\Controller\Exception
@@ -183,7 +183,7 @@ class ListController extends Web\Controller\Base
      * * id: a list of assessment IDs, in order of what their schedule should be
      *
      * @api   POST /learning/{contextType}/{contextId}/assessments/reorder
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      */
@@ -263,7 +263,7 @@ class ListController extends Web\Controller\Base
      * Get the form for creating a new assessment in a particular context
      *
      * @api   GET /learning/{contextType}/{contextId}/assessments/new?type
-     * @level 165
+     * @since 165
      *
      * @param AssessmentContext $context
      */

@@ -38,7 +38,7 @@ class Controller extends BaseController
      * View the marks overview for the given box
      *
      * @api   /submission/overview/{box_id}
-     * @level 150
+     * @since 150
      *
      * @param SubmissionBox $box
      * @deprecated 165 Ported to IAssessable route
@@ -56,7 +56,7 @@ class Controller extends BaseController
      * Download the CSV of the marks overview for the given box
      *
      * @api   /submission/overview/{box_id}/csv
-     * @level 150
+     * @since 150
      *
      * @param SubmissionBox $box
      * @deprecated 165 Ported to IAssessable route

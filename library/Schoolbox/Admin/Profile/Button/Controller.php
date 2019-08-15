@@ -87,7 +87,7 @@ class Controller extends Base
      * Display re-order screen
      *
      * @api   GET /adminv2/profile-button
-     * @level 182
+     * @since 182
      */
     public function getIndex(): void
     {
@@ -136,7 +136,7 @@ class Controller extends Base
      * Display modification screen
      *
      * @api   GET /adminv2/profile-button/modify/{id}
-     * @level 182
+     * @since 182
      *
      * @param int $id
      * @throws \InvalidArgumentException
@@ -181,7 +181,7 @@ class Controller extends Base
      * Display create screen
      *
      * @api   GET /adminv2/insert
-     * @level 182
+     * @since 182
      *
      */
     public function getCreate(): void
@@ -202,7 +202,7 @@ class Controller extends Base
      * Update profile button order
      *
      * @api   POST /adminv2/profile-button/order
-     * @level 182
+     * @since 182
      */
     public function postOrder(): void
     {
@@ -225,7 +225,7 @@ class Controller extends Base
      * Delete profile button
      *
      * @api   POST /adminv2/profile-button/delete
-     * @level 182
+     * @since 182
      */
     public function postDelete(): void
     {
@@ -239,7 +239,7 @@ class Controller extends Base
      * Save profile button
      *
      * @api   POST /adminv2/profile-button/modify
-     * @level 182
+     * @since 182
      */
     public function postModify(): void
     {
@@ -279,7 +279,7 @@ class Controller extends Base
         $item->setUrl($post['url']);
         $item->setCss(trim($post['css']));
         $item->setTarget($post['target']);
-        
+
         $this->profileButtonMapper->save($item);
 
         $this->campusAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
@@ -292,7 +292,7 @@ class Controller extends Base
                 $this->campusAvailabilityMapper->save($profileButtonCampus);
             }
         }
-        
+
         $this->roleAvailabilityMapper->deleteByColumn('profile_button_id', $item->getId());
 
         if (\is_array($post['roleAvailability'])) {

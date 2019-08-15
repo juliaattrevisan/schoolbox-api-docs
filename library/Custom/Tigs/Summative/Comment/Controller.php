@@ -18,7 +18,7 @@ class Controller extends Web\Controller\Base
      * users in a selected student role
      *
      * @api   GET /modules/custom/tigs/summative/comment/role/{roleId}/term/{termSlug}
-     * @level 18.1.0
+     * @since 18.1.0
      * @param int    $roleId
      * @param string $termSlug
      * @throws ServiceNotFound
@@ -40,7 +40,7 @@ class Controller extends Web\Controller\Base
      * users in a selected folder
      *
      * @api   GET /modules/custom/tigs/summative/comment/folder/{folderId}/term/{termSlug}
-     * @level 18.1.0
+     * @since 18.1.0
      * @param int $folderId
      * @param string $termSlug
      * @throws ServiceNotFound

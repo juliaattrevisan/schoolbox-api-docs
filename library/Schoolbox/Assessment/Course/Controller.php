@@ -150,7 +150,7 @@ class Controller extends Base\Base
      * Does not permit moving an existing Unit to a new Course.
      *
      * @api POST /course/convert/:courseFolderId/:unitFolderId
-     * @level 165
+     * @since 165
      *
      * @param Folder $courseFolder
      * @param Folder $unitFolder
@@ -283,7 +283,7 @@ class Controller extends Base\Base
      * Saves the sequence of Assessments in specified UnitSpecification
      *
      * @api /course/unitspecs/{id}/sequence
-     * @level 165
+     * @since 165
      *
      * @var int[] $_POST['sequence'] AssessmentIds, indexed by sequence
      */
@@ -364,7 +364,7 @@ class Controller extends Base\Base
      * Course.id will be null if it is a create.
      *
      * @api   GET /course/modify/{id}
-     * @level 160
+     * @since 160
      *
      * @param CourseSpecification $courseSpec The course being created/modified
      * @throws Deleted
@@ -429,7 +429,7 @@ class Controller extends Base\Base
      * Form to create a new course
      *
      * @api   GET /course/new{/:name}
-     * @level 160
+     * @since 160
      * @param string|null $name
      * @throws MapperException
      */
@@ -447,7 +447,7 @@ class Controller extends Base\Base
      * Accept the create formdata
      *
      * @api   POST /course/new
-     * @level 160
+     * @since 160
      *
      * @var string   $_POST['name']             name to give to new course's folder
      * @var int      $_POST['parent']           id of the folder to create the new course's folder under
@@ -594,7 +594,7 @@ class Controller extends Base\Base
 
     /**
      * @api   POST /course/modify/{id}
-     * @level 160
+     * @since 160
      *
      * @param CourseSpecification $courseSpec
      * @var string   $_POST['name'] indexed by unitSpec.id
@@ -687,7 +687,7 @@ class Controller extends Base\Base
      * * CourseBuilder Component on the Folder
      *
      * @api   POST /course/{courseSpecId}/units/new
-     * @level 160
+     * @since 160
      * @param CourseSpecification $courseSpec
      * @var string $_POST['name'] What to name the new unit
      */
@@ -804,7 +804,7 @@ class Controller extends Base\Base
      * Generate a list of CourseSpecs
      *
      * @api   GET /course/list
-     * @level 160
+     * @since 160
      *
      * @var string[] $_GET                       AJAX GET params
      * @var string   $_GET['encodedReturnUrl']   For URL generation
@@ -816,7 +816,7 @@ class Controller extends Base\Base
         $query = $this->getRequest()->query;
         $data = $this->getCourseData();
         $data['returnUrlKey'] = Redirect::RETURN_URL;
-        
+
         if ($query->get('folder')) {
             $folderModel = $this->folderMapper->findById($query->get('folder'));
             $data['suggestions'] = $this->getLinkSuggestions($folderModel);
@@ -852,7 +852,7 @@ class Controller extends Base\Base
      * Performs a search by CourseSpec's Folder name
      *
      * @api   GET /course/list/ajax
-     * @level 160
+     * @since 160
      *
      * @var string[] $_GET                       AJAX GET params
      * @var string   $_GET['search']             Search string submitted by user
@@ -1011,7 +1011,7 @@ class Controller extends Base\Base
      *
      * @param $folderId
      * @api   GET /course/parent
-     * @level 160
+     * @since 160
      */
     public function parentList($folderId)
     {
@@ -1085,7 +1085,7 @@ class Controller extends Base\Base
      * Delete a course specification
      *
      * @api   POST /course/delete/{id}
-     * @level 160
+     * @since 160
      *
      * @param CourseSpecification $courseSpec The course to delete
      * @param bool $deleteFolder
@@ -1122,7 +1122,7 @@ class Controller extends Base\Base
      * (Essentially we are converting a Unit back to a Folder)
      *
      * @api   POST /course/unitspecs/{id}/delete
-     * @level 160
+     * @since 160
      *
      * @param UnitSpecification $unitSpec The unit spec to delete
      */
@@ -1150,7 +1150,7 @@ class Controller extends Base\Base
      * (Essentially we are converting a Unit back to a Folder)
      *
      * @api   POST /course/units/{id}/delete
-     * @level 160
+     * @since 160
      *
      * @param UnitImplementation $unitImpl The unit implementation to delete
      */
@@ -1226,7 +1226,7 @@ class Controller extends Base\Base
 
     /**
      * @api GET /course/:folderId/nodes
-     * @level 155
+     * @since 155
      *
      * @param int $folderId
      */

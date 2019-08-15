@@ -38,7 +38,7 @@ class Controller extends ConfigController
      * Renders the module admin page
      *
      * @api   GET /adminv2/custom/tigs/summative
-     * @level 18.1.0
+     * @since 18.1.0
      * @throws \Aura\Di\Exception\ServiceNotFound
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
@@ -60,7 +60,7 @@ class Controller extends ConfigController
      * Updates admin items available on the module admin page
      *
      * @api   POST /adminv2/custom/tigs/summative
-     * @level 18.1.0
+     * @since 18.1.0
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception

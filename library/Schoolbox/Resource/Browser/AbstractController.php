@@ -247,7 +247,7 @@ abstract class AbstractController extends BaseController
      * Displays 3-panel browser
      *
      * @api GET /resources(/:folderId)
-     * @level 150
+     * @since 150
      *
      * @param int $folderId
      */
@@ -294,7 +294,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/:folderId/nodes
-     * @level 155
+     * @since 155
      *
      * @param int $folderId
      */
@@ -315,7 +315,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/:folderId/children
-     * @level 150
+     * @since 150
      *
      * @param int $folderId
      */
@@ -336,7 +336,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/:folderId/info
-     * @level 150
+     * @since 150
      *
      * @param int $folderId
      */
@@ -352,7 +352,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/file/:fileId/info
-     * @level 150
+     * @since 150
      *
      * @param int $fileId
      */
@@ -382,7 +382,7 @@ abstract class AbstractController extends BaseController
 
     /**
      * @api GET /resources/file/:fileId/ajax
-     * @level 150
+     * @since 150
      *
      * @param int $fileId
      */

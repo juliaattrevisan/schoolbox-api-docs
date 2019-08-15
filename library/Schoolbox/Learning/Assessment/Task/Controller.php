@@ -109,7 +109,7 @@ class Controller extends Assessment\Controller
      * Display appropriate landing page based on role
      *
      * @api   GET /learning/assessments/:assessmentId/:userId
-     * @level 165
+     * @since 165
      * @param IAssessable|Task $assessment
      * @param User             $student
      * @throws ServiceNotFound
@@ -226,7 +226,7 @@ class Controller extends Assessment\Controller
 
     /**
      * @api   GET /learning/assessments/:assessmentId/:studentId/submit
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessment
      * @param User        $student
@@ -245,7 +245,7 @@ class Controller extends Assessment\Controller
      * If the most recent task response has the same status, this call will rejected.
      *
      * @api   POST /learning/assessments/:assessmentId/:studentId/submit
-     * @level 165
+     * @since 165
      *
      * @param IAssessable|Model $assessment
      * @param User              $student

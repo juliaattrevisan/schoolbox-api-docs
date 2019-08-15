@@ -90,7 +90,7 @@ class Controller extends Web\Controller\Base
      * Displays a student's participation report for current term
      *
      * @api   GET /modules/custom/tigs/summative/participation/user/{userId}
-     * @level 18.1.0
+     * @since 18.1.0
      * @param User        $user
      * @param string|null $reportDate
      * @throws Exception

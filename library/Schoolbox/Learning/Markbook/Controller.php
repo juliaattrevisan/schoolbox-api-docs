@@ -160,7 +160,7 @@ class Controller extends Base
      * Displays a list of marks for students in the specified class
      *
      * @api   GET /learning/markbook?f=1,2&td=3
-     * @level 165
+     * @since 165
      * @param null|User $viewee Whose markbook are we looking at?
      * @throws RouteNotFound
      * @throws \InvalidArgumentException             If unable to locate Filter mapper class, or required filter definition classes

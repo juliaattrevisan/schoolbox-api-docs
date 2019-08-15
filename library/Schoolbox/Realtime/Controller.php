@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -278,7 +278,7 @@ class Controller extends BaseController
      * Shows the message configuration form
      *
      * @api   GET /settings/messages
-     * @level 150
+     * @since 150
      */
     public function configure()
     {
@@ -324,7 +324,7 @@ class Controller extends BaseController
                 }
             }
         }
-        
+
         $sources = SourceMapper::getInstance()
                                ->findAll()
                                ->indexBy('id')
@@ -348,7 +348,7 @@ class Controller extends BaseController
 
     /**
      * @api   POST /settings/messages
-     * @level 150
+     * @since 150
      */
     public function saveConfig()
     {

@@ -125,7 +125,7 @@ class Controller extends Base
      * Redirects to current user
      *
      * @api   GET /learning/pending
-     * @level 165
+     * @since 165
      * @throws RouteNotFound
      */
     public function getPendingAssessments(): void
@@ -149,7 +149,7 @@ class Controller extends Base
      * Displays a blank page with collapsed filter panel
      *
      * @api   GET /learning/pending/:userId
-     * @level 165
+     * @since 165
      * @param User                             $viewee The user whose pending assessments we are viewing.
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @var mixed[][] $_GET. Comma-separated keys, indexed by filter.id. Eg '1=&2=weighted&3=1,2,3' (1 => [], 2 => [weighted], 3 => [1,2,3])
@@ -191,7 +191,7 @@ class Controller extends Base
      * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
      *
      * @api   GET /learning/pending/:userId
-     * @level 165
+     * @since 165
      * @param User                             $viewee The user whose pending assessments we are viewing.
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      * @var  string[][]                        $_POST  ['filter_selection'] Indexed by filter.id, then concrete key
@@ -335,7 +335,7 @@ class Controller extends Base
      * Else term is historical, so we display classes where a student has submitted responses or received feedback
      *
      * @api   GET /learning/classes{/term}
-     * @level 165
+     * @since 165
      *
      * @param Term $term
      * @throws ServiceNotFound If unable to find HTML builder

@@ -88,7 +88,7 @@ class Controller extends BaseController
      * * returnUrl: a URL to return to once done
      *
      * @api   GET /learning/export/assessment/:assessmentId
-     * @level 165
+     * @since 165
      *
      * @param IAssessable $assessmentSpec
      * @throws \Aura\Di\Exception\ServiceNotFound
@@ -143,7 +143,7 @@ class Controller extends BaseController
      * Processes the export assessment request.
      *
      * @api      POST /learning/export/assessment/:assessmentId
-     * @level    165
+     * @since    165
      *
      * @param IAssessable $assessmentSpec
      *
@@ -381,7 +381,7 @@ class Controller extends BaseController
      * Download a csv of assessment results for Accellerus
      *
      * @api   GET /learning/export/assessment/csv
-     * @level 160
+     * @since 160
      * @throws InvalidArgumentException If any filter keys not recognised
      * @throws BrokenFilterException If a injected filter is unable to be processed
      */

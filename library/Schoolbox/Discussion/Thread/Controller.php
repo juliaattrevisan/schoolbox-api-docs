@@ -101,7 +101,7 @@ class Controller extends BaseController
      * @param Model    $thread
      * @param IThreadLocation $context
      *@api   GET /discussion/{contextType}/{contextId}/threads/{id}
-     * @level 190
+     * @since 190
      *
      */
     public function getThread(Model $thread, IThreadLocation $context): void
@@ -116,7 +116,7 @@ class Controller extends BaseController
      * @param IThreadLocation $context The item with which to associate the thread
      * @throws \Schoolbox\Mapper\Exception
      *@api   POST /discussion/{contextType}/{contextId}/threads/
-     * @level 190
+     * @since 190
      *
      */
     public function createThread(IThreadLocation $context): void
@@ -137,7 +137,7 @@ class Controller extends BaseController
      * @param Model    $thread
      * @param IThreadLocation $context
      *@api   GET /discussion/{contextType}/{contextId}/threads/{id}/comments
-     * @level 190
+     * @since 190
      *
      */
     public function getCommentsByThread(Model $thread, IThreadLocation $context): void
@@ -168,7 +168,7 @@ class Controller extends BaseController
      *
      * @throws \Schoolbox\Mapper\Exception
      *@api   POST /discussion/{contextType}/{contextId}/threads/{id}/comments
-     * @level 190
+     * @since 190
      *
      */
     public function createCommentInThread(Model $thread, IThreadLocation $context): void

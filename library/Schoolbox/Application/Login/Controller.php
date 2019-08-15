@@ -19,7 +19,7 @@ class Controller extends Base
     /**
      * Displays login page, will show error if XHR, will redirect to SAML if enabled
      * @api   GET /login
-     * @level 18.2
+     * @since 18.2
      *
      * @param string|null $error
      * @param string|null $page
@@ -98,7 +98,7 @@ class Controller extends Base
      * If unscuccessful will display login page with error
      *
      * @api   POST /login
-     * @level 18.2
+     * @since 18.2
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */

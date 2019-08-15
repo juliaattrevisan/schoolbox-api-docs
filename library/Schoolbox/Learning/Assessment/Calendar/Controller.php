@@ -59,7 +59,7 @@ class Controller extends Base
      * @throws UnderflowException
      * @throws UnexpectedValueException
      * @api   GET /learning/assessment/calendar
-     * @level 19.1
+     * @since 19.1
      */
     public function getReport(): void
     {
@@ -84,7 +84,7 @@ class Controller extends Base
      * Returns the contents of the Assessment Calendar page
      *
      * @api   POST /learning/assessment/calendar
-     * @level 19.1
+     * @since 19.1
      */
     public function postReport(): void
     {

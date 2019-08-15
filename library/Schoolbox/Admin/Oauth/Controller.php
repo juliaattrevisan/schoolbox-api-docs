@@ -40,7 +40,7 @@ class Controller extends ConfigController
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \Aura\Router\Exception\RouteNotFound
      * @api   GET /adminv2/oauth
-     * @level 190
+     * @since 190
      */
     public function getAdmin(): void
     {
@@ -70,7 +70,7 @@ class Controller extends ConfigController
      * @throws \UnexpectedValueException
      * @throws Predicate\InvalidColumnException
      * @api   POST /adminv2/oauth
-     * @level 190
+     * @since 190
      */
     public function postAdmin(): void
     {

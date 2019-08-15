@@ -95,7 +95,7 @@ class Controller extends BaseController
      * AJAX method for creating a new group or criterion
      *
      * @api POST /rubric
-     * @level 156
+     * @since 156
      */
     public function create()
     {
@@ -274,7 +274,7 @@ class Controller extends BaseController
      * Return a Twigged shard generated from the file ref given
      *
      * @api POST /rubric/import/{storageTuple}
-     * @level 156
+     * @since 156
      *
      * @param File $file
      */
@@ -331,7 +331,7 @@ class Controller extends BaseController
      * Download the given rubric as a CSV
      *
      * @api POST /rubric/csv
-     * @level 156
+     * @since 156
      */
     public function download()
     {
@@ -374,7 +374,7 @@ class Controller extends BaseController
      * Determines whether a rubric submitted via POST will invalidate marks.
      *
      * @api POST /rubric/determineMarkInvalidation
-     * @level 181
+     * @since 181
      */
     public function determineMarkInvalidation(): void
     {

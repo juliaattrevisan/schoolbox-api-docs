@@ -104,7 +104,7 @@ class Controller extends Base
 
     /**
      * @api /adminv2/lists/save
-     * @level 160
+     * @since 160
      */
     public function postSave()
     {
@@ -693,7 +693,7 @@ class Controller extends Base
      * Show options
      *
      * @api /adminv2/lists
-     * @level 160
+     * @since 160
      *
      * @param string $table Arbitrary value to identify a table. Does not need to be the actual table name.
      */
