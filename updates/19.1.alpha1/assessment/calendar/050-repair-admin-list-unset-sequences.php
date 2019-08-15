@@ -39,7 +39,7 @@ $app = new class extends CliTool\App
     private function repairNewsTopics(): void
     {
         // Sequence starts from this.
-        $sequenceBase = 1;
+        $sequenceBase = Schoolbox\Comms\News\Topic\Model::sequenceBase();
 
         $query = "
             SELECT newsTopicID, name, sequence 
@@ -100,7 +100,7 @@ $app = new class extends CliTool\App
     private function repairPastoralSeverity(): void
     {
         // Sequence starts from this.
-        $sequenceBase = 1;
+        $sequenceBase = Schoolbox\Pastoral\Severity\Model::sequenceBase();
 
         // Repair any soft-deleted
         $query = "

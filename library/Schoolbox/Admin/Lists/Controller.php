@@ -25,11 +25,13 @@ use ReflectionProperty;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Comms\News\Topic;
+use Schoolbox\Sequential;
 use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
+use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
 
 class Controller extends Base
@@ -118,7 +120,6 @@ class Controller extends Base
         }
 
         $mapper_name     = $tableData[$tableKey]['mapper'];
-        $sortable_column = trim($this->getRequest()->post["sortable_column"]);
 
         $mapper = $this->mapperFactory->get($mapper_name);
 
@@ -156,8 +157,13 @@ class Controller extends Base
             }
         }
 
-        // for database purposes, sequencing begins at 1
-        $sequence = 1;
+        // List item entity is responsible for declaring its sequence base
+        $sequence  = null;
+        $modelName = $mapper->getModel();
+        if (is_a($modelName, Sequential::class, true)) {
+            /** @var Sequential $modelName */
+            $sequence = $modelName::sequenceBase();
+        }
 
         foreach ($ids as $currentIndex => $id)
         {
@@ -234,17 +240,12 @@ class Controller extends Base
                 $model->$setter($boolean);
             }
 
-            if ($sortable_column != "") {
-                $setter = "set" . $this->underscoreToCamelCase($sortable_column);
-                $model->$setter($sequence);
+            if ($model instanceof Sequential) {
+                $model->setSequence($sequence++);
             }
 
             // Save the changes
-
             $mapper->save($model);
-
-            // increment the sequence counter
-            ++$sequence;
         }
 
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
@@ -476,7 +477,6 @@ class Controller extends Base
             'news-topic'             => [
                 'title'             => 'News Topics',
                 'mapper'            => Topic\Mapper::class,
-                'sortable'          => 'sequence',
                 'fields'            => [
                     'name'          => [
                         'caption'   => 'Name',
@@ -616,7 +616,7 @@ class Controller extends Base
             'pastoral-category'    => [
                 'title'             => 'Pastoral Sub-Types',
                 'mapper'            => PastoralCategoryMapper::class,
-                'sort'              => 'pastoralTypeId',
+                'sort'              => 'pastoral_type_id',
                 'fields'            => [
                     'pastoralType' => [
                         'getter'    => 'getPastoralType',
@@ -665,7 +665,6 @@ class Controller extends Base
             $return['pastoral-severity'] = [
                 'title' => 'Pastoral Record Severity',
                 'mapper' => PastoralSeverityMapper::class,
-                'sortable' => 'order',
                 'fields' => [
                     'name' => [
                         'caption' => 'Name',
@@ -685,6 +684,20 @@ class Controller extends Base
                 ]
             ];
         }
+
+        $return['year-levels'] = [
+            'title'  => 'Year Levels',
+            'delete' => true,
+            'mapper' => YearLevel\Mapper::class,
+            'fields' => [
+                YearLevel\Mapper::COL_NAME => [
+                    'caption'   => 'Name',
+                    'width'     => 12,
+                    'maxLength' => 150,
+                    'mandatory' => true,
+                ],
+            ],
+        ];
 
         return $return;
     }
@@ -726,21 +739,14 @@ class Controller extends Base
         if (isset($tables[$table]['findAllMethod'])) {
             $finder = $tables[$table]['findAllMethod'];
             $rows = $mapper->$finder();
+        } elseif (isset($tables[$table]['sort'])) {
+            $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
+        } elseif ($prototype instanceof Sequential) {
+            $rows = $mapper->findAll();
+            $tables[$table]['sortable'] = true;
         } else {
             $orderArr = array($mapper->getIdentifierColumn() => 'ASC');
             $rows = $mapper->findAll(array('order' => $orderArr));
-        }
-
-        if (isset($tables[$table]['sortable'])) {
-            if ($reflect->hasMethod('get' . $tables[$table]['sortable'])) {
-                $rows = $rows->sortBy($tables[$table]['sortable'], 'asc');
-            }
-        } else {
-            if (isset($tables[$table]['sort'])) {
-                if ($reflect->hasMethod('get' . $tables[$table]['sort'])) {
-                    $rows = $rows->sortBy($tables[$table]['sort'], 'asc');
-                }
-            }
         }
 
         foreach ($rows as $row) {

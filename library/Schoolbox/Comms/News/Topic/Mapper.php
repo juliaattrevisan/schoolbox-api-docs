@@ -33,4 +33,9 @@ class Mapper extends \Schoolbox\Mapper {
                 'type' => Mapper::TYPE_STRING,
             ));
 	}
+
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
+    }
 }
