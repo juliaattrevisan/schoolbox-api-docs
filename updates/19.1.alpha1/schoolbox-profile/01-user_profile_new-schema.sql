@@ -5,11 +5,11 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
 (
     `id`          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `external_id` VARCHAR(64)  NOT NULL,
-    `gender`      VARCHAR(25)  Null,
     `title`       VARCHAR(255) NULL,
     `firstname`   VARCHAR(255) NULL,
     `lastname`    VARCHAR(255) NULL,
     `email`       VARCHAR(255) NULL,
+    `gender`      VARCHAR(25)  Null,
     `created_at`  DATETIME     NOT NULL,
     `updated_at`  DATETIME     NOT NULL,
     `deleted_at`  DATETIME     NULL,
@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
 (
+    `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sis_user_profile_id` INT UNSIGNED NOT NULL,
     `mobile`              VARCHAR(45)  NULL,
     `phone_home`          VARCHAR(45)  NULL,
@@ -33,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
     `updated_at`          DATETIME     NOT NULL,
     `deleted_at`          DATETIME     NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
-    PRIMARY KEY (`sis_user_profile_id`),
+    PRIMARY KEY (`id`,`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_parent`
         FOREIGN KEY (`sis_user_profile_id`)
@@ -50,11 +51,9 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 (
+    `id`                          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sis_user_profile_id`         INT UNSIGNED  NOT NULL,
     `date_of_birth`               DATE          NULL,
-    `ib`                          TINYINT(1)    NULL,
-    `individual_learning_plans`   TINYINT(1)    NULL,
-    `esl`                         TINYINT(1)    NULL,
     `head_of_house_id`            VARCHAR(64)   NULL,
     `head_of_house_name`          VARCHAR(255)  NULL,
     `house_name`                  VARCHAR(255)  NULL,
@@ -70,20 +69,23 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `year_level_coordinator_id`   VARCHAR(64)   NULL,
     `year_level_coordinator_name` VARCHAR(255)  NULL,
     `mobile`                      VARCHAR(45)   NULL,
-    `special_needs`               TINYINT(1)    NULL,
     `studies_code`                VARCHAR(45)   NULL,
-    `boarding_status`             TINYINT(1)    NULL,
     `alert_medical`               VARCHAR(1024) NULL,
     `alert_comment`               VARCHAR(1024) NULL,
     `alert_message`               VARCHAR(1024) NULL,
     `alert_legal`                 VARCHAR(1024) NULL,
     `enrolment_date`              DATE          NULL,
     `leaving_date`                DATE          NULL,
+    `ib`                          TINYINT(1)    NULL,
+    `individual_learning_plans`   TINYINT(1)    NULL,
+    `esl`                         TINYINT(1)    NULL,
+    `special_needs`               TINYINT(1)    NULL,
+    `boarding_status`             TINYINT(1)    NULL,
     `created_at`                  DATETIME      NOT NULL,
     `updated_at`                  DATETIME      NOT NULL,
     `deleted_at`                  DATETIME      NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
-    PRIMARY KEY (`sis_user_profile_id`),
+    PRIMARY KEY (`id`,`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_student`
         FOREIGN KEY (`sis_user_profile_id`)
@@ -100,10 +102,11 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
 (
+    `id`                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sis_user_profile_id`  INT UNSIGNED NOT NULL,
     `category`             VARCHAR(255) NULL,
     `position_title`       VARCHAR(255) NULL,
-    `position_description` VARCHAR(500) NULL,
+    `position_description` VARCHAR(255) NULL,
     `department`           VARCHAR(255) NULL,
     `phone_work`           VARCHAR(45)  NULL,
     `room`                 VARCHAR(255) NULL,
@@ -114,7 +117,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
     `updated_at`           DATETIME     NOT NULL,
     `deleted_at`           DATETIME     NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
-    PRIMARY KEY (`sis_user_profile_id`),
+    PRIMARY KEY (`id`,`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_staff`
         FOREIGN KEY (`sis_user_profile_id`)
