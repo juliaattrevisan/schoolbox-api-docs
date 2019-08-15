@@ -132,23 +132,19 @@ class Controller extends BaseController
      * Display update folder screen
      *
      * @api GET /resource/folder/modify/:folderId
-     * @param $id
-     *
+     * @param int $id
      * @throws MapperException
+     * @throws SchoolboxException
+     * @throws UnexpectedValueException
      */
-    public function getFolderModify($id): void
+    public function getFolderModify(int $id): void
     {
-        $access                 = $this->access;
-        $userAccess             = $access->getFolderAccess($this->getUser(), $id);
+        $userAccess             = $this->access->getFolderAccess($this->getUser(), $id);
         $folderMapper           = $this->folderMapper;
         $homepageConfigMapper   = $this->homepageConfigMapper;
         $homepageTemplateMapper = $this->homepageTemplateMapper;
         $roleAccessMapper       = $this->roleAccessMapper;
-        $roleMapper             = $this->roleMapper;
         $errorMapper            = $this->errorMapper;
-        if ($userAccess < UserAccess::ACCESS_WRITE) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
-        }
 
         try {
             $folder = $folderMapper->findById($id);
@@ -221,7 +217,7 @@ class Controller extends BaseController
                     'parent'            => $parent,
                     'templates'         => $homepageTemplates,
                     'templateId'        => $templateId,
-                    'roles'             => $roleMapper->findAll(),
+                    'roles'             => $this->roleMapper->findAll(),
                     'rolePermissions'   => $rolePermissions,
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
@@ -241,21 +237,17 @@ class Controller extends BaseController
     /**
      * Display create folder screen
      *
-     * @param $parentId
+     * @param int $parentId
      * @throws SchoolboxException
+     * @throws UnexpectedValueException
      * @todo DRY this up with modify code
      */
-    public function getFolderCreate($parentId)
+    public function getFolderCreate(int $parentId): void
     {
-        $access                 = $this->access;
         $folderMapper           = $this->folderMapper;
         $homepageTemplateMapper = $this->homepageTemplateMapper;
         $roleMapper             = $this->roleMapper;
         $errorMapper            = $this->errorMapper;
-
-        if ($access->getFolderAccess($this->getUser(), $parentId) < UserAccess::ACCESS_WRITE) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
-        }
 
         try {
             $parent = $folderMapper->findById($parentId);

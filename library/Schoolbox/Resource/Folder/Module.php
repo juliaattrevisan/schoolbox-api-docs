@@ -18,6 +18,7 @@ use Schoolbox\Curriculum;
 use Schoolbox\Error;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\GroupMapper;
@@ -72,8 +73,20 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer) {
         $this
-            ->addRoutePermission($authorizer, '.*', new Rule\All(
-                new Rule\IsLoggedIn()
+            ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
+            ->addRoutePermission($authorizer, 'getFolderCreate', new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                static function (array $params): int {
+                    return (int)$params['parentId'];
+                },
+                Access::getInstance()
+            ))
+            ->addRoutePermission($authorizer, 'getFolderModify', new Rule\HasHomepageAccess(
+                UserAccess::ACCESS_WRITE,
+                static function (array $params): int {
+                    return (int)$params['id'];
+                },
+                Access::getInstance()
             ));
     }
 
