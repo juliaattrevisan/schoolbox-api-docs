@@ -263,16 +263,9 @@ class Report_Parent extends Report_Abstract
             $this->getPage()->setVar('search_form_option_block', '');
         }
 
-
-        if ($this->isYearsRestricted()) {
-
-            $allYears = $this->sisAllYearLevels;
-
-        } else {
-
-            $allYears = $this->allowedSearchableYears;
-
-        }
+        $allYears = $this->isYearsRestricted()
+            ? $this->allowedSearchableYears
+            : $this->sisAllYearLevels;
 
         foreach ($allYears as $year) {
             $this->getPage()->setVar([
