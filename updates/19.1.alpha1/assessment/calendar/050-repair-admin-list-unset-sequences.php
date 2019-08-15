@@ -106,7 +106,7 @@ $app = new class extends CliTool\App
         $query = "
             UPDATE lu_pastoral_severity
             SET `order` = :sequence_base_1
-            WHERE `order` IS NULL OR `order` < :sequence_base_2 AND deleted_at IS NOT NULL
+            WHERE (`order` IS NULL OR `order` < :sequence_base_2) AND deleted_at IS NOT NULL
         ";
         $this->getDatabaseInternal()->executeQuery($query, ['sequence_base_1' => $sequenceBase, 'sequence_base_2' => $sequenceBase]);
 
@@ -114,7 +114,7 @@ $app = new class extends CliTool\App
         $query = "
             SELECT id, name, `order`
             FROM lu_pastoral_severity
-            WHERE `order` IS NULL OR `order` < :sequence_base AND deleted_at IS NULL
+            WHERE (`order` IS NULL OR `order` < :sequence_base) AND deleted_at IS NULL
         ";
         $invalidSeverityRows = $this->getDatabaseInternal()->executeQuery($query, ['sequence_base' => $sequenceBase])->fetchAll();
 
