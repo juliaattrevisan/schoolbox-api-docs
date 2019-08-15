@@ -393,7 +393,7 @@ class Controller extends Base
      * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
      */
-    public function getCustomGradesYear(User $viewee, int $year)
+    public function getCustomGradesYear(User $viewee, int $year): void
     {
         $from = (new \Alaress_Date_Format())->setYear($year)->startOfYear();
         $to = (new \Alaress_Date_Format())->setYear($year)->endOfYear();
