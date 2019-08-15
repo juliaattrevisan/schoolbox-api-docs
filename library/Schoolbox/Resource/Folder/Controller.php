@@ -37,8 +37,9 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\YearLevel;
 use UnexpectedValueException;
-use Schoolbox\Resource\Folder\Code\Mapper as ClassCodeMapper;
+use Schoolbox\Resource\Folder;
 use Timetable_ColourMapper;
 use Schoolbox\Collection;
 
@@ -69,7 +70,7 @@ class Controller extends BaseController
     /** @var Access */
     protected $access;
 
-    /** @var ClassCodeMapper */
+    /** @var Folder\Code\Mapper */
     protected $classCodeMapper;
 
     /** @var Curriculum\Node\Mapper */
@@ -81,25 +82,53 @@ class Controller extends BaseController
     /** @var FileMapper */
     protected $fileMapper;
 
+    /** @var YearLevel\Mapper */
+    private $yearLevelMapper;
+
 
     /**
-     * Folder\Controller constructor.
-     * TODO DI
+     * @param Mapper                 $folderMapper
+     * @param HomepageConfigMapper   $homepageConfigMapper
+     * @param HomepageTemplateMapper $homepageTemplateMapper
+     * @param RoleAccessMapper       $roleAccessMapper
+     * @param UserAccessMapper       $userAccessMapper
+     * @param RoleMapper             $roleMapper
+     * @param ErrorMapper            $errorMapper
+     * @param Access                 $access
+     * @param Code\Mapper            $classCodeMapper
+     * @param Curriculum\Node\Mapper $curriculumNodeMapper
+     * @param GroupMapper            $groupMapper
+     * @param FileMapper             $fileMapper
+     * @param YearLevel\Mapper       $yearLevelMapper
      */
-    public function __construct()
-    {
-        $this->setFolderMapper(Mapper::getInstance());
-        $this->setHomepageConfigMapper(HomepageConfigMapper::getInstance());
-        $this->setHomepageTemplateMapper(HomepageTemplateMapper::getInstance());
-        $this->setRoleAccessMapper(RoleAccessMapper::getInstance());
-        $this->setUserAccessMapper(UserAccessMapper::getInstance());
-        $this->setRoleMapper(RoleMapper::getInstance());
-        $this->setErrorMapper(ErrorMapper::getInstance());
-        $this->setAccess(Access::getInstance());
-        $this->setClassCodeMapper(ClassCodeMapper::getInstance());
-        $this->setCurriculumNodeMapper(Curriculum\Node\Mapper::getInstance());
-        $this->setGroupMapper(GroupMapper::getInstance());
-        $this->setFileMapper(FileMapper::getInstance());
+    public function __construct(
+        Mapper $folderMapper,
+        HomepageConfigMapper $homepageConfigMapper,
+        HomepageTemplateMapper $homepageTemplateMapper,
+        RoleAccessMapper $roleAccessMapper,
+        UserAccessMapper $userAccessMapper,
+        RoleMapper $roleMapper,
+        ErrorMapper $errorMapper,
+        Access $access,
+        Folder\Code\Mapper $classCodeMapper,
+        Curriculum\Node\Mapper $curriculumNodeMapper,
+        GroupMapper $groupMapper,
+        FileMapper $fileMapper,
+        YearLevel\Mapper $yearLevelMapper
+    ) {
+        $this->folderMapper           = $folderMapper;
+        $this->homepageConfigMapper   = $homepageConfigMapper;
+        $this->homepageTemplateMapper = $homepageTemplateMapper;
+        $this->roleAccessMapper       = $roleAccessMapper;
+        $this->userAccessMapper       = $userAccessMapper;
+        $this->roleMapper             = $roleMapper;
+        $this->errorMapper            = $errorMapper;
+        $this->access                 = $access;
+        $this->classCodeMapper        = $classCodeMapper;
+        $this->curriculumNodeMapper   = $curriculumNodeMapper;
+        $this->groupMapper            = $groupMapper;
+        $this->fileMapper             = $fileMapper;
+        $this->yearLevelMapper        = $yearLevelMapper;
     }
 
     /**
@@ -178,6 +207,13 @@ class Controller extends BaseController
             $zone->attachFiles([ $folder->getCoverImage() ]);
         }
 
+        $yearLevelOptions = $this->yearLevelMapper->findAll()->map(static function(YearLevel\Model $yearLevel){
+            return [
+                'id'   => $yearLevel->getId(),
+                'name' => $yearLevel->getName(),
+            ];
+        })->getAll();
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@folder/modify.twig',
@@ -198,6 +234,8 @@ class Controller extends BaseController
                     'write'             => UserAccess::ACCESS_WRITE,
                     'moderate'          => UserAccess::ACCESS_FULL,
                     'coverImageZone'    => $zone->getTwigContext(),
+                    'editYearLevelUsage'=> $this->getUser()->isSuperuser(),
+                    'yearLevels'        => $yearLevelOptions,
                 ),
             )
         );
@@ -208,6 +246,7 @@ class Controller extends BaseController
      *
      * @param $parentId
      * @throws SchoolboxException
+     * @todo DRY this up with modify code
      */
     public function getFolderCreate($parentId)
     {
@@ -280,6 +319,7 @@ class Controller extends BaseController
                     'write'             => UserAccess::ACCESS_WRITE,
                     'moderate'          => UserAccess::ACCESS_FULL,
                     'coverImageZone'    => $zone->getTwigContext(),
+                    'editYearLevelUsage'=> $this->getUser()->isSuperuser(),
                 ),
             )
         );

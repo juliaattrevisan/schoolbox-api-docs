@@ -1,3 +1,25 @@
+{#
+    user                    User                - Current session user
+    breadcrumbs             array
+    folder                  Folder\Model
+    parent                  Folder\Model
+    templates               HomepageTemplate[]
+    templateId              int                 - (0 => keep existing, -1 => none)
+    roles                   Role[]
+    rolePermissions         int[]               - indexed by role id
+    database                string              - external database type
+    curriculumTagging       bool
+    userAccess              int                 - current users permission level to the folder
+    deny                    int                 - permission level DENY
+    read                    int                 - permission level READ
+    write                   int                 - permission level WRITE
+    moderate                int                 - permission level FULL
+    coverImageZone          array               - context data for cover image render
+    editYearLevelUsage      bool                - should YearLevel usages be editable or read-only
+    yearLevels              array[]             - Options suitable for default selectize wrapper
+    yearLevels[idx]['id']   int                 - Selectize option identifier
+    yearLevels[idx]['name'] string              - Selectize option label
+#}
 {% if folder.getId is null %}
     {% set action = 'Create' %}
 {% else %}
@@ -9,6 +31,7 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 <script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ config.site_version }}"></script>
+
 
 <script type="text/javascript">
     $(function() {
@@ -182,6 +205,17 @@
                 $("[data-alert]").addClass("hide");
             }
         }
+
+        {# YearLevel selectize. Populated syncronously with all YearLevels known #}
+        {% if editYearLevelUsage %}
+        $('#yearLevels').selectizeSelector({
+            multiple: true,
+            selectize: {
+                options: {{ yearLevels|json_encode|raw }},
+                hideSelected: true
+            }
+        });
+        {% endif %}
     });
 </script>
 
@@ -359,7 +393,6 @@
                     <div class="small-12 columns">
 
                         {# Only superusers can change subject codes#}
-
                         {% if user.isSuperuser %}
                             {% set codeTitle = 'If you want this folder to be a ' ~ locale.subject ~ ' enter its code here. You may enter multiple codes by separating them with a comma' %}
                         {% else %}
@@ -372,23 +405,53 @@
                             <input type="text" name="code" size="40" value="{{ folder.getCodeString }}"{% if not user.isSuperuser %} disabled{% endif %}/>
                         </label>
                     </div>
-                </fieldset>
 
-                {# Only superusers can recurse permission changes, and its only relevant on modification #}
-                {% if user.isSuperuser and action == 'Modify' %}
-                <fieldset class="content">
-                    <div class="small-12 large-10 columns">
-                        <input type="checkbox" id="recursive" name="recursive" value="1" />
-                        <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
-                    </div>
-
-                    <div class="small-12 columns">
-                        <div data-alert="" class="alert-box alert hide">
-                            This will remove all role permissions, group memberships, and class codes from all subfolders.
+                    {# Only superusers can recurse permission changes, and its only relevant on modification #}
+                    {% if user.isSuperuser and action == 'Modify' %}
+                        <div class="small-12 large-10 columns">
+                            <input type="checkbox" id="recursive" name="recursive" value="1" />
+                            <label for="recursive" class="checkbox-label">Apply these permissions to all subfolders</label>
                         </div>
-                    </div>
+
+                        <div class="small-12 columns">
+                            <div data-alert="" class="alert-box alert hide">
+                                This will remove all role permissions, group memberships, and class codes from all subfolders.
+                            </div>
+                        </div>
+                    {% endif %}
                 </fieldset>
-                {% endif %}
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% if editYearLevelUsage %}
+                            {% set toolTipTitle = 'Select the year levels to associate with this folder' %}
+                        {% else %}
+                            {% set toolTipTitle = "Only superusers may manage a folder's year level association" %}
+                        {% endif %}
+                        <label>
+                            Year Levels
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ toolTipTitle }}">?</span>
+                        </label>
+
+                        {% if editYearLevelUsage %}
+                            <input title="Year Levels" id="yearLevels" name="yearLevelIds" placeholder="Select year Levels" tabindex="-1" class="selectized" type="text">
+                        {% else %}
+                            {% set yearLevels = [] %}
+                            {% for yearLevel in folder.yearLevels %}
+                                {% set yearLevels = yearLevels|merge([yearLevel.name]) %}
+                            {% endfor %}
+                            <input title="Year Level usages" value="{{ yearLevels|join(', ') }}" readonly="readonly">
+                        {% endif %}
+                    </div>
+
+                    {% if editYearLevelUsage and action == 'Modify' %}
+                    <div class="small-12 large-10 columns">
+                        <input type="hidden" name="recursive-year-levels" value="0">
+                        <input type="checkbox" id="recursive-year-levels" name="recursive-year-levels" value="1" />
+                        <label for="recursive-year-levels" class="checkbox-label">Apply these year level associations to all subfolders</label>
+                    </div>
+                    {% endif %}
+                </fieldset>
 
                 <fieldset id="curriculum-codes" class="content">
 
