@@ -391,16 +391,20 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
 
     /**
-    * Assign roles to an event
-    *
-    * @param Event $event
-    * @throws Exception
-    */
+     * Assign roles to an event
+     *
+     * @param Event $event
+     */
     private function createRoles($event)
     {
+        // getRoleCollection can return ids, Schoolbox/Roles or Calendar Roles
         foreach ($event->getRoleCollection() as $role) {
             if ($role instanceof Role) {
-                $role = $role->getId();
+                $roleId = $role->getId();
+            } elseif ($role instanceof Schoolbox\Calendar\Relation\Role) {
+                $roleId = $role->getRoleId();
+            } else {
+                $roleId = $role;
             }
 
             $query = "
@@ -411,7 +415,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
             $statement = $this->database->prepare($query);
             $statement->bindParam(":eventId", $event->getId());
-            $statement->bindParam(":groupId", $role);
+            $statement->bindParam(":groupId", $roleId);
             $statement->execute();
         }
     }
