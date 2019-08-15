@@ -5,12 +5,10 @@ namespace Payload;
 
 class PastoralRecord extends Base
 {
+
     const BLOCKED = '0';
     const ALLOW_PUBLIC = '1';
     const ALLOW_CONFIDENCIAL = '2';
-    private $student_id;
-    private $record_id;
-    private $action;
 
     public static function getViewerPermissions(): array
     {
@@ -21,6 +19,10 @@ class PastoralRecord extends Base
         ];
     }
 
+    private $student_id;
+    private $record_id;
+    private $action;
+
     public function __construct()
     {
         Base::__construct();
@@ -30,13 +32,12 @@ class PastoralRecord extends Base
         $this->setFormParam('id', '');
         $this->setFormParam('student_id', '??');
         $this->setFormParam('heading', 'someHeading');
-        $this->setFormParam('typeId', '1');
-        $this->setFormParam('subtypeId', '1');
-        $this->setFormParam('severityId', '1');
-        $this->setFormParam('points', '1');
-        $this->setFormParam('tags', '');
-        $this->setFormParam('body_public', '<p>automated public statement</p>');
-        $this->setFormParam('body_private', '<p>automated public statement</p>');
+
+
+        $level_data= [
+            'level' => 1,
+            'campus[]' => 1
+        ];
     }
 
     public function setHeading(string $heading)
