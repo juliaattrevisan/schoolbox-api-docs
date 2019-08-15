@@ -44,9 +44,9 @@ $app = new class extends CliTool\App
         $query = "
             SELECT newsTopicID, name, sequence 
             FROM newsTopic 
-            WHERE sequence IS NULL OR sequence < {$sequenceBase}
+            WHERE sequence IS NULL OR sequence < :sequence_base
         ";
-        $invalidNewsTopics = $this->getDatabaseInternal()->executeQuery($query)->fetchAll();
+        $invalidNewsTopics = $this->getDatabaseInternal()->executeQuery($query, ['sequence_base' => $sequenceBase])->fetchAll();
 
         if (!count($invalidNewsTopics)) {
             $this->getLogger()->info("No invalid sequences found in table 'newsTopic'");
@@ -105,18 +105,18 @@ $app = new class extends CliTool\App
         // Repair any soft-deleted
         $query = "
             UPDATE lu_pastoral_severity
-            SET `order` = {$sequenceBase}
-            WHERE `order` IS NULL OR `order` < {$sequenceBase} AND deleted_at IS NOT NULL
+            SET `order` = :sequence_base_1
+            WHERE `order` IS NULL OR `order` < :sequence_base_2 AND deleted_at IS NOT NULL
         ";
-        $this->getDatabaseInternal()->execute($query);
+        $this->getDatabaseInternal()->executeQuery($query, ['sequence_base_1' => $sequenceBase, 'sequence_base_2' => $sequenceBase]);
 
         // Repair non-deleted
         $query = "
             SELECT id, name, `order`
             FROM lu_pastoral_severity
-            WHERE `order` IS NULL OR `order` < {$sequenceBase} AND deleted_at IS NULL
+            WHERE `order` IS NULL OR `order` < :sequence_base AND deleted_at IS NULL
         ";
-        $invalidSeverityRows = $this->getDatabaseInternal()->executeQuery($query)->fetchAll();
+        $invalidSeverityRows = $this->getDatabaseInternal()->executeQuery($query, ['sequence_base' => $sequenceBase])->fetchAll();
 
         if (!count($invalidSeverityRows)) {
             $this->getLogger()->info("No invalid severity records found in table 'lu_pastoral_severity'");
