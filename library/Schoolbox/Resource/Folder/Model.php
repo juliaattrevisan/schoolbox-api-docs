@@ -1,13 +1,11 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\Folder;
-
 
 use Alaress\Color\Color;
 use Schoolbox\Collection;
@@ -30,6 +28,8 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
+use Schoolbox\YearLevel;
+use UnexpectedValueException;
 
 /**
  * Class Model
@@ -60,6 +60,13 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @var Collection|FolderCode[]
      */
     private $codes;
+
+    /**
+     * A collection of YearLevels
+     *
+     * @var null|GenericCollection|YearLevel\Model[]
+     */
+    private $yearLevels;
 
     /**
      * Place holder for one of folder codes of this folder, which matches a class code and a campus code from SIS.
@@ -501,7 +508,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param Collection $teachers
      * @return Model
      * @throws \DomainException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function setTeachers(Collection $teachers): self
     {
@@ -659,5 +666,25 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function getMatchedCode(): string
     {
         return $this->matchedCode ?? '';
+    }
+
+    /**
+     * @return GenericCollection|YearLevel\Model[]|null
+     */
+    public function getYearLevels(): ?GenericCollection
+    {
+        return $this->yearLevels;
+    }
+
+    /**
+     * @param GenericCollection|YearLevel\Model[]|null $yearLevels
+     * @return $this
+     * @throws UnexpectedValueException
+     */
+    public function setYearLevels(GenericCollection $yearLevels): self
+    {
+        $yearLevels->assertCollectionOf(YearLevel\Model::class);
+        $this->yearLevels = $yearLevels;
+        return $this;
     }
 }

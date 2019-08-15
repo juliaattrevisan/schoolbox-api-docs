@@ -12,6 +12,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use function array_key_exists;
 use function count;
 use function explode;
 use PDO;
@@ -54,15 +55,14 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Code as FolderCode;
+use Schoolbox\YearLevel;
 use Alaress\Database\Predicate;
-use function strpos;
-use UnexpectedValueException;
 use Schoolbox\Error;
 
 /**
  * Class Mapper
  *
- * SBFS Folder Mapper. Maps category table to SBFS folder objects.
+ * SBFS Folder Mapper. Maps folder table to SBFS folder objects.
  *
  * @package Schoolbox\Resource\Folder
  * @method Model createModel($idValue = null)
@@ -137,6 +137,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 'this_key'  => 'id',
                 'other_key' => 'folder_id',
             )
+        );
+
+        $this->joinsVia(
+            'folder_year_level',
+            YearLevel\Mapper::class,
+            YearLevel\Mapper::COL_ID,
+            'year_level_id',
+            'folder_id',
+            null,
+            null,
+            null,
+            'yearLevels'
         );
 
         $this->hasJoin(
@@ -763,6 +775,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     protected function getSelectString()
     {
         $code_mapper           = $this->getJoinMapper('codes');
+        $yearLevelMapper       = $this->getJoinMapper('folder_year_level');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper          = $this->getJoinMapper('groups');
         $courseSpecMapper      = $this->getJoinMapper('course_specification');
@@ -775,6 +788,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 {$this->getJoinColumnString('coverImage', 'ci')},
                 {$this->getJoinColumnString('coverImage.allowedFileExtension', 'cim')},
                 {$code_mapper->getColumnString('cc')},
+                {$yearLevelMapper->getColumnString('yl')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
                 {$courseSpecMapper->getColumnString('cs')},
@@ -798,6 +812,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
+            LEFT JOIN {$this->getJoinSql('folder_year_level', '', 'yl')}
             LEFT JOIN {$this->getJoinSql('coverImage', '', 'ci', true)}
             LEFT JOIN {$this->getJoinSql('coverImage.allowedFileExtension', 'ci', 'cim', true)}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
@@ -871,10 +886,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Helper method for hydrating a result from a query created by getFindQuery().
      *
-     * @param  PDOStatement $statement
-     * @throws MapperException if statement returned no category
+     * @param PDOStatement $statement
      * @return Collection|Model[]
+     * @throws MapperException if statement returned no category
      * @throws DefinitionException If specified join does is not defined
+     * @throws \UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
@@ -888,10 +904,18 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $unitSpecMapper       = $this->getJoinMapper('unit_specification');
         /** @var FolderCode\Mapper $codeMapper */
         $codeMapper           = $this->getJoinMapper('codes');
+        /** @var YearLevel\Mapper $yearLevelMapper */
+        $yearLevelMapper      = $this->getJoinMapper('folder_year_level');
         /** @var Node\Mapper $curriculumNodeMapper */
         $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_category');
 
         $folders = $this->createCollection();
+
+        /**
+         * Light-weight cache for efficiency, indexed by YearLevel.id
+         * @var YearLevel\Model[] $yearLevelCache
+         */
+        $yearLevelCache = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
 
@@ -903,6 +927,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 // Blow away any previously attached codes
                 $folders[$folderId]->setCodes($codeMapper->createCollection());
+
+                $folders[$folderId]->setYearLevels($yearLevelMapper->createCollection());
 
                 // Blow away any previously attached curriculum node codes
                 $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
@@ -935,6 +961,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($row['cc.code']) {
                 $folderCode = $codeMapper->hydrate($row, 'cc');
                 $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
+            }
+
+            // Year Level usages: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
+            $yearLevelId = $row['yl.' . YearLevel\Mapper::COL_ID];
+            if ($yearLevelId) {
+                if (!array_key_exists($yearLevelId, $yearLevelCache)) {
+                    $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'yl');
+                }
+                $folders[$folderId]->getYearLevels()[$yearLevelId] = $yearLevelCache[$yearLevelId];
             }
 
             // Hydrate curriculum node codes (avoiding duplicates)
@@ -2149,6 +2184,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function getAncestry()
     {
         return $this->ancestry;
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        // By default, order by folder.name, yearLevel.sequence
+        return ['name' => 'ASC', 'yl.' .  YearLevel\Mapper::COL_SEQUENCE => 'ASC'];
     }
 
     /**
