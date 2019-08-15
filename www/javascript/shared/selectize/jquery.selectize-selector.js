@@ -81,8 +81,16 @@
                     // Initialize: clear existing options, and add items from
                     // settings.value
                     var self = this
-                    self.clear();
-                    self.clearOptions();
+                    // Don't clear options if the caller explicitly provided them.
+                    if (!(
+                        options.hasOwnProperty('selectize') &&
+                        typeof(options.selectize) === 'object' &&
+                        options.selectize !== null &&
+                        options.selectize.hasOwnProperty('options'))
+                    ) {
+                        self.clear();
+                        self.clearOptions();
+                    }
                     $.each(settings.value, function(i,v) {
                         // Is settings.value a list of text values, instead of a
                         // list of objects? (Happens on the email form page,
