@@ -1954,25 +1954,16 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findOneByColumn($columnName, $columnValue, array $options = array())
     {
-        return $this->findOneByColumnList(array($columnName => $columnValue), [], $options);
+        return $this->findOneByColumnList(array($columnName => $columnValue), $options);
     }
 
     /**
-     * Returns first model who matches all the values pairs in $columnList.
-     *
-     * @throws Exception if no instance of model is found
-     * @throws Exception\Deleted if the model was found but has been deleted
-     *
-     * @param  array $columnList
-     * @param  array $order Fields to order by (@see findByColumnList() $options param)
-     * @param  array $options
-     * @return object
+     * @inheritDoc
      */
-    public function findOneByColumnList($columnList, $order = array(), $options = array())
+    public function findOneByColumnList($columnList, array $options = array())
     {
         $defaults = [
             'deleted' => true,
-            'order'   => $order,
         ];
         $options = array_merge($defaults, $options);
 

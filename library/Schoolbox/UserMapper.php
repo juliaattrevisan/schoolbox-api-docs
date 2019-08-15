@@ -29,7 +29,7 @@ use UnexpectedValueException;
  * @method User findById($id)
  * @method User findByIdWithFallback($id)
  * @method User findOneByColumn($columnName, $columnValue, array $options = [])
- * @method User findOneByColumnList($columnList, $order = array(), $options = array())
+ * @method User findOneByColumnList($columnList, array $options = [])
  * @method User hydrate(array $row, $alias = '', $callback = null)
  * @method User createModel($idValue = null)
  * @method GenericCollection|User[] createCollection($contents = [])

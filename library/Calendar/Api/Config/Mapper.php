@@ -16,7 +16,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
- * @method Calendar_Api_Config_Record findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Calendar_Api_Config_Record findOneByColumnList($columnList, array $options = [])
  * @method Calendar_Api_Config_Record[] findByColumnList($columnList, $options = [])
  */
 class Calendar_Api_Config_Mapper extends BaseMapper

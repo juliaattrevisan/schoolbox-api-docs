@@ -227,15 +227,14 @@ interface IMapper
     /**
      * Returns first model who matches all the values pairs in $columnList.
      *
-     * @throws Exception if no instance of model is found
-     * @throws Exception\Deleted if the model was found but has been deleted
-     *
      * @param  array $columnList
-     * @param  array $order Fields to order by (@see findByColumnList() $options param)
+     * @param  array $options    (@see findByColumnList() for list of available options)
      *
      * @return object
+     * @throws Exception\Deleted If the model was found but has been deleted
+     * @throws Exception         If no instance of model is found
      */
-    public function findOneByColumnList($columnList, $order = array());
+    public function findOneByColumnList($columnList, array $options = array());
 
     /**
      * @brief Returns a collection with models which match the values pairs in the column list

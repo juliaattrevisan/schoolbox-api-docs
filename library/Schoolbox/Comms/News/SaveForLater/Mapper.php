@@ -13,7 +13,7 @@ use Schoolbox\UserMapper;
 
 /**
  * @method Model createModel($idValue = null)
- * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model findOneByColumnList($columnList, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

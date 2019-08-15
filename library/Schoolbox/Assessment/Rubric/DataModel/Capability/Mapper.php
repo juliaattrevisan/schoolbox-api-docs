@@ -22,7 +22,7 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Model createModel($idValue = null)
  * @method Model findById($id)
  * @method Model[] findByColumnList($columnList, $options = [])
- * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model findOneByColumnList($columnList, array $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -209,7 +209,6 @@ class Mapper extends BaseMapper
                 'parent_type' => $parentType,
                 'name'        => $name,
             ],
-            [],
             ['cache' => $cache,]
         );
     }

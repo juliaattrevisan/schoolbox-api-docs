@@ -575,7 +575,7 @@ class Controller extends Base
                         $position = $this->getPositionMapper()->findOneByColumnList([
                             'sport_id' => $sport->getId(),
                             'name' => $row[2]
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Position '{$row[2]}'");
                     } catch (MapperException $e) {
                         $position = new Position();
@@ -1016,7 +1016,7 @@ class Controller extends Base
                         $team = $this->getTeamMapper()->findOneByColumnList([
                             'name' => $row[4],
                             'division_id' => $division->getId()
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Team '{$row[1]}'");
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Team '{$row[4]}'");
@@ -1048,7 +1048,7 @@ class Controller extends Base
                                 $this->getDivisionUserMapper()->findOneByColumnList([
                                     'division_id' => $division->getId(),
                                     'user_id' => $user->getId()
-                                ], [], $this->disableCache);
+                                ], $this->disableCache);
                                 $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED DIVISION PLAYER: Already in division ({$player})");
                             } catch (MapperException $e) {
                                 $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to division '{$division->getName()}'");
@@ -1064,7 +1064,7 @@ class Controller extends Base
                                 $this->getTeamPlayerMapper()->findOneByColumnList([
                                     'team_id' => $team->getId(),
                                     'user_id' => $user->getId()
-                                ], [], $this->disableCache);
+                                ], $this->disableCache);
                                 $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Already in team ({$player})");
                             } catch (MapperException $e) {
                                 $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to team '{$team->getName()}'");
@@ -1151,7 +1151,7 @@ class Controller extends Base
                         $team = $this->getTeamMapper()->findOneByColumnList([
                             'name' => $row[4],
                             'division_id' => $division->getId()
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Team '{$row[4]}'");
                         $team = new Team();
@@ -1172,7 +1172,7 @@ class Controller extends Base
                         try {
                             $this->getCoachMapper()->findOneByColumnList([
                                 'user_id' => $coach
-                            ], [], $this->disableCache);
+                            ], $this->disableCache);
                         } catch (MapperException $e) {
                             try {
                                 $user = $this->getUserMapper()->findByExternalId($coach);
@@ -1190,7 +1190,7 @@ class Controller extends Base
                                     $teamCoach = $this->getTeamCoachMapper()->findOneByColumnList([
                                        'team_id' => $team->getId(),
                                        'coach_id' => $coach->getId()
-                                    ], [], $this->disableCache);
+                                    ], $this->disableCache);
                                     $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPING: Coach '{$user->getExternalId()}'");
                                 } catch (MapperException $e) {
                                     $teamCoach = new TeamCoach();
@@ -1304,7 +1304,7 @@ class Controller extends Base
                     try {
                         $venue = $this->getVenueMapper()->findOneByColumnList([
                             'name' => $row[7]
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Venue '{$row[7]}'");
                         $venue = new Venue();
@@ -1318,7 +1318,7 @@ class Controller extends Base
                         $teamHome = $this->getTeamMapper()->findOneByColumnList([
                             'name' => $row[8],
                             'division_id' => $division->getId()
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var Team $teamHome */
                         $teamHome = null;
@@ -1328,7 +1328,7 @@ class Controller extends Base
                         $teamAway = $this->getTeamMapper()->findOneByColumnList([
                             'name' => $row[9],
                             'division_id' => $division->getId()
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var Team $teamAway */
                         $teamAway = null;
@@ -1339,7 +1339,7 @@ class Controller extends Base
                     try {
                         $schoolHome = $this->getSchoolMapper()->findOneByColumnList([
                             'name' => $row[8]
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var School $schoolHome */
                         $schoolHome = null;
@@ -1348,7 +1348,7 @@ class Controller extends Base
                     try {
                         $schoolAway = $this->getSchoolMapper()->findOneByColumnList([
                             'name' => $row[9]
-                        ], [], $this->disableCache);
+                        ], $this->disableCache);
                     } catch (MapperException $e) {
                         /** @var School $schoolAway */
                         $schoolAway = null;
@@ -1393,7 +1393,7 @@ class Controller extends Base
                                 'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
                                 'away_school_id' => $schoolAway == null ? null : $schoolAway->getId(),
                                 'start_at' => $this->makeDateTime($row[5], $row[6])
-                            ], [], $this->disableCache);
+                            ], $this->disableCache);
                             $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         } catch (MapperException $e) {
                             $match = new Match();
@@ -1528,7 +1528,7 @@ class Controller extends Base
                 'name' => $divisionName,
                 'sport_id' => $sport->getId(),
                 'season_id' => $season->getId()
-            ], [], $this->disableCache);
+            ], $this->disableCache);
         } catch (MapperException $e) {
 
             /* If the division doesn't exist in that particular season
@@ -1541,7 +1541,7 @@ class Controller extends Base
                 $division = $this->getDivisionMapper()->findOneByColumnList([
                     'name'     => $divisionName,
                     'sport_id' => $sport->getId(),
-                ], [], $this->disableCache);
+                ], $this->disableCache);
 
                 $division->setSeason($season);
                 $this->getDivisionMapper()->save($division);

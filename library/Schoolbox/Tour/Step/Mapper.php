@@ -22,7 +22,7 @@ use Schoolbox\Tour\Step\Type\Modal;
  *
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model findOneByColumnList($columnList, array $options = [])
  * @method GenericCollection|Model[] findByColumnList($columnList, $options = array())
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = array())
  * @package Schoolbox\Tour\Step

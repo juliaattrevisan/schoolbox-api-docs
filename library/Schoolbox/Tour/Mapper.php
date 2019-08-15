@@ -21,7 +21,7 @@ use Schoolbox\UserMapper;
  *
  * @method Model createModel($id = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
- * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model findOneByColumnList($columnList, array $options = [])
  * @package Schoolbox\Tour
  */
 class Mapper extends BaseMapper

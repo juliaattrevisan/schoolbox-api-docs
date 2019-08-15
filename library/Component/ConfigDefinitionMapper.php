@@ -10,7 +10,7 @@
 
 /**
  * Class Component_ConfigDefinitionMapper
- * @method Component_ConfigDefinition findOneByColumnList($columnList, $order = array(), $options = array())
+ * @method Component_ConfigDefinition findOneByColumnList($columnList, array $options = [])
  */
 class Component_ConfigDefinitionMapper extends Schoolbox\Mapper {
 
