@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
 /*
   Table structure for `sis_profile_relation`
 */
-CREATE TABLE IF NOT EXISTS `sis_profile_relation`
+CREATE TABLE IF NOT EXISTS `sis_user_profile_relation`
 (
     `child_profile_id`  INT UNSIGNED NOT NULL,
     `user_profile_id`   INT UNSIGNED NOT NULL,

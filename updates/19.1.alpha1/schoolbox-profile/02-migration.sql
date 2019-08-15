@@ -50,9 +50,9 @@ INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `category`, `positi
     WHERE `groups`.`group_type` = 'staff';
 
 /*
- Migrate data from user_relation to sis_profile_relation table of the new schema
+ Migrate data from user_relation to sis_user_profile_relation table of the new schema
  */
-INSERT INTO `sis_profile_relation` (`child_profile_id`, `user_profile_id`, `emergency_contact`, `type`)
+INSERT INTO `sis_user_profile_relation` (`child_profile_id`, `user_profile_id`, `emergency_contact`, `type`)
     SELECT up1.id as child_id, up2.id as parent_id, NULL, 0
     FROM user_relation
     JOIN user user1 ON user_relation.user_id = user1.id
