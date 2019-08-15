@@ -201,7 +201,6 @@ class Mapper extends BaseMapper
             $pastoral = $pastoralMapper->findOneByColumn(
                 $pastoralMapper->getIdentifierColumn(),
                 $pastoral->getId(),
-                [],
                 ['cache' => false]
             );
         } catch (Deleted $e) {

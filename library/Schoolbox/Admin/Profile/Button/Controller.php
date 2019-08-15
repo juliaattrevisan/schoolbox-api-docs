@@ -163,7 +163,7 @@ class Controller extends Base
             'template' => '@adminProfileButton/modify.twig',
             'data' => [
                 'pageCurrent' => self::PAGE_CURRENT,
-                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [], [ 'cache' => false ]),
+                'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc'),

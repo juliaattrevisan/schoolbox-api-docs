@@ -7,7 +7,7 @@
  */
 
 /**
- * @method DueWork_Error findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method DueWork_Error findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class DueWork_ErrorMapper extends Schoolbox\Mapper
 {

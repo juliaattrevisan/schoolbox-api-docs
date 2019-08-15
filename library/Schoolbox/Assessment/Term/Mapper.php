@@ -21,7 +21,7 @@ use UnexpectedValueException;
  * @package Schoolbox\Assessment\Term
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findAll($options = array())
  */
 class Mapper extends BaseMapper

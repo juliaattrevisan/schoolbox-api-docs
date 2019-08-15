@@ -15,7 +15,7 @@ use Schoolbox\Mapper;
  * Class ConfigMapper
  *
  * @package Schoolbox\Config
- * @method Config findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method Config findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Config[] findByColumn($columnName, $columnValue, $options = array())
  */
 class ConfigMapper extends Mapper implements IConfigLoader

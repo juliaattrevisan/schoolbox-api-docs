@@ -26,7 +26,7 @@ use Schoolbox\GenericCollection;
  * @method Model findById($identifierValue)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  * @method Model[]|GenericCollection findByColumnList($columnList, $options = [])
- * @method Model findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends Schoolbox\Mapper {

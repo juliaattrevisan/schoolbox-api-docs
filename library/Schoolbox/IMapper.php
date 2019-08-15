@@ -210,19 +210,19 @@ interface IMapper
      * @return GenericCollection
      */
     public function findByColumn($columnName, $columnValue, $options = array());
+
     /**
      * Returns first model whose $columnName = $columnValue.
      *
-     * @throws Exception if no instance of model is found
-     * @throws Exception\Deleted if the model was found but has been deleted
-     *
-     * @param  String $columnName
-     * @param  String $columnValue
-     * @param  array  $order Fields to order by (@see findByColumnList() $options param)
+     * @param  string $columnName
+     * @param  string $columnValue
+     * @param  array  $options (@see findByColumnList() for list of available options)
      *
      * @return object
+     * @throws Exception if no instance of model is found
+     * @throws Exception\Deleted if the model was found but has been deleted
      */
-    public function findOneByColumn($columnName, $columnValue, $order = array());
+    public function findOneByColumn($columnName, $columnValue, array $options = array());
 
     /**
      * Returns first model who matches all the values pairs in $columnList.

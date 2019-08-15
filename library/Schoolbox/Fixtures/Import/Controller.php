@@ -514,7 +514,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Sport '{$row[1]}'");
                     } catch (MapperException $e) {
                         $sport = new Sport();
@@ -563,7 +563,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[1]}'");
                         $sport = new Sport();
@@ -757,7 +757,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $venue = $this->getVenueMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $venue = $this->getVenueMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Venue '{$row[1]}'");
                     } catch (MapperException $e) {
                         $venue = new Venue();
@@ -800,7 +800,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $this->getSchoolMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $this->getSchoolMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED SCHOOL: School '{$row[1]}' already exists");
 
                     } catch (MapperException $e) {
@@ -841,7 +841,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $status = $this->getStatusMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $status = $this->getStatusMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED STATUS: Status '{$row[1]}' already exists");
 
                     } catch (MapperException $e) {
@@ -917,7 +917,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Season '{$row[1]}'");
                     } catch (MapperException $e) {
                         $season = new Season();
@@ -976,7 +976,7 @@ class Controller extends Base
                 } else {
                     try {
                         /** @var Season $season */
-                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED TEAM: Season not found in database ({$row[1]})");
                         $error = true;
@@ -998,7 +998,7 @@ class Controller extends Base
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
@@ -1109,7 +1109,7 @@ class Controller extends Base
                 } else {
                     try {
                         /** @var Season $season */
-                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED COACH: Season not found in database ({$row[1]})");
                         $error = true;
@@ -1135,7 +1135,7 @@ class Controller extends Base
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
@@ -1178,7 +1178,7 @@ class Controller extends Base
                                 $user = $this->getUserMapper()->findByExternalId($coach);
 
                                 try {
-                                    $coach = $this->getCoachMapper()->findOneByColumn('user_id', $user->getId(), [], $this->disableCache);
+                                    $coach = $this->getCoachMapper()->findOneByColumn('user_id', $user->getId(), $this->disableCache);
                                 } catch (MapperException $e) {
                                     $coach = new Coach();
                                     $coach->setUser($user);
@@ -1236,7 +1236,7 @@ class Controller extends Base
                 } else {
                     try {
                         /** @var Season $season */
-                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], [], $this->disableCache);
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED FIXTURE: Season not found in database ({$row[1]})");
                         $error = true;
@@ -1287,7 +1287,7 @@ class Controller extends Base
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
-                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], [], $this->disableCache);
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2], $this->disableCache);
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();

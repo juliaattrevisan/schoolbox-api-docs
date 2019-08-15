@@ -1162,7 +1162,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         /** @var BaseMapper $mapperInstance */
         $mapperInstance = call_user_func($mapperClass . '::getInstance');
 
-        return $mapperInstance->findOneByColumn($mapperInstance->getIdentifierColumn(), $object->getId(), [], ['cache' => false]);
+        return $mapperInstance->findOneByColumn($mapperInstance->getIdentifierColumn(), $object->getId(), ['cache' => false]);
     }
 
     /**
