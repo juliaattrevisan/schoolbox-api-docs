@@ -15,10 +15,10 @@ INSERT INTO `sis_user_profile` (external_id, gender, title, firstname, lastname,
  Migrate data from user, user_profile and sis_user_profile_student to sis_profile_user table of the new schema
  */
 INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `ib`, `individual_learning_plans`, `esl`,
-                                        `head_of_house_id`, `head_of_house_name`, `house_name`, `house_description`, `form_name`, `form_description`, `teacher_form_id`, `teacher_form_name`,
+                                        `head_of_house_id`, `head_of_house_name`, `house_name`, `house_description`, `form_name`, `form_teacher_id`, `form_teacher_name`,
                                         `tutor_id`, `tutor_name`, `tutor_group`, `tutor_description`, `year_level`, `year_level_coordinator_id`, `year_level_coordinator_name`,
                                         `mobile`, `special_needs`, `studies_code`, `boarding_status`, `alert_medical`,`alert_comment`,`alert_message`,`alert_legal`,`enrolment_date`, `leaving_date`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`, NULL, NULL,`user`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`, NULL, NULL,`user`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
            `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, `user`.`boarding_status`, NULL, NULL, NULL, NULL, NULL, NULL, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
@@ -39,7 +39,7 @@ INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_h
 /*
  Migrate data from user to sis_profile_user_staff table of the new schema
  */
-INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `category`, `position_title`,`position_description`, `department`, `phone_work`, `room`, `building`,`work_email`, `campus_name`, created_at, updated_at, deleted_at)
+INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `category`, `position_title`,`position_description`, `department`, `phone_work`, `room`, `building`,`email_work`, `campus_name`, created_at, updated_at, deleted_at)
     SELECT `sis_user_profile`.`id`, NULL, `user`.`position_title`,NULL, NULL, NULL, NULL, NULL, `user`.`alt_email`, NULL, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
