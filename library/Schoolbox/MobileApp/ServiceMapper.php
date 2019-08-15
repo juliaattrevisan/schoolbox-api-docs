@@ -14,10 +14,11 @@ use Schoolbox\Resource\Storage;
 
 /**
  * Class ServiceMapper
+ *
  * @package Schoolbox\MobileApp
  * @method Service findById($identifierValue)
- * @method Service findOneByColumn($columnName, $columnValue, $order = array(), $options = array())
- * @method Service findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Service findOneByColumn($columnName, $columnValue, array $options = array())
+ * @method Service findOneByColumnList($columnList, array $options = [])
  * @method Service createModel($identifierValue = null)
  * @method Collection|Service[] findAll($options = array())
  */

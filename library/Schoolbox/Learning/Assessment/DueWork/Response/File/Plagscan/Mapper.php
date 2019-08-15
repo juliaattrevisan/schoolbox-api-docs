@@ -26,7 +26,7 @@ use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
 /**
- * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends \Schoolbox\Mapper
 {

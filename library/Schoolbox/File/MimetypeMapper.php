@@ -16,7 +16,7 @@ use Schoolbox;
  * Class MimetypeMapper
  *
  * @package Schoolbox\File
- * @method Mimetype findOneByColumn($columnName, $columnValue, $order = [])
+ * @method Mimetype findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class MimetypeMapper extends Schoolbox\Mapper {
 

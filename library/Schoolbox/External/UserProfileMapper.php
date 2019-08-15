@@ -20,7 +20,7 @@ use Schoolbox\UserMapper;
  *
  * @method UserProfile createModel($idValue = null)
  * @method UserProfile findById($identifierValue)
- * @method UserProfile findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method UserProfile findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class UserProfileMapper extends Schoolbox\Mapper
 {

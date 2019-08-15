@@ -34,7 +34,7 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\Permission\Access
  * @method UserAccess createModel($id = null)
- * @method UserAccess findOneByColumnList($columnList, $order = [], $options = [])
+ * @method UserAccess findOneByColumnList($columnList, array $options = [])
  * @method GenericCollection|UserAccess[] findByColumnList($columnList, $order = [])
  */
 class UserAccessMapper extends Mapper

@@ -626,7 +626,7 @@ class Controller extends Base
                      */
 
                     /** @var PastoralTagsModel $tag */
-                    $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, [], ['cache' => false]);
+                    $tag = $this->pastoralTagMapper->findOneByColumn('name', $tagCurrent, ['cache' => false]);
                 } catch (MapperDeletedException $e) {
                     /* Restore this tag to active duty
                      */

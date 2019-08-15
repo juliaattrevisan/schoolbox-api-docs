@@ -156,7 +156,6 @@ class EventRecurrenceMapper
             $previous = $this->getEventMapper()->findOneByColumn(
                 $this->getEventMapper()->getIdentifierColumn(),
                 $event->getId(),
-                [],
                 ['cache' => false]
             );
 
@@ -229,12 +228,7 @@ class EventRecurrenceMapper
         $event->setAccess($access);
 
         // Use start and end deltas to set time of each series event
-        $originalEvent = $this->getEventMapper()->findOneByColumn(
-            'id',
-            $event->getId(),
-            [],
-            ['cache' => false]
-        );
+        $originalEvent = $this->getEventMapper()->findOneByColumn('id', $event->getId(), ['cache' => false]);
 
         $startDelta = Interval::createFromDateTimeDifference(
             $originalEvent->getStartDateTime()->getDateTimeObject(),

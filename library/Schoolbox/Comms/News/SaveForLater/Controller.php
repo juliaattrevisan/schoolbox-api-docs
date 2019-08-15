@@ -143,7 +143,7 @@ class Controller extends Base
         $columnList = ['user_id' => $user->getId(), 'article_id' => $article->getId()];
 
         try {
-            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, [], ['deleted' => true]);
+            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, ['deleted' => true]);
         } catch (BaseMapper\Exception $e) {
             // No record? Create one.
             $savedForLater = $this->saveForLaterMapper->createModel()->setUser($user)->setArticle($article);
@@ -176,7 +176,7 @@ class Controller extends Base
         $columnList = ['user_id' => $user->getId(), 'article_id' => $article->getId()];
 
         try {
-            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, [], ['deleted' => true]);
+            $savedForLater = $this->saveForLaterMapper->findOneByColumnList($columnList, ['deleted' => true]);
         } catch (BaseMapper\Exception $e) {
             return false;
         }

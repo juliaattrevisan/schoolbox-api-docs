@@ -24,7 +24,7 @@ use Schoolbox\Resource\HomepageConfig;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method GenericCollection|Model[] findByColumn($columnName, $columnValue, $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */

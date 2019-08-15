@@ -16,7 +16,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 /**
  * Class Component_DefinitionMapper
  *
- * @method Component_Definition findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method Component_Definition findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class Component_DefinitionMapper extends Schoolbox\Mapper
 {
@@ -269,7 +269,7 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
      */
     public function findById($identifierValue)
     {
-        return $this->findOneByColumn($this->getIdentifierColumn(), $identifierValue, [], ['hidden' => true]);
+        return $this->findOneByColumn($this->getIdentifierColumn(), $identifierValue, ['hidden' => true]);
     }
 
     /**

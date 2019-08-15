@@ -32,7 +32,7 @@ use UnexpectedValueException;
  * @method SubmissionBox[]|GenericCollection createCollection($contents = [])
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
- * @method SubmissionBox findOneByColumn($columnName, $columnValue, $order = [], $options = [])
+ * @method SubmissionBox findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class SubmissionBoxMapper extends Schoolbox\Mapper
 {

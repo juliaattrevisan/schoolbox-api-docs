@@ -19,8 +19,8 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
- * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
- * @method Model findOneByColumnList($columnList, $order = [], $options = [])
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
+ * @method Model findOneByColumnList($columnList, array $options = [])
  */
 class Mapper extends BaseMapper implements BaseMapper\Searchable
 {

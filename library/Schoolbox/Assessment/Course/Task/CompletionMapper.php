@@ -206,7 +206,7 @@ class CompletionMapper extends Mapper {
                     'task_id'    => $task_id,
                     'student_id' => $student_id,
                 ),
-                array('completion_date' => 'desc')
+                ['order' => ['completion_date' => 'desc']]
             );
             if ($existing->getCompletionStatus() == $status) {
                 return array();
