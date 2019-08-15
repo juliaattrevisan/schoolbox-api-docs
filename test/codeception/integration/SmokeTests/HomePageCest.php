@@ -4,110 +4,213 @@ namespace SmokeTests;
 
 use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
+use Payload\Base;
+use Payload\GroupMember as GroupMemberPayload;
 use SchoolboxHelper\SchoolboxActionsConstants;
-
+use Payload\Folder as FolderPayload;
+use Payload\TextBoxComponent as TextBoxPayload;
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 class HomePageCest {
+
     /**
-     * Smoke test hompeage post forms include following actions:
-     * Create homepage
-     * Add users to homepage
-     * Set permissions for users in group permissions for homepage
-     * Add text component
-     * delete fresh text input in the text component that we created.
-     * create text input in the text component
-     *
-     * Each of these in the future itteration should be split into sepperate test functions.
-     * Also in future itterations we need to cover each component.
+     * Push a login payload to Schoolbox each test to ensure session is active and logged in.
      *
      * @param IntegrationTester $i
-     *
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     * @throws \Schoolbox\External\Exception
      */
-    public function SmokeHomepagePOST(IntegrationTester $i){
+    public function _before(IntegrationTester $i)
+    {
+        $i->loginAdmin2();
+    }
+
+    /** Create homepage. creates a homepage through a curl payload
+     *
+     * @param IntegrationTester $i
+     * @param FolderPayload     $folderPayload
+     */
+    public function createHomepage(IntegrationTester $i, FolderPayload $folderPayload){
         #GIVEN
-        $i->loginAdmin(); #we logged in as alaress
-        $homepage_title='Testing Home Page for Homepage Smoke';
-        $student = $i->getUser('drhodes');
-        $teacher = $i->getUser('zsmith');
-        $admin = $i->getUser('alaress');
+        $timestamp = time();
+        $homepage_title='Testing Home Page Create Homepage at '.$timestamp;
 
         #WHEN
-        $response = $i->createHomepage($homepage_title);
-        $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
+        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setName($homepage_title);
+        $response= $i->sendCurlRequest($folderPayload, true, 'Send request create homepage');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
-        $i->comment('Create homepage :'.$homePageId);
+
+        #THEN
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
+    }
+
+    /** Set up users tests setting up users on group page via curl requests.
+     *
+     *  Fires off create homepage.
+     *
+     * @param IntegrationTester  $i
+     * @param FolderPayload      $folderPayload
+     * @param GroupMemberPayload $memberPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function setUpUsers(IntegrationTester $i, FolderPayload $folderPayload, GroupMemberPayload $memberPayload){
+
+        #GIVEN
+        $timestamp = time();
+        $student = $i->getUser('drhodes');
+        $teacher = $i->getUser('zsmith');
+        $admin = $i->getUser('alaress');
+        $homepage_title='Testing Home Page Add Members with Permissions at '.$timestamp;
+
+        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setName($homepage_title);
+        $i->sendCurlRequest($folderPayload, false, 'Send request create homepage');
+        $homePage=$i->getFirstFolderByTitle($homepage_title);
+
+        #WHEN
+        $memberPayload->setFolderGroup($homePage->getId());
+        $memberPayload->setNewMember($student->getId());
+        $memberPayload->setNewMember($admin->getId());
+        $memberPayload->setNewMember($teacher->getId());
+        $response = $i->sendCurlRequest($memberPayload, true, 'Add group members to homepage #'.$homePage->getId());
+
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePage->getId()=>'302'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
-        $response = $i->addUsersToHomepageGroup($homePageId, [$student->getId(), $admin->getId(), $teacher->getId()]);
+        $memberPayload->resetMemberAdjustmentList();
+        $memberPayload->setNewMemberPermission($student->getId(), 'read');
+        $memberPayload->setNewMemberPermission($teacher->getId(), 'write');
+        $memberPayload->setNewMemberPermission($admin->getId(), 'admin');
+        $response = $i->sendCurlRequest($memberPayload, true, 'Add group members permissions to homepage #'.$homePage->getId());
+
         $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePageId=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePage->getId()=>'302'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
-        $i->comment('Add users to homepage ID:'.$homePageId);
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
-        #WHEN
-        $response = $i->setHomepageGroupUserPermission($homePageId, [$student->getId()=>1, $teacher->getId()=>2, $admin->getId()=>3]);
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePageId=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
-        ];
-        $i->comment('Change permission for group users on homepage ID:'.$homePageId);
+    }
 
-        #THEN
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
+    /** Set up text component on homepage using curl requests. Sets up a text component, creates text in it, deletes it.
+     *
+     * Fires off create homepage.
+     *
+     * @param IntegrationTester $i
+     * @param FolderPayload     $folderPayload
+     * @param TextBoxPayload    $textBoxPayload
+     * @throws \Schoolbox\External\Exception
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function setUpTextComponent(IntegrationTester $i, FolderPayload $folderPayload, TextBoxPayload $textBoxPayload){
+
+        #GIVEN
+        $timestamp = time();
+        $homepage_title='Testing Home Page Use Text Box Component at '.$timestamp;
+
+        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setName($homepage_title);
+        $i->sendCurlRequest($folderPayload, false, 'Send request create homepage');
+        $homePage=$i->getFirstFolderByTitle($homepage_title);
 
         #WHEN
         $text_component_class=$i->getComponentByClass('Component_Homepage_TextBoxController');
-        $text='<p>This is test Text</p>';
-        $response = $i->addComponentToHomepage($text_component_class->getId(), $homePageId, SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top']);
+
+        $textComponentPayload=new Base();
+        $textComponentPayload->setPage('/homepage/configForm.php');
+        $textComponentPayload->setReferer('/homepage/'.$homePage->getId());
+        $textComponentPayload->setFormParam('add', $text_component_class->getId());
+        $textComponentPayload->setFormParam('cid', $homePage->getId());
+
+        $response = $i->sendCurlRequest($textComponentPayload, true, 'Add text component to homepage #'.$homePage->getId());
         $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
-        $i->comment('Added the Text component to Homepage.');
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
         #WHEN
-        $homepage_text_component = $i->getComponentOnHomepage($homePageId, $text_component_class, 'top');
-        $heading='Heading Component Test - Delete me';
-        $i->addTextBoxToTextComponent($homePageId, $homepage_text_component, $text, $heading);
-        $response = $i->deleteTextBoxToTextComponent($homePageId, $heading);
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
-        ];
-        $i->comment('Delete a text input we freshly created.');
+        $capture_new_component_id='/div id=\'component(\d+)\'/';
+        preg_match($capture_new_component_id, $response->getBody(), $new_component_id_matches);
+        $created_component_id = $new_component_id_matches[1];
+        $textComponentPayload->setFormParam('type', 'components');
+        $textComponentPayload->setFormParam('column'.SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top'], $created_component_id);
+        $textComponentPayload->setFormParam('cid', $homePage->getId());
+
+        $response = $i->sendCurlRequest($textComponentPayload, true, 'send request drop component #'.$created_component_id.' onto homepage #'.$homePage->getId());
+        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
-
         #WHEN
-        $heading='Heading Component Test';
-        $response = $i->addTextBoxToTextComponent($homePageId, $homepage_text_component, $text, $heading);
+        $heading='Text Component Test Create Text at '.$timestamp;
+        $text='<p>This text has been created</p>';
+        $textBoxPayload->setHomepageId($homePage->getId());
+        $textBoxPayload->setComponentId(intval($created_component_id));
+        $textBoxPayload->setHeading($heading);
+        $textBoxPayload->setBody($text);
+        $response = $i->sendCurlRequest($textBoxPayload, true, 'send request create text on component #'.$created_component_id.' on homepage #'.$homePage->getId());
+
         $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'302'],
+            ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePage->getId()=>'302'],
             [GuzzleConstants::NO_REDIRECT=>'200']
         ];
-        $i->comment('create a fresh text input into the text component');
+
+        #THEN
+        $i->checkCurlReturn($expectedUrlsReturned, $response);
+
+        #WHEN
+        $textComponentPayload=new Base();
+        $textComponentPayload->setPage('/homepage/configForm.php');
+        $textComponentPayload->setReferer('/homepage/'.$homePage->getId());
+        $textComponentPayload->setFormParam('add', $text_component_class->getId());
+        $textComponentPayload->setFormParam('cid', $homePage->getId());
+
+        $response = $i->sendCurlRequest($textComponentPayload, true, 'Add text component to homepage #'.$homePage->getId());
+
+        preg_match($capture_new_component_id, $response->getBody(), $new_component_id_matches);
+        $deleted_component_id = $new_component_id_matches[1];
+        $textComponentPayload->setFormParam('type', 'components');
+        $textComponentPayload->setFormParam('column'.SchoolboxActionsConstants::HOMEPAGE_COMPONENT_POSITION['top'], $deleted_component_id);
+        $textComponentPayload->setFormParam('cid', $homePage->getId());
+        $i->sendCurlRequest($textComponentPayload, false, 'send request drop component #'.$deleted_component_id.' onto homepage #'.$homePage->getId());
+
+        $heading='Text Component Test Deleted Text at '.$timestamp;
+        $text='<p>This text has been deleted</p>';
+        $textBoxPayload->setHomepageId($homePage->getId());
+        $textBoxPayload->setComponentId($deleted_component_id);
+        $textBoxPayload->setHeading($heading);
+        $textBoxPayload->setBody($text);
+        $i->sendCurlRequest($textBoxPayload, false, 'send request create text on component #'.$created_component_id.' on homepage #'.$homePage->getId());
+
+
+        $textBox = $i->getTextBoxByHeading($heading);
+        $textBoxPayload->setReferer('/homepage/'.$homePage->getId());
+        $textBoxPayload->deleteFormParams();
+        $textBoxPayload->setMethod('GET');
+        $textBoxPayload->setQueryString('delete', $textBox->getId());
+        $textBoxPayload->setQueryString('originID', $homePage->getId());
+        $response = $i->sendCurlRequest($textBoxPayload, true, 'send request delete text box content on homepage #'.$homePage->getId());
+
+        $expectedUrlsReturned= [
+            ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePage->getId()=>'302'],
+            [GuzzleConstants::NO_REDIRECT=>'200']
+        ];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);

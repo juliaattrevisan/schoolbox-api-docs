@@ -69,10 +69,15 @@ class Base
 
     public function getFormParam(string $key)
     {
-        return $this->structure['payload']['form_params'][$key];
+        if (array_key_exists($key, $this->structure['payload']['form_params']))
+        {
+            return $this->structure['payload']['form_params'][$key];
+        }
+
+        return null;
     }
 
-    public function setFormParam(string $key, string $value)
+    public function setFormParam(string $key, ?string $value)
     {
         $this->structure['payload']['form_params'][$key]=$value;
     }
@@ -90,6 +95,16 @@ class Base
     protected function deleteFormParams()
     {
         unset($this->structure['payload']['form_params']);
+    }
+
+    public function setQueryString(string $key, ?string $value)
+    {
+        $this->structure['payload']['query'][$key]=$value;
+    }
+
+    public function removeQueryString(string $key)
+    {
+        unset($this->structure['payload']['query'][$key]);
     }
 
     public function payloadToArray()
