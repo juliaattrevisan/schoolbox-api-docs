@@ -97,7 +97,6 @@ class Controller extends BaseController
      * @param Access                 $access
      * @param Code\Mapper            $classCodeMapper
      * @param Curriculum\Node\Mapper $curriculumNodeMapper
-     * @param GroupMapper            $groupMapper
      * @param FileMapper             $fileMapper
      * @param YearLevel\Mapper       $yearLevelMapper
      */
@@ -112,7 +111,6 @@ class Controller extends BaseController
         Access $access,
         Folder\Code\Mapper $classCodeMapper,
         Curriculum\Node\Mapper $curriculumNodeMapper,
-        GroupMapper $groupMapper,
         FileMapper $fileMapper,
         YearLevel\Mapper $yearLevelMapper
     ) {
@@ -126,7 +124,6 @@ class Controller extends BaseController
         $this->access                 = $access;
         $this->classCodeMapper        = $classCodeMapper;
         $this->curriculumNodeMapper   = $curriculumNodeMapper;
-        $this->groupMapper            = $groupMapper;
         $this->fileMapper             = $fileMapper;
         $this->yearLevelMapper        = $yearLevelMapper;
     }
@@ -141,14 +138,14 @@ class Controller extends BaseController
      */
     public function getFolderModify($id): void
     {
-        $access = $this->getAccess();
-        $userAccess = $access->getFolderAccess($this->getUser(), $id);
-        $folderMapper = $this->getFolderMapper();
-        $homepageConfigMapper = $this->getHomepageConfigMapper();
-        $homepageTemplateMapper = $this->getHomepageTemplateMapper();
-        $roleAccessMapper = $this->getRoleAccessMapper();
-        $roleMapper = $this->getRoleMapper();
-        $errorMapper = $this->getErrorMapper();
+        $access                 = $this->access;
+        $userAccess             = $access->getFolderAccess($this->getUser(), $id);
+        $folderMapper           = $this->folderMapper;
+        $homepageConfigMapper   = $this->homepageConfigMapper;
+        $homepageTemplateMapper = $this->homepageTemplateMapper;
+        $roleAccessMapper       = $this->roleAccessMapper;
+        $roleMapper             = $this->roleMapper;
+        $errorMapper            = $this->errorMapper;
         if ($userAccess < UserAccess::ACCESS_WRITE) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
@@ -250,11 +247,11 @@ class Controller extends BaseController
      */
     public function getFolderCreate($parentId)
     {
-        $access = $this->getAccess();
-        $folderMapper = $this->getFolderMapper();
-        $homepageTemplateMapper = $this->getHomepageTemplateMapper();
-        $roleMapper = $this->getRoleMapper();
-        $errorMapper = $this->getErrorMapper();
+        $access                 = $this->access;
+        $folderMapper           = $this->folderMapper;
+        $homepageTemplateMapper = $this->homepageTemplateMapper;
+        $roleMapper             = $this->roleMapper;
+        $errorMapper            = $this->errorMapper;
 
         if ($access->getFolderAccess($this->getUser(), $parentId) < UserAccess::ACCESS_WRITE) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
@@ -282,7 +279,7 @@ class Controller extends BaseController
         $folder = new Model();
 
         // Default to parent's permissions
-        $permissions = $this->getRoleAccessMapper()->findByColumn('cid', $parent->getId());
+        $permissions = $this->roleAccessMapper->findByColumn('cid', $parent->getId());
         $rolePermissions = [];
         foreach ($permissions as $permission) {
             $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
@@ -332,9 +329,9 @@ class Controller extends BaseController
      */
     public function postDeleteFolder()
     {
-        $folderMapper = $this->getFolderMapper();
-        $errorMapper = $this->getErrorMapper();
-        $access = $this->getAccess();
+        $folderMapper = $this->folderMapper;
+        $errorMapper  = $this->errorMapper;
+        $access       = $this->access;
 
         // Find the folder to be deleted
 
@@ -365,9 +362,9 @@ class Controller extends BaseController
      */
     public function postMoveFolder()
     {
-        $access = $this->getAccess();
-        $errorMapper = $this->getErrorMapper();
-        $folderMapper = $this->getFolderMapper();
+        $access       = $this->access;
+        $errorMapper  = $this->errorMapper;
+        $folderMapper = $this->folderMapper;
 
         if ($this->getRequest()->post["source"] != $this->getRequest()->post["destination"])
         {
@@ -426,7 +423,7 @@ class Controller extends BaseController
      */
     public function postUpdateFolder()
     {
-        $errorMapper = $this->getErrorMapper();
+        $errorMapper = $this->errorMapper;
 
         try {
             $user        = $this->getUser();
@@ -469,10 +466,10 @@ class Controller extends BaseController
      */
     public function persistFolder($postData, User $user)
     {
-        $folderMapper     = $this->getFolderMapper();
-        $userAccessMapper = $this->getUserAccessMapper();
-        $roleAccessMapper = $this->getRoleAccessMapper();
-        $access           = $this->getAccess();
+        $folderMapper     = $this->folderMapper;
+        $userAccessMapper = $this->userAccessMapper;
+        $roleAccessMapper = $this->roleAccessMapper;
+        $access           = $this->access;
 
         $model = $folderMapper->createModel()
             ->setName($postData['name'])
@@ -615,7 +612,7 @@ class Controller extends BaseController
             throw new DomainException("Only SuperUsers may set Class Codes");
         }
 
-        $classCodeMapper = $this->getClassCodeMapper();
+        $classCodeMapper = $this->classCodeMapper;
         $codeCollection  = $classCodeMapper->createCollection();
 
         foreach (explode(',', $classCodeString) as $code) {
@@ -645,7 +642,7 @@ class Controller extends BaseController
      */
     protected function setCurriculumCodesOnFolder(Model $model, $curriculumCodes)
     {
-        $curriculumNodeMapper = $this->getCurriculumNodeMapper();
+        $curriculumNodeMapper = $this->curriculumNodeMapper;
 
         if (isset($curriculumCodes) && count($curriculumCodes)) {
             $model->setCurriculumNodes(
@@ -664,8 +661,8 @@ class Controller extends BaseController
      */
     protected function saveHomepageConfig(Model $model, $template)
     {
-        $confMapper = $this->getHomepageConfigMapper();
-        $tplMapper  = $this->getHomepageTemplateMapper();
+        $confMapper = $this->homepageConfigMapper;
+        $tplMapper  = $this->homepageTemplateMapper;
 
         $homepageConfig = $confMapper->createModel()->setCategory($model);
 
@@ -709,17 +706,17 @@ class Controller extends BaseController
     {
         /* Find all the unique folder ids that need their memberships purged
          */
-        $deleteFolderMemberships = array_values($this->getFolderMapper()->recurseInheritance($model));
+        $deleteFolderMemberships = array_values($this->folderMapper->recurseInheritance($model));
 
         if (!empty($deleteFolderMemberships)) {
             // If inheriting permissions we need to remove any user access permissions...
-            $this->getUserAccessMapper()->deleteByColumnList([
+            $this->userAccessMapper->deleteByColumnList([
                 "sid"     => $deleteFolderMemberships,
                 "service" => UserAccess::SERVICE_HOMEPAGE,
             ]);
 
             // ...and role permissions
-            $this->getRoleAccessMapper()->deleteByColumn("cid", $deleteFolderMemberships);
+            $this->roleAccessMapper->deleteByColumn("cid", $deleteFolderMemberships);
         }
     }
 
@@ -736,8 +733,8 @@ class Controller extends BaseController
     protected function createGroup($postData, Model $model, User $user)
     {
         // No changes in "KEEP_EXISTING" case
-        $roleAccessMapper = $this->getRoleAccessMapper();
-        $userAccessMapper = $this->getUserAccessMapper();
+        $roleAccessMapper = $this->roleAccessMapper;
+        $userAccessMapper = $this->userAccessMapper;
         $groupMapper      = $this->getGroupMapper();
 
         // is 'Create Group' set true?
@@ -789,8 +786,8 @@ class Controller extends BaseController
      */
     public function recursiveDelete($id, User $user)
     {
-        $errorMapper = $this->getErrorMapper();
-        $folderMapper = $this->getFolderMapper();
+        $errorMapper  = $this->errorMapper;
+        $folderMapper = $this->folderMapper;
 
         // If I'm not a superuser, I can't delete a non-empty folder
         if (!$user->isSuperuser()) {
@@ -822,10 +819,10 @@ class Controller extends BaseController
      */
     public function postFolderReset()
     {
-        $access = $this->getAccess();
-        $errorMapper = $this->getErrorMapper();
-        $folderMapper = $this->getFolderMapper();
-        $fileMapper = $this->getFileMapper();
+        $access       = $this->access;
+        $errorMapper  = $this->errorMapper;
+        $folderMapper = $this->folderMapper;
+        $fileMapper   = $this->fileMapper;
 
         try
         {
@@ -885,7 +882,7 @@ class Controller extends BaseController
         $userAccess  = [];
 
         /** @var \Schoolbox\Resource\Folder\Model $folder */
-        foreach ($this->getFolderMapper()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true)
+        foreach ($this->folderMapper->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true)
                      ->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
@@ -917,244 +914,4 @@ class Controller extends BaseController
             'userAccess'          => $userAccess
         ]));
     }
-
-    /**
-     * @return Mapper
-     */
-    protected function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-
-    /**
-     * @param Mapper $folderMapper
-     * @return static
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return HomepageConfigMapper
-     */
-    protected function getHomepageConfigMapper()
-    {
-        return $this->homepageConfigMapper;
-    }
-
-
-    /**
-     * @param HomepageConfigMapper $homepageConfigMapper
-     * @return static
-     */
-    public function setHomepageConfigMapper($homepageConfigMapper)
-    {
-        $this->homepageConfigMapper = $homepageConfigMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return HomepageTemplateMapper
-     */
-    protected function getHomepageTemplateMapper()
-    {
-        return $this->homepageTemplateMapper;
-    }
-
-
-    /**
-     * @param HomepageTemplateMapper $homepageTemplateMapper
-     * @return static
-     */
-    public function setHomepageTemplateMapper($homepageTemplateMapper)
-    {
-        $this->homepageTemplateMapper = $homepageTemplateMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return RoleAccessMapper
-     */
-    protected function getRoleAccessMapper()
-    {
-        return $this->roleAccessMapper;
-    }
-
-
-    /**
-     * @param RoleAccessMapper $roleAccessMapper
-     * @return static
-     */
-    public function setRoleAccessMapper($roleAccessMapper)
-    {
-        $this->roleAccessMapper = $roleAccessMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return UserAccessMapper
-     */
-    public function getUserAccessMapper()
-    {
-        return $this->userAccessMapper;
-    }
-
-
-    /**
-     * @param UserAccessMapper $userAccessMapper
-     * @return static
-     */
-    public function setUserAccessMapper($userAccessMapper)
-    {
-        $this->userAccessMapper = $userAccessMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return RoleMapper
-     */
-    protected function getRoleMapper()
-    {
-        return $this->roleMapper;
-    }
-
-
-    /**
-     * @param RoleMapper $roleMapper
-     * @return static
-     */
-    public function setRoleMapper($roleMapper)
-    {
-        $this->roleMapper = $roleMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return static
-     */
-    public function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return Access
-     */
-    protected function getAccess()
-    {
-        return $this->access;
-    }
-
-
-    /**
-     * @param Access $access
-     * @return static
-     */
-    public function setAccess($access)
-    {
-        $this->access = $access;
-        return $this;
-    }
-
-
-    /**
-     * @return ClassCodeMapper
-     */
-    protected function getClassCodeMapper()
-    {
-        return $this->classCodeMapper;
-    }
-
-
-    /**
-     * @param ClassCodeMapper $classCodeMapper
-     * @return static
-     */
-    public function setClassCodeMapper($classCodeMapper)
-    {
-        $this->classCodeMapper = $classCodeMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return Curriculum\Node\Mapper
-     */
-    protected function getCurriculumNodeMapper()
-    {
-        return $this->curriculumNodeMapper;
-    }
-
-
-    /**
-     * @param Curriculum\Node\Mapper $curriculumNodeMapper
-     * @return static
-     */
-    public function setCurriculumNodeMapper($curriculumNodeMapper)
-    {
-        $this->curriculumNodeMapper = $curriculumNodeMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return GroupMapper
-     */
-    protected function getGroupMapper()
-    {
-        return $this->groupMapper;
-    }
-
-
-    /**
-     * @param GroupMapper $groupMapper
-     * @return static
-     */
-    public function setGroupMapper($groupMapper)
-    {
-        $this->groupMapper = $groupMapper;
-        return $this;
-    }
-
-
-    /**
-     * @return FileMapper
-     */
-    protected function getFileMapper()
-    {
-        return $this->fileMapper;
-    }
-
-
-    /**
-     * @param FileMapper $fileMapper
-     * @return static
-     */
-    public function setFileMapper($fileMapper)
-    {
-        $this->fileMapper = $fileMapper;
-        return $this;
-    }
-
 }

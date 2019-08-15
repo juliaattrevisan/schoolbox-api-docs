@@ -107,7 +107,6 @@ class Module extends BaseModule
                 'access'                 => $mapperFactory->getLazy(Access::class),
                 'classCodeMapper'        => $mapperFactory->getLazy(Code\Mapper::class),
                 'curriculumNodeMapper'   => $mapperFactory->getLazy(Curriculum\Node\Mapper::class),
-                'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
                 'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
                 'yearLevelMapper'        => $mapperFactory->getLazy(YearLevel\Mapper::class),
             ])
