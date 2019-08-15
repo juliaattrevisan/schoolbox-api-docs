@@ -17,7 +17,6 @@ use OutOfBoundsException;
 use RangeException;
 use DomainException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -30,7 +29,6 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
-use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -42,6 +40,7 @@ use UnexpectedValueException;
 use Schoolbox\Resource\Folder;
 use Timetable_ColourMapper;
 use Schoolbox\Collection;
+use function ucfirst;
 
 class Controller extends BaseController
 {
@@ -128,21 +127,43 @@ class Controller extends BaseController
         $this->yearLevelMapper        = $yearLevelMapper;
     }
 
+
+    /**
+     * Display create folder page
+     *
+     * @api   /resource/folder/create/{parentId}
+     *
+     * @param Model $parent
+     * @throws MapperException
+     * @throws UnexpectedValueException
+     */
+    public function getFolderCreate(Model $parent): void
+    {
+        $breadcrumbs = [
+            [
+                'text' => $parent->getName(),
+                'href' => '/homepage/' . $parent->getId(),
+            ],
+            [
+                'text' => 'Create Folder',
+                'href' => '',
+            ],
+        ];
+
+        $folder = $this->folderMapper->createModel()->setParent($parent);
+        $this->displayFolderModifyForm($breadcrumbs, $folder);
+    }
+
+
     /**
      * Display update folder screen
      *
      * @api GET /resource/folder/modify/:folderId
      * @param Model $folder
-     * @throws MapperException
      * @throws UnexpectedValueException
      */
     public function getFolderModify(Model $folder): void
     {
-        $userAccess             = $this->access->getFolderAccess($this->getUser(), $folder->getId());
-        $homepageConfigMapper   = $this->homepageConfigMapper;
-        $homepageTemplateMapper = $this->homepageTemplateMapper;
-        $roleAccessMapper       = $this->roleAccessMapper;
-
         $breadcrumbs = [
             [
                 'text' => $folder->getParent()->getName(),
@@ -155,143 +176,90 @@ class Controller extends BaseController
             [
                 'text' => 'Modify',
                 'href' => '#',
-            ]
+            ],
         ];
 
-        try {
-            $homepageConfigMapper->findOneByColumn('cid', $folder->getId());
-            $templateId = HomepageTemplateMapper::TEMPLATE_KEEP_EXISTING;
-        } catch (\Exception $e) {
+        $this->displayFolderModifyForm($breadcrumbs, $folder);
+    }
+
+    /**
+     * Displays the folder modify form.
+     *
+     * @param array $breadcrumbs
+     * @param Model $folder
+     * @throws UnexpectedValueException
+     */
+    private function displayFolderModifyForm(array $breadcrumbs, Model $folder): void
+    {
+        // Homepage template
+        $homepageTemplates = $this->homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
+        if (!$folder->getId()) {
             $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
+        } else {
+            try {
+                $this->homepageConfigMapper->findOneByColumn('cid', $folder->getId());
+                $templateId = HomepageTemplateMapper::TEMPLATE_KEEP_EXISTING;
+                $homepageTemplates->prepend($this->homepageTemplateMapper->getKeepExistingHomepageTemplate());
+            } catch (\Exception $e) {
+                $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
+            }
         }
 
-        $permissions = $roleAccessMapper->findByColumn('cid', $folder->getId());
-
-        $rolePermissions = [];
-
-        foreach ($permissions as $permission) {
-            $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
-        }
-
-        $homepageTemplates = $homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
-        $homepageTemplates->prepend($homepageTemplateMapper->getKeepExistingHomepageTemplate());
-
-        $config = new ConfigLoader();
-
+        // Cover Image
         $zone = new Zone('coverImage');
         $zone
             ->setMulti(false)
             ->setAttachPrompt('Attach a cover image')
             ->setAttachmentsLabel('')
-            ->setMimeFilter('image/*')
-        ;
-
+            ->setMimeFilter('image/*');
         if ($folder->hasCoverImage()) {
-            $zone->attachFiles([ $folder->getCoverImage() ]);
+            $zone->attachFiles([$folder->getCoverImage()]);
         }
 
-        $yearLevelOptions = $this->yearLevelMapper->findAll()->map(static function(YearLevel\Model $yearLevel){
+        // Year Levels
+        $yearLevelOptions = $this->yearLevelMapper->findAll()->map(static function (YearLevel\Model $yearLevel) {
             return [
                 'id'   => $yearLevel->getId(),
                 'name' => $yearLevel->getName(),
             ];
         })->getAll();
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@folder/modify.twig',
-                'data'     => array(
-                    'user'              => $this->getUser(),
-                    'breadcrumbs'       => $breadcrumbs,
-                    'folder'            => $folder,
-                    'parent'            => $folder->getParent(),
-                    'templates'         => $homepageTemplates,
-                    'templateId'        => $templateId,
-                    'roles'             => $this->roleMapper->findAll(),
-                    'rolePermissions'   => $rolePermissions,
-                    'database'          => ucfirst($config->get('external_type')),
-                    'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
-                    'userAccess'        => $userAccess,
-                    'deny'              => UserAccess::ACCESS_DENY,
-                    'read'              => UserAccess::ACCESS_READ,
-                    'write'             => UserAccess::ACCESS_WRITE,
-                    'moderate'          => UserAccess::ACCESS_FULL,
-                    'coverImageZone'    => $zone->getTwigContext(),
-                    'editYearLevelUsage'=> $this->getUser()->isSuperuser(),
-                    'yearLevels'        => $yearLevelOptions,
-                ),
-            )
-        );
-    }
-
-    /**
-     * Display create folder screen
-     *
-     * @param Model $parent
-     * @throws UnexpectedValueException
-     * @todo DRY this up with modify code
-     */
-    public function getFolderCreate(Model $parent): void
-    {
-        $homepageTemplateMapper = $this->homepageTemplateMapper;
-        $roleMapper             = $this->roleMapper;
-
-        $breadcrumbs = [
-            [
-                'text' => $parent->getName(),
-                'href' => '/homepage/' . $parent->getId(),
-            ],
-            [
-                'text' => 'Create Folder',
-                'href' => '',
-            ]
-        ];
-
-        $config = new ConfigLoader();
-
-        $folder = new Model();
-
-        // Default to parent's permissions
-        $permissions = $this->roleAccessMapper->findByColumn('cid', $parent->getId());
-        $rolePermissions = [];
-        foreach ($permissions as $permission) {
+        // Role permissions (CREATE defaults to parent folder perms)
+        $permissionFolder = $folder->getId() ?? $folder->getParent()->getId();
+        $rolePermissions  = [];
+        foreach ($this->roleAccessMapper->findByColumn('cid', $permissionFolder) as $permission) {
             $rolePermissions[$permission->getRole()->getId()] = $permission->getType();
         }
 
-        // Folders that are not in the root note should inherit by default to reduce the user interface
-
-        if ($parent->getId() != Mapper::FOLDER_ROOT)
+        // New folders that are not in the root note inherit by default to reduce the user interface
+        if (!$folder->getId() && $folder->getParent()->getId() !== Mapper::FOLDER_ROOT) {
             $folder->enableInherit();
-
-        $zone = new Zone('coverImage');
-        $zone
-            ->setMulti(false)
-            ->setAttachPrompt('Attach a cover image')
-            ->setAttachmentsLabel('')
-            ->setMimeFilter('image/*')
-        ;
+        }
 
         $this->getResponse()->content->set(
-            array(
+            [
                 'template' => '@folder/modify.twig',
-                'data'     => array(
-                    'user'              => $this->getUser(),
-                    'breadcrumbs'       => $breadcrumbs,
-                    'folder'            => $folder,
-                    'parent'            => $parent,
-                    'templates'         => $homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]),
-                    'roles'             => $roleMapper->findAll(),
-                    'rolePermissions'   => $rolePermissions,
-                    'database'          => ucfirst($config->get('external_type')),
-                    'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
-                    'deny'              => UserAccess::ACCESS_DENY,
-                    'read'              => UserAccess::ACCESS_READ,
-                    'write'             => UserAccess::ACCESS_WRITE,
-                    'moderate'          => UserAccess::ACCESS_FULL,
-                    'coverImageZone'    => $zone->getTwigContext(),
-                    'editYearLevelUsage'=> $this->getUser()->isSuperuser(),
-                ),
-            )
+                'data'     => [
+                    'user'               => $this->getUser(),
+                    'breadcrumbs'        => $breadcrumbs,
+                    'folder'             => $folder,
+                    'parent'             => $folder->getParent(),
+                    'templates'          => $homepageTemplates,
+                    'templateId'         => $templateId,
+                    'roles'              => $this->roleMapper->findAll(),
+                    'rolePermissions'    => $rolePermissions,
+                    'database'           => ucfirst($this->getConfigLoader()->get('external_type')),
+                    'curriculumTagging'  => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                    'userAccess'         => $this->access->getFolderAccess($this->getUser(), $permissionFolder),
+                    'deny'               => UserAccess::ACCESS_DENY,
+                    'read'               => UserAccess::ACCESS_READ,
+                    'write'              => UserAccess::ACCESS_WRITE,
+                    'moderate'           => UserAccess::ACCESS_FULL,
+                    'coverImageZone'     => $zone->getTwigContext(),
+                    'editYearLevelUsage' => $this->getUser()->isSuperuser(),
+                    'yearLevels'         => $yearLevelOptions,
+                ],
+            ]
         );
     }
 
