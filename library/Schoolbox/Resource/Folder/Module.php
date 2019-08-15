@@ -9,19 +9,22 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File;
-use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\RoleMapper;
@@ -66,6 +69,56 @@ class Module extends BaseModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function initRoutePreloads(PathMatcher $matcher): void
+    {
+        $this
+            ->addRoutePreload(
+                $matcher,
+                '(?:getFolderCreate)',
+                function (array $params) {
+                    if (($params['parent'] ?? null) instanceof Model) {
+                        $parent = $params['parent'];
+                    } else {
+                        try {
+                            $parent = $this->getMapper()->findById($params['parentId']);
+                        } catch (MapperException $e) {
+                            throw new NotFound("No folder found for {$params['parentId']}", 0, $e);
+                        }
+                    }
+                    return ['parent' => $parent,];
+                }
+            )
+            ->addRoutePreload(
+                $matcher,
+                '(?:getFolderModify)',
+                function (array $params) {
+                    if (($params['folder'] ?? null) instanceof Model) {
+                        $folder = $params['folder'];
+                    } else {
+                        try {
+                            $folder = $this->getMapper()->findById($params['id']);
+                            $folder->setParent($this->getMapper()->findById($folder->getParent()->getId()));
+                        } catch (MapperException $e) {
+                            throw new NotFound("No folder found for {$params['id']}", 0, $e);
+                        }
+                    }
+                    return ['folder' => $folder,];
+                }
+            );
+    }
+
+    /**
+     * @return Mapper
+     * @throws \InvalidArgumentException
+     */
+    private function getMapper(): Mapper
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
     }
 
     /**

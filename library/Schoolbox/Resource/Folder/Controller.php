@@ -132,31 +132,21 @@ class Controller extends BaseController
      * Display update folder screen
      *
      * @api GET /resource/folder/modify/:folderId
-     * @param int $id
+     * @param Model $folder
      * @throws MapperException
-     * @throws SchoolboxException
      * @throws UnexpectedValueException
      */
-    public function getFolderModify(int $id): void
+    public function getFolderModify(Model $folder): void
     {
-        $userAccess             = $this->access->getFolderAccess($this->getUser(), $id);
-        $folderMapper           = $this->folderMapper;
+        $userAccess             = $this->access->getFolderAccess($this->getUser(), $folder->getId());
         $homepageConfigMapper   = $this->homepageConfigMapper;
         $homepageTemplateMapper = $this->homepageTemplateMapper;
         $roleAccessMapper       = $this->roleAccessMapper;
-        $errorMapper            = $this->errorMapper;
-
-        try {
-            $folder = $folderMapper->findById($id);
-            $parent = $folderMapper->findById($folder->getParent()->getId());
-        } catch (\Exception $e) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
-        }
 
         $breadcrumbs = [
             [
-                'text' => $parent->getName(),
-                'href' => '/homepage/' . $parent->getId(),
+                'text' => $folder->getParent()->getName(),
+                'href' => '/homepage/' . $folder->getParent()->getId(),
             ],
             [
                 'text' => $folder->getName(),
@@ -214,7 +204,7 @@ class Controller extends BaseController
                     'user'              => $this->getUser(),
                     'breadcrumbs'       => $breadcrumbs,
                     'folder'            => $folder,
-                    'parent'            => $parent,
+                    'parent'            => $folder->getParent(),
                     'templates'         => $homepageTemplates,
                     'templateId'        => $templateId,
                     'roles'             => $this->roleMapper->findAll(),
@@ -237,23 +227,14 @@ class Controller extends BaseController
     /**
      * Display create folder screen
      *
-     * @param int $parentId
-     * @throws SchoolboxException
+     * @param Model $parent
      * @throws UnexpectedValueException
      * @todo DRY this up with modify code
      */
-    public function getFolderCreate(int $parentId): void
+    public function getFolderCreate(Model $parent): void
     {
-        $folderMapper           = $this->folderMapper;
         $homepageTemplateMapper = $this->homepageTemplateMapper;
         $roleMapper             = $this->roleMapper;
-        $errorMapper            = $this->errorMapper;
-
-        try {
-            $parent = $folderMapper->findById($parentId);
-        } catch (\Exception $e) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
-        }
 
         $breadcrumbs = [
             [
@@ -279,7 +260,7 @@ class Controller extends BaseController
 
         // Folders that are not in the root note should inherit by default to reduce the user interface
 
-        if ($parentId != Mapper::FOLDER_ROOT)
+        if ($parent->getId() != Mapper::FOLDER_ROOT)
             $folder->enableInherit();
 
         $zone = new Zone('coverImage');
