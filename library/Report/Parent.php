@@ -1,6 +1,7 @@
 <?php
 
 use Alaress\Mail\AbstractMailer;
+use Schoolbox\Error;
 
 /**
  * Report_Parent
@@ -79,7 +80,7 @@ class Report_Parent extends Report_Abstract
 
         // Parents may only search in their student's year level
         if ($this->isYearsRestricted() && !(in_array($yearLevel, $yearColumn) || $yearLevel == '')) {
-            error(155);
+            error(Error\Mapper::ERROR_PERM_PARENT_DIRECTORY_YEAR_LEVEL);
         }
 
         $this->setYearLevel(trim($yearLevel));
@@ -94,7 +95,7 @@ class Report_Parent extends Report_Abstract
             . $this->getSearchBoardingStatus()
         ) > 0;
         if ($searching && !$this->checkPermissions()) {
-            error(155);
+            error(Error\Mapper::ERROR_PERM_PARENT_DIRECTORY_YEAR_LEVEL);
         } else {
             $this->setPage($page);
 
@@ -117,7 +118,7 @@ class Report_Parent extends Report_Abstract
 
             // check that something came back, otherwise inform the user that it was an invalid request
             if ($this->getAllRecords() === false) {
-                error(155);
+                error(Error\Mapper::ERROR_PERM_PARENT_DIRECTORY_YEAR_LEVEL);
             }
 
         }
@@ -262,16 +263,9 @@ class Report_Parent extends Report_Abstract
             $this->getPage()->setVar('search_form_option_block', '');
         }
 
-
-        if ($this->isYearsRestricted()) {
-
-            $allYears = $this->sisAllYearLevels;
-
-        } else {
-
-            $allYears = $this->allowedSearchableYears;
-
-        }
+        $allYears = $this->isYearsRestricted()
+            ? $this->allowedSearchableYears
+            : $this->sisAllYearLevels;
 
         foreach ($allYears as $year) {
             $this->getPage()->setVar([
