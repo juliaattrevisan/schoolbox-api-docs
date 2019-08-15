@@ -6,18 +6,18 @@ namespace Payload;
 
 class Folder extends Base
 {
-    const NO_PRIVLEDGES = '0';
-    const READ_PRIVLEDGES = '1';
-    const WRITE_PRIVLEDGES = '2';
+    const NO_PRIVILEGES = '0';
+    const READ_PRIVILEGES = '1';
+    const WRITE_PRIVILEGES = '2';
 
     const TEMPLATE_HOMEPAGE_ID=9;
 
     public static function getFolderPermissions(): array
     {
         return [
-            'none' => self::NO_PRIVLEDGES,
-            'read' => self::READ_PRIVLEDGES,
-            'write' => self::WRITE_PRIVLEDGES
+            'none' => self::NO_PRIVILEGES,
+            'read' => self::READ_PRIVILEGES,
+            'write' => self::WRITE_PRIVILEGES
         ];
     }
 

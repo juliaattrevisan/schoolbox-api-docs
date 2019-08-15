@@ -14,7 +14,40 @@ use Schoolbox\Mapper\Exception\Deleted;
  * @link      https://schoolbox.com.au/
  */
 
-class AssessmentCest {
+class AssessmentOnHomepageCest {
+
+    public function createAssessmene()
+    {
+
+    }
+
+    public function updateAssessment()
+    {
+
+    }
+
+    public function createAssessmentWithRubric()
+    {
+
+    }
+
+    public function submitAssessment()
+    {
+
+    }
+
+    public function markAssessmentWithRubric()
+    {
+
+    }
+
+    public function markAssessment()
+    {
+
+    }
+
+
+
     /**
      * Smoke test assessment post forms include following actions:
      * Add assessment to created homepage
