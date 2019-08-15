@@ -173,8 +173,8 @@ Data:
         el: '#email-class-lists',
         delimiters: ['${', '}'],
         data: {
-            subjectName: '{{ folder.name }}',
-            classCode: '{{ folder.codeString }}',
+            subjectName: '{{ folder.name | escape('js') }}',
+            classCode: '{{ folder.codeString | escape('js') }}',
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
             specialNeeds: '{{ specialNeeds }}',
