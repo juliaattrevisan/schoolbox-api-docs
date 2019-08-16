@@ -56,11 +56,13 @@
     <div class="small-12 medium-6 columns">
         <div class="content">
             <div class="context-switch clearfix">
-                {% include 'sub/semesterSelector.twig' with {
+                {% include '@learningGrades/semesterSelector.twig' with {
                     currentTerm: term,
                     terms:       terms,
                     route:       'learningGrades.getGradesForSubject',
-                    routeArgs:   {userId: student.id, subjectId: subject.id}
+                    routeArgs:   {userId: student.id, subjectId: subject.id},
+                    yearUrl:     yearUrl,
+                    year:        year
                 } only %}
                 {% include 'sub/subjectSelector.twig' with {
                     currentSubject: subject,

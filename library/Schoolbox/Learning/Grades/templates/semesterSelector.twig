@@ -50,17 +50,17 @@ Usage: include 'sub/semesterSelector.twig
         {% set foundYear = {} %}
         {% set selected = false %}
         {% for term in terms %}
-            {% if yearRoute %}
+            {% if yearUrl %}
                 {% if not term.displayFinish.isNull() %}
                     {% if not foundYear['_'~term.displayFinish.year] %}
                         {% set foundYear = foundYear | merge({('_'~term.displayFinish.year):true}) %}
-                        <option data-href="{{ routeLookup('learningGrades.getCustomGradesYear', routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
+                        <option data-href="{{ routeLookup('learningGrades.getGradesYear', routeArgs | merge({year: term.displayFinish.year}) ) }}" value="{{ term.displayFinish.year }}" {% if year == term.displayFinish.year %}{% set selected = true %}selected{% endif %}>
                             {#- dessicate -#}{{ term.displayFinish.year }} Grades Summary{#- dessicate -#}
                         </option>
                     {% endif %}
                 {% endif %}
             {% endif %}
-            <option data-href="{{ routeLookup(termRoute, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>
+            <option data-href="{{ routeLookup(route, routeArgs|merge({termCode: term.code}) ) }}" value="{{ term.code }}" {% if currentTerm.code == term.code and not selected%}selected{% endif %}>
                 {#- dessicate -#}{{ term.title }} ({{ term.start.dateOnly }} - {{ term.displayFinish.dateOnly }}){#- dessicate -#}
             </option>
         {% endfor %}

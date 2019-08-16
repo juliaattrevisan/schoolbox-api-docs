@@ -1,0 +1,16 @@
+
+<div class="small-12 content sibling">
+    <h3 class="no-margin">
+        {{ folder.name }}
+        <span class="meta">
+            {% for code in folder.codes %}
+                ({{ code.code }}){% if not loop.last %},{% endif %}
+            {% endfor %}
+        </span>
+    </h3>
+</div>
+{% if showOverallGrade %}
+    <div class="grade {{ urgency.marks(markbooks[folder.id].studentStatistics[studentId].meanNormalised) }}-bg no-margin">
+        <span>{{ markbooks[folder.id].studentStatistics[studentId].weightedMean }}</span>
+    </div>
+{% endif %}
