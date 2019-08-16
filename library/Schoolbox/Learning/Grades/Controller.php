@@ -393,7 +393,7 @@ class Controller extends Base
      * @api   GET /learning/grades-year/{userId}/year/{year}
      * @level 165
      */
-    public function getCustomGradesYear(User $viewee, int $year): void
+    public function getGradesYear(User $viewee, int $year): void
     {
         $from = (new \Alaress_Date_Format())->setYear($year)->startOfYear();
         $to = (new \Alaress_Date_Format())->setYear($year)->endOfYear();
@@ -726,7 +726,7 @@ class Controller extends Base
     private function getYearUrl(int $vieweeId)
     {
         try{
-            return $this->getRouter()->generate('learningGrades.getCustomGradesYear', ['userId' => $vieweeId]);
+            return $this->getRouter()->generate('learningGrades.getGradesYear', ['userId' => $vieweeId]);
         } catch (RouteNotFound $e) {
             return null;
         }
