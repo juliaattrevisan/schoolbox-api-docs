@@ -1,3 +1,10 @@
+/*
+ Change the collation of synergy_id column
+ */
+ALTER TABLE `user`
+    MODIFY synergy_id VARCHAR(64)
+        CHARACTER SET utf8mb4
+            COLLATE utf8mb4_unicode_ci;
 
 /*
  Migrate data from user and user_profile to sis_profile_user table of the new schema
@@ -7,7 +14,7 @@ INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, email, 
     FROM `user`
              LEFT JOIN `groups`       ON `user`.`group_id` = `groups`.`id`
              LEFT JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
-    WHERE `groups`.`group_type`  = 'student'
+    WHERE `groups`.`group_type` = 'student'
        OR `groups`.`group_type` = 'parent'
        OR `groups`.`group_type` = 'staff';
 
@@ -23,7 +30,7 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
            `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,`user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`,
     NULL, `user`.`boarding_status` , NOW(), NOW(), NULL
     FROM `user`
-             JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
+             JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
              JOIN `house`  ON `user`.`house` = `house`.`id`
@@ -35,7 +42,7 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
 INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `email`, created_at, updated_at, deleted_at)
     SELECT `sis_user_profile`.`id`, NULL, NULL, NULL, `user`.`alt_email`, NOW(), NOW(), NULL
     FROM `user`
-             JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
+             JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
     WHERE `groups`.`group_type` = 'parent';
 
@@ -46,7 +53,7 @@ INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `category`, `positi
                                       `room`, `building`,`email_work`, `campus_name`, created_at, updated_at, deleted_at)
     SELECT `sis_user_profile`.`id`, NULL, `user`.`position_title`,NULL, NULL, NULL, NULL, NULL, `user`.`alt_email`, NULL, NOW(), NOW(), NULL
     FROM `user`
-             JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id` COLLATE utf8mb4_unicode_ci
+             JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
     WHERE `groups`.`group_type` = 'staff';
 
@@ -57,6 +64,6 @@ INSERT INTO `sis_user_profile_relation` (`user_profile_id`, `child_profile_id`, 
     SELECT up1.id as child_id, up2.id as parent_id, NULL, 0
     FROM user_relation
     JOIN user user1 ON user_relation.user_id = user1.id
-    JOIN sis_user_profile up1 ON user1.synergy_id COLLATE utf8mb4_unicode_ci = up1.external_id
+    JOIN sis_user_profile up1 ON user1.synergy_id = up1.external_id
     JOIN user user2 ON user_relation.relation_id = user2.id
-    JOIN sis_user_profile up2 ON user2.synergy_id COLLATE utf8mb4_unicode_ci = up2.external_id
+    JOIN sis_user_profile up2 ON user2.synergy_id = up2.external_id
