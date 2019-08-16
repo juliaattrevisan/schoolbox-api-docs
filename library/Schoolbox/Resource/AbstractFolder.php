@@ -1,13 +1,11 @@
 <?php
 /**
- * 
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource;
-
 
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\IStorage;
@@ -53,16 +51,16 @@ abstract class AbstractFolder implements IFolder
     /**
      * Folder colour
      *
-     * @var Color
+     * @var null|Color
      */
-    protected $colour;
+    private $colour;
 
     /**
      * Cover image
      *
-     * @var IStorage
+     * @var null|IStorage
      */
-    protected $coverImage;
+    private $coverImage;
 
 
     /**
@@ -180,9 +178,19 @@ abstract class AbstractFolder implements IFolder
      *
      * @return Color
      */
-    public function getColour()
+    public function getColour(): ?Color
     {
         return $this->colour;
+    }
+
+    /**
+     * @param Color $colour
+     * @return $this
+     */
+    public function setColour(?Color $colour): self
+    {
+        $this->colour = $colour;
+        return $this;
     }
 
     /**
@@ -190,9 +198,18 @@ abstract class AbstractFolder implements IFolder
      *
      * @return IStorage
      */
-    public function getCoverImage()
+    public function getCoverImage(): ?IStorage
     {
         return $this->coverImage;
     }
 
+    /**
+     * @param IStorage $coverImage
+     * @return $this
+     */
+    public function setCoverImage(?IStorage $coverImage): self
+    {
+        $this->coverImage = $coverImage;
+        return $this;
+    }
 }

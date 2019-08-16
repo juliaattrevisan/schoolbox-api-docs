@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Resource\Folder;
 
-use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
@@ -78,15 +77,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * A group instance
      *
-     * @var \Schoolbox\Resource\Group
+     * @var null|\Schoolbox\Resource\Group
      */
     protected $group;
-
-    /** @var IStorage */
-    protected $coverImage;
-
-    /** @var Color */
-    protected $colour;
 
     /**
      * A collection of user instances
@@ -540,26 +533,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
 
     /**
-     * @return Color
-     */
-    public function getColour()
-    {
-        return $this->colour;
-    }
-
-
-    /**
-     * @param Color $colour
-     * @return $this
-     */
-    public function setColour($colour)
-    {
-        $this->colour = $colour;
-        return $this;
-    }
-
-
-    /**
      * @return bool
      */
     public function hasCoverImage()
@@ -567,24 +540,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         return $this->getCoverImage() instanceof IStorage && strlen($this->getCoverImage()->getHash());
     }
 
-    /**
-     * @return IStorage
-     */
-    public function getCoverImage()
-    {
-        return $this->coverImage;
-    }
-
-
-    /**
-     * @param IStorage $coverImage
-     * @return $this
-     */
-    public function setCoverImage($coverImage)
-    {
-        $this->coverImage = $coverImage;
-        return $this;
-    }
 
     /**
      * @return $this
