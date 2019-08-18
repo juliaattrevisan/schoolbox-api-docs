@@ -9,6 +9,7 @@
 namespace Alaress\Application;
 
 use Aura\Di;
+use Config\Modules\ModuleConfigInterface;
 use Predis;
 use Throwable;
 use RuntimeException;
