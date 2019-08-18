@@ -25,16 +25,10 @@
         function init(options, element) {
             var defaults = {
                 element: element,
-                container: '[data-component]',
-                iconExpand: 'expanded'
-            }
+                container: '[data-component]'
+            };
 
-            var derived = {
-            }
-
-            var merged = $.extend(defaults, derived, options);
-
-            return merged;
+            return $.extend(defaults, options);
         }
 
         /**
@@ -63,7 +57,7 @@
                 $.fn.executeCollapsable.call(self, component, icon);
             });
         }
-    }
+    };
 
     /**
      * Directly execute collapsable on demand
@@ -108,7 +102,7 @@
         }
 
         $.fn.executeIconToggle.call(this, icon);
-    }
+    };
 
     /**
      * Toggle expand/collapse icon state
@@ -116,7 +110,10 @@
      * @param icon
      */
     $.fn.executeIconToggle = function(icon) {
-        var classes = this.config ? this.config.iconExpand : 'expanded';
-        icon.toggleClass(classes);
+        if (icon.hasClass('icon-up-arrow')) {
+            icon.removeClass('icon-up-arrow').addClass('icon-down-arrow');
+        } else {
+            icon.removeClass('icon-down-arrow').addClass('icon-up-arrow');
+        }
     }
 }(jQuery));
