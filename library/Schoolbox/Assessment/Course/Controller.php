@@ -4,7 +4,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
@@ -12,7 +11,10 @@ use Aura\Di\Exception\ServiceNotFound;
 use Component_DefinitionMapper;
 use Component_Instance;
 use Component_InstanceMapper;
+use InvalidArgumentException;
+use PDOException;
 use RangeException;
+use Schoolbox\Application;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
@@ -43,6 +45,7 @@ use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
+use UnexpectedValueException;
 
 class Controller extends Base\Base
 {
@@ -154,9 +157,9 @@ class Controller extends Base\Base
      *
      * @param Folder $courseFolder
      * @param Folder $unitFolder
-     * @throws \PDOException
+     * @throws PDOException
      * @throws MapperException
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function convertFolders(Folder $courseFolder, Folder $unitFolder)
     {
@@ -470,19 +473,21 @@ class Controller extends Base\Base
             $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
                 $templateID = null;
+            } else {
+                $templateID = (int)$templateID;
             }
 
             // Create new CourseFolder
-            $courseFolder = $this->persistFolder([
-                'name'            => trim($post['name']),
-                'parent'          => trim($post['parent']),
-                'curriculumCodes' => explode(',', $post['curriculumCodes'][0]),
-                'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
-                'template'        => $templateID,
-                'group'           => $rolePermissions,
-                'recursive'       => false, // LEAVE THIS
-                'code'            => null,  // LEAVE THIS
-            ]);
+            $courseFolder = $this->persistFolder(
+                $post['name'],
+                (int)trim($post['parent']),
+                explode(',', $post['curriculumCodes'][0]),
+                $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                $templateID,
+                $rolePermissions,
+                false,
+                []
+            );
 
             $courseSpec = $this->courseSpecificationMapper->createModel();
             $courseSpec->setFolder($courseFolder);
@@ -521,6 +526,7 @@ class Controller extends Base\Base
      * @param string   $folderName
      * @param int      $parentFolderId
      * @throws Base\Exception
+     * @todo move route perm logic from controller to module (eg course parent folder access)
      */
     protected function validateCourseData($folderId = null, $folderName, $parentFolderId)
     {
@@ -717,22 +723,20 @@ class Controller extends Base\Base
             $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
                 $templateID = null;
+            } else {
+                $templateID = (int)$templateID;
             }
 
-            $folder = $this->persistFolder([
-                // the basics (note lack of ID and Codes)
-                'name'     => $name,
-                'parent'   => $courseSpec->getFolder()->getId(),
-
-                // configurable things
-                'inherit'  => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                'template' => $templateID,
-                'group'    => $rolePermissions,
-
-                // leave these always off
-                'recursive' => false, // LEAVE THIS
-                'code'      => null,  // LEAVE THIS
-            ]);
+            $folder = $this->persistFolder(
+                $name,
+                $courseSpec->getFolder()->getId(),
+                [],
+                $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+                $templateID,
+                $rolePermissions,
+                false,
+                []
+            );
 
             // Persist the unit too
             $unitSpec = new UnitSpecification();
@@ -764,25 +768,55 @@ class Controller extends Base\Base
     /**
      * Wrapper around Folder\Controller::persistFolder() and does some extra perms checking
      *
-     * @param array  $data
-     * @var int|null $data['categoryID'] If absent, this is an INSERT, if present, an UPDATE
-     * @var string   $data['name']
-     * @var int      $data['parent']
-     * @var int[]    $postData['curriculumCodes']
-     * @var bool     $data['inherit']    Whether to inherit permissions
-     * @var int      $data['template']
-     * @var int[]    $data['group']      Maps role to permission level
-     * @var bool     $data['recursive']  If true && user is SU, applies $data['inherit'] to entire subtree
-     * @var string   $data['code']       Comma-separated codes
+     * @param string   $name
+     * @param int      $parentId
+     * @param array    $curriculumCodeIds
+     * @param bool     $inherit                 Whether to inherit permissions
+     * @param int|null $templateId
+     * @param array    $rolePermissions         Maps role to permission level
+     * @param bool     $recurseRolePermissions  If true && user is SU, applies 'inherit' to entire subtree
+     * @param array    $classCodes
      * @return Folder
+     * @throws Deleted
      * @throws MapperException
+     * @throws RangeException
+     * @throws ServiceNotFound
+     * @throws InvalidArgumentException
+     * @throws PDOException
+     * @throws Application\Exception\Exception
+     * @throws UnexpectedValueException
      */
-    protected function persistFolder(array $data)
-    {
+    private function persistFolder(
+        string $name,
+        int $parentId,
+        array $curriculumCodeIds,
+        bool $inherit,
+        ?int $templateId,
+        array $rolePermissions,
+        bool $recurseRolePermissions,
+        array $classCodes
+    ): Folder {
         /** @var FolderController $folderController */
         $folderController = $this->getController('folder');
 
-        $folder = $folderController->persistFolder($data, $this->getUser());
+        $folder = $this->folderMapper->createModel();
+        $folder->setParent($this->folderMapper->findById($parentId));
+
+        $folder = $folderController->persistFolder(
+            $folder,
+            $name,
+            $inherit,
+            $templateId,
+            null,
+            null,
+            $curriculumCodeIds,
+            $rolePermissions,
+            $recurseRolePermissions,
+            $classCodes,
+            [],
+            false,
+            $this->getUser()
+        );
 
         // Check that the initiating user has write access to the newly-created folder, and if not,
         // explicitly give it to them. This covers the case where the template allows you to create a folder

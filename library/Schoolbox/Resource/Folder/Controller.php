@@ -11,11 +11,12 @@ namespace Schoolbox\Resource\Folder;
 use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use ArrayAccess;
+use Aura\Router;
 use Homepage;
 use InvalidArgumentException;
 use OutOfBoundsException;
+use PDOException;
 use RangeException;
-use DomainException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -29,6 +30,7 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -40,7 +42,6 @@ use UnexpectedValueException;
 use Schoolbox\Resource\Folder;
 use Timetable_ColourMapper;
 use Schoolbox\Collection;
-use function ucfirst;
 
 class Controller extends BaseController
 {
@@ -96,6 +97,7 @@ class Controller extends BaseController
      * @param Access                 $access
      * @param Code\Mapper            $classCodeMapper
      * @param Curriculum\Node\Mapper $curriculumNodeMapper
+     * @param GroupMapper            $groupMapper
      * @param FileMapper             $fileMapper
      * @param YearLevel\Mapper       $yearLevelMapper
      */
@@ -110,6 +112,7 @@ class Controller extends BaseController
         Access $access,
         Folder\Code\Mapper $classCodeMapper,
         Curriculum\Node\Mapper $curriculumNodeMapper,
+        GroupMapper $groupMapper,
         FileMapper $fileMapper,
         YearLevel\Mapper $yearLevelMapper
     ) {
@@ -123,6 +126,7 @@ class Controller extends BaseController
         $this->access                 = $access;
         $this->classCodeMapper        = $classCodeMapper;
         $this->curriculumNodeMapper   = $curriculumNodeMapper;
+        $this->groupMapper            = $groupMapper;
         $this->fileMapper             = $fileMapper;
         $this->yearLevelMapper        = $yearLevelMapper;
     }
@@ -136,6 +140,7 @@ class Controller extends BaseController
      * @param Model $parent
      * @throws MapperException
      * @throws UnexpectedValueException
+     * @throws Router\Exception\RouteNotFound
      */
     public function getFolderCreate(Model $parent): void
     {
@@ -150,8 +155,13 @@ class Controller extends BaseController
             ],
         ];
 
+        $formAction = $this->getRouter()->generate(
+            'folder.postCreateFolder',
+            ['parent' => $parent, 'parentId' => $parent->getId()]
+        );
+
         $folder = $this->folderMapper->createModel()->setParent($parent);
-        $this->displayFolderModifyForm($breadcrumbs, $folder);
+        $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
 
 
@@ -161,6 +171,7 @@ class Controller extends BaseController
      * @api GET /resource/folder/modify/:folderId
      * @param Model $folder
      * @throws UnexpectedValueException
+     * @throws Router\Exception\RouteNotFound
      */
     public function getFolderModify(Model $folder): void
     {
@@ -179,17 +190,23 @@ class Controller extends BaseController
             ],
         ];
 
-        $this->displayFolderModifyForm($breadcrumbs, $folder);
+        $formAction = $this->getRouter()->generate(
+            'folder.postUpdateFolder',
+            ['folder' => $folder, 'folderId' => $folder->getId()]
+        );
+
+        $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
 
     /**
      * Displays the folder modify form.
      *
-     * @param array $breadcrumbs
-     * @param Model $folder
+     * @param array  $breadcrumbs
+     * @param string $formAction
+     * @param Model  $folder
      * @throws UnexpectedValueException
      */
-    private function displayFolderModifyForm(array $breadcrumbs, Model $folder): void
+    private function displayFolderModifyForm(array $breadcrumbs, string $formAction, Model $folder): void
     {
         // Homepage template
         $homepageTemplates = $this->homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
@@ -242,6 +259,7 @@ class Controller extends BaseController
                 'data'     => [
                     'user'               => $this->getUser(),
                     'breadcrumbs'        => $breadcrumbs,
+                    'formAction'         => $formAction,
                     'folder'             => $folder,
                     'parent'             => $folder->getParent(),
                     'templates'          => $homepageTemplates,
@@ -348,28 +366,54 @@ class Controller extends BaseController
     }
 
     /**
+     * Creates a new folder in the specified parent folder
+     *
+     * @api   POST /resource/folder/{parentId:\d}/create
+     * @since 19.1
+     * @param Model $parent
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws SchoolboxException
+     * @throws PDOException
+     */
+    public function postCreateFolder(Model $parent): void
+    {
+        $this->postUpdateFolder($this->folderMapper->createModel()->setParent($parent));
+    }
+
+    /**
      * Update a folders details
      *
-     * @api POST /resource/folder/update
+     * @api   POST /resource/folder/{folderId:\d}/update
      * @since 156
-     * @var int|null $_POST['categoryID'] If absent, this is an INSERT, if present, an UPDATE
-     * @var string   $_POST['name']
-     * @var int      $_POST['parent']
-     * @var bool     $_POST['inherit']    Whether to inherit permissions
-     * @var int      $_POST['template']
-     * @var int[]    $_POST['group']      Maps role to permission level
-     * @var bool     $_POST['recursive']  If true && user is SU, applies $data['inherit'] to entire subtree
-     * @var string   $_POST['code']       Comma-separated codes
+     * @param Model $folder
+     * @throws InvalidArgumentException
+     * @throws MapperException
      * @throws SchoolboxException
+     * @throws PDOException
      */
-    public function postUpdateFolder()
+    public function postUpdateFolder(Model $folder): void
     {
         $errorMapper = $this->errorMapper;
+        $post        = $this->getRequest()->post->getArrayCopy();
 
         try {
-            $user        = $this->getUser();
-            $model       = $this->persistFolder($this->getRequest()->post, $user);
-            $newLocation = $this->createGroup($this->getRequest()->post, $model, $user);
+            $model = $this->persistFolder(
+                $folder,
+                $post['name'],
+                (bool)($post['inherit'] ?? false),
+                (int)$post['template'],
+                $post['colour'] ?: null,
+                $post['attachment'][0] ?? null,
+                array_filter($post['curriculumCodes']),
+                $post['group'],
+                (bool)($post['recursive-role-permissions'] ?? false),
+                array_filter(explode(',', $post['code'])),
+                array_filter(explode(',', $post['yearLevelIds'])),
+                (bool)($post['recursive-year-levels'] ?? false),
+                $this->getUser()
+            );
+            $newLocation = $this->createGroup($this->getRequest()->post, $model, $this->getUser());
 
             $this->getResponse()->redirect->afterPost($newLocation);
 
@@ -387,190 +431,194 @@ class Controller extends BaseController
         }
     }
 
+
     /**
-     * This is public for now because /cms/categoryForm.php needs to reference it
+     * Creates a new, or updates an existing, folder.
      *
-     * @param  ArrayAccess|array $postData        the array structure we'll use to construct this folder
-     * @var int|null $postData['categoryID']      If absent, this is an INSERT, if present, an UPDATE
-     * @var string   $postData['name']
-     * @var int      $postData['parent']
-     * @var bool     $postData['inherit']         Whether to inherit permissions
-     * @var int      $postData['template']
-     * @var int[]    $postData['curriculumCodes']
-     * @var int[]    $postData['group']           Maps role to permission level
-     * @var bool     $postData['recursive']       If true && $user is SU, applies $postData['inherit'] to entire subtree
-     * @var string   $postData['code']            Comma-separated codes
-     * @param  User              $user            the effecting user
-     * @throws OutOfBoundsException               if you lack permission to perform functions
-     * @throws RangeException                     if the database fails to save your folder
-     * @return Model                              representing the freshly saved folder
+     * @param Model    $folder                 The folder to persist
+     * @param string   $name
+     * @param bool     $inherit
+     * @param int|null $templateId
+     * @param string   $colour
+     * @param string   $coverImage
+     * @param array    $curriculumCodeIds
+     * @param string[] $rolePermissions        Maps role ids to permission levels
+     * @param bool     $recurseRolePermissions If true && $user is SU, applies $postData['inherit'] to entire subtree
+     * @param array    $classCodes
+     * @param array    $yearLevelIds           Comma-separated YearLevel ids
+     * @param bool     $recurseYearLevels      If true
+     * @param User     $user                   the effecting user
+     * @return Model                           Representing the freshly saved folder
+     * @throws InvalidArgumentException
+     * @throws MapperException
+     * @throws RangeException if the database fails to save your folder
+     * @throws SchoolboxException
+     * @throws UnexpectedValueException
+     * @throws PDOException
      */
-    public function persistFolder($postData, User $user)
-    {
-        $folderMapper     = $this->folderMapper;
+    public function persistFolder(
+        Model $folder,
+        string $name,
+        bool $inherit,
+        ?int $templateId,
+        ?string $colour,
+        ?string $coverImage,
+        array $curriculumCodeIds,
+        array $rolePermissions,
+        bool $recurseRolePermissions,
+        array $classCodes,
+        array $yearLevelIds,
+        bool $recurseYearLevels,
+        User $user
+    ): Model {
         $userAccessMapper = $this->userAccessMapper;
         $roleAccessMapper = $this->roleAccessMapper;
-        $access           = $this->access;
 
-        $model = $folderMapper->createModel()
-            ->setName($postData['name'])
-            ->setParent(
-                $folderMapper->createModel()
-                    ->setId($postData['parent'])
-            );
-
-        // Make sure the user has permission to perform the action
-
-        // Is this an UPDATE ?
-        if (is_numeric($postData['categoryID'])) {
-            // check this user has write access
-            if ($access->getFolderAccess($user, $postData['categoryID']) < UserAccess::ACCESS_WRITE) {
-                throw new OutOfBoundsException("I find your lack of access disturbing.");
-            }
-            $model->setId((int)$postData['categoryID']);
-        }
-        // Or is action INSERT ?
-        elseif ($access->getFolderAccess($user, $postData['parent']) < UserAccess::ACCESS_WRITE) {
-            // check this user has access to the parent folder
-            throw new OutOfBoundsException("I find your lack of access disturbing.");
-        }
-
-        // Is user SU or creating new Folder ?
-        if($user->isSuperuser() || !$model->getId()){
-            $existingFolder = null;
-        } else {
-            try {
-                $existingFolder = $folderMapper->findById($model->getId());
-            } catch (MapperException\Deleted $e) {
-                $existingFolder = $e->getDeletedObject();
-            } catch (MapperException $e) {
-                $existingFolder = null;
-            }
-        }
+        $folder->setName($name);
 
         // Either user is SU, or insertion of new Folder, or Folder did not have Class Codes
-        if($user->isSuperuser() || !$existingFolder || !$existingFolder->getCodes()->count()){
-            if (1 == $postData["inherit"]) {
-                $model->enableInherit();
-            } else {
-                $model->disableInherit();
-            }
-        // Else user is not a SU, folder exists, and it has Class Codes
+        if ($inherit && ($user->isSuperuser() || !$folder->getId() || !$folder->getCodes()->count())) {
+            $folder->enableInherit();
         } else {
-            // Ignore form data, and use existing values.
-            if ($existingFolder->getInherit()) {
-                $model->enableInherit();
-            } else {
-                $model->disableInherit();
+            $folder->disableInherit();
+        }
+
+        // Cover image
+        if ($coverImage) {
+            try {
+                $folder->setCoverImage((new CollectorFactory())->build($coverImage ? [$coverImage] : [])->getFirst());
+            } catch (ResourceException $e) {
+                // noop - retain current attachment
+                trigger_error("Unable to build folder cover image", E_USER_WARNING);
             }
+        } else {
+            $folder->setCoverImage(null);
         }
 
-        if ($model->getInherit()) {
-
-            // If inheriting permissions we need to remove any user access permissions...
-            $userAccessMapper->deleteByColumnList([
-                "sid"     => $postData["categoryID"],
-                "service" => UserAccess::SERVICE_HOMEPAGE,
-            ]);
-
-            // ...and role permissions
-            $roleAccessMapper->deleteByColumn("cid", $postData["categoryID"]);
+        // Colour
+        if($colour){
+            try {
+                $folder->setColour((new ColorFactory())->build($colour));
+            } catch (InvalidArgumentException $e) {
+                // noop - retain current colour
+                trigger_error("Unable to build folder colour", E_USER_WARNING);
+            }
+        } else {
+            $folder->setColour(null);
         }
 
-        // apply Class Codes
-        if($user->isSuperuser()){
-            $classCodes = $model->getInherit() ? '' : $postData['code'];
-
-            $classCodeArray = explode(',', $classCodes);
-
-            foreach ($classCodeArray as $code) {
+        // Validate class codes (prior to saving anything)
+        if($user->isSuperuser() && !$folder->getInherit()){
+            foreach ($classCodes as $code) {
                 if (strlen(trim($code)) > 20) {
                     throw $this->errorMapper->generateException(ErrorMapper::ERROR_CODE_TOO_LONG);
                 }
             }
-
-            $this->setClassCodesOnFolder($model, $classCodes, $user);
-        } elseif($existingFolder) {
-            $model->setCodes($existingFolder->getCodes());
         }
+
+        // Save folder so we can save joins
+        $this->folderMapper->save($folder);
+
+        // Only superusers get to change class codes and year levels
+        if ($user->isSuperuser()) {
+            $this->setClassCodesOnFolder($folder, $classCodes);
+        }
+
+        if ($folder->getInherit() && $folder->getId()) {
+            // If inheriting permissions we need to remove any user access permissions...
+            $userAccessMapper->deleteByColumnList([
+                "sid"     => $folder->getId(),
+                "service" => UserAccess::SERVICE_HOMEPAGE,
+            ]);
+
+            // ...and role permissions
+            $roleAccessMapper->deleteByColumn("cid", $folder->getId());
+        }
+
+        // apply YearLevel association
+        // TODO
 
         // apply Curriculum codes
-        $curriculumCodes = (is_array($postData['curriculumCodes']) ? $postData['curriculumCodes'] : []);
-        $this->setCurriculumCodesOnFolder($model, $curriculumCodes);
-
-        // apply candy
-        try {
-            $model->setColour((new ColorFactory())->build($postData['colour']));
-        } catch (InvalidArgumentException $e) {
-            $model->setColour(null);
-        }
-
-        try {
-            $model->setCoverImage((new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst());
-
-        } catch (ResourceException $e) {
-            // no attachment, nothing to do
-        }
-
-        $affectedIds = $folderMapper->save($model);
-
-        if ($affectedIds === false) {
-            // something went wrong
-            throw new RangeException("Failed to save folder.");
-        }
+        $curriculumCodes = (is_array($curriculumCodeIds) ? $curriculumCodeIds : []);
+        $this->setCurriculumCodesOnFolder($folder, $curriculumCodes);
 
         // only allow recursive permissions to supers
-        $recursive = $user->isSuperuser() && $postData['recursive'];
+        $recurseRolePermissions = $user->isSuperuser() && $recurseRolePermissions;
 
-        if (!$model->getInherit()) {
+        if (!$folder->getInherit()) {
             // If rolepermission collection is defined, reapply permissions (possibly recursively)
-            $roleAccessMapper->savePermissions($model, $postData['group'], $recursive);
+            $roleAccessMapper->savePermissions($folder, $rolePermissions, $recurseRolePermissions);
         }
 
-        if ($recursive) {
+        if ($recurseRolePermissions) {
             // Recurse inheritance
-            $this->recurseInheritance($model);
+            $this->recurseInheritance($folder);
         }
 
         // HomepageConfig definition
-        $this->saveHomepageConfig($model, $postData['template']);
+        $this->saveHomepageConfig($folder, $templateId);
 
-        return $model;
+        return $folder;
     }
 
     /**
-     * Put the given Class code lists onto the given folder
+     * Efficiently update a folder's class codes
      *
-     * @param Model $model
-     * @param string       $classCodeString
-     * @param User         $user
+     * @param Model    $folder
+     * @param string[] $newClassCodes
      * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    protected function setClassCodesOnFolder(Model $model, $classCodeString, User $user)
+    private function setClassCodesOnFolder(Model $folder, array $newClassCodes): void
     {
-        // Only superusers get to change class codes
-        if(!$user->isSuperuser()){
-            throw new DomainException("Only SuperUsers may set Class Codes");
-        }
-
-        $classCodeMapper = $this->classCodeMapper;
-        $codeCollection  = $classCodeMapper->createCollection();
-
-        foreach (explode(',', $classCodeString) as $code) {
-            $trimmedCode = trim($code);
-            if (strlen($trimmedCode)) {
-                $codeModel = $classCodeMapper->createModel();
-                $codeModel->setCode($trimmedCode);
-                $codeCollection->add($codeModel);
+        // Build codes to remove
+        if ($folder->getInherit()) {
+            // If folder is inheriting permissions, remove all class codes
+            $codesToRemove = $folder->getCodes()->deepClone();
+        } else {
+            // Else only remove those not in new set
+            $codesToRemove = $this->classCodeMapper->createCollection();
+            foreach ($folder->getCodes() as $codeModel) {
+                $match = false;
+                foreach ($newClassCodes as $newCode) {
+                    if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
+                        $match = true;
+                        break;
+                    }
+                }
+                if (!$match) {
+                    $codesToRemove[] = $codeModel;
+                }
             }
         }
-        $model->setCodes($codeCollection);
 
-        // Delete category codes here, allowing them to be recreated when the category gets saved.
-        // (I'm not confident that deleting cat codes in the postSave method
-        //  regardless of whether there are any won't break somewhere else)
-        if ($model->getId() && count($codeCollection) === 0) {
-            $classCodeMapper->deleteByColumn('folder_id', $model->getId());
+        // Build codes to add
+        $codesToAdd = $this->classCodeMapper->createCollection();
+        if (!$folder->getInherit()) {
+            foreach ($newClassCodes as $newCode) {
+                $match = false;
+                foreach ($folder->getCodes() as $codeModel) {
+                    if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
+                        $match = true;
+                        break;
+                    }
+                }
+                if (!$match) {
+                    $codesToAdd[] = $this->classCodeMapper
+                        ->createModel()
+                        ->setFolder($folder)
+                        ->setCode($newCode);
+                }
+            }
+        }
+
+        if ($codesToRemove->count()) {
+            $this->classCodeMapper->delete($codesToRemove);
+        }
+
+        if ($codesToAdd->count()) {
+            $this->classCodeMapper->save($codesToAdd);
         }
     }
 
@@ -676,7 +724,7 @@ class Controller extends BaseController
         // No changes in "KEEP_EXISTING" case
         $roleAccessMapper = $this->roleAccessMapper;
         $userAccessMapper = $this->userAccessMapper;
-        $groupMapper      = $this->getGroupMapper();
+        $groupMapper      = $this->groupMapper;
 
         // is 'Create Group' set true?
         if ($postData['groupcheck']) {

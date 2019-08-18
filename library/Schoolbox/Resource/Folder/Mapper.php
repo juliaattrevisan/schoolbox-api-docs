@@ -571,6 +571,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function updateFolderCodes($model, $previous = null)
     {
+        // TODO, this can probably all be removed, the controller is responsible for updating joins
         $folderCodeMapper = $this->getJoinMapper('codes');
         // first drop the previous code(s) connected to this folder
         $folderCodes = $folderCodeMapper->findByColumn('folder_id', $model->getId());
