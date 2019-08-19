@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
     `title`       VARCHAR(255) NULL,
     `firstname`   VARCHAR(255) NULL,
     `lastname`    VARCHAR(255) NULL,
-    `email`       VARCHAR(255) NULL,
     `gender`      VARCHAR(25)  Null,
     `created_at`  DATETIME     NOT NULL,
     `updated_at`  DATETIME     NOT NULL,
@@ -24,11 +23,11 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
 (
-    `id`                  INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sis_user_profile_id` INT UNSIGNED NOT NULL,
     `mobile`              VARCHAR(45)  NULL,
     `phone_home`          VARCHAR(45)  NULL,
     `phone_work`          VARCHAR(45)  NULL,
+    `username`            VARCHAR(255) NULL,
     `email`               VARCHAR(255) NULL,
     `created_at`          DATETIME     NOT NULL,
     `updated_at`          DATETIME     NOT NULL,
@@ -51,20 +50,19 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 (
-    `id`                          INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sis_user_profile_id`         INT UNSIGNED  NOT NULL,
     `date_of_birth`               DATE          NULL,
+    `username`                    VARCHAR(255)  NULL,
+    `email`                       VARCHAR(255)  NULL,
     `head_of_house_id`            VARCHAR(64)   NULL,
     `head_of_house_name`          VARCHAR(255)  NULL,
     `house_name`                  VARCHAR(255)  NULL,
-    `house_description`           VARCHAR(255)  NULL,
     `form_name`                   VARCHAR(255)  NULL,
     `form_teacher_id`             VARCHAR(64)   NULL,
     `form_teacher_name`           VARCHAR(255)  NULL,
-    `tutor_id`                    VARCHAR(64)   NULL,
     `tutor_name`                  VARCHAR(255)  NULL,
-    `tutor_group`                 VARCHAR(255)  NULL,
-    `tutor_description`           VARCHAR(255)  NULL,
+    `tutor_teacher_id`            VARCHAR(64)   NULL,
+    `tutor_teacher_name`          VARCHAR(255)  NULL,
     `year_level`                  VARCHAR(255)  NULL,
     `year_level_coordinator_id`   VARCHAR(64)   NULL,
     `year_level_coordinator_name` VARCHAR(255)  NULL,
@@ -102,16 +100,15 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
 */
 CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
 (
-    `id`                   INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `sis_user_profile_id`  INT UNSIGNED NOT NULL,
+    `username`             VARCHAR(255) NULL,
+    `email`                VARCHAR(255) NULL,
     `category`             VARCHAR(255) NULL,
     `position_title`       VARCHAR(255) NULL,
-    `position_description` VARCHAR(255) NULL,
     `department`           VARCHAR(255) NULL,
-    `phone_work`           VARCHAR(45)  NULL,
+    `phone`                VARCHAR(45)  NULL,
     `room`                 VARCHAR(255) NULL,
     `building`             VARCHAR(255) NULL,
-    `email_work`           VARCHAR(255) NULL,
     `campus_name`          VARCHAR(255) NULL,
     `created_at`           DATETIME     NOT NULL,
     `updated_at`           DATETIME     NOT NULL,

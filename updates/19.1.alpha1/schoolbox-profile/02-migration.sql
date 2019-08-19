@@ -9,8 +9,8 @@ ALTER TABLE `user`
 /*
  Migrate data from user and user_profile to sis_profile_user table of the new schema
  */
-INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, email, gender, created_at, updated_at, deleted_at)
-    SELECT `user`.`synergy_id`, `user`.`title`, `user`.`firstname`, `user`.`lastname`,  `user_profile`.`email`, `user_profile`.`gender`, NOW(), NOW(), NULL
+INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, gender, created_at, updated_at, deleted_at)
+    SELECT `user`.`synergy_id`, `user`.`title`, `user`.`firstname`, `user`.`lastname`, `user_profile`.`gender`, NOW(), NOW(), NULL
     FROM `user`
              LEFT JOIN `groups`       ON `user`.`group_id` = `groups`.`id`
              LEFT JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
@@ -21,12 +21,12 @@ INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, email, 
 /*
  Migrate data from user, user_profile and sis_user_profile_student to sis_profile_user table of the new schema
  */
-INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `head_of_house_id`, `head_of_house_name`, `house_name`, `house_description`, `form_name`,
-                                        `form_teacher_id`, `form_teacher_name`,`tutor_id`, `tutor_name`, `tutor_group`, `tutor_description`, `year_level`,
+INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `username`, `email`, `head_of_house_id`, `head_of_house_name`, `house_name`, `form_name`,
+                                        `form_teacher_id`, `form_teacher_name`,`tutor_name`, `tutor_teacher_id`, `tutor_teacher_name`, `year_level`,
                                         `year_level_coordinator_id`, `year_level_coordinator_name`,`mobile`, `studies_code`,`alert_medical`,`alert_comment`,
                                         `alert_message`,`alert_legal`,`enrolment_date`,`leaving_date`, `ib`, `individual_learning_plans`,`esl`, `special_needs`,
                                         `boarding_status`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+    SELECT `sis_user_profile`.`id`, `user_profile`.`dob`, `user`.`username`, `user`.`alt_email`,NULL, NULL,`house`.`house`, NULL, NULL, NULL, NULL, NULL, NULL,
            `user_profile`.`level`, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,`user_profile`.`ib_flag`, NULL,`user_profile`.`esl_flag`,
     NULL, `user`.`boarding_status` , NOW(), NOW(), NULL
     FROM `user`
@@ -39,8 +39,8 @@ INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, 
 /*
  Migrate data from user to sis_profile_user_parent table of the new schema
  */
-INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `email`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, NULL, NULL, NULL, `user`.`alt_email`, NOW(), NOW(), NULL
+INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_home`, `phone_work`, `username`, `email`, created_at, updated_at, deleted_at)
+    SELECT `sis_user_profile`.`id`, NULL, NULL, NULL,`user`.`username`, `user`.`alt_email`, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
@@ -49,9 +49,9 @@ INSERT INTO `sis_user_profile_parent` (`sis_user_profile_id`, `mobile`, `phone_h
 /*
  Migrate data from user to sis_profile_user_staff table of the new schema
  */
-INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `category`, `position_title`,`position_description`, `department`, `phone_work`,
-                                      `room`, `building`,`email_work`, `campus_name`, created_at, updated_at, deleted_at)
-    SELECT `sis_user_profile`.`id`, NULL, `user`.`position_title`,NULL, NULL, NULL, NULL, NULL, `user`.`alt_email`, NULL, NOW(), NOW(), NULL
+INSERT INTO `sis_user_profile_staff` (`sis_user_profile_id`, `username`, `email`,`category`, `position_title`, `department`, `phone`,
+                                      `room`, `building`, `campus_name`, created_at, updated_at, deleted_at)
+    SELECT `sis_user_profile`.`id`,`user`.`username`, `user`.`alt_email`, NULL, `user`.`position_title`, NULL, NULL, NULL, NULL, NULL, NOW(), NOW(), NULL
     FROM `user`
              JOIN `sis_user_profile` ON `sis_user_profile`.`external_id` = `user`.`synergy_id`
              JOIN `groups` ON `user`.`group_id` = `groups`.`id`
