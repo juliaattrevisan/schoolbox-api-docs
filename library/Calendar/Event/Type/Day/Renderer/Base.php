@@ -22,6 +22,11 @@ abstract class Base extends RendererBase
     private $event;
 
     /**
+     * @var \Calendar
+     */
+    private $calHandler;
+
+    /**
      * @param SitePage  $page
      * @param Day\Event $event
      * @param User      $user
@@ -31,7 +36,10 @@ abstract class Base extends RendererBase
     public function __construct(SitePage $page, Day\Event $event, User $user, \Calendar $calHandler, User $viewer)
     {
         parent::__construct($page, $user, $calHandler, $viewer);
-        $this->event = $event;
+
+        // TODO would rather not create this like this, but it's better than every renderer depending on it
+        $this->calHandler = new \Calendar();
+        $this->event      = $event;
     }
 
 
@@ -60,7 +68,7 @@ abstract class Base extends RendererBase
      */
     public function attendanceStatus()
     {
-        if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
+        if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
             if ($attendance['status'] == Event::ATTENDANCE_STATUS_PENDING) {
                 return 'Pending';
             } else if ($attendance['status'] == Event::ATTENDANCE_STATUS_APPROVED) {
