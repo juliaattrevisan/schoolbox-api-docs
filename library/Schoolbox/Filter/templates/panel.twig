@@ -146,13 +146,16 @@ Usage:
                 showContentPlaceholder();
             }
 
+            // Is there a href to post to?
+            // Post there if so, otherwise update the history state and filters
+            // immediately.
             if (href) {
                 $.post(href, data)
                     .success(function(response){
 
                         // Did we get not get JSON ?
                         if('object' !== typeof response){
-                            processServerError(response);
+                            processFilterUpdateError(response);
                             return;
                         }
 
@@ -164,17 +167,16 @@ Usage:
 
                         updateHistoryState(data);
                         replaceReportContent(response.content);
-                        processServerSuccess();
+                        processFilterUpdateSuccess();
                     })
                     .fail(function(response){
-                        processServerError(response.responseText);
+                        processFilterUpdateError(response.responseText);
                     })
-                    .always(processReportFetchAlways);
+                    .always(processFilterUpdateAlways);
             } else {
-                // Something happens here with data?
                 updateHistoryState(data);
-                processServerSuccess();
-                processReportFetchAlways();
+                processFilterUpdateSuccess();
+                processFilterUpdateAlways();
             }
         }
 
@@ -194,10 +196,9 @@ Usage:
 
 
         /**
-         * Handle a successful AJAX call
+         * Action for after the selected filters have been changed successfully.
          */
-        function processServerSuccess() {
-            // hideContentPlaceholder();
+        function processFilterUpdateSuccess() {
             $serverErrorFeedback.hide();
             $reportContent.attr('data-loaded', '1');
             $reportContent.trigger('filterContentLoaded');
@@ -206,10 +207,10 @@ Usage:
 
 
         /**
-         * Action for after the filter's content has been changed
-         * (whether successful or not).
+         * Action for after an attempt (successful or not) to update the
+         * selected filters.
          */
-        function processReportFetchAlways() {
+        function processFilterUpdateAlways() {
             $submitButton.val($submitButton.data('value'));
             hideFilterLoader();
             enableInputs();
@@ -314,11 +315,14 @@ Usage:
         }
 
         /**
-         * Try to figure out why the server failed to return a report
+         * Action for after an attempt to update the selected filters fails.
+         *
+         * Try to figure out why the server failed to return a report, and to
+         * display something helpful to the end user.
          *
          * @param {string} responseText
          */
-        function processServerError(responseText) {
+        function processFilterUpdateError(responseText) {
 
             // Was this an OOM error ?
             var oomErrorIndex = responseText.indexOf('Fatal error: Allowed memory size of');
