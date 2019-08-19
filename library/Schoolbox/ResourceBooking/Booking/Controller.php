@@ -653,7 +653,6 @@ class Controller extends Base
                     $sitepage,
                     $event,
                     $this->getUser(),
-                    new \Group(),
                     new \Calendar(),
                     $this->getUser()
                 );

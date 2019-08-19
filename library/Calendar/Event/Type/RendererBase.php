@@ -54,11 +54,10 @@ abstract class RendererBase implements RendererInterface
      *
      * @param SitePage $page
      * @param User $user
-     * @param \Group $groupHandler
      * @param \Calendar $calHandler
      * @param User $viewer
      */
-    public function __construct(SitePage $page, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer) {
+    public function __construct(SitePage $page, User $user, \Calendar $calHandler, User $viewer) {
         $this->setPage($page);
         $this->setUser($user);
         $this->setViewer($viewer);

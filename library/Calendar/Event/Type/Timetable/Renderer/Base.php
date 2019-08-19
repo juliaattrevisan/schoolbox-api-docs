@@ -27,13 +27,12 @@ abstract class Base extends RendererBase
      * @param SitePage        $page
      * @param Timetable\Event $event
      * @param User            $user
-     * @param \Group          $groupHandler
      * @param \Calendar       $calHandler
      * @param User            $viewer
      */
-    public function __construct(SitePage $page, Timetable\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    public function __construct(SitePage $page, Timetable\Event $event, User $user, \Calendar $calHandler, User $viewer)
     {
-        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        parent::__construct($page, $user, $calHandler, $viewer);
         $this->event = $event;
     }
 
@@ -60,7 +59,7 @@ abstract class Base extends RendererBase
             $from = new \Alaress_Date_Format();
             $from->startOfDay();
             $from->addDays($config->get('external_attendance_days') * -1);
-            
+
             if($this->getEvent()->getStartTime()->gte($from) && $this->getEvent()->getStartTime()->lte($now)) {
                 return true;
             }

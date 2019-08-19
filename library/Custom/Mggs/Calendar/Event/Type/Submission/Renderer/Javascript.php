@@ -28,13 +28,12 @@ class Javascript extends SubmissionRendererJavascript
      * @param SitePage  $page
      * @param EventBase $event
      * @param User      $user
-     * @param Group     $groupHandler
      * @param Calendar  $calHandler
      * @param User      $viewer
      */
-    public function __construct(SitePage $page, EventBase $event, User $user, Group $groupHandler, Calendar $calHandler, User $viewer)
+    public function __construct(SitePage $page, EventBase $event, User $user, Calendar $calHandler, User $viewer)
     {
-        parent::__construct($page, $event, $user, $groupHandler, $calHandler, $viewer);
+        parent::__construct($page, $event, $user, $calHandler, $viewer);
 
         // Regrettably, because of dynamic invocation, we have to settle for singletons in here
 

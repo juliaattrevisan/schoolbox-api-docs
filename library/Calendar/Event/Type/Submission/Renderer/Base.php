@@ -25,13 +25,12 @@ abstract class Base extends RendererBase
      * @param SitePage         $page
      * @param Submission\Event $event
      * @param User             $user
-     * @param \Group           $groupHandler
      * @param \Calendar        $calHandler
      * @param User             $viewer
      */
-    public function __construct(SitePage $page, Submission\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    public function __construct(SitePage $page, Submission\Event $event, User $user, \Calendar $calHandler, User $viewer)
     {
-        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        parent::__construct($page, $user, $calHandler, $viewer);
         $this->event = $event;
     }
 
@@ -55,4 +54,4 @@ abstract class Base extends RendererBase
     {
         return $this->event;
     }
-} 
+}

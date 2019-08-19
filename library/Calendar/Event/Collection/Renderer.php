@@ -39,9 +39,6 @@ class Renderer
     /** @var User */
     private $viewer;
 
-    /** @var Group $groupHandler */
-    private $groupHandler;
-
     /** @var Calendar $calendarHandler */
     private $calendarHandler;
 
@@ -75,7 +72,6 @@ class Renderer
         $this->viewer         = $viewer;
 
         //TODO remove these deprecated dependencies
-        $this->groupHandler    = new Group();
         $this->calendarHandler = new Calendar();
 
         $this->allEvents = new Collection();
@@ -133,7 +129,6 @@ class Renderer
             $this->page,
             $event,
             $this->user,
-            $this->groupHandler,
             $this->calendarHandler,
             $this->viewer
         );
@@ -207,15 +202,6 @@ class Renderer
     protected function getCalendarHandler(): Calendar
     {
         return $this->calendarHandler;
-    }
-
-
-    /**
-     * @return Group
-     */
-    protected function getGroupHandler(): Group
-    {
-        return $this->groupHandler;
     }
 
 
