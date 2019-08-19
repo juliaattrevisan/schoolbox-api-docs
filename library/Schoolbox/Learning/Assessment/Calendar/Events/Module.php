@@ -14,7 +14,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Calendar\Controller;
 use Schoolbox\Role;
 
@@ -60,6 +59,7 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
+
 
     /**
      * @inheritdoc
