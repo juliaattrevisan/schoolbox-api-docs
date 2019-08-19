@@ -182,7 +182,7 @@ function renderStudent(SitePage $page, $user, Group $groupHandler, External_User
                 $classCode = (($subject['campusCode'] ?? '') !== '') ? "{$subject['campusCode']}/{$subject['code']}" : $subject['code'];
                 $code = new FolderCode();
                 $code->setCode($classCode);
-                $subject['folder'] = new Folder();
+                $subject['folder'] = (new Folder())->setCodes(new Collection());
                 $subject['folder']->setName($subject['name'])->addCode($code);
             } else {
                 continue;

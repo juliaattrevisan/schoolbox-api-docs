@@ -113,7 +113,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function __construct()
     {
-        $this->setCodes(new Collection(array()));
         $this->setCurriculumNodes(new Collection());
         $this->assessables = new GenericCollection(IAssessable::class);
     }

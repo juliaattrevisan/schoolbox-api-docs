@@ -36,7 +36,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testNonUniqueOnFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderModel();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -56,7 +56,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testUniqueOnFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderModel();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -76,7 +76,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testExactCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderModel();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -96,7 +96,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testPrefixCollisionWithOtherFolder(array $codes, int $countDbMatches): void
     {
-        $folderModel = new Folder\Model();
+        $folderModel = $this->createFolderModel();
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -117,7 +117,7 @@ class ValidCodesSpecTest extends TestCase
      */
     public function testNoCollisionWithOtherFolder(?int $folderId, array $codes, int $countDbMatches): void
     {
-        $folderModel = (new Folder\Model())->setId($folderId);
+        $folderModel = $this->createFolderModel()->setId($folderId);
 
         foreach ($codes as $code) {
             $folderModel->getCodes()->add((new Folder\Code\Model())->setCode($code));
@@ -229,5 +229,13 @@ class ValidCodesSpecTest extends TestCase
             ->willReturn($results);
 
         return new ValidCodesSpec($folderCodeMapper);
+    }
+
+    /**
+     * @return Folder\Model
+     */
+    private function createFolderModel(): Folder\Model
+    {
+        return (new Folder\Model())->setCodes(new Collection());
     }
 }
