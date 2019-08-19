@@ -7,22 +7,20 @@
  * @link        https://schoolbox.com.au/
  */
 
-$surveyHandler = new Survey_Main();
-$sectionHandler = new Survey_Section();
-$questionHandler = new Survey_Question();
-$answerHandler = new Survey_Answer();
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\Folder\Mapper;
+
+$surveyHandler       = new Survey_Main();
+$sectionHandler      = new Survey_Section();
+$questionHandler     = new Survey_Question();
+$answerHandler       = new Survey_Answer();
 $questionBankHandler = new Survey_Question_Bank();
-$groupHandler = new Group();
+$groupHandler        = new Group();
 
-if (!$groupHandler->isStaff()) {
-    error(126);
-}
-
-if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['question_bank_id']) && count($_POST['question_bank_id'])) {
+if (!empty($_POST) && is_numeric($_POST['section_id'])) {
     $sectionId = $_POST['section_id'];
 
-    /* Find out if you are the owner of the section before adding
-     * Find out if the section exists first
+    /* Find out if the section exists first
      */
     $section = $sectionHandler->getByID($sectionId);
 
@@ -32,7 +30,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
         error(1);
     }
 
-    /* Check if online assessment exists. If it does, check if you own it
+    /* Check if online assessment exists. If it does, check if you have write access to it
      */
     if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
         $this->pageNotFound();
@@ -40,7 +38,21 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
 
     $survey = $surveyHandler->getByID($section['assess_id']);
 
-    if ($survey['user_id'] == $_SESSION['id']) {
+    /* Only write-accessors can do this action
+     */
+    $folder = (new Mapper())->findById($survey['category_id']);
+    $isInstructor = (new Access())->isInstructor($_SESSION['user'], $folder);
+
+    /* Not an instructor? You can't continue
+     */
+    if (!$isInstructor) {
+        error(131);
+    }
+
+    /* If you're an Instructor and you have question bank details submitted
+     * try to process the request
+     */
+    if ($isInstructor && is_array($_POST['question_bank_id']) && count($_POST['question_bank_id'])) {
         $allQuestionBankIDs = $_POST['question_bank_id'];
 
         foreach ($allQuestionBankIDs as $currentQuestionBankID) {
@@ -61,11 +73,9 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
         }
 
         SitePage::localRedir("/survey/summary/{$survey['assess_id']}");
-    } else {
-        error(131);
-    }
 
-    exit();
+        exit();
+    }
 }
 
 error(2);
