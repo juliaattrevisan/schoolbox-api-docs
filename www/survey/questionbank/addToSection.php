@@ -45,7 +45,7 @@ if (!empty($_POST) && is_numeric($_POST['section_id'])) {
     /* Not an instructor? You can't continue
      */
     if (!$isInstructor) {
-        error(131);
+        error(126);
     }
 
     /* If you're an Instructor and you have question bank details submitted
@@ -75,6 +75,8 @@ if (!empty($_POST) && is_numeric($_POST['section_id'])) {
 
         exit();
     }
+
+    error(131);
 }
 
 error(2);
