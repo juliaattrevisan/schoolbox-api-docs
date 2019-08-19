@@ -20,8 +20,11 @@ use RangeException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Curriculum;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
+use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -42,6 +45,7 @@ use UnexpectedValueException;
 use Schoolbox\Resource\Folder;
 use Timetable_ColourMapper;
 use Schoolbox\Collection;
+use function in_array;
 
 class Controller extends BaseController
 {
@@ -234,12 +238,14 @@ class Controller extends BaseController
         }
 
         // Year Levels
-        $yearLevelOptions = $this->yearLevelMapper->findAll()->map(static function (YearLevel\Model $yearLevel) {
+        $toSelectizeOption = static function (YearLevel\Model $yearLevel) {
             return [
                 'id'   => $yearLevel->getId(),
                 'name' => $yearLevel->getName(),
             ];
-        })->getAll();
+        };
+        $yearLevelOptions  = $this->yearLevelMapper->findAll()->map($toSelectizeOption)->getAll();
+        $yearLevelValues   = $folder->getYearLevels()->map($toSelectizeOption)->reindex()->getAll();
 
         // Role permissions (CREATE defaults to parent folder perms)
         $permissionFolder = $folder->getId() ?? $folder->getParent()->getId();
@@ -275,7 +281,8 @@ class Controller extends BaseController
                     'moderate'           => UserAccess::ACCESS_FULL,
                     'coverImageZone'     => $zone->getTwigContext(),
                     'editYearLevelUsage' => $this->getUser()->isSuperuser(),
-                    'yearLevels'         => $yearLevelOptions,
+                    'yearLevelOptions'   => $yearLevelOptions,
+                    'yearLevelValues'    => $yearLevelValues,
                 ],
             ]
         );
@@ -375,10 +382,16 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws SchoolboxException
      * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function postCreateFolder(Model $parent): void
     {
-        $this->postUpdateFolder($this->folderMapper->createModel()->setParent($parent));
+        $newFolder = $this->folderMapper
+            ->createModel()
+            ->setParent($parent)
+            ->setCodes(new GenericCollection(Code\Model::class))
+            ->setYearLevels(new GenericCollection(YearLevel\Model::class));
+        $this->postUpdateFolder($newFolder);
     }
 
     /**
@@ -407,7 +420,7 @@ class Controller extends BaseController
                 $post['attachment'][0] ?? null,
                 array_filter($post['curriculumCodes']),
                 $post['group'],
-                (bool)($post['recursive-role-permissions'] ?? false),
+                (bool)($post['recursive-permissions'] ?? false),
                 array_filter(explode(',', $post['code'])),
                 array_filter(explode(',', $post['yearLevelIds'])),
                 (bool)($post['recursive-year-levels'] ?? false),
@@ -435,26 +448,27 @@ class Controller extends BaseController
     /**
      * Creates a new, or updates an existing, folder.
      *
-     * @param Model    $folder                 The folder to persist
+     * @param Model    $folder             The folder to persist
      * @param string   $name
      * @param bool     $inherit
      * @param int|null $templateId
      * @param string   $colour
      * @param string   $coverImage
      * @param array    $curriculumCodeIds
-     * @param string[] $rolePermissions        Maps role ids to permission levels
-     * @param bool     $recurseRolePermissions If true && $user is SU, applies $postData['inherit'] to entire subtree
+     * @param string[] $rolePermissions    Maps role ids to permission levels
+     * @param bool     $recursePermissions If true && $user is SU, applies 'inherit' to entire subtree
      * @param array    $classCodes
-     * @param array    $yearLevelIds           Comma-separated YearLevel ids
-     * @param bool     $recurseYearLevels      If true
-     * @param User     $user                   the effecting user
-     * @return Model                           Representing the freshly saved folder
+     * @param array    $yearLevelIds       Comma-separated YearLevel ids
+     * @param bool     $recurseYearLevels  If true
+     * @param User     $user               the effecting user
+     * @return Model                       Representing the freshly saved folder
      * @throws InvalidArgumentException
      * @throws MapperException
      * @throws RangeException if the database fails to save your folder
      * @throws SchoolboxException
      * @throws UnexpectedValueException
      * @throws PDOException
+     * @throws DefinitionException
      */
     public function persistFolder(
         Model $folder,
@@ -465,15 +479,12 @@ class Controller extends BaseController
         ?string $coverImage,
         array $curriculumCodeIds,
         array $rolePermissions,
-        bool $recurseRolePermissions,
+        bool $recursePermissions,
         array $classCodes,
         array $yearLevelIds,
         bool $recurseYearLevels,
         User $user
     ): Model {
-        $userAccessMapper = $this->userAccessMapper;
-        $roleAccessMapper = $this->roleAccessMapper;
-
         $folder->setName($name);
 
         // Either user is SU, or insertion of new Folder, or Folder did not have Class Codes
@@ -516,67 +527,108 @@ class Controller extends BaseController
             }
         }
 
-        // Save folder so we can save joins
-        $this->folderMapper->save($folder);
-
         // Only superusers get to change class codes and year levels
         if ($user->isSuperuser()) {
             $this->updateFolderClassCodes($folder, $classCodes);
             $this->updateFolderYearLevels($folder, $yearLevelIds);
         }
+
         // apply Curriculum codes
-        $this->setCurriculumNodesOnFolder($folder, $curriculumCodeIds);
+        [$nodesToRemove, $nodesToAdd] = $this->setCurriculumNodesOnFolder($folder, $curriculumCodeIds);
 
-        if ($folder->getInherit() && $folder->getId()) {
-            // If inheriting permissions we need to remove any user access permissions...
-            $userAccessMapper->deleteByColumnList([
-                "sid"     => $folder->getId(),
-                "service" => UserAccess::SERVICE_HOMEPAGE,
-            ]);
+        // update role permission
+        $rolePermsToSave = $this->updateRolePermissions($folder, $rolePermissions);
 
-            // ...and role permissions
-            $roleAccessMapper->deleteByColumn("cid", $folder->getId());
+        // Save folder (also persists class-codes + year-level joins)
+        $this->folderMapper->save($folder);
+
+        // Persist curriculum code joins
+        if($nodesToRemove->count()){
+            $this->curriculumNodeMapper->delete($nodesToRemove);
+        }
+        if($nodesToAdd->count()){
+            $this->curriculumNodeMapper->save($nodesToRemove);
         }
 
-        // only allow recursive permissions to supers
-        $recurseRolePermissions = $user->isSuperuser() && $recurseRolePermissions;
-
-        if (!$folder->getInherit()) {
-            // If rolepermission collection is defined, reapply permissions (possibly recursively)
-            $roleAccessMapper->savePermissions($folder, $rolePermissions, $recurseRolePermissions);
-        }
-
-        if ($recurseRolePermissions) {
-            // Recurse inheritance
-            $this->recurseInheritance($folder);
+        // Update role perms
+        if($rolePermsToSave->count()){
+            $this->roleAccessMapper->save($rolePermsToSave);
         }
 
         // HomepageConfig definition
         $this->saveHomepageConfig($folder, $templateId);
 
+        // only allow recursive permissions to supers
+        if(($recursePermissions || $recurseYearLevels) && $user->isSuperuser()){
+            foreach($this->folderMapper->findAllChildren($folder->getId(), true) as $descendant){
+                if($recursePermissions){
+                    // Mapper post-save will handle the group/role permission + folder-code clean up for us
+                    $descendant->enableInherit();
+                }
+                if($recurseYearLevels){
+                    $this->updateFolderYearLevels($descendant, $yearLevelIds);
+                }
+                $this->folderMapper->save($descendant);
+            }
+        }
+
         return $folder;
     }
 
     /**
-     * Efficiently update a folder's class codes
+     * Efficiently builds the set of role perms to persist
+     *
+     * @param Model $folder
+     * @param array $rolePermissions
+     * @return GenericCollection
+     * @throws MapperException
+     * @throws DefinitionException
+     */
+    private function updateRolePermissions(Model $folder, array $rolePermissions): GenericCollection
+    {
+        $rolePermsToSave = $this->roleAccessMapper->createCollection();
+        if (!$folder->getInherit()) {
+            /** @var GenericCollection|RoleAccess[] $existingRolePerms */
+            $existingRolePerms = $folder->getId()
+                ? $this->roleAccessMapper->findAllForFolder($folder)->indexByCallback(
+                    static function (RoleAccess $roleAccess){
+                        return $roleAccess->getRole()->getId();
+                    })
+                : $this->roleAccessMapper->createCollection();
+
+            foreach($rolePermissions as $roleId => $permissionLevel){
+                $existingPerm = $existingRolePerms[$roleId];
+                if($existingPerm && $existingPerm->getType() !== (int)$permissionLevel){
+                    $existingPerm->setType($permissionLevel);
+                    $rolePermsToSave[$roleId] = $existingPerm;
+                } else {
+                    $rolePerm = $this->roleAccessMapper->createModel()
+                        ->setCategory($folder)
+                        ->setRole(RoleMapper::getInstance()->createModel($roleId))
+                        ->setType($permissionLevel);
+                    $rolePermsToSave[$roleId] = $rolePerm;
+                }
+            }
+        }
+        return $rolePermsToSave;
+    }
+
+    /**
+     * Updates a folder with the specified codes
      *
      * @param Model    $folder
      * @param string[] $newClassCodes
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     private function updateFolderClassCodes(Model $folder, array $newClassCodes): void
     {
-        // Build codes to remove
+        // Remove codes if folder inherits perms, or if code no longer in use
         if ($folder->getInherit()) {
             // If folder is inheriting permissions, remove all class codes
-            $codesToRemove = $folder->getCodes()->deepClone();
             $folder->setCodes($folder->getCodes()->emptyClone());
         } else {
             // Else only remove those not in new set
-            $codesToRemove = $this->classCodeMapper->createCollection();
-            foreach ($folder->getCodes() as $codeModel) {
+            foreach ($folder->getCodes() as $idx => $codeModel) {
                 $found = false;
                 foreach ($newClassCodes as $newCode) {
                     if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
@@ -585,13 +637,12 @@ class Controller extends BaseController
                     }
                 }
                 if (!$found) {
-                    $codesToRemove[] = $codeModel;
+                    $folder->getCodes()->offsetUnset($idx);
                 }
             }
         }
 
         // Build codes to add
-        $codesToAdd = $this->classCodeMapper->createCollection();
         if (!$folder->getInherit()) {
             foreach ($newClassCodes as $newCode) {
                 $found = false;
@@ -606,18 +657,9 @@ class Controller extends BaseController
                         ->createModel()
                         ->setFolder($folder)
                         ->setCode($newCode);
-                    $codesToAdd[] = $codeModel;
                     $folder->getCodes()[$codeModel->getCode()] = $codeModel;
                 }
             }
-        }
-
-        if ($codesToRemove->count()) {
-            $this->classCodeMapper->delete($codesToRemove);
-        }
-
-        if ($codesToAdd->count()) {
-            $this->classCodeMapper->save($codesToAdd);
         }
     }
 
@@ -627,76 +669,48 @@ class Controller extends BaseController
      * @param Model    $folder
      * @param string[] $yearLevelIds
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
     private function updateFolderYearLevels(Model $folder, array $yearLevelIds): void
     {
         // Build yearLevels to remove. Remove if not in new set
-        $yearLevelsToRemove = $this->yearLevelMapper->createCollection();
         foreach ($folder->getYearLevels() as $idx => $yearLevel) {
-            $found = false;
-            foreach ($yearLevelIds as $yearLevelId) {
-                if ((int)$yearLevelId === $yearLevel->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $yearLevelsToRemove[] = $yearLevel;
+            if (!in_array($yearLevel->getId(), $yearLevelIds, false)) {
                 $folder->getYearLevels()->offsetUnset($idx);
             }
         }
 
         // Build yearLevels to add. Add if not already on folder
-        $yearLevelsToAdd = $this->yearLevelMapper->createCollection();
         foreach ($yearLevelIds as $yearLevelId) {
-            $found = false;
-            foreach ($folder->getYearLevels() as $yearLevel) {
-                if ((int)$yearLevelId === $yearLevel->getId()) {
-                    $found = true;
-                    break;
-                }
+            if (!in_array($yearLevelId, $folder->getYearLevels()->keys(), false)) {
+                $folder->getYearLevels()[$yearLevelId] = $this->yearLevelMapper->findById($yearLevelId);
             }
-            if (!$found) {
-                $yearLevel                                    = $this->yearLevelMapper->findById($yearLevelId);
-                $yearLevelsToAdd[]                            = $yearLevel;
-                $folder->getYearLevels()[$yearLevel->getId()] = $yearLevel;
-            }
-        }
-
-        if ($yearLevelsToRemove->count()) {
-            $this->yearLevelMapper->delete($yearLevelsToRemove);
-        }
-
-        if ($yearLevelsToAdd->count()) {
-            $this->yearLevelMapper->save($yearLevelsToAdd);
         }
     }
 
     /**
      * Put the given Curriculum code lists onto the given folder
      *
+     * Returns the nodes that need to be added and remove in the database
+     *
      * @param Model    $folder
      * @param string[] $nodeIds
+     * @return GenericCollection[]|Curriculum\Node\Model[][]
      * @throws MapperException
-     * @throws PDOException
-     * @throws UnexpectedValueException
      */
-    private function setCurriculumNodesOnFolder(Model $folder, array $nodeIds): void
+    private function setCurriculumNodesOnFolder(Model $folder, array $nodeIds): array
     {
+        // Ensure nodes are indexed by node.id
+        $folder->getCurriculumNodes()->indexByCallback(
+            static function(Curriculum\Node\Model $node){
+                return $node->getId();
+            }
+        );
+
         // Remove existing node if not in new set
         $nodesToRemove = $this->curriculumNodeMapper->createCollection();
         foreach ($folder->getCurriculumNodes() as $idx => $node) {
-            $found = false;
-            foreach ($nodeIds as $nodeId) {
-                if ((int)$nodeId === $node->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $nodesToRemove[] = $node;
+            if (!in_array($node->getId(), $nodeIds, false)) {
+                $nodesToRemove[$node->getId()] = $node;
                 $folder->getCurriculumNodes()->offsetUnset($idx);
             }
         }
@@ -704,27 +718,13 @@ class Controller extends BaseController
         // Add new node if not already on folder
         $nodesToAdd = $this->curriculumNodeMapper->createCollection();
         foreach ($nodeIds as $nodeId) {
-            $found = false;
-            foreach ($folder->getCurriculumNodes() as $node) {
-                if ((int)$nodeId === $node->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
+            if (!in_array($nodeId, $folder->getCurriculumNodes()->keys(), false)) {
                 $node                                         = $this->curriculumNodeMapper->findById($nodeId);
-                $nodesToAdd[]                                 = $node;
+                $nodesToAdd[$node->getId()]                   = $node;
                 $folder->getCurriculumNodes()[$node->getId()] = $node;
             }
         }
-
-        if ($nodesToRemove->count()) {
-            $this->curriculumNodeMapper->delete($nodesToRemove);
-        }
-
-        if ($nodesToAdd->count()) {
-            $this->curriculumNodeMapper->save($nodesToAdd);
-        }
+        return [$nodesToRemove, $nodesToAdd];
     }
 
 

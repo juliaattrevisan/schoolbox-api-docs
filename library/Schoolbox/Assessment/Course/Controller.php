@@ -771,10 +771,10 @@ class Controller extends Base\Base
      * @param string   $name
      * @param int      $parentId
      * @param array    $curriculumCodeIds
-     * @param bool     $inherit                 Whether to inherit permissions
+     * @param bool     $inherit            Whether to inherit permissions
      * @param int|null $templateId
-     * @param array    $rolePermissions         Maps role to permission level
-     * @param bool     $recurseRolePermissions  If true && user is SU, applies 'inherit' to entire subtree
+     * @param array    $rolePermissions    Maps role to permission level
+     * @param bool     $recursePermissions If true && user is SU, applies 'inherit' to entire subtree
      * @param array    $classCodes
      * @return Folder
      * @throws Deleted
@@ -785,6 +785,7 @@ class Controller extends Base\Base
      * @throws PDOException
      * @throws Application\Exception\Exception
      * @throws UnexpectedValueException
+     * @throws BaseMapper\DefinitionException
      */
     private function persistFolder(
         string $name,
@@ -793,7 +794,7 @@ class Controller extends Base\Base
         bool $inherit,
         ?int $templateId,
         array $rolePermissions,
-        bool $recurseRolePermissions,
+        bool $recursePermissions,
         array $classCodes
     ): Folder {
         /** @var FolderController $folderController */
@@ -811,7 +812,7 @@ class Controller extends Base\Base
             null,
             $curriculumCodeIds,
             $rolePermissions,
-            $recurseRolePermissions,
+            $recursePermissions,
             $classCodes,
             [],
             false,

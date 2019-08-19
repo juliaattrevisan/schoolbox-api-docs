@@ -12,6 +12,8 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use UnexpectedValueException;
 use function array_key_exists;
 use function count;
@@ -482,8 +484,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @throws Predicate\InvalidColumnException
      * @throws SchoolboxException
      */
-    public function validateFolderCodes(Model $model): bool
+    protected function validateFolderCodes(Model $model): bool
     {
+        if ($model->getCodes() === null) {
+            return true;
+        }
         /** @var Code\Mapper $codeMapper */
         $codeMapper = $this->getJoinMapper('codes');
         if(!(new ValidCodesSpec($codeMapper))->isSatisfiedBy($model)){
@@ -546,18 +551,29 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     }
 
     /**
-     * PostSave callback to clear permissions if they are now being inherited
+     * PostSave callback to clear User- + Role-based permissions if they are now being inherited
      *
      * @param Model $model
-     * @param Model $previous
+     * @param null|Model $previous
      * @return bool
      * @throws DefinitionException If specified join not defined
      */
-    public function updateInheritedPermissions($model, $previous = null)
+    protected function updateInheritedPermissions(Model $model, Model $previous = null): bool
     {
-        // If we are inheriting permissions delete any previously created group perms
+        // If we are inheriting permissions delete any previously created group + user perms
         if ($previous && $model->getInherit()) {
+
+            // Delete the group
             $this->getJoinMapper('groups')->deleteByColumn('cid', $model->getId());
+
+            // Delete group memberships
+            UserAccessMapper::getInstance()->deleteByColumnList([
+                "sid"     => $model->getId(),
+                "service" => UserAccess::SERVICE_HOMEPAGE,
+            ]);
+
+            // Delete role permissions
+            RoleAccessMapper::getInstance()->deleteByColumn('cid', $model->getId());
         }
         return true;
     }
@@ -573,8 +589,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function updateFolderCodes(Model $model, Model $previous = null): bool
+    protected function updateFolderCodes(Model $model, Model $previous = null): bool
     {
+        // Don't update if join not hydrated
+        if ($model->getCodes() === null) {
+            return true;
+        }
+
         /** @var Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->getJoinMapper('codes');
 
@@ -585,8 +606,8 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // Don't save any codes if folder is inheriting permissions
         $newCodes = $model->getInherit()
-            ? $model->getCodes()
-            : $folderCodeMapper->createCollection();
+            ? $folderCodeMapper->createCollection()
+            : $model->getCodes();
 
         // Efficiently delete any class codes that have been removed from folder
         $codesToRemove = $folderCodeMapper->createCollection();
@@ -621,7 +642,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             }
         }
         if ($codesToAdd->count()) {
-            $folderCodeMapper->save($codesToRemove);
+            $folderCodeMapper->save($codesToAdd);
         }
         return true;
     }
@@ -636,7 +657,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function unMuteClassNotifications($model, $previous = null)
     {
         // only execute if folder has codes and not inheriting permissions
-        if ($model->getCodes()->count() && !$model->getInherit()) {
+        if (!$model->getInherit() && $model->getCodes() && $model->getCodes()->count()) {
 
             // remove any mutes that might exist on this subject (classes are not allowed to be muted)
             RerouteOverrideMapper::getInstance()->deleteByColumnList([

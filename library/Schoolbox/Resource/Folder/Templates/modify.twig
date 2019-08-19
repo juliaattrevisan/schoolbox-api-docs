@@ -1,25 +1,28 @@
 {#
-    user                    User                - Current session user
-    breadcrumbs             array
-    formAction              string
-    folder                  Folder\Model
-    parent                  Folder\Model
-    templates               HomepageTemplate[]  - all homepage templates available for selection
-    templateId              int                 - (0 => keep existing, -1 => none)
-    roles                   Role[]              - all roles in system
-    rolePermissions         int[]               - indexed by role id
-    database                string              - external database type
-    curriculumTagging       bool                - Whether the system is configured to enable folder curriculum codes
-    userAccess              int                 - current users permission level to the folder
-    deny                    int                 - permission level DENY
-    read                    int                 - permission level READ
-    write                   int                 - permission level WRITE
-    moderate                int                 - permission level FULL
-    coverImageZone          array               - context data for cover image render
-    editYearLevelUsage      bool                - should YearLevel usages be editable or read-only
-    yearLevels              array[]             - Options suitable for default selectize wrapper
-    yearLevels[idx]['id']   int                 - Selectize option identifier
-    yearLevels[idx]['name'] string              - Selectize option label
+    user                          User                - Current session user
+    breadcrumbs                   array
+    formAction                    string
+    folder                        Folder\Model
+    parent                        Folder\Model
+    templates                     HomepageTemplate[]  - all homepage templates available for selection
+    templateId                    int                 - (0 => keep existing, -1 => none)
+    roles                         Role[]              - all roles in system
+    rolePermissions               int[]               - indexed by role id
+    database                      string              - external database type
+    curriculumTagging             bool                - Whether the system is configured to enable folder curriculum codes
+    userAccess                    int                 - current users permission level to the folder
+    deny                          int                 - permission level DENY
+    read                          int                 - permission level READ
+    write                         int                 - permission level WRITE
+    moderate                      int                 - permission level FULL
+    coverImageZone                array               - context data for cover image render
+    editYearLevelUsage            bool                - should YearLevel usages be editable or read-only
+    yearLevelOptions              array[]             - Options suitable for default selectize wrapper
+    yearLevelOptions[idx]['id']   int                 - Selectize option identifier
+    yearLevelOptions[idx]['name'] string              - Selectize option label
+    yearLevelValues               array[]             - Values suitable for default selectize wrapper
+    yearLevelValues[idx]['id']    int                 - Selectize value identifier
+    yearLevelValues[idx]['name']  string              - Selectize value label
 #}
 {% if folder.getId is null %}
     {% set action = 'Create' %}
@@ -188,8 +191,8 @@
         }, 'Class codes may not exceed 20 characters.');
 
         // Warn user that permission recursion will delete role/group/class permissions.
-        $("#recursive-role-permissions").change(function() {
-            if ($("#recursive-role-permissions").prop("checked")) {
+        $("#recursive-permissions").change(function() {
+            if ($("#recursive-permissions").prop("checked")) {
                 $("[data-alert-permissions]").removeClass("hide");
             } else {
                 $("[data-alert-permissions]").addClass("hide");
@@ -200,12 +203,14 @@
         {% if editYearLevelUsage %}
         $('#yearLevels').selectizeSelector({
             multiple: true,
+            value: {{ yearLevelValues|json_encode|raw }},
             selectize: {
-                options: {{ yearLevels|json_encode|raw }},
+                options: {{ yearLevelOptions|json_encode|raw }},
                 hideSelected: true
             }
         });
         {% endif %}
+
     });
 </script>
 
@@ -318,8 +323,8 @@
                     {# Only superusers can recurse permission changes, and its only relevant on modification #}
                     {% if user.isSuperuser and action == 'Modify' %}
                         <div class="small-12 large-10 columns">
-                            <input type="checkbox" id="recursive-role-permissions" name="recursive-role-permissions" value="1" />
-                            <label for="recursive-role-permissions" class="checkbox-label">Apply these permissions to all subfolders</label>
+                            <input type="checkbox" id="recursive-permissions" name="recursive-permissions" value="1" />
+                            <label for="recursive-permissions" class="checkbox-label">Apply these permissions to all subfolders</label>
                         </div>
 
                         <div class="small-12 columns">
