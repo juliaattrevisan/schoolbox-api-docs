@@ -800,11 +800,8 @@ class Controller extends Base\Base
         /** @var FolderController $folderController */
         $folderController = $this->getController('folder');
 
-        $folder = $this->folderMapper->createModel();
-        $folder->setParent($this->folderMapper->findById($parentId));
-
         $folder = $folderController->persistFolder(
-            $folder,
+            Folder::createEmpty()->setParent($this->folderMapper->findById($parentId)),
             $name,
             $inherit,
             $templateId,

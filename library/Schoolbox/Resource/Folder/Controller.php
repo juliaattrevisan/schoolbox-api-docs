@@ -34,7 +34,6 @@ use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
-use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -165,11 +164,7 @@ class Controller extends BaseController
             ['parent' => $parent, 'parentId' => $parent->getId()]
         );
 
-        $folder = $this->folderMapper
-            ->createModel()
-            ->setParent($parent)
-            ->setCodes(new GenericCollection(Code\Model::class))
-            ->setYearLevels(new GenericCollection(YearLevel\Model::class));
+        $folder = Folder\Model::createEmpty()->setParent($parent);
         $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
 
@@ -392,11 +387,7 @@ class Controller extends BaseController
      */
     public function postCreateFolder(Model $parent): void
     {
-        $newFolder = $this->folderMapper
-            ->createModel()
-            ->setParent($parent)
-            ->setCodes(new GenericCollection(Code\Model::class))
-            ->setYearLevels(new GenericCollection(YearLevel\Model::class));
+        $newFolder = Folder\Model::createEmpty()->setParent($parent);
         $this->postUpdateFolder($newFolder);
     }
 

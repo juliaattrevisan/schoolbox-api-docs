@@ -111,6 +111,21 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     private $assessables;
 
     /**
+     * Returns a new empty folder model with empty join collections
+     *
+     * Use this when creating a new logical entity, as opposed to building an existing entity
+     *
+     * @return Model
+     * @throws UnexpectedValueException
+     */
+    public static function createEmpty(): self
+    {
+        return (new static())
+            ->setCodes(new GenericCollection(Code\Model::class))
+            ->setYearLevels(new GenericCollection(YearLevel\Model::class));
+    }
+
+    /**
      * Constructor
      *
      */
