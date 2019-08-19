@@ -46,6 +46,7 @@ use Schoolbox\Resource\Folder;
 use Timetable_ColourMapper;
 use Schoolbox\Collection;
 use function in_array;
+use function strnatcasecmp;
 
 class Controller extends BaseController
 {
@@ -577,8 +578,8 @@ class Controller extends BaseController
      * Efficiently builds the set of role perms to persist
      *
      * @param Model $folder
-     * @param array $rolePermissions
-     * @return GenericCollection
+     * @param string[] $rolePermissions Maps role ids to permission levels
+     * @return GenericCollection|RoleAccess[]
      * @throws MapperException
      * @throws DefinitionException
      */
@@ -612,7 +613,7 @@ class Controller extends BaseController
     }
 
     /**
-     * Updates a folder with the specified codes
+     * Updates a folder with the new codes
      *
      * @param Model    $folder
      * @param string[] $newClassCodes
@@ -620,43 +621,20 @@ class Controller extends BaseController
      */
     private function updateFolderClassCodes(Model $folder, array $newClassCodes): void
     {
+        // Clear codes
+        $folder->setCodes($folder->getCodes()->emptyClone());
+
         // Remove codes if folder inherits perms, or if code no longer in use
         if ($folder->getInherit()) {
-            // If folder is inheriting permissions, remove all class codes
-            $folder->setCodes($folder->getCodes()->emptyClone());
-        } else {
-            // Else only remove those not in new set
-            foreach ($folder->getCodes() as $idx => $codeModel) {
-                $found = false;
-                foreach ($newClassCodes as $newCode) {
-                    if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if (!$found) {
-                    $folder->getCodes()->offsetUnset($idx);
-                }
-            }
+            // If folder is inheriting permissions, ignore class codes
+            return;
         }
 
-        // Build codes to add
-        if (!$folder->getInherit()) {
-            foreach ($newClassCodes as $newCode) {
-                $found = false;
-                foreach ($folder->getCodes() as $codeModel) {
-                    if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
-                        $found = true;
-                        break;
-                    }
-                }
-                if (!$found) {
-                    $folder->getCodes()[$newCode] = $this->classCodeMapper
-                        ->createModel()
-                        ->setFolder($folder)
-                        ->setCode($newCode);
-                }
-            }
+        foreach ($newClassCodes as $newCode) {
+            $folder->getCodes()[$newCode] = $this->classCodeMapper
+                ->createModel()
+                ->setFolder($folder)
+                ->setCode($newCode);
         }
     }
 
@@ -716,9 +694,9 @@ class Controller extends BaseController
         $nodesToAdd = $this->curriculumNodeMapper->createCollection();
         foreach ($nodeIds as $nodeId) {
             if (!in_array($nodeId, $folder->getCurriculumNodes()->keys(), false)) {
-                $node                                         = $this->curriculumNodeMapper->findById($nodeId);
-                $nodesToAdd[$node->getId()]                   = $node;
-                $folder->getCurriculumNodes()[$node->getId()] = $node;
+                $node                                  = $this->curriculumNodeMapper->findById($nodeId);
+                $nodesToAdd[$nodeId]                   = $node;
+                $folder->getCurriculumNodes()[$nodeId] = $node;
             }
         }
         return [$nodesToRemove, $nodesToAdd];
