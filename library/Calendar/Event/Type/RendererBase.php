@@ -54,6 +54,9 @@ abstract class RendererBase implements RendererInterface
     var $calendarHandler;
 
     /**
+     * TODO this does not need a SitePage, it needs a DI
+     * Even that is iffy: introducing a service locator still introduces untold hidden dependencies
+     *
      * @param SitePage $page
      * @param User $user
      * @param \Group $groupHandler
