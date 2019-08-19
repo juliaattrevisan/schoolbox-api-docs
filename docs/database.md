@@ -11,11 +11,13 @@ The core database is either called "schoolbox" or "schoolboxdev", depending on t
 
 ### Naming Conventions
 We use snake case for our naming convention. Tables should be first named with their module then the entity.  For example "pastoral_comment".
-Common field names include; created_at, updated_at, modified_by, deleted_at.
+Common field names include; id, created_at, updated_at, modified_by, deleted_at.
 
-Foreign key field names: foreignentity_id
-Foreign Keys should be named: fk_currenttablename_fieldname
-Indexs should be name: idx_currenttablename_fieldname
+**Foreign entity identifier field names:** foreignentity_id
+
+**Foreign keys should be named:** fk_currenttablename_fieldname
+
+**Indexes should be name:** idx_currenttablename_fieldname
 
 
 ### Tables
