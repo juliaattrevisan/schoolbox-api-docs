@@ -97,7 +97,7 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
 
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only
-        $renderer = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], new \Calendar(), $_SESSION['user']);
+        $renderer = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], $_SESSION['user']);
         $output   = $renderer->render();
         echo $output;
         break;

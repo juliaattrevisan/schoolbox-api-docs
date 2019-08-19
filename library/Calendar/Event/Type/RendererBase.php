@@ -39,14 +39,6 @@ abstract class RendererBase implements RendererInterface
     var $page;
 
     /**
-     * Calendar Handler
-     * TODO: refactor this out
-     *
-     * @var \Calendar
-     */
-    var $calendarHandler;
-
-    /**
      * TODO this does not need a SitePage, it needs a DI
      * Even that is iffy: introducing a service locator still introduces untold hidden dependencies
      *
@@ -54,17 +46,12 @@ abstract class RendererBase implements RendererInterface
      *
      * @param SitePage $page
      * @param User $user
-     * @param \Calendar $calHandler
      * @param User $viewer
      */
-    public function __construct(SitePage $page, User $user, \Calendar $calHandler, User $viewer) {
+    public function __construct(SitePage $page, User $user, User $viewer) {
         $this->setPage($page);
         $this->setUser($user);
         $this->setViewer($viewer);
-
-        // TODO remove these
-        // CalendarHandler has a single dependency for attendance type objects
-        $this->setCalendarHandler($calHandler);
     }
 
 

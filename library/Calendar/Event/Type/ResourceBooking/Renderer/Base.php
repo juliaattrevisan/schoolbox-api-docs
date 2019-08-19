@@ -28,9 +28,9 @@ abstract class Base extends RendererBase
      * @param \Calendar             $calHandler
      * @param User                  $viewer
      */
-    public function __construct(SitePage $page, ResourceBooking\Event $event, User $user, \Calendar $calHandler, User $viewer)
+    public function __construct(SitePage $page, ResourceBooking\Event $event, User $user, User $viewer)
     {
-        parent::__construct($page, $user, $calHandler, $viewer);
+        parent::__construct($page, $user, $viewer);
         $this->event = $event;
     }
 

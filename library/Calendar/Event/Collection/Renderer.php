@@ -129,7 +129,6 @@ class Renderer
             $this->page,
             $event,
             $this->user,
-            $this->calendarHandler,
             $this->viewer
         );
         return $renderObj->render();

@@ -653,7 +653,6 @@ class Controller extends Base
                     $sitepage,
                     $event,
                     $this->getUser(),
-                    new \Calendar(),
                     $this->getUser()
                 );
                 $output[] = $renderer->render();
