@@ -11,8 +11,11 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\Calendar\Controller;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -51,10 +54,21 @@ class Module extends BaseModule
 
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function preInitControllerDependencies(ContainerInterface $injector): void
+    {
+        /** @var Container $injector */
+        $injector->params[Controller::class] = [
+            'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+        ];
     }
 }

@@ -569,6 +569,22 @@ class MapperProxy
 
 
     /**
+     * Find every assessment due between one of these dates.
+     *
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return GenericCollection|IAssessable[]
+     */
+    public function findAllBetweenDates(Alaress_Date_Format $from, Alaress_Date_Format $to): GenericCollection
+    {
+        $options['due_after']  = $from;
+        $options['due_before'] = $to;
+        $builder = $this->convertOptionsToPredicateBuilder($options, false);
+        return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
+    }
+
+
+    /**
      * Finds all assessables that this student is participating in.
      *
      * This method loads participation for $student only, and does not load the
