@@ -11,6 +11,10 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
 use const GuzzleHelper\VAGRANT_DOMAIN;
+use Payload\RubricCapability as RubCapabilityPayload;
+use Payload\RubricIndicator as RubIndicatorPayload;
+use Payload\Assessment as AssessmentPayload;
+use Payload\AssessmentMark as AssessmentMarkPayload;
 
 /**
  * Inherited Methods
@@ -142,5 +146,93 @@ class IntegrationTester extends \Codeception\Actor
         $loginPayload->setPassword('alaress');
 
         $this->sendCurlRequest($loginPayload, false);
+    }
+
+    public function setDefaultRubric(AssessmentPayload $assessmentPayload):AssessmentPayload
+    {
+
+        $folder_id = $assessmentPayload->getFormParam('folderId');
+        $capture_criterion_group_id='/rb\[0\]\[criterion\]\[(\d+)]\[groupId\]" value="(\d+)/';
+        #So that we can loop through getting the ID's for components create a skeleton to allow us to get it done. Need to update all the - values with real values.
+        $rubySkeleton[0] = ['group' => [['id' => -1, 'name'=>'I'],
+                                        ['id' => -2, 'name'=>'II'],
+                                        ['id' => -3, 'name'=>'III']],
+                            'criterion' => ['-1' => [ 'id' => -1,
+                                                      'groupId'=> -1],
+                                            '-2' => [ 'id' => -2,
+                                                      'groupId'=> -1],
+                                            '-3' => [ 'id' => -3,
+                                                      'groupId'=> -1]
+                            ]
+        ];
+
+        $copySkeletonForIteration = $rubySkeleton;
+        $counter=0;
+        foreach ($copySkeletonForIteration[0]['group'] as $group)
+        {
+            $capabilityName='I'.$counter;
+            $rubCapabilityPayload = new RubCapabilityPayload();
+            $rubCapabilityPayload->setFolderId($folder_id);
+            $rubCapabilityPayload->setName($capabilityName);
+            $rubCapabilityPayload->setGroupIndex($counter);
+
+            $this->sendCurlRequest($rubCapabilityPayload, false, 'send request to create capability, '.$capabilityName);
+
+            $counterCriterion=0;
+
+            ##This is a pain but I need to walk through so that I hit all the end point posts for each criterion and group id for rubrics
+            foreach ($copySkeletonForIteration[0]['criterion'] as $criterion)
+            {
+                $indicatorName='a'.$counterCriterion;
+                $rubIndicatorPayload = new RubIndicatorPayload();
+                $rubIndicatorPayload->setFolderId($folder_id);
+                $rubIndicatorPayload->setName($indicatorName);
+                $rubIndicatorPayload->setGroupName($capabilityName);
+                $response = $this->sendCurlRequest($rubIndicatorPayload, true, 'send request to create a indicator, '.$indicatorName.' in cabability, '.$capabilityName);
+                $criterion_group_id_matches=[];
+                preg_match($capture_criterion_group_id, $response->getBody(),$criterion_group_id_matches);
+
+                $capability_id=$criterion_group_id_matches[2];
+                $indicator_id=$criterion_group_id_matches[1];
+                $assessmentPayload->addRubricCapabitity($capability_id, $rubySkeleton[0]['group'][$counter]['name']);
+                $assessmentPayload->setRubricIndicator($indicator_id, $capability_id, ''.$counterCriterion, true);
+
+                if($counterCriterion===2){
+                    $assessmentPayload->setRubricDescription('', $indicator_id, 0, 'A'.$counterCriterion, '');
+                    $assessmentPayload->setRubricDescription('', $indicator_id,1, 'B'.$counterCriterion, '');
+                    $assessmentPayload->setRubricDescription('', $indicator_id,2, 'C'.$counterCriterion, '');
+                } else {
+                    $assessmentPayload->setRubricDescription('', $indicator_id,0, 'A'.$counterCriterion, 1);
+                    $assessmentPayload->setRubricDescription('', $indicator_id,1, 'B'.$counterCriterion, 2);
+                    $assessmentPayload->setRubricDescription('', $indicator_id,2, 'C'.$counterCriterion, 3);
+                }
+
+                $counterCriterion++;
+            }
+
+            $counter++;
+        }
+
+        $assessmentPayload->addRubricLevel('','A');
+        $assessmentPayload->addRubricLevel('','B');
+        $assessmentPayload->addRubricLevel('','C');
+
+        return $assessmentPayload;
+    }
+
+    public function setDefaultRubricMarks(AssessmentMarkPayload $assessmentMark)
+    {
+        $assessmentID = $assessmentMark->getAssessmentId();
+        /** @var Schoolbox\Assessment\Rubric\Grid\Grid $markGrid */
+        $markGrid = $this->getAssessmentRubricGrid($assessmentID); ## Has been deprecated needs a recode.
+
+        foreach ($markGrid->getCapabilityUsages() as $group_capability) {
+            foreach ($group_capability->getIndicatorUsages() as $capability_indicator)
+            {
+                $descriptors = $capability_indicator->getDescriptors();
+                $levelToPick=random_int(0,2);
+                $assessmentMark->addMarkRubricDescriptorSelect($descriptors[$levelToPick]->getId());
+            }
+        }
     }
 }
