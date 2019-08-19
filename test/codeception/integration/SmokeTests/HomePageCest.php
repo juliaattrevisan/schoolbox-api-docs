@@ -22,7 +22,7 @@ class HomePageCest {
      */
     public function _before(IntegrationTester $i)
     {
-        $i->loginAdmin2();
+        $i->loginAdmin();
     }
 
     /** Create homepage. creates a homepage through a curl payload

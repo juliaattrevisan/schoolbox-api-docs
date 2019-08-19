@@ -22,7 +22,7 @@ class CalendarCest {
      */
     public function _before(IntegrationTester $i)
     {
-        $i->loginAdmin2();
+        $i->loginAdmin();
     }
 
     /** Create a personal event from the full calendar month view, using a curl post.

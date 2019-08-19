@@ -21,7 +21,7 @@ class PastoralCest
      */
     public function _before(IntegrationTester $i)
     {
-        $i->loginAdmin2();
+        $i->loginAdmin();
     }
 
 

@@ -36,6 +36,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitMapper;
 class IntegrationTester extends \Codeception\Actor
 {
     const NO_REDIRECT = '-';
+    const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
 
     use _generated\IntegrationTesterActions;
 
@@ -121,7 +122,7 @@ class IntegrationTester extends \Codeception\Actor
     {
         if (!isset($this->redirect_settings)) {
             $this->guzzle_headers = [
-                'Host'         => VAGRANT_DOMAIN,
+                'Host'         => self::VAGRANT_DOMAIN,
                 'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
                 'Accept'       => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
             ];
@@ -170,7 +171,7 @@ class IntegrationTester extends \Codeception\Actor
     }
 
 
-    public function loginAdmin2()
+    public function loginAdmin()
     {
         $loginPayload = new LoginPayload();
         $loginPayload->setUsername('alaress');

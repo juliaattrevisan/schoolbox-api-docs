@@ -16,7 +16,7 @@ class CourseCest {
 
     public function _before(IntegrationTester $i)
     {
-        $i->loginAdmin2(); #we logged in as alaress
+        $i->loginAdmin(); #we logged in as alaress
     }
 
     /** Creates course using curl payloads

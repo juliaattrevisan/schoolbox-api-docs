@@ -32,6 +32,10 @@ class PastoralRecord extends Base
         $this->setFormParam('id', '');
         $this->setFormParam('student_id', '??');
         $this->setFormParam('heading', 'someHeading');
+        $this->setFormParam('typeId', '1');
+        $this->setFormParam('subtypeId', '1');
+        $this->setFormParam('severityId', '1');
+        $this->setFormParam('points', '');
     }
 
     public function setHeading(string $heading)

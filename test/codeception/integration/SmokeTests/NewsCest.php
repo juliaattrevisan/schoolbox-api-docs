@@ -22,7 +22,7 @@ class NewsCest {
      */
     public function _before(IntegrationTester $i)
     {
-        $i->loginAdmin2();
+        $i->loginAdmin();
     }
 
     /** Create draft news using curl request

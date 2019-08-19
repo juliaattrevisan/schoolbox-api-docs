@@ -28,7 +28,7 @@ class AssessmentOnGroupCest {
      */
     public function _before(IntegrationTester $i)
     {
-        $i->loginAdmin2();
+        $i->loginAdmin();
     }
 
     /** Creates an assessment using a curl payload
