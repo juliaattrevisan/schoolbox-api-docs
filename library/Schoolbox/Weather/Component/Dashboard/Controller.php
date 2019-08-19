@@ -15,8 +15,15 @@ use SitePage;
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-    // TODO these global defaults should come from the database. This will be addressed in SA-7986
+    /**
+     * Default location for which to obtain weather data
+     */
     private const DEFAULT_LOCATION = 'Melbourne, Australia';
+
+    /**
+     * Default number of days for the Forecast view which is what you see
+     * on the dashboard component itself
+     */
     private const DEFAULT_FORECAST_LIMIT = 3;
 
     /**
@@ -46,12 +53,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        /* Location for which to get the weather
-         * First check the component configuration - if there's a location there, use that
-         * Then check the system config for a default location - if there's a location there, use that
-         * Otherwise if that doesn't exist for some reason, default to Melbourne Australia
-         */
-        $location = trim($this->getConfig('url')) ?: self::DEFAULT_LOCATION;
+        $location = $this->determineWeatherLocation();
 
         $this->setComponentName("Weather in {$location}");
 
@@ -69,6 +71,35 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $this->weatherPayload = (new ApixuClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
 
         return true;
+    }
+
+
+    /**
+     * Location for which to get the weather
+     *
+     * @return string
+     */
+    private function determineWeatherLocation(): string
+    {
+        /* First check the component configuration - if there's a location there, use that
+         */
+        $location = trim($this->getConfig('url'));
+
+        if ('' !== $location) {
+            return $location;
+        }
+
+        /* Then check the system config for a default location - if there's a location there, use that
+         */
+        $location = trim($this->getConfigMapper()->getConfigLoader()->get('weather_location'));
+
+        if ('' !== $location) {
+            return $location;
+        }
+
+        /* Otherwise if that doesn't exist for some reason, default to Melbourne Australia
+         */
+        return self::DEFAULT_LOCATION;
     }
 
 
