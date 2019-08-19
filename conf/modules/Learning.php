@@ -6,16 +6,17 @@
 
 namespace Config\Modules;
 
-use Config\ModuleLoader;
 use Alaress\Application\Kernel;
+use Config\ModuleLoader;
 use Schoolbox\Assessment\Course;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Learning\Assessment\Calendar\Events\Module as AssessmentCalendarEventsModule;
 use Schoolbox\Learning\Assessment\Calendar\Module as AssessmentCalendarModule;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
+use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbackFileModule;
-use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Grades;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;
@@ -34,7 +35,7 @@ class Learning extends ModuleLoader
      */
     public function configure($kernel): void
     {
-        $namespace  = 'learning';
+        $namespace = 'learning';
 
         // TODO - split 'LearningModule' into ClassModule + PendingModule
         $this->loadModule($kernel, LearningModule::class, "/{$namespace}");
@@ -57,6 +58,11 @@ class Learning extends ModuleLoader
         $config = $kernel->getDependencyInjector()->get('config');
         if ($config->get('assessment_calendar_enabled')) {
             $this->loadModule($kernel, AssessmentCalendarModule::class, "/{$namespace}/assessment/calendar");
+            $this->loadModule(
+                $kernel,
+                AssessmentCalendarEventsModule::class,
+                "/{$namespace}/assessment/calendar/events"
+            );
         }
     }
 }
