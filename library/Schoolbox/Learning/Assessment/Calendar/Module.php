@@ -41,7 +41,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getReport', $routePerms);
-        $this->register('POST', '', 'postReport', $routePerms);
+//        $this->register('POST', '', 'postReport', $routePerms);
     }
 
 

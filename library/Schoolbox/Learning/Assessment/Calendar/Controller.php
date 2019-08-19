@@ -69,7 +69,9 @@ class Controller extends Base
         unset($queryArgs['page']);
 
         $page        = Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR;
-        $route       = $this->getRouter()->generate('learningAssessmentCalendar.postReport');
+//        $route       = $this->getRouter()->generate('learningAssessmentCalendar.postReport');
+        // This route goes nowhere: all is contained on the FullCalendar
+        $route       = '#';
         $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), [], $queryArgs);
 
         $this->response->content->set(
@@ -82,21 +84,22 @@ class Controller extends Base
         );
     }
 
-    /**
-     * Returns the contents of the Assessment Calendar page
-     *
-     * @api   POST /learning/assessment/calendar
-     * @since 19.1
-     */
-    public function postReport(): void
-    {
-        $eventData =
-            "TODO - calendar event JSON data <br>\n" .
-            print_r($this->request->post->getArrayCopy(), true);
-
-        $this->response->content->set($this->buildJsonOutput([
-            'status'  => 200,
-            'content' => $eventData,
-        ]));
-    }
+//    /**
+//     * Returns the contents of the Assessment Calendar page
+//     *
+//     * @api   POST /learning/assessment/calendar
+//     * @since 19.1
+//     */
+//    public function postReport(): void
+//    {
+//        // Might not even need to do anything here.
+//        $eventData =
+//            "TODO - calendar event JSON data <br>\n" .
+//            print_r($this->request->post->getArrayCopy(), true);
+//
+//        $this->response->content->set($this->buildJsonOutput([
+//            'status'  => 200,
+//            'content' => $eventData,
+//        ]));
+//    }
 }
