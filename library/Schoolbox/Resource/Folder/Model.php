@@ -56,7 +56,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * You must index these by folder_code.code to enable efficient de-duplication
      * when building collection (array key lookup vs array value traversal)
      *
-     * @var Collection|FolderCode[]
+     * Null means 'unknown'. Empty collection means this folder has no codes.
+     *
+     * @var null|Collection|FolderCode[]
      */
     private $codes;
 
@@ -419,7 +421,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return Collection|FolderCode[]
+     * @return null|Collection|FolderCode[]
      */
     public function getCodes()
     {
