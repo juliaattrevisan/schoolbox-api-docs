@@ -12,6 +12,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use function count;
 use function explode;
 use PDO;

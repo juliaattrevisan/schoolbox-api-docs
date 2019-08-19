@@ -1,0 +1,68 @@
+{% autoescape %}
+<script type="text/javascript">
+    // Which view gets shown?
+    var anchorView = '',
+        parts      = location.href.split('#');
+
+    if (parts.length > 1) {
+        anchorView = parts[1];
+        switch (anchorView) {
+            case 'month':
+                anchorView = 'dayGridMonth';
+                break;
+            case 'week':
+            case 'agendaWeek':
+            case 'basicWeek':
+                anchorView = 'timeGridWeek';
+                break;
+            case 'day':
+            case 'agendaDay':
+            case 'basicDay':
+                anchorView = 'timeGridDay';
+                break;
+            default:
+                anchorView = '';
+                break;
+        }
+    }
+
+    window.fullCalendarConfig = {
+        userId:             Number('{{ user.id }}'),
+        token:              '{{ user.key }}',
+        taskTypeId:         Number('{{ taskTypeId }}'),
+        sources:            {{ sources | raw }},
+        eventTypes:         {{ eventTypes | raw }},
+        groups:             {{ groups | raw }},
+        campuses:           {{ campuses | raw }},
+        selectedFilters:    {{ filters | raw }},
+        defaultDate:        '{{ "now" | date("Y-m-d") }}',
+        eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
+        firstDay:           Number('{{ config.calendar_start_day }}'),
+        defaultView:        anchorView || '{{ calendarView }}',
+        dateDisplayFormats: dateDisplayFormats,
+        translations:       {
+            eotc: {
+                proper: '{{ locale.eotc.proper }}'
+            },
+            dueWork: {
+                proper: '{{ locale.dueWork.proper }}'
+            }
+        }
+    };
+</script>
+{% endautoescape %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{{ locale.calendar.proper ~ " for " ~ user.fullName}}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <section>
+            <div id="calendar"></div>
+            <script type="text/javascript" src="/javascript/components/fullCalendar.bundle.js?v={SITE_VERSION}"></script>
+        </section>
+    </div>
+</div>
