@@ -1,12 +1,11 @@
 <?php
 /**
- * Assessment creation. Assessments must always belong in a Category.
+ * Add Question to Survey via Questionbank.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper;
 
