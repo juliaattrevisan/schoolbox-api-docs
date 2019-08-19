@@ -39,14 +39,6 @@ abstract class RendererBase implements RendererInterface
     var $page;
 
     /**
-     * Group Handler
-     * TODO: refactor this out
-     *
-     * @var \Group
-     */
-    var $groupHandler;
-
-    /**
      * Calendar Handler
      * TODO: refactor this out
      *
@@ -72,8 +64,6 @@ abstract class RendererBase implements RendererInterface
         $this->setViewer($viewer);
 
         // TODO remove these
-        // GroupHandler can be removed immediately
-        $this->setGroupHandler($groupHandler);
         // CalendarHandler has a single dependency for attendance type objects
         $this->setCalendarHandler($calHandler);
     }
@@ -153,22 +143,6 @@ abstract class RendererBase implements RendererInterface
     public function getCalendarHandler()
     {
         return $this->calendarHandler;
-    }
-
-    /**
-     * @param mixed $groupHandler
-     */
-    public function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getGroupHandler()
-    {
-        return $this->groupHandler;
     }
 
     /**
