@@ -84,6 +84,13 @@ class Assessment extends Base
     {
         $this->assessmentType=$type;
         $this->setReferer( '/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
+        $this->setFormParam('assessmentType', $this->assessmentType);
+        if($type==='project')
+        {
+            $this->setFormParam('summator', 'weighted');
+        } else {
+            $this->removeFormParam('summator');
+        }
     }
 
     public function setTitle(string $title)

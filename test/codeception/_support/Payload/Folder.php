@@ -10,6 +10,7 @@ class Folder extends Base
     const READ_PRIVILEGES = '1';
     const WRITE_PRIVILEGES = '2';
 
+    const TEMPLATE_NONE=-1;
     const TEMPLATE_HOMEPAGE_ID=9;
 
     public static function getFolderPermissions(): array

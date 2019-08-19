@@ -15,6 +15,7 @@ use Payload\RubricCapability as RubCapabilityPayload;
 use Payload\RubricIndicator as RubIndicatorPayload;
 use Payload\Assessment as AssessmentPayload;
 use Payload\AssessmentMark as AssessmentMarkPayload;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitMapper;
 
 /**
  * Inherited Methods
@@ -235,4 +236,30 @@ class IntegrationTester extends \Codeception\Actor
             }
         }
     }
+
+    public function courseImportAddUnits(\Payload\CourseImport $courseImportPayload, Schoolbox\GenericCollection $allTheUnits)
+    {
+        foreach($allTheUnits as $unit)
+        {
+            $courseImportPayload->addUnitImport($unit->getId());
+        }
+
+        return $courseImportPayload;
+    }
+
+    public function courseImportAddAssessments(\Payload\CourseImport $courseImportPayload, Schoolbox\GenericCollection $allTheUnits)
+    {
+        foreach($allTheUnits as $unit)
+        {
+            $courseImportPayload->addUnitSpec($unit->getId());
+            $assessments = $this->getAssessmentIdByCourseUnitSpecId($unit->getId());
+            foreach ($assessments as $assessment)
+            {
+                $courseImportPayload->addAssessmentImport($unit->getId(), $assessment['assessment_id']);
+            }
+        }
+
+        return $courseImportPayload;
+    }
+
 }
