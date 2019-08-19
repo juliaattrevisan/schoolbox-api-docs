@@ -33,20 +33,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
 
     /**
-     * Controller constructor.
-     *
-     * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
-     * @throws \InvalidArgumentException
-     */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
-    {
-        parent::__construct($instance, $user, $sitepage);
-    }
-
-
-    /**
      * Get the data to put into the template
      *
      * @return bool
