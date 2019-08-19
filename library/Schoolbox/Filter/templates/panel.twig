@@ -136,8 +136,9 @@ Usage:
         function fetchReport() {
             $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
-            var href = $submitButton.data('href');
-            var data = $optionCheckboxes.serialize();
+            var href        = $submitButton.data('href'),
+                data        = $optionCheckboxes.serialize(),
+                decodedData = deserialize(data);
             $submitButton.val($submitButton.data('working'));
 
             disableInputs();
@@ -165,17 +166,17 @@ Usage:
                             return;
                         }
 
-                        updateHistoryState(data);
+                        updateHistoryState(decodedData);
                         replaceReportContent(response.content);
-                        processFilterUpdateSuccess();
+                        processFilterUpdateSuccess(decodedData);
                     })
                     .fail(function(response){
                         processFilterUpdateError(response.responseText);
                     })
                     .always(processFilterUpdateAlways);
             } else {
-                updateHistoryState(data);
-                processFilterUpdateSuccess();
+                updateHistoryState(decodedData);
+                processFilterUpdateSuccess(decodedData);
                 processFilterUpdateAlways();
             }
         }
@@ -197,11 +198,13 @@ Usage:
 
         /**
          * Action for after the selected filters have been changed successfully.
+         *
+         * @param {object} decodedSelections
          */
-        function processFilterUpdateSuccess() {
+        function processFilterUpdateSuccess(decodedSelections) {
             $serverErrorFeedback.hide();
             $reportContent.attr('data-loaded', '1');
-            $reportContent.trigger('filterContentLoaded');
+            $reportContent.trigger('filterContentLoaded', [decodedSelections]);
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
 
@@ -257,12 +260,12 @@ Usage:
          * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
          * as expected.
          *
-         * @param {string} encodedSelections
+         * @param {object} decodedSelections
          */
-        function updateHistoryState(encodedSelections)
+        function updateHistoryState(decodedSelections)
         {
-            var decodedSelections = deserialize(encodedSelections),
-                nestedObj         = {};
+            var nestedObj = {};
+            console.log('decoded', decodedSelections);
 
             // Convert flat string array to nested object
             for (var filterId in decodedSelections) {
