@@ -12,6 +12,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use Alaress;
+use UnexpectedValueException;
 use function array_key_exists;
 use function count;
 use function explode;
@@ -58,6 +59,7 @@ use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\YearLevel;
 use Alaress\Database\Predicate;
 use Schoolbox\Error;
+use function strnatcasecmp;
 
 /**
  * Class Mapper
@@ -554,7 +556,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function updateInheritedPermissions($model, $previous = null)
     {
         // If we are inheriting permissions delete any previously created group perms
-        if ($model->getInherit()) {
+        if ($previous && $model->getInherit()) {
             $this->getJoinMapper('groups')->deleteByColumn('cid', $model->getId());
         }
         return true;
@@ -562,32 +564,64 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
 
     /**
-     * PostSave callback to save the folder's folderCodes
-     *
-     * @param Model $model
-     * @param Model $previous
+     * PostSave callback to efficiently save the folder's folderCodes
+     * @param Model      $model
+     * @param Model|null $previous
      * @return bool
-     * @throws DefinitionException If specified join not defined
+     * @throws DefinitionException
+     * @throws Exception
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    public function updateFolderCodes($model, $previous = null)
+    public function updateFolderCodes(Model $model, Model $previous = null): bool
     {
-        // TODO, this can probably all be removed, the controller is responsible for updating joins
+        /** @var Code\Mapper $folderCodeMapper */
         $folderCodeMapper = $this->getJoinMapper('codes');
-        // first drop the previous code(s) connected to this folder
-        $folderCodes = $folderCodeMapper->findByColumn('folder_id', $model->getId());
-        if($folderCodes->count()){
-            $folderCodeMapper->delete($folderCodes);
+
+        // No prior codes if this is a CREATE.
+        $oldCodes = $previous
+            ? $folderCodeMapper->findByColumn('folder_id', $model->getId())
+            : $folderCodeMapper->createCollection();
+
+        // Don't save any codes if folder is inheriting permissions
+        $newCodes = $model->getInherit()
+            ? $model->getCodes()
+            : $folderCodeMapper->createCollection();
+
+        // Efficiently delete any class codes that have been removed from folder
+        $codesToRemove = $folderCodeMapper->createCollection();
+        foreach ($oldCodes as $oldCode) {
+            $found = false;
+            foreach ($newCodes as $newCode) {
+                if (strnatcasecmp($oldCode->getCode(), $newCode) === 0) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $codesToRemove[] = $oldCode;
+            }
+        }
+        if ($codesToRemove->count()) {
+            $folderCodeMapper->delete($codesToRemove);
         }
 
-        // only execute if folder has codes and not inheriting permissions
-        if ($model->getCodes()->count() && !$model->getInherit()) {
-            // bind the given codes to this category
-            foreach ($model->getCodes() as $code) {
-                $code->setFolder($model);
+        // Save any class codes that have been added to folder
+        $codesToAdd = $folderCodeMapper->createCollection();
+        foreach ($newCodes as $newCode) {
+            $found = false;
+            foreach ($oldCodes as $oldCode) {
+                if (strnatcasecmp($oldCode->getCode(), $newCode) === 0) {
+                    $found = true;
+                    break;
+                }
             }
-
-            // persist the Code objects
-            $folderCodeMapper->save($model->getCodes());
+            if (!$found) {
+                $codesToAdd[] = $newCode;
+            }
+        }
+        if ($codesToAdd->count()) {
+            $folderCodeMapper->save($codesToRemove);
         }
         return true;
     }
@@ -891,7 +925,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @return Collection|Model[]
      * @throws MapperException if statement returned no category
      * @throws DefinitionException If specified join does is not defined
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
