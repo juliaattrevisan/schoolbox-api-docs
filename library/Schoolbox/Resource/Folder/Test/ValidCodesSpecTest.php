@@ -140,6 +140,7 @@ class ValidCodesSpecTest extends TestCase
             [['a', 'A A/A'], 0],
             [['a', 'A A/A'], 0],
             [['1', '1'], 0],
+            [['a&a', 'A&A'], 0],
         ];
     }
 
@@ -152,6 +153,7 @@ class ValidCodesSpecTest extends TestCase
             [['a/aaa', 'b/bbb'], 0],
             [['a/a', 'aa', 'a a', 'a a a'], 0],
             [['1', '2', '3'], 0],
+            [['a&a', 'a& a'], 0],
         ];
     }
 
@@ -161,6 +163,7 @@ class ValidCodesSpecTest extends TestCase
         return [
             [['a'], 1],
             [['1'], 1],
+            [['&'], 1],
         ];
     }
 
@@ -171,6 +174,7 @@ class ValidCodesSpecTest extends TestCase
             [['a'], 1],
             [['S/a'], 1],
             [['S/1'], 1],
+            [['S/&'], 1],
         ];
     }
 
@@ -181,9 +185,11 @@ class ValidCodesSpecTest extends TestCase
             [null, ['a'], 0],
             [null, ['a/aaa'], 0],
             [null, ['1'], 0],
+            [null, ['a&a'], 0],
             [1, ['a'], 0],
             [1, ['a/aaa'], 0],
             [1, ['1'], 0],
+            [1, ['a&a'], 0],
         ];
     }
 

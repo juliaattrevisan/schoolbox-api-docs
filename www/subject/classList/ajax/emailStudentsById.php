@@ -33,8 +33,12 @@ if ($allStudents && count($allStudents) && is_array($postData['allIds']) && coun
     $userMapper = new \Schoolbox\UserMapper();
     foreach ($allStudents as $currentStudent) {
         if (in_array($currentStudent['synergy_id'], $postData['allIds'], true)) {
-            $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
-
+            try {
+                $user = $userMapper->findByExternalId($currentStudent['synergy_id']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // Probably this is an user who is only in SIS. Ignoring.
+                continue;
+            }
             if($user->getEmail()) {
                 $emailString[] = $user->getFormattedEmailDisplay();
             }
