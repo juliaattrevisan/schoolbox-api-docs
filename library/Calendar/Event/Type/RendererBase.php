@@ -8,6 +8,7 @@
 namespace Calendar\Event\Type;
 
 use Alaress\Authorizer\Authorizer;
+use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use \SitePage;
 use Twig_Environment;
@@ -57,6 +58,8 @@ abstract class RendererBase implements RendererInterface
      * TODO this does not need a SitePage, it needs a DI
      * Even that is iffy: introducing a service locator still introduces untold hidden dependencies
      *
+     * TODO after that, only inject the DI's authorizer and router
+     *
      * @param SitePage $page
      * @param User $user
      * @param \Group $groupHandler
@@ -68,14 +71,18 @@ abstract class RendererBase implements RendererInterface
         $this->setUser($user);
         $this->setViewer($viewer);
 
-        //TODO remove these
+        // TODO remove these
+        // GroupHandler can be removed immediately
         $this->setGroupHandler($groupHandler);
+        // CalendarHandler has a single dependency for attendance type objects
         $this->setCalendarHandler($calHandler);
     }
 
 
     /**
      * Return templating engine
+     *
+     * TODO remove this: eventually Twig representations of events won't be required
      *
      * @return Twig_Environment
      */
@@ -166,6 +173,8 @@ abstract class RendererBase implements RendererInterface
 
     /**
      * Helper function - gets whether access to a route is allowed.
+     *
+     * TODO inject only what is required for this, not the entire DI
      *
      * @param string $name
      * @param array  $params
