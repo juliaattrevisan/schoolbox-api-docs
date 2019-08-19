@@ -1,7 +1,5 @@
 <?php
 /**
- * Controller
- *
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
@@ -10,6 +8,13 @@ namespace Schoolbox\Weather\Component\Dashboard;
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Weather\ApixuClient;
 
+/**
+ * Class Controller
+ *
+ * Display weather forecast data on the dashboard component
+ *
+ * @package Schoolbox\Weather\Component\Dashboard
+ */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
     /**
