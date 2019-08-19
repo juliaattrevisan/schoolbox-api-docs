@@ -19,21 +19,21 @@ if (!$groupHandler->isStaff()) {
 }
 
 if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['question_bank_id']) && count($_POST['question_bank_id'])) {
-    $section_id = $_POST['section_id'];
+    $sectionId = $_POST['section_id'];
 
     /* Find out if you are the owner of the section before adding
-      * Find out if the section exists first
-      */
-    $section = $sectionHandler->getByID($section_id);
+     * Find out if the section exists first
+     */
+    $section = $sectionHandler->getByID($sectionId);
 
     /* Check if the section exists
-      */
+     */
     if (!$section) {
         error(1);
     }
 
     /* Check if online assessment exists. If it does, check if you own it
-      */
+     */
     if (!$surveyHandler->isValidUrlAccess($section['assess_id'])) {
         $this->pageNotFound();
     }
@@ -46,26 +46,26 @@ if (!empty($_POST) && is_numeric($_POST['section_id']) && is_array($_POST['quest
         foreach ($allQuestionBankIDs as $currentQuestionBankID) {
             $questionBank = $questionBankHandler->getByID($currentQuestionBankID);
 
-            $question_id = $questionHandler->create(array(
-                'section_id' => $section_id,
+            $questionId = $questionHandler->create([
+                'section_id' => $sectionId,
                 'type_id' => $questionBank['type_id'],
-                'sequence' => $questionHandler->getNextSequence($section_id),
+                'sequence' => $questionHandler->getNextSequence($sectionId),
                 'marks' => $questionBank['marks'],
                 'question' => $questionBank['question']
-            ));
+            ]);
 
-            $answer_id = $answerHandler->create(array(
-                'question_id' => $question_id,
+            $answerId = $answerHandler->create([
+                'question_id' => $questionId,
                 'answer' => $questionBank['answer'],
-            ));
+            ]);
         }
 
-        SitePage::localRedir('/survey/summary/' . $survey['assess_id']);
+        SitePage::localRedir("/survey/summary/{$survey['assess_id']}");
     } else {
         error(131);
     }
 
     exit();
-} else {
-    error(2);
 }
+
+error(2);
