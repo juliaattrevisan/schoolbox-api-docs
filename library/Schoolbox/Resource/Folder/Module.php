@@ -96,7 +96,7 @@ class Module extends BaseModule
         $permUpdate = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, static function (array $params): int {
-                return (int)$params['id'];
+                return (int)$params['folderId'];
             }, Access::getInstance())
         );
         $preloadUpdate = function (array $params){
