@@ -2,7 +2,6 @@
 
 namespace SmokeTests;
 
-use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
@@ -46,7 +45,7 @@ class NewsCest {
 
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/news/'.$draft_article->getId().'?returnUrl=Lw%253D%253D'=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -81,7 +80,7 @@ class NewsCest {
         $response = $i->sendCurlRequest($newsPayload, true, 'Send request to publish draft news to moderate');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -115,7 +114,7 @@ class NewsCest {
         $response = $i->sendCurlRequest($newsPayload, true, 'Send request to publish draft news');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -154,7 +153,7 @@ class NewsCest {
         $response = $i->sendCurlRequest($newsPayload, true, 'Send request to accept news from moderate');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/news/'.$article_id=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -192,7 +191,7 @@ class NewsCest {
         $newsPayload->setFormParam('articleID', $article_id);
         $newsPayload->setFormParam('rejectReason', 'The reason is valid');
         $response = $i->sendCurlRequest($newsPayload, true, 'Send request to reject news from moderate');
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN;
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -228,7 +227,7 @@ class NewsCest {
         $newsPayload->setReferer('/news');
         $newsPayload->clearAllFormParams();
         $response = $i->sendCurlRequest($newsPayload, true, 'Send request to save news for later');
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
         #THEN;
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
@@ -267,7 +266,7 @@ class NewsCest {
         $response = $i->sendCurlRequest($newsPayload, true, 'Send request to delete news');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/news'=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN;

@@ -37,7 +37,7 @@ class LoginCest {
         $response = $i->sendCurlRequest($loginPayload, true);
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
-            ['-'=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -65,7 +65,7 @@ class LoginCest {
         $response = $i->sendCurlRequest($forgotPasswordPayload, true, 'Send request for forgotten password with email');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
-            ['-'=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -78,7 +78,7 @@ class LoginCest {
         $response = $i->sendCurlRequest($forgotPasswordPayload, true, 'Send request for forgotten password with username');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/passwordReset'=>'302'],
-            ['-'=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN

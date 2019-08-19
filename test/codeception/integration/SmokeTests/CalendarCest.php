@@ -7,7 +7,6 @@ use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
 use Payload\Base;
 use Payload\CalendarEvent as CalendarEventPayload;
-use GuzzleHelper\GuzzleConstants;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -51,7 +50,7 @@ class CalendarCest {
         $createEventRequest->setFormParam('type', CalendarEventPayload::getEventTypes()['personal']);
 
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create calendar event on full calendar page');
-        $expectedUrlsReturned=[[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned=[[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -81,7 +80,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create personal calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -114,7 +113,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create group calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -150,7 +149,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create campus calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -188,7 +187,7 @@ class CalendarCest {
         $response = $i->sendCurlRequest($eventPayload, true, 'Send request to modify personal calendar event');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/full/'.date('d-m-Y', $timestamp).'/'.$admin->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -233,7 +232,7 @@ class CalendarCest {
         $RSVP_Payload->setFormParam('status', 'add');
 
         $response = $i->sendCurlRequest($RSVP_Payload, true, 'Send request to RSVP to campus calendar event.');
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -294,7 +293,7 @@ class CalendarCest {
         $response=$i->sendCurlRequest($RSVP_Approve_Payload, true, 'Send request to RSVP to campus calendar event.');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/'.$event->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN

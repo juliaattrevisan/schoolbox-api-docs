@@ -2,7 +2,6 @@
 
 namespace SmokeTests;
 
-use GuzzleHelper\GuzzleConstants;
 use GuzzleHttp\Exception\GuzzleException;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
@@ -64,7 +63,7 @@ class AssessmentOnGroupCest {
         $response = $i->sendCurlRequest($newAssessmentRequest, true, 'Send request create asessment on Group Page #'.$groupPage->getId());
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$groupPage->getId()=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -124,7 +123,7 @@ class AssessmentOnGroupCest {
         $newAssessmentRequest->setFormParam('part-2', 1);
 
         $update_response = $i->sendCurlRequest($newAssessmentRequest, true, 'Send request to edit assessment part 2 mark edit assesssment #'.$groupPage->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $determine_mark_response);
@@ -165,7 +164,7 @@ class AssessmentOnGroupCest {
         $response = $i->sendCurlRequest($newAssessmentRequest, true, 'Send request create asessment with rubric on Group Page #'.$groupPage->getId());
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$groupPage->getId()=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -232,7 +231,7 @@ class AssessmentOnGroupCest {
 
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/learning/assessments/'.$assessmentPageId.'/'.$student->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -306,7 +305,7 @@ class AssessmentOnGroupCest {
         $i->setDefaultRubricMarks($newMarkRequest);
 
         $response = $i->sendCurlRequest($newMarkRequest, true, 'Send request mark rubric assessment # '.$assessmentPageId.' for student # '.$student->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -377,7 +376,7 @@ class AssessmentOnGroupCest {
         $newMarkRequest->setSubmittingStudentId($student->getId());
 
         $response = $i->sendCurlRequest($newMarkRequest, true, 'Send request mark assessment # '.$assessmentPageId.' for student # '.$student->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);

@@ -2,15 +2,11 @@
 
 namespace SmokeTests;
 
-use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
-use Payload\Assessment;
 use Payload\Base;
 use Payload\Folder as FolderPayload;
 use Payload\Course as CoursePayload;
-use Payload\GroupMember;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -55,7 +51,7 @@ class CourseCest {
         $response = $i->sendCurlRequest($coursePayload, true, 'Send request create a course spec');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/course/list'=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -71,7 +67,7 @@ class CourseCest {
         $unitSpecPayload->setFormParam('name', $unit_name);
 
         $response = $i->sendCurlRequest($unitSpecPayload, true, 'Send request create a unit spec');
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -85,7 +81,7 @@ class CourseCest {
         $response = $i->sendCurlRequest($coursePayload, true, 'Send save request for the newly created course');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/course/list'=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -200,7 +196,7 @@ class CourseCest {
         $importCourseSpecPayload->setClassPageId($classpage->getId());
 
         $response = $i->sendCurlRequest($importCourseSpecPayload, true, 'Send import Step 1. course spec to class page #'.$classpage->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
@@ -210,7 +206,7 @@ class CourseCest {
         $importCourseSpecPayload = $i->courseImportAddUnits($importCourseSpecPayload, $unitsForCourseSpec);
 
         $response = $i->sendCurlRequest($importCourseSpecPayload, true, 'Send import Step 2. unit specs to class page course, class page #'.$classpage->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
 
@@ -220,7 +216,7 @@ class CourseCest {
         $importCourseSpecPayload = $i->courseImportAddAssessments($importCourseSpecPayload, $unitsForCourseSpec);
 
         $response = $i->sendCurlRequest($importCourseSpecPayload, true, 'Send import Step 3. assessments to class page course unit spec, class page #'.$classpage->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);

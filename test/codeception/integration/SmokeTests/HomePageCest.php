@@ -2,7 +2,6 @@
 
 namespace SmokeTests;
 
-use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use Payload\Base;
 use Payload\GroupMember as GroupMemberPayload;
@@ -42,7 +41,7 @@ class HomePageCest {
         $response= $i->sendCurlRequest($folderPayload, true, 'Send request create homepage');
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/'=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -83,7 +82,7 @@ class HomePageCest {
 
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePage->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -98,7 +97,7 @@ class HomePageCest {
 
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/group/modify/'.$homePage->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -138,7 +137,7 @@ class HomePageCest {
         $textComponentPayload->setFormParam('cid', $homePage->getId());
 
         $response = $i->sendCurlRequest($textComponentPayload, true, 'Add text component to homepage #'.$homePage->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -152,7 +151,7 @@ class HomePageCest {
         $textComponentPayload->setFormParam('cid', $homePage->getId());
 
         $response = $i->sendCurlRequest($textComponentPayload, true, 'send request drop component #'.$created_component_id.' onto homepage #'.$homePage->getId());
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
+        $expectedUrlsReturned= [[IntegrationTester::NO_REDIRECT=>'200']];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
@@ -168,7 +167,7 @@ class HomePageCest {
 
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePage->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN
@@ -209,7 +208,7 @@ class HomePageCest {
 
         $expectedUrlsReturned= [
             ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePage->getId()=>'302'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
+            [IntegrationTester::NO_REDIRECT=>'200']
         ];
 
         #THEN

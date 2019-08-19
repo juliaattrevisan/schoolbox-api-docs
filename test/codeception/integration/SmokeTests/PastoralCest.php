@@ -2,7 +2,6 @@
 
 namespace SmokeTests;
 
-use GuzzleHelper\GuzzleConstants;
 use IntegrationTester;
 use Payload\PastoralRecord;
 use Payload\PastoralComment;
@@ -54,7 +53,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [GuzzleConstants::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200']
         ];
 
         #THEN
@@ -96,7 +95,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [GuzzleConstants::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200']
         ];
 
         #THEN
@@ -139,7 +138,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [GuzzleConstants::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200']
         ];
 
         #THEN
@@ -183,7 +182,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
-            [GuzzleConstants::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200']
         ];
 
         #THEN
@@ -195,7 +194,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
-            [GuzzleConstants::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200']
         ];
 
         #THEN

@@ -5,6 +5,7 @@
  */
 
 use Codeception\TestInterface;
+use GuzzleHelper\GuzzleConstants;
 use Payload\Login as LoginPayload;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -34,15 +35,44 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitMapper;
  */
 class IntegrationTester extends \Codeception\Actor
 {
+    const NO_REDIRECT = '-';
+
     use _generated\IntegrationTesterActions;
 
     /**
      * Define custom actions here
      */
 
-    use GuzzleHelper\GuzzleActions;
-
     use SchoolboxHelper\SchoolboxActions;
+
+    /**
+     * prepareGuzzleUrl prepares the Guzzle response history into an array we can use to check the history of redirects
+     *
+     * @param \GuzzleHttp\Psr7\Response $response
+     *
+     * @return array #array[[$URL => $STATUS_CODE]]
+     */
+    public function prepareGuzzleRedirectHistoryToArray(Response $response):array
+    {
+        $returnURLs = $response->getHeader('X-Guzzle-Redirect-History');
+        $returnCodes = $response->getHeader('X-Guzzle-Redirect-Status-History');
+        $lastReturnCode = ''.$response->getStatusCode();
+
+        if (isset($returnCodes) && $returnCodes !== [])
+        {
+            $counter=0;
+            $array_of_redirects=[];
+            while ($counter < count($returnCodes))
+            {
+                $array_of_redirects[] = [$returnURLs[$counter] => $returnCodes[$counter]];
+                $counter++;
+            }
+            $array_of_redirects[]=[self::NO_REDIRECT =>$lastReturnCode];
+            return $array_of_redirects;
+        }
+
+        return [['-' =>$lastReturnCode]];
+    }
 
     /**
      * checkCurlReturn checks the return values against the actual values that have been returned during the test.
@@ -84,10 +114,10 @@ class IntegrationTester extends \Codeception\Actor
 
     public function _before(TestInterface $test)
     {
-        $this->initGuzzleClient2();
+        $this->initGuzzleClient();
     }
 
-    public function initGuzzleClient2()
+    public function initGuzzleClient()
     {
         if (!isset($this->redirect_settings)) {
             $this->guzzle_headers = [
@@ -115,7 +145,7 @@ class IntegrationTester extends \Codeception\Actor
      */
     public function sendCurlRequest( \Payload\Base $requestDetails, bool $redirect, string $step_message=''):Response
     {
-        $this->initGuzzleClient2();
+        $this->initGuzzleClient();
 
         $requestDetailsArray = $requestDetails->payloadToArray();
 
