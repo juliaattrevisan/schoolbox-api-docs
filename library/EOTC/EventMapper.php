@@ -139,6 +139,7 @@ class EventMapper extends CalendarEventMapper
              */
             if ($eventItem->getMetadata()) {
                 $metadataMapper = EventMetadataMapper::getInstance();
+                $metadataMapper->localBodyCacheBypass = $this->localBodyCacheBypass;
                 $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
                 /* Accumulate staff attendees for this event
@@ -170,6 +171,7 @@ class EventMapper extends CalendarEventMapper
                         'order' => [
                             'created_at' => 'DESC',
                         ],
+                        'cache' => !$this->localBodyCacheBypass
                     ]
                 );
 
@@ -517,6 +519,9 @@ class EventMapper extends CalendarEventMapper
                     'column' => 'metadata_id',
                     'key'    => 'id',
                     'mapper' => EventMetadataMapper::getInstance(),
+                    'options' => [
+                        'cache' => !$this->localBodyCacheBypass
+                    ],
                 ],
             ]
         );
@@ -601,6 +606,9 @@ class EventMapper extends CalendarEventMapper
                     'column' => 'campus_id',
                     'key'    => 'id',
                     'mapper' => CampusMapper::getInstance(),
+                    'options' => [
+                        'cache' => !$this->localBodyCacheBypass
+                    ],
                 ],
             ]
         );
@@ -685,6 +693,9 @@ class EventMapper extends CalendarEventMapper
                     'column' => 'role_id',
                     'key'    => 'id',
                     'mapper' => RoleMapper::getInstance(),
+                    'options' => [
+                        'cache' => !$this->localBodyCacheBypass
+                    ],
                 ],
             ]
         );

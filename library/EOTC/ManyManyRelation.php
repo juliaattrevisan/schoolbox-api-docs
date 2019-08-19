@@ -13,6 +13,9 @@
 namespace EOTC;
 
 
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\Storage\Model;
+
 class ManyManyRelation extends \Schoolbox\Mapper {
 
 	/**
@@ -55,6 +58,9 @@ class ManyManyRelation extends \Schoolbox\Mapper {
 	 */
 	public function find() {
 		$join = $this->getJoin();
+		if (empty($join['value'])) {
+		    return new GenericCollection(Model::class);
+        }
 		$relationTableDefinition = $this->getRelationTableDefinition();
 
 		$query = "
