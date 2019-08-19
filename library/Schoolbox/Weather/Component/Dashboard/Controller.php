@@ -8,10 +8,7 @@
 namespace Schoolbox\Weather\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
-use Component_Instance;
-use Schoolbox\User;
 use Schoolbox\Weather\ApixuClient;
-use SitePage;
 
 class Controller extends Component_Dashboard_ControllerAbstract
 {
