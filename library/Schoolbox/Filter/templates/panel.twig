@@ -25,6 +25,9 @@ Usage:
         // ============== Global Variables & Constants
         var MAX_VISIBLE_SELECTIONS = 4;
 
+        // ============== Configuration
+        var quickload = Boolean("{{ quickload }}");
+
         // ============== jQuery DOM handles
         var $reportContent       = $('#{{ contentId }}');
         var $filterPanel         = $('#filter_panel');
@@ -160,46 +163,59 @@ Usage:
                         }
 
                         updateHistoryState(data);
-                        processServerSuccess(response.content);
+                        replaceReportContent(response.content);
+                        processServerSuccess();
                     })
                     .fail(function(response){
                         processServerError(response.responseText);
                     })
-                    .always(function() {
-                        $submitButton.val($submitButton.data('value'));
-                        hideFilterLoader();
-                        enableInputs();
-                        hideContentPlaceholder();
-                    });
+                    .always(processReportFetchAlways);
             } else {
                 // Something happens here with data?
                 updateHistoryState(data);
-                processServerSuccess('');
-
-                $submitButton.val($submitButton.data('value'));
-                hideFilterLoader();
-                enableInputs();
-                hideContentPlaceholder();
+                processServerSuccess();
+                processReportFetchAlways();
             }
         }
 
+
         /**
-         * Handle a successful AJAX call
+         * Replace the content of the report with the given HTML.
          *
          * @param {string} html
          */
-        function processServerSuccess(html) {
-            hideContentPlaceholder();
-            $serverErrorFeedback.hide();
-            if (Boolean("{{ quickload }}")) {
+        function replaceReportContent(html) {
+            if (quickload) {
                 $reportContent.get(0).innerHTML = html;
             } else {
                 $reportContent.html(html);
             }
+        }
+
+
+        /**
+         * Handle a successful AJAX call
+         */
+        function processServerSuccess() {
+            // hideContentPlaceholder();
+            $serverErrorFeedback.hide();
             $reportContent.attr('data-loaded', '1');
             $reportContent.trigger('filterContentLoaded');
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
+
+
+        /**
+         * Action for after the filter's content has been changed
+         * (whether successful or not).
+         */
+        function processReportFetchAlways() {
+            $submitButton.val($submitButton.data('value'));
+            hideFilterLoader();
+            enableInputs();
+            hideContentPlaceholder();
+        }
+
 
         /**
          * Returns the panel's serialised filter option selections in object structure.
