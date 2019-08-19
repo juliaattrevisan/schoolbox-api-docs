@@ -1073,50 +1073,6 @@ class Controller extends Base\Base
 
 
     /**
-     * Save the given template for the given folder
-     *
-     * @param Folder $model
-     * @param int $template
-     */
-    protected function saveHomepageConfig(Folder $model, $template)
-    {
-        $confMapper = $this->homepageConfigMapper;
-        $tplMapper = $this->homepageTemplateMapper;
-
-        $homepageConfig = $confMapper->createModel()->setCategory($model);
-
-        // if homepage is to be removed
-        try {
-            if ($template == HomepageTemplate::HOMEPAGE_REMOVE) {
-                $confMapper->emptyHomepage($homepageConfig);
-                $confMapper->delete($homepageConfig);
-
-            } elseif ($template == HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
-                // we're done. get out.
-                return;
-
-            } elseif ($template > 0) {
-                // if template defined
-                $homepageConfig->setTemplate($tplMapper->findById($template));
-
-                // Save homepage config
-                $confMapper->save($homepageConfig);
-                $confMapper->resetToTemplate($homepageConfig);
-
-            } else {
-                throw new RangeException("Invalid template ID specified");
-            }
-        } catch (BaseMapper\Exception $e) {
-            throw new RangeException("Invalid template ID specified", 0, $e);
-        }
-
-        // Ram it back into its parent object where it belongs
-        $model->setHomepage($homepageConfig);
-
-    }
-
-
-    /**
      * Delete a course specification
      *
      * @api   POST /course/delete/{id}
