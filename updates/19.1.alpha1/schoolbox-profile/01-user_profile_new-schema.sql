@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
     `updated_at`          DATETIME     NOT NULL,
     `deleted_at`          DATETIME     NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
-    PRIMARY KEY (`id`,`sis_user_profile_id`),
+    PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_parent`
         FOREIGN KEY (`sis_user_profile_id`)
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `updated_at`                  DATETIME      NOT NULL,
     `deleted_at`                  DATETIME      NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
-    PRIMARY KEY (`id`,`sis_user_profile_id`),
+    PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_student`
         FOREIGN KEY (`sis_user_profile_id`)
@@ -114,7 +114,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
     `updated_at`           DATETIME     NOT NULL,
     `deleted_at`           DATETIME     NULL,
     INDEX `id_idx` (`sis_user_profile_id` ASC),
-    PRIMARY KEY (`id`,`sis_user_profile_id`),
+    PRIMARY KEY (`sis_user_profile_id`),
     UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_staff`
         FOREIGN KEY (`sis_user_profile_id`)
