@@ -165,7 +165,11 @@ class Controller extends BaseController
             ['parent' => $parent, 'parentId' => $parent->getId()]
         );
 
-        $folder = $this->folderMapper->createModel()->setParent($parent);
+        $folder = $this->folderMapper
+            ->createModel()
+            ->setParent($parent)
+            ->setCodes(new GenericCollection(Code\Model::class))
+            ->setYearLevels(new GenericCollection(YearLevel\Model::class));
         $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
 
@@ -384,6 +388,7 @@ class Controller extends BaseController
      * @throws SchoolboxException
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws DefinitionException
      */
     public function postCreateFolder(Model $parent): void
     {
@@ -405,6 +410,7 @@ class Controller extends BaseController
      * @throws MapperException
      * @throws SchoolboxException
      * @throws PDOException
+     * @throws DefinitionException
      */
     public function postUpdateFolder(Model $folder): void
     {
@@ -797,9 +803,11 @@ class Controller extends BaseController
      *
      * @param ArrayAccess $postData the array structure we'll use to construct this group
      * @param Model       $model    the Folder model we're working with
-     * @param User        $user     the effecting user
-     * @throws \Exception
+     * @param User        $user
      * @return string
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     protected function createGroup($postData, Model $model, User $user)
     {
