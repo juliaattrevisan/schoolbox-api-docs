@@ -79,7 +79,7 @@ class Base
         return null;
     }
 
-    public function setFormParam(string $key, ?string $value)
+    public function setFormParam(string $key, $value)
     {
         $this->structure['payload']['form_params'][$key]=$value;
     }
