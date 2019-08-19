@@ -32,7 +32,16 @@ class AssessmentOnGroupCest {
         $i->loginAdmin2();
     }
 
-    public function createAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
+    /** Creates an assessment using a curl payload
+     *
+     * Fires off creation of a group homepage folder.
+     *
+     * @param IntegrationTester $i
+     * @param AssessmentPayload $newAssessmentRequest
+     * @throws Exception
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function createAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest):void
     {
         #GIVEN
         $timestamp = time();
@@ -62,24 +71,16 @@ class AssessmentOnGroupCest {
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 
-    /**        $student = $i->getUser('drhodes');
-    $teacher = $i->getUser('zsmith');
-    $admin = $i->getUser('alaress');
-
-    $memberPayload = new GroupMember();
-    $memberPayload->setFolderGroup($groupPage->getId());
-    $memberPayload->setNewMember($student->getId());
-    $memberPayload->setNewMember($admin->getId());
-    $memberPayload->setNewMember($teacher->getId());
-    $i->sendCurlRequest($memberPayload, false, 'Add group members to homepage #'.$homePage->getId());
-
-    $memberPayload->resetMemberAdjustmentList();
-    $memberPayload->setNewMemberPermission($student->getId(), 'read');
-    $memberPayload->setNewMemberPermission($teacher->getId(), 'write');
-    $memberPayload->setNewMemberPermission($admin->getId(), 'admin');
-    $i->sendCurlRequest($memberPayload, false, 'Add group members permissions to homepage #'.$homePage->getId());
-    */
-
+    /** Updates an assessment using a curl payuload.
+     *
+     * Fires off creation of a group homepage folder and create assessment.
+     *
+     * @param IntegrationTester $i
+     * @param AssessmentPayload $newAssessmentRequest
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function updateAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
     {
         #GIVEN
@@ -130,6 +131,16 @@ class AssessmentOnGroupCest {
         $i->checkCurlReturn($expectedUrlsReturned, $update_response);
     }
 
+    /** Creates an assessment that has a rubric grid set for its mark.
+     *
+     * Fires off creation of a group homepage folder.
+     *
+     * @param IntegrationTester $i
+     * @param AssessmentPayload $newAssessmentRequest
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function createAssessmentWithRubric(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
     {
         #GIVEN
@@ -161,6 +172,16 @@ class AssessmentOnGroupCest {
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 
+    /**Submits an assessment on behalf of the student using a curl payload.
+     *
+     * Fires off creation of a group homepage folder and create assessment.
+     *
+     * @param IntegrationTester $i
+     * @param AssessmentPayload $newAssessmentRequest
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function submitAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
     {
         #GIVEN
@@ -219,6 +240,17 @@ class AssessmentOnGroupCest {
 
     }
 
+    /**Marks an assessment with a rubric using a curl payload.
+     *
+     * Fires off creation of a group homepage folder and create assessment with rubric grid for mark and submission on behalf of student.
+     *
+     * @param IntegrationTester     $i
+     * @param AssessmentPayload     $newAssessmentRequest
+     * @param AssessmentMarkPayload $newMarkRequest
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function markAssessmentWithRubric(IntegrationTester $i, AssessmentPayload $newAssessmentRequest, AssessmentMarkPayload $newMarkRequest)
     {
         #GIVEN
@@ -280,6 +312,17 @@ class AssessmentOnGroupCest {
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
 
+    /**Marks an assessment using a curl payload.
+     *
+     * Fires off creation of a group homepage folder and create assessment for mark and submission on behalf of student.
+     *
+     * @param IntegrationTester     $i
+     * @param AssessmentPayload     $newAssessmentRequest
+     * @param AssessmentMarkPayload $newMarkRequest
+     * @throws Deleted
+     * @throws Exception
+     * @throws \Schoolbox\Mapper\Exception
+     */
     public function markAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest, AssessmentMarkPayload $newMarkRequest)
     {
         #GIVEN
@@ -338,107 +381,5 @@ class AssessmentOnGroupCest {
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
-    }
-
-
-
-    /**
-     * Smoke test assessment post forms include following actions:
-     * Add assessment to created homepage
-     * Update assesssment
-     * Create assessment with rubric
-     * Submit assessment on behalf of student
-     * Mark assessment with rubric
-     * Mark normal assessment
-     *
-     * Each of these in the future itteration should be split into sepperate test functions.
-     *
-     * @param IntegrationTester $i
-     *
-     * @throws GuzzleException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws Deleted
-     * @throws Exception
-     *
-     *
-     */
-    public function SmokeAssessmentPOST(IntegrationTester $i):void
-    {
-        #GIVEN
-        $i->loginAdmin(); #we logged in as alaress
-        $homepage_title='Testing Home Page for Assessment';
-        $i->createHomepage($homepage_title);
-        $homePageId=$i->getFirstHomepageIdByTitle($homepage_title);
-        $i->addDefaultUsersToHomepage($homePageId);
-        $student = $i->getUser('drhodes');
-        $admin = $i->getUser('alaress');
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
-
-        #WHEN
-        /** @var Response $response */
-        $response = $i->createAssessmentOnHomepage($assessment_title,$homePageId);
-        $expectedUrlsReturned= [
-            ['https://vagrant.dev.schoolbox.cloud/homepage/'.$homePageId=>'303'],
-            [GuzzleConstants::NO_REDIRECT=>'200']
-        ];
-
-        #THEN
-        $i->comment('Created homepage and added assessment to it');
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
-
-
-
-        #WHEN
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' Edit it 3';
-        $i->createAssessmentOnHomepage($assessment_title, $homePageId);
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $determine_mark_response = $i->determineMarkInvalidation($homePageId, $assessmentPageId, $assessment_title);
-        $update_response = $i->updateAssessmentOnHomepage($homePageId, $assessmentPageId, $assessment_title);
-        $expectedUrlsReturned= [[GuzzleConstants::NO_REDIRECT=>'200']];
-
-        #THEN
-        $i->comment('Updated Assessment');
-        $i->checkCurlReturn($expectedUrlsReturned, $determine_mark_response);
-        $i->checkCurlReturn($expectedUrlsReturned, $update_response);
-
-        #WHEN
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
-        $response = $i->createAssessementForHomepageWithRubric($assessment_title,$homePageId);
-
-        #THEN
-        $i->comment('Create Assessment with rubric for a homepage');
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
-
-        #WHEN
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $response = $i->submitAssessment($assessmentPageId, $student->getId());
-
-        #THEN
-        $i->comment('Submit assessment on behalf of student');
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
-
-        #WHEN
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId.' With Rubric';
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $i->submitAssessment($assessmentPageId, $student->getId());
-
-        #THEN
-        $response = $i->markAssessmentWithRubric($assessmentPageId, $admin->getId(), $student->getId());
-        $i->comment('Mark assessment with rubric');
-
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
-
-        #WHEN
-        $assessment_title='Testing Assessment On Homepage ID '.$homePageId;
-        $assessmentPageId=$i->getFirstAssessmentIdByTitle($assessment_title);
-        $response = $i->markAssessment($assessmentPageId, $admin->getId(), $student->getId());
-
-        #THEN
-        $i->comment('Mark normal assessment');
-        $i->checkCurlReturn($expectedUrlsReturned, $response);
-
-        ##To Do - Submit reflection on assessment.
-
     }
 }
