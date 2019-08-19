@@ -509,7 +509,7 @@ class Controller extends BaseController
         }
 
         // Colour
-        if($colour){
+        if ($colour) {
             try {
                 $folder->setColour((new ColorFactory())->build($colour));
             } catch (InvalidArgumentException $e) {
@@ -521,7 +521,7 @@ class Controller extends BaseController
         }
 
         // Validate class codes (prior to saving anything)
-        if($user->isSuperuser() && !$folder->getInherit()){
+        if ($user->isSuperuser() && !$folder->getInherit()) {
             foreach ($classCodes as $code) {
                 if (strlen(trim($code)) > 20) {
                     throw $this->errorMapper->generateException(ErrorMapper::ERROR_CODE_TOO_LONG);
@@ -547,26 +547,26 @@ class Controller extends BaseController
         $this->updateHomepageTemplate($folder, $homepageTemplate);
 
         // Persist curriculum code joins
-        if($nodesToRemove->count()){
+        if ($nodesToRemove->count()) {
             $this->curriculumNodeMapper->delete($nodesToRemove);
         }
-        if($nodesToAdd->count()){
+        if ($nodesToAdd->count()) {
             $this->curriculumNodeMapper->save($nodesToRemove);
         }
 
         // Update role perms
-        if($rolePermsToSave->count()){
+        if ($rolePermsToSave->count()) {
             $this->roleAccessMapper->save($rolePermsToSave);
         }
 
         // only allow recursive permissions to supers
-        if(($recursePermissions || $recurseYearLevels) && $user->isSuperuser()){
-            foreach($this->folderMapper->findAllChildren($folder->getId(), true) as $descendant){
-                if($recursePermissions){
+        if (($recursePermissions || $recurseYearLevels) && $user->isSuperuser()) {
+            foreach ($this->folderMapper->findAllChildren($folder->getId(), true) as $descendant) {
+                if ($recursePermissions) {
                     // Mapper post-save will handle the group/role permission + folder-code clean up for us
                     $descendant->enableInherit();
                 }
-                if($recurseYearLevels){
+                if ($recurseYearLevels) {
                     $this->updateFolderYearLevels($descendant, $yearLevelIds);
                 }
                 $this->folderMapper->save($descendant);
@@ -592,22 +592,22 @@ class Controller extends BaseController
             /** @var GenericCollection|RoleAccess[] $existingRolePerms */
             $existingRolePerms = $folder->getId()
                 ? $this->roleAccessMapper->findAllForFolder($folder)->indexByCallback(
-                    static function (RoleAccess $roleAccess){
+                    static function (RoleAccess $roleAccess) {
                         return $roleAccess->getRole()->getId();
                     })
                 : $this->roleAccessMapper->createCollection();
 
-            foreach($rolePermissions as $roleId => $permissionLevel){
+            foreach ($rolePermissions as $roleId => $permissionLevel) {
                 $existingPerm = $existingRolePerms[$roleId];
-                if($existingPerm && $existingPerm->getType() !== (int)$permissionLevel){
+                if ($existingPerm && $existingPerm->getType() !== (int)$permissionLevel) {
                     $existingPerm->setType($permissionLevel);
                     $rolePermsToSave[$roleId] = $existingPerm;
                 } else {
-                    $rolePerm = $this->roleAccessMapper->createModel()
+                    $rolePermsToSave[$roleId] = $this->roleAccessMapper
+                        ->createModel()
                         ->setCategory($folder)
                         ->setRole(RoleMapper::getInstance()->createModel($roleId))
                         ->setType($permissionLevel);
-                    $rolePermsToSave[$roleId] = $rolePerm;
                 }
             }
         }
@@ -654,11 +654,10 @@ class Controller extends BaseController
                     }
                 }
                 if (!$found) {
-                    $codeModel = $this->classCodeMapper
+                    $folder->getCodes()[$newCode] = $this->classCodeMapper
                         ->createModel()
                         ->setFolder($folder)
                         ->setCode($newCode);
-                    $folder->getCodes()[$codeModel->getCode()] = $codeModel;
                 }
             }
         }
@@ -702,7 +701,7 @@ class Controller extends BaseController
     {
         // Ensure nodes are indexed by node.id
         $folder->getCurriculumNodes()->indexByCallback(
-            static function(Curriculum\Node\Model $node){
+            static function (Curriculum\Node\Model $node) {
                 return $node->getId();
             }
         );
@@ -792,31 +791,6 @@ class Controller extends BaseController
         $this->homepageConfigMapper->save($homepageConfig);
         $this->homepageConfigMapper->resetToTemplate($homepageConfig);
     }
-
-    /**
-     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
-     *
-     * @param Model $model
-     * @throws \Exception
-     */
-    protected function recurseInheritance(Model $model)
-    {
-        /* Find all the unique folder ids that need their memberships purged
-         */
-        $deleteFolderMemberships = array_values($this->folderMapper->recurseInheritance($model));
-
-        if (!empty($deleteFolderMemberships)) {
-            // If inheriting permissions we need to remove any user access permissions...
-            $this->userAccessMapper->deleteByColumnList([
-                "sid"     => $deleteFolderMemberships,
-                "service" => UserAccess::SERVICE_HOMEPAGE,
-            ]);
-
-            // ...and role permissions
-            $this->roleAccessMapper->deleteByColumn("cid", $deleteFolderMemberships);
-        }
-    }
-
 
     /**
      * Helper function to persist a group for a folder
