@@ -15,7 +15,9 @@ use Calendar\Event\Type\Submission\Event;
 use Calendar_Api_EventType_Interface;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 
 /**
  * Implementation of the calendar API for the assessment calendar.
@@ -29,13 +31,29 @@ class Api implements Calendar_Api_EventType_Interface
 
 
     /**
+     * @var User
+     */
+    private $viewer;
+
+
+    /**
+     * @var Visibility
+     */
+    private $visibility;
+
+
+    /**
      * Constructor
      *
+     * @param User                 $viewer
      * @param AssessmentDataSource $assessmentDataSource
+     * @param Visibility           $visibility
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource)
+    public function __construct(User $viewer, AssessmentDataSource $assessmentDataSource, Visibility $visibility)
     {
+        $this->viewer               = $viewer;
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->visibility           = $visibility;
     }
 
 
@@ -104,6 +122,9 @@ class Api implements Calendar_Api_EventType_Interface
         }
 
         // Current user doesn't have permission?
+        if (!$this->visibility->isVisibleToUser($assessment, $this->viewer, true)) {
+            return null;
+        }
 
         $event = new Event();
 

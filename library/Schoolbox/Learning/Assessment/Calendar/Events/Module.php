@@ -13,6 +13,8 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -58,6 +60,11 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
+            'visibility'           => $injector->lazy(function () {
+                /** @var Access $access */
+                $access = $this->getMapperFactory()->get(Access::class);
+                return new Visibility($access);
+            }),
         ];
     }
 }

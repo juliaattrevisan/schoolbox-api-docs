@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
+use Schoolbox\Learning\Assessment\Visibility;
 
 /**
  * Controller for retrieving calendar events for the assessment calendar.
@@ -21,14 +22,23 @@ class Controller extends Base
      */
     private $assessmentDataSource;
 
+
+    /**
+     * @var Visibility
+     */
+    private $visibility;
+
+
     /**
      * Constructor
      *
      * @param AssessmentDataSource $assessmentDataSource
+     * @param Visibility           $visibility
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource)
+    public function __construct(AssessmentDataSource $assessmentDataSource, Visibility $visibility)
     {
         $this->assessmentDataSource = $assessmentDataSource;
+        $this->visibility           = $visibility;
     }
 
 
@@ -43,7 +53,7 @@ class Controller extends Base
         // Must have:
         // start and end dates, not greater than 2 months between?
         $calendar = new Renderer(
-            new Api($this->assessmentDataSource),
+            new Api($this->getUser(), $this->assessmentDataSource, $this->visibility),
             $this->request->query->getInt('start'),
             $this->request->query->getInt('end'),
             $this->getUser(),
