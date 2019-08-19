@@ -5,13 +5,27 @@ Usage:
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning'], [locale.assessment.proper ~ ' Calendar']) }}
+{% set reportContentId = 'calendarDataTODO' %}
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        // Filtered content has been [re]loaded
+        // (Shouldn't this trigger contain the filters that are selected?)
+        $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+            // Somehow pass the list of filters into the Vue calendar.
+            // I guess put it in a global var, and then trigger some change
+            // somewhere?
+            console.log(selectedFilters);
+        });
+    });
+</script>
+{% endautoescape %}
 
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ locale.assessment.proper }} Calendar</h1>
         <section class="content">
-            {% set reportContentId = 'calendarDataTODO' %}
-
             {% include '@filters/panel.twig' with {
                 contentId: reportContentId,
                 panel:     filterPanel,
