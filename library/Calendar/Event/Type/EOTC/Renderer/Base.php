@@ -9,10 +9,10 @@
 
 namespace Calendar\Event\Type\EOTC\Renderer;
 
+use Aura\Di\ContainerInterface;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\EOTC;
 use Schoolbox\User;
-use SitePage;
 
 
 abstract class Base extends RendererBase
@@ -21,14 +21,16 @@ abstract class Base extends RendererBase
     private $event;
 
     /**
-     * @param SitePage   $page
-     * @param EOTC\Event $event
-     * @param User       $user
-     * @param User       $viewer
+     * Constructor
+     *
+     * @param ContainerInterface $di
+     * @param EOTC\Event         $event
+     * @param User               $user
+     * @param User               $viewer
      */
-    public function __construct(SitePage $page, EOTC\Event $event, User $user, User $viewer)
+    public function __construct(ContainerInterface $di, EOTC\Event $event, User $user, User $viewer)
     {
-        parent::__construct($page, $user, $viewer);
+        parent::__construct($di, $user, $viewer);
         $this->event = $event;
     }
 

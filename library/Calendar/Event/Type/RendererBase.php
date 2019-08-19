@@ -10,9 +10,8 @@ namespace Calendar\Event\Type;
 use Alaress\Authorizer\Authorizer;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use \SitePage;
+use Schoolbox\User;
 use Twig_Environment;
-use \Schoolbox\User;
 
 abstract class RendererBase implements RendererInterface
 {
@@ -30,26 +29,27 @@ abstract class RendererBase implements RendererInterface
      */
     var $viewer;
 
+    /**
+     * DI container
+     *
+     * TODO once template engine is removed, remove this and only inject the authorizer and router
+     * Whilst this is better than including SitePage this is still iffy:
+     * including a service locator introduces unknowable hidden dependencies.
+     *
+     * @var ContainerInterface
+     */
+    private $di;
+
 
     /**
-     * SitePage
+     * Constructor
      *
-     * @var SitePage
+     * @param ContainerInterface $di
+     * @param User               $user
+     * @param User               $viewer
      */
-    var $page;
-
-    /**
-     * TODO this does not need a SitePage, it needs a DI
-     * Even that is iffy: introducing a service locator still introduces untold hidden dependencies
-     *
-     * TODO after that, only inject the DI's authorizer and router
-     *
-     * @param SitePage $page
-     * @param User $user
-     * @param User $viewer
-     */
-    public function __construct(SitePage $page, User $user, User $viewer) {
-        $this->setPage($page);
+    public function __construct(ContainerInterface $di, User $user, User $viewer) {
+        $this->di = $di;
         $this->setUser($user);
         $this->setViewer($viewer);
     }
@@ -62,8 +62,9 @@ abstract class RendererBase implements RendererInterface
      *
      * @return Twig_Environment
      */
-    public function getTemplate() {
-        return $this->page->getDi()->get('templateEngine');
+    public function getTemplate(): Twig_Environment
+    {
+        return $this->di->get('templateEngine');
     }
 
 
@@ -100,38 +101,6 @@ abstract class RendererBase implements RendererInterface
     }
 
     /**
-     * @return SitePage
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * @param SitePage $page
-     */
-    public function setPage($page)
-    {
-        $this->page = $page;
-    }
-
-    /**
-     * @param mixed $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler)
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCalendarHandler()
-    {
-        return $this->calendarHandler;
-    }
-
-    /**
      * Helper function - gets whether access to a route is allowed.
      *
      * TODO inject only what is required for this, not the entire DI
@@ -152,16 +121,16 @@ abstract class RendererBase implements RendererInterface
     /**
      * @return Authorizer
      */
-    public function getAuthorizer()
+    public function getAuthorizer(): Authorizer
     {
-        return $this->getPage()->getDi()->get('authorizer');
+        return $this->di->get('authorizer');
     }
 
     /**
      * @return Router
      */
-    public function getRouter()
+    public function getRouter(): Router
     {
-        return $this->getPage()->getDi()->get('router');
+        return $this->di->get('router');
     }
 }

@@ -95,7 +95,7 @@ if (count($affectedIds) == 1) {
         // Only one event should ever be gotten here, so render that one only
         /** @var \Schoolbox\User $user */
         $user     = $_SESSION['user'];
-        $renderer = new Javascript(new SitePage(), $calendarEvent, $user, $user);
+        $renderer = new Javascript($page->getDi(), $calendarEvent, $user, $user);
         $output   = $renderer->render();
         echo $output;
         break;
