@@ -162,6 +162,7 @@ Data:
 
 <script src="/javascript/components/schoolbox-vue.min.js"></script>
 
+{% autoescape 'js' %}
 <script type="text/javascript">
     var postHeaders = {
         'X-Requested-With' : 'XMLHttpRequest',
@@ -173,8 +174,8 @@ Data:
         el: '#email-class-lists',
         delimiters: ['${', '}'],
         data: {
-            subjectName: '{{ folder.name | escape('js') }}',
-            classCode: '{{ folder.codeString | escape('js') }}',
+            subjectName: '{{ folder.name }}',
+            classCode: '{{ folder.codeString }}',
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
             specialNeeds: '{{ specialNeeds }}',
@@ -399,3 +400,4 @@ Data:
         }
     });
 </script>
+{% endautoescape %}
