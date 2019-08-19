@@ -143,33 +143,44 @@ Usage:
                 showContentPlaceholder();
             }
 
-            $.post(href, data)
-                .success(function(response){
+            if (href) {
+                $.post(href, data)
+                    .success(function(response){
 
-                    // Did we get not get JSON ?
-                    if('object' !== typeof response){
-                        processServerError(response);
-                        return;
-                    }
+                        // Did we get not get JSON ?
+                        if('object' !== typeof response){
+                            processServerError(response);
+                            return;
+                        }
 
-                    // Was an exception thrown?
-                    if(200 !== response.status){
-                        renderExceptionThrown(response.code, response.message, response.line, response.file);
-                        return;
-                    }
+                        // Was an exception thrown?
+                        if(200 !== response.status){
+                            renderExceptionThrown(response.code, response.message, response.line, response.file);
+                            return;
+                        }
 
-                    updateHistoryState(data);
-                    processServerSuccess(response.content);
-                })
-                .fail(function(response){
-                    processServerError(response.responseText);
-                })
-                .always(function() {
-                    $submitButton.val($submitButton.data('value'));
-                    hideFilterLoader();
-                    enableInputs();
-                    hideContentPlaceholder();
-                });
+                        updateHistoryState(data);
+                        processServerSuccess(response.content);
+                    })
+                    .fail(function(response){
+                        processServerError(response.responseText);
+                    })
+                    .always(function() {
+                        $submitButton.val($submitButton.data('value'));
+                        hideFilterLoader();
+                        enableInputs();
+                        hideContentPlaceholder();
+                    });
+            } else {
+                // Something happens here with data?
+                updateHistoryState(data);
+                processServerSuccess('');
+
+                $submitButton.val($submitButton.data('value'));
+                hideFilterLoader();
+                enableInputs();
+                hideContentPlaceholder();
+            }
         }
 
         /**

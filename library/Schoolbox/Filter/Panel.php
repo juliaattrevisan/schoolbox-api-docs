@@ -40,10 +40,11 @@ class Panel
 
     /**
      * @param string                         $page
-     * @param string                         $route      The route to send the filter selections to
+     * @param string|null                    $route      The route to send the filter selections to.
+     *                                                   If null, don't send anywhere.
      * @param GenericCollection|IComponent[] $components The set of filters to display in this panel instance
      */
-    public function __construct(string $page, string $route, GenericCollection $components)
+    public function __construct(string $page, ?string $route, GenericCollection $components)
     {
         $this->page       = $page;
         $this->route      = $route;

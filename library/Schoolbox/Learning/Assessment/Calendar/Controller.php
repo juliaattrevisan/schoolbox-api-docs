@@ -68,11 +68,17 @@ class Controller extends Base
         $queryArgs = $this->request->query->getArrayCopy();
         unset($queryArgs['page']);
 
+        // This filter panel does not post anywhere when its filters change.
+        // Any on-change action is handled by the full calendar component.
         $page        = Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR;
-//        $route       = $this->getRouter()->generate('learningAssessmentCalendar.postReport');
-        // This route goes nowhere: all is contained on the FullCalendar
-        $route       = '#';
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), [], $queryArgs);
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            null,
+            $this->getUser(),
+            [],
+            $queryArgs
+        );
 
         $this->response->content->set(
             $this->buildHtmlOutput(
