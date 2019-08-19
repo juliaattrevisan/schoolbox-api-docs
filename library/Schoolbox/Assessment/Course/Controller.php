@@ -472,7 +472,7 @@ class Controller extends Base\Base
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_course_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
-                $templateID = null;
+                $templateID = HomepageTemplate::HOMEPAGE_NONE;
             } else {
                 $templateID = (int)$templateID;
             }
@@ -722,7 +722,7 @@ class Controller extends Base\Base
 
             $templateID = $this->getConfigLoader()->get('course_builder_default_unit_page_template');
             if ($this->homepageTemplateMapper->countByColumn('id', $templateID) === 0) {
-                $templateID = null;
+                $templateID = HomepageTemplate::HOMEPAGE_NONE;
             } else {
                 $templateID = (int)$templateID;
             }
@@ -792,7 +792,7 @@ class Controller extends Base\Base
         int $parentId,
         array $curriculumCodeIds,
         bool $inherit,
-        ?int $templateId,
+        int $templateId,
         array $rolePermissions,
         bool $recursePermissions,
         array $classCodes

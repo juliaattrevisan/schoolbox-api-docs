@@ -218,7 +218,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateInheritedPermissions']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateFolderCodes']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'unMuteClassNotifications']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveHomepageConfig']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCourseSpecification']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'refreshNotificationRedirects']);
 
@@ -664,28 +663,6 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 'delivery'      => RoutePermission::MUTE,
                 'msg_route_key' => "service.1.{$model->getId()}"
             ]);
-        }
-
-        return true;
-    }
-
-    /**
-     * Post-save callback - saves a homepage config for newly created folders.
-     *
-     * @param Model $model
-     * @param Model $previous
-     * @return bool
-     * @throws DefinitionException If specified join not defined
-     */
-    public function saveHomepageConfig($model, $previous = null)
-    {
-        if (!isset($previous)) {
-            $homepage = $model->getHomepage();
-            if ($homepage instanceof HomepageConfig && $homepage->getTemplate()->getId()) {
-                $model->getHomepage()->setCategory($model);
-                $homepageConfigMapper = $this->getJoinMapper('homepages');
-                $homepageConfigMapper->save($model->getHomepage());
-            }
         }
 
         return true;

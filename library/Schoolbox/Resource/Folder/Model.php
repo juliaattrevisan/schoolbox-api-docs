@@ -17,6 +17,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Resource;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Browser\NodeInterface;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
@@ -44,11 +45,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     use DeletedAtDate;
 
     /**
-     * A homepage instance
+     * A homepage instance (if this folder has one)
      *
-     * @var \Schoolbox\Resource\HomepageConfig
+     * @var null|Resource\HomepageConfig
      */
-    protected $homepage;
+    private $homepage;
 
     /**
      * A collection of FolderCode() instances
@@ -431,10 +432,10 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Set homepage
      *
-     * @param \Schoolbox\Resource\HomepageConfig $homepage
+     * @param null|Resource\HomepageConfig $homepage
      * @return $this
      */
-    public function setHomepage($homepage)
+    public function setHomepage(?Resource\HomepageConfig $homepage): self
     {
         $this->homepage = $homepage;
         return $this;
@@ -443,9 +444,9 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * Get homepage
      *
-     * @return \Schoolbox\Resource\HomepageConfig
+     * @return Resource\HomepageConfig
      */
-    public function getHomepage()
+    public function getHomepage(): ?Resource\HomepageConfig
     {
         return $this->homepage;
     }

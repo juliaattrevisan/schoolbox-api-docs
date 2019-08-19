@@ -34,6 +34,7 @@ use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
+use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
@@ -215,14 +216,14 @@ class Controller extends BaseController
         // Homepage template
         $homepageTemplates = $this->homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
         if (!$folder->getId()) {
-            $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
+            $templateId = HomepageTemplate::HOMEPAGE_NONE;
         } else {
             try {
                 $this->homepageConfigMapper->findOneByColumn('cid', $folder->getId());
-                $templateId = HomepageTemplateMapper::TEMPLATE_KEEP_EXISTING;
+                $templateId = HomepageTemplate::HOMEPAGE_KEEP_EXISTING;
                 $homepageTemplates->prepend($this->homepageTemplateMapper->getKeepExistingHomepageTemplate());
             } catch (\Exception $e) {
-                $templateId = HomepageTemplateMapper::TEMPLATE_NONE;
+                $templateId = HomepageTemplate::HOMEPAGE_NONE;
             }
         }
 
@@ -451,7 +452,7 @@ class Controller extends BaseController
      * @param Model    $folder             The folder to persist
      * @param string   $name
      * @param bool     $inherit
-     * @param int|null $templateId
+     * @param int      $templateId
      * @param string   $colour
      * @param string   $coverImage
      * @param array    $curriculumCodeIds
@@ -474,7 +475,7 @@ class Controller extends BaseController
         Model $folder,
         string $name,
         bool $inherit,
-        ?int $templateId,
+        int $templateId,
         ?string $colour,
         ?string $coverImage,
         array $curriculumCodeIds,
@@ -486,6 +487,7 @@ class Controller extends BaseController
         User $user
     ): Model {
         $folder->setName($name);
+        $homepageTemplate = $this->buildHomepageTemplate($folder, $templateId);
 
         // Either user is SU, or insertion of new Folder, or Folder did not have Class Codes
         if ($inherit && ($user->isSuperuser() || !$folder->getId() || !$folder->getCodes()->count())) {
@@ -542,6 +544,8 @@ class Controller extends BaseController
         // Save folder (also persists class-codes + year-level joins)
         $this->folderMapper->save($folder);
 
+        $this->updateHomepageTemplate($folder, $homepageTemplate);
+
         // Persist curriculum code joins
         if($nodesToRemove->count()){
             $this->curriculumNodeMapper->delete($nodesToRemove);
@@ -554,9 +558,6 @@ class Controller extends BaseController
         if($rolePermsToSave->count()){
             $this->roleAccessMapper->save($rolePermsToSave);
         }
-
-        // HomepageConfig definition
-        $this->saveHomepageConfig($folder, $templateId);
 
         // only allow recursive permissions to supers
         if(($recursePermissions || $recurseYearLevels) && $user->isSuperuser()){
@@ -727,50 +728,70 @@ class Controller extends BaseController
         return [$nodesToRemove, $nodesToAdd];
     }
 
+    /**
+     * Validates and returns new homepage template
+     *
+     * @param Model $model
+     * @param int   $templateId
+     * @return HomepageTemplate
+     * @throws MapperException
+     * @throws RangeException
+     */
+    private function buildHomepageTemplate(Model $model, int $templateId): HomepageTemplate
+    {
+        if ($templateId === HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
+            return $this->homepageTemplateMapper->getKeepExistingHomepageTemplate();
+        }
+        if ($templateId === HomepageTemplate::HOMEPAGE_NONE) {
+            return $this->homepageTemplateMapper->getNoHomepageTemplate();
+        }
+
+        // Avoid a DB call if user selected current template
+        $oldHomepage = $model->getHomepage();
+        if ($oldHomepage && $oldHomepage->getTemplate()->getId() === $templateId) {
+            return $oldHomepage->getTemplate();
+        }
+
+        // Check new template exists and return it.
+        try {
+            return $this->homepageTemplateMapper->findById($templateId);
+        } catch (MapperException $e) {
+            throw new RangeException("Invalid template ID specified", 0, $e);
+        }
+    }
 
     /**
      * Save the given template for the given folder
      *
-     * @param Model $model
-     * @param int          $template
-     * @throws RangeException if the specified template is not acceptable
+     * @param Model            $folder
+     * @param HomepageTemplate $homepageTemplate
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    protected function saveHomepageConfig(Model $model, $template)
+    private function updateHomepageTemplate(Model $folder, HomepageTemplate $homepageTemplate): void
     {
-        $confMapper = $this->homepageConfigMapper;
-        $tplMapper  = $this->homepageTemplateMapper;
-
-        $homepageConfig = $confMapper->createModel()->setCategory($model);
-
-        // if homepage is to be removed
-        try {
-            if ($template == HomepageTemplate::HOMEPAGE_REMOVE) {
-                $confMapper->emptyHomepage($homepageConfig);
-                $confMapper->delete($homepageConfig);
-
-            } elseif ($template == HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
-                // we're done. get out.
-                return;
-
-            } elseif ($template > 0) {
-                // if template defined
-                $homepageConfig->setTemplate($tplMapper->findById($template));
-
-                // Save homepage config
-                $confMapper->save($homepageConfig);
-                $confMapper->resetToTemplate($homepageConfig);
-
-            } else {
-                throw new RangeException("Invalid template ID specified");
+        if ($homepageTemplate->getId() === HomepageTemplate::HOMEPAGE_KEEP_EXISTING) {
+            return;
+        }
+        if ($homepageTemplate->getId() === HomepageTemplate::HOMEPAGE_NONE) {
+            if ($folder->getHomepage()) {
+                $this->homepageConfigMapper->emptyHomepage($folder->getHomepage());
+                $this->homepageConfigMapper->delete($folder->getHomepage());
             }
-        } catch (MapperException $e) {
-            throw new RangeException("Invalid template ID specified", 0, $e);
+            $folder->setHomepage(null);
+            return;
         }
 
-        // Ram it back into its parent object where it belongs
-        $model->setHomepage($homepageConfig);
-    }
+        $homepageConfig = $this->homepageConfigMapper
+            ->createModel()
+            ->setCategory($folder)
+            ->setTemplate($homepageTemplate);
+        $folder->setHomepage($homepageConfig);
 
+        $this->homepageConfigMapper->save($homepageConfig);
+        $this->homepageConfigMapper->resetToTemplate($homepageConfig);
+    }
 
     /**
      * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
