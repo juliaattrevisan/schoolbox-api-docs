@@ -54,13 +54,13 @@
                 // Naivest implementation: check length
                 switch (filterKey) {
                     case 'source':
-                        return this.sources.length === this.selected.source.length;
+                        return this.sources.length === (this.selected?.source || []).length;
                     case 'group':
-                        return this.groups.length === this.selected.group.length;
+                        return this.groups.length === (this.selected?.group || []).length;
                     case 'campus':
-                        return this.campuses.length === this.selected.campus.length;
+                        return this.campuses.length === (this.selected?.campus || []).length;
                     case 'eventType':
-                        return this.eventTypes.length === this.selected.eventType.length;
+                        return this.eventTypes.length === (this.selected?.eventType || []).length;
                     default:
                         return false;
                 }
