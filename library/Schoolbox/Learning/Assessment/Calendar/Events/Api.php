@@ -97,6 +97,14 @@ class Api implements Calendar_Api_EventType_Interface
             return null;
         }
 
+        // Not published yet?
+        // TODO shouldn't this be handled in the request?
+        if ($assessment->getPublishAt()->gt(Alaress_Date_Format::now())) {
+            return null;
+        }
+
+        // Current user doesn't have permission?
+
         $event = new Event();
 
         $event->setAssessment($assessment);
