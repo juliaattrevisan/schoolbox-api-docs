@@ -617,15 +617,12 @@ class Controller extends Base
         $source
             ->setStatus($this->getRequest()->query['status']);
 
-        /** @var \SitePage $sitepage */
-        $sitepage = $this->getDi()->get('sitePage');
-
         $calendar = new Renderer(
             $source,
             (int)$this->getRequest()->query['start'],
             (int)$this->getRequest()->query['end'],
             $this->getUser(),
-            $sitepage,
+            $this->getDi(),
             $this->getUser()
         );
 

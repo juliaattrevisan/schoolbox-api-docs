@@ -55,7 +55,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $this->start->getUnixTimeStamp(),
             $this->end->getUnixTimeStamp(),
             $this->getUser(),
-            $this->getSitePage(),
+            $this->getSitePage()->getDi(),
             $this->getUser()
         );
 

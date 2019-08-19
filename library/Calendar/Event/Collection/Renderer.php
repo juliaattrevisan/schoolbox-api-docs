@@ -9,6 +9,7 @@
 
 namespace Calendar\Event\Collection;
 
+use Aura\Di\ContainerInterface;
 use Calendar_Api_EventType_Interface;
 use SitePage;
 use Calendar\Event\Collection;
@@ -28,8 +29,10 @@ class Renderer
     /** @var int $endTimestamp A unix timestamp */
     private $endTimestamp;
 
-    /** @var SitePage $page An instance of sitepage */
-    private $page;
+    /**
+     * @var ContainerInterface
+     */
+    private $di;
 
     /** @var User */
     private $user;
@@ -48,7 +51,7 @@ class Renderer
      * @param int                              $startTimestamp
      * @param int                              $endTimestamp
      * @param User                             $user
-     * @param SitePage                         $page
+     * @param ContainerInterface               $di
      * @param User                             $viewer
      */
     public function __construct(
@@ -56,14 +59,14 @@ class Renderer
         int $startTimestamp,
         int $endTimestamp,
         User $user,
-        Sitepage $page,
+        ContainerInterface $di,
         User $viewer
     ) {
         $this->api            = $api;
         $this->startTimestamp = $startTimestamp;
         $this->endTimestamp   = $endTimestamp;
         $this->user           = $user;
-        $this->page           = $page;
+        $this->di             = $di;
         $this->viewer         = $viewer;
 
         $this->allEvents = new Collection();
@@ -118,7 +121,7 @@ class Renderer
         $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
-            $this->page->getDi(),
+            $this->di,
             $event,
             $this->user,
             $this->viewer
@@ -149,17 +152,6 @@ class Renderer
     protected function getStartTimestamp(): int
     {
         return $this->startTimestamp;
-    }
-
-
-    /**
-     * Get page
-     *
-     * @return Sitepage
-     */
-    protected function getPage(): SitePage
-    {
-        return $this->page;
     }
 
 

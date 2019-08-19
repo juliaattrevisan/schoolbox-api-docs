@@ -10,6 +10,7 @@
 
 namespace Calendar\Event\Collection;
 
+use Aura\Di\ContainerInterface;
 use Calendar\Event\Collection;
 use Schoolbox\User;
 
@@ -25,9 +26,19 @@ class Lister extends Renderer
      * @param \SitePage $page
      * @param User $viewer          Who is viewing the Calendar
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
+    /**
+     * Constructor
+     *
+     * @param                    $api
+     * @param                    $startTimestamp
+     * @param                    $endTimestamp
+     * @param User               $user           Who the Calendar is about
+     * @param ContainerInterface $di
+     * @param User               $viewer         Who is viewing the Calendar
+     */
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, ContainerInterface $di, User $viewer)
     {
-        parent::__construct($api, $startTimestamp, $endTimestamp, $user, $page, $viewer);
+        parent::__construct($api, $startTimestamp, $endTimestamp, $user, $di, $viewer);
 
         /* Detonate multi-day events into their individual day ingredients
          * Merje and sort
