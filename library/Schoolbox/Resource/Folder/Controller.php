@@ -521,8 +521,11 @@ class Controller extends BaseController
 
         // Only superusers get to change class codes and year levels
         if ($user->isSuperuser()) {
-            $this->setClassCodesOnFolder($folder, $classCodes);
+            $this->updateFolderClassCodes($folder, $classCodes);
+            $this->updateFolderYearLevels($folder, $yearLevelIds);
         }
+        // apply Curriculum codes
+        $this->setCurriculumNodesOnFolder($folder, $curriculumCodeIds);
 
         if ($folder->getInherit() && $folder->getId()) {
             // If inheriting permissions we need to remove any user access permissions...
@@ -534,13 +537,6 @@ class Controller extends BaseController
             // ...and role permissions
             $roleAccessMapper->deleteByColumn("cid", $folder->getId());
         }
-
-        // apply YearLevel association
-        // TODO
-
-        // apply Curriculum codes
-        $curriculumCodes = (is_array($curriculumCodeIds) ? $curriculumCodeIds : []);
-        $this->setCurriculumCodesOnFolder($folder, $curriculumCodes);
 
         // only allow recursive permissions to supers
         $recurseRolePermissions = $user->isSuperuser() && $recurseRolePermissions;
@@ -570,24 +566,25 @@ class Controller extends BaseController
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function setClassCodesOnFolder(Model $folder, array $newClassCodes): void
+    private function updateFolderClassCodes(Model $folder, array $newClassCodes): void
     {
         // Build codes to remove
         if ($folder->getInherit()) {
             // If folder is inheriting permissions, remove all class codes
             $codesToRemove = $folder->getCodes()->deepClone();
+            $folder->setCodes($folder->getCodes()->emptyClone());
         } else {
             // Else only remove those not in new set
             $codesToRemove = $this->classCodeMapper->createCollection();
             foreach ($folder->getCodes() as $codeModel) {
-                $match = false;
+                $found = false;
                 foreach ($newClassCodes as $newCode) {
                     if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
-                        $match = true;
+                        $found = true;
                         break;
                     }
                 }
-                if (!$match) {
+                if (!$found) {
                     $codesToRemove[] = $codeModel;
                 }
             }
@@ -597,18 +594,20 @@ class Controller extends BaseController
         $codesToAdd = $this->classCodeMapper->createCollection();
         if (!$folder->getInherit()) {
             foreach ($newClassCodes as $newCode) {
-                $match = false;
+                $found = false;
                 foreach ($folder->getCodes() as $codeModel) {
                     if (strnatcasecmp($newCode, $codeModel->getCode()) === 0) {
-                        $match = true;
+                        $found = true;
                         break;
                     }
                 }
-                if (!$match) {
-                    $codesToAdd[] = $this->classCodeMapper
+                if (!$found) {
+                    $codeModel = $this->classCodeMapper
                         ->createModel()
                         ->setFolder($folder)
                         ->setCode($newCode);
+                    $codesToAdd[] = $codeModel;
+                    $folder->getCodes()[$codeModel->getCode()] = $codeModel;
                 }
             }
         }
@@ -623,20 +622,108 @@ class Controller extends BaseController
     }
 
     /**
+     * Efficiently update a folder's year levels
+     *
+     * @param Model    $folder
+     * @param string[] $yearLevelIds
+     * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function updateFolderYearLevels(Model $folder, array $yearLevelIds): void
+    {
+        // Build yearLevels to remove. Remove if not in new set
+        $yearLevelsToRemove = $this->yearLevelMapper->createCollection();
+        foreach ($folder->getYearLevels() as $idx => $yearLevel) {
+            $found = false;
+            foreach ($yearLevelIds as $yearLevelId) {
+                if ((int)$yearLevelId === $yearLevel->getId()) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $yearLevelsToRemove[] = $yearLevel;
+                $folder->getYearLevels()->offsetUnset($idx);
+            }
+        }
+
+        // Build yearLevels to add. Add if not already on folder
+        $yearLevelsToAdd = $this->yearLevelMapper->createCollection();
+        foreach ($yearLevelIds as $yearLevelId) {
+            $found = false;
+            foreach ($folder->getYearLevels() as $yearLevel) {
+                if ((int)$yearLevelId === $yearLevel->getId()) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $yearLevel                                    = $this->yearLevelMapper->findById($yearLevelId);
+                $yearLevelsToAdd[]                            = $yearLevel;
+                $folder->getYearLevels()[$yearLevel->getId()] = $yearLevel;
+            }
+        }
+
+        if ($yearLevelsToRemove->count()) {
+            $this->yearLevelMapper->delete($yearLevelsToRemove);
+        }
+
+        if ($yearLevelsToAdd->count()) {
+            $this->yearLevelMapper->save($yearLevelsToAdd);
+        }
+    }
+
+    /**
      * Put the given Curriculum code lists onto the given folder
      *
-     * @param Model $model
-     * @param array $curriculumCodes
+     * @param Model    $folder
+     * @param string[] $nodeIds
      * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
-    protected function setCurriculumCodesOnFolder(Model $model, $curriculumCodes)
+    private function setCurriculumNodesOnFolder(Model $folder, array $nodeIds): void
     {
-        $curriculumNodeMapper = $this->curriculumNodeMapper;
+        // Remove existing node if not in new set
+        $nodesToRemove = $this->curriculumNodeMapper->createCollection();
+        foreach ($folder->getCurriculumNodes() as $idx => $node) {
+            $found = false;
+            foreach ($nodeIds as $nodeId) {
+                if ((int)$nodeId === $node->getId()) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $nodesToRemove[] = $node;
+                $folder->getCurriculumNodes()->offsetUnset($idx);
+            }
+        }
 
-        if (isset($curriculumCodes) && count($curriculumCodes)) {
-            $model->setCurriculumNodes(
-                $curriculumNodeMapper->findByColumn('id', $curriculumCodes)
-            );
+        // Add new node if not already on folder
+        $nodesToAdd = $this->curriculumNodeMapper->createCollection();
+        foreach ($nodeIds as $nodeId) {
+            $found = false;
+            foreach ($folder->getCurriculumNodes() as $node) {
+                if ((int)$nodeId === $node->getId()) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $node                                         = $this->curriculumNodeMapper->findById($nodeId);
+                $nodesToAdd[]                                 = $node;
+                $folder->getCurriculumNodes()[$node->getId()] = $node;
+            }
+        }
+
+        if ($nodesToRemove->count()) {
+            $this->curriculumNodeMapper->delete($nodesToRemove);
+        }
+
+        if ($nodesToAdd->count()) {
+            $this->curriculumNodeMapper->save($nodesToAdd);
         }
     }
 

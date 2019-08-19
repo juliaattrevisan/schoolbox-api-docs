@@ -14,6 +14,7 @@ use Schoolbox;
  * See Model's class docblock for entity semantics.
  * @see \Schoolbox\YearLevel\Model
  *
+ * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends Schoolbox\Mapper
