@@ -9,9 +9,7 @@
 
 namespace Calendar\Event\Collection;
 
-use Calendar;
 use Calendar_Api_EventType_Interface;
-use Group;
 use SitePage;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
@@ -38,9 +36,6 @@ class Renderer
 
     /** @var User */
     private $viewer;
-
-    /** @var Calendar $calendarHandler */
-    private $calendarHandler;
 
     /** @var Collection $allEvents Mega-stack Collection instance which stores all events */
     private $allEvents;
@@ -70,9 +65,6 @@ class Renderer
         $this->user           = $user;
         $this->page           = $page;
         $this->viewer         = $viewer;
-
-        //TODO remove these deprecated dependencies
-        $this->calendarHandler = new Calendar();
 
         $this->allEvents = new Collection();
         $this->collectAllEvents();
@@ -192,15 +184,6 @@ class Renderer
     public function getAllEvents(): Collection
     {
         return $this->allEvents;
-    }
-
-
-    /**
-     * @return Calendar
-     */
-    protected function getCalendarHandler(): Calendar
-    {
-        return $this->calendarHandler;
     }
 
 
