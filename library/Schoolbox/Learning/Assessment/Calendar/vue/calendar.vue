@@ -105,9 +105,8 @@
                             'X-Requested-With' : 'XMLHttpRequest'
                         },
                         params: {
-                            start:  Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                            end:    Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            userId: self.config.userId,
+                            start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                            end:   Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                         }
                     }
                 ).then(
@@ -206,8 +205,7 @@
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             }"
-            :default-date="config.defaultDate"
-            :default-view="config.defaultView || 'dayGridMonth'"
+            default-view="dayGridMonth"
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-limit="config.eventLimit"
             :first-day="config.firstDay"
