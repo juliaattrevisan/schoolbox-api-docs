@@ -27,12 +27,10 @@ class Definition extends Filter\AbstractDefinition
     protected const NAME = 'Work Type';
 
     // If assessment does not have a WorkType at all
-    const KEY_NONE = 'none';
+    public const KEY_NONE = 'none';
 
     /**
-     * Intentionally not a GenericCollection so we can include null (ie assessment does not have a workType at all)
-     *
-     * @var Collection|WorkType\Model[]
+     * @var GenericCollection|WorkType\Model[]
      */
     private $workTypes;
 
@@ -41,13 +39,13 @@ class Definition extends Filter\AbstractDefinition
      * @param Filter\Model                       $filter
      * @param Filter\Page\Option\Mapper          $filterOptionMapper
      * @param Filter\Page\Option\Defaults\Mapper $filterDefaultMapper
-     * @param Collection                         $workTypes
+     * @param GenericCollection|WorkType\Model[] $workTypes
      */
     public function __construct(
         Filter\Model $filter,
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
-        Collection $workTypes
+        GenericCollection $workTypes
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->workTypes = $workTypes;
@@ -142,7 +140,7 @@ class Definition extends Filter\AbstractDefinition
         // Ensure it contains all WorkTypes
         foreach ($this->workTypes as $workType) {
 
-            $abstractKey = null === $workType ? self::KEY_NONE : (string)$workType->getId();
+            $abstractKey = (string)$workType->getId();
 
             if (!$options->offsetExists($abstractKey)) {
                 $option = $this->getFilterOptionMapper()->createModel();

@@ -11,7 +11,6 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment\WorkType;
 
-
 /**
  * A factory for building 'WorkType' filter objects
  */
@@ -52,7 +51,7 @@ class Factory extends Filter\AbstractFactory
             $filter,
             $this->getOptionMapper(),
             $this->getDefaultsMapper(),
-            $this->getWorkTypes()
+            $this->workTypeMapper->findAll()
         );
     }
 
@@ -64,24 +63,6 @@ class Factory extends Filter\AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        $workTypeIds = $this->getWorkTypes()->getColumnValues('id');
-        return new KeyConverter($filter, new Collection(array_combine($workTypeIds, $workTypeIds)));
-    }
-
-
-    /**
-     * Includes a NULL for when an assessment has no WorkType
-     *
-     * @return Collection|WorkType\Model[]|null[]
-     */
-    private function getWorkTypes()
-    {
-        $genericCollection = $this->workTypeMapper->findAll();
-        $collection        = new Collection();
-        $collection->offsetSet(Definition::KEY_NONE, null);
-        foreach ($genericCollection as $workType) {
-            $collection->offsetSet($workType->getId(), $workType);
-        }
-        return $collection;
+        return new KeyConverter($filter, new Collection($this->workTypeMapper->findAllIds()));
     }
 }
