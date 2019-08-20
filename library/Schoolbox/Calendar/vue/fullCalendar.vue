@@ -114,20 +114,6 @@
              */
             onLoading(isLoading) {
                 this.helper.onLoading(isLoading);
-                // // TODO find a non-jQuery dependent way to do this
-                // if (isLoading === true) {
-                //     // this.$refs.toast.activate('Loading...');
-                //     this.jQuery.magnificPopup.open({
-                //         showCloseBtn: false,
-                //         items: {
-                //             src: "<div class='preview loader'></div>",
-                //             type: 'inline'
-                //         }
-                //     });
-                // } else {
-                //     // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                //     this.jQuery.magnificPopup.close();
-                // }
             },
 
             /**
@@ -354,7 +340,7 @@
              * @return {boolean}
              */
             isTask(event) {
-                return Number(event?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId;
+                return this.helper.isTask(event);
             },
 
             /**
