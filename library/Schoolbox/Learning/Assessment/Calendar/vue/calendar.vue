@@ -141,6 +141,16 @@
             dayTitleFormat(dateObject) {
                 return this.helper.dayTitleFormat(dateObject);
             },
+
+            /**
+             * Callback for when the filters for this calendar are updated.
+             *
+             * Fired from outer space (i.e. from the outside window).
+             */
+            onFilterChange(filters) {
+                console.log(filters);
+                this.$refs.fullCalendar.getApi().rerenderEvents();
+            },
         }
     }
 
