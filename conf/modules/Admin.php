@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Damian SLoane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -96,13 +96,6 @@ class Admin implements ModuleConfigInterface
         $profileButtons = new \Schoolbox\Admin\Profile\Button\Module($di);
         $profileButtons->init('/adminv2/profile-button');
 
-        // Pastoral care import page
-
-        if ($di->get('config')->get('pastoral_enabled')) {
-            $courseBuilder = new \Schoolbox\Admin\Import\Pastoral\Module($di);
-            $courseBuilder->init('/adminv2/import-pastoral');
-        }
-
         // Route list
         $routes = new \Schoolbox\Admin\RouteSummary\Module($di);
         $routes->init('/adminv2/routes');
@@ -138,5 +131,16 @@ class Admin implements ModuleConfigInterface
         // oAuth-specific settings
         $oauth = new \Schoolbox\Admin\Oauth\Module($di);
         $oauth->init('/adminv2/oauth');
+
+        /**
+         * Importers
+         */
+
+        /* Pastoral Care
+         */
+        if ($di->get('config')->get('pastoral_enabled')) {
+            $pastoralImporter = new \Schoolbox\Admin\Import\Pastoral\Module($di);
+            $pastoralImporter->init('/adminv2/import-pastoral');
+        }
     }
-} 
+}

@@ -19,6 +19,8 @@ class ImporterFactory
 
     public const IMPORT_USER = 'adminImportUser';
 
+    public const IMPORT_PROFILE = 'adminImportProfile';
+
     public const IMPORT_STRUCTURE = 'adminImportStructure';
 
     public const IMPORT_TIMETABLE = 'adminImportTimetable';
@@ -41,6 +43,8 @@ class ImporterFactory
         switch ($basename) {
             case self::IMPORT_USER:
                 return new Importer\User($reader, $log, $performUpdate);
+            case self::IMPORT_PROFILE:
+                return new Importer\Profile($reader, $log, $performUpdate);
             case self::IMPORT_STRUCTURE:
                 return new Importer\TimetableStructure($reader, $log, $performUpdate);
             case self::IMPORT_TIMETABLE:
@@ -75,12 +79,11 @@ class ImporterFactory
                 break;
 
             case self::IMPORT_USER:
+            case self::IMPORT_PROFILE:
             default:
                 break;
         }
 
         return $reader;
     }
-
-
 }

@@ -41,6 +41,11 @@ trait ImportNavigation
                 $currentPage === 'adminPhotos'
             ),
             new Node(
+                'User Profiles',
+                $router->generate('adminImportProfile.upload'),
+                $currentPage === 'adminImportProfile'
+            ),
+            new Node(
                 'Timetable Structure',
                 $router->generate('adminImportStructure.upload'),
                 $currentPage === 'adminImportStructure'

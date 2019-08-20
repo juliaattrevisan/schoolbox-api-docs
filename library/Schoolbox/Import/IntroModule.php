@@ -32,11 +32,13 @@ class IntroModule extends BaseModule
     public function initSubmodules(ContainerInterface $injector, $basePath)
     {
         $userModule      = new ImportModule($injector, $this->basename.'User');
+        $profileModule   = new ImportModule($injector, $this->basename.'Profile');
         $structureModule = new ImportModule($injector, $this->basename.'Structure');
         $timetableModule = new ImportModule($injector, $this->basename.'Timetable');
         $enrolmentModule = new ImportModule($injector, $this->basename.'Enrolment');
 
         $userModule->init($basePath.'/user');
+        $profileModule->init($basePath.'/profile');
         $structureModule->init($basePath.'/timetable-structure');
         $timetableModule->init($basePath.'/timetable');
         $enrolmentModule->init($basePath.'/enrolment');
