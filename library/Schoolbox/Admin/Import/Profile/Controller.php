@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -87,10 +88,17 @@ class Controller extends Base
     /**
      * Process the form vars
      */
-    public function postIndex()
+    public function postUpload()
     {
+        new \Alaress_Probe($this->getRequest()->post['attachment']);
+
+        $attachments = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
+
+        new \Alaress_Probe($attachments);
+
+        die();
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/submit.twig', [
-            'var1' => $this->getRequest()->post['var1']
         ])->setTitle('Import User Profile'));
     }
 }

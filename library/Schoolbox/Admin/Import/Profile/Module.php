@@ -50,7 +50,7 @@ class Module extends BaseModule
         );
 
         $this->register('GET', '', 'getIndex', $getPerms);
-        $this->register('POST', '', 'postIndex', $postPerms);
+        $this->register('POST', '/upload', 'postUpload', $postPerms);
     }
 
 
