@@ -66,6 +66,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
         $username = $this->redis->get($this->cookies['remember']);
 
         if (strlen($username)) {
+
             // found a redis match; attempt to rebuild that session
 
             // For safety's sake regenerate their session ID
@@ -73,7 +74,9 @@ class Phpfunc extends \Aura\Session\Phpfunc
 
             // regenerate session from username
             // TODO replace cantankerous old handler
-            return (new \Session())->create($username, true);
+            $session = new \Session();
+            $session->disableLoginLog();
+            return $session->create($username, true);
         }
 
         return false;
