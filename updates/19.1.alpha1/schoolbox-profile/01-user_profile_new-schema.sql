@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
     `title`       VARCHAR(255) NULL,
     `firstname`   VARCHAR(255) NULL,
     `lastname`    VARCHAR(255) NULL,
-    `gender`      VARCHAR(25)  Null,
     `created_at`  DATETIME     NOT NULL,
     `updated_at`  DATETIME     NOT NULL,
     `deleted_at`  DATETIME     NULL,
@@ -17,6 +16,9 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile`
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4
     COLLATE = utf8mb4_unicode_ci;
+
+CREATE INDEX idx_external_id
+    ON sis_user_profile (external_id);
 
 /*
  Table structure for `sis_user_profile_parent`
@@ -32,9 +34,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_parent`
     `created_at`          DATETIME     NOT NULL,
     `updated_at`          DATETIME     NOT NULL,
     `deleted_at`          DATETIME     NULL,
-    INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
-    UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_parent`
         FOREIGN KEY (`sis_user_profile_id`)
             REFERENCES `sis_user_profile` (`id`)
@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `date_of_birth`               DATE          NULL,
     `username`                    VARCHAR(255)  NULL,
     `email`                       VARCHAR(255)  NULL,
+    `gender`                      VARCHAR(25)   NULL,
     `head_of_house_id`            VARCHAR(64)   NULL,
     `head_of_house_name`          VARCHAR(255)  NULL,
     `house_name`                  VARCHAR(255)  NULL,
@@ -82,9 +83,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `created_at`                  DATETIME      NOT NULL,
     `updated_at`                  DATETIME      NOT NULL,
     `deleted_at`                  DATETIME      NULL,
-    INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
-    UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_student`
         FOREIGN KEY (`sis_user_profile_id`)
             REFERENCES `sis_user_profile` (`id`)
@@ -113,9 +112,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_staff`
     `created_at`           DATETIME     NOT NULL,
     `updated_at`           DATETIME     NOT NULL,
     `deleted_at`           DATETIME     NULL,
-    INDEX `id_idx` (`sis_user_profile_id` ASC),
     PRIMARY KEY (`sis_user_profile_id`),
-    UNIQUE INDEX `sis_user_profile_id_UNIQUE` (`sis_user_profile_id` ASC),
     CONSTRAINT `fk1_sis_user_profile_staff`
         FOREIGN KEY (`sis_user_profile_id`)
             REFERENCES `sis_user_profile` (`id`)
@@ -134,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_relation`
     `child_profile_id`  INT UNSIGNED NOT NULL,
     `user_profile_id`   INT UNSIGNED NOT NULL,
     `emergency_contact` TINYINT(1)   NOT NULL,
-    `type`              VARCHAR(45)  NOT NULL,
+    `type`              VARCHAR(55)  NOT NULL,
     INDEX `fk_sis_profile_relation_1_idx` (`child_profile_id` ASC),
     INDEX `fk_sis_profile_relation_2_idx` (`user_profile_id` ASC),
     CONSTRAINT `fk_sis_profile_relation_1`
