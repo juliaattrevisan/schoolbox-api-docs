@@ -108,8 +108,8 @@ class Admin implements ModuleConfigInterface
         $featureTours->init('/adminv2/feature-tours');
 
         // Service Roster
-        $featureTours = new \Schoolbox\Admin\Service\Module($di);
-        $featureTours->init('/adminv2/service');
+        $serviceRoster = new \Schoolbox\Admin\Service\Module($di);
+        $serviceRoster->init('/adminv2/service');
 
         // SHAPS
         $shaps = new \Schoolbox\Admin\SHAPS\Module($di);
@@ -120,8 +120,8 @@ class Admin implements ModuleConfigInterface
         $news->init('/adminv2/news');
 
         // Settings
-        $news = new \Schoolbox\Admin\Settings\Module($di);
-        $news->init('/adminv2/setting');
+        $settings = new \Schoolbox\Admin\Settings\Module($di);
+        $settings->init('/adminv2/setting');
 
         // oAuth-specific settings
         $oauth = new \Schoolbox\Admin\Oauth\Module($di);
