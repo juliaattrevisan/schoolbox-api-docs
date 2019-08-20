@@ -9,22 +9,10 @@
     import RevealModal        from '@schoolbox/reveal-modal'
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
     import axios              from 'axios'
-    // import qs                 from "qs";
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
-    // const URL_STATE_CHANGE = '/calendar/changeState';
-
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
-    // const URL_EVENT_UPDATE = '/calendar/ajax/update';
-    // const URL_EVENT_FILTER = '/calendar/ajax/filter';
-    // const URL_EVENT_CREATE = '/calendar/ajax/create';
-    // const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
-    // const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
-    // const URL_EVENT_EXPORT = '/calendar/export.php';
-    //
-    // const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
-    // const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -54,17 +42,6 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
-            // urls() {
-            //     return {
-            //         create: URL_EVENT_CREATE,
-            //         modifyForm: URL_EVENT_MODIFY_FORM,
-            //         modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-            //         update: URL_EVENT_UPDATE,
-            //         export: URL_EVENT_EXPORT,
-            //         attendanceList: URL_ATTENDANCE_LIST,
-            //         attendanceToggle: URL_ATTENDANCE_TOGGLE,
-            //     };
-            // },
             formats() {
                 return {
                     formDate: FORMAT_FORM_DATE,
@@ -97,7 +74,6 @@
              * @param callback  A function to call with the list of events.
              */
             events(fetchInfo, callback) {
-                var self = this;
                 axios.get(
                     URL_EVENT_SOURCE,
                     {
