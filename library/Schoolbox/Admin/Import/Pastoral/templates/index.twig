@@ -1,39 +1,33 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script>
+    $(function(){
+        $('[data-import]').click(function(e) {
+            var defaultOwnerId = $('#defaultOwner')[0].value;
 
-    $(function() {
+            $('#defaultOwnerError').addClass('hide');
 
-        $(function(){
-            $('[data-import]').click(function(e) {
-                var defaultOwnerId = $('#defaultOwner')[0].value;
-
-                $('#defaultOwnerError').addClass('hide');
-
-                if (defaultOwnerId != '') {
-                    $("[data-import]").prop('value', 'Please Wait...');
-                    $("[data-import]").prop('disabled', true);
-                    $("[data-form-import]").submit();
-                } else {
-                    $('#defaultOwner').focus();
-                    $('#defaultOwnerError').removeClass('hide');
-                    e.preventDefault();
-                }
-            });
-        });
-
-        $('#defaultOwner').selectizeSelector({
-            multiple: false,
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {roleTypeID: 'staff'},
-                dataType: 'json'
+            if (defaultOwnerId != '') {
+                $("[data-import]").prop('value', 'Please Wait...');
+                $("[data-import]").prop('disabled', true);
+                $("[data-form-import]").submit();
+            } else {
+                $('#defaultOwner').focus();
+                $('#defaultOwnerError').removeClass('hide');
+                e.preventDefault();
             }
         });
-
     });
 
+    $('#defaultOwner').selectizeSelector({
+        multiple: false,
+        ajax: {
+            url:      '/ajax/user.php',
+            type:     'GET',
+            data:     {roleTypeID: 'staff'},
+            dataType: 'json'
+        }
+    });
 </script>
 
 {{ renderAdminNavigation(pageCurrent) }}
