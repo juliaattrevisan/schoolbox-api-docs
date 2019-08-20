@@ -70,11 +70,6 @@ class Admin implements ModuleConfigInterface
         $terminology = new \Schoolbox\Admin\Terminology\Module($di);
         $terminology->init('/adminv2/terminology');
 
-        // Admin course builder page
-
-        $photos = new \Schoolbox\Admin\Photos\Module($di);
-        $photos->init('/adminv2/photos');
-
         // Admin bulk add folders
 
         $bulkAddFolders = new \Schoolbox\Admin\BulkAddFolders\Module($di);
@@ -135,6 +130,11 @@ class Admin implements ModuleConfigInterface
         /**
          * Importers
          */
+
+        /* User Photos
+         */
+        $photos = new \Schoolbox\Admin\Photos\Module($di);
+        $photos->init('/adminv2/photos');
 
         /* Pastoral Care
          */
