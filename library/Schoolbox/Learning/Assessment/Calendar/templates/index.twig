@@ -7,6 +7,7 @@ Usage:
 {{ bread.crumbs(['Learning'], [locale.assessment.proper ~ ' Calendar']) }}
 {% set reportContentId = 'calendarDataTODO' %}
 
+
 {% autoescape 'js' %}
 <script type="text/javascript">
     $(function () {
@@ -19,6 +20,30 @@ Usage:
             console.log(selectedFilters);
         });
     });
+
+
+    window.fullCalendarConfig = {
+        // taskTypeId:         Number('{TASK_TYPE_ID}'),
+        // sources:            {SOURCES_JSON},
+        // eventTypes:         {EVENT_TYPES_JSON},
+        // groups:             {GROUPS_JSON},
+        // campuses:           {CAMPUSES_JSON},
+        // selectedFilters:    {SELECTED_FILTERS_JSON},
+        // defaultDate:        '{SELECTED_DATE}',
+        // eventLimit:         Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
+        // firstDay:           Number('{CALENDAR_START_DAY}'),
+        // defaultView:        anchorView || '{CALENDAR_VIEW}',
+        dateDisplayFormats: dateDisplayFormats,
+        // TODO This must be moved to Twig so these can be guaranteed to be escaped
+        translations:       {
+            eotc: {
+                proper: '{TPL_LOCAL_EOTC_PC}'
+            },
+            dueWork: {
+                proper: '{TPL_LOCAL_DUEWORK_PC}'
+            }
+        }
+    };
 </script>
 {% endautoescape %}
 
@@ -33,6 +58,9 @@ Usage:
             } only %}
         </section>
 
-        <div id="{{ reportContentId }}"></div>
+        <div id="{{ reportContentId }}">
+            <div id="calendar"></div>
+            <script type="text/javascript" src="/javascript/components/assessmentCalendar.bundle.js?v={SITE_VERSION}"></script>
+        </div>
     </div>
 </div>
