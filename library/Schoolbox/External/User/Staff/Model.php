@@ -1,0 +1,250 @@
+<?php
+/**
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+declare(strict_types=1);
+
+namespace Schoolbox\External\User\Staff;
+
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\External\User\Model as UserModel;
+
+class Model implements ISoftDeletable
+{
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
+
+    /**
+     * @var string|null
+     */
+    private $username;
+
+    /**
+     * @var string|null
+     */
+    private $email;
+
+    /**
+     * @var string|null
+     */
+    private $category;
+
+    /**
+     * @var string|null
+     */
+    private $positionTitle;
+
+    /**
+     * @var string|null
+     */
+    private $department;
+
+    /**
+     * @var string|null
+     */
+    private $phone;
+
+    /**
+     * @var string|null
+     */
+    private $room;
+
+    /**
+     * @var string|null
+     */
+    private $building;
+
+    /**
+     * @var string|null
+     */
+    private $campusName;
+
+    /**
+     * @var UserModel
+     */
+    private $user;
+
+
+    /**
+     * @return string|null
+     */
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPositionTitle(): ?string
+    {
+        return $this->positionTitle;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDepartment(): ?string
+    {
+        return $this->department;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getRoom(): ?string
+    {
+        return $this->room;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBuilding(): ?string
+    {
+        return $this->building;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCampusName(): ?string
+    {
+        return $this->campusName;
+    }
+
+    /**
+     * @return UserModel
+     */
+    public function getUser(): UserModel
+    {
+        return $this->user;
+    }
+
+
+    /**
+     * @param string|null $username
+     * @return Model
+     */
+    public function setUsername(?string $username): self
+    {
+        $this->username = $username;
+        return $this;
+    }
+
+    /**
+     * @param string|null $email
+     * @return Model
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @param string|null $category
+     * @return Model
+     */
+    public function setCategory(?string $category): self
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * @param string|null $positionTitle
+     * @return Model
+     */
+    public function setPositionTitle(?string $positionTitle): self
+    {
+        $this->positionTitle = $positionTitle;
+        return $this;
+    }
+
+    /**
+     * @param string|null $department
+     * @return Model
+     */
+    public function setDepartment(?string $department): self
+    {
+        $this->department = $department;
+        return $this;
+    }
+
+    /**
+     * @param string|null $phone
+     * @return Model
+     */
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+        return $this;
+    }
+
+    /**
+     * @param string|null $room
+     * @return Model
+     */
+    public function setRoom(?string $room): self
+    {
+        $this->room = $room;
+        return $this;
+    }
+
+    /**
+     * @param string|null $building
+     * @return Model
+     */
+    public function setBuilding(?string $building): self
+    {
+        $this->building = $building;
+        return $this;
+    }
+
+    /**
+     * @param string|null $campusName
+     * @return Model
+     */
+    public function setCampusName(?string $campusName): self
+    {
+        $this->campusName = $campusName;
+        return $this;
+    }
+
+    /**
+     * @param UserModel $user
+     */
+    public function setUser(?UserModel $user): void
+    {
+        $this->user = $user;
+    }
+}
