@@ -40,11 +40,14 @@ use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Mapper as RubricDescriptorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Mapper as RubricIndicatorMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Level\Mapper as RubricLevelMapper;
+use Schoolbox\Blog;
 use Schoolbox\Collection;
+use Schoolbox\Curriculum;
 use Schoolbox\Discussion;
 use Schoolbox\GenericCollection;
 use Schoolbox\IMapper;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Fixtures;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\Project;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
@@ -239,6 +242,11 @@ class RecursiveUndeleter extends CliTool\App
             Pastoral\Access\Mapper::class => 'role_id',
             Pastoral\Audience\Mapper::class => 'role_id',
         ],
+        Pastoral\Mapper::class          => [
+            Pastoral\Comment\Mapper::class,
+            Pastoral\Attachment\Mapper::class,
+            Pastoral\Access\Mapper::class,
+        ],
         Pastoral\Group\Mapper::class        => [
             Pastoral\Access\Mapper::class => 'group_id',
             Pastoral\Audience\Mapper::class => 'group_id',
@@ -258,6 +266,52 @@ class RecursiveUndeleter extends CliTool\App
         ],
         Discussion\Comment\Mapper::class    => [],
         Eportfolio\PageMapper::class        => [],
+        Blog\Homepage\Post\Mapper::class                => [
+            Blog\Homepage\Comment\Mapper::class,
+            Blog\Homepage\Image\Mapper::class,
+        ],
+        Blog\Homepage\Comment\Mapper::class             => [],
+        Blog\Homepage\Image\Mapper::class               => [],
+        Curriculum\Node\Mapper::class                   => [
+            Curriculum\Node\Mapper::class => 'curriculum_node_parent_id',
+        ],
+        Fixtures\Division\Mapper::class                 => [
+            Fixtures\Team\Mapper::class          => 'division_id',
+            Fixtures\Division\User\Mapper::class => 'division_id',
+        ],
+        Fixtures\Division\User\Mapper::class            => [],
+        Fixtures\Match\Mapper::class                    => [
+            Fixtures\ItineraryItem\Mapper::class => 'match_id',
+            Fixtures\Result\Mapper::class        => 'match_id',
+        ],
+        Fixtures\ItineraryItem\Mapper::class            => [],
+        Fixtures\Result\Mapper::class                   => [],
+        Fixtures\Season\Mapper::class                   => [
+            Fixtures\Division\Mapper::class => 'season_id',
+            Fixtures\Match\Mapper::class    => 'season_id',
+        ],
+        Fixtures\Sport\Mapper::class                    => [
+            Fixtures\Division\Mapper::class => 'sport_id',
+            Fixtures\Position\Mapper::class => 'sport_id',
+        ],
+        Fixtures\Position\Mapper::class                 => [],
+        Fixtures\Team\Mapper::class                     => [
+            Fixtures\Team\Player\Mapper::class => 'team_id',
+        ],
+        Fixtures\Team\Player\Mapper::class              => [],
+        Pastoral\Attachment\Mapper::class               => [
+            Pastoral\UploadQueue\Mapper::class,
+        ],
+        Pastoral\UploadQueue\Mapper::class              => [],
+        Schoolbox\Resource\My\File\Mapper::class        => [
+            Component\Eportfolio\FileListMapper::class => 'file_id',
+        ],
+        Component\Eportfolio\FileListMapper::class      => [],
+        Schoolbox\ResourceBooking\Item\Mapper::class    => [
+            Schoolbox\ResourceBooking\Booking\Mapper::class,
+        ],
+        Schoolbox\ResourceBooking\Booking\Mapper::class => [],
+        Pastoral\Comment\Mapper::class                  => [],
     ];
 
 
