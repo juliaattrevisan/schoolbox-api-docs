@@ -36,6 +36,10 @@ class AdminImport implements ModuleConfigInterface
          */
         (new \Schoolbox\Admin\Photos\Module($di))->init('/adminv2/photos');
 
+        /* User Profile
+         */
+        (new \Schoolbox\Admin\Import\Profile\Module($di))->init('/adminv2/import/profile');
+
         /* Pastoral Care
          */
         if ($di->get('config')->get('pastoral_enabled')) {

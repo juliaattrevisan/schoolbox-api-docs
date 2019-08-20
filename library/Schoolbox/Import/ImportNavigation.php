@@ -42,7 +42,7 @@ trait ImportNavigation
             ),
             new Node(
                 'User Profiles',
-                $router->generate('adminImportProfile.upload'),
+                $router->generate('adminImportProfile.getIndex'),
                 $currentPage === 'adminImportProfile'
             ),
             new Node(
