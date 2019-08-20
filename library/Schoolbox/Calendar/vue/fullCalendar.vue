@@ -1,23 +1,22 @@
 <script>
 
-    import FullCalendar             from '@fullcalendar/vue'
-    import interactionPlugin        from '@fullcalendar/interaction'
-    import dayGridPlugin            from '@fullcalendar/daygrid'
-    import timeGridPlugin           from '@fullcalendar/timegrid'
-    import listPlugin               from '@fullcalendar/list'
-    import momentPlugin,
-           {toMoment, toDuration}   from '@fullcalendar/moment'
-    import RevealModal              from '@schoolbox/reveal-modal'
-    import MetaList                 from '@schoolbox/meta/list'
-    import MetaItem                 from '@schoolbox/meta/item'
-    import Toast                    from "@schoolbox/toast";
-    import ViewEventModal           from '@schoolbox/fullcalendar/view-event-modal';
-    import CreateEventModal         from './createEventModal';
-    import ExportModal              from "./exportModal";
-    import FilterModal              from "./filterModal";
-    import axios                    from 'axios'
-    import qs                       from "qs";
-    import FullCalendarHelper       from "@schoolbox/fullcalendar/helper";
+    import FullCalendar               from '@fullcalendar/vue'
+    import interactionPlugin          from '@fullcalendar/interaction'
+    import dayGridPlugin              from '@fullcalendar/daygrid'
+    import timeGridPlugin             from '@fullcalendar/timegrid'
+    import listPlugin                 from '@fullcalendar/list'
+    import momentPlugin, {toDuration} from '@fullcalendar/moment'
+    import RevealModal                from '@schoolbox/reveal-modal'
+    import MetaList                   from '@schoolbox/meta/list'
+    import MetaItem                   from '@schoolbox/meta/item'
+    import Toast                      from "@schoolbox/toast";
+    import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
+    import CreateEventModal           from './createEventModal';
+    import ExportModal                from "./exportModal";
+    import FilterModal                from "./filterModal";
+    import axios                      from 'axios'
+    import qs                         from "qs";
+    import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
