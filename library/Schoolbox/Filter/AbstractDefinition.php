@@ -315,8 +315,9 @@ abstract class AbstractDefinition implements IDefinition
      * eg:
      *   list of configured terms,
      *   list of configured work-types
+     * @return string[]
      */
-    public function getAbstractKeys()
+    public function getAbstractKeys(): array
     {
         // Default. You MUST override if the set of options displayed in admin includes dynamic options (eg Terms, WorkTypes etc).
         // Dynamic options depend on database contents, but do not change per viewee.

@@ -11,6 +11,8 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
+use function array_map;
+use function array_merge;
 
 
 /**
@@ -109,9 +111,12 @@ class Definition extends Filter\AbstractDefinition
      *
      * @return string[]
      */
-    public function getAbstractKeys()
+    public function getAbstractKeys(): array
     {
-        return array_merge($this->getCustomKeys(), $this->workTypes->keys());
+        // Ensure numeric ids are cast to string keys
+        return array_merge($this->getCustomKeys(), array_map(static function (int $workTypeId) {
+            return (string)$workTypeId;
+        }, $this->workTypes->keys()));
     }
 
 

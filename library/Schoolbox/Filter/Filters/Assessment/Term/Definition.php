@@ -10,6 +10,8 @@ namespace Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
+use function array_map;
+use function array_merge;
 
 
 /**
@@ -189,9 +191,12 @@ abstract class Definition extends Filter\AbstractDefinition
      *
      * @return string[]
      */
-    public function getAbstractKeys()
+    public function getAbstractKeys(): array
     {
-        return array_merge($this->getCustomKeys(), $this->terms->keys());
+        // Ensure numeric ids are cast to string keys
+        return array_merge($this->getCustomKeys(), array_map(static function (int $termId) {
+            return (string)$termId;
+        }, $this->terms->keys()));
     }
 
 
