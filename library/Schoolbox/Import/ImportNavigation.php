@@ -38,7 +38,7 @@ trait ImportNavigation
             new Node(
                 'User Photos',
                 $router->generate('adminPhotos.getIndex'),
-                $currentPage === 'adminUserPhotos'
+                $currentPage === 'adminPhotos'
             ),
             new Node(
                 'Timetable Structure',

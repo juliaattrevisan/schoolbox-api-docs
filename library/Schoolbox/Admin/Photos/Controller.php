@@ -135,6 +135,7 @@ class Controller extends Base
                 'template' => '@adminPhotos/index.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
+                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminPhotos')->getAllNodes(),
                     'attachzone' => $this->getAttachZone(),
                 ),
             )
@@ -182,6 +183,7 @@ class Controller extends Base
                 'template' => '@adminPhotos/view.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
+                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminPhotos')->getAllNodes(),
                     'users' => $users,
                     'surname' => $surname
                 ),
