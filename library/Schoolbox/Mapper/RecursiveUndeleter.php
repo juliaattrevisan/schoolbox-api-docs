@@ -257,6 +257,7 @@ class RecursiveUndeleter extends CliTool\App
             Discussion\Comment\Mapper::class => 'discussion_thread_id',
         ],
         Discussion\Comment\Mapper::class    => [],
+        Eportfolio\PageMapper::class        => [],
     ];
 
 
