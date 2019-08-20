@@ -63,7 +63,7 @@ trait ImportNavigation
             $args[] = new Node(
                 'Pastoral Care Records',
                 $router->generate('adminImportPastoral.getIndex'),
-                $currentPage === 'adminPastoralCare'
+                $currentPage === 'adminImportPastoral'
             );
         }
 
