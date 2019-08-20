@@ -75,7 +75,6 @@ trait VObjectTrait
             $vEvent->add('DTSTART', $start_time);
             $vEvent->add('DTEND', $end_time);
         } else {
-            $end_time->add(new DateInterval('P1D'));
             $vEvent->add('DTSTART', $start_time->format('Ymd'), ['VALUE' => 'DATE']);
             $vEvent->add('DTEND', $end_time->format('Ymd'), ['VALUE' => 'DATE']);
         }
