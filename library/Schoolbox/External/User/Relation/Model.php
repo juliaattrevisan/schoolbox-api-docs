@@ -7,33 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\User\Relation;
 
-use Alaress_Date_Format;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model as ModelTrait;
-
-class Model implements ISoftDeletable
+class Model
 {
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt(): Alaress_Date_Format
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     */
-    public function setCreatedAt(Alaress_Date_Format $createdAt): void
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    use ModelTrait\Id;
-    use ModelTrait\CreatedAtDate;
-    use ModelTrait\UpdatedAtDate;
-    use ModelTrait\DeletedAtDate;
-
     /**
      * @var int
      */

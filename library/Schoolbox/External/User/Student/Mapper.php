@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\User\Student;
 
+use PDO;
+use PDOStatement;
 use Schoolbox\External\User;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
@@ -90,11 +92,11 @@ class Mapper extends \Schoolbox\Mapper
      * @throws DefinitionException
      * @throws UnexpectedValueException
      */
-    protected function hydrateSelect(\PDOStatement $statement): GenericCollection
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
     {
         $collection = $this->createCollection();
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $student = $this->hydrate($row);
 
             if ($student) {
