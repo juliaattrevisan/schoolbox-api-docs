@@ -10,12 +10,18 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
+
+    use ImportNavigation;
+
+
     /**
      * @var UserMapper
      */
@@ -45,11 +51,36 @@ class Controller extends Base
      * Provide form
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \ReflectionException
+     * @throws \UnexpectedValueException
      */
     public function getIndex()
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/index.twig', [
+            'pageCurrent' => 'import',
+            'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
+            'attachzone' => $this->getAttachZone(),
         ])->setTitle('Import User Profile'));
+    }
+
+
+    /**
+     * Insert an attach zone into the template
+     *
+     * @return array
+     * @throws \UnexpectedValueException
+     */
+    private function getAttachZone(): array
+    {
+        return (new Zone('attachment'))
+            ->setModalTitle('Select CSV Files')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload CSV Files')
+            ->setMimeFilter('text/csv')
+            ->setReadOnly(false)
+            ->setMulti(true)
+            ->getTwigContext();
     }
 
 

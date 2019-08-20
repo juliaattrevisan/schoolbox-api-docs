@@ -1,24 +1,23 @@
-{# Add your own javascript, validation etc. #}
-{# Use pantry for styling #}
+{{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ user.fullname }}</h2>
-        <section class="content">
-        {% set formAction = routeLookupIfAuthorized('adminImportProfile.postIndex') %}
-        {% if formAction %}
-            <form action="{{ formAction }}" method="post">
-                <input type="hidden" name="id" value="{{ user.id }}" />
+        <h2 class="subheader">User Profiles</h2>
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
+    </div>
+</div>
 
-                <label>var1</label>
-                <input type="text" name="var1" />
+<div class="row">
+    <div class="small-12 island">
+        <form method="post" action="/adminv2/import/profile/upload">
+            <section class="content">
+                <p>Import profile data by attaching the CSV files here.</p>
+            </section>
 
-                <input type="submit" />
-            </form>
-        {% else %}
-            Not authorised to POST
-        {% endif %}
-        </section>
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+            <input type="submit" class="button" value="Upload CSV">
+        </form>
     </div>
 </div>
 
