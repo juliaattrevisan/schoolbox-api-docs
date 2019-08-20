@@ -13,7 +13,7 @@
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
-    const URL_STATE_CHANGE = '/calendar/changeState';
+    // const URL_STATE_CHANGE = '/calendar/changeState';
 
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
     // const URL_EVENT_UPDATE = '/calendar/ajax/update';
@@ -77,20 +77,6 @@
             },
         },
         methods: {
-            // /**
-            //  * Open the export modal.
-            //  */
-            // onExportClick() {
-            //     this.$refs.export.open();
-            // },
-            //
-            // /**
-            //  * Open the filter modal.
-            //  */
-            // onFilterClick() {
-            //     this.$refs.filter.open();
-            // },
-
             /**
              * Event loading callback: show a spinner whilst events are loading,
              * remove the spinner once they have finished.
@@ -134,20 +120,6 @@
                 // Fail callback: consider a message saying something failed
             },
 
-            // /**
-            //  * Callback for when the calendar view changes: preserve the
-            //  * newly selected view for this user.
-            //  * @see https://fullcalendar.io/docs/viewSkeletonRender
-            //  *
-            //  * @param info
-            //  */
-            // viewSkeletonRender(info) {
-            //     axios.post(
-            //         URL_STATE_CHANGE,
-            //         qs.stringify({calendarView: info.view.type})
-            //     );
-            // },
-
             /**
              * Event render callback: manually tweaks the event's rendering, and
              * can also conditionally show/hide the event.
@@ -157,91 +129,8 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
-                if (!this.helper.eventRender(eventRenderInfo)) {
-                    return false;
-                }
-
-
-                // Extra condition for rendering events on this calendar:
-                // All of the event's attributes must match at least one
-                // selected filter: if it doesn't, don't render it.
-                let self            = this,
-                    calEvent        = eventRenderInfo.event,
-                    eventFilters    = {},
-                    isEventRendered = true;
-
-                // Build a list of filters from the event
-                calEvent.classNames.forEach(function (className) {
-                    let match = className.match(/^([a-z]+)(\d+)/i);
-                    if (match) {
-                        let prefix = match[1],
-                            id     = Number(match[2]);
-                        if (!eventFilters[prefix]) {
-                            eventFilters[prefix] = [];
-                        }
-                        eventFilters[prefix].push(id);
-                    }
-                });
-
-                // Check the event matches at least one selection in each filter
-                Object.keys(eventFilters).forEach(function (prefix) {
-                    let ids                = eventFilters[prefix],
-                        matchesAnyInFilter = true;
-                    ids.forEach(function (id) {
-                        // Check id against the list of selected filters.
-                        // (Sources have multiple IDs per source: only check one)
-                        let keyspace = [];
-                        switch (prefix) {
-                            case 'source':
-                                keyspace = (self.config.selectedFilters?.source || []).flat();
-                                break;
-
-                            case 'type':
-                                keyspace = self.config.selectedFilters?.eventType || [];
-                                break;
-
-                            case 'group':
-                                keyspace = self.config.selectedFilters?.group || [];
-                                break;
-
-                            case 'campus':
-                                keyspace = self.config.selectedFilters?.campus || [];
-                                break;
-
-                            default:
-                                // Ignore this one
-                                return;
-                        }
-                        if (!keyspace.includes(id)) {
-                            matchesAnyInFilter = false;
-                        }
-                    });
-                    if (!matchesAnyInFilter) {
-                        isEventRendered = false;
-                    }
-                });
-
-                return isEventRendered;
+                return this.helper.eventRender(eventRenderInfo);
             },
-
-            // /**
-            //  * Click a date on the calendar callback: opens the create event
-            //  * modal for the clicked date.
-            //  * @see https://fullcalendar.io/docs/dateClick
-            //  *
-            //  * @param dateClickInfo
-            //  */
-            // onDateClick(dateClickInfo) {
-            //     let [firstEventType] = this.config.eventTypes;
-            //     this.newEvent = {
-            //         date:        dateClickInfo.date,
-            //         allDay:      dateClickInfo.allDay,
-            //         title:       '',
-            //         detail:      '',
-            //         type:        firstEventType ? firstEventType.id : null,
-            //     };
-            //     this.$refs.createEvent.open();
-            // },
 
             /**
              * Click an event on the calendar callback: opens the view event
@@ -257,44 +146,6 @@
                 this.$refs.event.open();
             },
 
-            // /**
-            //  * Resize event callback: persist the change to the event's start
-            //  * and end dates.
-            //  * @see https://fullcalendar.io/docs/eventResize
-            //  *
-            //  * @param eventResizeInfo
-            //  */
-            // onEventResize(eventResizeInfo) {
-            //     let event = eventResizeInfo.event,
-            //         data  = {
-            //             eventId: event?.extendedProps?.data?.meta?.eventId,
-            //             resize:  true,
-            //             start:   this.toMoment(event.start).format(),
-            //             end:     this.toMoment(event.end).format(),
-            //         };
-            //     // Apply and then remove the "loading" class
-            //     axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            // },
-            //
-            // /**
-            //  * Drop event callback: persist the change to the event's start
-            //  * and end dates.
-            //  * @see https://fullcalendar.io/docs/eventDrop
-            //  *
-            //  * @param eventDropInfo
-            //  */
-            // onEventDrop(eventDropInfo) {
-            //     let event = eventDropInfo.event,
-            //         delta = toDuration(eventDropInfo.delta),
-            //         data  = {
-            //             eventId:     event?.extendedProps?.data?.meta?.eventId,
-            //             minuteDelta: delta.asMinutes(),
-            //             allDay:      event.allDay,
-            //         };
-            //     // Apply and then remove the "loading" class
-            //     axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            // },
-
             /**
              * Helper function for converting a Date object to a Moment object.
              * @see https://fullcalendar.io/docs/moment-plugins
@@ -304,50 +155,6 @@
             toMoment(date) {
                 return this.helper.toMoment(date);
             },
-
-            // /**
-            //  * Callback for adding an event to the calendar.
-            //  * @see https://fullcalendar.io/docs/Calendar-addEvent
-            //  *
-            //  * @param event
-            //  */
-            // addEvent(event) {
-            //     this.$refs.fullCalendar.getApi().addEvent(event);
-            // },
-            //
-            // /**
-            //  * Is the given event a task or not? This affects how it's rendered.
-            //  *
-            //  * @param event
-            //  * @return {boolean}
-            //  */
-            // isTask(event) {
-            //     return this.helper.isTask(event);
-            // },
-            //
-            // /**
-            //  * Callback for reloading the calendar's events. May be used when
-            //  * a series of events is deleted, as the calendar no longer knows
-            //  * whether an event should be rendered even if it wasn't deleted.
-            //  * @see https://fullcalendar.io/docs/Calendar-refetchEvents
-            //  */
-            // reloadEvents() {
-            //     this.$refs.fullCalendar.getApi().refetchEvents();
-            // },
-            //
-            // /**
-            //  * Callback for when the filters have been updated: rerender events
-            //  * (thus hiding events which don't match the new filters) and
-            //  * persist the filters selected.
-            //  *
-            //  * @param selectedFilters
-            //  */
-            // updateSelectedFilters(selectedFilters) {
-            //     // The selected filters in config are read-only and passed by reference.
-            //     // TODO pass it by value into the filter modal, and update in this method
-            //     this.$refs.fullCalendar.getApi().rerenderEvents();
-            //     axios.post(URL_EVENT_FILTER, qs.stringify({ filters: this.config.selectedFilters, }))
-            // },
 
             /**
              * Helper for rendering the title of the day view.
@@ -406,12 +213,8 @@
             :first-day="config.firstDay"
             :events="events"
             :event-render="eventRender"
-            :view-skeleton-render="viewSkeletonRender"
             @loading="onLoading"
-            @dateClick="onDateClick"
             @eventClick="onEventClick"
-            @eventResize="onEventResize"
-            @eventDrop="onEventDrop"
         />
     </div>
 </template>
