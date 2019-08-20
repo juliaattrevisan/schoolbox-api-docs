@@ -1,11 +1,10 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-{# Shared navigation menu #}
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="small-12 island collapse">
-        <h1>User Photos</h1>
+        <h2 class="subheader">User Photos</h2>
         <dl class="sub-nav">
             <dd>
                 <a href="/adminv2/import/user">User</a>

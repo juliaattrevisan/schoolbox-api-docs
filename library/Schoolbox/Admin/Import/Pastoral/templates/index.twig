@@ -38,11 +38,11 @@
 
 {# Shared navigation menu #}
 
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{{ renderAdminNavigation(pageCurrent) }}
 
 <div class="row">
     <div class="small-12 island">
-        <h1>Pastoral Care Records</h1>
+        <h2 class="subheader">Pastoral Care Records</h2>
         <dl class="tabs">
             <dd>
                 <a href="/adminv2/import/user">User</a>
