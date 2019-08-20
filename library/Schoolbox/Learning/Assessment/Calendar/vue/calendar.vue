@@ -1,30 +1,30 @@
 <script>
 
-    import FullCalendar               from '@fullcalendar/vue'
-    import interactionPlugin          from '@fullcalendar/interaction'
-    import dayGridPlugin              from '@fullcalendar/daygrid'
-    import timeGridPlugin             from '@fullcalendar/timegrid'
-    import listPlugin                 from '@fullcalendar/list'
-    import momentPlugin, {toDuration} from '@fullcalendar/moment'
-    import RevealModal                from '@schoolbox/reveal-modal'
-    import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
-    import axios                      from 'axios'
-    import qs                         from "qs";
-    import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
+    import FullCalendar       from '@fullcalendar/vue'
+    import interactionPlugin  from '@fullcalendar/interaction'
+    import dayGridPlugin      from '@fullcalendar/daygrid'
+    import timeGridPlugin     from '@fullcalendar/timegrid'
+    import listPlugin         from '@fullcalendar/list'
+    import momentPlugin       from '@fullcalendar/moment'
+    import RevealModal        from '@schoolbox/reveal-modal'
+    import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
+    import axios              from 'axios'
+    // import qs                 from "qs";
+    import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
 
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
-    const URL_EVENT_UPDATE = '/calendar/ajax/update';
-    const URL_EVENT_FILTER = '/calendar/ajax/filter';
-    const URL_EVENT_CREATE = '/calendar/ajax/create';
-    const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
-    const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
-    const URL_EVENT_EXPORT = '/calendar/export.php';
-
-    const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
-    const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
+    // const URL_EVENT_UPDATE = '/calendar/ajax/update';
+    // const URL_EVENT_FILTER = '/calendar/ajax/filter';
+    // const URL_EVENT_CREATE = '/calendar/ajax/create';
+    // const URL_EVENT_MODIFY_FORM = '/calendar/modify.php';
+    // const URL_EVENT_MODIFY_FORM_ACTION = '/calendar/modifyForm.php';
+    // const URL_EVENT_EXPORT = '/calendar/export.php';
+    //
+    // const URL_ATTENDANCE_LIST = '/calendar/attendance/list/';
+    // const URL_ATTENDANCE_TOGGLE = '/service/attendance/setAttendance';
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -54,17 +54,17 @@
         computed: {
             jQuery: () => window.jQuery,
             config: () => window.fullCalendarConfig,
-            urls() {
-                return {
-                    create: URL_EVENT_CREATE,
-                    modifyForm: URL_EVENT_MODIFY_FORM,
-                    modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
-                    update: URL_EVENT_UPDATE,
-                    export: URL_EVENT_EXPORT,
-                    attendanceList: URL_ATTENDANCE_LIST,
-                    attendanceToggle: URL_ATTENDANCE_TOGGLE,
-                };
-            },
+            // urls() {
+            //     return {
+            //         create: URL_EVENT_CREATE,
+            //         modifyForm: URL_EVENT_MODIFY_FORM,
+            //         modifyFormAction: URL_EVENT_MODIFY_FORM_ACTION,
+            //         update: URL_EVENT_UPDATE,
+            //         export: URL_EVENT_EXPORT,
+            //         attendanceList: URL_ATTENDANCE_LIST,
+            //         attendanceToggle: URL_ATTENDANCE_TOGGLE,
+            //     };
+            // },
             formats() {
                 return {
                     formDate: FORMAT_FORM_DATE,
@@ -77,19 +77,19 @@
             },
         },
         methods: {
-            /**
-             * Open the export modal.
-             */
-            onExportClick() {
-                this.$refs.export.open();
-            },
-
-            /**
-             * Open the filter modal.
-             */
-            onFilterClick() {
-                this.$refs.filter.open();
-            },
+            // /**
+            //  * Open the export modal.
+            //  */
+            // onExportClick() {
+            //     this.$refs.export.open();
+            // },
+            //
+            // /**
+            //  * Open the filter modal.
+            //  */
+            // onFilterClick() {
+            //     this.$refs.filter.open();
+            // },
 
             /**
              * Event loading callback: show a spinner whilst events are loading,
@@ -134,19 +134,19 @@
                 // Fail callback: consider a message saying something failed
             },
 
-            /**
-             * Callback for when the calendar view changes: preserve the
-             * newly selected view for this user.
-             * @see https://fullcalendar.io/docs/viewSkeletonRender
-             *
-             * @param info
-             */
-            viewSkeletonRender(info) {
-                axios.post(
-                    URL_STATE_CHANGE,
-                    qs.stringify({calendarView: info.view.type})
-                );
-            },
+            // /**
+            //  * Callback for when the calendar view changes: preserve the
+            //  * newly selected view for this user.
+            //  * @see https://fullcalendar.io/docs/viewSkeletonRender
+            //  *
+            //  * @param info
+            //  */
+            // viewSkeletonRender(info) {
+            //     axios.post(
+            //         URL_STATE_CHANGE,
+            //         qs.stringify({calendarView: info.view.type})
+            //     );
+            // },
 
             /**
              * Event render callback: manually tweaks the event's rendering, and
@@ -224,24 +224,24 @@
                 return isEventRendered;
             },
 
-            /**
-             * Click a date on the calendar callback: opens the create event
-             * modal for the clicked date.
-             * @see https://fullcalendar.io/docs/dateClick
-             *
-             * @param dateClickInfo
-             */
-            onDateClick(dateClickInfo) {
-                let [firstEventType] = this.config.eventTypes;
-                this.newEvent = {
-                    date:        dateClickInfo.date,
-                    allDay:      dateClickInfo.allDay,
-                    title:       '',
-                    detail:      '',
-                    type:        firstEventType ? firstEventType.id : null,
-                };
-                this.$refs.createEvent.open();
-            },
+            // /**
+            //  * Click a date on the calendar callback: opens the create event
+            //  * modal for the clicked date.
+            //  * @see https://fullcalendar.io/docs/dateClick
+            //  *
+            //  * @param dateClickInfo
+            //  */
+            // onDateClick(dateClickInfo) {
+            //     let [firstEventType] = this.config.eventTypes;
+            //     this.newEvent = {
+            //         date:        dateClickInfo.date,
+            //         allDay:      dateClickInfo.allDay,
+            //         title:       '',
+            //         detail:      '',
+            //         type:        firstEventType ? firstEventType.id : null,
+            //     };
+            //     this.$refs.createEvent.open();
+            // },
 
             /**
              * Click an event on the calendar callback: opens the view event
@@ -257,44 +257,43 @@
                 this.$refs.event.open();
             },
 
-            /**
-             * Resize event callback: persist the change to the event's start
-             * and end dates.
-             * @see https://fullcalendar.io/docs/eventResize
-             *
-             * @param eventResizeInfo
-             */
-            onEventResize(eventResizeInfo) {
-                // TODO this needs to consider events in series
-                let event = eventResizeInfo.event,
-                    data  = {
-                        eventId: event?.extendedProps?.data?.meta?.eventId,
-                        resize:  true,
-                        start:   this.toMoment(event.start).format(),
-                        end:     this.toMoment(event.end).format(),
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            },
-
-            /**
-             * Drop event callback: persist the change to the event's start
-             * and end dates.
-             * @see https://fullcalendar.io/docs/eventDrop
-             *
-             * @param eventDropInfo
-             */
-            onEventDrop(eventDropInfo) {
-                let event = eventDropInfo.event,
-                    delta = toDuration(eventDropInfo.delta),
-                    data  = {
-                        eventId:     event?.extendedProps?.data?.meta?.eventId,
-                        minuteDelta: delta.asMinutes(),
-                        allDay:      event.allDay,
-                    };
-                // Apply and then remove the "loading" class
-                axios.post(URL_EVENT_UPDATE, qs.stringify(data));
-            },
+            // /**
+            //  * Resize event callback: persist the change to the event's start
+            //  * and end dates.
+            //  * @see https://fullcalendar.io/docs/eventResize
+            //  *
+            //  * @param eventResizeInfo
+            //  */
+            // onEventResize(eventResizeInfo) {
+            //     let event = eventResizeInfo.event,
+            //         data  = {
+            //             eventId: event?.extendedProps?.data?.meta?.eventId,
+            //             resize:  true,
+            //             start:   this.toMoment(event.start).format(),
+            //             end:     this.toMoment(event.end).format(),
+            //         };
+            //     // Apply and then remove the "loading" class
+            //     axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+            // },
+            //
+            // /**
+            //  * Drop event callback: persist the change to the event's start
+            //  * and end dates.
+            //  * @see https://fullcalendar.io/docs/eventDrop
+            //  *
+            //  * @param eventDropInfo
+            //  */
+            // onEventDrop(eventDropInfo) {
+            //     let event = eventDropInfo.event,
+            //         delta = toDuration(eventDropInfo.delta),
+            //         data  = {
+            //             eventId:     event?.extendedProps?.data?.meta?.eventId,
+            //             minuteDelta: delta.asMinutes(),
+            //             allDay:      event.allDay,
+            //         };
+            //     // Apply and then remove the "loading" class
+            //     axios.post(URL_EVENT_UPDATE, qs.stringify(data));
+            // },
 
             /**
              * Helper function for converting a Date object to a Moment object.
@@ -369,13 +368,7 @@
     <div>
         <view-event-modal ref="event"
                           :event="currentEvent"
-                          :task-type-id="config.taskTypeId"
                           :to-moment="toMoment"
-                          :event-modify-form-url="urls.modifyForm"
-                          :event-modify-form-action-url="urls.modifyFormAction"
-                          :event-update-url="urls.update"
-                          :attendance-list-url="urls.attendanceList"
-                          :attendance-toggle-url="urls.attendanceToggle"
                           :format-display-date="formats.displayDate"
                           :format-display-time="formats.displayTime"
                           :format-display-datetime="formats.displayDatetime"
@@ -401,20 +394,10 @@
                 omitZeroMinute: true,
             }"
             content-height="auto"
-            :custom-buttons="{
-                customExport: {
-                    text: 'export',
-                    click: onExportClick
-                },
-                customFilters: {
-                    text: 'filters',
-                    click: onFilterClick
-                },
-            }"
             :header="{
                 left: 'prev,today,next',
                 center: 'title',
-                right: 'customFilters,dayGridMonth,timeGridWeek,timeGridDay,customExport'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
             }"
             :default-date="config.defaultDate"
             :default-view="config.defaultView || 'dayGridMonth'"
