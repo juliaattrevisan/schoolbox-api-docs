@@ -9,27 +9,8 @@
 
 <div class="row">
     <div class="small-12 island collapse">
-        <h1>{{ locale.pastoralCare.proper }} Records</h1>
-        <dl class="sub-nav">
-            <dd>
-                <a href="/adminv2/import/user">User</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/photos/upload">User Photos</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/import/timetable-structure">Timetable Structure</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/import/timetable">Timetable</a>
-            </dd>
-            <dd>
-                <a href="/adminv2/import/enrolment">Enrolment</a>
-            </dd>
-            <dd class="active">
-                <a href="/adminv2/import-pastoral">{{ locale.pastoralCare.proper }} Records</a>
-            </dd>
-        </dl>
+        <h2 class="subheader">{{ locale.pastoralCare.proper }} Records</h2>
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 </div>
 
