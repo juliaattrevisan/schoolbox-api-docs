@@ -231,32 +231,34 @@
 
                 // Ensure that this event matches the selected filters.
                 // For all of them, match against the event's class names.
-                let eventFilters    = {},
+                let eventAttributes = {},
                     isEventRendered = true;
                 calEvent.classNames.forEach(function (className) {
                     let match = className.match(/^([a-z]+)(\d+)/i);
                     if (match) {
-                        let prefix = match[1],
-                            id     = Number(match[2]);
-                        if (!eventFilters[prefix]) {
-                            eventFilters[prefix] = [];
+                        let attributeGroup = match[1],
+                            id             = Number(match[2]);
+                        if (!eventAttributes[attributeGroup]) {
+                            eventAttributes[attributeGroup] = [];
                         }
-                        eventFilters[prefix].push(id);
+                        eventAttributes[attributeGroup].push(id);
                     }
                 });
 
 
-                // All of the event's attributes must match at least one selected.
+                // All of the event's attributes must match at least one
+                // selected filter.
                 // If it doesn't, don't render it.
-                Object.keys(eventFilters).forEach(function (prefix) {
-                    let ids                = eventFilters[prefix],
-                        matchesAnyInFilter = true;
+                Object.keys(eventAttributes).forEach(function (attributeGroup) {
+                    let ids                = eventAttributes[attributeGroup],
+                        eventMatchesFilter = false;
                     ids.forEach(function (id) {
                         // Check id against the list of selected filters.
-                        // (Sources have multiple IDs per source: only check one)
                         let keyspace = [];
-                        switch (prefix) {
+                        switch (attributeGroup) {
                             case 'source':
+                                // Sources have multiple IDs per selection:
+                                // this event needs to only match one of them.
                                 keyspace = (self.config.selectedFilters?.source || []).flat();
                                 break;
 
@@ -276,11 +278,11 @@
                                 // Ignore this one
                                 return;
                         }
-                        if (!keyspace.includes(id)) {
-                            matchesAnyInFilter = false;
+                        if (keyspace.includes(id)) {
+                            eventMatchesFilter = true;
                         }
                     });
-                    if (!matchesAnyInFilter) {
+                    if (!eventMatchesFilter) {
                         isEventRendered = false;
                     }
                 });
