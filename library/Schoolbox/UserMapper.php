@@ -963,4 +963,9 @@ class UserMapper extends Mapper
     {
         return $this->findByColumn('username', $username, $options)->first();
     }
+
+    public function getParent()
+    {
+
+    }
 }
