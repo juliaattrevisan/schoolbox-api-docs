@@ -13,6 +13,7 @@
 
     // Various URLs that FullCalendar may make use of.
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
+    const EVENT_SOURCE_ID  = 1;
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
     const FORMAT_FORM_DATETIME = 'DD-MM-YYYY HH:mm';
@@ -70,10 +71,10 @@
              * Event source.
              * @see https://fullcalendar.io/docs/events-function
              *
-             * @param fetchInfo The time span of the events to fetch
-             * @param callback  A function to call with the list of events.
+             * @param fetchInfo       The time span of the events to fetch
+             * @param successCallback A function to call with the list of events.
              */
-            events(fetchInfo, callback) {
+            events(fetchInfo, successCallback) {
                 axios.get(
                     URL_EVENT_SOURCE,
                     {
@@ -87,7 +88,7 @@
                     }
                 ).then(
                     function (response) {
-                        callback(response.data.filter(function (v) {
+                        successCallback(response.data.filter(function (v) {
                             return 'start' in v;
                         }));
                     }
@@ -146,10 +147,21 @@
              * Callback for when the filters for this calendar are updated.
              *
              * Fired from outer space (i.e. from the outside window).
+             *
+             * @param {object} selectedFilters The filters that were selected
              */
-            onFilterChange(filters) {
-                console.log(filters);
-                this.$refs.fullCalendar.getApi().rerenderEvents();
+            onFilterChange(selectedFilters) {
+                // Don't render events until the event source is added?
+                let calendarApi         = this.$refs.fullCalendar.getApi(),
+                    existingEventSource = calendarApi.getEventSourceById(EVENT_SOURCE_ID);
+                if (existingEventSource) {
+                    calendarApi.refetchEvents();
+                } else {
+                    calendarApi.addEventSource({
+                        id:     EVENT_SOURCE_ID,
+                        events: this.events
+                    });
+                }
             },
         }
     }
@@ -195,7 +207,6 @@
             :scroll-time="config.dateDisplayFormats.calendarStartTime"
             :event-limit="config.eventLimit"
             :first-day="config.firstDay"
-            :events="events"
             :event-render="eventRender"
             @loading="onLoading"
             @eventClick="onEventClick"
