@@ -8,7 +8,11 @@ declare(strict_types=1);
 namespace Schoolbox\YearLevel;
 
 use InvalidArgumentException;
+use PDO;
 use Schoolbox;
+use Schoolbox\Mapper\Exception\CallbackException;
+use function array_map;
+use function implode;
 
 /**
  * See Model's class docblock for entity semantics.
@@ -46,7 +50,40 @@ class Mapper extends Schoolbox\Mapper
         $this->uses(self::COL_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses(self::COL_DELETED_AT, self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateName']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'setSequenceIfUnset']);
+    }
+
+
+    /**
+     * Validates that the name is not empty and is unique
+     *
+     * @param Model $model
+     * @return bool
+     * @throws CallbackException
+     */
+    protected function validateName(Model $model): bool
+    {
+        if (trim($model->getName() ?? '') === '') {
+            throw new CallbackException("YearLevel name cannot be empty");
+        }
+        $query  = 'SELECT id, name FROM lu_year_level WHERE deleted_at IS NULL AND name = :name';
+        $params = ['name' => $model->getName()];
+        if ($model->getId()) {
+            $query        .= " AND id != :id";
+            $params['id'] = $model->getId();
+        }
+
+        $collisionRows = $this->getDatabase()->query($query, $params)->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($collisionRows)) {
+            $collisions = array_map(static function (array $row) {
+                return "id: {$row['id']}, name: '{$row['name']}'";
+            }, $collisionRows);
+            throw new CallbackException("YearLevel name must be unique. Collisions found: " . implode(', ', $collisions));
+        }
+
+        return true;
     }
 
     /**
