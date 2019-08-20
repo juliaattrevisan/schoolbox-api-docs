@@ -40,12 +40,12 @@
 
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">Pastoral Care Records</h2>
+        <h2 class="subheader">{{ locale.pastoralCare.proper }} Records</h2>
         {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 {% if externalEnabled == '1' %}
     <div class="small-12 island">
-        <h2 class="subheader">Import Pastoral Care Records From SIS</h2>
+        <h2 class="subheader">Import {{ locale.pastoralCare.proper }} Records From SIS</h2>
         <form data-form-import method="post" action="/adminv2/import-pastoral/process">
             <section>
                 <div class="content">

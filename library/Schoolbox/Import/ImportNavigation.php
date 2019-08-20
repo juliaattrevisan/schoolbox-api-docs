@@ -7,6 +7,8 @@
 namespace Schoolbox\Import;
 
 use Aura\Router\Router;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 
@@ -65,8 +67,10 @@ trait ImportNavigation
         /* Optional Pastoral Module
          */
         if ($this->getConfigLoader()->get('pastoral_enabled')) {
+            $rosettaStone = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+
             $args[] = new Node(
-                'Pastoral Care Records',
+                $rosettaStone->translate('pastoralCare', false, true) . ' Records',
                 $router->generate('adminImportPastoral.getIndex'),
                 $currentPage === 'adminImportPastoral'
             );
