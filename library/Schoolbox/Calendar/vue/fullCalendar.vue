@@ -112,6 +112,12 @@
              *                  false once they are finished.
              */
             onLoading(isLoading) {
+                // TODO this method should be unnecessary
+                // I should just be able to reference this in the `<full-calendar>`
+                // tag as `@loading="helper.onLoading"`, but `this` within that
+                // call is null.
+                // Even `@loading="helper.onLoading.bind(helper)"` fails, the method
+                // doesn't get called at all.
                 this.helper.onLoading(isLoading);
             },
 
@@ -319,6 +325,8 @@
              * @param date
              */
             toMoment(date) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
                 return this.helper.toMoment(date);
             },
 
@@ -339,6 +347,8 @@
              * @return {boolean}
              */
             isTask(event) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
                 return this.helper.isTask(event);
             },
 
@@ -374,6 +384,8 @@
              * @return {*}
              */
             dayTitleFormat(dateObject) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
                 return this.helper.dayTitleFormat(dateObject);
             },
         }

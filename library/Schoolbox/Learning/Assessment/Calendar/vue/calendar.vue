@@ -64,6 +64,8 @@
              *                  false once they are finished.
              */
             onLoading(isLoading) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading` in the main fullCalendar)
                 this.helper.onLoading(isLoading);
             },
 
@@ -105,6 +107,8 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading` in the main fullCalendar)
                 return this.helper.eventRender(eventRenderInfo);
             },
 
@@ -129,6 +133,8 @@
              * @param date
              */
             toMoment(date) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading` in the main fullCalendar)
                 return this.helper.toMoment(date);
             },
 
@@ -140,6 +146,8 @@
              * @return {*}
              */
             dayTitleFormat(dateObject) {
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading` in the main fullCalendar)
                 return this.helper.dayTitleFormat(dateObject);
             },
 
