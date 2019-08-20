@@ -14,16 +14,16 @@
             </div>
         {% endif %}
 
-        {% include '@upsRuleset/navigation.twig' with { allNodes: allNavigation } %}
+        {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
     <div class="small-12 island">
         <form action="{{ routeLookup(basename ~ '.preview') }}" method="post">
-                {% block helpText %}
-                {% endblock helpText %}
+            {% block helpText %}
+            {% endblock helpText %}
 
-                {% block form %}
-                    <input type="submit" value="Preview Import" />
-                {% endblock form %}
+            {% block form %}
+                <input type="submit" value="Preview Import" />
+            {% endblock form %}
         </form>
     </div>
 </div>

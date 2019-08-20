@@ -1,0 +1,9 @@
+{% if allNodes|length %}
+    <dl class="sub-nav">
+        {% for currentNode in allNodes %}
+            <dd {% if currentNode.isActive() %}class="active"{% endif %}>
+                <a href="{{ currentNode.getUrl() }}">{{ currentNode.getName() }}</a>
+            </dd>
+        {% endfor %}
+    </dl>
+{% endif %}
