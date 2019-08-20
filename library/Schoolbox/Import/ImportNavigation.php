@@ -4,7 +4,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Import;
 
 use Aura\Router\Router;
@@ -21,10 +20,11 @@ trait ImportNavigation
     /**
      * Builds breadcrumbs for this page.
      *
-     * @param  Router $router
+     * @param Router $router
      * @return Navigator
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
-    protected function buildBreadcrumbs(Router $router)
+    protected function buildBreadcrumbs(Router $router): Navigator
     {
         return new Navigator(
             new Node('Administration', '/adminv2/home', false),
@@ -35,48 +35,56 @@ trait ImportNavigation
     /**
      * Builds navigation for this page.
      *
-     * @param  Router $router
-     * @param  string $currentPage
+     * @param Router $router
+     * @param string $currentPage
      * @return Navigator
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \ReflectionException
      */
-    protected function buildNavigation(Router $router, $currentPage = '')
+    protected function buildNavigation(Router $router, string $currentPage = ''): Navigator
     {
-        $reflection = new \ReflectionClass(Navigator::class);
-        $args       = [
+        $args = [
             new Node(
                 'User',
                 $router->generate('adminImportUser.upload'),
-                ($currentPage == 'adminImportUser')
+                $currentPage === 'adminImportUser'
             ),
             new Node(
                 'User Photos',
                 $router->generate('adminPhotos.getIndex'),
-                ($currentPage == 'adminUserPhotos')
+                $currentPage === 'adminUserPhotos'
             ),
             new Node(
                 'Timetable Structure',
                 $router->generate('adminImportStructure.upload'),
-                ($currentPage == 'adminImportStructure')
+                $currentPage === 'adminImportStructure'
             ),
             new Node(
                 'Timetable',
                 $router->generate('adminImportTimetable.upload'),
-                ($currentPage == 'adminImportTimetable')
+                $currentPage === 'adminImportTimetable'
             ),
             new Node(
                 'Enrolment',
                 $router->generate('adminImportEnrolment.upload'),
-                ($currentPage == 'adminImportEnrolment')
+                $currentPage === 'adminImportEnrolment'
             ),
-
         ];
+
+        /* Optional Pastoral Module
+         */
         if ($this->getConfigLoader()->get('pastoral_enabled')) {
             $args[] = new Node(
                 'Pastoral Care Records',
                 $router->generate('adminImportPastoral.getIndex'),
-                ($currentPage == 'adminPastoralCare')
+                $currentPage === 'adminPastoralCare'
             );
         }
-        return $reflection->newInstanceArgs($args);
+
+        /* TODO: Reuses the UPS Navigator??
+         */
+        $reflection = (new \ReflectionClass(Navigator::class))->newInstanceArgs($args);
+
+        return $reflection;
     }
 }
