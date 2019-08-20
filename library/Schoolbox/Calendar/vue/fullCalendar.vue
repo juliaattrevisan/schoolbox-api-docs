@@ -11,7 +11,7 @@
     import MetaList                 from '@schoolbox/meta/list'
     import MetaItem                 from '@schoolbox/meta/item'
     import Toast                    from "@schoolbox/toast";
-    import ViewEventModal           from './viewEventModal';
+    import ViewEventModal           from '@schoolbox/fullcalendar/view-event-modal';
     import CreateEventModal         from './createEventModal';
     import ExportModal              from "./exportModal";
     import FilterModal              from "./filterModal";
