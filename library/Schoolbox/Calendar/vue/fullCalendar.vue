@@ -331,6 +331,7 @@
              * @param eventResizeInfo
              */
             onEventResize(eventResizeInfo) {
+                // TODO this needs to consider events in series
                 let event = eventResizeInfo.event,
                     data  = {
                         eventId: event?.extendedProps?.data?.meta?.eventId,
