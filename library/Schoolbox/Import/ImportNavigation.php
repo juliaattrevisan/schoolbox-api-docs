@@ -39,8 +39,8 @@ trait ImportNavigation
             ),
             new Node(
                 'User Photos',
-                $router->generate('adminPhotos.getIndex'),
-                $currentPage === 'adminPhotos'
+                $router->generate('adminImportPhotos.getIndex'),
+                $currentPage === 'adminImportPhotos'
             ),
             new Node(
                 'User Profiles',

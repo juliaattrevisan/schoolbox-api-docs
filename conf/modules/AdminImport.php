@@ -34,7 +34,7 @@ class AdminImport implements ModuleConfigInterface
 
         /* User Photos
          */
-        (new \Schoolbox\Admin\Photos\Module($di))->init('/adminv2/photos');
+        (new \Schoolbox\Admin\Import\Photos\Module($di))->init('/adminv2/import/photos');
 
         /* User Profile
          */

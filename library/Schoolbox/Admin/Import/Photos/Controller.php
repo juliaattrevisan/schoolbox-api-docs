@@ -7,7 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Admin\Photos;
+namespace Schoolbox\Admin\Import\Photos;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -120,7 +120,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/photos');
+        $this->getResponse()->redirect->afterPost('/adminv2/import/photos');
     }
 
     /**
@@ -132,10 +132,10 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             array(
-                'template' => '@adminPhotos/index.twig',
+                'template' => '@adminImportPhotos/index.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
-                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminPhotos')->getAllNodes(),
+                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                     'attachzone' => $this->getAttachZone(),
                 ),
             )
@@ -180,10 +180,10 @@ class Controller extends Base
         // Render this thing out
         $this->getResponse()->content->set(
             array(
-                'template' => '@adminPhotos/view.twig',
+                'template' => '@adminImportPhotos/view.twig',
                 'data'     => array(
                     'pageCurrent' => 'import',
-                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminPhotos')->getAllNodes(),
+                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                     'users' => $users,
                     'surname' => $surname
                 ),

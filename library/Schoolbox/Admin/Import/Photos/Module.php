@@ -7,7 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\Admin\Photos;
+namespace Schoolbox\Admin\Import\Photos;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule;
@@ -18,10 +18,9 @@ use InvalidArgumentException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\UserMapper;
 
-
 class Module extends BaseModule
 {
-    protected $basename = 'adminPhotos';
+    protected $basename = 'adminImportPhotos';
 
     /**
      * Hook method for setting up routes via self::register()
