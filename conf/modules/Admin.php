@@ -91,19 +91,5 @@ class Admin implements ModuleConfigInterface
 
         // Filters
         (new FilterModule($di))->init('/adminv2/filters');
-
-        /**
-         * Importers
-         */
-
-        /* User Photos
-         */
-        (new \Schoolbox\Admin\Photos\Module($di))->init('/adminv2/photos');
-
-        /* Pastoral Care
-         */
-        if ($di->get('config')->get('pastoral_enabled')) {
-            (new \Schoolbox\Admin\Import\Pastoral\Module($di))->init('/adminv2/import-pastoral');
-        }
     }
 }
