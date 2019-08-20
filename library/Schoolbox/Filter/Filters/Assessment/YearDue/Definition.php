@@ -46,32 +46,6 @@ class Definition extends Filter\AbstractDefinition
         return $key;
     }
 
-
-    /**
-     * @param string $key The option's abstract key
-     * @param string $page
-     * @param string $roleType
-     * @return bool
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // No options checked
-        return false;
-    }
-
-
-    /**
-     * @param string            $customAbstractKey
-     * @param Filter\Page\Model $pageFilter
-     * @return bool
-     */
-    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
-    {
-        // by default, all YearsDue are available
-        return true;
-    }
-
-
     /**
      * @inheritdoc
      */

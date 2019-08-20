@@ -111,27 +111,6 @@ class Definition extends Filter\AbstractDefinition
         throw new InvalidArgumentException(sprintf("Unknown '%s' key: '%s'", self::NAME, $key));
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // No options checked
-        return false;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
-    {
-        // by default, all options are available
-        return true;
-    }
-
-
     /**
      * @inheritdoc
      */

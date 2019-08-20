@@ -106,7 +106,14 @@ abstract class AbstractDefinition implements IDefinition
      * @param Page\Model $pageFilter
      * @return bool
      */
-    abstract protected function getInitialAvailability(string $customAbstractKey, Page\Model $pageFilter): bool;
+    protected function getInitialAvailability(
+        /** @noinspection PhpUnusedParameterInspection */
+        string $customAbstractKey,
+        Page\Model $pageFilter
+    ): bool
+    {
+        return true;
+    }
 
 
     /**
@@ -281,7 +288,14 @@ abstract class AbstractDefinition implements IDefinition
      * @param string $roleType
      * @return bool
      */
-    abstract protected function getInitialSelectedState(string $key, string $page, string $roleType): bool;
+    protected function getInitialSelectedState(
+        /** @noinspection PhpUnusedParameterInspection */
+        string $key,
+        string $page,
+        string $roleType
+    ): bool {
+        return false;
+    }
 
 
     /**

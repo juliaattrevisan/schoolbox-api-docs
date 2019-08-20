@@ -92,17 +92,6 @@ class Definition extends Filter\AbstractDefinition
         throw new InvalidArgumentException("Unknown AssessmentType key: $key");
     }
 
-
-    /**
-     * @inheritdoc
-     */
-    public function getInitialAvailability(string $customAbstractKey, Filter\Page\Model $pageFilter): bool
-    {
-        // by default, all AssessmentTypes are available
-        return true;
-    }
-
-
     /**
      * @inheritdoc
      */
@@ -127,17 +116,6 @@ class Definition extends Filter\AbstractDefinition
         }
         return $cleanPageOptions;
     }
-
-
-    /**
-     * @inheritdoc
-     */
-    protected function getInitialSelectedState(string $key, string $page, string $roleType): bool
-    {
-        // No options checked
-        return false;
-    }
-
 
     /**
      * @inheritdoc
