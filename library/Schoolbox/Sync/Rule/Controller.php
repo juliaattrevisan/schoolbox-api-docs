@@ -24,12 +24,12 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
-        $allBreadcrumbs = new Navigator(
+        $allBreadcrumbs = new Navigator([
             new Node('Home', '/adminv2/home', false),
             new Node('User Provisioning System', '/adminv2/ups', false),
             new Node(ucwords($params['rulesetId']), "/adminv2/ups/{$params['rulesetId']}", false),
             new Node('Add Rule', '#', true)
-        );
+        ]);
 
         $this->getResponse()->content->set([
             'template' => '@upsRule/add.twig',
@@ -84,11 +84,11 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
-        $allBreadcrumbs = new Navigator(
+        $allBreadcrumbs = new Navigator([
             new Node('Home', '/adminv2/home', false),
             new Node('User Provisioning System', '/adminv2/ups', false),
             new Node(ucwords($rulesetId), "/adminv2/ups/{$rulesetId}", true)
-        );
+        ]);
 
         $this->getResponse()->content->set([
             'template' => '@upsRule/add.twig',

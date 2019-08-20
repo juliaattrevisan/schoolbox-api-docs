@@ -26,10 +26,10 @@ trait ImportNavigation
      */
     protected function buildBreadcrumbs(Router $router): Navigator
     {
-        return new Navigator(
+        return new Navigator([
             new Node('Administration', '/adminv2/home', false),
             new Node('Importer', $router->generate('adminImport.intro'), true)
-        );
+        ]);
     }
 
     /**
@@ -81,10 +81,6 @@ trait ImportNavigation
             );
         }
 
-        /* TODO: Reuses the UPS Navigator??
-         */
-        $reflection = (new \ReflectionClass(Navigator::class))->newInstanceArgs($args);
-
-        return $reflection;
+        return new Navigator($args);
     }
 }

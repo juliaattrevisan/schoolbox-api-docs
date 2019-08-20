@@ -8,7 +8,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Sync\Navigator;
 
 use \Schoolbox\Collection;
@@ -20,27 +19,23 @@ class Navigator {
      *
      * @var Collection
      */
-    private $allNodes = null;
+    private $allNodes;
 
     /**
      * Constructor
      *
      * Accepts any number of breadcrumb nodes
+     *
+     * @param array $nodes
      */
-    public function __construct() {
-        $this->setAllNodes(new Collection());
+    public function __construct(array $nodes) {
+        $this->allNodes = new Collection();
 
-        $numArgs = func_num_args();
-
-        if ($numArgs) {
-            for ($i = 0; $i < $numArgs; $i++) {
-                $currentNode = func_get_arg($i);
-
-                /* Only add instances of \Schoolbox\Sync\Navigator\Node
-                 */
-                if ($currentNode instanceof Node) {
-                    $this->getAllNodes()->add($currentNode);
-                }
+        /* Only add instances of \Schoolbox\Sync\Navigator\Node
+         */
+        foreach ($nodes as $node) {
+            if ($node instanceof Node) {
+                $this->allNodes->add($node);
             }
         }
     }
@@ -49,21 +44,11 @@ class Navigator {
      */
 
     /**
-     * Set all Nodes
-     *
-     * @param \Schoolbox\Collection $allNodes
-     */
-    private function setAllNodes($allNodes)
-    {
-        $this->allNodes = $allNodes;
-    }
-
-    /**
      * Get all Nodes
      *
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
-    public function getAllNodes()
+    public function getAllNodes(): Collection
     {
         return $this->allNodes;
     }

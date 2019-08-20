@@ -64,18 +64,18 @@ class Controller extends Base {
 
         /* Breadcrumbs
          */
-        $allBreadcrumbs = new Navigator(
+        $allBreadcrumbs = new Navigator([
             new Node('Home', '/adminv2/home', false),
             new Node('User Provisioning System', $this->getBasePath(), true)
-        );
+        ]);
 
         /* Navigation
          */
-        $allNavigation = new Navigator(
+        $allNavigation = new Navigator([
             new Node('Student', "{$this->getBasePath()}/student", false),
             new Node('Parent', "{$this->getBasePath()}/parent", false),
             new Node('Staff', "{$this->getBasePath()}/staff", false)
-        );
+        ]);
 
         /* Twig data
          */
@@ -171,11 +171,11 @@ class Controller extends Base {
      */
     public function logs()
     {
-        $allBreadcrumbs = new Navigator(
+        $allBreadcrumbs = new Navigator([
             new Node('Home', '/adminv2/home', false),
             new Node('User Provisioning System', $this->getBasePath(), false),
             new Node('Logs', $this->getBasePath() . '/logs', true)
-        );
+        ]);
 
         $this->getResponse()->content->set([
             'template' => '@upsRuleset/log/list.twig',
@@ -265,13 +265,13 @@ class Controller extends Base {
                         $linesPerPage)
                 ];
 
-                $allBreadcrumbs = new Navigator(
+                $allBreadcrumbs = new Navigator([
                     new Node('Home', '/adminv2/home', false),
                     new Node('User Provisioning System', $this->getBasePath(), false),
                     new Node('Logs', $this->getBasePath() . '/logs', false),
                     new Node("{$log['timestamp']->getDatabase()} ({$log['roleType']})",
                         $this->getBasePath() . "/log/$logId", true)
-                );
+                ]);
 
                 $data = [
                     'id' => $logId,

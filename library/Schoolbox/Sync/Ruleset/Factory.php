@@ -45,51 +45,51 @@ class Factory
             /* Students
              */
             case Role::STUDENT:
-                $allBreadcrumbs = new Navigator(
+                $allBreadcrumbs = new Navigator([
                     new Node('Home', '/adminv2/home', false),
                     new Node('User Provisioning System', '/adminv2/ups', false),
                     new Node('Student', '/adminv2/ups/student', true)
-                );
+                ]);
 
-                $allNavigation = new Navigator(
+                $allNavigation = new Navigator([
                     new Node('Student', '/adminv2/ups/student', true),
                     new Node('Parent', '/adminv2/ups/parent', false),
                     new Node('Staff', '/adminv2/ups/staff', false)
-                );
+                ]);
 
                 break;
 
             /* Parents
              */
             case Role::PARENT:
-                $allBreadcrumbs = new Navigator(
+                $allBreadcrumbs = new Navigator([
                     new Node('Home', '/adminv2/home', false),
                     new Node('User Provisioning System', '/adminv2/ups', false),
                     new Node('Parent', '/adminv2/ups/parent', true)
-                );
+                ]);
 
-                $allNavigation = new Navigator(
+                $allNavigation = new Navigator([
                     new Node('Student', '/adminv2/ups/student', false),
                     new Node('Parent', '/adminv2/ups/parent', true),
                     new Node('Staff', '/adminv2/ups/staff', false)
-                );
+                ]);
 
                 break;
 
             /* Staff
              */
             case Role::STAFF:
-                $allBreadcrumbs = new Navigator(
+                $allBreadcrumbs = new Navigator([
                     new Node('Home', '/adminv2/home', false),
                     new Node('User Provisioning System', '/adminv2/ups', false),
                     new Node('Staff', '/adminv2/ups/staff', true)
-                );
+                ]);
 
-                $allNavigation = new Navigator(
+                $allNavigation = new Navigator([
                     new Node('Student', '/adminv2/ups/student', false),
                     new Node('Parent', '/adminv2/ups/parent', false),
                     new Node('Staff', '/adminv2/ups/staff', true)
-                );
+                ]);
 
                 break;
 
