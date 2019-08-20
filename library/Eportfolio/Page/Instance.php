@@ -294,7 +294,7 @@ class Eportfolio_Page_Instance extends Eportfolio_Page_Abstract
 
                 if ($this->getPage()->getDi()->has('sentry')) {
                     /** @var Raven_Client $sentry */
-                    $sentry = $this->$this->getPage()->get('sentry');
+                    $sentry = $this->getPage()->getDi()->get('sentry');
                     $sentry->captureException($e);
                 }
             }
