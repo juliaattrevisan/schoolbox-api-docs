@@ -59,7 +59,6 @@ class Controller extends Base
                 'template' => '@adminImportPastoral/index.twig',
                 'data'     => [
                     'pageCurrent'     => 'import',
-                    'allBreadcrumbs'  => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                     'externalEnabled' => $this->getConfigMapper()->get("external_pastoral"),
                 ],
             ]
@@ -75,7 +74,6 @@ class Controller extends Base
             'template' => '@adminImportPastoral/log.twig',
             'data'     => [
                 'pageCurrent'    => 'import',
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
             ],
         ]);
@@ -92,7 +90,6 @@ class Controller extends Base
             'template' => '@adminImportPastoral/logDetail.twig',
             'data'     => [
                 'pageCurrent'    => 'import',
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'log'            => $log,
             ],
         ]);
@@ -123,7 +120,6 @@ class Controller extends Base
             'template'   => '@adminImportPastoral/log.twig',
             'data'       => [
                 'pageCurrent'    => 'import',
-                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'logs'           => $this->getPastoralLogMapper()->findImportIds(),
                 'message'        => true,
             ],

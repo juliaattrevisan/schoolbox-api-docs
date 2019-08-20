@@ -54,7 +54,6 @@ class ImportController extends Base
     protected function getBaseData()
     {
         return [
-            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
             'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename'       => $this->basename,
             'hasExternalDb'  => ($this->getDi()->get('config')->get('external_type') != 'schoolbox'),
@@ -109,7 +108,7 @@ class ImportController extends Base
     public function import()
     {
         set_time_limit(1800);
-        
+
         $logger = $this->buildLogger();
         try {
             $reader = $this->buildReader($upload = $this->buildUpload());
