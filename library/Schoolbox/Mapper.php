@@ -2849,6 +2849,13 @@ abstract class Mapper implements IMapper, Serializable
                     continue;
                 }
 
+                // Dehydrates to an array if join was hydrated in model graph, null otherwise
+                $propertyValue = $this->getModelProperty($model, $map['property']);
+                if (null === $propertyValue) {
+                    // Join is not hydrated on this model
+                    continue;
+                }
+
                 $joinSchema = $this->joins[$map['join']];
                 $joinMulti  = $joinSchema['multi'];
                 $thisKey    = $this->getModelProperty($model, $this->getPropertyFromColumn($joinSchema['this_key']));
@@ -2868,9 +2875,6 @@ abstract class Mapper implements IMapper, Serializable
 
                 // step 2: insert new relations in join table
                 $insertRelationStatement = $this->database->prepare(sprintf($insertPattern, $viaTable, $viaLocal, $viaForeign));
-
-                // should dehydrate to an array
-                $propertyValue = (array)$this->getModelProperty($model, $map['property']);
 
                 // iterate the values given and insert into join table
                 $otherMapper       = $this->getJoinMapper($map['join']);
