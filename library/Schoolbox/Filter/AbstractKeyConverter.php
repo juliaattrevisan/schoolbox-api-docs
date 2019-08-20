@@ -29,7 +29,10 @@ abstract class AbstractKeyConverter implements IKeyConverter
 
 
     /**
-     * Fetch the item represented by the key
+     * Fetch the item represented by the key.
+     *
+     * The item will ultimately be injected into the IdFinder and its query building and the item's data type should
+     * be the most appropriate. Eg ids most likely INT or NULL, enums probably STRING
      *
      * @param string          $key
      * @param \Schoolbox\User $user
