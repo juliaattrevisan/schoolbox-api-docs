@@ -77,7 +77,7 @@ class Module extends BaseModule
 
             /* Check that the selected user exists in schoolbox
              */
-            $user = $this->getUserMapper()->findByExternalId($params['externalUserId']);
+            $user = $this->getUserMapper()->findByExternalId($params['externalUserId'], Role::STUDENT);
         } catch (MapperException $e) {
 
             /* If they weren't found in either, exit
