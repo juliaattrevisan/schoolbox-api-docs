@@ -1440,7 +1440,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     ) {
         $statement = $this->findForUserQuery($user, $get_subjects, $access_level, $exactAccess);
 
-        /** @var Collection|Model[] $collection */
+        /** @var Code\Mapper $folderCodeMapper */
+        $folderCodeMapper = $this->getJoinMapper('codes');
+
         $collection = $this->createCollection();
         while($row = $statement->fetch(PDO::FETCH_ASSOC)){
             $id = $row['c.id'];
@@ -1448,6 +1450,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // First time we've seen folder?
             if (!isset($collection[$id])) {
                 $collection[$id] = $this->hydrate($row, 'c');
+                $collection[$id]->setCodes($folderCodeMapper->createCollection());
             }
 
             $folder = $collection[$id];
@@ -1968,6 +1971,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     public function findFoldersWithResponses(User $student, Term $term = null)
     {
+        /** @var Code\Mapper $codeMapper */
         $codeMapper           = $this->getJoinMapper('codes');
 
         $whereParams = [
@@ -2022,6 +2026,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($folders[$folderId] == null) {
                 $folder = $this->hydrate($row, 'f');
                 $folders[$folderId] = $folder;
+                $folder->setCodes($codeMapper->createCollection());
             } else {
                 $folder = $folders[$folderId];
             }
@@ -2160,6 +2165,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             if (!$folderCache[$folderId] instanceof Model) {
                 $folderCache[$folderId] = $this->hydrate($row, 'f');
+                $folderCache[$folderId]->setCodes($codeMapper->createCollection());
                 $folders->add($folderCache[$folderId]);
             }
 
