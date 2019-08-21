@@ -53,6 +53,9 @@
       margin-right: 1rem;
     }
   }
+  @media #{$small-only} {
+    display: block;
+  }
 }
 
 /* TODO: This already existed in _content.scss
