@@ -55,8 +55,9 @@ fi
 echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
-cat /etc/apt/sources.list
-cat /etc/apt/sources.list.d/*
+apt-get update
+
+apt-get install php-xdebug -f
 
 sudo phpenmod -s cli xdebug
 echo "Running php unit"
@@ -65,6 +66,8 @@ unitTestResult=$?;
 sudo phpdismod -s cli xdebug
 #phpdbg -qrr -d memory_limit=-1 vendor/bin/phpunit --configuration phpunit.xml --testsuite default --coverage-clover clover.xml
 #unitTestResult=$?;
+
+apt-get remove php-xdebug -f
 
 echo "Uploading results to Code Climate"
 export CC_TEST_REPORTER_ID=baf2d1f70fd896aed53229eb8da1f700d250bead944063cfdb190a9d40eef3cd;
