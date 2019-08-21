@@ -11,7 +11,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
-use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator as BaseTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -37,9 +36,6 @@ class Project implements IAssessmentTypeTranslator
      */
     protected $baseTranslator;
 
-    /** @var ProjectMapper */
-    private $projectMapper;
-
     /** @var MarkTypeMapper */
     private $markTypeMapper;
 
@@ -52,7 +48,6 @@ class Project implements IAssessmentTypeTranslator
     public function __construct(BaseTranslator $baseTranslator)
     {
         $this->baseTranslator = $baseTranslator;
-        $this->projectMapper  = ProjectMapper::getInstance(); // TODO inject
         $this->markTypeMapper = MarkTypeMapper::getInstance(); // TODO inject
     }
 
@@ -62,7 +57,7 @@ class Project implements IAssessmentTypeTranslator
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return $this->projectMapper->createModel(); // TODO consider using ID
+        return new ProjectModel();
     }
 
 

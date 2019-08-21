@@ -249,7 +249,7 @@ class Mapper extends BaseMapper
      */
     protected function createDynamicPlanIfNew(Model $assessment, Model $previous = null)
     {
-        if ($previous || $assessment->hasProject() || $assessment->getPlans()->count()) {
+        if ($previous || $assessment->hasProject() || ($assessment->getPlans() && $assessment->getPlans()->count())) {
             // this is a modify, or a project, or already has plan[s]; do nothing
             return true;
         }
@@ -830,6 +830,7 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             $project = $model->getProject();
             if ($project) {
+                $project->setAssessments($this->createCollection());
                 $projects[$project->getId()] = $project;
             }
         }
@@ -899,6 +900,8 @@ class Mapper extends BaseMapper
         foreach ($modelList as $model) {
             if (isset($curriculumNodes[$model->getId()])) {
                 $model->setCurriculumNodes($curriculumNodes[$model->getId()]);
+            } else {
+                $model->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
         }
         return $modelList;
@@ -931,8 +934,12 @@ class Mapper extends BaseMapper
                     // Broken assessment - not much I can do besides ignore
                     continue;
                 }
-                if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
-                    $submodel->setAttachments($files[$submodel->getId()]);
+                if ($submodel instanceof SubmissionBox) {
+                    if (!empty($files[$submodel->getId()])) {
+                        $submodel->setAttachments($files[$submodel->getId()]);
+                    } else {
+                        $submodel->setAttachments($this->getJoinMapper('duework.files')->createCollection());
+                    }
                 }
             }
         }
