@@ -28,8 +28,8 @@ Weather details page (linked from dashboard component)
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <div class="weather-summary">
-                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" />
-                                    <h3>{{ today.weatherSummary }}</h3>
+                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
+                                    <p>{{ today.weatherSummary }}</p>
                                 </div>
                             </div>
                         </li>
@@ -39,8 +39,7 @@ Weather details page (linked from dashboard component)
                                 <p class="meta">Currently</p>
                                 <div class="temperature">
                                     <p class="temperature-forecast">
-                                        <h3>{{ today.currentTemp }}&deg;C
-                                        </h3>
+                                        {{ today.currentTemp }}&deg;C
                                     </p>
                                 </div>
                             </div>
@@ -50,8 +49,8 @@ Weather details page (linked from dashboard component)
                                 <p class="meta">Temperature</p>
                                 <div class="temperature">
                                     <p class="temperature-forecast">
-                                        <h3><span class="hot">Hi {{ today.highTemp }}&deg;C</span>
-                                        <span class="cold">Lo {{ today.lowTemp }}&deg;C</span></h3>
+                                        <span class="hot">Hi {{ today.highTemp }}&deg;C</span>
+                                        <span class="cold">Lo {{ today.lowTemp }}&deg;C</span>
                                     </p>
                                 </div>
                             </div>
@@ -60,14 +59,14 @@ Weather details page (linked from dashboard component)
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <p class="meta">Wind</p>
-                                <h3>{{ today.windSpeed }} km/h {{ today.windDirection }}</h3>
+                                <p class="temperature-forecast">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
                             </div>
                         </li>
 
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <p class="meta">Humidity</p>
-                                <h3>{{ today.humidity }}%</h3>
+                                <p class="temperature-forecast">{{ today.humidity }}%</p>
                             </div>
                         </li>
                     </ul>
