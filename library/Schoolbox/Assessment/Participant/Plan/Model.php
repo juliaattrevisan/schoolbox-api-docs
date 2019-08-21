@@ -76,12 +76,6 @@ class Model implements ISoftDeletable
     private $participants;
 
 
-    public function __construct()
-    {
-        $this->participants = new GenericCollection(Participant\Model::class);
-    }
-
-
     // Getters/Setters
 
 
@@ -269,7 +263,8 @@ class Model implements ISoftDeletable
      */
     public function setParticipants(GenericCollection $participants): self
     {
-        $this->participants->replaceWith($participants);
+        $participants->assertCollectionOf(Participant\Model::class);
+        $this->participants = $participants;
         return $this;
     }
 }

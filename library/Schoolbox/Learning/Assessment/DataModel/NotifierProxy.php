@@ -144,6 +144,7 @@ class NotifierProxy
                       ->setCloseDate($plan->getDueDate())
                       ->setAssessment($assessmentModel);
             // Set participants too
+            $planModel->setParticipants($this->participantMapper->createCollection());
             foreach ($plan->getParticipants() as $participant) {
                 $participantModel = $this->participantMapper->createModel($participant->getId())
                     ->setUser($participant->getUser())

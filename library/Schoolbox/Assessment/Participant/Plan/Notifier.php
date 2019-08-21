@@ -468,6 +468,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                     ->setCloseDate($domainModelPlan->getDueDate());
 
                 // Finagle participants too
+                $dataModelPlan->setParticipants(ParticipantMapper::getInstance()->createCollection());
                 foreach ($domainModelPlan->getParticipants() as $participant) {
                     $dataModelParticipant = ParticipantMapper::getInstance()->createModel($participant->getId());
                     $dataModelParticipant

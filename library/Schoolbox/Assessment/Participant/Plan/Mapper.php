@@ -149,10 +149,17 @@ class Mapper extends BaseMapper
 
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $plan = $plans[$row['id']] ?? $this->hydrate($row);
-            if (!$plan) {
-                continue;
+            if ($plans[$row['id']]) {
+                $plan = $plans[$row['id']];
+            } else {
+                $plan = $this->hydrate($row);
+                // Are we hydrating 'participant' join?
+                if (array_key_exists('p.id', $row)) {
+                    $plan->setParticipants($participantMapper->createCollection());
+                }
+                $plans[$plan->getId()] = $plan;
             }
+
             // Did the query join onto participants and users?
             $participant = null;
             $user = null;
@@ -168,7 +175,6 @@ class Mapper extends BaseMapper
                 $participant->setUser($user);
                 $plan->getParticipants()[$participant->getUser()->getId()] = $participant;
             }
-            $plans[$plan->getId()] = $plan;
         }
         return $plans;
     }
