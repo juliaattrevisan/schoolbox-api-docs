@@ -55,6 +55,9 @@ fi
 echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
+cat /etc/apt/sources.list
+cat /etc/apt/sources.list.d/*
+
 sudo phpenmod -s cli xdebug
 echo "Running php unit"
 php -e vendor/bin/paratest -p 4 --configuration phpunit.xml --testsuite default --coverage-clover clover.xml
