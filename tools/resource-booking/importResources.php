@@ -77,7 +77,7 @@ HELP
             }
 
             // Create the resource to import booking for
-            $resource = new Item\Model();
+            $resource = Item\Model::createEmpty();
             $resource
                 ->setName($row['Name'])
                 ->setDescription($row['Description'])
