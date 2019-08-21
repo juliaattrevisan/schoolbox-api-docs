@@ -131,7 +131,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
         ));
 
         $this->hasJoin('user', array(
-            'multiple'  => true,
+            'multiple'  => false,
             'mapper'    => '\\Schoolbox\\UserMapper',
             'this_key'  => 'owner_id',
             'other_key' => 'id',
