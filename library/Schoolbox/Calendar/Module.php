@@ -8,16 +8,19 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule\Any;
+use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
+use Alaress\Authorizer\Rule\IsSuperuser;
+use Alaress\Authorizer\Rule\IsUserOrParentOfUser;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -35,7 +38,7 @@ class Module extends BaseModule
     {
         // Supported format MM-DD-YYYY
         // Explanation here: https://regex101.com/r/X8zFce/1
-        $this->addGetRoute($router, 'getCalendar', $basePath, "/v2{/selectedDate}")->addTokens([
+        $this->addGetRoute($router, 'getCalendar', $basePath, "/full{/selectedDate}")->addTokens([
             'date' => '([0-2][0-9]|(3)[0-1]\d+(-))(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}'
         ]);
     }
@@ -43,10 +46,23 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-//    public function initRoutePermissions(Authorizer $authorizer)
-//    {
-//        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn());
-//    }
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission($authorizer, '.*', new IsLoggedIn())
+        ->addRoutePermission(
+            $authorizer,
+            '.*',
+            new Any(
+                new IsSuperuser(),
+                new HasRole(Role::STAFF),
+                new IsUserOrParentOfUser(
+                    $this->getExternalUser(),
+                    $this->getMapperFactory()->get(UserMapper::class),
+                    'id'
+                )
+            )
+        );
+    }
 
     /**
      * @inheritdoc
