@@ -10,7 +10,6 @@ namespace Schoolbox\Comms\News;
 use Alaress\Json\Linkable;
 use Alaress\Json\SerializeTrait;
 use Alaress_Date_Format;
-use DomainException;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Exceptions\InvalidTransitionException;
 use Schoolbox\Discussion\Thread;
@@ -24,6 +23,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Comms\News\Topic;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use TypeError;
 
 class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thread\Context\IThreadLocation
 {
@@ -988,7 +988,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
     /**
      * @param GenericCollection|Audience\Model[] $audience
-     * @throws DomainException If the new collection contains items of an incompatible type
+     * @throws TypeError If the new collection contains items of an incompatible type
      * @return $this
      */
     public function setAudience(GenericCollection $audience): self

@@ -29,6 +29,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
 use Schoolbox\YearLevel;
+use TypeError;
 use UnexpectedValueException;
 
 /**
@@ -421,7 +422,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * @param GenericCollection $codes
      * @return $this
-     * @throws UnexpectedValueException
+     * @throws TypeError
      */
     public function setCodes($codes)
     {
@@ -587,12 +588,14 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param Collection|IAssessable[] $assessables
+     * @param Collection|GenericCollection|IAssessable[] $assessables
      * @return static
+     * @throws TypeError
      */
     public function setAssessables(Collection $assessables)
     {
-        $this->assessables->replaceWith($assessables);
+        $assessables->assertCollectionOf(IAssessable::class);
+        $this->assessables = $assessables;
         return $this;
     }
 
@@ -645,7 +648,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * @param GenericCollection|YearLevel\Model[]|null $yearLevels
      * @return $this
-     * @throws UnexpectedValueException
+     * @throws TypeError
      */
     public function setYearLevels(GenericCollection $yearLevels): self
     {

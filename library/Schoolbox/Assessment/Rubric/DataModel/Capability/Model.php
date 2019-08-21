@@ -6,14 +6,13 @@
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
-use DomainException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use UnexpectedValueException;
+use TypeError;
 
 /**
  * Model for rubric capabilities.
@@ -145,7 +144,7 @@ class Model implements ISoftDeletable
     /**
      * @param IndicatorModel[]|GenericCollection $indicators
      * @return $this
-     * @throws UnexpectedValueException
+     * @throws TypeError
      */
     public function setIndicators(GenericCollection $indicators): self
     {
