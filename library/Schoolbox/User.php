@@ -221,7 +221,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     private $boardingStatus;
 
     /**
+     *
      * @var IConfigLoader
+     * @deprecated Don't use this in new code, models should not have dependencies on services
+     * @todo Remove this from this model
      */
     protected $config_loader;
 
@@ -239,21 +242,25 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     private $children;
 
-
     /**
-     * Build default empty objects so things don't explode
+     * Returns a new user with empty joins (as opposed to simply not hydrated and therefore unknown)
+     *
+     * @return User
      * @throws \UnexpectedValueException
      */
-    public function __construct()
+    public static function createEmpty(): self
     {
-        $this->campusCollection = new GenericCollection(Campus::class);
-        $this->subject_collection = new GenericCollection(Subject::class);
-//        $this->accessList = new GenericCollection(UserAccess::class);
-        $this->setConfigLoader(new ConfigLoader());
-        $this->setLinkedUser(new Collection(array()));
-        $this->setRole(new Role());
-        $this->children = new GenericCollection(self::class);
-        $this->parents  = new GenericCollection(self::class);
+        $emptyUser = new static();
+
+        // Create empty (not NULL) joins.
+        $emptyUser->subject_collection = new GenericCollection(Subject::class);
+        $emptyUser->children = new GenericCollection(self::class);
+        $emptyUser->parents  = new GenericCollection(self::class);
+
+        // TODO. Remove global dependency
+        $emptyUser->config_loader = new ConfigLoader();
+
+        return $emptyUser;
     }
 
 
@@ -1336,10 +1343,12 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
     /**
      * @param Collection|self[] $linkedUser
+     * @return $this
      */
-    public function setLinkedUser($linkedUser)
+    public function setLinkedUser($linkedUser): self
     {
         $this->linkedUser = $linkedUser;
+        return $this;
     }
 
     /**

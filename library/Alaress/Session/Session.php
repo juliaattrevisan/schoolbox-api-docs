@@ -79,7 +79,7 @@ class Session extends BaseSession {
         if ($this->isAuthSessionAlive()) {
             $user = $this->getSegment(null)->get('user');
         }
-        return ($user instanceof User) ? $user : new User();
+        return ($user instanceof User) ? $user : User::createEmpty();
     }
 
     /**

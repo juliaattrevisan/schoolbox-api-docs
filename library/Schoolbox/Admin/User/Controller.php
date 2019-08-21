@@ -554,8 +554,7 @@ class Controller extends Base
         if (!isset($user)) {
 
             // Creating a new user
-
-            $user = new User();
+            $user = User::createEmpty();
 
             // New users get enabled automatically
 
