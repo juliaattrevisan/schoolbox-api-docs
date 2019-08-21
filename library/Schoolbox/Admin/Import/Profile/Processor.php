@@ -57,7 +57,7 @@ class Processor
             /* Get the columns out and from here, work out what kind of file it is
              */
             $header = $reader->current();
-//                new \Alaress_Probe($file, $header);
+                new \Alaress_Probe($file, $header);
 //                die();
 
 
@@ -70,7 +70,7 @@ class Processor
 
                 /* Process the Student Profile csv
                  */
-                $this->processStudentProfile($file);
+                $this->processStudentProfile($reader);
             } elseif ($this->isStaffProfile($header)) {
 
                 /* Process the Staff Profile csv
@@ -122,8 +122,39 @@ class Processor
     {
         return $this->matches($row, [
             'External ID',
+            'Type',
+            'Username',
+            'Title',
             'Firstname',
-            'Lastname',
+            'Surname',
+            'Gender',
+            'Email',
+            'Mobile',
+            'Date of Birth',
+            'House',
+            'Head of House ID',
+            'Head of House Name',
+            'Form',
+            'Form Teacher ID',
+            'Form Teacher Name',
+            'Tutor',
+            'Tutor Teacher ID',
+            'Tutor Teacher Name',
+            'Year Level',
+            'Year Level Coordinator ID',
+            'Year Level Coordinator Name',
+            'Studies Code',
+            'Medical Alert',
+            'Comment',
+            'Contact Alert',
+            'Legal Alert',
+            'Enrolment Date',
+            'Leaving Date',
+            'IB',
+            'ILP',
+            'ESL',
+            'Special Needs',
+            'Boarding Status'
         ]);
     }
 
@@ -131,10 +162,13 @@ class Processor
     /**
      * Process student profile csv
      *
-     * @param $file
+     * @param Reader $reader
      */
-    private function processStudentProfile($file)
+    private function processStudentProfile(Reader $reader): void
     {
+        foreach ($reader as $i => $row) {
+            new \Alaress_Probe($row);
+        }
     }
 
 
