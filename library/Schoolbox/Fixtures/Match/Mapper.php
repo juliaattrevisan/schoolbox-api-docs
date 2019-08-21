@@ -95,6 +95,11 @@ class Mapper extends BaseMapper
      */
     public function saveItinerary(Match $match)
     {
+        if ($match->getItinerary() === null) {
+            // Don't attempt to save if join is not hydrated
+            return true;
+        }
+
         // ensure the itinerary items all point to the correct match (ie. this one)
         foreach ($match->getItinerary() as $item) {
             $item->setMatch($match);

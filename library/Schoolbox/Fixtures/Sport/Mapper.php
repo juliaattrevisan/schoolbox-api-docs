@@ -91,6 +91,9 @@ class Mapper extends BaseMapper
     {
         /** @var Sport[] $cache */
         $cache = [];
+        /** @var PositionMapper $positionMapper */
+        $positionMapper = $this->getJoinMapper('positions');
+        $positionIdCol  = "p.{$positionMapper->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
 
@@ -98,9 +101,13 @@ class Mapper extends BaseMapper
 
             if (empty($cache[$sportId])) {
                 $cache[$sportId] = $this->hydrate($r);
+                $cache[$sportId]->setPositions($positionMapper->createCollection());
             }
 
-            $cache[$sportId]->getPositions()->add($this->hydrateJoin($r, 'positions', 'p'));
+            // Only add position/s if sport has some
+            if (isset($r[$positionIdCol])) {
+                $cache[$sportId]->getPositions()->add($this->hydrateJoin($r, 'positions', 'p'));
+            }
         }
 
         return $this->createCollection($cache);

@@ -15,6 +15,7 @@ use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Division\User\Model as DivisionUser;
 use Schoolbox\Fixtures\Division\User\Mapper as DivisionUserMapper;
+use Schoolbox\UserMapper;
 
 /**
  * Collects metadata for Schoolbox\Fixtures\Division\Model objects,
@@ -73,6 +74,7 @@ class Collector
         // TODO add players into division model as a M2M join
         /** @var DivisionUser[] $players */
         $players = $this->getDivisionUserMapper()->findByColumn('division_id', $division->getId(), ['order' => ['sequence' => 'desc']]);
+        $division->setPlayers(UserMapper::getInstance()->createCollection());
         foreach ($players as $player) {
             $division->getPlayers()->add($player->getUser());
         }
@@ -93,6 +95,9 @@ class Collector
             $teams = $this->getTeamMapper()->findByColumn('division_id', $division->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+        foreach ($teams as $team) {
+            $team->setPlayers(UserMapper::getInstance()->createCollection());
         }
 
         $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(

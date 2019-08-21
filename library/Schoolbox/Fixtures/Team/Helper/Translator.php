@@ -12,6 +12,7 @@ use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 /**
  * Translates a Division object into a data format that is suitable for use in
@@ -78,7 +79,7 @@ class Translator
             $team->getId(),
             ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
         );
-
+        $team->setPlayers(UserMapper::getInstance()->createCollection());
         foreach ($teamPlayers as $teamPlayer) {
             $team->getPlayers()->add($teamPlayer->getUser());
         }
