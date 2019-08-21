@@ -10,6 +10,9 @@ namespace Schoolbox\Survey\Attempt;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Survey\Mapper as SurveyMapper;
 
+/**
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ */
 class Mapper extends BaseMapper
 {
     /**
