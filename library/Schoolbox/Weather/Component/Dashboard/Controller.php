@@ -43,8 +43,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         $location = $this->determineWeatherLocation();
 
-        $this->setComponentName("Weather in {$location}");
-
         // Number of days of forecast to show.
         // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option,
         // so we have to fall back to default
@@ -57,6 +55,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
 
         $this->weatherPayload = (new ApixuClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
+
+        $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");
 
         return true;
     }
