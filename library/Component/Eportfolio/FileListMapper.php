@@ -73,14 +73,14 @@ class FileListMapper extends Schoolbox\Mapper
 		));
 
 		$this->hasJoin($this->myFileJoin, array(
-			'multiple'  => true,
+            'multiple'  => false,
 			'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
 			'this_key'  => 'file_id',
 			'other_key' => 'id',
 		));
 
 		$this->hasJoin('pages', array(
-			'multiple'  => true,
+            'multiple'  => false,
 			'mapper'    => '\\Eportfolio\\PageMapper',
 			'this_key'  => 'page_id',
 			'other_key' => 'page_id',
