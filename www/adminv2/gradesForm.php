@@ -30,7 +30,7 @@ foreach ($_POST['group'] as $groupId => $group) {
     // Save each group
     if (strlen($group['name']) > 0) {
         if (preg_match('/^new-/', $groupId)) {
-            $groupModel = new GradeLevel\Group\Model();
+            $groupModel = GradeLevel\Group\Model::createEmpty();
         } else {
             $groupModel = $groupMapper->findById($groupId);
         }

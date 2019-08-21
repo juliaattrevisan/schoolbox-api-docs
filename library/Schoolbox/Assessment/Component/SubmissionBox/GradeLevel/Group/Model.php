@@ -11,6 +11,8 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevelModel;
+use Schoolbox\GenericCollection;
+use UnexpectedValueException;
 
 class Model
 {
@@ -36,11 +38,17 @@ class Model
     protected $gradeLevels;
 
     /**
-     * Constructor - sets up grade level collection.
+     * Returns a new empty model
+     *
+     * @return Model
+     * @throws UnexpectedValueException
      */
-    public function __construct()
+    public static function createEmpty(): self
     {
-        $this->setGradeLevels(new Collection());
+        $emptyModel = new static();
+        $emptyModel->gradeLevels = new GenericCollection(GradeLevelModel::class);
+
+        return $emptyModel;
     }
 
     /**
