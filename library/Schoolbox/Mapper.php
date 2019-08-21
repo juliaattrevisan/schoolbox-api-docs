@@ -2849,12 +2849,15 @@ abstract class Mapper implements IMapper, Serializable
                     continue;
                 }
 
-                // Dehydrates to an array if join was hydrated in model graph, null otherwise
+                // Hydrated N:N joins may contain either a model or collection,
+                // these dehydrate to a model identifier and array, respectively.
+                // Dehydrates to null if join was not hydrated at all.
                 $propertyValue = $this->getModelProperty($model, $map['property']);
                 if (null === $propertyValue) {
                     // Join is not hydrated on this model
                     continue;
                 }
+                $propertyValue = (array)$propertyValue;
 
                 $joinSchema = $this->joins[$map['join']];
                 $joinMulti  = $joinSchema['multi'];
