@@ -16,7 +16,6 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use \Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
-use \DomainException;
 use Alaress_Date_NullDate;
 
 class Model implements ISoftDeletable
@@ -67,14 +66,6 @@ class Model implements ISoftDeletable
      * @var QuizAnswer[]|GenericCollection<QuizAnswer>
      */
     private $answers;
-
-    /**
-     * Model constructor.
-     */
-    public function __construct()
-    {
-        $this->answers = new GenericCollection(QuizAnswer::class);
-    }
 
     /**
      * The mark that the user has received for this attempt.
@@ -274,7 +265,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return QuizAnswer[]|GenericCollection<QuizQuestion>
+     * @return QuizAnswer[]|GenericCollection<QuizAnswer>
      */
     public function getAnswers()
     {
@@ -282,13 +273,13 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param GenericCollection $answers
+     * @param QuizAnswer[]|GenericCollection<QuizAnswer> $answers
      * @return static
-     * @throws DomainException if new Generic Collection is of incorrect type
      */
     public function setAnswers(GenericCollection $answers)
     {
-        $this->answers->replaceWith($answers);
+        $answers->assertCollectionOf(QuizAnswer::class);
+        $this->answers = $answers;
         return $this;
     }
 
