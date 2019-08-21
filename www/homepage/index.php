@@ -376,7 +376,7 @@ $this->setVar(array(
     'HEADING_JS' => json_encode($folder->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
     'CODE' => urlencode(urlencode($folder->getCodeString())),
     'ID' => $folder->getId(),
-    'USER_TOKEN' => $_SESSION['key'],
+    'USER_TOKEN' => $sessionUser->getKey(),
     'ENCODED_RETURN_URL' => Redirect::encode("/homepage/{$folder->getId()}"),
 
     /* Homepage rss feed
