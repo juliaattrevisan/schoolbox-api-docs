@@ -43,8 +43,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\IsExternalUser('externalUserId'),
-                new Rule\IsParentOfExternalUser($this->getExternalUser(), $this->getUserMapper(),'externalUserId')
+                new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper())
             )
         );
 
@@ -85,8 +84,11 @@ class Module extends BaseModule
             throw new NotFound();
         }
 
-
+        /* Preload data structure goes into perms chain
+         * Pass the $user->getId() value to reuse IsUserOrParentOfUser() auth rule
+         */
         return [
+            'id' => $user->getId(),
             'db' => \MSSQL::getInstance(),
             'externalUser' => $externalUser,
             'user' => $user
