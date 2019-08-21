@@ -245,7 +245,7 @@ class DataSource
             // (New capabilities may never be course-level, they are always
             //  created on the unit)
             if (!$capabilityModel) {
-                $capabilityModel = $capabilityMapper->createModel()
+                $capabilityModel = (new CapabilityModel())
                     ->setId($capabilityId)
                     ->setParentId($folder->getId())
                     ->setParentType(CapabilityModel::PARENT_TYPE_CATEGORY);

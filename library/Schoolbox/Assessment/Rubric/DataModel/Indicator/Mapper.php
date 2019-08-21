@@ -5,6 +5,7 @@
  */
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
+use PDOException;
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
@@ -15,6 +16,7 @@ use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use UnexpectedValueException;
 
 /**
  * Mapper for rubric indicators.
@@ -119,9 +121,13 @@ class Mapper extends BaseMapper {
         foreach ($collection as $indicator) {
             if (isset($indicatorNodes[$indicator->getId()])) {
                 $indicator->setCurriculumNodes($indicatorNodes[$indicator->getId()]);
+            } else {
+                $indicator->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
             if (isset($capabilityNodes[$indicator->getCapability()->getId()])) {
                 $indicator->getCapability()->setCurriculumNodes($capabilityNodes[$indicator->getCapability()->getId()]);
+            } else {
+                $indicator->getCapability()->setCurriculumNodes($curriculumNodeMapper->createCollection());
             }
         }
 
@@ -327,13 +333,21 @@ class Mapper extends BaseMapper {
      *
      * If none exists: create it
      *
+     * Hydrated joins:
+     * * curriculumNodes
+     * * capability
+     * * capability.curriculumNodes
+     *
      * @param int    $parentId
      * @param string $parentType
      * @param string $name
      * @param string $capabilityName
      * @param bool   $cache
      * @return Model
+     * @throws BaseMapper\DefinitionException
      * @throws MapperException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      */
     public function findOrCreateOneForParentByKey(
         int $parentId,
@@ -356,10 +370,13 @@ class Mapper extends BaseMapper {
             // Build it
             /** @var CapabilityMapper $capabilityMapper */
             $capabilityMapper = $this->getJoinMapper('capability');
+            /** @var NodeMapper $nodeMapper */
+            $nodeMapper = $this->getJoinMapper('curriculum_node_for_rubric_indicator');
             $capability       = $capabilityMapper->findOrCreateOneForParentByName($parentId, $parentType, $capabilityName, $cache);
             $indicator        = $this->createModel()
                                      ->setCapability($capability)
-                                     ->setName($name);
+                                     ->setName($name)
+                                     ->setCurriculumNodes($nodeMapper->createCollection());
             $this->save($indicator);
             return $indicator;
         }

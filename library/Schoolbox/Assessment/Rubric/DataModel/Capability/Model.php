@@ -83,9 +83,9 @@ class Model implements ISoftDeletable
      */
     public function __construct()
     {
-        $this->curriculumNodes = new GenericCollection(NodeModel::class);
         $this->indicators      = new GenericCollection(IndicatorModel::class);
     }
+
 
     /**
      * @return string
