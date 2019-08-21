@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission;
+use Schoolbox\Curriculum;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -23,7 +24,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Role;
 use Schoolbox\User;
-use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 
 class SubmissionBox implements IAssessableDataModel, ISoftDeletable
@@ -166,18 +166,30 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     private $selfReviewability;
 
+    /**
+     * Returns a new model with *empty* (as opposed to unknown) joins
+     *
+     * @return SubmissionBox
+     * @throws \UnexpectedValueException
+     */
+    public static function createEmpty(): self
+    {
+        $emptyModel = new static();
+        $emptyModel->submissions = new GenericCollection(Submission::class);
+        $emptyModel->attachments = new GenericCollection(SubmissionBox\SingleFile\Model::class);
+        $emptyModel->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class));
+        return $emptyModel;
+    }
+
 
     public function __construct()
     {
         $this->setCategory(new FolderModel());
-        $this->setCurriculumNodes(new Collection());
         $this->setPublishDate(new \Alaress_Date_NullDate());
         $this->setOpenDate(new \Alaress_Date_NullDate());
         $this->setDueDate(new \Alaress_Date_NullDate());
         $this->setLateDate(new \Alaress_Date_NullDate());
         $this->setAssessmentModel(new Model());
-        $this->submissions = new GenericCollection(Submission::class);
-        $this->attachments = new GenericCollection(SubmissionBox\SingleFile\Model::class);
     }
 
     /**

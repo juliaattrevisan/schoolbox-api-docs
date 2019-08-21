@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model as DueWorkFileModel;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -24,26 +25,22 @@ use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
  */
 class DueWork implements IAssessmentTypeTranslator
 {
-    /** @var SubmissionBoxMapper */
-    private $submissionBoxMapper;
-
     /** @var DueWorkModel\MarkTypeMapper */
     private $markTypeMapper;
 
     public function __construct()
     {
-        $this->submissionBoxMapper = SubmissionBoxMapper::getInstance(); // TODO inject
         $this->markTypeMapper = DueWorkModel\MarkTypeMapper::getInstance(); // TODO inject
     }
 
 
     /**
      * @return IAssessableDataModel
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return $this->submissionBoxMapper->createModel(); // TODO consider using ID
+        return SubmissionBox::createEmpty();
     }
 
 
