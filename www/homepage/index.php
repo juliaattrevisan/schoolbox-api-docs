@@ -327,7 +327,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
         'colour_list_block' => '',
         'course_actions_block' => '',
 
-        // Read access users still see their collapse button 
+        // Read access users still see their collapse button
         'HIDE_CONTROLS_ON_WRITE' => ''
     ]);
 }
@@ -376,6 +376,7 @@ $this->setVar(array(
     'HEADING_JS' => json_encode($folder->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
     'CODE' => urlencode(urlencode($folder->getCodeString())),
     'ID' => $folder->getId(),
+    'USER_TOKEN' => $sessionUser->getKey(),
     'ENCODED_RETURN_URL' => Redirect::encode("/homepage/{$folder->getId()}"),
 
     /* Homepage rss feed

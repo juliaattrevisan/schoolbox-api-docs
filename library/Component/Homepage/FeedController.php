@@ -59,8 +59,7 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             $this->setBlock('has_activity', 'event', 'event_block');
 
             $this->setVar([
-                'empty_state_block' => '',
-                'USER_TOKEN' => $_SESSION['key']
+                'empty_state_block' => ''
             ]);
 
             if (!$this->feed->count()) {
