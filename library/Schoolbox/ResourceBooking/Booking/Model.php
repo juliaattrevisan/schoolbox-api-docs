@@ -80,11 +80,6 @@ class Model implements ISoftDeletable, JsonSerializable
      */
     protected $relatedBookingList;
 
-    public function __construct()
-    {
-        $this->setRelatedBookingList(new Collection());
-    }
-
     /**
      * @param  Alaress_Date_Format $modifiedAt
      * @return $this
