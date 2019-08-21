@@ -8,8 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Csv\Reader;
-use Psr\Log\LoggerInterface;
-use Schoolbox\Resource\Storage\IStorage;
 
 /**
  * Class Processor
@@ -40,48 +38,59 @@ class Processor
 
 
     /**
-     * Process each of the supplied files
+     * Process each of the supplied files in any order
+     * Override this class for different data sources when needed
+     *
      * @throws \RuntimeException
      */
     public function process(): void
     {
         foreach ($this->files as $file) {
+            $this->processOne($file->readStream());
+        }
+    }
 
-            $reader = new Reader($file->readStream());
-            $reader->setLoadFromFirst(false);
 
-            /* Load the first row
+    /**
+     * Process the contents of a supplied file
+     *
+     * @param resource $contents
+     *
+     * @throws \RuntimeException
+     */
+    private function processOne($contents): void
+    {
+        $reader = new Reader($contents);
+        $reader->setLoadFromFirst(false);
+
+        /* Load the first row
+         */
+        $reader->next();
+
+        /* Get the columns out and from here, work out what kind of file it is
+         */
+        $header = $reader->current();
+
+        if ($this->isRelation($header)) {
+
+            /* Process the Relations csv
              */
-            $reader->next();
+            $this->processRelation($reader);
+        } elseif ($this->isStudentProfile($header)) {
 
-            /* Get the columns out and from here, work out what kind of file it is
+            /* Process the Student Profile csv
              */
-            $header = $reader->current();
-                new \Alaress_Probe($file, $header);
-//                die();
+            $this->processStudentProfile($reader);
+        } elseif ($this->isStaffProfile($header)) {
 
+            /* Process the Staff Profile csv
+             */
+            $this->processStaffProfile($reader);
+        } elseif ($this->isParentProfile($header)) {
 
-            if ($this->isRelation($header)) {
-
-                /* Process the Relations csv
-                 */
-                $this->processRelation($file);
-            } elseif ($this->isStudentProfile($header)) {
-
-                /* Process the Student Profile csv
-                 */
-                $this->processStudentProfile($reader);
-            } elseif ($this->isStaffProfile($header)) {
-
-                /* Process the Staff Profile csv
-                 */
-                $this->processStaffProfile($reader);
-            } elseif ($this->isParentProfile($header)) {
-
-                /* Process the Parent Profile csv
-                 */
-                $this->processParentProfile($reader);
-            }
+            /* Process the Parent Profile csv
+             */
+            $this->processParentProfile($reader);
         }
     }
 
@@ -95,9 +104,10 @@ class Processor
     private function isRelation(array $row): bool
     {
         return $this->matches($row, [
-            'External ID',
-            'Firstname',
-            'Lastname',
+            'Relation ID',
+            'Student ID',
+            'Type',
+            'Emergency Contact',
         ]);
     }
 
@@ -105,10 +115,13 @@ class Processor
     /**
      * Process the Relations csv
      *
-     * @param $file
+     * @param Reader $reader
      */
-    private function processRelation(IStorage $file)
+    private function processRelation(Reader $reader): void
     {
+        foreach ($reader as $i => $row) {
+            new \Alaress_Probe($row);
+        }
     }
 
 
