@@ -255,7 +255,9 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function __clone()
     {
-        $this->campusCollection = clone $this->campusCollection;
+        if ($this->campusCollection !== null) {
+            $this->campusCollection = clone $this->campusCollection;
+        }
 //        $this->accessList = clone $this->accessList;
         if ($this->accessList instanceof GenericCollection) {
             $this->accessList = clone $this->accessList;
@@ -1436,13 +1438,13 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
 
     /**
-     * @param Collection|User[] $children
+     * @param GenericCollection<User> $children
      * @return $this
-     * @throws DomainException If collection has wrong member-item type
      */
-    public function setChildren(Collection $children): self
+    public function setChildren(GenericCollection $children): self
     {
-        $this->children->replaceWith($children);
+        $children->assertCollectionOf(self::class);
+        $this->children = $children;
         return $this;
     }
 

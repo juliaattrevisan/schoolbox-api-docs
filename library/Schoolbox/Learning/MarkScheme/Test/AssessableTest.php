@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\MarkScheme\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\Participant;
@@ -2988,7 +2989,8 @@ class AssessableTest extends TestCase
         ];
         $gradeGroup = (new GradeGroup())
             ->setId($data[0]['id'])
-            ->setName($data[0]['name']);
+            ->setName($data[0]['name'])
+            ->setGradeLevels(new GenericCollection(GradeLevel::class));
 
         foreach ($data[0]['grades'] as $gradeLevelArr) {
             $gradeLevel = (new GradeLevel())

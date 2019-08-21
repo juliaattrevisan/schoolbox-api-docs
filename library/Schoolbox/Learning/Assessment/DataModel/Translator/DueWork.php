@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model as DueWorkFileModel;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
@@ -120,15 +119,17 @@ class DueWork implements IAssessmentTypeTranslator
         }
 
         // Translate files
-        $dataModel->setAttachments(new GenericCollection(SubmissionBox\SingleFile\Model::class));
-        foreach ($domainObject->getAttachedFiles() as $file) {
-            $dataModel->addAttachment(
-                (new DueWorkFileModel())
-                    ->setId($file->getId())
-                    ->setBox($dataModel)
-                    ->setStorage($file->getStorage())
-                    ->setBasename($file->getBasename())
-            );
+        if ($domainObject->getAttachedFiles() !== null) {
+            $dataModel->setAttachments(new GenericCollection(SubmissionBox\SingleFile\Model::class));
+            foreach ($domainObject->getAttachedFiles() as $file) {
+                $dataModel->addAttachment(
+                    (new DueWorkFileModel())
+                        ->setId($file->getId())
+                        ->setBox($dataModel)
+                        ->setStorage($file->getStorage())
+                        ->setBasename($file->getBasename())
+                );
+            }
         }
     }
 
@@ -179,13 +180,16 @@ class DueWork implements IAssessmentTypeTranslator
 
         // Convert attachments
         $domainObject->setAttachedFiles($domainObject->getAttachedFiles()->emptyClone());
-        foreach ($dataModel->getAttachments() as $attachment) {
-            $domainObject->getAttachedFiles()->add(
-                (new DueWorkFile())
-                    ->setId($attachment->getId())
-                    ->setFilename($attachment->getFilename())
-                    ->setStorage($attachment)
-            );
+        if ($dataModel->getAttachments() !== null) {
+            $domainObject->setAttachedFiles(new GenericCollection(DueWorkFile::class));
+            foreach ($dataModel->getAttachments() as $attachment) {
+                $domainObject->getAttachedFiles()->add(
+                    (new DueWorkFile())
+                        ->setId($attachment->getId())
+                        ->setFilename($attachment->getFilename())
+                        ->setStorage($attachment)
+                );
+            }
         }
 
         // Convert work type

@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\MarkScheme\Test;
 
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
@@ -107,6 +108,7 @@ class LetterGradeTest extends TestCase
         $gradeGroup = new GradeGroup();
         $gradeGroup->setId(3);
         $gradeGroup->setName('Competency');
+        $gradeGroup->setGradeLevels(new GenericCollection(GradeLevel::class));
 
         $levelDatums = [
             ['13',  '0', '20', 'Needs Attention'],

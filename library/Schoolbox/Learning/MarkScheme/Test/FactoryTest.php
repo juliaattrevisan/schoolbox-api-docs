@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
@@ -378,6 +379,7 @@ class FactoryTest extends TestCase
         $gradeGroup = new GradeGroup();
         $gradeGroup->setId(3);
         $gradeGroup->setName('Competency');
+        $gradeGroup->setGradeLevels(new GenericCollection(GradeLevel::class));
 
         $levelDatums = [
             ['13', '0', '20', 'Needs Attention'],

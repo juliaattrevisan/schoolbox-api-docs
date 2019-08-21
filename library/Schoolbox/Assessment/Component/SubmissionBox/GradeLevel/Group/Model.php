@@ -11,8 +11,6 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevelModel;
-use Schoolbox\GenericCollection;
-use UnexpectedValueException;
 
 class Model
 {
