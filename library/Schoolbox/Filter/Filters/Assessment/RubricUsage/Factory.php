@@ -95,6 +95,7 @@ class Factory extends AbstractFactory
      * @throws ReflectionException
      * @throws Mapper\Exception
      * @throws UnexpectedValueException
+     * @throws \DomainException
      */
     public function buildComponent(
         IDefinition $definition,
@@ -133,8 +134,11 @@ class Factory extends AbstractFactory
         } elseif ($showIndicators) {
             $capabilities = RubricCapabilityMapper::getInstance()->createCollection();
             foreach (RubricIndicatorMapper::getInstance()->findForFolder($folders->getPropertyValues('id')) as $indicator) {
-                $capability                                       = $indicator->getCapability();
-                $capability->getIndicators()[$indicator->getId()] = $indicator;
+                $capability = $indicator->getCapability();
+                if (!$capability->getIndicators()) {
+                    $capability->setIndicators(RubricIndicatorMapper::getInstance()->createCollection());
+                }
+                $capability->getIndicators()->setOffset($indicator->getId(), $indicator);
                 if (!$capabilities->offsetExists($capability->getId())) {
                     $capabilities[$capability->getId()] = $capability;
                 }

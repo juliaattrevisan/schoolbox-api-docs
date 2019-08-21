@@ -8,12 +8,12 @@ namespace Schoolbox\Assessment\Rubric\DataModel\Capability;
 
 use DomainException;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
-use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use UnexpectedValueException;
 
 /**
  * Model for rubric capabilities.
@@ -79,15 +79,6 @@ class Model implements ISoftDeletable
     private $indicators;
 
     /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->indicators      = new GenericCollection(IndicatorModel::class);
-    }
-
-
-    /**
      * @return string
      */
     public function getName(): string
@@ -145,7 +136,7 @@ class Model implements ISoftDeletable
     /**
      * @return IndicatorModel[]|GenericCollection
      */
-    public function getIndicators(): GenericCollection
+    public function getIndicators(): ?GenericCollection
     {
         return $this->indicators;
     }
@@ -154,11 +145,12 @@ class Model implements ISoftDeletable
     /**
      * @param IndicatorModel[]|GenericCollection $indicators
      * @return $this
-     * @throws DomainException
+     * @throws UnexpectedValueException
      */
     public function setIndicators(GenericCollection $indicators): self
     {
-        $this->indicators->replaceWith($indicators);
+        $indicators->assertCollectionOf(IndicatorModel::class);
+        $this->indicators = $indicators;
         return $this;
     }
 }
