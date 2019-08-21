@@ -7,9 +7,7 @@
 namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
 
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
-use Schoolbox\Curriculum\Node\Model as NodeModel;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
-use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -35,14 +33,6 @@ class Model implements ISoftDeletable
      */
     private $capability;
 
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->curriculumNodes = new GenericCollection(NodeModel::class);
-    }
 
     /**
      * @param  string $name
