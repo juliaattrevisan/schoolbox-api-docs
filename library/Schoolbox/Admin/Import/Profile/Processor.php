@@ -7,7 +7,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
+use Alaress\Csv\Reader;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Resource\Storage\IStorage;
 
 /**
  * Class Processor
@@ -21,12 +23,6 @@ class Processor
 {
 
     /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-
-    /**
      * @var array
      */
     private $files;
@@ -35,23 +31,32 @@ class Processor
     /**
      * Processor constructor.
      *
-     * @param LoggerInterface $logger
      * @param array           $files
      */
-    public function __construct(LoggerInterface $logger, array $files)
+    public function __construct(array $files)
     {
-        $this->logger = $logger;
         $this->files = $files;
     }
 
 
     /**
      * Process each of the supplied files
+     * @throws \RuntimeException
      */
     public function process(): void
     {
         foreach ($this->files as $file) {
-            $header = fgetcsv($file);
+
+            $reader = new Reader($file->readStream());
+            $reader->setLoadFromFirst(false);
+
+            /* Load the first row
+             */
+            $reader->next();
+
+            /* Get the columns out and from here, work out what kind of file it is
+             */
+            $header = $reader->current();
 
             if ($this->isRelation($header)) {
 
@@ -72,7 +77,11 @@ class Processor
 
                 /* Process the Parent Profile csv
                  */
-                $this->processParentProfile($file);
+                $this->processParentProfile($reader);
+//
+//                new \Alaress_Probe($file, $header);
+//                die();
+
             }
         }
     }
@@ -99,7 +108,7 @@ class Processor
      *
      * @param $file
      */
-    private function processRelation($file)
+    private function processRelation(IStorage $file)
     {
     }
 
@@ -166,8 +175,15 @@ class Processor
     {
         return $this->matches($row, [
             'External ID',
+            'Type',
+            'Username',
+            'Title',
             'Firstname',
-            'Lastname',
+            'Surname',
+            'Email',
+            'Mobile',
+            'Home Phone',
+            'Work Phone'
         ]);
     }
 
@@ -175,10 +191,13 @@ class Processor
     /**
      * Process parent profile csv
      *
-     * @param $file
+     * @param Reader $reader
      */
-    private function processParentProfile($file)
+    private function processParentProfile(Reader $reader): void
     {
+        foreach ($reader as $i => $row) {
+            new \Alaress_Probe($row);
+        }
     }
 
 

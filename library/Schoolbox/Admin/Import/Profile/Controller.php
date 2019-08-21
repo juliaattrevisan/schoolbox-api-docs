@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
+use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Import\ImportNavigation;
@@ -87,12 +88,17 @@ class Controller extends Base
 
     /**
      * Process the form vars
+     *
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \InvalidArgumentException
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      */
     public function postUpload()
     {
         $attachments = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
 
-        new \Alaress_Probe($attachments);
+        $processor = (new Processor($attachments))->process();
 
         die();
 
