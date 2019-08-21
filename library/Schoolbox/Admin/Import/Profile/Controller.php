@@ -90,8 +90,6 @@ class Controller extends Base
      */
     public function postUpload()
     {
-        new \Alaress_Probe($this->getRequest()->post['attachment']);
-
         $attachments = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
 
         new \Alaress_Probe($attachments);
