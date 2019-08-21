@@ -254,13 +254,16 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
 
         // Create empty (not NULL) joins.
         $emptyUser->subject_collection = new GenericCollection(Subject::class);
-        $emptyUser->children = new GenericCollection(self::class);
-        $emptyUser->parents  = new GenericCollection(self::class);
-
-        // TODO. Remove global dependency
-        $emptyUser->config_loader = new ConfigLoader();
+        $emptyUser->children           = new GenericCollection(self::class);
+        $emptyUser->parents            = new GenericCollection(self::class);
 
         return $emptyUser;
+    }
+
+    public function __construct()
+    {
+        // TODO. Remove global dependency
+        $this->config_loader = new ConfigLoader();
     }
 
 
@@ -944,7 +947,8 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     public function setCampusCollection(GenericCollection $campusCollection)
     {
-        $this->campusCollection->replaceWith($campusCollection);
+        $campusCollection->assertCollectionOf(Campus::class);
+        $this->campusCollection = $campusCollection;
         return $this;
     }
 
