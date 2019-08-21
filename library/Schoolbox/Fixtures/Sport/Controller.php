@@ -22,6 +22,9 @@ use Schoolbox\Fixtures\Position\Model as Position;
 
 use \Schoolbox\Mapper as BaseMapper;
 
+/**
+ * @method Mapper getMapper()
+ */
 class Controller extends AbstractController
 {
     /**

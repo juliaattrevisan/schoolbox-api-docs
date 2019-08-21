@@ -30,14 +30,6 @@ class Model implements ISoftDeletable
     /** @var Collection|Position[] */
     protected $positions;
 
-
-    /**
-     */
-    public function __construct()
-    {
-        $this->positions = new Collection();
-    }
-
     /**
      * @param string $name
      * @return self

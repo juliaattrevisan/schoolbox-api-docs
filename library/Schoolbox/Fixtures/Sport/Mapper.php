@@ -99,7 +99,7 @@ class Mapper extends BaseMapper
             if (empty($cache[$sportId])) {
                 $cache[$sportId] = $this->hydrate($r);
             }
-            
+
             $cache[$sportId]->getPositions()->add($this->hydrateJoin($r, 'positions', 'p'));
         }
 
@@ -107,7 +107,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Perform an intersection of the itinerary given against what exists in the database:
+     * Perform an intersection of the positions given against what exists in the database:
      *  - any records that exist in memory are to be persisted to the DB;
      *  - any records that exist in DB but not memory are to be deleted.
      *
@@ -116,6 +116,10 @@ class Mapper extends BaseMapper
      */
     public function savePositions(Sport $model)
     {
+        if ($model->getPositions() === null) {
+            // Don't attempt to save if join is not hydrated
+            return true;
+        }
         // ensure the positions all point onto this sport
         foreach ($model->getPositions() as $position) {
             $position->setSport($model);
