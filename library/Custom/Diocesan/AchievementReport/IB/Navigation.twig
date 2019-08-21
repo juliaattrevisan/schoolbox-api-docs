@@ -18,7 +18,7 @@
                             {# Provide button only if you can get there
                              # Other places hardcode this url, but we can do it properly here
                              #}
-                            {% set ibRoute = routeLookupIfAuthorized('achievementreport.ib', {
+                            {% set ibRoute = routeLookupIfAuthorized('achievementreport.getIb', {
                                 externalUserId: externalUser.StudentID,
                                 year: year
                             }) %}

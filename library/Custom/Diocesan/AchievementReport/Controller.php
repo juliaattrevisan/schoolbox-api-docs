@@ -47,7 +47,7 @@ class Controller extends Base {
      * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function selector(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getSelector(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $selector->determineDefaultReport();
@@ -63,7 +63,7 @@ class Controller extends Base {
         switch ($report) {
             case NavigationSelector::SCHOOLGRADES_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.schoolGrades', [
+                    $this->getRouter()->generate('achievementreport.getSchoolGrades', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -73,7 +73,7 @@ class Controller extends Base {
 
             case NavigationSelector::IB_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.ib', [
+                    $this->getRouter()->generate('achievementreport.getIb', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -83,7 +83,7 @@ class Controller extends Base {
 
             case NavigationSelector::NCEA_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.ncea', [
+                    $this->getRouter()->generate('achievementreport.getNcea', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -93,7 +93,7 @@ class Controller extends Base {
 
             case NavigationSelector::COMMENTS_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.comments', [
+                    $this->getRouter()->generate('achievementreport.getComments', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -103,7 +103,7 @@ class Controller extends Base {
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
                 $this->getResponse()->redirect->to(
-                    $this->getRouter()->generate('achievementreport.standardisedTest', [
+                    $this->getRouter()->generate('achievementreport.getStandardisedTest', [
                         'externalUserId' => $externalUser['StudentID'],
                         'year' => $year
                     ])
@@ -136,7 +136,7 @@ class Controller extends Base {
      * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function standardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getStandardisedTest(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $this->getResponse()->content->set(array(
             'template' => '@standardisedTest/StandardisedTest.twig',
@@ -157,7 +157,7 @@ class Controller extends Base {
      * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function schoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getSchoolGrades(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new SchoolGrades\Footer($user, $externalUser, $db, null);
@@ -209,7 +209,7 @@ class Controller extends Base {
      * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function ib(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getIb(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -221,7 +221,7 @@ class Controller extends Base {
          */
         if (null === $year && \count($allYears)) {
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate('achievementreport.ib', [
+                $this->getRouter()->generate('achievementreport.getIb', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
                 ])
@@ -266,7 +266,7 @@ class Controller extends Base {
      * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function ncea(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getNcea(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         $selector = new NavigationSelector($db, $user, $externalUser);
         $footer = new NCEA\Footer($user, $externalUser, $db, null);
@@ -393,7 +393,7 @@ class Controller extends Base {
      * @param int|null $year
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function comments(MSSQL $db, User $user, array $externalUser, ?int $year)
+    public function getComments(MSSQL $db, User $user, array $externalUser, ?int $year)
     {
         /* The selected year should contain data. If a selected
          * year contains no data, probably 404 or something - you
@@ -405,7 +405,7 @@ class Controller extends Base {
          */
         if (null === $year && \count($allYears)) {
             $this->getResponse()->redirect->to(
-                $this->getRouter()->generate('achievementreport.comments', [
+                $this->getRouter()->generate('achievementreport.getComments', [
                     'externalUserId' => $externalUser['StudentID'],
                     'year' => $allYears[0]
                 ])
