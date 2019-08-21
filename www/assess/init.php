@@ -108,7 +108,7 @@ if (!$attempt) {
                                        ->setUser(UserMapper::getInstance()->createModel($userId))
                                        ->setStart(Alaress_Date_Format::now());
         $attemptMapper->save($attemptModel);
-        $quizModel->getAttempts()->add($attemptModel);
+        $quizModel->setAttempts($attemptMapper->createCollection([$attemptModel]));
         $attemptId = $attemptModel->getId();
         // Assign all questions on quiz init, not starting a section.
         // This ensures that a response is created for all answers,
