@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Schoolbox\Calendar\Config\Campus;
 use Schoolbox\Calendar\Config\EventType;
 use Schoolbox\Calendar\Config\Filter;
@@ -42,9 +43,10 @@ class Controller extends Base
     }
 
     /**
+     * @param null $selectedDate
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getCalendar(): void
+    public function getCalendar($selectedDate = null): void
     {
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
@@ -66,6 +68,7 @@ class Controller extends Base
                     'eventTypes'    => $eventType->toJson(),
                     'calendarView'  => $calendarView,
                     'filters'       => $filters->toJson(),
+                    'selectedDate'  => $selectedDate ?? Alaress_Date_Format::now()
                 ]
             )
         );

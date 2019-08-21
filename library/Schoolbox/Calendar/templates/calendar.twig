@@ -35,7 +35,7 @@
         groups:             {{ groups | raw }},
         campuses:           {{ campuses | raw }},
         selectedFilters:    {{ filters | raw }},
-        defaultDate:        '{{ "now" | date("Y-m-d") }}',
+        defaultDate:        '{{ selectedDate|date('Y-m-d') }}',
         eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
         firstDay:           Number('{{ config.calendar_start_day }}'),
         defaultView:        anchorView || '{{ calendarView }}',

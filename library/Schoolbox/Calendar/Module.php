@@ -13,6 +13,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
 use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -27,10 +28,16 @@ class Module extends BaseModule
      */
     protected $basename = 'calendar';
 
-
-    protected function registerRoutes(): void
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutes(Router $router, $basePath)
     {
-        $this->register('GET', '/v2', 'getCalendar');
+        // Supported format MM-DD-YYYY
+        // Explanation here: https://regex101.com/r/X8zFce/1
+        $this->addGetRoute($router, 'getCalendar', $basePath, "/v2{/selectedDate}")->addTokens([
+            'date' => '([0-2][0-9]|(3)[0-1]\d+(-))(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}'
+        ]);
     }
 
     /**
