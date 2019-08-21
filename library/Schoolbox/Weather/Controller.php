@@ -37,8 +37,6 @@ class Controller extends Base
          * If I give MEL to apixu, it derives to [weatherLocation] => Melbourne Airport, Australia
          * If I give Melbourne Airport, Australia to apixu, it derives to [weatherLocation] => Melbourne, Australia
          */
-        $weatherPayload['weatherLocation'] = $location;
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@weather/weather.twig', $weatherPayload));
     }
 }

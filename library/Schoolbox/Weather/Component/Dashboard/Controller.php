@@ -51,6 +51,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $apiUrl = $this->getConfigMapper()->getConfigLoader()->get('weather_api_url');
 
         $this->weatherPayload = (new ApixuClient($apiKey, $apiUrl))->getForecast($forecastLimit, $location);
+        $this->weatherPayload['weeklyForecastLocation'] = $location;
 
         $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");
 
