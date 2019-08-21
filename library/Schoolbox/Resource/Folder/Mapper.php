@@ -175,7 +175,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         $this->hasJoin(
             'groups', array(
-                'multiple'  => true,
+                'multiple'  => false,
                 'mapper'    => GroupMapper::class,
                 'this_key'  => 'id',
                 'other_key' => 'cid',
