@@ -958,12 +958,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if (!$folders->offsetExists($folderId)) {
                 $folders[$folderId] = $this->hydrate($row);
 
-                // Blow away any previously attached codes
+                // Instantiate collections we are about to populate
                 $folders[$folderId]->setCodes($codeMapper->createCollection());
-
                 $folders[$folderId]->setYearLevels($yearLevelMapper->createCollection());
-
-                // Blow away any previously attached curriculum node codes
                 $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
 
                 $folders[$folderId]->setHomepage($homepageConfigMapper->hydrate($row, 'hp'));
@@ -1002,7 +999,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 if (!array_key_exists($yearLevelId, $yearLevelCache)) {
                     $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'yl');
                 }
-                $folders[$folderId]->getYearLevels()[$yearLevelId] = $yearLevelCache[$yearLevelId];
+                $folders[$folderId]->getYearLevels()->setOffset($yearLevelId, $yearLevelCache[$yearLevelId]);
             }
 
             // Hydrate curriculum node codes (avoiding duplicates)
@@ -1294,6 +1291,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Generates the prepared statement for usage in findFolderIdsForUser() and findForUser()
+     *
+     * Joins onto:
+     *  * Homepage
+     *  * Folder codes
+     *  * Group
      *
      * @param User $user
      * @param bool $get_subjects
@@ -1964,6 +1966,10 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Return a list of folders that the student has submitted work to in a given term
+     *
+     * Folder is hydrated with:
+     *  * folder codes
+     *
      * @param User $student
      * @param null|Term $term
      * @return Collection|Model[]
@@ -2048,6 +2054,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     /**
      * Return a set of folders where the student has received feedback
      *
+     * Hydrated joins:
+     * * folder code
+     *
      * @param User $student
      * @param Term|null $term
      * @return GenericCollection
@@ -2070,6 +2079,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Return a set of folders where the teacher has provided feedback in the specified term
+     *
+     * Hydrated joins:
+     *  * folder codes
      *
      * Includes:
      * 1. assessments directly in folders
@@ -2100,6 +2112,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
     /**
      * Hydrates folders with feedbacks based on a where clause provided
+     *
+     * Hydrated joins:
+     *  * folder code
      *
      * @param $whereClause
      * @param $whereParams
