@@ -56,7 +56,7 @@ echo "Preparing conf.php"
 cp -f www/conf/tarball.conf.php www/conf/conf.php;
 
 echo "Running php unit"
-vendor/bin/paratest -p 4 --configuration phpunit.xml --testsuite default --coverage-clover clover.xml
+php -e vendor/bin/paratest -p 4 --configuration phpunit.xml --testsuite default --coverage-clover clover.xml
 unitTestResult=$?;
 #phpdbg -qrr -d memory_limit=-1 vendor/bin/phpunit --configuration phpunit.xml --testsuite default --coverage-clover clover.xml
 #unitTestResult=$?;
