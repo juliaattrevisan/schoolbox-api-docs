@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
 use Schoolbox\User;
 use Session;
+use Symfony\Component\HttpFoundation\IpUtils;
 
 class Controller extends Base
 {
@@ -47,7 +48,7 @@ class Controller extends Base
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
         // (or the users IP exists in the blacklist
-        if ($this->getConfigLoader()->get('saml_enabled')
+        if (( $this->getConfigLoader()->get('saml_enabled') || $this->samlForce() )
             && ($this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '')
             && $samlAuth !== '0'
             && (!$this->samlBlacklist() || $samlAuth === '1')) {
@@ -174,12 +175,17 @@ class Controller extends Base
      */
     private function samlBlacklist(): bool
     {
-        $ipBlacklist = $this->getConfigLoader()->get('saml_ip_blacklist');
-        foreach (explode(',', $ipBlacklist) as $ip) {
-            if ($ip === Session::getIP()) {
-                return true;
-            }
-        }
-        return false;
+        $ipBlacklist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_blacklist')));
+        return IpUtils::checkIp(Session::getIP(), $ipBlacklist);
+    }
+
+    /**
+     * Check if the users IP exists in the SAML whitelist.
+     * @return bool
+     */
+    private function samlForce(): bool
+    {
+        $ipWhitelist = array_map('trim', explode(',', $this->getConfigLoader()->get('saml_ip_whitelist')));
+        return IpUtils::checkIp(Session::getIP(), $ipWhitelist);
     }
 }
