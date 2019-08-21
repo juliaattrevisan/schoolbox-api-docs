@@ -127,7 +127,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
             ->setAssessables(new GenericCollection(IAssessable::class));
     }
 
-
     /**
      * Does this category have a homepage?
      *
@@ -420,11 +419,13 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
 
     /**
-     * @param  Collection $codes
+     * @param GenericCollection $codes
      * @return $this
+     * @throws UnexpectedValueException
      */
     public function setCodes($codes)
     {
+        $codes->assertCollectionOf(Code\Model::class);
         $this->codes = $codes;
         return $this;
     }
