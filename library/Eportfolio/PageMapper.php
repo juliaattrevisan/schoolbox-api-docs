@@ -169,26 +169,23 @@ class PageMapper extends Schoolbox\Mapper
         $statement->bindParam(':ownerId', $ownerId);
         $statement->execute();
 
-        /* Manually construct hierarchy of blog items and their comments
-         */
         $collection = $this->createCollection();
-
+        $idCol      = "ep.{$this->getIdentifierColumn()}";
         foreach ($statement as $row) {
-            $pageItem = $this->hydrate($row, 'ep');
-            $permissionItem = $permission_mapper->hydrate($row, 'p');
-
-            /* Put it into the collection in the index with the same
-             * value as the page id, if it doesn't already live there
-             */
-            if (!is_a($collection->getOffset($pageItem->getPageId()), '\Eportfolio\Page')) {
-                $collection->setOffset($pageItem->getPageId(), $pageItem);
+            if ($collection->offsetExists($row[$idCol])) {
+                $pageItem = $collection->getOffset($row[$idCol]);
+            } else {
+                $pageItem = $this->hydrate($row, 'ep');
+                $pageItem->setPermissions($permission_mapper->createCollection());
+                $collection->setOffset($row[$idCol], $pageItem);
             }
 
             /* If a permission was parsed from this $row, hydrate
              * put the permission with its parent page
              */
+            $permissionItem = $permission_mapper->hydrate($row, 'p');
             if ($permissionItem instanceof Permission) {
-                $collection->getOffset($permissionItem->getPageId())->getPermissions()->add($permissionItem);
+                $pageItem->getPermissions()->add($permissionItem);
             }
         }
 
