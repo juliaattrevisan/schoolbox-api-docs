@@ -242,23 +242,6 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
      */
     private $children;
 
-    /**
-     * Returns a new user with empty joins (as opposed to simply not hydrated and therefore unknown)
-     *
-     * @return User
-     * @throws \UnexpectedValueException
-     */
-    public static function createEmpty(): self
-    {
-        $emptyUser = new static();
-
-        // Create empty (not NULL) joins.
-        $emptyUser->subject_collection = new GenericCollection(Subject::class);
-        $emptyUser->children           = new GenericCollection(self::class);
-        $emptyUser->parents            = new GenericCollection(self::class);
-
-        return $emptyUser;
-    }
 
     public function __construct()
     {

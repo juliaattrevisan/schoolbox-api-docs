@@ -160,7 +160,7 @@ class Controller extends Base
             array(
                 'template' => '@resourceItem/edit.twig',
                 'data'     => array(
-                    'item'            => Model::createEmpty(),
+                    'item'            => new Model(),
                     'categoryList'    => $this->getMapper()->getJoinMapper('category')->findAll([
                         'order' => ['name' => 'asc',]
                     ]),
@@ -249,7 +249,7 @@ class Controller extends Base
      */
     public function create()
     {
-        $model = Model::createEmpty();
+        $model = new Model();
         $this->updateItemWithFormValues(
             $model,
             $this->getRequest()->post

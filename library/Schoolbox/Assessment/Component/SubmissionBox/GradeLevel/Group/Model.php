@@ -38,20 +38,6 @@ class Model
     protected $gradeLevels;
 
     /**
-     * Returns a new empty model
-     *
-     * @return Model
-     * @throws UnexpectedValueException
-     */
-    public static function createEmpty(): self
-    {
-        $emptyModel = new static();
-        $emptyModel->gradeLevels = new GenericCollection(GradeLevelModel::class);
-
-        return $emptyModel;
-    }
-
-    /**
      * @return int
      */
     public function getId()

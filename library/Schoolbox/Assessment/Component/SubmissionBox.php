@@ -154,33 +154,12 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     protected $deleted;
 
     /**
-     * @var Submission[]|GenericCollection
-     */
-    private $submissions;
-
-    /**
      * Can learners reflect on or grade their own submissions?
      *
      * @see SubmissionBox::SELF_REVIEWABILITY_NONE and adjacent constants
      * @var string
      */
     private $selfReviewability;
-
-    /**
-     * Returns a new model with *empty* (as opposed to unknown) joins
-     *
-     * @return SubmissionBox
-     * @throws \UnexpectedValueException
-     */
-    public static function createEmpty(): self
-    {
-        $emptyModel = new static();
-        $emptyModel->submissions = new GenericCollection(Submission::class);
-        $emptyModel->attachments = new GenericCollection(SubmissionBox\SingleFile\Model::class);
-        $emptyModel->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class));
-        return $emptyModel;
-    }
-
 
     public function __construct()
     {
@@ -372,7 +351,8 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      */
     public function setAttachments(GenericCollection $attachments)
     {
-        $this->attachments->replaceWith($attachments);
+        $attachments->assertCollectionOf(SubmissionBox\SingleFile\Model::class);
+        $this->attachments = $attachments;
         return $this;
     }
 
@@ -789,24 +769,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
         }
 
         return false;
-    }
-
-    /**
-     * @return Submission[]|GenericCollection
-     */
-    public function getSubmissions()
-    {
-        return $this->submissions;
-    }
-
-    /**
-     * @param Submission[]|GenericCollection $submissions
-     * @return static
-     */
-    public function setSubmissions(GenericCollection $submissions)
-    {
-        $this->submissions->replaceWith($submissions);
-        return $this;
     }
 
     /**

@@ -108,14 +108,6 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $roleList;
 
-    public static function createEmpty(): self
-    {
-        return (new static())
-            ->setModeratorList(new Collection())
-            ->setRelatedResourceList(new Collection())
-            ->setRoleList(new Collection());
-    }
-
     public function __construct() {
         $this->setImage(new Storage\Model());
     }

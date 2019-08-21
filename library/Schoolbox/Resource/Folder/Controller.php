@@ -165,7 +165,7 @@ class Controller extends BaseController
             ['parent' => $parent, 'parentId' => $parent->getId()]
         );
 
-        $folder = Folder\Model::createEmpty()->setParent($parent);
+        $folder = (new Folder\Model())->setParent($parent);
         $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
 
@@ -388,7 +388,11 @@ class Controller extends BaseController
      */
     public function postCreateFolder(Model $parent): void
     {
-        $newFolder = Folder\Model::createEmpty()->setParent($parent);
+        $newFolder = (new Model())
+            ->setParent($parent)
+            ->setCodes(new GenericCollection(Code\Model::class))
+            ->setYearLevels(new GenericCollection(YearLevel\Model::class))
+            ->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class));
         $this->postUpdateFolder($newFolder);
     }
 

@@ -11,6 +11,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\SingleFile\Model as DueWorkFileModel;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
@@ -36,11 +37,10 @@ class DueWork implements IAssessmentTypeTranslator
 
     /**
      * @return IAssessableDataModel
-     * @throws \UnexpectedValueException
      */
     public function createDataModel(): IAssessableDataModel
     {
-        return SubmissionBox::createEmpty();
+        return new SubmissionBox();
     }
 
 
@@ -120,7 +120,7 @@ class DueWork implements IAssessmentTypeTranslator
         }
 
         // Translate files
-        $dataModel->setAttachments($dataModel->getAttachments()->emptyClone());
+        $dataModel->setAttachments(new GenericCollection(SubmissionBox\SingleFile\Model::class));
         foreach ($domainObject->getAttachedFiles() as $file) {
             $dataModel->addAttachment(
                 (new DueWorkFileModel())

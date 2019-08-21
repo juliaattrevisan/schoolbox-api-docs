@@ -19,6 +19,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Collection;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
@@ -35,6 +36,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Ancestry;
+use Schoolbox\Resource\Folder\Code as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Controller as FolderController;
@@ -42,8 +44,10 @@ use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
+use Schoolbox\YearLevel;
 use \Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Curriculum\Node;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use UnexpectedValueException;
 
@@ -800,8 +804,14 @@ class Controller extends Base\Base
         /** @var FolderController $folderController */
         $folderController = $this->getController('folder');
 
+        $folder = (new Folder())
+            ->setParent($this->folderMapper->findById($parentId))
+            ->setCodes(new GenericCollection(FolderCode\Model::class))
+            ->setYearLevels(new GenericCollection(YearLevel\Model::class))
+            ->setCurriculumNodes(new GenericCollection(Node\Model::class));
+
         $folder = $folderController->persistFolder(
-            Folder::createEmpty()->setParent($this->folderMapper->findById($parentId)),
+            $folder,
             $name,
             $inherit,
             $templateId,
