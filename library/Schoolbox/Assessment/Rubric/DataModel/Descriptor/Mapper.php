@@ -126,6 +126,7 @@ class Mapper extends Schoolbox\Mapper {
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var Level\Mapper $levelMapper */
         $levelMapper      = $this->getJoinMapper('level');
         $indicatorMapper  = $this->getJoinMapper('indicator');
         $capabilityMapper = $this->getJoinMapper('indicator.capability');
@@ -158,7 +159,9 @@ class Mapper extends Schoolbox\Mapper {
 
             // First time we've encountered this Level ?
             if (!$levels->getOffset($levelId)) {
-                $levels->setOffset($levelId, $this->hydrateJoin($r, 'level', 'l'));
+                $level = $levelMapper->hydrate($r, 'l');
+                $level->setDescriptors($this->createCollection());
+                $levels->setOffset($levelId, $level);
             }
             $level = $levels->getOffset($levelId);
 
