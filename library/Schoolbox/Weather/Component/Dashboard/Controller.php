@@ -17,10 +17,6 @@ use Schoolbox\Weather\ApixuClient;
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
-    /**
-     * Default location for which to obtain weather data
-     */
-    private const DEFAULT_LOCATION = 'Melbourne, Australia';
 
     /**
      * Default number of days for the Forecast view which is what you see
@@ -41,7 +37,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        $location = $this->determineWeatherLocation();
+        $location = (new \Schoolbox\Weather\Location())->detect($this->getConfig('url'), $this->getConfigMapper()->getConfigLoader()->get('weather_location'));
 
         // Number of days of forecast to show.
         // Special case 0 - this is the 'all' case -_- but our API has no such thing as an 'all' option,
@@ -59,35 +55,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $this->setComponentName("Weather in {$this->weatherPayload['weatherLocation']}");
 
         return true;
-    }
-
-
-    /**
-     * Location for which to get the weather
-     *
-     * @return string
-     */
-    private function determineWeatherLocation(): string
-    {
-        /* First check the component configuration - if there's a location there, use that
-         */
-        $location = trim($this->getConfig('url'));
-
-        if ('' !== $location) {
-            return $location;
-        }
-
-        /* Then check the system config for a default location - if there's a location there, use that
-         */
-        $location = trim($this->getConfigMapper()->getConfigLoader()->get('weather_location'));
-
-        if ('' !== $location) {
-            return $location;
-        }
-
-        /* Otherwise if that doesn't exist for some reason, default to Melbourne Australia
-         */
-        return self::DEFAULT_LOCATION;
     }
 
 
