@@ -57,6 +57,9 @@ class Processor
             /* Get the columns out and from here, work out what kind of file it is
              */
             $header = $reader->current();
+//                new \Alaress_Probe($file, $header);
+//                die();
+
 
             if ($this->isRelation($header)) {
 
@@ -72,16 +75,12 @@ class Processor
 
                 /* Process the Staff Profile csv
                  */
-                $this->processStaffProfile($file);
+                $this->processStaffProfile($reader);
             } elseif ($this->isParentProfile($header)) {
 
                 /* Process the Parent Profile csv
                  */
                 $this->processParentProfile($reader);
-//
-//                new \Alaress_Probe($file, $header);
-//                die();
-
             }
         }
     }
@@ -149,8 +148,19 @@ class Processor
     {
         return $this->matches($row, [
             'External ID',
+            'Type',
+            'Username',
+            'Title',
             'Firstname',
-            'Lastname',
+            'Surname',
+            'Email',
+            'Work Phone',
+            'Staff Category',
+            'Position Title',
+            'Department',
+            'Building',
+            'Room',
+            'Campus'
         ]);
     }
 
@@ -158,10 +168,13 @@ class Processor
     /**
      * Process staff profile csv
      *
-     * @param $file
+     * @param Reader $reader
      */
-    private function processStaffProfile($file)
+    private function processStaffProfile(Reader $reader): void
     {
+        foreach ($reader as $i => $row) {
+            new \Alaress_Probe($row);
+        }
     }
 
 
