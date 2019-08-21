@@ -38,9 +38,8 @@ class SourceList extends Base
     public function generate(): self
     {
         $this->data = new Collection(
-            Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar(
-            new ModuleChecker($this->configMapper)
-        ));
+            Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar(new ModuleChecker($this->configMapper))
+        );
 
         return $this;
     }

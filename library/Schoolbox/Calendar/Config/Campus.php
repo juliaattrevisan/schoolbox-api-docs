@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Config;
 
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -53,9 +54,9 @@ class Campus extends Base
 
     /**
      * @param GenericCollection $data
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
-    private function format(GenericCollection $data): \Schoolbox\Collection
+    private function format(GenericCollection $data): Collection
     {
         return $data->map(
             function (\Schoolbox\Campus $v) {

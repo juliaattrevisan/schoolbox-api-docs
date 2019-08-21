@@ -43,10 +43,10 @@ class Controller extends Base
     }
 
     /**
-     * @param null $selectedDate
+     * @param string|null $selectedDate
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getCalendar($selectedDate = null): void
+    public function getCalendar(?string $selectedDate): void
     {
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
@@ -59,7 +59,8 @@ class Controller extends Base
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@calendar/calendar.twig', [
+                '@calendar/calendar.twig',
+                [
                     'user'          => $this->getUser(),
                     'taskTypeId'    => $eventType->getTaskIdFromEvents(),
                     'groups'        => $groups->toJson(),

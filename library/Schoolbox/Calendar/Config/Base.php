@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Config;
 
+use Schoolbox\Collection;
+
 /**
  * Class Base
  * @package Schoolbox\Calendar\Config
@@ -14,14 +16,14 @@ namespace Schoolbox\Calendar\Config;
 class Base
 {
     /**
-     * @var \Schoolbox\Collection
+     * @var Collection
      */
     protected $data;
 
     /**
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
-    public function getData(): \Schoolbox\Collection
+    public function getData(): Collection
     {
         return $this->data;
     }

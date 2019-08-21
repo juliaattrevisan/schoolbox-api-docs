@@ -7,8 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Config;
 
-use Schoolbox\GenericCollection;
-use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\User;
 
@@ -51,10 +50,10 @@ class Group extends Base
     }
 
     /**
-     * @param GenericCollection $data
-     * @return \Schoolbox\Collection
+     * @param Collection $data
+     * @return Collection
      */
-    private function format(GenericCollection $data): \Schoolbox\Collection
+    private function format(Collection $data): Collection
     {
         return $data->map(
             function (\Schoolbox\Resource\Folder\Model $v) {

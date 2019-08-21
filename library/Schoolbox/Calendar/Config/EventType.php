@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Config;
 
 use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 
 /**
@@ -42,9 +43,9 @@ class EventType extends Base
 
     /**
      * @param GenericCollection $data
-     * @return \Schoolbox\Collection
+     * @return Collection
      */
-    private function format(GenericCollection $data): \Schoolbox\Collection
+    private function format(GenericCollection $data): Collection
     {
         return $data->map(
             function (\Schoolbox\Calendar\EventType $v) {
