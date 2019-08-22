@@ -37,8 +37,8 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'has_eotc_events_all', 'has_eotc_events_all_block');
 
         $this->getPage()->setVar([
-            'USER_CALENDAR_ID' => $this->getUser()->getId(),
-            'USER_FULLNAME'    => $this->getUser()->getFullname(),
+            'USER_CALENDAR_ID' => $this->user->getId(),
+            'USER_FULLNAME'    => $this->user->getFullname(),
         ]);
 
         $this->setupSelectedDayMonthYear();
@@ -91,11 +91,11 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
         $this->getPage()->setVar([
-            'CALENDAR_USER_ID'         => $this->getUser()->getId(),
+            'CALENDAR_USER_ID'         => $this->user->getId(),
             'CALENDAR_VIEW'            => $calendarView,
             'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
             'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
-            'USER_TOKEN'               => $this->getUser()->getKey(),
+            'USER_TOKEN'               => $this->user->getKey(),
         ]);
     }
 }

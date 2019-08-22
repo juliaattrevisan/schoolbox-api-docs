@@ -63,8 +63,8 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setCalendarHandler(new Calendar());
         $this->moduleChecker = $moduleChecker;
 
-        $this->setUser($user);
-        $this->setViewer($viewer);
+        $this->user = $user;
+        $this->viewer = $viewer;
         $this->setGroupHandler(new Group());
         $this->setPage($page);
         $this->setDate($date);
@@ -205,7 +205,7 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setSelected($selected);
 
         $categoryList = $this->getCategoryList();
-        $campusList   = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
+        $campusList   = $this->getCalendarHandler()->getFilterCampusList($this->user->getId());
 
         // Shoehorn the above into JSON-encoded vars
         $this->getPage()->setVar(
@@ -467,45 +467,5 @@ abstract class Calendar_Layout_Full_Abstract
     protected function getApi()
     {
         return $this->api;
-    }
-
-    /**
-     * Set user
-     *
-     * @param User $user
-     */
-    protected function setUser($user)
-    {
-        $this->user = $user;
-    }
-
-    /**
-     * Get user
-     *
-     * @return User
-     */
-    protected function getUser()
-    {
-        return $this->user;
-    }
-
-    /**
-     * Set viewer
-     *
-     * @param User $viewer
-     */
-    public function setViewer($viewer)
-    {
-        $this->viewer = $viewer;
-    }
-
-    /**
-     * Get viewer
-     *
-     * @return User
-     */
-    public function getViewer()
-    {
-        return $this->viewer;
     }
 }
