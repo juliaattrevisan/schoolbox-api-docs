@@ -146,7 +146,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
     {
         $query = "SELECT
                       assess_attempt.attempt_id,
-                      assess_attempt.user_id, synergy_id, firstname, lastname,
+                      assess_attempt.user_id, synergy_id, firstname, lastname, user.deleted_at as user_deleted_at,
                       assess_attempt.start, assess_attempt.finish,
                       (UNIX_TIMESTAMP(assess_attempt.finish) - UNIX_TIMESTAMP(assess_attempt.start)) AS timeTaken,
                       SUM(assess_response.mark) AS totalMarks,
