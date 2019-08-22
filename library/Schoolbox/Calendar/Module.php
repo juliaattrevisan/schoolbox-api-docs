@@ -89,6 +89,7 @@ class Module extends BaseModule
             'folderMapper'      => $this->getMapperFactory()->getLazy(Mapper::class),
             'campusMapper'      => $this->getMapperFactory()->getLazy(CampusMapper::class),
             'eventTypeMapper'   => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
+            'calApiConfigMapper'=> $this->getMapperFactory()->getLazy(\Calendar_Api_Config_Mapper::class),
         ];
     }
 }

@@ -24,12 +24,19 @@ class SourceList extends Base
     private $configMapper;
 
     /**
-     * SourceList constructor.
-     * @param IConfigLoader $configMapper
+     * @var Calendar_Api_Config_Mapper
      */
-    public function __construct(IConfigLoader $configMapper)
+    private $calApiConfigMapper;
+
+    /**
+     * SourceList constructor.
+     * @param IConfigLoader              $configMapper
+     * @param Calendar_Api_Config_Mapper $calApiConfigMapper
+     */
+    public function __construct(IConfigLoader $configMapper, Calendar_Api_Config_Mapper $calApiConfigMapper)
     {
-        $this->configMapper = $configMapper;
+        $this->configMapper         = $configMapper;
+        $this->calApiConfigMapper   = $calApiConfigMapper;
     }
 
     /**
@@ -38,7 +45,7 @@ class SourceList extends Base
     public function generate(): self
     {
         $this->data = new Collection(
-            Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar(new ModuleChecker($this->configMapper))
+            $this->calApiConfigMapper->getSourceListForCalendar(new ModuleChecker($this->configMapper))
         );
 
         return $this;
