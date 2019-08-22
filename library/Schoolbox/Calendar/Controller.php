@@ -59,7 +59,7 @@ class Controller extends Base
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
         $eventType        = (new EventType($this->eventTypeMapper))->generate();
         $sourceList       = (new SourceList(ConfigMapper::getInstance()))->generate();
-        $filters          = (new Filter($this->di))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
+        $filters          = (new Filter($this->di->get('session')))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
 
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->getUser()->getCalendarView()]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;

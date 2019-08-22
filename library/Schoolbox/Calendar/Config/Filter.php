@@ -19,9 +19,9 @@ use Schoolbox\Collection;
 class Filter extends Base
 {
     /**
-     * @var ContainerInterface
+     * @var Session
      */
-    private $di;
+    private $session;
 
     private const GROUP     = 'group';
     private const CAMPUS    = 'campus';
@@ -30,11 +30,11 @@ class Filter extends Base
 
     /**
      * Filter constructor.
-     * @param ContainerInterface $di
+     * @param Session $session
      */
-    public function __construct(ContainerInterface $di)
+    public function __construct(Session $session)
     {
-        $this->di = $di;
+        $this->session = $session;
     }
 
     /**
@@ -48,9 +48,7 @@ class Filter extends Base
     public function generate(Collection $campuses, Collection $groups, Collection $eventTypes, Collection $sourceLists): self
     {
         try {
-            /** @var Session $session */
-            $session = $this->di->get('session');
-            $filters = $session->get('calendarFilter');
+            $filters = $this->session->get('calendarFilter');
         } catch (Exception $e) {
             throw new Exception\ServiceNotFound();
         }
