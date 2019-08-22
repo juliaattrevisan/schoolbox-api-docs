@@ -12,7 +12,6 @@
   }
 
   p {
-    font-size: 1rem;
     margin: 0;
     &.hot {
       color: $hot-color;
@@ -44,13 +43,17 @@
     margin-bottom: 1rem;
 
   }
-  .weather-forecast p {
-      font-size: unset;
-  }
 
   .temperature-forecast {
     .meta {
       margin-right: 1rem;
+    }
+    font-size: 1rem;
+  }
+  @media #{$small-only} {
+    display: block;
+    li {
+      border-bottom: 1px solid #ededed;
     }
   }
 }

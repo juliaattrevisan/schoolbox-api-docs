@@ -18,7 +18,9 @@ Weather details page (linked from dashboard component)
     <div class="row">
         <div class="small-12 island">
             <h2 class="subheader">Currently</h2>
-            <p class="meta">Last updated: {{ today.lastUpdated }}</p>
+            <ul class="meta">
+                <li>Last updated: {{ today.lastUpdated }}</li>
+            </ul>
             <section>
                 <div class="row collapse">
                     <ul class="weather-list">
@@ -26,19 +28,27 @@ Weather details page (linked from dashboard component)
                         <li class="weather-forecast">
                             <div class="weather-card">
                                 <div class="weather-summary">
-                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" />
-                                    <p class="meta">{{ today.weatherSummary }}</p>
+                                    <img src="{{ today.weatherIcon }}" alt="{{ today.weatherSummary }}" title="{{ today.weatherSummary }}"/>
+                                    <p>{{ today.weatherSummary }}</p>
                                 </div>
                             </div>
                         </li>
 
                         <li class="weather-forecast">
                             <div class="weather-card">
-                                <h3>Temperature</h3>
-
+                                <p class="meta">Currently</p>
                                 <div class="temperature">
                                     <p class="temperature-forecast">
-                                        <span class="meta">Currently {{ today.currentTemp }}&deg;C</span>
+                                        {{ today.currentTemp }}&deg;C
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="weather-forecast">
+                            <div class="weather-card">
+                                <p class="meta">Temperature</p>
+                                <div class="temperature">
+                                    <p class="temperature-forecast">
                                         <span class="hot">Hi {{ today.highTemp }}&deg;C</span>
                                         <span class="cold">Lo {{ today.lowTemp }}&deg;C</span>
                                     </p>
@@ -48,15 +58,15 @@ Weather details page (linked from dashboard component)
 
                         <li class="weather-forecast">
                             <div class="weather-card">
-                                <h3>Wind</h3>
-                                <p class="meta">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
+                                <p class="meta">Wind</p>
+                                <p class="temperature-forecast">{{ today.windSpeed }} km/h {{ today.windDirection }}</p>
                             </div>
                         </li>
 
                         <li class="weather-forecast">
                             <div class="weather-card">
-                                <h3>Humidity</h3>
-                                <p class="meta">{{ today.humidity }}%</p>
+                                <p class="meta">Humidity</p>
+                                <p class="temperature-forecast">{{ today.humidity }}%</p>
                             </div>
                         </li>
                     </ul>
@@ -78,7 +88,7 @@ Weather details page (linked from dashboard component)
                                     <h3>{{ forecastDay.day }}</h3>
                                     <div class="weather-summary">
                                         <img src="{{ forecastDay.weatherIcon }}" alt="{{ forecastDay.weatherSummary }}" />
-                                        <p class="meta">{{ forecastDay.weatherSummary }}</p>
+                                        <p>{{ forecastDay.weatherSummary }}</p>
                                     </div>
                                     <p class="temperature">
                                         <span class="hot">Hi {{ forecastDay.highTemp }}&deg;C</span>
