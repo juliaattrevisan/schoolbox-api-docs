@@ -33,6 +33,7 @@ suites:
         modules:
             enabled:
                 - \Helper\Integration
+                - \Helper\SchoolboxCli
                 - Asserts
                 - PhpBrowser:
                     url: 'http://vagrant.dev.schoolbox.cloud'
@@ -53,10 +54,10 @@ extensions:
 #        - Codeception\Extension\Recorder:
 #            delete_successful: false
 
-params: 
+params:
     - env
 
-gherkin: []    
+gherkin: []
 
 # additional paths
 paths:

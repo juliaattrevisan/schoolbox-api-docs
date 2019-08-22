@@ -3,41 +3,36 @@
 
 namespace Payload;
 
-use Payload\RubricCapability;
-use Payload\RubricIndicator;
-
-
 class Assessment extends Base
 {
     private $capabilityCount;
     private $levelCount;
-    private $eventTimestamp;
-    private $contexttype;
+    private $contextType;
     private $contextId;
     private $assessmentType;
     public function __construct()
     {
         Base::__construct();
 
-        $this->eventTimestamp=time();
-        $this->contexttype='folders';
-        $this->contextId='??';
-        $this->assessmentType='dueWork';
-        $this->capabilityCount=0;
-        $this->levelCount=0;
-        $this->setPage('/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments');
-        $this->setReferer( '/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
-        $this->setFormParam('contextType', $this->contexttype);
+        $eventTimestamp        =time();
+        $this->contextType     ='folders';
+        $this->contextId       ='??';
+        $this->assessmentType  ='dueWork';
+        $this->capabilityCount =0;
+        $this->levelCount      =0;
+        $this->setPage('/learning/'.$this->contextType.'/'.$this->contextId.'/assessments');
+        $this->setReferer( '/learning/'.$this->contextType.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
+        $this->setFormParam('contextType', $this->contextType);
         $this->setFormParam('contextId', $this->contextId);
         $this->setFormParam('folderId', '??');
         $this->setFormParam('assessmentType', $this->assessmentType);
         $this->setFormParam('title', 'someTitle');
         $this->setFormParam('description', '<p>This is a test assignment for automated tests</p>');
         $this->setFormParam('acceptOnline', 0);
-        $this->setFormParam('publishDate', date('d/m/Y g:ia', strtotime('- 5 day', $this->eventTimestamp)));
-        $this->setFormParam('openDate', date('d/m/Y g:ia', strtotime('- 1 day', $this->eventTimestamp)));
-        $this->setFormParam('dueDate', date('d/m/Y g:ia', strtotime('+ 10 day', $this->eventTimestamp)));
-        $this->setFormParam('closeDate', date('d/m/Y g:ia', strtotime('+ 12 day', $this->eventTimestamp)));
+        $this->setFormParam('publishDate', date('d/m/Y g:ia', strtotime('- 5 day', $eventTimestamp)));
+        $this->setFormParam('openDate', date('d/m/Y g:ia', strtotime('- 1 day', $eventTimestamp)));
+        $this->setFormParam('dueDate', date('d/m/Y g:ia', strtotime('+ 10 day', $eventTimestamp)));
+        $this->setFormParam('closeDate', date('d/m/Y g:ia', strtotime('+ 12 day', $eventTimestamp)));
         $this->setFormParam('weight', 14);
         $this->setFormParam('self_reviewable', 'none');
         $this->setFormParam('visibility', 2);
@@ -66,24 +61,24 @@ class Assessment extends Base
 
     public function setContextType(string $contextType)
     {
-        $this->contexttype=$contextType;
-        $this->setFormParam('contextType', $this->contexttype);
-        $this->setPage('/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments');
-        $this->setReferer( '/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
+        $this->contextType =$contextType;
+        $this->setFormParam('contextType', $this->contextType);
+        $this->setPage('/learning/'.$this->contextType.'/'.$this->contextId.'/assessments');
+        $this->setReferer( '/learning/'.$this->contextType.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
     }
 
     public function setContextId(int $contextId)
     {
         $this->contextId=$contextId;
         $this->setFormParam('contextId', $this->contextId);
-        $this->setPage('/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments');
-        $this->setReferer( '/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
+        $this->setPage('/learning/'.$this->contextType.'/'.$this->contextId.'/assessments');
+        $this->setReferer( '/learning/'.$this->contextType.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
     }
 
     public function setAssessmentType (string $type)
     {
         $this->assessmentType=$type;
-        $this->setReferer( '/learning/'.$this->contexttype.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
+        $this->setReferer( '/learning/'.$this->contextType.'/'.$this->contextId.'/assessments/new?type=='.$this->assessmentType);
         $this->setFormParam('assessmentType', $this->assessmentType);
         if($type==='project')
         {
@@ -127,5 +122,4 @@ class Assessment extends Base
         $this->setFormParam('rb[0][descriptor]['.$indicatorId.']['.$level.'][text]', $text);
         $this->setFormParam('rb[0][descriptor]['.$indicatorId.']['.$level.'][points]', $points);
     }
-
 }

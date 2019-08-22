@@ -1,17 +1,21 @@
 <?php
-
+declare(strict_types=1);
 
 namespace Payload;
 
-
+/**
+ * A payload to send to a folder create/update route
+ *
+ * By default this will create
+ */
 class Folder extends Base
 {
-    const NO_PRIVILEGES = '0';
-    const READ_PRIVILEGES = '1';
-    const WRITE_PRIVILEGES = '2';
+    private const NO_PRIVILEGES    = '0';
+    private const READ_PRIVILEGES  = '1';
+    private const WRITE_PRIVILEGES = '2';
 
-    const TEMPLATE_NONE=-1;
-    const TEMPLATE_HOMEPAGE_ID=9;
+    public const TEMPLATE_NONE        = -1;
+    public const TEMPLATE_HOMEPAGE_ID = 9;
 
     public static function getFolderPermissions(): array
     {
@@ -22,15 +26,15 @@ class Folder extends Base
         ];
     }
 
-    private $action;
     private $parent_id;
+
     public function __construct()
     {
-        Base::__construct();
-        $this->action='create';
+        parent::__construct();
         $this->parent_id=0;
-        $this->setPage('/resource/folder/update');
-        $this->setReferer('/resource/folder/'.$this->action.'/'.$this->parent_id);
+        $this->setPage('/folder/{parentId:\d+}/create');
+        $this->setReferer('/resource/folder/create/'.$this->parent_id);
+
         $this->setFormParam('parent', $this->parent_id);
         $this->setFormParam('categoryID', null);
         $this->setFormParam('name', 'sometitle');
@@ -72,6 +76,4 @@ class Folder extends Base
     {
         $this->setFormParam('group['.$role_id.']', self::getFolderPermissions()[$permission_level] );
     }
-
-
 }

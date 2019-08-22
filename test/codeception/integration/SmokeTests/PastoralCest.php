@@ -19,7 +19,7 @@ class PastoralCest
      *
      * @param IntegrationTester $i
      */
-    public function _before(IntegrationTester $i)
+    public function _before(IntegrationTester $i): void
     {
         $i->loginAdmin();
     }
@@ -29,19 +29,18 @@ class PastoralCest
      *
      * @param IntegrationTester $i
      * @param PastoralRecord    $pastoralRecPayload
-     * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload)
+    public function createPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload): void
     {
         #GIVEN
-        $timestamp = time();
-        $teacher = $i->getUser('zsmith');
+        $timestamp       = time();
+        $teacher         = $i->getUser('zsmith');
         $student_drhodes = $i->getUser('drhodes');
         $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role = $i->getRoleByTitle('Teachers');
-        $heading = 'Automated Test Pastrol record create at ' . $timestamp;
+        $teacher_role    = $i->getRoleByTitle('Teachers');
+        $heading         = 'Automated Test Pastrol record create at ' . $timestamp;
 
         #WHEN
         $pastoralRecPayload->setStudentId($student_drhodes->getId());
@@ -53,7 +52,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200'],
         ];
 
         #THEN
@@ -66,19 +65,18 @@ class PastoralCest
      *
      * @param IntegrationTester $i
      * @param PastoralRecord    $pastoralRecPayload
-     * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function modifyPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload)
+    public function modifyPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload): void
     {
         #GIVEN
-        $timestamp = time();
-        $teacher = $i->getUser('zsmith');
+        $timestamp       = time();
+        $teacher         = $i->getUser('zsmith');
         $student_drhodes = $i->getUser('drhodes');
         $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role = $i->getRoleByTitle('Teachers');
-        $heading = 'Automated Test Pastrol record modify at ' . $timestamp;
+        $teacher_role    = $i->getRoleByTitle('Teachers');
+        $heading         = 'Automated Test Pastrol record modify at ' . $timestamp;
 
         $pastoralRecPayload->setStudentId($student_drhodes->getId());
         $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
@@ -95,7 +93,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200'],
         ];
 
         #THEN
@@ -108,20 +106,19 @@ class PastoralCest
      *
      * @param IntegrationTester $i
      * @param PastoralRecord    $pastoralRecPayload
-     * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function duplicatePastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload)
+    public function duplicatePastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload): void
     {
         #GIVEN
-        $timestamp = time();
-        $teacher = $i->getUser('zsmith');
-        $student_drhodes = $i->getUser('drhodes');
-        $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role = $i->getRoleByTitle('Teachers');
+        $timestamp                = time();
+        $teacher                  = $i->getUser('zsmith');
+        $student_drhodes          = $i->getUser('drhodes');
+        $blocked_teacher          = $i->getUser('jbenson');
+        $teacher_role             = $i->getRoleByTitle('Teachers');
         $student_duplicate_target = $i->getUser('rrhodes');
-        $heading = 'Automated Test Pastrol record duplicate at ' . $timestamp;
+        $heading                  = 'Automated Test Pastrol record duplicate at ' . $timestamp;
 
         $pastoralRecPayload->setStudentId($student_drhodes->getId());
         $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
@@ -138,7 +135,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200'],
         ];
 
         #THEN
@@ -152,19 +149,21 @@ class PastoralCest
      * @param IntegrationTester $i
      * @param PastoralRecord    $pastoralRecPayload
      * @param PastoralComment   $pastoralCommentPayload
-     * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function commentOnPastoralRecord(IntegrationTester $i, PastoralRecord $pastoralRecPayload, PastoralComment $pastoralCommentPayload)
-    {
+    public function commentOnPastoralRecord(
+        IntegrationTester $i,
+        PastoralRecord $pastoralRecPayload,
+        PastoralComment $pastoralCommentPayload
+    ): void {
         #GIVEN
-        $timestamp = time();
-        $teacher = $i->getUser('zsmith');
+        $timestamp       = time();
+        $teacher         = $i->getUser('zsmith');
         $student_drhodes = $i->getUser('drhodes');
         $blocked_teacher = $i->getUser('jbenson');
-        $teacher_role = $i->getRoleByTitle('Teachers');
-        $heading = 'Automated Test Pastrol create comments at ' . $timestamp;
+        $teacher_role    = $i->getRoleByTitle('Teachers');
+        $heading         = 'Automated Test Pastrol create comments at ' . $timestamp;
 
         $pastoralRecPayload->setStudentId($student_drhodes->getId());
         $pastoralRecPayload->setViewer('user', $blocked_teacher->getId(), 'blocked');
@@ -182,7 +181,7 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200'],
         ];
 
         #THEN
@@ -194,11 +193,10 @@ class PastoralCest
 
         $expectedUrlsReturned = [
             ['https://vagrant.dev.schoolbox.cloud/pastoral/student/' . $student_drhodes->getId() . '/record/' . $pastoral_record->getId() => '303'],
-            [IntegrationTester::NO_REDIRECT => '200']
+            [IntegrationTester::NO_REDIRECT => '200'],
         ];
 
         #THEN
         $i->checkCurlReturn($expectedUrlsReturned, $response);
     }
-
 }

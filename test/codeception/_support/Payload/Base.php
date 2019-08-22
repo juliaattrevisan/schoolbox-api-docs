@@ -1,8 +1,15 @@
 <?php
-
+declare(strict_types=1);
 
 namespace Payload;
 
+/**
+ * A payload encapsulates:
+ * * a HTTP method
+ * * a URL
+ * * HTTP headers
+ *
+ */
 class Base
 {
     protected const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
