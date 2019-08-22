@@ -10,11 +10,10 @@
 namespace Calendar\Event\Collection;
 
 use Aura\Di\ContainerInterface;
-use Calendar_Api_EventType_Interface;
-use SitePage;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;
+use Calendar_Api_EventType_Interface;
 use Schoolbox\User;
 
 class Renderer

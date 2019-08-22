@@ -8,11 +8,9 @@
 namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 
 use Aura\Di\ContainerInterface;
-use Calendar;
 use Calendar\Event\Type\EventBase;
 use Calendar\Event\Type\Submission\Renderer\Javascript as SubmissionRendererJavascript;
 use Custom\Mggs\Personalised\Participant\Mapper as ParticipantMapper;
-use Group;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;

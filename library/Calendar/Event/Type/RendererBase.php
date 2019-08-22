@@ -48,7 +48,8 @@ abstract class RendererBase implements RendererInterface
      * @param User               $user
      * @param User               $viewer
      */
-    public function __construct(ContainerInterface $di, User $user, User $viewer) {
+    public function __construct(ContainerInterface $di, User $user, User $viewer)
+    {
         $this->di = $di;
         $this->setUser($user);
         $this->setViewer($viewer);
@@ -69,8 +70,8 @@ abstract class RendererBase implements RendererInterface
 
 
     /**
-    * @param \Schoolbox\User $user
-    */
+     * @param \Schoolbox\User $user
+     */
     public function setUser($user)
     {
         $this->user = $user;
@@ -110,7 +111,7 @@ abstract class RendererBase implements RendererInterface
      *
      * @return bool|string False if not authorized, a URL if it is.
      */
-    public function getRouteIfAuthorized($name, array $params = array())
+    public function getRouteIfAuthorized($name, array $params = [])
     {
         if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->getViewer())) {
             return $this->getRouter()->generate($name, $params);
