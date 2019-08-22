@@ -1,18 +1,16 @@
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
 namespace SmokeTests;
 
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Exception\GuzzleException;
-use Payload\Login as LoginPayload;
-use Payload\ForgotPassword as ForgotPassPayload;
-use const GuzzleHelper\VAGRANT_DOMAIN;
-
-/**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
- */
+use Payload;
 
 class LoginCest {
     /**
@@ -22,7 +20,7 @@ class LoginCest {
      *
      * @throws GuzzleException
      */
-    public function LoginLocalUser(IntegrationTester $i, LoginPayload $loginPayload){
+    public function LoginLocalUser(IntegrationTester $i, Payload\Login $loginPayload){
 
         #GIVEN
         $user='alaress';
@@ -51,7 +49,7 @@ class LoginCest {
      *
      * @throws GuzzleException
      */
-    public function LoginForgotPassword(IntegrationTester $i, ForgotPassPayload $forgotPasswordPayload){
+    public function LoginForgotPassword(IntegrationTester $i, Payload\ForgotPassword $forgotPasswordPayload){
 
         #GIVEN
         $user_email='alaress@schoolbox.com.au';

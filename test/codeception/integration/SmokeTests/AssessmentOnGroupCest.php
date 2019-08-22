@@ -1,4 +1,9 @@
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
 namespace SmokeTests;
 
@@ -9,11 +14,6 @@ use Payload\Base;
 use Payload\GroupMember;
 use Schoolbox\External\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
-
-/**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
- */
 
 class AssessmentOnGroupCest {
 

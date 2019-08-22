@@ -1,17 +1,15 @@
 <?php
-
-namespace SmokeTests;
-
-use IntegrationTester;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
-use Payload\Base;
-use Payload\CalendarEvent as CalendarEventPayload;
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
+
+namespace SmokeTests;
+
+use IntegrationTester;
+use Payload;
+use Payload\Base;
 
 class CalendarCest {
 
@@ -47,7 +45,7 @@ class CalendarCest {
         $createEventRequest->setFormParam('allDay', 1);
         $createEventRequest->setFormParam('date', date('d-m-Y'));
         $createEventRequest->setFormParam('title', $title);
-        $createEventRequest->setFormParam('type', CalendarEventPayload::getEventTypes()['personal']);
+        $createEventRequest->setFormParam('type', Payload\CalendarEvent::getEventTypes()['personal']);
 
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create calendar event on full calendar page');
         $expectedUrlsReturned=[[IntegrationTester::NO_REDIRECT=>'200']];
@@ -59,12 +57,12 @@ class CalendarCest {
     /** Create a personal event from the calendar event modify page.
      *
      * @param IntegrationTester    $i
-     * @param CalendarEventPayload $createEventRequest
+     * @param Payload\CalendarEvent $createEventRequest
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createPersonalEvent(IntegrationTester $i, CalendarEventPayload $createEventRequest)
+    public function createPersonalEvent(IntegrationTester $i, Payload\CalendarEvent $createEventRequest)
     {
         #GIVEN
         $timestamp=time();
@@ -74,7 +72,7 @@ class CalendarCest {
         #WHEN
         $createEventRequest->setUserID($admin->getId());
         $createEventRequest->setTitle($title);
-        $createEventRequest->setFormParam('level', CalendarEventPayload::getEventTypes()['personal']);
+        $createEventRequest->setFormParam('level', Payload\CalendarEvent::getEventTypes()['personal']);
         $createEventRequest->setFormParam('campus[]', 1);
 
         $response = $i->sendCurlRequest($createEventRequest, true, 'Send request to create personal calendar event');
@@ -91,12 +89,12 @@ class CalendarCest {
     /** Create a group event from the calendar event modify page.
      *
      * @param IntegrationTester    $i
-     * @param CalendarEventPayload $createEventRequest
+     * @param Payload\CalendarEvent $createEventRequest
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createGroupEvent(IntegrationTester $i, CalendarEventPayload $createEventRequest)
+    public function createGroupEvent(IntegrationTester $i, Payload\CalendarEvent $createEventRequest)
     {
         #GIVEN
         $timestamp=time();
@@ -107,7 +105,7 @@ class CalendarCest {
         #WHEN
         $createEventRequest->setUserID($admin->getId());
         $createEventRequest->setTitle($title);
-        $createEventRequest->setFormParam('level', CalendarEventPayload::getEventTypes()['group']);
+        $createEventRequest->setFormParam('level', Payload\CalendarEvent::getEventTypes()['group']);
         $createEventRequest->setFormParam('group[0]', $targetGroup);
         $createEventRequest->setFormParam('campus[]', 1);
 
@@ -125,12 +123,12 @@ class CalendarCest {
     /** Create a campus event from the calendar event modify page.
      *
      * @param IntegrationTester    $i
-     * @param CalendarEventPayload $createEventRequest
+     * @param Payload\CalendarEvent $createEventRequest
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createCampusEvent(IntegrationTester $i, CalendarEventPayload $createEventRequest)
+    public function createCampusEvent(IntegrationTester $i, Payload\CalendarEvent $createEventRequest)
     {
         #GIVEN
         $timestamp=time();
@@ -142,7 +140,7 @@ class CalendarCest {
         #WHEN
         $createEventRequest->setUserID($admin->getId());
         $createEventRequest->setTitle($title);
-        $createEventRequest->setFormParam('level', CalendarEventPayload::getEventTypes()['campus']);
+        $createEventRequest->setFormParam('level', Payload\CalendarEvent::getEventTypes()['campus']);
         $createEventRequest->setFormParam('campus[0]', $targetCampuses[0]);
         $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
@@ -162,12 +160,12 @@ class CalendarCest {
     /** Modify personal event using the calendar event edit page.
      *
      * @param IntegrationTester    $i
-     * @param CalendarEventPayload $eventPayload
+     * @param Payload\CalendarEvent $eventPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function modifyPersonalEvent(IntegrationTester $i, CalendarEventPayload $eventPayload)
+    public function modifyPersonalEvent(IntegrationTester $i, Payload\CalendarEvent $eventPayload)
     {
         #GIVEN
         $timestamp=time();
@@ -176,7 +174,7 @@ class CalendarCest {
 
         $eventPayload->setUserID($admin->getId());
         $eventPayload->setTitle($title);
-        $eventPayload->setFormParam('level', CalendarEventPayload::getEventTypes()['personal']);
+        $eventPayload->setFormParam('level', Payload\CalendarEvent::getEventTypes()['personal']);
         $eventPayload->setFormParam('campus[]', 1);
 
         $i->sendCurlRequest($eventPayload, false, 'Send request to create personal calendar event');
@@ -201,12 +199,12 @@ class CalendarCest {
     /** RSVP to a calendar event. Curl post
      *
      * @param IntegrationTester    $i
-     * @param CalendarEventPayload $createEventRequest
+     * @param Payload\CalendarEvent $createEventRequest
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function rsvpToEvent(IntegrationTester $i, CalendarEventPayload $createEventRequest)
+    public function rsvpToEvent(IntegrationTester $i, Payload\CalendarEvent $createEventRequest)
     {
         #GIVEN
         $timestamp=time();
@@ -218,7 +216,7 @@ class CalendarCest {
 
         $createEventRequest->setUserID($admin->getId());
         $createEventRequest->setTitle($title);
-        $createEventRequest->setFormParam('level', CalendarEventPayload::getEventTypes()['campus']);
+        $createEventRequest->setFormParam('level', Payload\CalendarEvent::getEventTypes()['campus']);
         $createEventRequest->setFormParam('campus[0]', $targetCampuses[0]);
         $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
@@ -245,12 +243,12 @@ class CalendarCest {
     /** Approve all attendees for a Calendar Event.
      *
      * @param IntegrationTester    $i
-     * @param CalendarEventPayload $createEventRequest
+     * @param Payload\CalendarEvent $createEventRequest
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function approveAttendees(IntegrationTester $i, CalendarEventPayload $createEventRequest)
+    public function approveAttendees(IntegrationTester $i, Payload\CalendarEvent $createEventRequest)
     {
 
         #GIVEN
@@ -263,7 +261,7 @@ class CalendarCest {
         #WHEN
         $createEventRequest->setUserID($admin->getId());
         $createEventRequest->setTitle($title);
-        $createEventRequest->setFormParam('level', CalendarEventPayload::getEventTypes()['campus']);
+        $createEventRequest->setFormParam('level', Payload\CalendarEvent::getEventTypes()['campus']);
         $createEventRequest->setFormParam('campus[0]', $targetCampuses[0]);
         $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);

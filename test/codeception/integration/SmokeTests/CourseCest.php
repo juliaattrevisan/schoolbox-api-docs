@@ -1,17 +1,17 @@
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
 namespace SmokeTests;
 
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
+use Payload;
 use Payload\Base;
-use Payload\Folder as FolderPayload;
-use Payload\Course as CoursePayload;
 
-/**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
- */
 class CourseCest {
 
     public function _before(IntegrationTester $i)
@@ -24,19 +24,19 @@ class CourseCest {
      * Fires off creating a course folder.
      *
      * @param IntegrationTester $i
-     * @param CoursePayload     $coursePayload
+     * @param Payload\Course    $coursePayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createCourse (IntegrationTester $i, CoursePayload $coursePayload){
+    public function createCourse (IntegrationTester $i, Payload\Course $coursePayload){
         #GIVEN
         $timestamp = time();
         $folder_title='Test Folder For Create Course at '.$timestamp;
         $faculty_folder=$i->getFirstFolderByTitle('Faculties');
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_NONE);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_NONE);
         $folderPayload->setName($folder_title);
         $folderPayload->setParentFolder($faculty_folder->getId());
         $i->sendCurlRequest($folderPayload, false, 'Send request create a Folder in faculty folder');
@@ -93,19 +93,19 @@ class CourseCest {
      * Fires off creating a course folder, class folder, adding users to group, creating a course, creating assessments for the course.
      *
      * @param IntegrationTester $i
-     * @param CoursePayload     $coursePayload
+     * @param Payload\Course    $coursePayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function importCourseToClass (IntegrationTester $i, CoursePayload $coursePayload){
+    public function importCourseToClass (IntegrationTester $i, Payload\Course $coursePayload){
         #GIVEN
         $timestamp = time();
         $folder_title='Test Folder For Create Course with assessments at '.$timestamp;
         $faculty_folder=$i->getFirstFolderByTitle('Faculties');
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_NONE);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_NONE);
         $folderPayload->setName($folder_title);
         $folderPayload->setParentFolder($faculty_folder->getId());
         $i->sendCurlRequest($folderPayload, false, 'Send request create a Folder in faculty folder');
@@ -175,8 +175,8 @@ class CourseCest {
         $teacher = $i->getUser('zsmith');
         $admin = $i->getUser('alaress');
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($classpage_title);
         $folderPayload->setFormParam('code', $class_code);
         $i->sendCurlRequest($folderPayload, false, 'Create new class for import test');

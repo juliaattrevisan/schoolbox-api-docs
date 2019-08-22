@@ -1,17 +1,14 @@
 <?php
-
-namespace SmokeTests;
-
-use IntegrationTester;
-use GuzzleHttp\Psr7\Response;
-use GuzzleHttp\Exception\GuzzleException;
-use Page\Common;
-use Payload\CreateNews as NewsPayload;
-
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
+
+namespace SmokeTests;
+
+use IntegrationTester;
+use Payload;
 
 class NewsCest {
 
@@ -28,12 +25,12 @@ class NewsCest {
     /** Create draft news using curl request
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function createDraftNews(IntegrationTester $i, NewsPayload $newsPayload){
+    public function createDraftNews(IntegrationTester $i, Payload\CreateNews $newsPayload){
         #GIVEN
         $timestamp=time();
         $title = 'Smoke Test News Title Draft at '.$timestamp;
@@ -57,12 +54,12 @@ class NewsCest {
      *  Fires off a create step.
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function publishDraftToModerate(IntegrationTester $i, NewsPayload $newsPayload){
+    public function publishDraftToModerate(IntegrationTester $i, Payload\CreateNews $newsPayload){
         #GIVEN
         $timestamp=time();
         $title = 'Smoke Test News Title Moderate at '.$timestamp;
@@ -91,12 +88,12 @@ class NewsCest {
      *  Fires off a create step.
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function publishNewsFromDraft(IntegrationTester $i, NewsPayload $newsPayload){
+    public function publishNewsFromDraft(IntegrationTester $i, Payload\CreateNews $newsPayload){
         #GIVEN
         $timestamp=time();
         $title = 'Smoke Test News Title Publish Form Draft at '.$timestamp;
@@ -125,12 +122,12 @@ class NewsCest {
      *  Fires off a create step and putting the news into moderation
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function publishNewsFromModerate(IntegrationTester $i, NewsPayload $newsPayload){
+    public function publishNewsFromModerate(IntegrationTester $i, Payload\CreateNews $newsPayload){
         #GIVEN
         $timestamp=time();
         $title = 'Smoke Test News Title Publish Form Moderate at '.$timestamp;
@@ -164,12 +161,12 @@ class NewsCest {
      *  Fires off a create step and putting the news into moderation
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function rejectNewsFromModerate(IntegrationTester $i, NewsPayload $newsPayload){
+    public function rejectNewsFromModerate(IntegrationTester $i, Payload\CreateNews $newsPayload){
         #GIVEN
         $timestamp=time();
         $title = 'Smoke Test News Title Reject from Moderate at '.$timestamp;
@@ -202,12 +199,12 @@ class NewsCest {
      *  Fires off a create step and publish step for news.
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function saveNewsForLater(IntegrationTester $i, NewsPayload $newsPayload){
+    public function saveNewsForLater(IntegrationTester $i, Payload\CreateNews $newsPayload){
         #GIVEN
         $timestamp=time();
         $title = 'Smoke Test News Title Save news for later at '.$timestamp;
@@ -237,12 +234,12 @@ class NewsCest {
      *  Fires off a create step and publish step for news.
      *
      * @param IntegrationTester $i
-     * @param NewsPayload       $newsPayload
+     * @param Payload\CreateNews $newsPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function deleteNews(IntegrationTester $i, NewsPayload $newsPayload)
+    public function deleteNews(IntegrationTester $i, Payload\CreateNews $newsPayload)
     {
         #GIVEN
         $timestamp = time();

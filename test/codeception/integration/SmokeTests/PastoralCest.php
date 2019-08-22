@@ -1,15 +1,15 @@
 <?php
+/**
+ * @copyright Copyright 2019, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+declare(strict_types=1);
 
 namespace SmokeTests;
 
 use IntegrationTester;
 use Payload\PastoralRecord;
 use Payload\PastoralComment;
-
-/**
- * @copyright Copyright 2019, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
- */
 
 class PastoralCest
 {

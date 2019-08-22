@@ -1,17 +1,17 @@
 <?php
-
-namespace SmokeTests;
-
-use IntegrationTester;
-use Payload\Base;
-use Payload\GroupMember as GroupMemberPayload;
-use SchoolboxHelper\SchoolboxActionsConstants;
-use Payload\Folder as FolderPayload;
-use Payload\TextBoxComponent as TextBoxPayload;
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+declare(strict_types=1);
+
+namespace SmokeTests;
+
+use IntegrationTester;
+use Payload;
+use Payload\Base;
+use Payload\GroupMember as GroupMemberPayload;
+use SchoolboxHelper\SchoolboxActionsConstants;
 
 class HomePageCest {
 
@@ -28,15 +28,15 @@ class HomePageCest {
     /** Create homepage. creates a homepage through a curl payload
      *
      * @param IntegrationTester $i
-     * @param FolderPayload     $folderPayload
+     * @param Payload\Folder    $folderPayload
      */
-    public function createHomepage(IntegrationTester $i, FolderPayload $folderPayload){
+    public function createHomepage(IntegrationTester $i, Payload\Folder  $folderPayload){
         #GIVEN
         $timestamp = time();
         $homepage_title='Testing Home Page Create Homepage at '.$timestamp;
 
         #WHEN
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setTemplate(Payload\Folder ::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($homepage_title);
         $response= $i->sendCurlRequest($folderPayload, true, 'Send request create homepage');
         $expectedUrlsReturned= [
@@ -53,13 +53,13 @@ class HomePageCest {
      *  Fires off create homepage.
      *
      * @param IntegrationTester  $i
-     * @param FolderPayload      $folderPayload
+     * @param Payload\Folder     $folderPayload
      * @param GroupMemberPayload $memberPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function setUpUsers(IntegrationTester $i, FolderPayload $folderPayload, GroupMemberPayload $memberPayload){
+    public function setUpUsers(IntegrationTester $i, Payload\Folder $folderPayload, GroupMemberPayload $memberPayload){
 
         #GIVEN
         $timestamp = time();
@@ -68,7 +68,7 @@ class HomePageCest {
         $admin = $i->getUser('alaress');
         $homepage_title='Testing Home Page Add Members with Permissions at '.$timestamp;
 
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($homepage_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create homepage');
         $homePage=$i->getFirstFolderByTitle($homepage_title);
@@ -110,19 +110,19 @@ class HomePageCest {
      * Fires off create homepage.
      *
      * @param IntegrationTester $i
-     * @param FolderPayload     $folderPayload
-     * @param TextBoxPayload    $textBoxPayload
+     * @param Payload\Folder    $folderPayload
+     * @param Payload\TextBoxComponent $textBoxPayload
      * @throws \Schoolbox\External\Exception
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function setUpTextComponent(IntegrationTester $i, FolderPayload $folderPayload, TextBoxPayload $textBoxPayload){
+    public function setUpTextComponent(IntegrationTester $i, Payload\Folder $folderPayload, Payload\TextBoxComponent $textBoxPayload){
 
         #GIVEN
         $timestamp = time();
         $homepage_title='Testing Home Page Use Text Box Component at '.$timestamp;
 
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($homepage_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create homepage');
         $homePage=$i->getFirstFolderByTitle($homepage_title);
