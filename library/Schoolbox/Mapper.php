@@ -2849,15 +2849,19 @@ abstract class Mapper implements IMapper, Serializable
                     continue;
                 }
 
-                // Hydrated N:N joins may contain either a model or collection,
-                // these dehydrate to a model identifier and array, respectively.
-                // Dehydrates to null if join was not hydrated at all.
-                $propertyValue = $this->getModelProperty($model, $map['property']);
-                if (null === $propertyValue) {
+                // We use join tables for two use cases:
+                // 1. True N:N relationships (eg folder:yearLevel), and
+                // 2. N:0..1 relationships (eg assessment:unitSpec)
+                // The first case is a Collection, the latter a Model.
+                // For N:N, null means 'unknown', while empty means 'no associations'.
+                // For N:0..1, null could either mean 'unknown' or 'no association'.
+                // For the latter, for now assume the join is always hydrated (see SA-9156)
+                $dehydrated = $this->getModelProperty($model, $map['property']);
+                if (null === $dehydrated && $map['hydrator'] instanceof Column\Collection) {
                     // Join is not hydrated on this model
                     continue;
                 }
-                $propertyValue = (array)$propertyValue;
+                $propertyValue = (array)$dehydrated;
 
                 $joinSchema = $this->joins[$map['join']];
                 $joinMulti  = $joinSchema['multi'];
