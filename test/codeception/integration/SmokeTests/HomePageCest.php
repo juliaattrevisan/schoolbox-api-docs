@@ -30,13 +30,13 @@ class HomePageCest {
      * @param IntegrationTester $i
      * @param Payload\Folder    $folderPayload
      */
-    public function createHomepage(IntegrationTester $i, Payload\Folder  $folderPayload){
+    public function createHomepage(IntegrationTester $i, Payload\Folder $folderPayload){
         #GIVEN
         $timestamp = time();
         $homepage_title='Testing Home Page Create Homepage at '.$timestamp;
 
         #WHEN
-        $folderPayload->setTemplate(Payload\Folder ::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($homepage_title);
         $response= $i->sendCurlRequest($folderPayload, true, 'Send request create homepage');
         $expectedUrlsReturned= [

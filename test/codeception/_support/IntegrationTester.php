@@ -5,18 +5,12 @@
  */
 
 use Codeception\TestInterface;
-use GuzzleHelper\GuzzleConstants;
-use Payload\Login as LoginPayload;
-use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
-use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Response;
-use const GuzzleHelper\VAGRANT_DOMAIN;
 use Payload\RubricCapability as RubCapabilityPayload;
 use Payload\RubricIndicator as RubIndicatorPayload;
 use Payload\Assessment as AssessmentPayload;
 use Payload\AssessmentMark as AssessmentMarkPayload;
-use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitMapper;
 
 /**
  * Inherited Methods
@@ -173,7 +167,7 @@ class IntegrationTester extends \Codeception\Actor
 
     public function loginAdmin()
     {
-        $loginPayload = new LoginPayload();
+        $loginPayload = new Payload\Login();
         $loginPayload->setUsername('alaress');
         $loginPayload->setPassword('alaress');
 
