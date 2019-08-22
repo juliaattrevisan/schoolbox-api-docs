@@ -48,7 +48,6 @@ echo "Copying driver files..."
     sudo mkdir -p /opt/microsoft/msodbcsql
     sudo bash -c 'echo -e "/usr/lib64" >> /etc/ld.so.conf'
     sudo cp ~/pdosqlsrv/usr-bin/* /usr/bin
-    sudo cp ~/pdosqlsrv/etc-php-7.1-apache2-conf.d/* /etc/php/7.1/apache2/conf.d
     sudo cp ~/pdosqlsrv/etc-php-7.1-cli-conf.d/* /etc/php/7.1/cli/conf.d
     sudo cp ~/pdosqlsrv/usr-lib64/*.a /usr/lib64
     sudo cp ~/pdosqlsrv/usr-lib64/*.so /usr/lib64

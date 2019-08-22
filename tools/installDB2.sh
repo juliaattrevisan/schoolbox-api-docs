@@ -72,7 +72,6 @@ echo "Adding Extension To PHP 7.1 Configuration Files..."
 # echo | sudo... Gotta make a move to a town that's right for me...
 
 {
-echo 'extension=ibm_db2.so' | sudo tee /etc/php/7.1/apache2/conf.d/20-ibm_db2.ini
 echo 'extension=ibm_db2.so' | sudo tee /etc/php/7.1/cli/conf.d/20-ibm_db2.ini
 } &>> ~/ibm_db2_install.log
 
