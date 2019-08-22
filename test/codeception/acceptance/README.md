@@ -5,10 +5,10 @@ All Codeception acceptance tests go in this folder.
 
 ## Structure
 
-    _data/ # not sure yet
-    _output/ # logs and screenshots of runs
-    _support/ # custom steps for scenarios?
-    bin/
+    ../_data/ # not sure yet
+    ../_output/ # logs and screenshots of runs
+    ../_support/ # custom steps for scenarios?
+    ../bin/
         phantomjs/ # created by phantomjs-server.sh
         phantomjs-server.sh
     *Cest.php # individual test scenarios
@@ -55,7 +55,7 @@ relative to `test/acceptance`:
 
 ## Writing tests
 
-See `test/acceptance/LoginCest.php` for an example - it shows an example of
+See `test/codeception/acceptance/LoginCest.php` for an example - it shows an example of
 driving a web browser to perform commands, and of a direct database query.
 
 
