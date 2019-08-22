@@ -89,23 +89,4 @@ class Controller extends Base
             )
         );
     }
-
-//    /**
-//     * Returns the contents of the Assessment Calendar page
-//     *
-//     * @api   POST /learning/assessment/calendar
-//     * @since 19.1
-//     */
-//    public function postReport(): void
-//    {
-//        // Might not even need to do anything here.
-//        $eventData =
-//            "TODO - calendar event JSON data <br>\n" .
-//            print_r($this->request->post->getArrayCopy(), true);
-//
-//        $this->response->content->set($this->buildJsonOutput([
-//            'status'  => 200,
-//            'content' => $eventData,
-//        ]));
-//    }
 }
