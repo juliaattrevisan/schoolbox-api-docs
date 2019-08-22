@@ -8,7 +8,7 @@
 namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 
 use Aura\Di\ContainerInterface;
-use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\Submission;
 use Calendar\Event\Type\Submission\Renderer\Javascript as SubmissionRendererJavascript;
 use Custom\Mggs\Personalised\Participant\Mapper as ParticipantMapper;
 use Schoolbox\Config\ConfigMapper;
@@ -26,11 +26,11 @@ class Javascript extends SubmissionRendererJavascript
      * Constructor
      *
      * @param ContainerInterface $di
-     * @param EventBase          $event
+     * @param Submission\Event   $event
      * @param User               $user
      * @param User               $viewer
      */
-    public function __construct(ContainerInterface $di, EventBase $event, User $user, User $viewer)
+    public function __construct(ContainerInterface $di, Submission\Event $event, User $user, User $viewer)
     {
         parent::__construct($di, $event, $user, $viewer);
 
