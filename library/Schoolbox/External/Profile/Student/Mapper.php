@@ -5,11 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Student;
+namespace Schoolbox\External\Profile\Student;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\External\User;
+use Schoolbox\External\Profile;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
 use UnexpectedValueException;
@@ -23,7 +23,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_student');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', User\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
         $this->uses('date_of_birth', self::TYPE_DATE);
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
@@ -102,8 +102,8 @@ class Mapper extends \Schoolbox\Mapper
             if ($student) {
                 $user = $this->getJoinMapper('user')->hydrate($row, 'u');
                 $student->setUser($user);
+                $collection->add($student);
             }
-            $collection->add($student);
         }
 
         return $collection;

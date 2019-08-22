@@ -48,7 +48,7 @@ class Model
     /**
      * @return bool
      */
-    public function isEmergencyContact(): bool
+    public function getEmergencyContact(): bool
     {
         return $this->emergencyContact;
     }
@@ -63,20 +63,20 @@ class Model
 
 
     /**
-     * @param string $childProfileId
+     * @param int $childProfileId
      * @return Model
      */
-    public function setChildProfileId(string $childProfileId): Model
+    public function setChildProfileId(int $childProfileId): Model
     {
         $this->childProfileId = $childProfileId;
         return $this;
     }
 
     /**
-     * @param string $userProfileId
+     * @param int $userProfileId
      * @return Model
      */
-    public function setUserProfileId(string $userProfileId): Model
+    public function setUserProfileId(int $userProfileId): Model
     {
         $this->userProfileId = $userProfileId;
         return $this;

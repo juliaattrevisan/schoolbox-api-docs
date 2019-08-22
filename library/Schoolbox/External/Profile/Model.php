@@ -121,4 +121,14 @@ class Model implements ISoftDeletable
         $this->lastname = $lastname;
         return $this;
     }
+
+    /**
+     * @param string|null $email
+     * @return Model
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
 }

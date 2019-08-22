@@ -5,15 +5,25 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Staff;
+namespace Schoolbox\External\Profile\Staff;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\External\User;
+use Schoolbox\External\Profile;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
 use UnexpectedValueException;
 
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\External\User\Staff
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -23,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_staff');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', User\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
         $this->uses('category', self::TYPE_STRING);
@@ -83,8 +93,8 @@ class Mapper extends \Schoolbox\Mapper
             if ($staff) {
                 $user = $this->getJoinMapper('user')->hydrate($row, 'u');
                 $staff->setUser($user);
+                $collection->add($staff);
             }
-            $collection->add($staff);
         }
 
         return $collection;

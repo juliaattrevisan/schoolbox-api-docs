@@ -5,15 +5,24 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Parent;
+namespace Schoolbox\External\Profile\Parent;
 
 use PDOStatement;
 use PDO;
-use Schoolbox\External\User;
+use Schoolbox\External\Profile;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
 use UnexpectedValueException;
 
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\External\User\Parent
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -23,7 +32,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_parent');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', User\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
         $this->uses('mobile', self::TYPE_STRING);
         $this->uses('phone_home', self::TYPE_STRING);
         $this->uses('phone_work', self::TYPE_STRING);
@@ -74,13 +83,13 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $staff = $this->hydrate($row);
+            $parent = $this->hydrate($row);
 
-            if ($staff) {
+            if ($parent) {
                 $user = $this->getJoinMapper('user')->hydrate($row, 'u');
-                $staff->setUser($user);
+                $parent->setUser($user);
+                $collection->add($parent);
             }
-            $collection->add($staff);
         }
 
         return $collection;

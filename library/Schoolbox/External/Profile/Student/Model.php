@@ -14,7 +14,6 @@ use Schoolbox\External\User\Model as UserModel;
 
 class Model implements ISoftDeletable
 {
-    use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
@@ -702,10 +701,12 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param UserModel $user
+     * @param UserModel|null $user
+     * @return Model
      */
-    public function setUser(?UserModel $user): void
+    public function setUser(?UserModel $user): self
     {
         $this->user = $user;
+        return $this;
     }
 }
