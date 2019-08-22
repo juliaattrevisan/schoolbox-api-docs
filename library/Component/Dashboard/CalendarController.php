@@ -70,7 +70,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
             $this->start->getUnixTimeStamp(),
             $this->end->getUnixTimeStamp(),
             $this->getUser(),
-            $this->getSitePage(),
+            $this->getSitePage()->getDi(),
             $this->getUser()
         );
 

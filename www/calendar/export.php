@@ -468,7 +468,7 @@ $renderer = new Renderer(
     $startTimestamp,
     $endTimestamp,
     $user,
-    (new SitePage(false))->setDi($kernel->getDependencyInjector()),
+    $kernel->getDependencyInjector(),
     $viewer
 );
 

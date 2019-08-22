@@ -9,13 +9,11 @@
 
 namespace Calendar\Event\Collection;
 
-use Calendar;
-use Calendar_Api_EventType_Interface;
-use Group;
-use SitePage;
+use Aura\Di\ContainerInterface;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\RendererInterface;
+use Calendar_Api_EventType_Interface;
 use Schoolbox\User;
 
 class Renderer
@@ -30,20 +28,16 @@ class Renderer
     /** @var int $endTimestamp A unix timestamp */
     private $endTimestamp;
 
-    /** @var SitePage $page An instance of sitepage */
-    private $page;
+    /**
+     * @var ContainerInterface
+     */
+    private $di;
 
     /** @var User */
     private $user;
 
     /** @var User */
     private $viewer;
-
-    /** @var Group $groupHandler */
-    private $groupHandler;
-
-    /** @var Calendar $calendarHandler */
-    private $calendarHandler;
 
     /** @var Collection $allEvents Mega-stack Collection instance which stores all events */
     private $allEvents;
@@ -56,7 +50,7 @@ class Renderer
      * @param int                              $startTimestamp
      * @param int                              $endTimestamp
      * @param User                             $user
-     * @param SitePage                         $page
+     * @param ContainerInterface               $di
      * @param User                             $viewer
      */
     public function __construct(
@@ -64,19 +58,15 @@ class Renderer
         int $startTimestamp,
         int $endTimestamp,
         User $user,
-        Sitepage $page,
+        ContainerInterface $di,
         User $viewer
     ) {
         $this->api            = $api;
         $this->startTimestamp = $startTimestamp;
         $this->endTimestamp   = $endTimestamp;
         $this->user           = $user;
-        $this->page           = $page;
+        $this->di             = $di;
         $this->viewer         = $viewer;
-
-        //TODO remove these deprecated dependencies
-        $this->groupHandler    = new Group();
-        $this->calendarHandler = new Calendar();
 
         $this->allEvents = new Collection();
         $this->collectAllEvents();
@@ -130,11 +120,9 @@ class Renderer
         $rendererClass = $event->getRendererClass($format);
         /** @var RendererInterface $renderObj */
         $renderObj = new $rendererClass(
-            $this->page,
+            $this->di,
             $event,
             $this->user,
-            $this->groupHandler,
-            $this->calendarHandler,
             $this->viewer
         );
         return $renderObj->render();
@@ -167,17 +155,6 @@ class Renderer
 
 
     /**
-     * Get page
-     *
-     * @return Sitepage
-     */
-    protected function getPage(): SitePage
-    {
-        return $this->page;
-    }
-
-
-    /**
      * Set all events
      *
      * @param Collection $allEvents
@@ -198,24 +175,6 @@ class Renderer
     public function getAllEvents(): Collection
     {
         return $this->allEvents;
-    }
-
-
-    /**
-     * @return Calendar
-     */
-    protected function getCalendarHandler(): Calendar
-    {
-        return $this->calendarHandler;
-    }
-
-
-    /**
-     * @return Group
-     */
-    protected function getGroupHandler(): Group
-    {
-        return $this->groupHandler;
     }
 
 

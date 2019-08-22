@@ -8,10 +8,10 @@
 namespace Calendar\Event\Type;
 
 use Alaress\Authorizer\Authorizer;
+use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use \SitePage;
+use Schoolbox\User;
 use Twig_Environment;
-use \Schoolbox\User;
 
 abstract class RendererBase implements RendererInterface
 {
@@ -29,61 +29,49 @@ abstract class RendererBase implements RendererInterface
      */
     var $viewer;
 
-
     /**
-     * SitePage
+     * DI container
      *
-     * @var SitePage
-     */
-    var $page;
-
-    /**
-     * Group Handler
-     * TODO: refactor this out
+     * TODO once template engine is removed, remove this and only inject the authorizer and router
+     * Whilst this is better than including SitePage this is still iffy:
+     * including a service locator introduces unknowable hidden dependencies.
      *
-     * @var \Group
+     * @var ContainerInterface
      */
-    var $groupHandler;
+    private $di;
+
 
     /**
-     * Calendar Handler
-     * TODO: refactor this out
+     * Constructor
      *
-     * @var \Calendar
+     * @param ContainerInterface $di
+     * @param User               $user
+     * @param User               $viewer
      */
-    var $calendarHandler;
-
-    /**
-     * @param SitePage $page
-     * @param User $user
-     * @param \Group $groupHandler
-     * @param \Calendar $calHandler
-     * @param User $viewer
-     */
-    public function __construct(SitePage $page, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer) {
-        $this->setPage($page);
+    public function __construct(ContainerInterface $di, User $user, User $viewer)
+    {
+        $this->di = $di;
         $this->setUser($user);
         $this->setViewer($viewer);
-
-        //TODO remove these
-        $this->setGroupHandler($groupHandler);
-        $this->setCalendarHandler($calHandler);
     }
 
 
     /**
      * Return templating engine
      *
+     * TODO remove this: eventually Twig representations of events won't be required
+     *
      * @return Twig_Environment
      */
-    public function getTemplate() {
-        return $this->page->getDi()->get('templateEngine');
+    public function getTemplate(): Twig_Environment
+    {
+        return $this->di->get('templateEngine');
     }
 
 
     /**
-    * @param \Schoolbox\User $user
-    */
+     * @param \Schoolbox\User $user
+     */
     public function setUser($user)
     {
         $this->user = $user;
@@ -114,62 +102,16 @@ abstract class RendererBase implements RendererInterface
     }
 
     /**
-     * @return SitePage
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * @param SitePage $page
-     */
-    public function setPage($page)
-    {
-        $this->page = $page;
-    }
-
-    /**
-     * @param mixed $calendarHandler
-     */
-    public function setCalendarHandler($calendarHandler)
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getCalendarHandler()
-    {
-        return $this->calendarHandler;
-    }
-
-    /**
-     * @param mixed $groupHandler
-     */
-    public function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getGroupHandler()
-    {
-        return $this->groupHandler;
-    }
-
-    /**
      * Helper function - gets whether access to a route is allowed.
+     *
+     * TODO inject only what is required for this, not the entire DI
      *
      * @param string $name
      * @param array  $params
      *
      * @return bool|string False if not authorized, a URL if it is.
      */
-    public function getRouteIfAuthorized($name, array $params = array())
+    public function getRouteIfAuthorized($name, array $params = [])
     {
         if ($this->getAuthorizer()->isPathAuthorizedForUser($name, $params, $this->getViewer())) {
             return $this->getRouter()->generate($name, $params);
@@ -180,16 +122,16 @@ abstract class RendererBase implements RendererInterface
     /**
      * @return Authorizer
      */
-    public function getAuthorizer()
+    public function getAuthorizer(): Authorizer
     {
-        return $this->getPage()->getDi()->get('authorizer');
+        return $this->di->get('authorizer');
     }
 
     /**
      * @return Router
      */
-    public function getRouter()
+    public function getRouter(): Router
     {
-        return $this->getPage()->getDi()->get('router');
+        return $this->di->get('router');
     }
 }

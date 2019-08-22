@@ -189,7 +189,7 @@ class Controller extends Base {
             (int)$this->getRequest()->query->get('start'),
             (int)$this->getRequest()->query->get('end'),
             $this->getUser(),
-            $this->getDi()->get('sitePage'),
+            $this->getDi(),
             $this->getUser()
         );
         $output = json_decode('[' . \implode(',', $calendar->renderAll('javascript')) . ']');

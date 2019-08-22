@@ -9,11 +9,11 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
+use Aura\Di\ContainerInterface;
 use Calendar\Event\Type\Day;
 use \Calendar\Event\Type\RendererBase;
 use Schoolbox\Calendar\Event;
 use Schoolbox\User;
-use SitePage;
 
 abstract class Base extends RendererBase
 {
@@ -22,17 +22,25 @@ abstract class Base extends RendererBase
     private $event;
 
     /**
-     * @param SitePage  $page
-     * @param Day\Event $event
-     * @param User      $user
-     * @param \Group    $groupHandler
-     * @param \Calendar $calHandler
-     * @param User      $viewer
+     * @var \Calendar
      */
-    public function __construct(SitePage $page, Day\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    private $calHandler;
+
+    /**
+     * Constructor
+     *
+     * @param ContainerInterface $di
+     * @param Day\Event          $event
+     * @param User               $user
+     * @param User               $viewer
+     */
+    public function __construct(ContainerInterface $di, Day\Event $event, User $user, User $viewer)
     {
-        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
-        $this->event = $event;
+        parent::__construct($di, $user, $viewer);
+
+        // TODO would rather not create this like this, but it's better than every renderer depending on it
+        $this->calHandler = new \Calendar();
+        $this->event      = $event;
     }
 
 
@@ -61,7 +69,7 @@ abstract class Base extends RendererBase
      */
     public function attendanceStatus()
     {
-        if ($attendance = $this->getCalendarHandler()->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
+        if ($attendance = $this->calHandler->getAttendanceByEventAndUser($this->event->getEventId(), $this->getViewer()->getId())) {
             if ($attendance['status'] == Event::ATTENDANCE_STATUS_PENDING) {
                 return 'Pending';
             } else if ($attendance['status'] == Event::ATTENDANCE_STATUS_APPROVED) {
@@ -82,4 +90,4 @@ abstract class Base extends RendererBase
     {
         return $this->event;
     }
-} 
+}

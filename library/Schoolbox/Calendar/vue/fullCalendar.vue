@@ -1,22 +1,22 @@
 <script>
 
-    import FullCalendar             from '@fullcalendar/vue'
-    import interactionPlugin        from '@fullcalendar/interaction'
-    import dayGridPlugin            from '@fullcalendar/daygrid'
-    import timeGridPlugin           from '@fullcalendar/timegrid'
-    import listPlugin               from '@fullcalendar/list'
-    import momentPlugin,
-           {toMoment, toDuration}   from '@fullcalendar/moment'
-    import RevealModal              from '@schoolbox/reveal-modal'
-    import MetaList                 from '@schoolbox/meta/list'
-    import MetaItem                 from '@schoolbox/meta/item'
-    import Toast                    from "@schoolbox/toast";
-    import ViewEventModal           from './viewEventModal';
-    import CreateEventModal         from './createEventModal';
-    import ExportModal              from "./exportModal";
-    import FilterModal              from "./filterModal";
-    import axios                    from 'axios'
-    import qs                       from "qs";
+    import FullCalendar               from '@fullcalendar/vue'
+    import interactionPlugin          from '@fullcalendar/interaction'
+    import dayGridPlugin              from '@fullcalendar/daygrid'
+    import timeGridPlugin             from '@fullcalendar/timegrid'
+    import listPlugin                 from '@fullcalendar/list'
+    import momentPlugin, {toDuration} from '@fullcalendar/moment'
+    import RevealModal                from '@schoolbox/reveal-modal'
+    import MetaList                   from '@schoolbox/meta/list'
+    import MetaItem                   from '@schoolbox/meta/item'
+    import Toast                      from "@schoolbox/toast";
+    import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
+    import CreateEventModal           from './createEventModal';
+    import ExportModal                from "./exportModal";
+    import FilterModal                from "./filterModal";
+    import axios                      from 'axios'
+    import qs                         from "qs";
+    import FullCalendarHelper         from "@schoolbox/fullcalendar/helper";
 
     // Various URLs that FullCalendar may make use of.
     const URL_STATE_CHANGE = '/calendar/changeState';
@@ -52,6 +52,9 @@
             MetaList,
             FullCalendar,
             RevealModal,
+        },
+        beforeMount() {
+            this.helper = new FullCalendarHelper(this, this.config, this.jQuery);
         },
         data() {
             return {
@@ -109,20 +112,13 @@
              *                  false once they are finished.
              */
             onLoading(isLoading) {
-                // TODO find a non-jQuery dependent way to do this
-                if (isLoading === true) {
-                    // this.$refs.toast.activate('Loading...');
-                    this.jQuery.magnificPopup.open({
-                        showCloseBtn: false,
-                        items: {
-                            src: "<div class='preview loader'></div>",
-                            type: 'inline'
-                        }
-                    });
-                } else {
-                    // this.$refs.toast.timeout('Done', true, 3000, 2000);
-                    this.jQuery.magnificPopup.close();
-                }
+                // TODO this method should be unnecessary
+                // I should just be able to reference this in the `<full-calendar>`
+                // tag as `@loading="helper.onLoading"`, but `this` within that
+                // call is null.
+                // Even `@loading="helper.onLoading.bind(helper)"` fails, the method
+                // doesn't get called at all.
+                this.helper.onLoading(isLoading);
             },
 
             /**
@@ -179,60 +175,20 @@
              * @return {boolean}
              */
             eventRender(eventRenderInfo) {
-                let calEvent = eventRenderInfo.event,
-                    self     = this;
-
-                // Always render placeholders in the most basic manner
-                if (calEvent.id === 'placeholder') {
-                    return true;
-                }
-
-                // Ignore the phantom event that the API puts there
-                if (!calEvent?.extendedProps?.data) {
+                if (!this.helper.eventRender(eventRenderInfo)) {
                     return false;
                 }
 
-                // Don't render me if I'm marked as do not render
-                if ('is_rendered' in calEvent && !calEvent?.is_rendered) {
-                    return false;
-                }
 
-                // Mangle the event using old-fashioned jQuery
-                // TODO don't depend on jQuery for this
-                let $element = this.jQuery(eventRenderInfo.el),
-                    inner    = $element.find('.fc-content'),
-                    title    = $element.find('.fc-title'),
-                    content  = $element.find('.fc-event-content');
-
-                // If appropriate, indicate this event can be attended
-                if (Boolean(calEvent?.extendedProps?.data?.attendance?.icon)) {
-                    let span = '<span class="att">(A)</span>';
-                    if (content.length === 1) {
-                        content.append(span)
-                    } else {
-                        inner.append(span)
-                    }
-                }
-
-                // If this event is a task, alter the state of the checkbox accordingly.
-                if (this.isTask(calEvent)) {
-                    inner.prepend(
-                        this.jQuery('<input type="checkbox" name="completed" class="plain" />')
-                            .attr('id', 't' + calEvent?.extendedProps?.data?.meta?.eventId)
-                    );
-                    if (Boolean(calEvent?.extendedProps?.data?.meta?.completed)) {
-                        title.addClass('strike');
-                        inner.find(':checkbox').prop('checked', true)
-                    }
-                }
-
-                // Apply the visible class?
-                $element.addClass(calEvent?.extendedProps?.data?.styles?.visible);
-
-                // Ensure that this event matches the selected filters.
-                // For all of them, match against the event's class names.
-                let eventAttributes = {},
+                // Extra condition for rendering events on this calendar:
+                // All of the event's attributes must match at least one
+                // selected filter: if it doesn't, don't render it.
+                let self            = this,
+                    calEvent        = eventRenderInfo.event,
+                    eventAttributes = {},
                     isEventRendered = true;
+
+                // Build a list of filters from the event
                 calEvent.classNames.forEach(function (className) {
                     let match = className.match(/^([a-z]+)(\d+)/i);
                     if (match) {
@@ -331,6 +287,7 @@
              * @param eventResizeInfo
              */
             onEventResize(eventResizeInfo) {
+                // TODO this needs to consider events in series
                 let event = eventResizeInfo.event,
                     data  = {
                         eventId: event?.extendedProps?.data?.meta?.eventId,
@@ -368,7 +325,9 @@
              * @param date
              */
             toMoment(date) {
-                return toMoment(date, this.$refs.fullCalendar.getApi());
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
+                return this.helper.toMoment(date);
             },
 
             /**
@@ -388,7 +347,9 @@
              * @return {boolean}
              */
             isTask(event) {
-                return Number(event?.extendedProps?.data?.meta?.eventTypeId) === this.config.taskTypeId;
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
+                return this.helper.isTask(event);
             },
 
             /**
@@ -423,7 +384,9 @@
              * @return {*}
              */
             dayTitleFormat(dateObject) {
-                return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
+                // TODO this method should be unnecessary
+                // (for the same reason as `onLoading`)
+                return this.helper.dayTitleFormat(dateObject);
             },
         }
     }
@@ -489,13 +452,7 @@
                     columnHeaderFormat: formats.displayWeekDay
                 }
             }"
-            :event-time-format="{
-                hour: 'numeric',
-                hour12: true,
-                minute: '2-digit',
-                meridiem: 'short',
-                omitZeroMinute: true,
-            }"
+            :event-time-format="helper.eventTimeFormat"
             content-height="auto"
             :custom-buttons="{
                 customExport: {

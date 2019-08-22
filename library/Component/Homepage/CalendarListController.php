@@ -95,7 +95,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
             $this->start->getUnixTimeStamp(),
             $this->end->getUnixTimeStamp(),
             $this->getUser(),
-            $this->getSitePage(),
+            $this->getSitePage()->getDi(),
             $this->getUser()
         );
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {

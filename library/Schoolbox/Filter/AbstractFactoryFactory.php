@@ -167,12 +167,13 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * * any option in the overrides will be present in the page-filter options in the panel
      * * user-selections for the page filter will be replaced by the page-filter's overrides
      *
-     * @param User      $user
-     * @param string    $page
-     * @param string    $route
-     * @param null|User $viewee
-     * @param array     $routeArgs  Any route params, as received by the controller's public API method
-     * @param array     $request Indexed by filter.id
+     * @param User        $user
+     * @param string      $page
+     * @param null|string $route      Where to post to when the Apply Filters button is clicked.
+     *                                If null, don't post.
+     * @param null|User   $viewee
+     * @param array       $routeArgs  Any route params, as received by the controller's public API method
+     * @param array       $request Indexed by filter.id
      * @return Panel
      * @throws \InvalidArgumentException             If unable to locate Filter mapper class, or required filter definition classes
      * @throws DomainException                       If this class has not defined the entity it is filtering
@@ -182,7 +183,7 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
      * @throws \UnderflowException                   If we generate an empty PB IN query
      * @throws \UnexpectedValueException             If wrong item type inserted in a generic collection
      */
-    public function buildPanel(User $user, string $page, string $route, ?User $viewee, array $routeArgs, array $request = []): Panel
+    public function buildPanel(User $user, string $page, ?string $route, ?User $viewee, array $routeArgs, array $request = []): Panel
     {
         // Clean up aura-inserted items (do this as low down in logic as possible - not in controller)
         if (array_key_exists('page', $request)) {

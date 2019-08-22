@@ -15,8 +15,8 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
-use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\DefinitionException;
 use UnderflowException;
 use UnexpectedValueException;
 
@@ -42,7 +42,7 @@ class Controller extends Base
         RosettaStone $rosettaStone
     ) {
         $this->filterFactoryFactory = $filterFactoryFactory;
-        $this->rosettaStone = $rosettaStone;
+        $this->rosettaStone         = $rosettaStone;
     }
 
 
@@ -65,36 +65,28 @@ class Controller extends Base
     {
         $pageTitle = sprintf('%s Calendar', $this->rosettaStone->translate('assessment', false, true));
 
-        $queryArgs = $this->getRequest()->query->getArrayCopy();
+        $queryArgs = $this->request->query->getArrayCopy();
         unset($queryArgs['page']);
 
-        $page = Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR;
-        $route = $this->getRouter()->generate('learningAssessmentCalendar.postReport');
-        $filterPanel = $this->filterFactoryFactory->buildPanel($this->getUser(), $page, $route, $this->getUser(), [], $queryArgs);
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@learningAssessmentCalendar/index.twig', [
-                'filterPanel' => $filterPanel,
-
-            ])->setTab('submission')->setTitle($pageTitle)
+        // This filter panel does not post anywhere when its filters change.
+        // Any on-change action is handled by the full calendar component.
+        $page        = Filter\Page\Model::PAGE_ASSESSMENT_CALENDAR;
+        $filterPanel = $this->filterFactoryFactory->buildPanel(
+            $this->getUser(),
+            $page,
+            null,
+            $this->getUser(),
+            [],
+            $queryArgs
         );
-    }
 
-    /**
-     * Returns the contents of the Assessment Calendar page
-     *
-     * @api   POST /learning/assessment/calendar
-     * @since 19.1
-     */
-    public function postReport(): void
-    {
-        $eventData =
-            "TODO - calendar event JSON data <br>\n" .
-            print_r($this->request->post->getArrayCopy(), true);
-
-        $this->getResponse()->content->set($this->buildJsonOutput([
-            'status'  => 200,
-            'content' => $eventData,
-        ]));
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@learningAssessmentCalendar/index.twig',
+                ['filterPanel' => $filterPanel,],
+                'submission',
+                $pageTitle
+            )
+        );
     }
 }

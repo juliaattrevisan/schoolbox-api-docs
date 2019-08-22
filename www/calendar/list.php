@@ -98,7 +98,7 @@ $calendar = new Lister(
     $start->getUnixTimeStamp(),
     $finish->addDays(1)->getUnixTimeStamp(),
     $user,
-    $this,
+    $this->getDi(),
     $user
 );
 

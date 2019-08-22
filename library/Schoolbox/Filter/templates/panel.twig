@@ -25,6 +25,9 @@ Usage:
         // ============== Global Variables & Constants
         var MAX_VISIBLE_SELECTIONS = 4;
 
+        // ============== Configuration
+        var quickload = Boolean("{{ quickload }}");
+
         // ============== jQuery DOM handles
         var $reportContent       = $('#{{ contentId }}');
         var $filterPanel         = $('#filter_panel');
@@ -133,8 +136,9 @@ Usage:
         function fetchReport() {
             $toast.toastActivate({text: 'Requesting report...'});
             showFilterLoader();
-            var href = $submitButton.data('href');
-            var data = $optionCheckboxes.serialize();
+            var href        = $submitButton.data('href'),
+                data        = $optionCheckboxes.serialize(),
+                decodedData = deserialize(data);
             $submitButton.val($submitButton.data('working'));
 
             disableInputs();
@@ -143,52 +147,79 @@ Usage:
                 showContentPlaceholder();
             }
 
-            $.post(href, data)
-                .success(function(response){
+            // Is there a href to post to?
+            // Post there if so, otherwise update the history state and filters
+            // immediately.
+            if (href) {
+                $.post(href, data)
+                    .success(function(response){
 
-                    // Did we get not get JSON ?
-                    if('object' !== typeof response){
-                        processServerError(response);
-                        return;
-                    }
+                        // Did we get not get JSON ?
+                        if('object' !== typeof response){
+                            processFilterUpdateError(response);
+                            return;
+                        }
 
-                    // Was an exception thrown?
-                    if(200 !== response.status){
-                        renderExceptionThrown(response.code, response.message, response.line, response.file);
-                        return;
-                    }
+                        // Was an exception thrown?
+                        if(200 !== response.status){
+                            renderExceptionThrown(response.code, response.message, response.line, response.file);
+                            return;
+                        }
 
-                    updateHistoryState(data);
-                    processServerSuccess(response.content);
-                })
-                .fail(function(response){
-                    processServerError(response.responseText);
-                })
-                .always(function() {
-                    $submitButton.val($submitButton.data('value'));
-                    hideFilterLoader();
-                    enableInputs();
-                    hideContentPlaceholder();
-                });
+                        updateHistoryState(decodedData);
+                        replaceReportContent(response.content);
+                        processFilterUpdateSuccess(decodedData);
+                    })
+                    .fail(function(response){
+                        processFilterUpdateError(response.responseText);
+                    })
+                    .always(processFilterUpdateAlways);
+            } else {
+                updateHistoryState(decodedData);
+                processFilterUpdateSuccess(decodedData);
+                processFilterUpdateAlways();
+            }
         }
 
+
         /**
-         * Handle a successful AJAX call
+         * Replace the content of the report with the given HTML.
          *
          * @param {string} html
          */
-        function processServerSuccess(html) {
-            hideContentPlaceholder();
-            $serverErrorFeedback.hide();
-            if (Boolean("{{ quickload }}")) {
+        function replaceReportContent(html) {
+            if (quickload) {
                 $reportContent.get(0).innerHTML = html;
             } else {
                 $reportContent.html(html);
             }
+        }
+
+
+        /**
+         * Action for after the selected filters have been changed successfully.
+         *
+         * @param {object} decodedSelections
+         */
+        function processFilterUpdateSuccess(decodedSelections) {
+            $serverErrorFeedback.hide();
             $reportContent.attr('data-loaded', '1');
-            $reportContent.trigger('filterContentLoaded');
+            $reportContent.trigger('filterContentLoaded', [decodedSelections]);
             $toast.toastTimeout({text: 'Success!', css: 'success'});
         }
+
+
+        /**
+         * Action for after an attempt (successful or not) to update the
+         * selected filters.
+         */
+        function processFilterUpdateAlways() {
+            $submitButton.val($submitButton.data('value'));
+            hideFilterLoader();
+            enableInputs();
+            hideContentPlaceholder();
+        }
+
 
         /**
          * Returns the panel's serialised filter option selections in object structure.
@@ -229,12 +260,11 @@ Usage:
          * reflects the current view. This ensures the user can copy/paste the URL, and page refresh works
          * as expected.
          *
-         * @param {string} encodedSelections
+         * @param {object} decodedSelections
          */
-        function updateHistoryState(encodedSelections)
+        function updateHistoryState(decodedSelections)
         {
-            var decodedSelections = deserialize(encodedSelections),
-                nestedObj         = {};
+            var nestedObj = {};
 
             // Convert flat string array to nested object
             for (var filterId in decodedSelections) {
@@ -287,11 +317,14 @@ Usage:
         }
 
         /**
-         * Try to figure out why the server failed to return a report
+         * Action for after an attempt to update the selected filters fails.
+         *
+         * Try to figure out why the server failed to return a report, and to
+         * display something helpful to the end user.
          *
          * @param {string} responseText
          */
-        function processServerError(responseText) {
+        function processFilterUpdateError(responseText) {
 
             // Was this an OOM error ?
             var oomErrorIndex = responseText.indexOf('Fatal error: Allowed memory size of');

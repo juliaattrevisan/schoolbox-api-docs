@@ -10,10 +10,10 @@
 
 namespace Calendar\Event\Type\External\Renderer;
 
-use \Calendar\Event\Type\RendererBase;
+use Aura\Di\ContainerInterface;
 use Calendar\Event\Type\External;
+use Calendar\Event\Type\RendererBase;
 use Schoolbox\User;
-use SitePage;
 
 abstract class Base extends RendererBase
 {
@@ -23,16 +23,16 @@ abstract class Base extends RendererBase
 
 
     /**
-     * @param SitePage       $page
-     * @param External\Event $event
-     * @param User           $user
-     * @param \Group         $groupHandler
-     * @param \Calendar      $calHandler
-     * @param User           $viewer
+     * Constructor
+     *
+     * @param ContainerInterface $di
+     * @param External\Event     $event
+     * @param User               $user
+     * @param User               $viewer
      */
-    public function __construct(SitePage $page, External\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    public function __construct(ContainerInterface $di, External\Event $event, User $user, User $viewer)
     {
-        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        parent::__construct($di, $user, $viewer);
         $this->event = $event;
     }
 

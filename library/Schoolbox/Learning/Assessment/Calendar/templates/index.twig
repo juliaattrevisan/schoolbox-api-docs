@@ -5,13 +5,33 @@ Usage:
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(['Learning'], [locale.assessment.proper ~ ' Calendar']) }}
+{% set reportContentId = 'calendarDataTODO' %}
+
+
+{% autoescape 'js' %}
+<script type="text/javascript">
+    $(function () {
+        // Filtered content has been [re]loaded
+        // (Shouldn't this trigger contain the filters that are selected?)
+        $('#{{ reportContentId }}').on('filterContentLoaded', function (event, selectedFilters) {
+            // Somehow pass the list of filters into the Vue calendar
+            window.assessmentCalendar.$children[0].onFilterChange(selectedFilters);
+        });
+    });
+
+
+    window.fullCalendarConfig = {
+        eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
+        firstDay:           Number('{{ config.calendar_start_day }}'),
+        dateDisplayFormats: dateDisplayFormats
+    };
+</script>
+{% endautoescape %}
 
 <div class="row">
     <div class="small-12 columns">
         <h1>{{ locale.assessment.proper }} Calendar</h1>
         <section class="content">
-            {% set reportContentId = 'calendarDataTODO' %}
-
             {% include '@filters/panel.twig' with {
                 contentId: reportContentId,
                 panel:     filterPanel,
@@ -19,6 +39,9 @@ Usage:
             } only %}
         </section>
 
-        <div id="{{ reportContentId }}"></div>
+        <div id="{{ reportContentId }}">
+            <div id="calendar"></div>
+            <script type="text/javascript" src="/javascript/components/assessmentCalendar.bundle.js?v={SITE_VERSION}"></script>
+        </div>
     </div>
 </div>

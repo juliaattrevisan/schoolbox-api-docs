@@ -9,10 +9,10 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
+use Aura\Di\ContainerInterface;
 use \Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\ResourceBooking;
 use Schoolbox\User;
-use SitePage;
 
 abstract class Base extends RendererBase
 {
@@ -22,16 +22,16 @@ abstract class Base extends RendererBase
 
 
     /**
-     * @param SitePage              $page
+     * Constructor
+     *
+     * @param ContainerInterface    $di
      * @param ResourceBooking\Event $event
      * @param User                  $user
-     * @param \Group                $groupHandler
-     * @param \Calendar             $calHandler
      * @param User                  $viewer
      */
-    public function __construct(SitePage $page, ResourceBooking\Event $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer)
+    public function __construct(ContainerInterface $di, ResourceBooking\Event $event, User $user, User $viewer)
     {
-        parent::__construct($page, $user, $groupHandler, $calHandler, $viewer);
+        parent::__construct($di, $user, $viewer);
         $this->event = $event;
     }
 

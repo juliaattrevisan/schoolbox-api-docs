@@ -7,16 +7,14 @@
 
 namespace Custom\Mggs\Calendar\Event\Type\Submission\Renderer;
 
-use Calendar;
-use Calendar\Event\Type\EventBase;
+use Aura\Di\ContainerInterface;
+use Calendar\Event\Type\Submission;
 use Calendar\Event\Type\Submission\Renderer\Javascript as SubmissionRendererJavascript;
 use Custom\Mggs\Personalised\Participant\Mapper as ParticipantMapper;
-use Group;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
-use SitePage;
 use UnexpectedValueException;
 
 class Javascript extends SubmissionRendererJavascript
@@ -25,16 +23,16 @@ class Javascript extends SubmissionRendererJavascript
     private $pblMapper;
 
     /**
-     * @param SitePage  $page
-     * @param EventBase $event
-     * @param User      $user
-     * @param Group     $groupHandler
-     * @param Calendar  $calHandler
-     * @param User      $viewer
+     * Constructor
+     *
+     * @param ContainerInterface $di
+     * @param Submission\Event   $event
+     * @param User               $user
+     * @param User               $viewer
      */
-    public function __construct(SitePage $page, EventBase $event, User $user, Group $groupHandler, Calendar $calHandler, User $viewer)
+    public function __construct(ContainerInterface $di, Submission\Event $event, User $user, User $viewer)
     {
-        parent::__construct($page, $event, $user, $groupHandler, $calHandler, $viewer);
+        parent::__construct($di, $event, $user, $viewer);
 
         // Regrettably, because of dynamic invocation, we have to settle for singletons in here
 
