@@ -18,7 +18,7 @@ use UnexpectedValueException;
 /**
  * Class Mapper
  *
- * @package Schoolbox\External\User\Staff
+ * @package Schoolbox\External\Profile\Staff
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
@@ -33,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_staff');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'baseProfile', 'baseProfile');
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
         $this->uses('category', self::TYPE_STRING);
@@ -58,7 +58,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('baseProfile', 'bp')}
         ";
     }
 
@@ -72,7 +72,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('user', null, 'u')}
+            INNER JOIN {$this->getJoinSql('baseProfile', null, 'bp')}
         ";
     }
 
@@ -88,12 +88,12 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $staff = $this->hydrate($row);
+            $staffProfile = $this->hydrate($row);
 
-            if ($staff) {
-                $user = $this->getJoinMapper('user')->hydrate($row, 'u');
-                $staff->setUser($user);
-                $collection->add($staff);
+            if ($staffProfile) {
+                $baseProfile = $this->getJoinMapper('baseProfile')->hydrate($row, 'bp');
+                $staffProfile->setBaseProfile($baseProfile);
+                $collection->add($staffProfile);
             }
         }
 

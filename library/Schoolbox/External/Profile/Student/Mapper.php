@@ -23,7 +23,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_student');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'baseProfile', 'baseProfile');
         $this->uses('date_of_birth', self::TYPE_DATE);
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
@@ -68,7 +68,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('baseProfile', 'bp')}
         ";
     }
 
@@ -82,7 +82,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('user', null, 'u')}
+            INNER JOIN {$this->getJoinSql('baseProfile', null, 'bp')}
         ";
     }
 
@@ -97,12 +97,12 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $student = $this->hydrate($row);
+            $studentProfile = $this->hydrate($row);
 
-            if ($student) {
-                $user = $this->getJoinMapper('user')->hydrate($row, 'u');
-                $student->setUser($user);
-                $collection->add($student);
+            if ($studentProfile) {
+                $baseProfile = $this->getJoinMapper('baseProfile')->hydrate($row, 'bp');
+                $studentProfile->setBaseProfile($baseProfile);
+                $collection->add($studentProfile);
             }
         }
 

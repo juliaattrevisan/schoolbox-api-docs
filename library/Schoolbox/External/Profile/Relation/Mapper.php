@@ -12,7 +12,7 @@ use Schoolbox\External\Profile;
 /**
  * Class Mapper
  *
- * @package Schoolbox\External\User\Relation
+ * @package Schoolbox\External\Profile\Relation
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)

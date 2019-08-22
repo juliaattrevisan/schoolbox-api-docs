@@ -5,11 +5,11 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Parent;
+namespace Schoolbox\External\Profile\Parent;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\External\User\Model as UserModel;
+use Schoolbox\External\Profile\Model as ProfileModel;
 
 
 class Model implements ISoftDeletable
@@ -45,9 +45,9 @@ class Model implements ISoftDeletable
     private $email;
 
     /**
-     * @var UserModel
+     * @var ProfileModel
      */
-    private $user;
+    private $baseProfile;
 
 
     /**
@@ -142,20 +142,20 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return UserModel
+     * @return ProfileModel
      */
-    public function getUser(): UserModel
+    public function getBaseProfile(): ProfileModel
     {
-        return $this->user;
+        return $this->baseProfile;
     }
 
     /**
-     * @param UserModel|null $user
+     * @param ProfileModel|null $baseProfile
      * @return Model
      */
-    public function setUser(?UserModel $user): self
+    public function setBaseProfile(?ProfileModel $baseProfile): self
     {
-        $this->user = $user;
+        $this->baseProfile = $baseProfile;
         return $this;
     }
 }

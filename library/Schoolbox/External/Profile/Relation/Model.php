@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Relation;
+namespace Schoolbox\External\Profile\Relation;
 
 class Model
 {
@@ -66,7 +66,7 @@ class Model
      * @param int $childProfileId
      * @return Model
      */
-    public function setChildProfileId(int $childProfileId): Model
+    public function setChildProfileId(int $childProfileId): self
     {
         $this->childProfileId = $childProfileId;
         return $this;
@@ -76,7 +76,7 @@ class Model
      * @param int $userProfileId
      * @return Model
      */
-    public function setUserProfileId(int $userProfileId): Model
+    public function setUserProfileId(int $userProfileId): self
     {
         $this->userProfileId = $userProfileId;
         return $this;
@@ -86,7 +86,7 @@ class Model
      * @param bool $emergencyContact
      * @return Model
      */
-    public function setEmergencyContact(bool $emergencyContact): Model
+    public function setEmergencyContact(bool $emergencyContact): self
     {
         $this->emergencyContact = $emergencyContact;
         return $this;
@@ -96,7 +96,7 @@ class Model
      * @param string $type
      * @return Model
      */
-    public function setType(string $type): Model
+    public function setType(string $type): self
     {
         $this->type = $type;
         return $this;

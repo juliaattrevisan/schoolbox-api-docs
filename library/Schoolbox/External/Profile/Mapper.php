@@ -10,7 +10,7 @@ namespace Schoolbox\External\Profile;
 /**
  * Class Mapper
  *
- * @package Schoolbox\External\User
+ * @package Schoolbox\External\Profile
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
