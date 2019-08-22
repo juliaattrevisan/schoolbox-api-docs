@@ -30,7 +30,7 @@
         "sabre/dav": "~3.2.2",
         "sabre/vobject" : "~4.1.2",
         "ezyang/htmlpurifier": "~4.9.3",
-        "twig/twig": "~2.4.4",
+        "twig/twig": "~2.7.0",
         "twig/extensions": "~1.5.1",
         "swiftmailer/swiftmailer": "~6.0.2",
         "maximebf/debugbar": "~1.14.0",
