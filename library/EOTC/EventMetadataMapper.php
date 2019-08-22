@@ -230,7 +230,6 @@ class EventMetadataMapper extends BaseMapper
                     'mapper' => UserMapper::getInstance(),
                     'options' => [
                         'deleted' => true,
-                        'cache' => !$this->localBodyCacheBypass
                     ],
                 ),
             )
@@ -335,8 +334,7 @@ class EventMetadataMapper extends BaseMapper
                     'options' => array(
                         'order' => array(
                             'lastname' => 'ASC'
-                        ),
-                        'cache' => !$this->localBodyCacheBypass
+                        )
                     )
                 ),
             )

@@ -254,7 +254,7 @@ abstract class Mapper implements IMapper, Serializable
     protected $propagator;
 
     /** @var bool */
-    protected $localBodyCacheBypass = false;
+    private $localBodyCacheBypass = false;
 
     /**
      * Is caching enabled for this mapper?

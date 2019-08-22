@@ -6,45 +6,40 @@
  * pseudo-mapping of column names
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
 
 namespace EOTC;
 
 
-use Schoolbox\GenericCollection;
-use Schoolbox\Resource\Storage\Model;
-use Schoolbox\Mapper;
+class ManyManyRelation extends \Schoolbox\Mapper {
 
-class ManyManyRelation extends Mapper
-{
+	/**
+	 * An array definition
+	 *
+	 * @var array
+	 */
+	private $relationTableDefinition = array();
 
-    /**
-     * An array definition
-     *
-     * @var array
-     */
-    private $relationTableDefinition = array();
+	/**
+	 * An array definition
+	 *
+	 * @var array
+	 */
+	private $join = array();
 
-    /**
-     * An array definition
-     *
-     * @var array
-     */
-    private $join = array();
-
-    /**
-     * Constructor
-     *
-     * @param array $relationTableDefinition
-     * @param array $join
-     */
-    public function setup($relationTableDefinition = array(), $join = array())
-    {
-        $this->setRelationTableDefinition($relationTableDefinition);
-        $this->setJoin($join);
-    }
+	/**
+	 * Constructor
+	 *
+	 * @param array $relationTableDefinition
+	 * @param array $join
+	 */
+	public function setup($relationTableDefinition = array(), $join = array()) {
+		$this->setRelationTableDefinition($relationTableDefinition);
+		$this->setJoin($join);
+	}
 
     /**
      * Implemented out of necessity
@@ -54,86 +49,78 @@ class ManyManyRelation extends Mapper
         // noop
     }
 
-    /**
-     * Find results of join
-     *
-     * @return mixed
-     */
-    public function find()
-    {
-        $join = $this->getJoin();
-        if (empty($join['value'])) {
-            return new GenericCollection(Model::class);
-        }
-        $relationTableDefinition = $this->getRelationTableDefinition();
+	/**
+	 * Find results of join
+	 *
+	 * @return mixed
+	 */
+	public function find() {
+		$join = $this->getJoin();
+		$relationTableDefinition = $this->getRelationTableDefinition();
 
-        $query = "
+		$query = "
 			SELECT {$join['relation']['column']}
 			FROM `{$relationTableDefinition['name']}`
 			WHERE {$join['column']} = :value
 		";
 
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(":value", $join['value']);
-        $statement->execute();
+		$statement = $this->database->prepare($query);
+		$statement->bindParam(":value", $join['value']);
+		$statement->execute();
 
-        /* Find all the primary keys in the relation table and objectify
-         * them into a collection
-         */
-        $ids = array();
+		/* Find all the primary keys in the relation table and objectify
+		 * them into a collection
+		 */
+		$ids = array();
 
-        foreach ($statement as $row) {
-            $ids[] = $row[$join['relation']['column']];
-        }
+		foreach ($statement as $row) {
+			$ids[] = $row[$join['relation']['column']];
+		}
 
-        /** @var Mapper $mapper */
-        $mapper = $join['relation']['mapper'];
+		/** @var \Schoolbox\Mapper $mapper */
+		$mapper = $join['relation']['mapper'];
 
-        $allInstances = $mapper->findByColumn($join['relation']['key'], $ids, isset($join['relation']['options']) ? $join['relation']['options'] : array());
+		$allInstances = $mapper->findByColumn($join['relation']['key'], $ids, isset($join['relation']['options']) ? $join['relation']['options'] : array());
 
-        return $allInstances;
-    }
+		return $allInstances;
+	}
 
-    /* Getters/Setters
-     */
+	/* Getters/Setters
+	 */
 
-    /**
-     * Set join
-     *
-     * @param array $join
-     */
-    private function setJoin($join)
-    {
-        $this->join = $join;
-    }
+	/**
+	 * Set join
+	 *
+	 * @param array $join
+	 */
+	private function setJoin($join) {
+		$this->join = $join;
+	}
 
-    /**
-     * Get join
-     *
-     * @return array
-     */
-    public function getJoin()
-    {
-        return $this->join;
-    }
+	/**
+	 * Get join
+	 *
+	 * @return array
+	 */
+	public function getJoin() {
+		return $this->join;
+	}
 
-    /**
-     * Set relation table definition
-     *
-     * @param array $relationTableDefinition
-     */
-    private function setRelationTableDefinition($relationTableDefinition)
-    {
-        $this->relationTableDefinition = $relationTableDefinition;
-    }
+	/**
+	 * Set relation table definition
+	 *
+	 * @param array $relationTableDefinition
+	 */
+	private function setRelationTableDefinition($relationTableDefinition) {
+		$this->relationTableDefinition = $relationTableDefinition;
+	}
 
-    /**
-     * Get relation table definition
-     *
-     * @return array
-     */
-    private function getRelationTableDefinition()
-    {
-        return $this->relationTableDefinition;
-    }
+	/**
+	 * Get relation table definition
+	 *
+	 * @return array
+	 */
+	private function getRelationTableDefinition() {
+		return $this->relationTableDefinition;
+	}
 }
