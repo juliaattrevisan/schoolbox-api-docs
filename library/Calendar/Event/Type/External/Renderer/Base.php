@@ -11,10 +11,9 @@
 namespace Calendar\Event\Type\External\Renderer;
 
 use Aura\Di\ContainerInterface;
-use \Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\External;
+use Calendar\Event\Type\RendererBase;
 use Schoolbox\User;
-use SitePage;
 
 abstract class Base extends RendererBase
 {

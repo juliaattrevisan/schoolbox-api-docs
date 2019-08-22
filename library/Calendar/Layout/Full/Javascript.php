@@ -14,17 +14,14 @@
  */
 
 use EOTC\ConfigMapper as EOTCConfigMapper;
-use Schoolbox\Calendar\EventType;
-use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Calendar\Util\ViewNameMapping;
-use Schoolbox\Collection;
 
 class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 {
     /**
      * Choose template file
      */
-    protected function setupTemplateFile()
+    protected function setupTemplateFile(): void
     {
         $this->setTemplateFile('calendar/full.html');
         $this->getPage()->setTab('calendar');
@@ -33,7 +30,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     /**
      * Set up blocks and stuff
      */
-    protected function setupBlocks()
+    protected function setupBlocks(): void
     {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
@@ -41,7 +38,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
 
         $this->getPage()->setVar([
             'USER_CALENDAR_ID' => $this->getUser()->getId(),
-            'USER_FULLNAME' => $this->getUser()->getFullname(),
+            'USER_FULLNAME'    => $this->getUser()->getFullname(),
         ]);
 
         $this->setupSelectedDayMonthYear();
@@ -50,7 +47,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     /**
      * Set up selected day/month/year
      */
-    protected function setupSelectedDayMonthYear()
+    protected function setupSelectedDayMonthYear(): void
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
@@ -60,22 +57,22 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             $selectedDate = time();
         }
 
-        $selectedDay = date("j", $selectedDate);
+        $selectedDay   = date("j", $selectedDate);
         $selectedMonth = date("n", $selectedDate);
-        $selectedYear = date("Y", $selectedDate);
+        $selectedYear  = date("Y", $selectedDate);
 
         $this->getPage()->setVar([
-            'SELECTED_DAY' => $selectedDay,
+            'SELECTED_DAY'   => $selectedDay,
             'SELECTED_MONTH' => $selectedMonth - 1,
-            'SELECTED_YEAR' => $selectedYear,
-            'SELECTED_DATE' => date('Y-m-d', $selectedDate),
+            'SELECTED_YEAR'  => $selectedYear,
+            'SELECTED_DATE'  => date('Y-m-d', $selectedDate),
         ]);
     }
 
     /**
      * Render calendar
      */
-    public function render()
+    public function render(): void
     {
         $this->setupMovementButtons();
 
@@ -85,7 +82,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
             $this->getPage()->parse('has_eotc_events_all_block', 'has_eotc_events_all');
         } else {
             $this->getPage()->setVar([
-                'has_eotc_events_all_block' => ''
+                'has_eotc_events_all_block' => '',
             ]);
         }
 

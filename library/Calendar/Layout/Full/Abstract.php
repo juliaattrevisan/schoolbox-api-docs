@@ -22,21 +22,21 @@ abstract class Calendar_Layout_Full_Abstract
     protected $groupHandler = null;
 
     protected $subStuHandler = null;
-    protected $page = null;
-    protected $date = '';
-    protected $categoryList = [];
-    protected $templateFile = '';
-    protected $selected = [];
-    protected $selectedDate = null;
-    protected $startOfWeek = null;
+    protected $page          = null;
+    protected $date          = '';
+    protected $categoryList  = [];
+    protected $templateFile  = '';
+    protected $selected      = [];
+    protected $selectedDate  = null;
+    protected $startOfWeek   = null;
 
     /** @var Calendar_Api_EventType_Interface Actual connector instance */
     protected $api;
 
-    /** @var  Schoolbox\User $user     Who this Calendar is about */
+    /** @var  Schoolbox\User $user Who this Calendar is about */
     protected $user;
 
-    /** @var  Schoolbox\User $viewer   Who is currently viewing the Calendar */
+    /** @var  Schoolbox\User $viewer Who is currently viewing the Calendar */
     protected $viewer;
 
     /** @var ModuleChecker */
@@ -45,10 +45,10 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Constructor
      *
-     * @param $page
-     * @param User $user
-     * @param $date
-     * @param User $viewer
+     * @param                      $page
+     * @param User                 $user
+     * @param                      $date
+     * @param User                 $viewer
      * @param Calendar_Api_Factory $factory
      * @param ModuleChecker        $moduleChecker
      */
@@ -76,14 +76,14 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Does the current user have permission to view this calendar page?
      *
-     * @param  int $userId
-     * @param  Schoolbox\User $currentUser
-     * @param  Group $groupHandler
+     * @param int            $userId
+     * @param Schoolbox\User $currentUser
+     * @param Group          $groupHandler
      * @throws Exception if user doesn't have permission to view calendar.
      *                   The exception's code matches a Schoolbox error code.
      * @return bool
      */
-    public static function permissionCheck($userId, Schoolbox\User $currentUser, Group $groupHandler)
+    public static function permissionCheck($userId, Schoolbox\User $currentUser, Group $groupHandler): bool
     {
         if ($currentUser->getId() != $userId) {
             try {
@@ -102,24 +102,24 @@ abstract class Calendar_Layout_Full_Abstract
     }
 
     /**
-     * @return mixed
+     * @return void
      */
-    abstract protected function setupTemplateFile();
-
-    /**
-     * @return mixed
-     */
-    abstract protected function setupBlocks();
+    abstract protected function setupTemplateFile(): void;
 
     /**
      * @return void
      */
-    abstract protected function render();
+    abstract protected function setupBlocks(): void;
+
+    /**
+     * @return void
+     */
+    abstract protected function render(): void;
 
     /**
      * Set up selected day/month/year
      */
-    protected function setupSelectedDayMonthYear()
+    protected function setupSelectedDayMonthYear(): void
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
 
@@ -138,13 +138,13 @@ abstract class Calendar_Layout_Full_Abstract
             $selectedDate = time();
         }
 
-        $selectedDay = date("j", $selectedDate);
+        $selectedDay   = date("j", $selectedDate);
         $selectedMonth = date("n", $selectedDate);
-        $selectedYear = date("Y", $selectedDate);
+        $selectedYear  = date("Y", $selectedDate);
 
-        $dayOfWeek = date("w", mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear));
+        $dayOfWeek   = date("w", mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear));
         $startOfWeek = mktime(0, 0, 0, $selectedMonth, ($selectedDay - $dayOfWeek), $selectedYear);
-        $endOfWeek = strtotime("+6 days", $startOfWeek);
+        $endOfWeek   = strtotime("+6 days", $startOfWeek);
 
         if (date("m", $startOfWeek) != date("m", $endOfWeek)) {
             $month = date('jS F', $startOfWeek) . ' - ' . date("jS F", $endOfWeek);
@@ -153,14 +153,14 @@ abstract class Calendar_Layout_Full_Abstract
         }
 
         $this->getPage()->setVar(
-            array(
+            [
                 'SELECTED_DAY'   => $selectedDay,
                 'SELECTED_MONTH' => $selectedMonth,
                 'SELECTED_YEAR'  => $selectedYear,
                 'YEAR'           => date("Y", $startOfWeek),
                 'MONTH'          => $month,
                 'DAY'            => $selectedDay,
-            )
+            ]
         );
 
         $this->setStartOfWeek($startOfWeek);
@@ -169,7 +169,7 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Setup movement buttons
      */
-    protected function setupMovementButtons()
+    protected function setupMovementButtons(): void
     {
         // Load sources, types
         $typeList   = EventTypeMapper::getInstance()->findAll();
@@ -179,10 +179,10 @@ abstract class Calendar_Layout_Full_Abstract
         // Load what is selected: default to selecting everything
         /** @var EventType[] $typeList */
         if (isset($_SESSION['calendarFilter'])) {
-            $selected['group']     = $_SESSION['calendarFilter']['group']      ?? [];
-            $selected['campus']    = $_SESSION['calendarFilter']['campus']     ?? [];
-            $selected['eventType'] = $_SESSION['calendarFilter']['eventType']  ?? [];
-            $selected['source']    = $_SESSION['calendarFilter']['source']     ?? [];
+            $selected['group']     = $_SESSION['calendarFilter']['group'] ?? [];
+            $selected['campus']    = $_SESSION['calendarFilter']['campus'] ?? [];
+            $selected['eventType'] = $_SESSION['calendarFilter']['eventType'] ?? [];
+            $selected['source']    = $_SESSION['calendarFilter']['source'] ?? [];
         } else {
             // select everything
             foreach ($this->getCategoryList() as $cat) {
@@ -205,7 +205,7 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setSelected($selected);
 
         $categoryList = $this->getCategoryList();
-        $campusList = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
+        $campusList   = $this->getCalendarHandler()->getFilterCampusList($this->getUser()->getId());
 
         // Shoehorn the above into JSON-encoded vars
         $this->getPage()->setVar(
@@ -228,7 +228,7 @@ abstract class Calendar_Layout_Full_Abstract
                     function ($v) {
                         return [
                             'id'   => (int)$v['CAMPUS_ID'],
-                            'name' => $v['CAMPUS_NAME']
+                            'name' => $v['CAMPUS_NAME'],
                         ];
                     },
                     $campusList
@@ -274,7 +274,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @param Calendar $calendarHandler
      */
-    protected function setCalendarHandler($calendarHandler)
+    protected function setCalendarHandler(Calendar $calendarHandler): void
     {
         $this->calendarHandler = $calendarHandler;
     }
@@ -284,7 +284,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @return Calendar
      */
-    protected function getCalendarHandler()
+    protected function getCalendarHandler(): Calendar
     {
         return $this->calendarHandler;
     }
@@ -294,7 +294,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @param Group $groupHandler
      */
-    protected function setGroupHandler($groupHandler)
+    protected function setGroupHandler(Group $groupHandler): void
     {
         $this->groupHandler = $groupHandler;
     }
@@ -304,7 +304,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @return Group
      */
-    protected function getGroupHandler()
+    protected function getGroupHandler(): Group
     {
         return $this->groupHandler;
     }
@@ -312,9 +312,9 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Set template file
      *
-     * @param $templateFile
+     * @param string $templateFile
      */
-    protected function setTemplateFile($templateFile)
+    protected function setTemplateFile(string $templateFile)
     {
         $this->templateFile = $templateFile;
     }
@@ -324,7 +324,7 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @return string
      */
-    protected function getTemplateFile()
+    protected function getTemplateFile(): string
     {
         return $this->templateFile;
     }
@@ -494,7 +494,8 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @param User $viewer
      */
-    public function setViewer($viewer){
+    public function setViewer($viewer)
+    {
         $this->viewer = $viewer;
     }
 
@@ -503,7 +504,8 @@ abstract class Calendar_Layout_Full_Abstract
      *
      * @return User
      */
-    public function getViewer(){
+    public function getViewer()
+    {
         return $this->viewer;
     }
 }

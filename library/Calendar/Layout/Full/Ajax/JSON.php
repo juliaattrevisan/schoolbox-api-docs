@@ -20,14 +20,14 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
     /**
      * Choose template file
      */
-    protected function setupTemplateFile()
+    protected function setupTemplateFile(): void
     {
     }
 
     /**
      * Set up blocks and stuff
      */
-    protected function setupBlocks()
+    protected function setupBlocks() :void
     {
         $this->setupSelectedDayMonthYear();
     }
@@ -35,7 +35,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
     /**
      * Set up selected day/month/year
      */
-    protected function setupSelectedDayMonthYear()
+    protected function setupSelectedDayMonthYear(): void
     {
         list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
 
@@ -67,7 +67,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
     /**
      * Render calendar
      */
-    public function render()
+    public function render(): void
     {
         header('Content-type: application/json');
 
