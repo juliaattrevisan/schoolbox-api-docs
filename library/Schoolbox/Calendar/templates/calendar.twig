@@ -1,4 +1,4 @@
-{% autoescape %}
+{% autoescape 'js' %}
 <script type="text/javascript">
     // Which view gets shown?
     var anchorView = '',
@@ -30,11 +30,11 @@
         userId:             Number('{{ user.id }}'),
         token:              '{{ user.key }}',
         taskTypeId:         Number('{{ taskTypeId }}'),
-        sources:            {{ sources | raw }},
-        eventTypes:         {{ eventTypes | raw }},
-        groups:             {{ groups | raw }},
-        campuses:           {{ campuses | raw }},
-        selectedFilters:    {{ filters | raw }},
+        sources:            {{ sources | json_encode }},
+        eventTypes:         {{ eventTypes | json_encode }},
+        groups:             {{ groups | json_encode }},
+        campuses:           {{ campuses | json_encode }},
+        selectedFilters:    {{ filters | json_encode }},
         defaultDate:        '{{ selectedDate|date('Y-m-d') }}',
         eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
         firstDay:           Number('{{ config.calendar_start_day }}'),
