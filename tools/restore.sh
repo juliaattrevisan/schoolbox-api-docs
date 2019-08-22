@@ -38,21 +38,8 @@ then
 	error;
 fi
 
-# Find the apache user
-apacheuser='';
-if [ `which apache2 | wc -l` -ne 0 ];
-then
-	apacheuser='www-data';
-fi
-if [ `which httpd | wc -l` -ne 0 ];
-then
-	apacheuser='apache';
-fi
-if [ -z $apacheuser ];
-then
-	errmsg="Unable to detect apache";
-	error;
-fi
+# Find the nginx user
+wwwuser='www-data';
 
 echo -e "\033[38;5;1m";
 echo "*************************************************************************";
@@ -460,7 +447,7 @@ then
 		echo -e "\nCopying data from $sourcedata to $thisdatadir";
 		rsync -rltHv $sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip* --exclude=*.lock;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
-		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
+		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
 	if [ "$sourceloc" = '[R]' ];
 	then
@@ -490,7 +477,7 @@ then
 		echo -e "\nCopying data from ssh $sourcep1 : $sourcedata to $thisdatadir";
 		rsync -rltHzv -e ssh $sourcep1:$sourcedata/ $thisdatadir/ --delete-before  --exclude=cache/zip*;
 		$instdir/tools/create-data-dirs.sh $thisdatadir;
-		$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
+		$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 	fi
 	if [ "$sourceloc" = '[B]' ];
 	then
@@ -593,7 +580,7 @@ then
 	sourcefiledir=${sourcefiledir%/*};
 	mv -f $thisdatadir/restoredata/$sourcefiledir/* $thisdatadir/;
 	$instdir/tools/create-data-dirs.sh $thisdatadir;
-	$instdir/tools/set-data-dir-perms.sh $thisdatadir $apacheuser;
+	$instdir/tools/set-data-dir-perms.sh $thisdatadir $wwwuser;
 fi
 
 ## Cleanup remotely copied database
@@ -653,15 +640,15 @@ then
 	truncateTables;
 fi
 
-# Restart apache
-echo -e "\nRestarting Apache\c";
-if [ `which apache2 | wc -l` -ne 0 ];
+# Restart nginx
+echo -e "\nRestarting Nginx\c";
+if [ `which nginx | wc -l` -ne 0 ];
 then
-	/usr/sbin/service apache2 restart >/dev/null 2>&1;
+	/usr/sbin/service nginx restart >/dev/null 2>&1;
 fi
 if [ $? -ne 0 ];
 then
-	errmsg="An error occured restarting apache";
+	errmsg="An error occured restarting nginx";
 	error;
 else
 	echo -e " - OK";
