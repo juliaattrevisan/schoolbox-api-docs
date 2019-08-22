@@ -117,7 +117,8 @@ class Api implements Calendar_Api_EventType_Interface
 
         // Not published yet?
         // TODO shouldn't this be handled in the request?
-        if ($assessment->getPublishAt()->gt(Alaress_Date_Format::now())) {
+        $publishDate = $assessment->getPublishAt();
+        if (!$publishDate || $publishDate->gt(Alaress_Date_Format::now())) {
             return null;
         }
 
