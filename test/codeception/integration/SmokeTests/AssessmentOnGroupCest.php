@@ -2,17 +2,13 @@
 
 namespace SmokeTests;
 
-use GuzzleHttp\Exception\GuzzleException;
 use IntegrationTester;
 use GuzzleHttp\Psr7\Response;
+use Payload;
 use Payload\Base;
 use Payload\GroupMember;
 use Schoolbox\External\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
-use Payload\Folder as FolderPayload;
-use Payload\Assessment as AssessmentPayload;
-use Payload\AssessmentMark as AssessmentMarkPayload;
-use Schoolbox\User;
 
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -36,19 +32,19 @@ class AssessmentOnGroupCest {
      * Fires off creation of a group homepage folder.
      *
      * @param IntegrationTester $i
-     * @param AssessmentPayload $newAssessmentRequest
+     * @param Payload\Assessment $newAssessmentRequest
      * @throws Exception
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function createAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest):void
+    public function createAssessment(IntegrationTester $i, Payload\Assessment $newAssessmentRequest):void
     {
         #GIVEN
         $timestamp = time();
         $group_title='Testing Create Assessments on Group Page at '.$timestamp;
 
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($group_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create Group Page');
         $groupPage=$i->getFirstFolderByTitle($group_title);
@@ -75,20 +71,20 @@ class AssessmentOnGroupCest {
      * Fires off creation of a group homepage folder and create assessment.
      *
      * @param IntegrationTester $i
-     * @param AssessmentPayload $newAssessmentRequest
+     * @param Payload\Assessment $newAssessmentRequest
      * @throws Deleted
      * @throws Exception
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function updateAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
+    public function updateAssessment(IntegrationTester $i, Payload\Assessment $newAssessmentRequest)
     {
         #GIVEN
         $timestamp = time();
         $group_title='Testing Edit Assessments on Group Page at '.$timestamp;
         $student = $i->getUser('drhodes');
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($group_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create Group Page');
         $groupPage=$i->getFirstFolderByTitle($group_title);
@@ -135,20 +131,20 @@ class AssessmentOnGroupCest {
      * Fires off creation of a group homepage folder.
      *
      * @param IntegrationTester $i
-     * @param AssessmentPayload $newAssessmentRequest
+     * @param Payload\Assessment $newAssessmentRequest
      * @throws Deleted
      * @throws Exception
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function createAssessmentWithRubric(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
+    public function createAssessmentWithRubric(IntegrationTester $i, Payload\Assessment $newAssessmentRequest)
     {
         #GIVEN
         $timestamp = time();
         $group_title='Testing Create Assessments with rubric on Group Page at '.$timestamp;
         $student = $i->getUser('drhodes');
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($group_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create Group Page');
         $groupPage=$i->getFirstFolderByTitle($group_title);
@@ -176,20 +172,20 @@ class AssessmentOnGroupCest {
      * Fires off creation of a group homepage folder and create assessment.
      *
      * @param IntegrationTester $i
-     * @param AssessmentPayload $newAssessmentRequest
+     * @param Payload\Assessment $newAssessmentRequest
      * @throws Deleted
      * @throws Exception
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function submitAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest)
+    public function submitAssessment(IntegrationTester $i, Payload\Assessment $newAssessmentRequest)
     {
         #GIVEN
         $timestamp = time();
         $group_title='Testing Submit Assessment on Group Page at '.$timestamp;
 
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($group_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create Group Page');
         $groupPage=$i->getFirstFolderByTitle($group_title);
@@ -244,20 +240,20 @@ class AssessmentOnGroupCest {
      * Fires off creation of a group homepage folder and create assessment with rubric grid for mark and submission on behalf of student.
      *
      * @param IntegrationTester     $i
-     * @param AssessmentPayload     $newAssessmentRequest
-     * @param AssessmentMarkPayload $newMarkRequest
+     * @param Payload\Assessment    $newAssessmentRequest
+     * @param Payload\AssessmentMark $newMarkRequest
      * @throws Deleted
      * @throws Exception
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function markAssessmentWithRubric(IntegrationTester $i, AssessmentPayload $newAssessmentRequest, AssessmentMarkPayload $newMarkRequest)
+    public function markAssessmentWithRubric(IntegrationTester $i, Payload\Assessment $newAssessmentRequest, Payload\AssessmentMark $newMarkRequest)
     {
         #GIVEN
         $timestamp = time();
         $group_title='Testing Mark Assessment with rubric on Group Page at '.$timestamp;
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($group_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create Group Page');
         $groupPage=$i->getFirstFolderByTitle($group_title);
@@ -316,21 +312,21 @@ class AssessmentOnGroupCest {
      * Fires off creation of a group homepage folder and create assessment for mark and submission on behalf of student.
      *
      * @param IntegrationTester     $i
-     * @param AssessmentPayload     $newAssessmentRequest
-     * @param AssessmentMarkPayload $newMarkRequest
+     * @param Payload\Assessment    $newAssessmentRequest
+     * @param Payload\AssessmentMark $newMarkRequest
      * @throws Deleted
      * @throws Exception
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function markAssessment(IntegrationTester $i, AssessmentPayload $newAssessmentRequest, AssessmentMarkPayload $newMarkRequest)
+    public function markAssessment(IntegrationTester $i, Payload\Assessment $newAssessmentRequest, Payload\AssessmentMark $newMarkRequest)
     {
         #GIVEN
         $timestamp = time();
         $group_title='Testing Mark Assessment on Group Page at '.$timestamp;
 
 
-        $folderPayload = new FolderPayload();
-        $folderPayload->setTemplate(FolderPayload::TEMPLATE_HOMEPAGE_ID);
+        $folderPayload = new Payload\Folder();
+        $folderPayload->setTemplate(Payload\Folder::TEMPLATE_HOMEPAGE_ID);
         $folderPayload->setName($group_title);
         $i->sendCurlRequest($folderPayload, false, 'Send request create Group Page');
         $groupPage=$i->getFirstFolderByTitle($group_title);
