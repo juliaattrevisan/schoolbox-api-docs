@@ -77,6 +77,7 @@ function renderParent(SitePage $page, $user, External_User $synUserHandler, User
                 'customButtons'  => $customButtons,
                 'eportfolioAuth' => $authenticator->canView(),
                 'now'            => Alaress_Date_Format::now(),
+                'isRestricted'   => ConfigMapper::getInstance()->get('restrict_parent_emails'),
             ]
         )
     );
