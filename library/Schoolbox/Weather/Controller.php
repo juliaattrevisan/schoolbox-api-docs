@@ -23,7 +23,9 @@ class Controller extends Base
      */
     public function getWeatherDetails()
     {
-        $location = (new Location())->detect($_GET['location'], $this->getConfigLoader()->get('weather_location'));
+        /* Co-erce to string in case someone visits this page directly w/o a location querystring param
+         */
+        $location = (new Location())->detect((string)$this->request->query['location'], $this->getConfigLoader()->get('weather_location'));
 
         $apiKey = $this->getConfigLoader()->get('weather_api_key');
         $apiUrl = $this->getConfigLoader()->get('weather_api_url');
