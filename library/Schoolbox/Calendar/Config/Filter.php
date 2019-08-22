@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar\Config;
 
 use Alaress\Session\Session;
-use Aura\Di\ContainerInterface;
 use Aura\Di\Exception;
 use Schoolbox\Collection;
 

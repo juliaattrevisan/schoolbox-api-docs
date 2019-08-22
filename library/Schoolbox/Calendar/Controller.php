@@ -17,7 +17,6 @@ use Schoolbox\Calendar\Config\SourceList;
 use Schoolbox\Calendar\Config\Group;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\CampusMapper;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Controller extends Base
@@ -35,10 +34,10 @@ class Controller extends Base
     /**
      * @var EventTypeMapper
      */
-    private  $eventTypeMapper;
+    private $eventTypeMapper;
 
     /**
-     * @var
+     * @var Calendar_Api_Config_Mapper
      */
     private $calApiConfigMapper;
 
