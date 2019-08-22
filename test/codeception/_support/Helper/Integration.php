@@ -7,13 +7,16 @@ namespace Helper;
 use Codeception\Exception\ModuleException;
 use Codeception\Module\Db;
 use Codeception\TestInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
 use Schoolbox\Resource\Storage\HashGenerator;
 
 class Integration extends \Codeception\Module
 {
 
-    /**
-     * Define custom actions here
-     */
-
+    public function sendRequestCurl($method, $uri, $params)
+    {
+        #_request($method, $uri, $params);
+        return $this->getModule('PhpBrowser')->guzzle->request($method, $uri, $params);
+    }
 }
