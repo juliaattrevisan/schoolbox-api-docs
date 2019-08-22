@@ -18,10 +18,6 @@ abstract class Calendar_Layout_Full_Abstract
     /** @var Calendar $calendarHandler */
     protected $calendarHandler = null;
 
-    /** @var Group $groupHandler */
-    protected $groupHandler = null;
-
-    protected $subStuHandler = null;
     protected $page          = null;
     protected $date          = '';
     protected $categoryList  = [];
@@ -58,15 +54,14 @@ abstract class Calendar_Layout_Full_Abstract
 
         /* Still used for perms and stuff
          */
-        $this->setCalendarHandler(new Calendar());
+        $this->calendarHandler = new Calendar();
         $this->moduleChecker = $moduleChecker;
 
         $this->user = $user;
         $this->viewer = $viewer;
-        $this->setGroupHandler(new Group());
         $this->page = $page;
         $this->date = $date;
-        $this->categoryList = $this->getGroupHandler()->involvedInCategoryList($user->getId());
+        $this->categoryList = (new Group())->involvedInCategoryList($user->getId());
         $this->setupTemplateFile();
         $this->setupBlocks();
     }
@@ -203,7 +198,7 @@ abstract class Calendar_Layout_Full_Abstract
         $this->selected = $selected;
 
         $categoryList = $this->categoryList;
-        $campusList   = $this->getCalendarHandler()->getFilterCampusList($this->user->getId());
+        $campusList   = $this->calendarHandler->getFilterCampusList($this->user->getId());
 
         // Shoehorn the above into JSON-encoded vars
         $this->page->setVar(
@@ -261,49 +256,5 @@ abstract class Calendar_Layout_Full_Abstract
 
         // Output selected filters as JSON
         $this->page->setVar('SELECTED_FILTERS_JSON', json_encode($selected));
-    }
-
-    /* Getters/Setters
-     */
-
-
-    /**
-     * Set calendar handler
-     *
-     * @param Calendar $calendarHandler
-     */
-    protected function setCalendarHandler(Calendar $calendarHandler): void
-    {
-        $this->calendarHandler = $calendarHandler;
-    }
-
-    /**
-     * Get calendar handler
-     *
-     * @return Calendar
-     */
-    protected function getCalendarHandler(): Calendar
-    {
-        return $this->calendarHandler;
-    }
-
-    /**
-     * Set group handler
-     *
-     * @param Group $groupHandler
-     */
-    protected function setGroupHandler(Group $groupHandler): void
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * Get group handler
-     *
-     * @return Group
-     */
-    protected function getGroupHandler(): Group
-    {
-        return $this->groupHandler;
     }
 }
