@@ -10,7 +10,6 @@ namespace Schoolbox\Calendar\Config;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Config_Mapper;
 use Schoolbox\Collection;
-use Schoolbox\IConfigLoader;
 
 /**
  * Class SourceList
@@ -19,24 +18,24 @@ use Schoolbox\IConfigLoader;
 class SourceList extends Base
 {
     /**
-     * @var IConfigLoader
-     */
-    private $configMapper;
-
-    /**
      * @var Calendar_Api_Config_Mapper
      */
     private $calApiConfigMapper;
 
     /**
-     * SourceList constructor.
-     * @param IConfigLoader              $configMapper
-     * @param Calendar_Api_Config_Mapper $calApiConfigMapper
+     * @var ModuleChecker
      */
-    public function __construct(IConfigLoader $configMapper, Calendar_Api_Config_Mapper $calApiConfigMapper)
+    private $moduleChecker;
+
+    /**
+     * SourceList constructor.
+     * @param Calendar_Api_Config_Mapper $calApiConfigMapper
+     * @param ModuleChecker              $moduleChecker
+     */
+    public function __construct(Calendar_Api_Config_Mapper $calApiConfigMapper, ModuleChecker $moduleChecker)
     {
-        $this->configMapper         = $configMapper;
         $this->calApiConfigMapper   = $calApiConfigMapper;
+        $this->moduleChecker        = $moduleChecker;
     }
 
     /**
@@ -45,7 +44,7 @@ class SourceList extends Base
     public function generate(): self
     {
         $this->data = new Collection(
-            $this->calApiConfigMapper->getSourceListForCalendar(new ModuleChecker($this->configMapper))
+            $this->calApiConfigMapper->getSourceListForCalendar($this->moduleChecker)
         );
 
         return $this;

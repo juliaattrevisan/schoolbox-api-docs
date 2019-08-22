@@ -9,6 +9,7 @@ namespace Schoolbox\Calendar;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Calendar\Api\ModuleChecker;
 use Calendar_Api_Config_Mapper;
 use Schoolbox\Calendar\Config\Campus;
 use Schoolbox\Calendar\Config\EventType;
@@ -42,18 +43,24 @@ class Controller extends Base
     private $calApiConfigMapper;
 
     /**
+     * @var ModuleChecker
+     */
+    private $moduleChecker;
+
+    /**
      * Controller constructor.
      * @param FolderMapper                $folderMapper
      * @param CampusMapper                $campusMapper
      * @param EventTypeMapper             $eventTypeMapper
      * @param Calendar_Api_Config_Mapper $calApiConfigMapper
      */
-    public function __construct(FolderMapper $folderMapper, CampusMapper $campusMapper, EventTypeMapper $eventTypeMapper, Calendar_Api_Config_Mapper $calApiConfigMapper)
+    public function __construct(FolderMapper $folderMapper, CampusMapper $campusMapper, EventTypeMapper $eventTypeMapper, Calendar_Api_Config_Mapper $calApiConfigMapper, ModuleChecker $moduleChecker)
     {
         $this->folderMapper         = $folderMapper;
         $this->campusMapper         = $campusMapper;
         $this->eventTypeMapper      = $eventTypeMapper;
         $this->calApiConfigMapper   = $calApiConfigMapper;
+        $this->moduleChecker        = $moduleChecker;
     }
 
     /**
@@ -65,7 +72,7 @@ class Controller extends Base
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
         $eventType        = (new EventType($this->eventTypeMapper))->generate();
-        $sourceList       = (new SourceList($this->getConfigLoader(), $this->calApiConfigMapper))->generate();
+        $sourceList       = (new SourceList($this->calApiConfigMapper, $this->moduleChecker))->generate();
         $filters          = (new Filter($this->getSession()))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
 
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->getUser()->getCalendarView()]
