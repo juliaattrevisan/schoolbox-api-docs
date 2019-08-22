@@ -21,16 +21,6 @@ echo "--------------------------------------------------------------------------
 echo
 } &>> ~/ibm_db2_install.log
 
-echo "Switching Active PHP Version To 7.1..."
-
-{
-USERPATH=`pwd`
-sudo a2dismod php5
-sudo a2enmod php7.1
-sudo update-alternatives --set php /usr/bin/php7.1
-sudo service apache2 restart
-} &>> ~/ibm_db2_install.log
-
 echo "Downloading IBM DB2 source and CLI drivers..."
 
 {
@@ -84,16 +74,6 @@ echo "Adding Extension To PHP 7.1 Configuration Files..."
 {
 echo 'extension=ibm_db2.so' | sudo tee /etc/php/7.1/apache2/conf.d/20-ibm_db2.ini
 echo 'extension=ibm_db2.so' | sudo tee /etc/php/7.1/cli/conf.d/20-ibm_db2.ini
-} &>> ~/ibm_db2_install.log
-
-echo "Restarting Apache Service & Schoolbox Daemons..."
-
-{
-sudo service apache2 restart
-sudo service schoolbox-scheduled restart
-sudo service schoolbox-rerouted restart
-sudo service schoolbox-socketd restart
-sudo service schoolbox-digestd restart
 } &>> ~/ibm_db2_install.log
 
 {

@@ -24,16 +24,6 @@ echo
     echo
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
-echo "Switching Active PHP Version To 7.1..."
-
-{
-    USERPATH=`pwd`
-    sudo a2dismod php5
-    sudo a2enmod php7.1
-    sudo update-alternatives --set php /usr/bin/php7.1
-    sudo service apache2 restart
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
 eval "cd ${USERPATH}"
 
 echo "Installing driver pre-requisites..."
@@ -143,16 +133,6 @@ echo "Building MSSQLPHP v4.1.8..."
     ./configure --enable-static CXXFLAGS=-std=c++11
     make
     sudo make install
-} &>> ~/php_7.1_pdosqlsrv_install.log
-
-
-echo "Restarting Apache Service & Schoolbox Daemons..."
-
-{
-    sudo service apache2 restart
-    sudo service schoolbox-scheduled restart
-    sudo service schoolbox-socketd restart
-    sudo service schoolbox-digestd restart
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
 echo

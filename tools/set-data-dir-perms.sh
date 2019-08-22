@@ -14,7 +14,7 @@
 echo "Updating data directory permissions";
 
 datadir='/var/lib/schoolbox';
-apacheuser='www-data';
+wwwuser='www-data';
 
 if [ ! -z $1 ];
 then
@@ -26,11 +26,11 @@ fi
 
 if [ ! -z $2 ];
 then
-	apacheuser=$2;
+	wwwuser=$2;
 fi
 
 # Fix permissions
-chown -R $apacheuser:$apacheuser $datadir
+chown -R $wwwuser:$wwwuser $datadir
 chmod -R 775 $datadir
 
 # End of script
