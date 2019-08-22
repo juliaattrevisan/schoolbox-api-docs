@@ -886,7 +886,7 @@ class User extends Base implements IUser
         // Metadata
 
         $meta = new Staff\Meta();
-        $meta->setPosition($staffRow['positionTitle']);
+        $meta->getPosition()->setDescription($staffRow['positionTitle']);
 
         $staff->setMeta($meta);
 

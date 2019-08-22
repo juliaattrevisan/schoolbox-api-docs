@@ -115,4 +115,12 @@ class Position {
     {
         return $this->startDate;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->description ?: '';
+    }
 }

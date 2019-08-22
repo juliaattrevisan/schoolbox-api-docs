@@ -54,8 +54,9 @@ class Staff extends IteratorIterator
             ->setGivenName($currentResult['staff_given_name'])
             ->setLastname($currentResult['staff_surname'])
             ->getMeta()
-            ->setPosition($currentResult['staff_position'])
             ->setDepartment($currentResult['staff_department'])
+            ->getPosition()
+            ->setDescription($currentResult['staff_position'])
         ;
 
         $staff
@@ -88,11 +89,6 @@ class Staff extends IteratorIterator
         array_map([$staff, "addEmail"], $this->columnValuesAsEmail($preStack, 'default_email'));
         array_map([$staff, "addWorkEmail"], $this->columnValuesAsEmail($preStack, 'work_email'));
         array_map([$staff, "addHomeEmail"], $this->columnValuesAsEmail($preStack, 'home_email'));
-
-        /* Position - one for every item in stack
-         */
-
-        $staff->getMeta()->setPosition($this->columnValuesAsArray($preStack, 'staff_position'));
 
         /* Campus
          */
