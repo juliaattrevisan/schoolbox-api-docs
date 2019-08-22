@@ -71,7 +71,7 @@ class Model implements ISoftDeletable
     /**
      * @var string|null
      */
-    private $tutorName;
+    private $tutorGroup;
 
     /**
      * @var string|null
@@ -252,9 +252,9 @@ class Model implements ISoftDeletable
     /**
      * @return string|null
      */
-    public function getTutorName(): ?string
+    public function getTutorGroup(): ?string
     {
-        return $this->tutorName;
+        return $this->tutorGroup;
     }
 
     /**
@@ -511,12 +511,12 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string|null $tutorName
+     * @param string|null $tutorGroup
      * @return Model
      */
-    public function setTutorName(?string $tutorName): self
+    public function setTutorGroup(?string $tutorGroup): self
     {
-        $this->tutorName = $tutorName;
+        $this->tutorGroup = $tutorGroup;
         return $this;
     }
 

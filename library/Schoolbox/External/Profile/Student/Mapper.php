@@ -14,6 +14,16 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
 use UnexpectedValueException;
 
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\External\Profile\Student
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -34,7 +44,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('form_name', self::TYPE_STRING);
         $this->uses('form_teacher_id', self::TYPE_STRING);
         $this->uses('form_teacher_name', self::TYPE_STRING);
-        $this->uses('tutor_name', self::TYPE_STRING);
+        $this->uses('tutor_group', self::TYPE_STRING);
         $this->uses('tutor_teacher_id', self::TYPE_STRING);
         $this->uses('tutor_teacher_name', self::TYPE_STRING);
         $this->uses('year_level', self::TYPE_STRING);

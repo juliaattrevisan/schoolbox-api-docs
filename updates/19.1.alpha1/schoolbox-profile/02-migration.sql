@@ -22,7 +22,7 @@ INSERT INTO `sis_user_profile` (external_id, title, firstname, lastname, created
  Migrate data from user, user_profile and sis_user_profile_student to sis_profile_user table of the new schema
  */
 INSERT INTO `sis_user_profile_student` (`sis_user_profile_id`, `date_of_birth`, `username`, `email`, `gender`,`head_of_house_id`, `head_of_house_name`, `house_name`, `form_name`,
-                                        `form_teacher_id`, `form_teacher_name`,`tutor_name`, `tutor_teacher_id`, `tutor_teacher_name`, `year_level`,
+                                        `form_teacher_id`, `form_teacher_name`,`tutor_group`, `tutor_teacher_id`, `tutor_teacher_name`, `year_level`,
                                         `year_level_coordinator_id`, `year_level_coordinator_name`,`mobile`, `studies_code`,`alert_medical`,`alert_comment`,
                                         `alert_message`,`alert_legal`,`enrolment_date`,`leaving_date`, `ib`, `individual_learning_plans`,`esl`, `special_needs`,
                                         `boarding_status`, created_at, updated_at, deleted_at)
