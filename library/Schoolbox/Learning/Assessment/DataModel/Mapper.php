@@ -160,7 +160,6 @@ class Mapper extends BaseMapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'setSequence'));
         $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'validateOpenSpan'));
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCurriculumNodes']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteQuiz'));
@@ -223,23 +222,6 @@ class Mapper extends BaseMapper
         }
         return $this->executeSelect($this->getSelectStringForParticipant($student), $this->getFromString(), $pb, [], $options)->indexBy('id');
     }
-
-
-    /**
-     * Update any associated curriculum nodes when saving an assessment
-     *
-     * @param Model $assessment
-     * @throws BaseMapper\DefinitionException If join name is not on this mapper
-     */
-    protected function updateCurriculumNodes(Model $assessment)
-    {
-        /** @var CurriculumNodeMapper $curriculumNodeMapper */
-        $curriculumNodeMapper = $this->getJoinMapper('curriculum_node_for_assessment');
-        $curriculumNodeMapper
-            ->deleteRelations($assessment->getId())
-            ->insertRelations($assessment->getCurriculumNodes(), $assessment->getId());
-    }
-
 
     /**
      * @param Model      $assessment
