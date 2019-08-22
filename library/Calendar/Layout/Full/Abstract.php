@@ -17,14 +17,13 @@ abstract class Calendar_Layout_Full_Abstract
 {
     /** @var Calendar $calendarHandler */
     protected $calendarHandler = null;
-
-    protected $page          = null;
-    protected $date          = '';
-    protected $categoryList  = [];
-    protected $templateFile  = '';
-    protected $selected      = [];
-    protected $selectedDate  = null;
-    protected $startOfWeek   = null;
+    protected $page            = null;
+    protected $date            = '';
+    protected $categoryList    = [];
+    protected $templateFile    = '';
+    protected $selected        = [];
+    protected $selectedDate    = null;
+    protected $startOfWeek     = null;
 
     /** @var Calendar_Api_EventType_Interface Actual connector instance */
     protected $api;
@@ -50,18 +49,12 @@ abstract class Calendar_Layout_Full_Abstract
      */
     public function __construct(SitePage $page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
     {
-        $this->api = $factory->produceForUser($user, $viewer);
-
-        /* Still used for perms and stuff
-         */
-        $this->calendarHandler = new Calendar();
+        $this->api           = $factory->produceForUser($user, $viewer);
         $this->moduleChecker = $moduleChecker;
-
-        $this->user = $user;
-        $this->viewer = $viewer;
-        $this->page = $page;
-        $this->date = $date;
-        $this->categoryList = (new Group())->involvedInCategoryList($user->getId());
+        $this->user          = $user;
+        $this->viewer        = $viewer;
+        $this->page          = $page;
+        $this->date          = $date;
         $this->setupTemplateFile();
         $this->setupBlocks();
     }
@@ -168,6 +161,8 @@ abstract class Calendar_Layout_Full_Abstract
         $typeList   = EventTypeMapper::getInstance()->findAll();
         $sourceList = Calendar_Api_Config_Mapper::getInstance()->getSourceListForCalendar($this->moduleChecker);
 
+        $categoryList = (new Group())->involvedInCategoryList($this->user->getId());
+        $campusList   = (new Calendar())->getFilterCampusList($this->user->getId());
 
         // Load what is selected: default to selecting everything
         /** @var EventType[] $typeList */
@@ -178,7 +173,7 @@ abstract class Calendar_Layout_Full_Abstract
             $selected['source']    = $_SESSION['calendarFilter']['source'] ?? [];
         } else {
             // select everything
-            foreach ($this->categoryList as $cat) {
+            foreach ($categoryList as $cat) {
                 $selected['group'][] = (int)$cat['id'];
             }
 
@@ -196,9 +191,6 @@ abstract class Calendar_Layout_Full_Abstract
         }
 
         $this->selected = $selected;
-
-        $categoryList = $this->categoryList;
-        $campusList   = $this->calendarHandler->getFilterCampusList($this->user->getId());
 
         // Shoehorn the above into JSON-encoded vars
         $this->page->setVar(
