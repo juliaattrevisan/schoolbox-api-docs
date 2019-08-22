@@ -18,11 +18,6 @@ use Schoolbox\Permission\Access\Access as FolderAccess;
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$calendarHandler = new Calendar();
-$page = new SitePage();
-
-$groupHandler = new Group();
-
 $user = $_SESSION['user'];
 $ownerId = $_POST['userId'];
 $owner = UserMapper::getInstance()->findById($ownerId);
@@ -95,7 +90,7 @@ if (count($affectedIds) == 1) {
         // Only one event should ever be gotten here, so render that one only
         /** @var \Schoolbox\User $user */
         $user     = $_SESSION['user'];
-        $renderer = new Javascript($page->getDi(), $calendarEvent, $user, $user);
+        $renderer = new Javascript($kernel->getDependencyInjector(), $calendarEvent, $user, $user);
         $output   = $renderer->render();
         echo $output;
         break;

@@ -11,7 +11,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $calendarHandler = new Calendar();
-$page            = new SitePage();
 
 $event = $calendarHandler->getByID($_POST['eventId']);
 //
@@ -97,7 +96,7 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
 
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only
-        $renderer = new Javascript($page->getDi(), $calendarEvent, $_SESSION['user'], $_SESSION['user']);
+        $renderer = new Javascript($kernel->getDependencyInjector(), $calendarEvent, $_SESSION['user'], $_SESSION['user']);
         $output   = $renderer->render();
         echo $output;
         break;
