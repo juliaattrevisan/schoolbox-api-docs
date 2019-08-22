@@ -38,7 +38,7 @@ class Module extends BaseModule
         // Supported format MM-DD-YYYY
         // Explanation here: https://regex101.com/r/X8zFce/1
         $this->addGetRoute($router, 'getCalendar', $basePath, "{/selectedDate}")->addTokens([
-            'date' => '([0-2][0-9]|(3)[0-1]\d+(-))(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}'
+            'selectedDate' => '([0-2][0-9]|(3)[0-1]\d+(-))(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}'
         ]);
     }
 
