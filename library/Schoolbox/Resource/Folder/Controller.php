@@ -165,7 +165,11 @@ class Controller extends BaseController
             ['parent' => $parent, 'parentId' => $parent->getId()]
         );
 
-        $folder = (new Folder\Model())->setParent($parent);
+        $folder = (new Folder\Model())
+            ->setParent($parent)
+            ->setCodes(new GenericCollection(Code\Model::class))
+            ->setYearLevels(new GenericCollection(YearLevel\Model::class))
+            ->setCurriculumNodes(new GenericCollection(Curriculum\Node\Model::class));
         $this->displayFolderModifyForm($breadcrumbs, $formAction, $folder);
     }
 
