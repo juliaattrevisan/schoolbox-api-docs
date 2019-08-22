@@ -78,12 +78,12 @@ class Controller extends Base
                 [
                     'user'          => $this->getUser(),
                     'taskTypeId'    => $eventType->getTaskIdFromEvents(),
-                    'groups'        => $groups->toJson(),
-                    'sources'       => $sourceList->toJson(),
-                    'campuses'      => $campus->toJson(),
-                    'eventTypes'    => $eventType->toJson(),
+                    'groups'        => $groups,
+                    'sources'       => $sourceList,
+                    'campuses'      => $campus,
+                    'eventTypes'    => $eventType,
                     'calendarView'  => $calendarView,
-                    'filters'       => $filters->toJson(),
+                    'filters'       => $filters,
                     'selectedDate'  => $selectedDate ?? Alaress_Date_Format::now()
                 ]
             )

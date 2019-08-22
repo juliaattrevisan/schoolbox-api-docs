@@ -13,7 +13,7 @@ use Schoolbox\Collection;
  * Class Base
  * @package Schoolbox\Calendar\Config
  */
-class Base
+class Base implements \JsonSerializable
 {
     /**
      * @var Collection
@@ -29,10 +29,10 @@ class Base
     }
 
     /**
-     * @return false|string
+     * @return mixed|Collection
      */
-    public function toJson()
+    public function jsonSerialize()
     {
-        return json_encode($this->data);
+        return $this->data;
     }
 }
