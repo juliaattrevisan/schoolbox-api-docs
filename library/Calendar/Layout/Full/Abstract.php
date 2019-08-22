@@ -45,18 +45,16 @@ abstract class Calendar_Layout_Full_Abstract
     /**
      * Constructor
      *
-     * @param                      $page
+     * @param SitePage             $page
      * @param User                 $user
      * @param                      $date
      * @param User                 $viewer
      * @param Calendar_Api_Factory $factory
      * @param ModuleChecker        $moduleChecker
      */
-    public function __construct($page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
+    public function __construct(SitePage $page, User $user, $date, User $viewer, Calendar_Api_Factory $factory, ModuleChecker $moduleChecker)
     {
-        $api = $factory->produceForUser($user, $viewer);
-
-        $this->setApi($api);
+        $this->api = $factory->produceForUser($user, $viewer);
 
         /* Still used for perms and stuff
          */
@@ -66,9 +64,9 @@ abstract class Calendar_Layout_Full_Abstract
         $this->user = $user;
         $this->viewer = $viewer;
         $this->setGroupHandler(new Group());
-        $this->setPage($page);
-        $this->setDate($date);
-        $this->setCategoryList($this->getGroupHandler()->involvedInCategoryList($user->getId()));
+        $this->page = $page;
+        $this->date = $date;
+        $this->categoryList = $this->getGroupHandler()->involvedInCategoryList($user->getId());
         $this->setupTemplateFile();
         $this->setupBlocks();
     }
@@ -121,7 +119,7 @@ abstract class Calendar_Layout_Full_Abstract
      */
     protected function setupSelectedDayMonthYear(): void
     {
-        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
+        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->date);
 
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
@@ -132,7 +130,7 @@ abstract class Calendar_Layout_Full_Abstract
             $selectedDate = time();
         }
 
-        $this->setSelectedDate($selectedDate);
+        $this->selectedDate = $selectedDate;
 
         if ($selectedDate <= 0) {
             $selectedDate = time();
@@ -152,7 +150,7 @@ abstract class Calendar_Layout_Full_Abstract
             $month = date("jS", $startOfWeek) . ' - ' . date('jS F', $endOfWeek);
         }
 
-        $this->getPage()->setVar(
+        $this->page->setVar(
             [
                 'SELECTED_DAY'   => $selectedDay,
                 'SELECTED_MONTH' => $selectedMonth,
@@ -163,7 +161,7 @@ abstract class Calendar_Layout_Full_Abstract
             ]
         );
 
-        $this->setStartOfWeek($startOfWeek);
+        $this->startOfWeek = $startOfWeek;
     }
 
     /**
@@ -185,7 +183,7 @@ abstract class Calendar_Layout_Full_Abstract
             $selected['source']    = $_SESSION['calendarFilter']['source'] ?? [];
         } else {
             // select everything
-            foreach ($this->getCategoryList() as $cat) {
+            foreach ($this->categoryList as $cat) {
                 $selected['group'][] = (int)$cat['id'];
             }
 
@@ -202,13 +200,13 @@ abstract class Calendar_Layout_Full_Abstract
             }
         }
 
-        $this->setSelected($selected);
+        $this->selected = $selected;
 
-        $categoryList = $this->getCategoryList();
+        $categoryList = $this->categoryList;
         $campusList   = $this->getCalendarHandler()->getFilterCampusList($this->user->getId());
 
         // Shoehorn the above into JSON-encoded vars
-        $this->getPage()->setVar(
+        $this->page->setVar(
             'GROUPS_JSON',
             json_encode(
                 array_map(
@@ -221,7 +219,7 @@ abstract class Calendar_Layout_Full_Abstract
                 )
             )
         );
-        $this->getPage()->setVar(
+        $this->page->setVar(
             'CAMPUSES_JSON',
             json_encode(
                 array_map(
@@ -235,7 +233,7 @@ abstract class Calendar_Layout_Full_Abstract
                 )
             )
         );
-        $this->getPage()->setVar(
+        $this->page->setVar(
             'EVENT_TYPES_JSON',
             json_encode(
                 $typeList->map(
@@ -250,19 +248,19 @@ abstract class Calendar_Layout_Full_Abstract
                 )
             )
         );
-        $this->getPage()->setVar('SOURCES_JSON', json_encode($sourceList));
+        $this->page->setVar('SOURCES_JSON', json_encode($sourceList));
 
 
         // output task type too
         foreach ($typeList as $type) {
             if ($type->isTaskType()) {
-                $this->getPage()->setVar('TASK_TYPE_ID', $type->getId());
+                $this->page->setVar('TASK_TYPE_ID', $type->getId());
             }
         }
 
 
         // Output selected filters as JSON
-        $this->getPage()->setVar('SELECTED_FILTERS_JSON', json_encode($selected));
+        $this->page->setVar('SELECTED_FILTERS_JSON', json_encode($selected));
     }
 
     /* Getters/Setters
@@ -307,165 +305,5 @@ abstract class Calendar_Layout_Full_Abstract
     protected function getGroupHandler(): Group
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * Set template file
-     *
-     * @param string $templateFile
-     */
-    protected function setTemplateFile(string $templateFile)
-    {
-        $this->templateFile = $templateFile;
-    }
-
-    /**
-     * Get template file
-     *
-     * @return string
-     */
-    protected function getTemplateFile(): string
-    {
-        return $this->templateFile;
-    }
-
-    /**
-     * Set page
-     *
-     * @param $page
-     */
-    protected function setPage($page)
-    {
-        $this->page = $page;
-    }
-
-    /**
-     * Get page
-     *
-     * @return SitePage
-     */
-    protected function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * Set date
-     *
-     * @param $date
-     */
-    protected function setDate($date)
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * Get date
-     *
-     * @return string
-     */
-    protected function getDate()
-    {
-        return $this->date;
-    }
-
-    /**
-     * Set category list
-     *
-     * @param array $categoryList
-     */
-    protected function setCategoryList($categoryList)
-    {
-        $this->categoryList = $categoryList;
-    }
-
-    /**
-     * Get category list
-     *
-     * @return array
-     */
-    protected function getCategoryList()
-    {
-        return $this->categoryList;
-    }
-
-    /**
-     * Set selected
-     *
-     * @param $selected
-     */
-    protected function setSelected($selected)
-    {
-        $this->selected = $selected;
-    }
-
-    /**
-     * Get selected
-     *
-     * @return array
-     */
-    protected function getSelected()
-    {
-        return $this->selected;
-    }
-
-    /**
-     * Set selected date
-     *
-     * @param $selectedDate
-     */
-    protected function setSelectedDate($selectedDate)
-    {
-        $this->selectedDate = $selectedDate;
-    }
-
-    /**
-     * Get selected date
-     *
-     * @return null
-     */
-    protected function getSelectedDate()
-    {
-        return $this->selectedDate;
-    }
-
-    /**
-     * Set start of week
-     *
-     * @param $startOfWeek
-     */
-    protected function setStartOfWeek($startOfWeek)
-    {
-        $this->startOfWeek = $startOfWeek;
-    }
-
-    /**
-     * Get start of week
-     *
-     * @return null
-     */
-    protected function getStartOfWeek()
-    {
-        return $this->startOfWeek;
-    }
-
-    /**
-     * Set api
-     *
-     * @param $api
-     */
-    protected function setApi($api)
-    {
-        $this->api = $api;
-    }
-
-    /**
-     * Get api
-     *
-     * @return Calendar_Api_EventType_Interface
-     */
-    protected function getApi()
-    {
-        return $this->api;
     }
 }

@@ -37,7 +37,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
      */
     protected function setupSelectedDayMonthYear(): void
     {
-        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
+        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->date);
 
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
 
@@ -48,7 +48,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
             $selectedDate = time();
         }
 
-        $this->setSelectedDate($selectedDate);
+        $this->selectedDate = $selectedDate;
 
         if ($selectedDate <= 0) {
             $selectedDate = time();
@@ -61,7 +61,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
         $dayOfWeek   = date("w", mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear));
         $startOfWeek = mktime(0, 0, 0, $selectedMonth, ($selectedDay - $dayOfWeek), $selectedYear);
 
-        $this->setStartOfWeek($startOfWeek);
+        $this->startOfWeek = $startOfWeek;
     }
 
     /**
@@ -74,11 +74,11 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
         $startSequence = new Alaress_Date_Format($_GET['start'], 'U');
         $endSequence   = new Alaress_Date_Format($_GET['end'], 'U');
         $renderer      = new Renderer(
-            $this->getApi(),
+            $this->api,
             $startSequence->getUnixTimeStamp(),
             $endSequence->getUnixTimeStamp(),
             $this->user,
-            $this->getPage()->getDi(),
+            $this->page->getDi(),
             $this->viewer
         );
 

@@ -23,8 +23,8 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
      */
     protected function setupTemplateFile(): void
     {
-        $this->setTemplateFile('calendar/full.html');
-        $this->getPage()->setTab('calendar');
+        $this->templateFile = 'calendar/full.html';
+        $this->page->setTab('calendar');
     }
 
     /**
@@ -32,11 +32,11 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
      */
     protected function setupBlocks(): void
     {
-        $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
-        $this->getPage()->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'has_eotc_events_all', 'has_eotc_events_all_block');
+        $this->page->setFile(TEMPLATE_content, $this->templateFile);
+        $this->page->setBlock(TEMPLATE_content, 'event_type', 'event_type_block');
+        $this->page->setBlock(TEMPLATE_content, 'has_eotc_events_all', 'has_eotc_events_all_block');
 
-        $this->getPage()->setVar([
+        $this->page->setVar([
             'USER_CALENDAR_ID' => $this->user->getId(),
             'USER_FULLNAME'    => $this->user->getFullname(),
         ]);
@@ -49,9 +49,9 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
      */
     protected function setupSelectedDayMonthYear(): void
     {
-        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->getDate());
+        list($selectedDay, $selectedMonth, $selectedYear) = explode("-", $this->date);
         $selectedDate = @mktime(0, 0, 0, $selectedMonth, $selectedDay, $selectedYear);
-        $this->setSelectedDate($selectedDate);
+        $this->selectedDate = $selectedDate;
 
         if ($selectedDate <= 0) {
             $selectedDate = time();
@@ -61,7 +61,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         $selectedMonth = date("n", $selectedDate);
         $selectedYear  = date("Y", $selectedDate);
 
-        $this->getPage()->setVar([
+        $this->page->setVar([
             'SELECTED_DAY'   => $selectedDay,
             'SELECTED_MONTH' => $selectedMonth - 1,
             'SELECTED_YEAR'  => $selectedYear,
@@ -79,9 +79,9 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         /* If EOTC is enabled, show these options
          */
         if (EOTCConfigMapper::getInstance()->isSubscriptionEnabled()) {
-            $this->getPage()->parse('has_eotc_events_all_block', 'has_eotc_events_all');
+            $this->page->parse('has_eotc_events_all_block', 'has_eotc_events_all');
         } else {
-            $this->getPage()->setVar([
+            $this->page->setVar([
                 'has_eotc_events_all_block' => '',
             ]);
         }
@@ -90,7 +90,7 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
         $calendarView = ViewNameMapping::MAP_STORED_TO_FC[$this->viewer->getCalendarView()]
             ?? ViewNameMapping::VIEW_MONTH_FC_NAME;
 
-        $this->getPage()->setVar([
+        $this->page->setVar([
             'CALENDAR_USER_ID'         => $this->user->getId(),
             'CALENDAR_VIEW'            => $calendarView,
             'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
