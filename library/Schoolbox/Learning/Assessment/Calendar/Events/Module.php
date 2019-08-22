@@ -60,10 +60,8 @@ class Module extends BaseModule
         /** @var Container $injector */
         $injector->params[Controller::class] = [
             'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
-            'visibility'           => $injector->lazy(function () {
-                /** @var Access $access */
-                $access = $this->getMapperFactory()->get(Access::class);
-                return new Visibility($access);
+            'visibility'           => $injector->lazy(static function () {
+                return new Visibility(Access::getInstance());
             }),
         ];
     }
