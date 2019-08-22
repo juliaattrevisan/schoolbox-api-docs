@@ -144,9 +144,21 @@ export default class FullCalendarHelper {
      * Without this the calendar renders the date twice for some reason.
      *
      * @param dateObject
-     * @return {*}
+     * @return {string}
      */
     dayTitleFormat(dateObject) {
         return this.toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
     }
 }
+
+
+/**
+ * Constant definition for the formatting of an event's time.
+ */
+FullCalendarHelper.prototype.eventTimeFormat = {
+    hour: 'numeric',
+    hour12: true,
+    minute: '2-digit',
+    meridiem: 'short',
+    omitZeroMinute: true,
+};

@@ -198,13 +198,7 @@
                     columnHeaderFormat: formats.displayWeekDay
                 }
             }"
-            :event-time-format="{
-                hour: 'numeric',
-                hour12: true,
-                minute: '2-digit',
-                meridiem: 'short',
-                omitZeroMinute: true,
-            }"
+            :event-time-format="helper.eventTimeFormat"
             content-height="auto"
             :header="{
                 left: 'prev,today,next',
