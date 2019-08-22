@@ -86,8 +86,9 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'folderMapper'  => $this->getMapperFactory()->getLazy(Mapper::class),
-            'campusMapper'  => $this->getMapperFactory()->getLazy(CampusMapper::class),
+            'folderMapper'      => $this->getMapperFactory()->getLazy(Mapper::class),
+            'campusMapper'      => $this->getMapperFactory()->getLazy(CampusMapper::class),
+            'eventTypeMapper'   => $this->getMapperFactory()->getLazy(EventTypeMapper::class),
         ];
     }
 }

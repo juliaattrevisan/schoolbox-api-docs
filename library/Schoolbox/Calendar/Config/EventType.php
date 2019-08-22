@@ -18,11 +18,25 @@ use Schoolbox\GenericCollection;
 class EventType extends Base
 {
     /**
+     * @var EventTypeMapper
+     */
+    private $eventTypeMapper;
+
+    /**
+     * EventType constructor.
+     * @param EventTypeMapper $eventTypeMapper
+     */
+    public function __construct(EventTypeMapper $eventTypeMapper)
+    {
+        $this->eventTypeMapper = $eventTypeMapper;
+    }
+
+    /**
      * @return EventType
      */
     public function generate(): self
     {
-        $this->data = $this->format(EventTypeMapper::getInstance()->findAll());
+        $this->data = $this->format($this->eventTypeMapper->findAll());
 
         return $this;
     }

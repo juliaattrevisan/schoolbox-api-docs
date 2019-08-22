@@ -32,14 +32,21 @@ class Controller extends Base
     private $campusMapper;
 
     /**
-     * Controller constructor.
-     * @param FolderMapper $folderMapper
-     * @param CampusMapper $campusMapper
+     * @var EventTypeMapper
      */
-    public function __construct(FolderMapper $folderMapper, CampusMapper $campusMapper)
+    private  $eventTypeMapper;
+
+    /**
+     * Controller constructor.
+     * @param FolderMapper    $folderMapper
+     * @param CampusMapper    $campusMapper
+     * @param EventTypeMapper $eventTypeMapper
+     */
+    public function __construct(FolderMapper $folderMapper, CampusMapper $campusMapper, EventTypeMapper $eventTypeMapper)
     {
         $this->folderMapper     = $folderMapper;
         $this->campusMapper     = $campusMapper;
+        $this->eventTypeMapper  = $eventTypeMapper;
     }
 
     /**
@@ -50,7 +57,7 @@ class Controller extends Base
     {
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
-        $eventType        = (new EventType())->generate();
+        $eventType        = (new EventType($this->eventTypeMapper))->generate();
         $sourceList       = (new SourceList(ConfigMapper::getInstance()))->generate();
         $filters          = (new Filter($this->di))->generate($campus->getData(), $groups->getData(), $eventType->getData(), $sourceList->getData());
 
