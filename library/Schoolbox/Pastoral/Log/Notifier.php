@@ -9,6 +9,9 @@ namespace Schoolbox\Pastoral\Log;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
@@ -19,6 +22,9 @@ use Schoolbox\User;
 class Notifier extends AbstractModuleNotifier
 {
     const TRIGGER_CREATED = 'created';
+
+    /** @var RosettaStone $l10n */
+    protected $l10n;
 
     /**
      * @param Model  $model
@@ -34,7 +40,7 @@ class Notifier extends AbstractModuleNotifier
             // Create the message
 
             $builder = new Builder();
-            $builder->setTitle("Pastoral care import completed")
+            $builder->setTitle(sprintf("%s import completed", $this->l10n->translate('pastoralCare', false, true)))
                 ->setIcon("/images/icon.php?size=".$this->iconSize."&icon=".NSMapper::NS_PASTORAL_LOG)
                 ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
                 ->setNamespace($this->getSlug())
@@ -54,6 +60,11 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
+        if (empty($dependencies["l10n"])) {
+            $stoneFactory = new RosettaStoneFactory();
+            $dependencies["l10n"] = $stoneFactory->build(L10nMapper::getInstance());
+        }
+
         parent::loadDependencies($dependencies);
     }
 
@@ -100,5 +111,15 @@ class Notifier extends AbstractModuleNotifier
             [$this, "notify" . ucfirst($label)],
         ];
     }
-}
 
+    /**
+     * @param RosettaStone $l10n
+     * @return self|$this
+     */
+    public function setL10n(RosettaStone $l10n)
+    {
+        $this->l10n = $l10n;
+
+        return $this;
+    }
+}

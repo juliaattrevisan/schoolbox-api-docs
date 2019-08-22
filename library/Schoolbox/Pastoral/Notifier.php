@@ -117,7 +117,9 @@ class Notifier extends AbstractModuleNotifier
         $timestamp = md5(date("YmdHis"));
 
         $href = "/pastoral/student/{$pastoral->getStudent()->getId()}/record/{$pastoral->getId()}?ts={$timestamp}";
-        $severity = $pastoral->getSeverity() ? strtolower($pastoral->getSeverity()->getName()) . ' severity' : '';
+        $severity = $pastoral->getSeverity()
+            ? sprintf('%s %s', strtolower($pastoral->getSeverity()->getName()), $this->l10n->translate('severity'))
+            : '';
         $type = strtolower($pastoral->getSubType() instanceof SubType\Model ? $pastoral->getSubType()->getName() : $pastoral->getType()->getName());
 
         $builder = new Builder();
@@ -330,14 +332,6 @@ class Notifier extends AbstractModuleNotifier
         $this->userMapper = $userMapper;
 
         return $this;
-    }
-
-    /**
-     * @return RosettaStone
-     */
-    public function getL10n(): RosettaStone
-    {
-        return $this->l10n;
     }
 
     /**
