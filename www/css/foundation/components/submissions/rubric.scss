@@ -128,6 +128,7 @@ table.rb {
          */
         div {
             position: relative;
+            padding: .7rem;
         }
     }
     textarea {
@@ -373,29 +374,6 @@ select.letter-grade-select {
             text-align: center;
             width: 100%;
         }
-        td[data-header]:before {
-            content: attr(data-header);
-            display: block;
-            float: left;
-            font-weight: bold;
-            text-align: left;
-            width: 50%;
-        }
-        td[data-header] > * {
-            clear: right;
-            display: block;
-            float: right;
-            width: 50%;
-        }
-        td[data-header]:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 50%;
-            padding-bottom: 200%;
-            display: block;
-        }
     }
     table.rb {
         tbody th {
@@ -424,6 +402,11 @@ select.letter-grade-select {
                 label {
                     font-weight: bold;
                 }
+            }
+        }
+        td {
+            div {
+                padding: .7rem 0 .7rem 0;
             }
         }
         .rb-criterion-name {

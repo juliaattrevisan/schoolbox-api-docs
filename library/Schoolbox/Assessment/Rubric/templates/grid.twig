@@ -19,7 +19,7 @@
 {% set showSummaryTotal = showRubricTotal and rubricMarkedGrid and markType.mode != "none" %}
 {% set showSummaryCapability = showGroupTotal and rubricMarkedGrid and rubricGrid.assessment.markPerCapability %}
 <div class="scrollable">
-<table class="rb">
+    <table class="rb markable stack-for-medium-down">
     {% set hasLevels = '' %}
     {% for level in rubricGrid.levels %}
         {% set hasLevels = hasLevels ~ level.name %}
@@ -47,11 +47,11 @@
             <tr>
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                    <th class="capability" scope="row" rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
+                    <th class="capability rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
                     {% set rowspan = 0 %}
                 {% endif %}
 
-                <th scope="row">{{ critUsage.indicator.name }}</th>
+                <th class="rb-criterion-name">{{ critUsage.indicator.name }}</th>
 
                 {% set indicatorMark = rubricMarkedGrid
                     ? rubricMarkedGrid.retrieveIndicatorMark(critUsage)
@@ -75,11 +75,11 @@
 
                         <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
-                                <p>
+                                <p class="rb-description">
                                     {{- descriptor.description|nl2br -}}
                                 </p>
                                 {% if descriptor.hasValue and config.rubric_show_points and showDescriptorValue %}
-                                    <aside>
+                                    <aside class="rb-value used" >
                                         {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
                                             {% if isMarkDisplayed %}
                                                 <span class="range-selection-value">{{ indicatorMark.value }}</span>
