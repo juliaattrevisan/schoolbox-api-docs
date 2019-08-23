@@ -129,6 +129,7 @@ class Module extends BaseModule
             'moduleChecker'     => $injector->lazyNew(ModuleChecker::class, [
                 'config'    => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             ]),
+            'eventMapper'       => $this->getMapperFactory()->getLazy(EventMapper::class),
         ];
     }
 

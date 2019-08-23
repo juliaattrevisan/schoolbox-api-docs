@@ -49,27 +49,51 @@ class Controller extends Base
     private $moduleChecker;
 
     /**
-     * Controller constructor.
-     * @param FolderMapper                $folderMapper
-     * @param CampusMapper                $campusMapper
-     * @param EventTypeMapper             $eventTypeMapper
-     * @param Calendar_Api_Config_Mapper $calApiConfigMapper
+     * @var EventMapper
      */
-    public function __construct(FolderMapper $folderMapper, CampusMapper $campusMapper, EventTypeMapper $eventTypeMapper, Calendar_Api_Config_Mapper $calApiConfigMapper, ModuleChecker $moduleChecker)
-    {
+    private $eventMapper;
+
+    /**
+     * Controller constructor.
+     * @param FolderMapper               $folderMapper
+     * @param CampusMapper               $campusMapper
+     * @param EventTypeMapper            $eventTypeMapper
+     * @param Calendar_Api_Config_Mapper $calApiConfigMapper
+     * @param ModuleChecker              $moduleChecker
+     * @param EventMapper                $eventMapper
+     */
+    public function __construct(
+        FolderMapper $folderMapper,
+        CampusMapper $campusMapper,
+        EventTypeMapper $eventTypeMapper,
+        Calendar_Api_Config_Mapper $calApiConfigMapper,
+        ModuleChecker $moduleChecker,
+        EventMapper $eventMapper
+    ) {
         $this->folderMapper         = $folderMapper;
         $this->campusMapper         = $campusMapper;
         $this->eventTypeMapper      = $eventTypeMapper;
         $this->calApiConfigMapper   = $calApiConfigMapper;
         $this->moduleChecker        = $moduleChecker;
+        $this->eventMapper          = $eventMapper;
     }
 
     /**
      * @param string|null $selectedDate
+     * @param User        $user
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function getCalendar(?string $selectedDate, User $user): void
     {
+        $series = $this->getRequest()->query->get('s');
+
+        if ($series !== null) {
+            $event = $this->eventMapper->findNextInSeries($series);
+
+            $selectedDate = $event->getStartDateTime()->getURLDate();
+        }
+
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
         $eventType        = (new EventType($this->eventTypeMapper))->generate();
@@ -107,8 +131,8 @@ class Controller extends Base
         $this->response->redirect->to(
             $this->getRouteIfAuthorized('calendar.getCalendar',
                 [
-                    'selectedDate' => $selectedDate,
-                    'userId'    => $user->getId()
+                    'selectedDate'  => $selectedDate,
+                    'userId'        => $user->getId()
                 ]
             )
         );
