@@ -176,14 +176,45 @@ class Processor
 
 
     /**
-     * Process each of the supplied files in any order
+     * Process each of the supplied files in a specific order
+     * Relationship csvs must come last
+     *
      * Override this class for different data sources when needed
      *
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function process(): void
     {
+        /* Sort the files so that the relation one comes last
+         */
+        $profileFiles = [];
+        $relationFiles = [];
+
         foreach ($this->files as $file) {
+            $reader = new Reader($file->readStream());
+            $reader->setLoadFromFirst(false);
+
+            /* Load the first row
+             */
+            $reader->next();
+
+            /* Get the columns out and from here, work out what kind of file it is
+             */
+            $header = $reader->current();
+
+            if ($this->isRelation($header)) {
+                $relationFiles[] = $file;
+            } else {
+                $profileFiles[] = $file;
+            }
+        }
+
+        $sortedFiles = array_merge($profileFiles, $relationFiles);
+
+        /* Process all of these files in the required order
+         */
+        foreach ($sortedFiles as $file) {
             $this->processOne($file->readStream());
         }
     }
@@ -195,6 +226,7 @@ class Processor
      * @param resource $contents
      *
      * @throws \RuntimeException
+     * @throws \Schoolbox\Mapper\Exception
      */
     private function processOne($contents): void
     {
