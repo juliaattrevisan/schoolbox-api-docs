@@ -26,6 +26,9 @@ class Processor
      */
     private $files;
 
+    /**
+     * Columns in a Parent CSV
+     */
     private const IMPORT_COLUMNS_PARENT = [
         'External ID',
         'Type',
