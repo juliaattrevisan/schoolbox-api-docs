@@ -80,6 +80,27 @@ class Processor
 
 
     /**
+     * Columns in a Staff csv
+     */
+    private const IMPORT_COLUMNS_STAFF = [
+        'External ID',
+        'Type',
+        'Username',
+        'Title',
+        'Firstname',
+        'Surname',
+        'Email',
+        'Work Phone',
+        'Staff Category',
+        'Position Title',
+        'Department',
+        'Building',
+        'Room',
+        'Campus'
+    ];
+
+
+    /**
      * @var array
      */
     private $files;
@@ -104,6 +125,12 @@ class Processor
 
 
     /**
+     * @var Profile\Staff\Mapper
+     */
+    private $staffProfileMapper;
+
+
+    /**
      * Processor constructor.
      *
      * @param array           $files
@@ -115,6 +142,7 @@ class Processor
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
         $this->studentProfileMapper = new Profile\Student\Mapper();
+        $this->staffProfileMapper = new Profile\Staff\Mapper();
     }
 
 
@@ -283,22 +311,7 @@ class Processor
      */
     private function isStaffProfile(array $row): bool
     {
-        return $this->matches($row, [
-            'External ID',
-            'Type',
-            'Username',
-            'Title',
-            'Firstname',
-            'Surname',
-            'Email',
-            'Work Phone',
-            'Staff Category',
-            'Position Title',
-            'Department',
-            'Building',
-            'Room',
-            'Campus'
-        ]);
+        return $this->matches($row, self::IMPORT_COLUMNS_STAFF);
     }
 
 
@@ -310,7 +323,28 @@ class Processor
     private function processStaffProfile(Reader $reader): void
     {
         foreach ($reader as $i => $row) {
-            new \Alaress_Probe($row);
+            $data = array_combine(self::IMPORT_COLUMNS_STAFF, $row);
+
+            $baseProfile = $this->baseProfileMapper->createModel()
+                ->setExternalId($data['External ID'])
+                ->setTitle($data['Title'])
+                ->setFirstname($data['Firstname'])
+                ->setLastname($data['Surname']);
+
+            $staffProfile = $this->staffProfileMapper->createModel()
+                ->setUsername($data['Username'])
+                ->setEmail($data['Email'])
+                ->setCategory($data['Staff Category'])
+                ->setPositionTitle($data['Position Title'])
+                ->setDepartment($data['Department'])
+                ->setPhone($data['Work Phone'])
+                ->setRoom($data['Room'])
+                ->setBuilding($data['Building'])
+                ->setCampusName($data['Campus'])
+                ->setBaseProfile($baseProfile);
+
+            $this->baseProfileMapper->save($baseProfile);
+            $this->staffProfileMapper->save($staffProfile);
         }
     }
 
