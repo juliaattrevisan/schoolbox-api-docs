@@ -39,6 +39,47 @@ class Processor
 
 
     /**
+     * Columns in a Student csv
+     */
+    private const IMPORT_COLUMNS_STUDENT = [
+        'External ID',
+        'Type',
+        'Username',
+        'Title',
+        'Firstname',
+        'Surname',
+        'Gender',
+        'Email',
+        'Mobile',
+        'Date of Birth',
+        'House',
+        'Head of House ID',
+        'Head of House Name',
+        'Form',
+        'Form Teacher ID',
+        'Form Teacher Name',
+        'Tutor Group',
+        'Tutor Teacher ID',
+        'Tutor Teacher Name',
+        'Year Level',
+        'Year Level Coordinator ID',
+        'Year Level Coordinator Name',
+        'Studies Code',
+        'Medical Alert',
+        'Comment',
+        'Contact Alert',
+        'Legal Alert',
+        'Enrolment Date',
+        'Leaving Date',
+        'IB',
+        'ILP',
+        'ESL',
+        'Special Needs',
+        'Boarding Status'
+    ];
+
+
+    /**
      * @var array
      */
     private $files;
@@ -57,6 +98,12 @@ class Processor
 
 
     /**
+     * @var Profile\Student\Mapper
+     */
+    private $studentProfileMapper;
+
+
+    /**
      * Processor constructor.
      *
      * @param array           $files
@@ -67,6 +114,7 @@ class Processor
 
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
+        $this->studentProfileMapper = new Profile\Student\Mapper();
     }
 
 
@@ -166,42 +214,7 @@ class Processor
      */
     private function isStudentProfile(array $row): bool
     {
-        return $this->matches($row, [
-            'External ID',
-            'Type',
-            'Username',
-            'Title',
-            'Firstname',
-            'Surname',
-            'Gender',
-            'Email',
-            'Mobile',
-            'Date of Birth',
-            'House',
-            'Head of House ID',
-            'Head of House Name',
-            'Form',
-            'Form Teacher ID',
-            'Form Teacher Name',
-            'Tutor',
-            'Tutor Teacher ID',
-            'Tutor Teacher Name',
-            'Year Level',
-            'Year Level Coordinator ID',
-            'Year Level Coordinator Name',
-            'Studies Code',
-            'Medical Alert',
-            'Comment',
-            'Contact Alert',
-            'Legal Alert',
-            'Enrolment Date',
-            'Leaving Date',
-            'IB',
-            'ILP',
-            'ESL',
-            'Special Needs',
-            'Boarding Status'
-        ]);
+        return $this->matches($row, self::IMPORT_COLUMNS_STUDENT);
     }
 
 
@@ -209,11 +222,55 @@ class Processor
      * Process student profile csv
      *
      * @param Reader $reader
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function processStudentProfile(Reader $reader): void
     {
         foreach ($reader as $i => $row) {
-            new \Alaress_Probe($row);
+            $data = array_combine(self::IMPORT_COLUMNS_STUDENT, $row);
+
+            $baseProfile = $this->baseProfileMapper->createModel()
+                ->setExternalId($data['External ID'])
+                ->setTitle($data['Title'])
+                ->setFirstname($data['Firstname'])
+                ->setLastname($data['Surname']);
+
+            $studentProfile = $this->studentProfileMapper->createModel()
+                ->setDateOfBirth(\Alaress_Date_Format::now())
+                ->setUsername($data['Username'])
+                ->setEmail($data['Email'])
+                ->setGender($data['Gender'])
+                ->setHeadOfHouseId($data['Head of House ID'])
+                ->setHeadOfHouseName($data['Head of House Name'])
+                ->setHouseName($data['House'])
+                ->setFormName($data['Form'])
+                ->setFormTeacherId($data['Form Teacher ID'])
+                ->setFormTeacherName($data['Form Teacher Name'])
+                ->setTutorGroup($data['Tutor Group'])
+                ->setTutorTeacherId($data['Tutor Teacher ID'])
+                ->setTutorTeacherName($data['Tutor Teacher Name'])
+                ->setYearLevel($data['Year Level'])
+                ->setYearLevelCoordinatorId($data['Year Level Coordinator ID'])
+                ->setYearLevelCoordinatorName($data['Year Level Coordinator Name'])
+                ->setMobile($data['Mobile'])
+                ->setStudiesCode($data['Studies Code'])
+                ->setAlertMedical($data['Medical Alert'])
+                ->setAlertComment($data['Comment'])
+                ->setAlertMessage($data['Contact Alert'])
+                ->setAlertLegal($data['Legal Alert'])
+                ->setEnrolmentDate($data['Enrolment Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($data['Enrolment Date'])) : null)
+                ->setLeavingDate($data['Leaving Date'] ? \Alaress_Date_Format::newFromTimestamp(strtotime($data['Leaving Date'])) : null)
+                ->setIb((bool)$data['IB'])
+                ->setIndividualLearningPlans((bool)$data['ILP'])
+                ->setEsl((bool)$data['ESL'])
+                ->setSpecialNeeds((bool)$data['Special Needs'])
+                ->setBoardingStatus((bool)$data['Boarding Status'])
+                ->setBaseProfile($baseProfile);
+
+            $this->baseProfileMapper->save($baseProfile);
+            $this->studentProfileMapper->save($studentProfile);
         }
     }
 
