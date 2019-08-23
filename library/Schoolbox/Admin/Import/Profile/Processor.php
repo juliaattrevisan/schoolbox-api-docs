@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Csv\Reader;
+use Alaress\Database\Connector\IConnector;
+use Alaress\IDatabase;
 use Schoolbox\External\Profile;
 
 /**
@@ -142,11 +144,18 @@ class Processor
 
 
     /**
+     * @var IConnector
+     */
+    private $database;
+
+
+    /**
      * Processor constructor.
      *
-     * @param array           $files
+     * @param array     $files
+     * @param IConnector $database
      */
-    public function __construct(array $files)
+    public function __construct(array $files, IConnector $database)
     {
         $this->files = $files;
 
@@ -154,6 +163,8 @@ class Processor
         $this->parentProfileMapper = new Profile\Parent\Mapper();
         $this->studentProfileMapper = new Profile\Student\Mapper();
         $this->staffProfileMapper = new Profile\Staff\Mapper();
+
+        $this->database = $database;
     }
 
 
@@ -234,8 +245,31 @@ class Processor
      */
     private function processRelation(Reader $reader): void
     {
+        /* Remember a set of (profile_id, external_id) tuples to save on db pounding
+         * while trying to derive relations between external_ids from csv
+         *
+         * Our schema creates relations between profile_ids, not external_ids
+         * so we might as well cache these to save on performance penalty
+         */
+        $statement = $this->database->prepareQuery('
+            SELECT id, external_id 
+            FROM sis_user_profile
+            ORDER BY id
+        ');
+
+        $statement->execute();
+
+        /* Set hash lookup of external_id => sis_user_profile.id
+         * so we can quickly identify profile ids from their external ids
+         */
+        $cache = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $cache[$row['external_id']] = $row['id'];
+        }
+
         foreach ($reader as $i => $row) {
-            new \Alaress_Probe($row);
+
         }
     }
 
