@@ -8,47 +8,27 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
-use Alaress\Csv\Reader;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Import\ImportNavigation;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
+/**
+ * Class Controller
+ *
+ * Import User Profiles from four csvs:
+ *    student.csv
+ *    parent.csv
+ *    staff.csv
+ *    relation.csv
+ *
+ * @package Schoolbox\Admin\Import\Profile
+ */
 class Controller extends Base
 {
-
     use ImportNavigation;
-
-
-    /**
-     * @var UserMapper
-     */
-    private $userMapper;
-
-
-    /**
-     * @var ErrorMapper
-     */
-    private $errorMapper;
-
-
-    /**
-     * Controller constructor.
-     *
-     * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
-     */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
-    }
-
 
     /**
      * Provide form
@@ -90,11 +70,14 @@ class Controller extends Base
     /**
      * Process the form vars
      *
+     * @throws MapperException
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \InvalidArgumentException
+     * @throws \ReflectionException
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
-     * @throws MapperException
+     * @throws \http\Exception\InvalidArgumentException
      */
     public function postUpload()
     {

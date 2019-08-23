@@ -14,11 +14,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
-use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -85,19 +80,6 @@ class Module extends BaseModule
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
-        $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
-        ];
-    }
-
-
-    /**
-     * @return Mapper|UserMapper
-     * @throws \InvalidArgumentException If cannot find mapper class
-     */
-    protected function getUserMapper()
-    {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        $injector->params[Controller::class] = [];
     }
 }

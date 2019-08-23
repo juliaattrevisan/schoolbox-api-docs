@@ -9,9 +9,6 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Csv\Reader;
 use Alaress\Database\Connector\IConnector;
-use Alaress\IDatabase;
-use Alaress\Lumberjack\Logger;
-use http\Exception\InvalidArgumentException;
 use Schoolbox\External\Profile;
 
 /**
@@ -193,7 +190,7 @@ class Processor
      *
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function process(): Processor
     {
@@ -244,9 +241,9 @@ class Processor
      * @param resource $contents
      *
      * @return int
-     * @throws \http\Exception\InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \InvalidArgumentException
      */
     private function processOne($contents): int
     {
@@ -283,7 +280,7 @@ class Processor
             return $this->processParentProfile($reader);
         }
 
-        throw new InvalidArgumentException('Unknown header contents' . implode(', ', $header));
+        throw new \InvalidArgumentException('Unknown header contents' . implode(', ', $header));
     }
 
 
