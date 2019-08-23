@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
+use Schoolbox\Filter\Filters\Assessment\FactoryFactory as FilterFactoryFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
 
@@ -30,15 +31,26 @@ class Controller extends Base
 
 
     /**
+     * @var FilterFactoryFactory
+     */
+    private $filterFactoryFactory;
+
+
+    /**
      * Constructor
      *
      * @param AssessmentDataSource $assessmentDataSource
      * @param Visibility           $visibility
+     * @param FilterFactoryFactory $filterFactoryFactory
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource, Visibility $visibility)
-    {
+    public function __construct(
+        AssessmentDataSource $assessmentDataSource,
+        Visibility $visibility,
+        FilterFactoryFactory $filterFactoryFactory
+    ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
+        $this->filterFactoryFactory = $filterFactoryFactory;
     }
 
 
