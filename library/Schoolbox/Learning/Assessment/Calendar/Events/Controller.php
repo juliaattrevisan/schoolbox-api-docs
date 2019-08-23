@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Page as FilterPage;
+use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
 
@@ -44,23 +45,32 @@ class Controller extends Base
 
 
     /**
+     * @var FilterSelection\Mapper
+     */
+    private $filterSelectionMapper;
+
+
+    /**
      * Constructor
      *
      * @param AssessmentDataSource             $assessmentDataSource
      * @param Visibility                       $visibility
      * @param AssessmentFilters\IdFinder       $assessmentIdFinder
      * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
+     * @param FilterSelection\Mapper           $filterSelectionMapper
      */
     public function __construct(
         AssessmentDataSource $assessmentDataSource,
         Visibility $visibility,
         AssessmentFilters\IdFinder $assessmentIdFinder,
-        AssessmentFilters\FactoryFactory $filterFactoryFactory
+        AssessmentFilters\FactoryFactory $filterFactoryFactory,
+        FilterSelection\Mapper $filterSelectionMapper
     ) {
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->visibility           = $visibility;
-        $this->assessmentIdFinder   = $assessmentIdFinder;
-        $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->assessmentDataSource  = $assessmentDataSource;
+        $this->visibility            = $visibility;
+        $this->assessmentIdFinder    = $assessmentIdFinder;
+        $this->filterFactoryFactory  = $filterFactoryFactory;
+        $this->filterSelectionMapper = $filterSelectionMapper;
     }
 
 
@@ -72,24 +82,24 @@ class Controller extends Base
      */
     public function getEvents(): void
     {
-        $qsFilters = $this->request->query->get('filters', []);
-        $page      = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
+        $qsFilters      = $this->request->query->get('filters', []);
+        $page           = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
+        $codec          = $this->filterFactoryFactory->buildCodec();
+        $userSelections = $codec->convertRequestToSelections($this->getUser(), $page, $qsFilters);
 
-        $codec           = $this->filterFactoryFactory->buildCodec();
-        $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $qsFilters);
 
-        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page);
-        // Do something with the user selections. Pass them in to the API?
+        // Store the filters this user selected
+        $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
-        // Must have:
-        // start and end dates, not greater than 2 months between?
+
+        // Query the API for the events in this time span
         $calendar = new Renderer(
             new Api(
                 $this->getUser(),
                 $this->assessmentDataSource,
                 $this->visibility,
                 $this->assessmentIdFinder,
-                $filters
+                $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page)
             ),
             $this->request->query->getInt('start'),
             $this->request->query->getInt('end'),
@@ -98,6 +108,9 @@ class Controller extends Base
             $this->getUser()
         );
 
+
+        // The API's renderAll returns a list of json-encoded events.
+        // Decode them all, and then re-encode.
         $output = array_map('json_decode', $calendar->renderAll('javascript'));
         $this->response->content->set($this->buildJsonOutput($output));
     }

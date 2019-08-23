@@ -63,11 +63,11 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
-            'visibility'           => $injector->lazy(static function () {
+            'assessmentDataSource'  => $injector->lazyGet('assessmentDataSource'),
+            'visibility'            => $injector->lazy(static function () {
                 return new Visibility(Access::getInstance());
             }),
-            'filterFactoryFactory' => $injector->lazy(function () use ($injector) {
+            'filterFactoryFactory'  => $injector->lazy(function () use ($injector) {
                 /** @var RosettaStone $rosettaStone */
                 $rosettaStone = $injector->get('l10n');
                 return new FilterFactoryFactory(
@@ -75,7 +75,7 @@ class Module extends BaseModule
                     $rosettaStone
                 );
             }),
-            'assessmentIdFinder'   => $injector->lazy(function () {
+            'assessmentIdFinder'    => $injector->lazy(function () {
                 /** @var Filter\Mapper $filterMapper */
                 $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
                 return Filter\Filters\Assessment\IdFinder::getInstance(
@@ -83,6 +83,7 @@ class Module extends BaseModule
                     $this->getMapperFactory()->get(Assessment\Mapper::class)
                 );
             }),
+            'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
         ];
     }
 }
