@@ -165,12 +165,13 @@ class Processor
     /**
      * Processor constructor.
      *
-     * @param array     $files
+     * @param array      $files
      * @param IConnector $database
+     * @throws \RuntimeException
      */
     public function __construct(array $files, IConnector $database)
     {
-        $this->files = $files;
+        $this->files = $this->presortFiles($files);
 
         $this->baseProfileMapper = new Profile\Mapper();
         $this->parentProfileMapper = new Profile\Parent\Mapper();
@@ -194,12 +195,33 @@ class Processor
      */
     public function process(): Processor
     {
-        /* Sort the files so that the relation one comes last
-         */
+        foreach ($this->files as $file) {
+            try {
+                $this->log[] = "Starting processing from {$file->getBasename()}";
+                $n = $this->processOne($file->readStream());
+                $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
+            } catch (\InvalidArgumentException $e) {
+                $this->log[] = $e->getMessage();
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * Sort the files so that the relation one comes last
+     *
+     * @param array $files
+     * @return array
+     * @throws \RuntimeException
+     */
+    private function presortFiles(array $files): array
+    {
         $profileFiles = [];
         $relationFiles = [];
 
-        foreach ($this->files as $file) {
+        foreach($files as $file) {
             $reader = new Reader($file->readStream());
             $reader->setLoadFromFirst(false);
 
@@ -218,21 +240,9 @@ class Processor
             }
         }
 
-        $sortedFiles = array_merge($profileFiles, $relationFiles);
-
         /* Process all of these files in the required order
          */
-        foreach ($sortedFiles as $file) {
-            try {
-                $this->log[] = "Starting processing from {$file->getBasename()}";
-                $n = $this->processOne($file->readStream());
-                $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
-            } catch (\InvalidArgumentException $e) {
-                $this->log[] = $e->getMessage();
-            }
-        }
-
-        return $this;
+        return array_merge($profileFiles, $relationFiles);
     }
 
 
