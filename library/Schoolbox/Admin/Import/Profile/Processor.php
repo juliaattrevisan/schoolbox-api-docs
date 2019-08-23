@@ -389,9 +389,20 @@ class Processor
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \Alaress\Database\Exception
      */
     private function processStudentProfile(Reader $reader): int
     {
+
+        /* Find the last inserted id and remember it
+         */
+        $lastId = $this->database->executeQuery('
+            SELECT sis_user_profile_id
+            FROM sis_user_profile_student
+            ORDER BY sis_user_profile_id DESC
+            LIMIT 1
+        ')->fetch()['sis_user_profile_id'];
+
         $n = 0;
 
         foreach ($reader as $i => $row) {
@@ -441,6 +452,17 @@ class Processor
             $n++;
         }
 
+        /* Delete everything prior to the last inserted id
+         */
+        $removal = $this->database->prepareQuery('
+            DELETE FROM sis_user_profile_student
+            WHERE sis_user_profile_id <= :lastId
+        ');
+
+        $removal->execute([
+            'lastId' => $lastId
+        ]);
+
         return $n;
     }
 
@@ -465,9 +487,19 @@ class Processor
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \Alaress\Database\Exception
      */
     private function processStaffProfile(Reader $reader): int
     {
+        /* Find the last inserted id and remember it
+         */
+        $lastId = $this->database->executeQuery('
+            SELECT sis_user_profile_id
+            FROM sis_user_profile_staff
+            ORDER BY sis_user_profile_id DESC
+            LIMIT 1
+        ')->fetch()['sis_user_profile_id'];
+
         $n = 0;
 
         foreach ($reader as $i => $row) {
@@ -497,6 +529,17 @@ class Processor
             $n++;
         }
 
+        /* Delete everything prior to the last inserted id
+         */
+        $removal = $this->database->prepareQuery('
+            DELETE FROM sis_user_profile_staff
+            WHERE sis_user_profile_id <= :lastId
+        ');
+
+        $removal->execute([
+            'lastId' => $lastId
+        ]);
+
         return $n;
     }
 
@@ -521,9 +564,20 @@ class Processor
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \Alaress\Database\Exception
      */
     private function processParentProfile(Reader $reader): int
     {
+
+        /* Find the last inserted id and remember it
+         */
+        $lastId = $this->database->executeQuery('
+            SELECT sis_user_profile_id
+            FROM sis_user_profile_parent
+            ORDER BY sis_user_profile_id DESC
+            LIMIT 1
+        ')->fetch()['sis_user_profile_id'];
+
         $n = 0;
 
         foreach ($reader as $i => $row) {
@@ -548,6 +602,17 @@ class Processor
 
             $n++;
         }
+
+        /* Delete everything prior to the last inserted id
+         */
+        $removal = $this->database->prepareQuery('
+            DELETE FROM sis_user_profile_parent
+            WHERE sis_user_profile_id <= :lastId
+        ');
+
+        $removal->execute([
+            'lastId' => $lastId
+        ]);
 
         return $n;
     }
