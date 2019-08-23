@@ -230,6 +230,7 @@ class EventMetadataMapper extends BaseMapper
                     'mapper' => UserMapper::getInstance(),
                     'options' => [
                         'deleted' => true,
+                        'cache' => false,
                     ],
                 ),
             )
@@ -334,7 +335,8 @@ class EventMetadataMapper extends BaseMapper
                     'options' => array(
                         'order' => array(
                             'lastname' => 'ASC'
-                        )
+                        ),
+                        'cache' => false,
                     )
                 ),
             )
