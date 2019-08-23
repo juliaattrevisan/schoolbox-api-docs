@@ -25,9 +25,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Role;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 class Module extends BaseModule
 {
@@ -46,6 +44,13 @@ class Module extends BaseModule
         // Sample path: 23-08-2019 or 23-08-2019/230
         // Selected date regex explanation here: https://regex101.com/r/X8zFce/1
         $this->addGetRoute($router, 'getCalendar', $basePath, "{/selectedDate,userId}")->addTokens([
+            'selectedDate' => '([0-2][0-9]|(3)[0-1]\d+(-))(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}',
+            'userId' => '\d+'
+        ]);
+
+        // Redirect old paths
+        $this->addGetRoute($router, 'redirect', $basePath, "/{format}{/selectedDate,userId}")->addTokens([
+            'format' => 'week|month|full|week-list|month-list',
             'selectedDate' => '([0-2][0-9]|(3)[0-1]\d+(-))(-)(((0)[0-9])|((1)[0-2]))(-)\d{4}',
             'userId' => '\d+'
         ]);

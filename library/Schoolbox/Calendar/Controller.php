@@ -96,4 +96,21 @@ class Controller extends Base
             )
         );
     }
+
+    /**
+     * @param string|null $selectedDate
+     * @param User        $user
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function redirect(?string $selectedDate, User $user)
+    {
+        $this->response->redirect->to(
+            $this->getRouteIfAuthorized('calendar.getCalendar',
+                [
+                    'selectedDate' => $selectedDate,
+                    'userId'    => $user->getId()
+                ]
+            )
+        );
+    }
 }
