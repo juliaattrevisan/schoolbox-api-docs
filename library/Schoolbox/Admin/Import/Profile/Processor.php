@@ -224,6 +224,7 @@ class Processor
          */
         foreach ($sortedFiles as $file) {
             try {
+                $this->log[] = "Starting processing from {$file->getBasename()}";
                 $n = $this->processOne($file->readStream());
                 $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
             } catch (\InvalidArgumentException $e) {
