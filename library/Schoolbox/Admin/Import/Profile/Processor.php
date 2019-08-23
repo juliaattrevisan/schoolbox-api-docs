@@ -416,11 +416,9 @@ class Processor
         /* Find the last inserted id and remember it
          */
         $lastId = $this->database->executeQuery('
-            SELECT sis_user_profile_id
+            SELECT MAX(sis_user_profile_id) AS lastId
             FROM sis_user_profile_student
-            ORDER BY sis_user_profile_id DESC
-            LIMIT 1
-        ')->fetch()['sis_user_profile_id'];
+        ')->fetch()['lastId'];
 
         $n = 0;
 
@@ -513,11 +511,9 @@ class Processor
         /* Find the last inserted id and remember it
          */
         $lastId = $this->database->executeQuery('
-            SELECT sis_user_profile_id
+            SELECT MAX(sis_user_profile_id) AS lastId
             FROM sis_user_profile_staff
-            ORDER BY sis_user_profile_id DESC
-            LIMIT 1
-        ')->fetch()['sis_user_profile_id'];
+        ')->fetch()['lastId'];
 
         $n = 0;
 
@@ -591,11 +587,9 @@ class Processor
         /* Find the last inserted id and remember it
          */
         $lastId = $this->database->executeQuery('
-            SELECT sis_user_profile_id
+            SELECT MAX(sis_user_profile_id) AS lastId
             FROM sis_user_profile_parent
-            ORDER BY sis_user_profile_id DESC
-            LIMIT 1
-        ')->fetch()['sis_user_profile_id'];
+        ')->fetch()['lastId'];
 
         $n = 0;
 
