@@ -22,11 +22,6 @@ class Processor
 {
 
     /**
-     * @var array
-     */
-    private $files;
-
-    /**
      * Columns in a Parent CSV
      */
     private const IMPORT_COLUMNS_PARENT = [
@@ -41,6 +36,25 @@ class Processor
         'Home Phone',
         'Work Phone'
     ];
+
+
+    /**
+     * @var array
+     */
+    private $files;
+
+
+    /**
+     * @var Profile\Mapper
+     */
+    private $baseProfileMapper;
+
+
+    /**
+     * @var Profile\Parent\Mapper
+     */
+    private $parentProfileMapper;
+
 
     /**
      * Processor constructor.
