@@ -284,8 +284,20 @@ class Processor
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
 
-            new \Alaress_Probe($cache[$data['Relation ID']], $cache[$data['Student ID']]);
+            /* Check that both relations exist. They might not exist because the
+             * relation csv may contain data that wasn't in the other three files
+             * (probably from human error but who knows)
+             */
+            if (!$cache[$data['Relation ID']]) {
+                continue;
+            }
 
+            if (!$cache[$data['Student ID']]) {
+                continue;
+            }
+
+            /* Otherwise both exist; build relation
+             */
             $relation = $this->relationMapper->createModel()
                 ->setChildProfileId($cache[$data['Relation ID']])
                 ->setUserProfileId($cache[$data['Student ID']])
