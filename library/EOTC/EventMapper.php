@@ -170,6 +170,7 @@ class EventMapper extends CalendarEventMapper
                         'order' => [
                             'created_at' => 'DESC',
                         ],
+                        'cache' => false,
                     ]
                 );
 
@@ -517,6 +518,9 @@ class EventMapper extends CalendarEventMapper
                     'column' => 'metadata_id',
                     'key'    => 'id',
                     'mapper' => EventMetadataMapper::getInstance(),
+                    'options' => [
+                        'cache' => false,
+                    ],
                 ],
             ]
         );
@@ -601,6 +605,9 @@ class EventMapper extends CalendarEventMapper
                     'column' => 'campus_id',
                     'key'    => 'id',
                     'mapper' => CampusMapper::getInstance(),
+                    'options' => [
+                        'cache' => false,
+                    ],
                 ],
             ]
         );
@@ -685,6 +692,9 @@ class EventMapper extends CalendarEventMapper
                     'column' => 'role_id',
                     'key'    => 'id',
                     'mapper' => RoleMapper::getInstance(),
+                    'options' => [
+                        'cache' => false,
+                    ],
                 ],
             ]
         );
