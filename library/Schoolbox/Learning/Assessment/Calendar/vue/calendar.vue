@@ -38,6 +38,7 @@
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 currentEvent: {},
                 newEvent: {},
+                selectedFilters: null,
             }
         },
         computed: {
@@ -77,6 +78,12 @@
              * @param successCallback A function to call with the list of events.
              */
             events(fetchInfo, successCallback) {
+                // No filters loaded yet? Render nothing.
+                // The selected filters get populated by `onFilterChange`:
+                // this is called by the filter's `filterContentLoaded` trigger.
+                if (this.selectedFilters === null) {
+                    successCallback([]);
+                }
                 axios.get(
                     URL_EVENT_SOURCE,
                     {
@@ -86,6 +93,8 @@
                         params: {
                             start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                             end:   Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                            // How do I get filters into here?
+                            filters: this.selectedFilters,
                         }
                     }
                 ).then(
@@ -159,17 +168,8 @@
              * @param {object} selectedFilters The filters that were selected
              */
             onFilterChange(selectedFilters) {
-                // Don't render events until the event source is added?
-                let calendarApi         = this.$refs.fullCalendar.getApi(),
-                    existingEventSource = calendarApi.getEventSourceById(EVENT_SOURCE_ID);
-                if (existingEventSource) {
-                    calendarApi.refetchEvents();
-                } else {
-                    calendarApi.addEventSource({
-                        id:     EVENT_SOURCE_ID,
-                        events: this.events
-                    });
-                }
+                this.selectedFilters = selectedFilters;
+                this.$refs.fullCalendar.getApi().refetchEvents();
             },
         }
     }
@@ -210,6 +210,7 @@
             :event-limit="config.eventLimit"
             :first-day="config.firstDay"
             :event-render="eventRender"
+            :events="events"
             @loading="onLoading"
             @eventClick="onEventClick"
         />
