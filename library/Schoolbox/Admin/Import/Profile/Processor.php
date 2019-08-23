@@ -101,6 +101,17 @@ class Processor
 
 
     /**
+     * Columns in a Relation csv
+     */
+    private const IMPORT_COLUMNS_RELATION = [
+        'Relation ID',
+        'Student ID',
+        'Type',
+        'Emergency Contact',
+    ];
+
+
+    /**
      * @var array
      */
     private $files;
@@ -212,12 +223,7 @@ class Processor
      */
     private function isRelation(array $row): bool
     {
-        return $this->matches($row, [
-            'Relation ID',
-            'Student ID',
-            'Type',
-            'Emergency Contact',
-        ]);
+        return $this->matches($row, self::IMPORT_COLUMNS_RELATION);
     }
 
 
