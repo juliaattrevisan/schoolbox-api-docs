@@ -128,7 +128,8 @@ class Controller extends Base
      */
     public function redirect(?string $selectedDate, User $user)
     {
-        $route = $this->getRouteIfAuthorized('calendar.getCalendar',
+        $route = $this->getRouteIfAuthorized(
+            'calendar.getCalendar',
             [
                 'selectedDate'  => $selectedDate,
                 'userId'        => $user->getId()

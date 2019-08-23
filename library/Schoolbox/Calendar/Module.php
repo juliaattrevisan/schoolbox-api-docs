@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar;
 
 use Alaress\Authorizer\Authorizer;
-use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule\Any;
 use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
