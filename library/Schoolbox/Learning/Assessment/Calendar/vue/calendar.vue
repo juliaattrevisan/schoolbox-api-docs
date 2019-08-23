@@ -83,6 +83,7 @@
                 // this is called by the filter's `filterContentLoaded` trigger.
                 if (this.selectedFilters === null) {
                     successCallback([]);
+                    return;
                 }
                 axios.get(
                     URL_EVENT_SOURCE,
