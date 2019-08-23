@@ -83,6 +83,10 @@
                             <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_LASTNAME}</a></td>
                             <td><a href='/search/user/{ATTEMPT_USER_ID}'>{ATTEMPT_FIRSTNAME}</a></td>
                             <!-- END respondent_name -->
+                            <!-- BEGIN respondent_name_no_link -->
+                            <td>{ATTEMPT_LASTNAME}</td>
+                            <td>{ATTEMPT_FIRSTNAME}</td>
+                            <!-- END respondent_name_no_link -->
                             <td data-order="{ATTEMPT_START_TIMESTAMP}">{ATTEMPT_START}</td>
                             <td data-order="{ATTEMPT_FINISH_TIMESTAMP}">{ATTEMPT_FINISH}</td>
                             <td><a href='/survey/review/{ATTEMPT_ASSESS_ID}/{ATTEMPT_SECTION_ID}/{ATTEMPT_ATTEMPT_ID}' class="icon-view no-text"></a></td>
