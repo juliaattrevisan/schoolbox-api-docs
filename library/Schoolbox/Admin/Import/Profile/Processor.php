@@ -250,6 +250,9 @@ class Processor
      *
      * @param Reader $reader
      * @throws \Alaress\Database\Exception
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function processRelation(Reader $reader): void
     {
@@ -273,21 +276,23 @@ class Processor
         $cache = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $cache[$row['external_id']] = $row['id'];
+            $cache[$row['external_id']] = (int)$row['id'];
         }
 
+        /* Process each relation
+         */
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
-            new \Alaress_Probe($data);
 
-//            $relation = $this->relationMapper->createModel()
-//                ->setChildProfileId($studentBaseProfile->getId())
-//                ->setUserProfileId($parentBaseProfile->getId())
-//                ->setType('parent, I guess')
-//                ->setEmergencyContact(true);
-//
-//            $relationMapper->save($relation);
+            new \Alaress_Probe($cache[$data['Relation ID']], $cache[$data['Student ID']]);
 
+            $relation = $this->relationMapper->createModel()
+                ->setChildProfileId($cache[$data['Relation ID']])
+                ->setUserProfileId($cache[$data['Student ID']])
+                ->setType($data['Type'])
+                ->setEmergencyContact((bool)$data['Emergency Contact']);
+
+            $this->relationMapper->save($relation);
         }
     }
 
