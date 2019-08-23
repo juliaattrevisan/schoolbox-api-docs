@@ -210,7 +210,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($resourceUrl)
             ->setParam('user', new UserParam($user))
             ->setParam('resource', new Param($object->getResource()->getName(), $resourceUrl))
-            ->setParam('date', new Param($startDate->getLocal(), '/calendar/full/' . $startDate->getURLDate() . '/' . $owner->getId()));
+            ->setParam('date', new Param($startDate->getLocal(), '/calendar/' . $startDate->getURLDate() . '/' . $owner->getId()));
 
         // Notify the owner of the booking (usually the person who the booking is for)
         if (!$isOwnerEffector) {
