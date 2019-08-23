@@ -310,6 +310,13 @@ class Processor
      */
     private function processRelation(Reader $reader): int
     {
+        /* Find the last inserted id and remember it
+         */
+        $lastId = $this->database->executeQuery('
+            SELECT GREATEST(MAX(child_profile_id), MAX(user_profile_id)) AS lastId
+            FROM sis_user_profile_relation
+        ')->fetch()['lastId'];
+
         $n = 0;
 
         /* Remember a set of (profile_id, external_id) tuples to save on db pounding
@@ -364,6 +371,18 @@ class Processor
 
             $n++;
         }
+
+        /* Delete everything prior to the last inserted id
+         */
+        $removal = $this->database->prepareQuery('
+            DELETE FROM sis_user_profile_relation
+            WHERE child_profile_id <= :lastId
+            OR user_profile_id <= :lastId
+        ');
+
+        $removal->execute([
+            'lastId' => $lastId
+        ]);
 
         return $n;
     }
