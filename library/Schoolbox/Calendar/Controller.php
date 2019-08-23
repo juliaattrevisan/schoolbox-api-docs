@@ -19,6 +19,7 @@ use Schoolbox\Calendar\Config\Group;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -67,7 +68,7 @@ class Controller extends Base
      * @param string|null $selectedDate
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getCalendar(?string $selectedDate): void
+    public function getCalendar(?string $selectedDate, User $user): void
     {
         $groups           = (new Group($this->getUser(), $this->folderMapper))->generate();
         $campus           = (new Campus($this->getUser(), $this->campusMapper))->generate();
@@ -82,7 +83,7 @@ class Controller extends Base
             $this->buildHtmlOutput(
                 '@calendar/calendar.twig',
                 [
-                    'user'          => $this->getUser(),
+                    'user'          => $user->getId() === null ? $this->getUser() : $user,
                     'taskTypeId'    => $eventType->getTaskIdFromEvents(),
                     'groups'        => $groups,
                     'sources'       => $sourceList,
