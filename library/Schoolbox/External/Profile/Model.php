@@ -36,10 +36,6 @@ class Model
      */
     private $lastname;
 
-    /**
-     * @var string
-     */
-    private $email;
 
     /**
      * @return string $externalId
@@ -73,13 +69,6 @@ class Model
         return $this->lastname;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
 
     /**
      * @param string $externalId
@@ -118,16 +107,6 @@ class Model
     public function setLastname(?string $lastname): self
     {
         $this->lastname = $lastname;
-        return $this;
-    }
-
-    /**
-     * @param string|null $email
-     * @return Model
-     */
-    public function setEmail(?string $email): self
-    {
-        $this->email = $email;
         return $this;
     }
 }
