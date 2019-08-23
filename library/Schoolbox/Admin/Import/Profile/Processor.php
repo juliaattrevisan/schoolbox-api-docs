@@ -264,7 +264,7 @@ class Processor
             return $this->processParentProfile($reader);
         }
 
-        return 0;
+        return null;
     }
 
 
