@@ -144,6 +144,12 @@ class Processor
 
 
     /**
+     * @var Profile\Relation\Mapper
+     */
+    private $relationMapper;
+
+
+    /**
      * @var IConnector
      */
     private $database;
@@ -163,6 +169,7 @@ class Processor
         $this->parentProfileMapper = new Profile\Parent\Mapper();
         $this->studentProfileMapper = new Profile\Student\Mapper();
         $this->staffProfileMapper = new Profile\Staff\Mapper();
+        $this->relationMapper = new Profile\Relation\Mapper();
 
         $this->database = $database;
     }
@@ -242,6 +249,7 @@ class Processor
      * Process the Relations csv
      *
      * @param Reader $reader
+     * @throws \Alaress\Database\Exception
      */
     private function processRelation(Reader $reader): void
     {
@@ -269,6 +277,16 @@ class Processor
         }
 
         foreach ($reader as $i => $row) {
+            $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
+            new \Alaress_Probe($data);
+
+//            $relation = $this->relationMapper->createModel()
+//                ->setChildProfileId($studentBaseProfile->getId())
+//                ->setUserProfileId($parentBaseProfile->getId())
+//                ->setType('parent, I guess')
+//                ->setEmergencyContact(true);
+//
+//            $relationMapper->save($relation);
 
         }
     }

@@ -97,7 +97,7 @@ class Controller extends Base
     public function postUpload()
     {
         $attachments = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
-new \Alaress_Probe($this->getDi()->get('databaseInternal'));
+
         $processor = (new Processor($attachments, $this->getDi()->get('databaseInternal')))->process();
 
         die();
