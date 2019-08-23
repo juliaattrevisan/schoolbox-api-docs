@@ -10,6 +10,7 @@
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
     import axios              from 'axios'
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
+    import {stringify}        from 'qs';
 
     // Various URLs that FullCalendar may make use of.
     const URL_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -96,7 +97,8 @@
                             end:   Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
                             // How do I get filters into here?
                             filters: this.selectedFilters,
-                        }
+                        },
+                        paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
                     }
                 ).then(
                     function (response) {
