@@ -225,10 +225,11 @@ class Processor
      *
      * @param resource $contents
      *
+     * @return int
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function processOne($contents): void
+    private function processOne($contents): int
     {
         $reader = new Reader($contents);
         $reader->setLoadFromFirst(false);
@@ -245,23 +246,43 @@ class Processor
 
             /* Process the Relations csv
              */
-            $this->processRelation($reader);
+            $n = $this->processRelation($reader);
+
+            new \Alaress_Probe("Processed {$n} relations.");
+
+            return $n;
         } elseif ($this->isStudentProfile($header)) {
 
             /* Process the Student Profile csv
              */
-            $this->processStudentProfile($reader);
+            $n = $this->processStudentProfile($reader);
+
+            new \Alaress_Probe("Processed {$n} student profiles.");
+
+            return $n;
         } elseif ($this->isStaffProfile($header)) {
 
             /* Process the Staff Profile csv
              */
-            $this->processStaffProfile($reader);
+            $n = $this->processStaffProfile($reader);
+
+            new \Alaress_Probe("Processing {$n} staff profiles.");
+
+            return $n;
         } elseif ($this->isParentProfile($header)) {
 
             /* Process the Parent Profile csv
              */
-            $this->processParentProfile($reader);
+            $n = $this->processParentProfile($reader);
+
+            new \Alaress_Probe("Processing {$n} parent profiles.");
+
+            return $n;
         }
+
+        new \Alaress_Probe('Unknown file containing header columns ' . implode(', ', $header));
+
+        return 0;
     }
 
 
@@ -281,13 +302,16 @@ class Processor
      * Process the Relations csv
      *
      * @param Reader $reader
+     * @return int number of rows processed
      * @throws \Alaress\Database\Exception
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processRelation(Reader $reader): void
+    private function processRelation(Reader $reader): int
     {
+        $n = 0;
+
         /* Remember a set of (profile_id, external_id) tuples to save on db pounding
          * while trying to derive relations between external_ids from csv
          *
@@ -295,7 +319,7 @@ class Processor
          * so we might as well cache these to save on performance penalty
          */
         $statement = $this->database->prepareQuery('
-            SELECT id, external_id 
+            SELECT id, external_id
             FROM sis_user_profile
             ORDER BY id
         ');
@@ -337,7 +361,11 @@ class Processor
                 ->setEmergencyContact((bool)$data['Emergency Contact']);
 
             $this->relationMapper->save($relation);
+
+            $n++;
         }
+
+        return $n;
     }
 
 
@@ -357,12 +385,15 @@ class Processor
      * Process student profile csv
      *
      * @param Reader $reader
+     * @return int number of rows processed
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processStudentProfile(Reader $reader): void
+    private function processStudentProfile(Reader $reader): int
     {
+        $n = 0;
+
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_STUDENT, $row);
 
@@ -406,7 +437,11 @@ class Processor
 
             $this->baseProfileMapper->save($baseProfile);
             $this->studentProfileMapper->save($studentProfile);
+
+            $n++;
         }
+
+        return $n;
     }
 
 
@@ -426,9 +461,15 @@ class Processor
      * Process staff profile csv
      *
      * @param Reader $reader
+     * @return int number of rows processed
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function processStaffProfile(Reader $reader): void
+    private function processStaffProfile(Reader $reader): int
     {
+        $n = 0;
+
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_STAFF, $row);
 
@@ -452,7 +493,11 @@ class Processor
 
             $this->baseProfileMapper->save($baseProfile);
             $this->staffProfileMapper->save($staffProfile);
+
+            $n++;
         }
+
+        return $n;
     }
 
 
@@ -472,12 +517,15 @@ class Processor
      * Process parent profile csv
      *
      * @param Reader $reader
+     * @return int number of rows processed
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function processParentProfile(Reader $reader): void
+    private function processParentProfile(Reader $reader): int
     {
+        $n = 0;
+
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_PARENT, $row);
 
@@ -497,7 +545,11 @@ class Processor
 
             $this->baseProfileMapper->save($baseProfile);
             $this->parentProfileMapper->save($parentProfile);
+
+            $n++;
         }
+
+        return $n;
     }
 
 
