@@ -5,15 +5,25 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Student;
+namespace Schoolbox\External\Profile\Student;
 
 use PDO;
 use PDOStatement;
-use Schoolbox\External\User;
+use Schoolbox\External\Profile;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
 use UnexpectedValueException;
 
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\External\Profile\Student
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -23,7 +33,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         $this->hasTable('sis_user_profile_student');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', User\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'baseProfile', 'baseProfile');
         $this->uses('date_of_birth', self::TYPE_DATE);
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
@@ -34,7 +44,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('form_name', self::TYPE_STRING);
         $this->uses('form_teacher_id', self::TYPE_STRING);
         $this->uses('form_teacher_name', self::TYPE_STRING);
-        $this->uses('tutor_name', self::TYPE_STRING);
+        $this->uses('tutor_group', self::TYPE_STRING);
         $this->uses('tutor_teacher_id', self::TYPE_STRING);
         $this->uses('tutor_teacher_name', self::TYPE_STRING);
         $this->uses('year_level', self::TYPE_STRING);
@@ -68,7 +78,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('baseProfile', 'bp')}
         ";
     }
 
@@ -82,7 +92,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('user', null, 'u')}
+            INNER JOIN {$this->getJoinSql('baseProfile', null, 'bp')}
         ";
     }
 
@@ -97,13 +107,13 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $student = $this->hydrate($row);
+            $studentProfile = $this->hydrate($row);
 
-            if ($student) {
-                $user = $this->getJoinMapper('user')->hydrate($row, 'u');
-                $student->setUser($user);
+            if ($studentProfile) {
+                $baseProfile = $this->getJoinMapper('baseProfile')->hydrate($row, 'bp');
+                $studentProfile->setBaseProfile($baseProfile);
+                $collection->add($studentProfile);
             }
-            $collection->add($student);
         }
 
         return $collection;

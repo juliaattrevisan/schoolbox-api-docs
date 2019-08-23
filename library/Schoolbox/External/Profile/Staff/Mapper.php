@@ -5,15 +5,25 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Parent;
+namespace Schoolbox\External\Profile\Staff;
 
-use PDOStatement;
 use PDO;
-use Schoolbox\External\User;
+use PDOStatement;
+use Schoolbox\External\Profile;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\{Exception, DefinitionException};
 use UnexpectedValueException;
 
+
+/**
+ * Class Mapper
+ *
+ * @package Schoolbox\External\Profile\Staff
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends \Schoolbox\Mapper
 {
     /**
@@ -21,14 +31,18 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('sis_user_profile_parent');
+        $this->hasTable('sis_user_profile_staff');
         $this->hasModel(Model::class);
-        $this->joins('sis_user_profile_id', User\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'user', 'user');
-        $this->uses('mobile', self::TYPE_STRING);
-        $this->uses('phone_home', self::TYPE_STRING);
-        $this->uses('phone_work', self::TYPE_STRING);
+        $this->joins('sis_user_profile_id', Profile\Mapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'baseProfile', 'baseProfile');
         $this->uses('username', self::TYPE_STRING);
         $this->uses('email', self::TYPE_STRING);
+        $this->uses('category', self::TYPE_STRING);
+        $this->uses('position_title', self::TYPE_STRING);
+        $this->uses('department', self::TYPE_STRING);
+        $this->uses('phone', self::TYPE_STRING);
+        $this->uses('room', self::TYPE_STRING);
+        $this->uses('building', self::TYPE_STRING);
+        $this->uses('campus_name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -44,7 +58,7 @@ class Mapper extends \Schoolbox\Mapper
         return "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('baseProfile', 'bp')}
         ";
     }
 
@@ -58,7 +72,7 @@ class Mapper extends \Schoolbox\Mapper
     {
         return "
             FROM {$this->getTable()}
-            INNER JOIN {$this->getJoinSql('user', null, 'u')}
+            INNER JOIN {$this->getJoinSql('baseProfile', null, 'bp')}
         ";
     }
 
@@ -74,13 +88,13 @@ class Mapper extends \Schoolbox\Mapper
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $staff = $this->hydrate($row);
+            $staffProfile = $this->hydrate($row);
 
-            if ($staff) {
-                $user = $this->getJoinMapper('user')->hydrate($row, 'u');
-                $staff->setUser($user);
+            if ($staffProfile) {
+                $baseProfile = $this->getJoinMapper('baseProfile')->hydrate($row, 'bp');
+                $staffProfile->setBaseProfile($baseProfile);
+                $collection->add($staffProfile);
             }
-            $collection->add($staff);
         }
 
         return $collection;

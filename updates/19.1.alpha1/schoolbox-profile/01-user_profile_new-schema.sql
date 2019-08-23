@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `sis_user_profile_student`
     `form_name`                   VARCHAR(255)  NULL,
     `form_teacher_id`             VARCHAR(64)   NULL,
     `form_teacher_name`           VARCHAR(255)  NULL,
-    `tutor_name`                  VARCHAR(255)  NULL,
+    `tutor_group`                 VARCHAR(255)  NULL,
     `tutor_teacher_id`            VARCHAR(64)   NULL,
     `tutor_teacher_name`          VARCHAR(255)  NULL,
     `year_level`                  VARCHAR(255)  NULL,

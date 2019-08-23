@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User;
+namespace Schoolbox\External\Profile;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -119,6 +119,16 @@ class Model implements ISoftDeletable
     public function setLastname(?string $lastname): self
     {
         $this->lastname = $lastname;
+        return $this;
+    }
+
+    /**
+     * @param string|null $email
+     * @return Model
+     */
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
         return $this;
     }
 }

@@ -5,16 +5,15 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\User\Student;
+namespace Schoolbox\External\Profile\Student;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\External\User\Model as UserModel;
+use Schoolbox\External\Profile\Model as ProfileModel;
 
 class Model implements ISoftDeletable
 {
-    use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
@@ -72,7 +71,7 @@ class Model implements ISoftDeletable
     /**
      * @var string|null
      */
-    private $tutorName;
+    private $tutorGroup;
 
     /**
      * @var string|null
@@ -165,9 +164,9 @@ class Model implements ISoftDeletable
     private $boardingStatus;
 
     /**
-     * @var UserModel
+     * @var ProfileModel
      */
-    private $user;
+    private $baseProfile;
 
 
     /**
@@ -253,9 +252,9 @@ class Model implements ISoftDeletable
     /**
      * @return string|null
      */
-    public function getTutorName(): ?string
+    public function getTutorGroup(): ?string
     {
-        return $this->tutorName;
+        return $this->tutorGroup;
     }
 
     /**
@@ -403,11 +402,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return UserModel
+     * @return ProfileModel
      */
-    public function getUser(): UserModel
+    public function getBaseProfile(): ProfileModel
     {
-        return $this->user;
+        return $this->baseProfile;
     }
 
 
@@ -512,12 +511,12 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string|null $tutorName
+     * @param string|null $tutorGroup
      * @return Model
      */
-    public function setTutorName(?string $tutorName): self
+    public function setTutorGroup(?string $tutorGroup): self
     {
-        $this->tutorName = $tutorName;
+        $this->tutorGroup = $tutorGroup;
         return $this;
     }
 
@@ -702,10 +701,12 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param UserModel $user
+     * @param ProfileModel|null $baseProfile
+     * @return Model
      */
-    public function setUser(?UserModel $user): void
+    public function setBaseProfile(?ProfileModel $baseProfile): self
     {
-        $this->user = $user;
+        $this->baseProfile = $baseProfile;
+        return $this;
     }
 }
