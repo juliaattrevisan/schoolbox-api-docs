@@ -246,41 +246,23 @@ class Processor
 
             /* Process the Relations csv
              */
-            $n = $this->processRelation($reader);
-
-            new \Alaress_Probe("Processed {$n} relations.");
-
-            return $n;
+            return $this->processRelation($reader);
         } elseif ($this->isStudentProfile($header)) {
 
             /* Process the Student Profile csv
              */
-            $n = $this->processStudentProfile($reader);
-
-            new \Alaress_Probe("Processed {$n} student profiles.");
-
-            return $n;
+            return $this->processStudentProfile($reader);
         } elseif ($this->isStaffProfile($header)) {
 
             /* Process the Staff Profile csv
              */
-            $n = $this->processStaffProfile($reader);
-
-            new \Alaress_Probe("Processing {$n} staff profiles.");
-
-            return $n;
+            return $this->processStaffProfile($reader);
         } elseif ($this->isParentProfile($header)) {
 
             /* Process the Parent Profile csv
              */
-            $n = $this->processParentProfile($reader);
-
-            new \Alaress_Probe("Processing {$n} parent profiles.");
-
-            return $n;
+            return $this->processParentProfile($reader);
         }
-
-        new \Alaress_Probe('Unknown file containing header columns ' . implode(', ', $header));
 
         return 0;
     }
