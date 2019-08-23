@@ -10,6 +10,8 @@ namespace Schoolbox\Admin\Import\Profile;
 use Alaress\Csv\Reader;
 use Alaress\Database\Connector\IConnector;
 use Alaress\IDatabase;
+use Alaress\Lumberjack\Logger;
+use http\Exception\InvalidArgumentException;
 use Schoolbox\External\Profile;
 
 /**
@@ -156,6 +158,14 @@ class Processor
 
 
     /**
+     * An array of log messages
+     *
+     * @var array
+     */
+    private $log = [];
+
+
+    /**
      * Processor constructor.
      *
      * @param array     $files
@@ -183,8 +193,9 @@ class Processor
      *
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws InvalidArgumentException
      */
-    public function process(): void
+    public function process(): Processor
     {
         /* Sort the files so that the relation one comes last
          */
@@ -215,8 +226,15 @@ class Processor
         /* Process all of these files in the required order
          */
         foreach ($sortedFiles as $file) {
-            $this->processOne($file->readStream());
+            try {
+                $n = $this->processOne($file->readStream());
+                $this->log[] = "Processed {$n} rows from {$file->getBasename()}";
+            } catch (\InvalidArgumentException $e) {
+                $this->log[] = $e->getMessage();
+            }
         }
+
+        return $this;
     }
 
 
@@ -226,6 +244,7 @@ class Processor
      * @param resource $contents
      *
      * @return int
+     * @throws \http\Exception\InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      */
@@ -264,7 +283,7 @@ class Processor
             return $this->processParentProfile($reader);
         }
 
-        return null;
+        throw new InvalidArgumentException('Unknown header contents' . implode(', ', $header));
     }
 
 
@@ -350,6 +369,8 @@ class Processor
                 ->setEmergencyContact((bool)$data['Emergency Contact']);
 
             $this->relationMapper->save($relation);
+
+            $this->log[] = "Created relation between {$data['Relation ID']} and {$data['Student ID']}";
 
             $n++;
         }
@@ -448,6 +469,8 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->studentProfileMapper->save($studentProfile);
 
+            $this->log[] = "Created student profile for {$data['Firstname']} {$data['Surname']}";
+
             $n++;
         }
 
@@ -523,6 +546,8 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->staffProfileMapper->save($staffProfile);
 
+            $this->log[] = "Created staff profile for {$data['Firstname']} {$data['Surname']}";
+
             $n++;
         }
 
@@ -595,6 +620,8 @@ class Processor
             $this->baseProfileMapper->save($baseProfile);
             $this->parentProfileMapper->save($parentProfile);
 
+            $this->log[] = "Created parent profile for {$data['Firstname']} {$data['Surname']}";
+
             $n++;
         }
 
@@ -623,5 +650,16 @@ class Processor
     private function matches(array $row, array $expected): bool
     {
         return !\count(array_diff($row, $expected));
+    }
+
+
+    /**
+     * Get log for what happened during this import
+     *
+     * @return array
+     */
+    public function getLog(): array
+    {
+        return $this->log;
     }
 }
