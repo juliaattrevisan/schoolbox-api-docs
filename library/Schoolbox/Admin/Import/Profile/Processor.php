@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Csv\Reader;
+use Schoolbox\External\Profile;
 
 /**
  * Class Processor
@@ -25,6 +26,18 @@ class Processor
      */
     private $files;
 
+    private const IMPORT_COLUMNS_PARENT = [
+        'External ID',
+        'Type',
+        'Username',
+        'Title',
+        'Firstname',
+        'Surname',
+        'Email',
+        'Mobile',
+        'Home Phone',
+        'Work Phone'
+    ];
 
     /**
      * Processor constructor.
@@ -34,6 +47,9 @@ class Processor
     public function __construct(array $files)
     {
         $this->files = $files;
+
+        $this->baseProfileMapper = new Profile\Mapper();
+        $this->parentProfileMapper = new Profile\Parent\Mapper();
     }
 
 
@@ -233,18 +249,7 @@ class Processor
      */
     private function isParentProfile(array $row): bool
     {
-        return $this->matches($row, [
-            'External ID',
-            'Type',
-            'Username',
-            'Title',
-            'Firstname',
-            'Surname',
-            'Email',
-            'Mobile',
-            'Home Phone',
-            'Work Phone'
-        ]);
+        return $this->matches($row, self::IMPORT_COLUMNS_PARENT);
     }
 
 
@@ -252,11 +257,31 @@ class Processor
      * Process parent profile csv
      *
      * @param Reader $reader
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     private function processParentProfile(Reader $reader): void
     {
         foreach ($reader as $i => $row) {
-            new \Alaress_Probe($row);
+            $data = array_combine(self::IMPORT_COLUMNS_PARENT, $row);
+
+            $baseProfile = $this->baseProfileMapper->createModel()
+                ->setExternalId($data['External ID'])
+                ->setTitle($data['Title'])
+                ->setFirstname($data['Firstname'])
+                ->setLastname($data['Surname']);
+
+            $parentProfile = $this->parentProfileMapper->createModel()
+                ->setMobile($data['Mobile'])
+                ->setPhoneHome($data['Home Phone'])
+                ->setPhoneWork($data['Work Phone'])
+                ->setUsername($data['Username'])
+                ->setEmail($data['Email'])
+                ->setBaseProfile($baseProfile);
+
+            $this->baseProfileMapper->save($baseProfile);
+            $this->parentProfileMapper->save($parentProfile);
         }
     }
 
