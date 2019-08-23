@@ -85,13 +85,11 @@ class Api implements Calendar_Api_EventType_Interface
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
-        $assessments = $this->assessmentDataSource->findAllByIds(
+        $assessments = $this->assessmentDataSource->findAllBetweenDates(
+            Alaress_Date_Format::newFromTimestamp($startTimestamp),
+            Alaress_Date_Format::newFromTimestamp($endTimestamp),
             $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
-//        $assessments = $this->assessmentDataSource->findAllBetweenDates(
-//            Alaress_Date_Format::newFromTimestamp($startTimestamp),
-//            Alaress_Date_Format::newFromTimestamp($endTimestamp)
-//        );
 
         $stack = new Collection();
         foreach ($assessments as $assessment) {

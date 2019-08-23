@@ -1,9 +1,9 @@
 <?php
 /**
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress\Database\Predicate\Builder;
@@ -151,7 +151,7 @@ class MapperProxy
      * This method loads participants, responses and feedback. It does not load the rubric grid.
      *
      * @param int       $id
-     * @param null|User $student         If provided, load only this student's participation
+     * @param null|User $student If provided, load only this student's participation
      * @return IAssessable
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -310,7 +310,7 @@ class MapperProxy
         try {
             // Get all assessables which have this assessment as a spec
             $options['spec_assessment_id'] = $assessmentId;
-            $builder = $this->convertOptionsToPredicateBuilder($options, false);
+            $builder                       = $this->convertOptionsToPredicateBuilder($options, false);
             return $this->loadParticipantsIntoAssessmentCollection(
                 $this->translateToDomainModelCollection(
                     $this->baseMapper->findByPredicates($builder, $options)
@@ -475,8 +475,8 @@ class MapperProxy
      *
      * This method does not currently load participants or the rubric grid.
      *
-     * @param int $folderId
-     * @param array     $options
+     * @param int   $folderId
+     * @param array $options
      * @return Collection|IAssessable[]
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
      * @throws TypeError If a PredicateBuilder method is called with wrong data type
@@ -573,13 +573,20 @@ class MapperProxy
      *
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
+     * @param array|null          $ids If provided, restrict search to these IDs
      * @return GenericCollection|IAssessable[]
      */
-    public function findAllBetweenDates(Alaress_Date_Format $from, Alaress_Date_Format $to): GenericCollection
-    {
+    public function findAllBetweenDates(
+        Alaress_Date_Format $from,
+        Alaress_Date_Format $to,
+        array $ids = null
+    ): GenericCollection {
         $options['due_after']  = $from;
         $options['due_before'] = $to;
-        $builder = $this->convertOptionsToPredicateBuilder($options, false);
+        $builder               = $this->convertOptionsToPredicateBuilder($options, false);
+        if (isset($ids)) {
+            $builder->in('id', $ids);
+        }
         return $this->translateToDomainModelCollection($this->baseMapper->findByPredicates($builder, $options));
     }
 
@@ -650,7 +657,7 @@ class MapperProxy
         // Build a list of parameters to pass to findAllForFolderId
         $options['due_after']  = $from;
         $options['due_before'] = $to;
-        $builder = $this->convertOptionsToPredicateBuilder($options, $usePlanDates);
+        $builder               = $this->convertOptionsToPredicateBuilder($options, $usePlanDates);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
@@ -688,7 +695,7 @@ class MapperProxy
      * @param bool                $usePlanDates Filter by plan dates instead of assessment dates
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
-     * @param array               $options Any other query options
+     * @param array               $options      Any other query options
      * @return Collection|IAssessable[]
      * @throws DefinitionException If specified join mapper not registered
      * @throws InvalidColumnException If a PredicateBuilder method is called with an invalid column name
@@ -719,7 +726,7 @@ class MapperProxy
         // Build a list of parameters to pass to findAllForFolderId
         $options['window_open']  = $from;
         $options['window_close'] = $to;
-        $builder = $this->convertOptionsToPredicateBuilder($options, $usePlanDates);
+        $builder                 = $this->convertOptionsToPredicateBuilder($options, $usePlanDates);
 
         // Find assessments which this student is no longer in the class for,
         // but has created a response or feedback for.
@@ -1050,7 +1057,7 @@ class MapperProxy
             }
             return $assessment;
         } // This can be thrown. The @method annotation masks exceptions thrown from base implementation.
-        /** @noinspection PhpRedundantCatchClauseInspection */
+            /** @noinspection PhpRedundantCatchClauseInspection */
         catch (MapperException\Deleted $e) {
             // Populate participants for the deleted assessment, and rethrow
             $assessment = $this->translateToDomainModel($e->getDeletedObject());
@@ -1086,7 +1093,7 @@ class MapperProxy
         $builder = $this->baseMapper->getPredicateBuilder();
         // Term filter (overrides due before/after)
         if ($options['term'] instanceof Term) {
-            $term = $options['term'];
+            $term                  = $options['term'];
             $options['due_after']  = $term->getStart();
             $options['due_before'] = $term->getActualFinish();
         }
@@ -1094,7 +1101,7 @@ class MapperProxy
         $aTable = $this->baseMapper->getTable();
 
         // Are we interested in the custom plan dates, or the assessment dates?
-        if($usePlanDates){
+        if ($usePlanDates) {
             $publishDateColumn = new Coalesce(['participant_plan.publish_date', "$aTable.publish_date"]);
             $dueDateColumn     = new Coalesce(['participant_plan.due_date', "$aTable.due_date"]);
             $closeDateColumn   = new Coalesce(['participant_plan.close_date', "$aTable.close_date"]);
@@ -1131,8 +1138,8 @@ class MapperProxy
             // NOT (assess.end < window.open OR assess.start >= window.close)
             $builder->notAny(
                 $this->baseMapper->getPredicateBuilder()
-                    ->lessThan($dueDateColumn, $options['window_open'])
-                    ->notLessThan($publishDateColumn, $options['window_close'])
+                                 ->lessThan($dueDateColumn, $options['window_open'])
+                                 ->notLessThan($publishDateColumn, $options['window_close'])
             );
         }
 
@@ -1181,8 +1188,8 @@ class MapperProxy
      * Loads participants into a collection of assessables.
      *
      * @param Collection $collection
-     * @param User       $user            If specified, only load this user's interactions
-     * @param bool       $removeExcluded  Set to true to exclude excluded non-member participants
+     * @param User       $user           If specified, only load this user's interactions
+     * @param bool       $removeExcluded Set to true to exclude excluded non-member participants
      * @return Collection|IAssessable[]
      * @throws DefinitionException If unable to locate a specified mapper join
      * @throws DomainException If user has interaction but not participant record
@@ -1207,7 +1214,7 @@ class MapperProxy
      *
      * @return GenericCollection|IAssessable[]
      */
-    public function createCollection($contents = array())
+    public function createCollection($contents = [])
     {
         return new GenericCollection($this->getModel(), $contents);
     }
