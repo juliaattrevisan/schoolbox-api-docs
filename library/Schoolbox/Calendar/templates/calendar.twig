@@ -1,4 +1,4 @@
-<!-- BEGIN custom_head -->
+{% autoescape 'js' %}
 <script type="text/javascript">
     // Which view gets shown?
     var anchorView = '',
@@ -27,35 +27,34 @@
     }
 
     window.fullCalendarConfig = {
-        userId:             Number('{CALENDAR_USER_ID}'),
-        token:              '{USER_TOKEN}',
-        taskTypeId:         Number('{TASK_TYPE_ID}'),
-        sources:            {SOURCES_JSON},
-        eventTypes:         {EVENT_TYPES_JSON},
-        groups:             {GROUPS_JSON},
-        campuses:           {CAMPUSES_JSON},
-        selectedFilters:    {SELECTED_FILTERS_JSON},
-        defaultDate:        '{SELECTED_DATE}',
-        eventLimit:         Boolean('{CALENDAR_COLLAPSE_EVENTS}'),
-        firstDay:           Number('{CALENDAR_START_DAY}'),
-        defaultView:        anchorView || '{CALENDAR_VIEW}',
+        userId:             Number('{{ user.id }}'),
+        token:              '{{ user.key }}',
+        taskTypeId:         Number('{{ taskTypeId }}'),
+        sources:            {{ sources | json_encode | raw }},
+        eventTypes:         {{ eventTypes | json_encode | raw }},
+        groups:             {{ groups | json_encode | raw }},
+        campuses:           {{ campuses | json_encode | raw }},
+        selectedFilters:    {{ filters | json_encode | raw }},
+        defaultDate:        '{{ selectedDate|date('Y-m-d') }}',
+        eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
+        firstDay:           Number('{{ config.calendar_start_day }}'),
+        defaultView:        anchorView || '{{ calendarView }}',
         dateDisplayFormats: dateDisplayFormats,
-        // TODO This must be moved to Twig so these can be guaranteed to be escaped
         translations:       {
             eotc: {
-                proper: '{TPL_LOCAL_EOTC_PC}'
+                proper: '{{ locale.eotc.proper }}'
             },
             dueWork: {
-                proper: '{TPL_LOCAL_DUEWORK_PC}'
+                proper: '{{ locale.dueWork.proper }}'
             }
         }
     };
 </script>
-<!-- END custom_head -->
+{% endautoescape %}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{TPL_LOCAL_CALENDAR_PC} for {USER_FULLNAME}</h1>
+        <h1>{{ locale.calendar.proper ~ " for " ~ user.fullName}}</h1>
     </div>
 </div>
 

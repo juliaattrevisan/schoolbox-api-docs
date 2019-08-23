@@ -340,7 +340,7 @@ class Event implements ISoftDeletable
             return '/homepage/' . $groupId;
         } else {
             if ($returnView === 'calendar') {
-                $return = "/calendar/full/$returnDate";
+                $return = "/calendar/$returnDate";
 
                 if ($userId) {
                     $return .= '/' . $userId;

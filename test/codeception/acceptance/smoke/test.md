@@ -80,7 +80,7 @@ as zsmith:
 #### Calendar
 
 as zsmith:
-* go to http://192.168.36.10/calendar/full
+* go to http://192.168.36.10/calendar
 * create an event, with:
   * title
   * date
@@ -98,14 +98,14 @@ as zsmith:
   * the type and location are preserved
 
 as cglenn:
-* go to http://192.168.36.10/calendar/full
+* go to http://192.168.36.10/calendar
 * verify that the event doesn't show on your calendar; it's not yours
 * go to zsmith's profile: http://192.168.36.10/search/user/151
 * visit his calendar
 * verify that you see his event
 
 as zsmith:
-* go to http://192.168.36.10/calendar/full
+* go to http://192.168.36.10/calendar
 * modify the event you just created
   * make it not yet published
 
