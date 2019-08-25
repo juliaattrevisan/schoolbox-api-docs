@@ -7,6 +7,7 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Calendar\Event\Collection\Renderer;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
@@ -39,12 +40,12 @@ $calendarApi           = new Calendar_Api_EventType_Submission_Schoolbox_ForDueW
     $visibility,
     $colourManager
 );
-$renderer              = new Calendar\Event\Collection\Renderer($calendarApi, (int)$_GET['start'], (int)$_GET['end'], $user, $this->getDi(), $viewer);
+$renderer              = new Renderer($calendarApi, (int)$_GET['start'], (int)$_GET['end'], $user, $this->getDi(), $viewer);
 
 // until this script becomes an Aura route, this is really the best we can do...
 $strategy = ConfigMapper::getInstance()->get('site_location') === 'mggs'
     ? 'pbl-javascript'
-    : 'javascript';
+    : Renderer::RENDER_FORMAT_JSON;
 
 printf('[%s]', \implode(',', $renderer->renderAll($strategy)));
 exit;

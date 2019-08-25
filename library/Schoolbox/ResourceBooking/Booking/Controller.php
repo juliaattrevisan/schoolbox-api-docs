@@ -626,7 +626,7 @@ class Controller extends Base
             $this->getUser()
         );
 
-        $output = $calendar->renderAll('javascript');
+        $output = $calendar->renderAll(Renderer::RENDER_FORMAT_JSON);
 
         // Get timetabled classes for this room, if there are any.
         $roomCode = $item->getRoomCode();

@@ -18,6 +18,8 @@ use Schoolbox\User;
 
 class Renderer
 {
+    public const RENDER_FORMAT_JSON = 'javascript';
+
 
     /** @var Calendar_Api_EventType_Interface $api An instance of a Calendar API class */
     private $api;

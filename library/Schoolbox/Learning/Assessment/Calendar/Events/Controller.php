@@ -127,7 +127,7 @@ class Controller extends Base
 
         // The API's renderAll returns a list of json-encoded events.
         // Decode them all, and then re-encode.
-        $output = array_map('json_decode', $calendar->renderAll('javascript'));
+        $output = array_map('json_decode', $calendar->renderAll(Renderer::RENDER_FORMAT_JSON));
         $this->response->content->set($this->buildJsonOutput($output));
     }
 }

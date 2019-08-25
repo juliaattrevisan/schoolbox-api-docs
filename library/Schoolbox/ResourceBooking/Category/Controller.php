@@ -192,7 +192,7 @@ class Controller extends Base {
             $this->getDi(),
             $this->getUser()
         );
-        $output = json_decode('[' . \implode(',', $calendar->renderAll('javascript')) . ']');
+        $output = json_decode('[' . \implode(',', $calendar->renderAll(Renderer::RENDER_FORMAT_JSON)) . ']');
         $this->getResponse()->content->set(
             array(
                 'format' => 'json',
