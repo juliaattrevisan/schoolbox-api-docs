@@ -13,6 +13,7 @@
  */
 
 use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
 
 class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 {
@@ -84,7 +85,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract
 
         /* Render all registered events
          */
-        echo "[" . \implode(',', $renderer->renderAll(Renderer::RENDER_FORMAT_JSON)) . "]";
+        echo "[" . \implode(',', $renderer->renderAll(EventBase::RENDER_FORMAT_JSON)) . "]";
 
         // Save page that is being viewed into history.
         // Problem with storing start of sequence:

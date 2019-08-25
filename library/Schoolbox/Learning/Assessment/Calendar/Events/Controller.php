@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
@@ -127,7 +128,7 @@ class Controller extends Base
 
         // The API's renderAll returns a list of json-encoded events.
         // Decode them all, and then re-encode.
-        $output = array_map('json_decode', $calendar->renderAll(Renderer::RENDER_FORMAT_JSON));
+        $output = array_map('json_decode', $calendar->renderAll(EventBase::RENDER_FORMAT_JSON));
         $this->response->content->set($this->buildJsonOutput($output));
     }
 }

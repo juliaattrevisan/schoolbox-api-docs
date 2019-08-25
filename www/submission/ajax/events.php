@@ -8,6 +8,8 @@
  */
 
 use Calendar\Event\Collection\Renderer;
+use Calendar\Event\Type\EventBase;
+use Calendar\Event\Type\Submission\Event as SubmissionEvent;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
@@ -44,8 +46,8 @@ $renderer              = new Renderer($calendarApi, (int)$_GET['start'], (int)$_
 
 // until this script becomes an Aura route, this is really the best we can do...
 $strategy = ConfigMapper::getInstance()->get('site_location') === 'mggs'
-    ? 'pbl-javascript'
-    : Renderer::RENDER_FORMAT_JSON;
+    ? SubmissionEvent::RENDER_FORMAT_JSON_PBL
+    : EventBase::RENDER_FORMAT_JSON;
 
 printf('[%s]', \implode(',', $renderer->renderAll($strategy)));
 exit;
