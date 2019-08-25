@@ -9,11 +9,14 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
+use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Controller for retrieving calendar events for the assessment calendar.
@@ -79,6 +82,9 @@ class Controller extends Base
      *
      * @api   GET /learning/assessment/calendar/events
      * @since 19.1
+     *
+     * @throws MapperException      if somehow a mapper call couldn't create a model?
+     * @throws ApplicationException if start and end weren't both supplied as query string params
      */
     public function getEvents(): void
     {
@@ -92,6 +98,16 @@ class Controller extends Base
         $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $userSelections);
 
 
+        // User must have provided a start and end date: error out otherwise
+        $start = filter_var($this->request->query->get('start'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        $end   = filter_var($this->request->query->get('end'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        if (!isset($start, $end)) {
+            // No you don't throw any exception: only ApplicationException
+            /** @noinspection PhpUnhandledExceptionInspection */
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INVALID_DATE);
+        }
+
+
         // Query the API for the events in this time span
         $calendar = new Renderer(
             new Api(
@@ -101,8 +117,8 @@ class Controller extends Base
                 $this->assessmentIdFinder,
                 $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page)
             ),
-            $this->request->query->getInt('start'),
-            $this->request->query->getInt('end'),
+            $start,
+            $end,
             $this->getUser(),
             $this->getDi(),
             $this->getUser()
