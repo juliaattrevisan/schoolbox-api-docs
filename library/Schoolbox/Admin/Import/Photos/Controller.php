@@ -120,33 +120,13 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/import/photos');
+        $this->getResponse()->redirect->afterPost('/adminv2/import/photos/upload');
     }
 
     /**
      * Render the upload page
      */
     public function getIndex()
-    {
-        // Render this thing out
-
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminImportPhotos/index.twig',
-                'data'     => array(
-                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
-                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
-                    'attachzone' => $this->getAttachZone(),
-                ),
-            )
-        );
-    }
-
-
-    /**
-     * Render the view page
-     */
-    public function getView()
     {
         $surname = $this->getRequest()->query['surname'];
 
@@ -177,13 +157,13 @@ class Controller extends Base
             ]
         ]);
 
-        // Render this thing out
         $this->getResponse()->content->set(
             array(
-                'template' => '@adminImportPhotos/view.twig',
+                'template' => '@adminImportPhotos/index.twig',
                 'data'     => array(
                     'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
                     'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
+                    'attachzone' => $this->getAttachZone(),
                     'users' => $users,
                     'surname' => $surname
                 ),

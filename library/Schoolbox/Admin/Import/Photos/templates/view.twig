@@ -1,24 +1,4 @@
-<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-<script>
-    $(function() {
-        $('[data-delete]').click(function(event) {
-            event.preventDefault();
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to remove this user\'s photo?',
-                confirmEvent: function() {
-                    $.post('/adminv2/import/photos/delete', {
-                        id: $(event.target).attr('data-delete')
-                    })
-                    .done(function() {
-                        $(event.target).closest('li').remove();
-                    });
-                }
-            });
-        });
-    });
-</script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
@@ -39,63 +19,3 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <h3>Filter By Surname</h3>
-            <dl class="sub-nav no-margin">
-                {% for letter in 'a'..'z' %}
-                    {% set css = '' %}
-
-                    {% if surname == letter %}
-                        {% set css = 'class="active"' %}
-                    {% endif %}
-
-                    <dd {{ css|raw }}><a href="?surname={{ letter }}">{{ letter|upper }}</a></dd>
-                {% endfor %}
-            </dl>
-        </section>
-    </div>
-</div>
-
-{# Config page contents #}
-
-<div class="row">
-    <div class="small-12 island">
-        <section>
-
-            {% if users | length == 0 %}
-
-                <section class="content">
-                    <div class="empty-state">
-                        <i class="icon-user"></i>
-                        <p>No user photos found for surnames starting with '{{ surname | upper }}'</p>
-                    </div>
-                </section>
-
-            {% else %}
-
-                <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                    {% for user in users %}
-                        <li class="actions-small-1">
-                            <div class="card small-12">
-                                <a href="/search/user/{{ user.getId }}" title="View Profile">
-                                    <img src='/portrait.php?userId={{ user.getExternalId }}&size=square64&cb={{ date().timestamp }}' alt="View Profile" />
-                                    <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
-                                </a>
-                                <p class="meta">{{ user.getRole.getName }}</p>
-                            </div>
-                            <nav>
-                                <span>
-                                    <a data-delete="{{ user.getExternalId }}" href="#" class="icon-close" title="Delete Photo"></a>
-                                </span>
-                            </nav>
-                        </li>
-                    {% endfor %}
-                </ul>
-
-            {% endif %}
-
-        </section>
-    </div>
-</div>

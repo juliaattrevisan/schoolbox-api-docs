@@ -39,7 +39,6 @@ class Module extends BaseModule
         });
 
         $this->register('GET', '/upload', 'getIndex', $superuserOnly);
-        $this->register('GET', '', 'getView', $superuserOnly);
         $this->register('POST', '/upload', 'postUpload', $superuserOnly);
         $this->register('POST', '/delete', 'postDelete', $superuserOnly);
     }
