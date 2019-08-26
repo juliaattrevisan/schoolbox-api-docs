@@ -319,19 +319,6 @@ class Processor
      */
     private function processRelation(Reader $reader): int
     {
-        /* Find the previously inserted ids; these need to be removed from both
-         * this table, the relationship table, and the sis_user_profile table
-         *
-         * Each file can be uploaded independently of the others which means we can't
-         * make very many assumptions/presumptions about the db's contents
-         */
-        $lastId = $this->database->executeQuery('
-            SELECT GREATEST(MAX(child_profile_id), MAX(user_profile_id)) AS lastId
-            FROM sis_user_profile_relation
-        ')->fetch()['lastId'];
-
-        $n = 0;
-
         /* Remember a set of (profile_id, external_id) tuples to save on db pounding
          * while trying to derive relations between external_ids from csv
          *
@@ -355,8 +342,17 @@ class Processor
             $cache[$row['external_id']] = (int)$row['id'];
         }
 
+        /* Delete previous relations
+         * Without a primary key you just can't tell where one set ends and where another begins
+         */
+        $this->database->executeQuery('
+            DELETE FROM sis_user_profile_relation
+        ');
+
         /* Process each relation
          */
+        $n = 0;
+
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
 
@@ -386,20 +382,10 @@ class Processor
 
             $this->log[] = "Created relation between {$data['Relation ID']} and {$data['Student ID']}";
 
+            /* These two humans have relations
+             */
             $n++;
         }
-
-        /* Delete everything prior to the last inserted id
-         */
-        $removal = $this->database->prepareQuery('
-            DELETE FROM sis_user_profile_relation
-            WHERE child_profile_id <= :lastId
-            OR user_profile_id <= :lastId
-        ');
-
-        $removal->execute([
-            'lastId' => $lastId
-        ]);
 
         return $n;
     }
