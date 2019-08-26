@@ -89,6 +89,7 @@ class Controller extends Base
         $processor = (new Processor($attachments, $db))->process();
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportProfile/log.twig', [
+            'pageCurrent' => 'import',
             'allNavigation' => $this->buildNavigation($this->getRouter(), 'adminImportProfile')->getAllNodes(),
             'log' => $processor->getLog()
         ])->setTitle('Import User Profile'));
