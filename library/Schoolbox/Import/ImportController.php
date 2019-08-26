@@ -54,6 +54,7 @@ class ImportController extends Base
     protected function getBaseData()
     {
         return [
+            'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
             'allNavigation'  => $this->buildNavigation($this->getRouter(), $this->basename)->getAllNodes(),
             'basename'       => $this->basename,
             'hasExternalDb'  => ($this->getDi()->get('config')->get('external_type') != 'schoolbox'),
@@ -69,7 +70,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/upload.twig',
             'data'     => $this->getBaseData() + [
-                'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'attachzone'    => $this->getAttachzone()->getTwigContext(),
                 'uploadMissing' => $this->getSession()->getSegment(static::class)->getFlash('uploadMissing', false)
             ],
@@ -95,7 +96,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/preview.twig',
             'data'     => $this->getBaseData() + [
-                'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'log'        => ['lines' => $this->parseLogLines($logger),],
                 'attachzone' => $this->getAttachzone($upload->getHash())->getTwigContext(),
             ],
@@ -121,7 +122,7 @@ class ImportController extends Base
         $this->getResponse()->content->set([
             'template' => '@' . $this->basename . '/import.twig',
             'data'     => $this->getBaseData() + [
-                'pageCurrent' => 'import',
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
                 'log' => ['lines' => $this->parseLogLines($logger),],
             ],
         ]);

@@ -7,9 +7,11 @@
     });
 </script>
 
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+
 <div class="row">
     <div class="small-12 island collapse">
-        <h2 class="subheader">{{ locale.pastoralCare.proper }} Records</h2>
+        <h1>{{ locale.pastoralCare.proper }} Records</h1>
         {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 </div>

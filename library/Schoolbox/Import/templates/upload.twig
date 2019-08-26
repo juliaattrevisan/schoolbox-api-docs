@@ -1,8 +1,8 @@
-{{ renderAdminNavigation(pageCurrent) }}
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
     <div class="small-12 columns">
-        <h2 class="subheader">
+        <h1>
             {% block title %}
             {% endblock %}
         </h2>

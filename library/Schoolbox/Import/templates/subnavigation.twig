@@ -1,6 +1,6 @@
 {# This is a clone of sync/navigation.twig to use admin-specific subnav style #}
 {% if allNodes|length %}
-    <dl class="sub-nav">
+    <dl class="tabs">
         {% for currentNode in allNodes %}
             <dd {% if currentNode.active %}class="active"{% endif %}>
                 <a href="{{ currentNode.url }}">{{ currentNode.name }}</a>

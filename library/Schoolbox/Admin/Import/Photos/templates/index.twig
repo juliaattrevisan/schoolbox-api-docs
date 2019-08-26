@@ -1,10 +1,10 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-{{ renderAdminNavigation(pageCurrent) }}
+{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
 
 <div class="row">
     <div class="small-12 island collapse">
-        <h2 class="subheader">User Photos</h2>
+        <h1>User Photos</h1>
         {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 </div>
