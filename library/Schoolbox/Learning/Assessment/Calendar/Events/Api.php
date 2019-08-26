@@ -9,10 +9,12 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 use Calendar\Event\Collection;
 use Calendar\Event\Type\EventInterface;
 use Calendar\Event\Type\Submission\Event;
 use Calendar_Api_EventType_Interface;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
@@ -43,17 +45,38 @@ class Api implements Calendar_Api_EventType_Interface
 
 
     /**
+     * @var IdFinder
+     */
+    private $assessmentIdFinder;
+
+
+    /**
+     * @var array
+     */
+    private $filters;
+
+
+    /**
      * Constructor
      *
      * @param User                 $viewer
      * @param AssessmentDataSource $assessmentDataSource
      * @param Visibility           $visibility
+     * @param IdFinder             $assessmentIdFinder
+     * @param array                $filters
      */
-    public function __construct(User $viewer, AssessmentDataSource $assessmentDataSource, Visibility $visibility)
-    {
+    public function __construct(
+        User $viewer,
+        AssessmentDataSource $assessmentDataSource,
+        Visibility $visibility,
+        IdFinder $assessmentIdFinder,
+        array $filters
+    ) {
         $this->viewer               = $viewer;
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
+        $this->assessmentIdFinder   = $assessmentIdFinder;
+        $this->filters              = $filters;
     }
 
 
@@ -64,7 +87,8 @@ class Api implements Calendar_Api_EventType_Interface
     {
         $assessments = $this->assessmentDataSource->findAllBetweenDates(
             Alaress_Date_Format::newFromTimestamp($startTimestamp),
-            Alaress_Date_Format::newFromTimestamp($endTimestamp)
+            Alaress_Date_Format::newFromTimestamp($endTimestamp),
+            $this->assessmentIdFinder->findIdsByFilters($this->filters)
         );
 
         $stack = new Collection();
@@ -111,14 +135,17 @@ class Api implements Calendar_Api_EventType_Interface
         $dueDate = $assessment->getDueAt();
 
         // Can't show an event if I don't know when to show it
-        if (!$dueDate) {
+        if (!$dueDate || $dueDate instanceof Alaress_Date_NullDate) {
             return null;
         }
 
         // Not published yet?
         // TODO shouldn't this be handled in the request?
         $publishDate = $assessment->getPublishAt();
-        if (!$publishDate || $publishDate->gt(Alaress_Date_Format::now())) {
+        if (!$publishDate
+            || $publishDate instanceof Alaress_Date_NullDate
+            || $publishDate->gt(Alaress_Date_Format::now())
+        ) {
             return null;
         }
 

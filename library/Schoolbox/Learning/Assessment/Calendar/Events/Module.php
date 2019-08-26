@@ -13,6 +13,10 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\FactoryFactory as FilterFactoryFactory;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
@@ -62,6 +66,22 @@ class Module extends BaseModule
             'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
             'visibility'           => $injector->lazy(static function () {
                 return new Visibility(Access::getInstance());
+            }),
+            'filterFactoryFactory' => $injector->lazy(function () use ($injector) {
+                /** @var RosettaStone $rosettaStone */
+                $rosettaStone = $injector->get('l10n');
+                return new FilterFactoryFactory(
+                    $this->getMapperFactory(),
+                    $rosettaStone
+                );
+            }),
+            'assessmentIdFinder'   => $injector->lazy(function () {
+                /** @var Filter\Mapper $filterMapper */
+                $filterMapper = $this->getMapperFactory()->get(Filter\Mapper::class);
+                return Filter\Filters\Assessment\IdFinder::getInstance(
+                    $filterMapper,
+                    $this->getMapperFactory()->get(Assessment\Mapper::class)
+                );
             }),
         ];
     }

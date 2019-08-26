@@ -9,6 +9,8 @@ namespace Schoolbox\Learning\Assessment\Calendar\Events;
 
 use Alaress\Web\Controller\Base;
 use Calendar\Event\Collection\Renderer;
+use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\Visibility;
 
@@ -30,15 +32,35 @@ class Controller extends Base
 
 
     /**
+     * @var AssessmentFilters\IdFinder
+     */
+    private $assessmentIdFinder;
+
+
+    /**
+     * @var AssessmentFilters\FactoryFactory
+     */
+    private $filterFactoryFactory;
+
+
+    /**
      * Constructor
      *
-     * @param AssessmentDataSource $assessmentDataSource
-     * @param Visibility           $visibility
+     * @param AssessmentDataSource             $assessmentDataSource
+     * @param Visibility                       $visibility
+     * @param AssessmentFilters\IdFinder       $assessmentIdFinder
+     * @param AssessmentFilters\FactoryFactory $filterFactoryFactory
      */
-    public function __construct(AssessmentDataSource $assessmentDataSource, Visibility $visibility)
-    {
+    public function __construct(
+        AssessmentDataSource $assessmentDataSource,
+        Visibility $visibility,
+        AssessmentFilters\IdFinder $assessmentIdFinder,
+        AssessmentFilters\FactoryFactory $filterFactoryFactory
+    ) {
         $this->assessmentDataSource = $assessmentDataSource;
         $this->visibility           = $visibility;
+        $this->assessmentIdFinder   = $assessmentIdFinder;
+        $this->filterFactoryFactory = $filterFactoryFactory;
     }
 
 
@@ -50,10 +72,25 @@ class Controller extends Base
      */
     public function getEvents(): void
     {
+        $qsFilters = $this->request->query->get('filters', []);
+        $page      = FilterPage\Model::PAGE_ASSESSMENT_CALENDAR;
+
+        $codec           = $this->filterFactoryFactory->buildCodec();
+        $userSelections  = $codec->convertRequestToSelections($this->getUser(), $page, $qsFilters);
+
+        $filters = $this->filterFactoryFactory->convertSelectionsToFilters($userSelections, $this->getUser(), $page);
+        // Do something with the user selections. Pass them in to the API?
+
         // Must have:
         // start and end dates, not greater than 2 months between?
         $calendar = new Renderer(
-            new Api($this->getUser(), $this->assessmentDataSource, $this->visibility),
+            new Api(
+                $this->getUser(),
+                $this->assessmentDataSource,
+                $this->visibility,
+                $this->assessmentIdFinder,
+                $filters
+            ),
             $this->request->query->getInt('start'),
             $this->request->query->getInt('end'),
             $this->getUser(),
