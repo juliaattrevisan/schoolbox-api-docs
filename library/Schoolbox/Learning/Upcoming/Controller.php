@@ -9,7 +9,9 @@ namespace Schoolbox\Learning\Upcoming;
 
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
+use Calendar\Event\Collection\Renderer;
 use External_ClassInterface;
+use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use function func_get_args;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -365,5 +367,39 @@ class Controller extends Base
             $filterIdMap[$definition->getFilter()->getId()] = $definition::getSlug();
         }
         return $filterIdMap;
+    }
+
+    /**
+     * @param User $student
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function getEvents(User $student): void
+    {
+        $request             = $this->request->query->get('filters', []);
+        $page                = Filter\Page\Model::PAGE_UPCOMING_ASSESSMENTS;
+        $codec               = $this->filterFactoryFactory->buildCodec();
+        $selectionsPerFilter = $codec->convertRequestToSelections($student, $page, $request);
+        $filters             = $this->filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+        $visibility          = new Visibility($this->access);
+
+        $calendar = new Renderer(
+            new Api(
+                $this->getUser(),
+                $this->assessmentDataSource,
+                $visibility,
+                $this->assessmentIdFinder,
+                $filters
+            ),
+            (int) $this->getRequest()->query['start'],
+            (int) $this->getRequest()->query['end'],
+            $this->getUser(),
+            $this->di,
+            $this->getUser()
+        );
+
+        // TODO: Apply constants that's implemented on SA-9154 once mergerd
+        $this->response->content->set($this->buildJsonOutput(
+            array_map('json_decode', $calendar->renderAll('javascript'))
+        ));
     }
 }

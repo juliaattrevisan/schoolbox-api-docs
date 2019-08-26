@@ -93,6 +93,7 @@ class Module extends BaseModule
         };
 
         $this->register('GET',  '',                        'getUpcoming', new Rule\IsLoggedIn());
+        $this->register('GET',  '/events/{studentId:\d+}', 'getEvents', $access, $preloadStudent);
         $this->register('GET',  '/{studentId:\d+}{/date}', 'getUpcomingForStudent',  $access, $preloadStudentAndDate);
         $this->register('POST', '/{studentId:\d+}',        'postUpcomingForStudent', $access, $preloadStudent);
     }

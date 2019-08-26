@@ -29,6 +29,7 @@
                 }"
                 default-view="dayGridMonth"
                 :event-render="eventRender"
+                :events="events"
                 @loading="onLoading"
                 @eventClick="onEventClick"
         />
@@ -46,9 +47,10 @@
     import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
     import axios              from 'axios'
     import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
+    import {stringify}        from 'qs';
 
     // Various URLs that FullCalendar may make use of.
-    const URL_EVENT_SOURCE = '/submission/ajax/events';
+    const URL_EVENT_SOURCE = '/learning/due/events';
     const EVENT_SOURCE_ID  = 1;
 
     const FORMAT_FORM_DATE = 'DD-MM-YYYY';
@@ -74,6 +76,7 @@
                 calendarPlugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
                 currentEvent: {},
                 newEvent: {},
+                selectedFilters: null,
             }
         },
         computed: {
@@ -137,9 +140,12 @@
              * @param successCallback A function to call with the list of events.
              */
             events(fetchInfo, successCallback) {
-                console.log('test');
+                if (this.selectedFilters === null) {
+                    successCallback([]);
+                    return;
+                }
                 axios.get(
-                    URL_EVENT_SOURCE,
+                    URL_EVENT_SOURCE + '/' + window.fullCalendarConfig.userId,
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'
@@ -147,8 +153,9 @@
                         params: {
                             start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
                             end:   Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                            userId: 6
-                        }
+                            filters: this.selectedFilters,
+                        },
+                        paramsSerializer: params => stringify(params, {arrayFormat: 'brackets'}),
                     }
                 ).then(
                     function (response) {
@@ -196,17 +203,8 @@
              * @param {object} selectedFilters The filters that were selected
              */
             onFilterChange(selectedFilters) {
-                // Don't render events until the event source is added?
-                let calendarApi         = this.$refs.fullCalendar.getApi(),
-                    existingEventSource = calendarApi.getEventSourceById(EVENT_SOURCE_ID);
-                if (existingEventSource) {
-                    calendarApi.refetchEvents();
-                } else {
-                    calendarApi.addEventSource({
-                        id:     EVENT_SOURCE_ID,
-                        events: this.events
-                    });
-                }
+                this.selectedFilters = selectedFilters;
+                this.$refs.fullCalendar.getApi().refetchEvents();
             },
         }
     }

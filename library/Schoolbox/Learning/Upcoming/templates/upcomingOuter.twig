@@ -61,7 +61,8 @@
         window.fullCalendarConfig = {
             eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
             firstDay:           Number('{{ config.calendar_start_day }}'),
-            dateDisplayFormats: dateDisplayFormats
+            dateDisplayFormats: dateDisplayFormats,
+            userId:             Number('{{ student.getId() }}')
         };
     </script>
 {% endautoescape %}
