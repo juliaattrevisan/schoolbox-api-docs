@@ -120,7 +120,7 @@ class Controller extends Base
             }
         }
 
-        $this->getResponse()->redirect->afterPost('/adminv2/import/photos/upload');
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportPhotos.getIndex'));
     }
 
     /**
