@@ -444,26 +444,17 @@ class EventMapper extends CalendarEventMapper
             return;
         }
 
-        /* Sequential Dependency due to Mapper Cache
-         *
-         * $event gets refetched from its cached version when metadataMapper->save() occurs
-         * If you do operations in the wrong order, it can overwrite your campus/role selections
-         * with what was previously there, undoing any of your changes
-         *
-         * Therefore we save the $event modifications first, then we save the $metadata ones
-         * to avoid the refetch problem. Then we assign the metadata instance to the event itself
-         * because that was also refetched
-         */
+        // Because of the mapper caching problem, order of operations in this area had to be re-ordered a couple of times.
+        $event->setMetadata($metadata);
 
-        /* Clear and recreate other relations with most recent $metadata instance
-         */
+        $metadataMapper = EventMetadataMapper::getInstance();
         $this->deleteCampusRelations($event);
         $this->createCampus($event);
 
         $this->deleteRoleRelations($event);
         $this->createRole($event);
-
-        $metadataMapper = EventMetadataMapper::getInstance();
+        $metadataMapper->save($metadata);
+        $metadataMapper->saveRelation($event);
 
         $metadataMapper->deleteStaffAttendeesRelations($metadata);
         $metadataMapper->createStaffAttendees($metadata);
@@ -476,20 +467,6 @@ class EventMapper extends CalendarEventMapper
 
         $metadataMapper->deleteResourceBookingsRelations($metadata);
         $metadataMapper->createResourceBookings($metadata);
-
-        /* ...set it after all the mutations and persistence has occurred
-         * That should prevent spectral caching
-         */
-        $event->setMetadata($metadata);
-
-        /* Somehow $event->getMetadata() returns a cached version of the metadata that
-         * was in $event when it was first hydrated - even if we manually set it in line 446!
-         *
-         * This prevents you from adding files to a new event; it will always set it back to
-         * the empty metadata that spawned with $event due to strange caching
-         */
-        $metadataMapper->save($metadata);
-        $metadataMapper->saveRelation($event);
     }
 
 
