@@ -6,7 +6,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Admin\Import\Photos;
 
 use Alaress\Web\Controller\Base;
@@ -37,7 +36,8 @@ class Controller extends Base
      * @param StorageMapper $storageMapper
      * @param UserMapper    $userMapper
      */
-    public function __construct(Storage\Mapper $storageMapper, UserMapper $userMapper) {
+    public function __construct(Storage\Mapper $storageMapper, UserMapper $userMapper)
+    {
         $this->storageMapper = $storageMapper;
         $this->userMapper = $userMapper;
     }
@@ -88,6 +88,7 @@ class Controller extends Base
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      * @throws \PDOException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function postUpload()
     {
@@ -123,6 +124,7 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('adminImportPhotos.getIndex'));
     }
 
+
     /**
      * Render the upload page
      */
@@ -145,10 +147,10 @@ class Controller extends Base
         /* Find all the people who have portraits - needs external id and portrait hash
          * Do a match on first letter to minimise hydrations that we throw out
          */
-        $pb = $this->userMapper->getPredicateBuilder();
-        $pb->notNull('synergy_id');
-        $pb->notNull('portrait_hash');
-        $pb->like('lastname', "{$surname}%");
+        $pb = $this->userMapper->getPredicateBuilder()
+            ->notNull('synergy_id')
+            ->notNull('portrait_hash')
+            ->like('lastname', "{$surname}%");
 
         $users = $this->userMapper->findByPredicates($pb, [
             'order' => [
@@ -157,17 +159,15 @@ class Controller extends Base
             ]
         ]);
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminImportPhotos/index.twig',
-                'data'     => array(
-                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
-                    'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
-                    'attachzone' => $this->getAttachZone(),
-                    'users' => $users,
-                    'surname' => $surname
-                ),
-            )
-        );
+        $this->getResponse()->content->set([
+            'template' => '@adminImportPhotos/index.twig',
+            'data' => [
+                'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
+                'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
+                'attachzone' => $this->getAttachZone(),
+                'users' => $users,
+                'surname' => $surname
+            ],
+        ]);
     }
 }
