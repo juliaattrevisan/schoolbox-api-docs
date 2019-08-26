@@ -312,6 +312,10 @@ class RecursiveUndeleter extends CliTool\App
         ],
         Schoolbox\ResourceBooking\Booking\Mapper::class => [],
         Pastoral\Comment\Mapper::class                  => [],
+        Schoolbox\Forum\ThreadMapper::class                             => [
+            Schoolbox\Forum\PostMapper::class => 'threadID',
+        ],
+        Schoolbox\Forum\PostMapper::class               => [],
     ];
 
 
