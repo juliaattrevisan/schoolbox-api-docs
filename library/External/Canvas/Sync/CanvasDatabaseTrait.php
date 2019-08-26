@@ -10,6 +10,8 @@ namespace External\Canvas\Sync;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\Base;
 use Alaress\Database\Broker\Mysql\Broker;
+use Alaress\Database\Transactor\Base as Transactor;
+use Alaress\Database\Transactor\Strategy;
 use PDO;
 
 /**
@@ -31,7 +33,7 @@ trait CanvasDatabaseTrait
      */
     private function buildCanvasDbConnection(): IConnector
     {
-        $connector = new Base(new Broker());
+        $connector = new Base(new Broker(), new Transactor(new Strategy\Nested()));
 
         $connectionOptions = [
             PDO::ATTR_EMULATE_PREPARES => false,
