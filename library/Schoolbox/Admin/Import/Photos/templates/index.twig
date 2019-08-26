@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
 
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
     <div class="small-12 island collapse">

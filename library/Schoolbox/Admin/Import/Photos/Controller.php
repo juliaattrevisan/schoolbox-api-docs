@@ -134,7 +134,7 @@ class Controller extends Base
             array(
                 'template' => '@adminImportPhotos/index.twig',
                 'data'     => array(
-                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
+                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
                     'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                     'attachzone' => $this->getAttachZone(),
                 ),
@@ -182,7 +182,7 @@ class Controller extends Base
             array(
                 'template' => '@adminImportPhotos/view.twig',
                 'data'     => array(
-                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter())->getAllNodes(),
+                    'allBreadcrumbs' => $this->buildBreadcrumbs($this->getRouter()),
                     'allNavigation'  => $this->buildNavigation($this->getRouter(), 'adminImportPhotos')->getAllNodes(),
                     'users' => $users,
                     'surname' => $surname

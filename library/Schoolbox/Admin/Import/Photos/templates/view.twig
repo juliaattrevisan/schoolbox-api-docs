@@ -20,11 +20,12 @@
     });
 </script>
 
-{% include '@upsRuleset/breadcrumbs.twig' with { allNodes: allBreadcrumbs } %}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
     <div class="small-12 island collapse">
-        <h1>User Photos</h2>
+        <h1>User Photos</h1>
         {% include '@adminImport/subnavigation.twig' with { allNodes: allNavigation } %}
     </div>
 </div>

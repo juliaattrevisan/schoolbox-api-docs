@@ -24,25 +24,15 @@ trait ImportNavigation
      * Builds breadcrumbs for this page.
      *
      * @param Router $router
-     * @return Navigator
+     * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    protected function buildBreadcrumbs(Router $router): Navigator
+    protected function buildBreadcrumbs(Router $router): array
     {
-        $args = [
-            new Node(
-                'Administration',
-                '/adminv2/home',
-                false
-            ),
-            new Node(
-                'Importer',
-                $router->generate('adminImport.intro'),
-                true
-            )
+        return [
+            ['Administration', '/adminv2/home'],
+            ['Importer', $router->generate('adminImport.intro')],
         ];
-
-        return new Navigator($args);
     }
 
     /**
