@@ -319,7 +319,11 @@ class Processor
      */
     private function processRelation(Reader $reader): int
     {
-        /* Find the last inserted id and remember it
+        /* Find the previously inserted ids; these need to be removed from both
+         * this table, the relationship table, and the sis_user_profile table
+         *
+         * Each file can be uploaded independently of the others which means we can't
+         * make very many assumptions/presumptions about the db's contents
          */
         $lastId = $this->database->executeQuery('
             SELECT GREATEST(MAX(child_profile_id), MAX(user_profile_id)) AS lastId
@@ -414,6 +418,62 @@ class Processor
 
 
     /**
+     * Delete everything in $previousIds
+     *
+     * @param string $table
+     * @param array $newIds
+     * @throws \Alaress\Database\Exception
+     */
+    private function removePreviousProfileIds(string $table, array $newIds): void
+    {
+        $ids = implode(', ', $newIds);
+
+        if (null !== $ids) {
+
+            /* Find the ids outside of $newIds
+             *
+             * These specific ids need to be removed from the collective set in sis_user_profile
+             * which may contain a whole bunch of other ids that should remain valid
+             *
+             * Remove these specific ids from $table
+             */
+            $previousIds = $this->database->executeQuery("
+                SELECT GROUP_CONCAT(sis_user_profile_id) AS previousIds 
+                FROM {$table}
+                WHERE sis_user_profile_id NOT IN ({$ids})
+            ")->fetch()['previousIds'];
+
+            /* If there were previous ids, remove 'em
+             */
+            if (null !== $previousIds) {
+
+                /* Remove from extension tables
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM {$table}
+                    WHERE sis_user_profile_id IN ({$previousIds});
+                ");
+
+                /* Remove from relation table
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM sis_user_profile_relation
+                    WHERE child_profile_id IN ({$previousIds})
+                    OR user_profile_id IN ({$previousIds});
+                ");
+
+                /* Remove from base profile table
+                 */
+                $this->database->executeQuery("
+                    DELETE FROM sis_user_profile
+                    WHERE id IN ({$previousIds});
+                ");
+            }
+        }
+    }
+
+
+    /**
      * Process student profile csv
      *
      * @param Reader $reader
@@ -425,15 +485,13 @@ class Processor
      */
     private function processStudentProfile(Reader $reader): int
     {
-
-        /* Find the last inserted id and remember it
+        /* Find the previously inserted ids; these need to be removed from both
+         * this table, the relationship table, and the sis_user_profile table
+         *
+         * Each file can be uploaded independently of the others which means we can't
+         * make very many assumptions/presumptions about the db's contents
          */
-        $lastId = $this->database->executeQuery('
-            SELECT MAX(sis_user_profile_id) AS lastId
-            FROM sis_user_profile_student
-        ')->fetch()['lastId'];
-
-        $n = 0;
+        $newIds = [];
 
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_STUDENT, $row);
@@ -481,21 +539,12 @@ class Processor
 
             $this->log[] = "Created student profile for {$data['Firstname']} {$data['Surname']}";
 
-            $n++;
+            $newIds[] = $baseProfile->getId();
         }
 
-        /* Delete everything prior to the last inserted id
-         */
-        $removal = $this->database->prepareQuery('
-            DELETE FROM sis_user_profile_student
-            WHERE sis_user_profile_id <= :lastId
-        ');
+        $this->removePreviousProfileIds($this->studentProfileMapper->getTable(), $newIds);
 
-        $removal->execute([
-            'lastId' => $lastId
-        ]);
-
-        return $n;
+        return \count($newIds);
     }
 
 
@@ -523,14 +572,13 @@ class Processor
      */
     private function processStaffProfile(Reader $reader): int
     {
-        /* Find the last inserted id and remember it
+        /* Find the previously inserted ids; these need to be removed from both
+         * this table, the relationship table, and the sis_user_profile table
+         *
+         * Each file can be uploaded independently of the others which means we can't
+         * make very many assumptions/presumptions about the db's contents
          */
-        $lastId = $this->database->executeQuery('
-            SELECT MAX(sis_user_profile_id) AS lastId
-            FROM sis_user_profile_staff
-        ')->fetch()['lastId'];
-
-        $n = 0;
+        $newIds = [];
 
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_STAFF, $row);
@@ -558,21 +606,12 @@ class Processor
 
             $this->log[] = "Created staff profile for {$data['Firstname']} {$data['Surname']}";
 
-            $n++;
+            $newIds[] = $baseProfile->getId();
         }
 
-        /* Delete everything prior to the last inserted id
-         */
-        $removal = $this->database->prepareQuery('
-            DELETE FROM sis_user_profile_staff
-            WHERE sis_user_profile_id <= :lastId
-        ');
+        $this->removePreviousProfileIds($this->staffProfileMapper->getTable(), $newIds);
 
-        $removal->execute([
-            'lastId' => $lastId
-        ]);
-
-        return $n;
+        return \count($newIds);
     }
 
 
@@ -600,15 +639,13 @@ class Processor
      */
     private function processParentProfile(Reader $reader): int
     {
-
-        /* Find the last inserted id and remember it
+        /* Find the previously inserted ids; these need to be removed from both
+         * this table, the relationship table, and the sis_user_profile table
+         *
+         * Each file can be uploaded independently of the others which means we can't
+         * make very many assumptions/presumptions about the db's contents
          */
-        $lastId = $this->database->executeQuery('
-            SELECT MAX(sis_user_profile_id) AS lastId
-            FROM sis_user_profile_parent
-        ')->fetch()['lastId'];
-
-        $n = 0;
+        $newIds = [];
 
         foreach ($reader as $i => $row) {
             $data = array_combine(self::IMPORT_COLUMNS_PARENT, $row);
@@ -632,21 +669,12 @@ class Processor
 
             $this->log[] = "Created parent profile for {$data['Firstname']} {$data['Surname']}";
 
-            $n++;
+            $newIds[] = $baseProfile->getId();
         }
 
-        /* Delete everything prior to the last inserted id
-         */
-        $removal = $this->database->prepareQuery('
-            DELETE FROM sis_user_profile_parent
-            WHERE sis_user_profile_id <= :lastId
-        ');
+        $this->removePreviousProfileIds($this->parentProfileMapper->getTable(), $newIds);
 
-        $removal->execute([
-            'lastId' => $lastId
-        ]);
-
-        return $n;
+        return \count($newIds);
     }
 
 
