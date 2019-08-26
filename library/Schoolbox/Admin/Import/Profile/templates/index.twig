@@ -13,17 +13,71 @@
         <form method="post" action="/adminv2/import/profile/upload">
             <section>
                 <div class="content">
-                    <p>Import profile data by attaching the CSV files here.</p>
+                    <p>
+                        These uploads will help you populate information about the people in your school.
+                        The user provisioning system may use these records to create and update accounts.
+                        In addition this information will be displayed on the user profile screen.
+                        The relationships will be used to link students to parents in the system.
+                    </p>
+
+                    <p>
+                        The file should be saved in CSV format. When you upload a file, all previous records
+                        of that type will be removed from the database so the CSV must contain the entire list
+                        of records. Any headings that do not match the supplied templates will cause an error.
+                    </p>
+
+                    <p>
+                        You may upload all the files in the same import, or you can upload them individually.
+                        However, relationships will always be imported last.
+                    </p>
                 </div>
-                <div class="component-action">
-                    <section>
-                        <a href="/adminv2/import/profile/student.csv" class="button">Download Student Template</a>
-                        <a href="/adminv2/import/profile/parent.csv" class="button">Download Parent Template</a>
-                        <a href="/adminv2/import/profile/staff.csv" class="button">Download Staff Template</a>
-                        <a href="/adminv2/import/profile/relationship.csv" class="button">Download Relationship Template</a>
-                    </section>
+                <div class="content">
+                    <div class="row">
+                        <div class="small-12 medium-3 columns">
+                            <h2>Students</h2>
+                            <p>
+                                This file is required to contain: External ID, Type, Username, Firstname and Surname.
+                                All other fields are optional but must have the same heading as provided in the template.
+                            </p>
+                            <p>
+                                <a href="/adminv2/import/profile/student.csv" class="button">Download Student Template</a>
+                            </p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <h2>Staff</h2>
+                            <p>
+                                This file is required to contain: External ID, Type, Username, Firstname and Surname.
+                                All other fields are optional but must have the same heading as provided in the template.
+                            </p>
+                            <p>
+                                <a href="/adminv2/import/profile/staff.csv" class="button">Download Staff Template</a>
+                            </p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <h2>Parents</h2>
+                            <p>
+                                This file is required to contain: External ID, Type, Username, Firstname and Surname.
+                                All other fields are optional but must have the same heading as provided in the template.
+                            </p>
+                            <p>
+                                <a href="/adminv2/import/profile/parent.csv" class="button">Download Parent Template</a>
+                            </p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <h2>Relationships</h2>
+                            <p>
+                                This file must contain a Relation ID and a Student ID. The Relation ID must match a parent
+                                record that has previously been uploaded. The Student ID must match an existing student
+                                that has been uploaded. The record will be skipped if either of these do not match.
+                            </p>
+                            <p>
+                                <a href="/adminv2/import/profile/relationship.csv" class="button">Download Relationship Template</a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </section>
+
             {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
             <input type="submit" class="button" value="Upload CSV">
