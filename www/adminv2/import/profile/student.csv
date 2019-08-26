@@ -1,0 +1,4 @@
+External ID,Type,Username,Title,Firstname,Surname,Gender,Email,Mobile,Date of Birth,House,Head of House ID,Head of House Name,Form,Form Teacher ID,Form Teacher Name,Tutor Group,Tutor Teacher ID,Tutor Teacher Name,Year Level,Year Level Coordinator ID,Year Level Coordinator Name,Studies Code,Medical Alert,Comment,Contact Alert,Legal Alert,Enrolment Date,Leaving Date,IB,ILP,ESL,Special Needs,Boarding Status
+123,Student,tbaker,,Tristian,Baker,Boy,tbaker@school.cloud,23345435,1998-02-02,Red,,Mr Smith,2B,,Mr Barlow,,,,Year 2,,,,Alergic to peanuts,,,,2012-01-01,2020-04-02,1,,,,1
+75323,Student,vname,,Vanessa,Name,Girl,vanme@school.cloud,,1999-03-05,Green,,,6F,,Mrs Smith,,,,Year 6,,,,,,Parents are seperated,Intervention order,2012-01-01,,,,1,,1
+464773,Student,tjones,,Tom,Jones,Boy,tjones@school.cloud,,2002-06-23,Yellow,,,,,,7 Homeroom,,Mr Jones,7,,,,Has hearing aids,Please read ILP for more information,,,2012-01-01,,,1,,1,0
