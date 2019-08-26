@@ -361,10 +361,12 @@ class Processor
              * (probably from human error but who knows)
              */
             if (!$cache[$data['Relation ID']]) {
+                $this->log[] = "Skipped relation between {$data['Relation ID']} and {$data['Student ID']}; {$data['Relation ID']} doesn't exist";
                 continue;
             }
 
             if (!$cache[$data['Student ID']]) {
+                $this->log[] = "Skipped relation between {$data['Relation ID']} and {$data['Student ID']}; {$data['Student ID']} doesn't exist";
                 continue;
             }
 
