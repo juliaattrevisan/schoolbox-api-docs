@@ -17,16 +17,16 @@
                 e.preventDefault();
             }
         });
-    });
 
-    $('#defaultOwner').selectizeSelector({
-        multiple: false,
-        ajax: {
-            url:      '/ajax/user.php',
-            type:     'GET',
-            data:     {roleTypeID: 'staff'},
-            dataType: 'json'
-        }
+        $('#defaultOwner').selectizeSelector({
+            multiple: false,
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {roleTypeID: 'staff'},
+                dataType: 'json'
+            }
+        });
     });
 </script>
 
