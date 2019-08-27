@@ -84,7 +84,6 @@ class ReaderTest extends TestCase
     }
 
 
-
     /**
      * This is an example of when filldown is true
      * A specific column name ordering and case exists
@@ -161,6 +160,86 @@ class ReaderTest extends TestCase
                 'FirstName' => 'hello',
                 'Phone' => 'here',
                 'Address' => 'happened',
+                'External ID' => '7'
+            ],
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+    /**
+     * This is an example of when filldown is false
+     * A specific column name ordering and case exists
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidTransientSpecifiedColumns()
+    {
+        $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
+
+        $reader = new Reader(__DIR__ . '/provider.csv', false, $expectedColumns);
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            [
+                'LastName' => 'lastname',
+                'FirstName' => 'firstname',
+                'Phone' => 'phone',
+                'Address' => 'address',
+                'External ID' => 'external id'
+            ],
+            [
+                'LastName' => 'bravo',
+                'FirstName' => 'alpha',
+                'Phone' => 'delta',
+                'Address' => 'charlie',
+                'External ID' => '1'
+            ],
+            [
+                'LastName' => 'green',
+                'FirstName' => 'red',
+                'Phone' => 'green',
+                'Address' => 'blue',
+                'External ID' => '2'
+            ],
+            [
+                'LastName' => 'missing',
+                'FirstName' => '',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '3'
+            ],
+            [
+                'LastName' => '',
+                'FirstName' => '',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '4'
+            ],
+            [
+                'LastName' => 'what',
+                'FirstName' => 'whoa',
+                'Phone' => 'here',
+                'Address' => 'happened',
+                'External ID' => '5'
+            ],
+            [
+                'LastName' => 'niceuuu',
+                'FirstName' => 'heh',
+                'Phone' => '',
+                'Address' => '',
+                'External ID' => '6'
+            ],
+            [
+                'LastName' => '',
+                'FirstName' => 'hello',
+                'Phone' => '',
+                'Address' => '',
                 'External ID' => '7'
             ],
         ];
