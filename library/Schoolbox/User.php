@@ -248,6 +248,7 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     {
         $this->campusCollection = new GenericCollection(Campus::class);
         $this->subject_collection = new GenericCollection(Subject::class);
+        $this->accessList = new GenericCollection(UserAccess::class);
         $this->setConfigLoader(new ConfigLoader());
         $this->setLinkedUser(new Collection(array()));
         $this->setRole(new Role());
@@ -262,9 +263,10 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     public function __clone()
     {
         $this->campusCollection = clone $this->campusCollection;
-        if ($this->accessList instanceof Collection) {
-            $this->accessList = clone $this->accessList;
-        }
+        $this->accessList = clone $this->accessList;
+//        if ($this->accessList instanceof Collection) {
+//            $this->accessList = clone $this->accessList;
+//        }
     }
 
     /**
@@ -1005,27 +1007,21 @@ class User implements \Alaress\Json\Serializable, Linkable, ISoftDeletable
     }
 
     /**
-     * @param  Collection|UserAccess[] $accessList
+     * @param  GenericCollection|UserAccess[] $accessList
      *
      * @return $this
      */
-    public function setAccessList($accessList)
+    public function setAccessList(GenericCollection $accessList): self
     {
         $this->accessList = $accessList;
         return $this;
     }
 
     /**
-     * @return Collection|UserAccess[]
+     * @return GenericCollection|UserAccess[]
      */
-    public function getAccessList()
+    public function getAccessList(): GenericCollection
     {
-        /** @var UserAccessMapper $uaMapper */
-        if(!isset($this->accessList)) {
-            $uaMapper = UserAccessMapper::getInstance();
-            $this->setAccessList($uaMapper->findAllForUser($this));
-        }
-
         return $this->accessList;
     }
 
