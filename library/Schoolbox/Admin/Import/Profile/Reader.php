@@ -358,11 +358,18 @@ class Reader implements \Iterator
     private function cleanup() {
         if (\is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
-            unset($this->fp);
+            $this->fp = null;
         }
 
         $this->currentKey = 0;
         $this->currentRow = false;
+    }
+
+    /**
+     * Cleans up after itself when destroyed
+     */
+    public function __destruct() {
+        $this->cleanup();
     }
 }
 
