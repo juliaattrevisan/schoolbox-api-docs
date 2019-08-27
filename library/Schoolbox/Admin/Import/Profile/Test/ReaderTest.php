@@ -41,9 +41,9 @@ class ReaderTest extends TestCase
         $expected = [
             ['external id', 'firstname', 'lastname', 'address', 'phone'],
             ['1', 'alpha', 'bravo', 'charlie', 'delta'],
-            ['2', 'red', 'green', 'blue', 'green'],
-            ['3', 'red', 'missing', 'blue', 'green'],
-            ['4', 'red', 'missing', 'blue', 'green'],
+            ['2', 'red\'s', 'green', 'blue', 'green'],
+            ['3', 'red\'s', 'missing', 'blue', 'green'],
+            ['4', 'red\'s', 'missing', 'blue', 'green'],
             ['5', 'whoa', 'what', 'happened', 'here'],
             ['6', 'heh', 'niceuuu', 'happened', 'here'],
             ['7', 'hello', 'niceuuu', 'happened', 'here']
@@ -72,7 +72,7 @@ class ReaderTest extends TestCase
         $expected = [
             ['external id', 'firstname', 'lastname', 'address', 'phone'],
             ['1', 'alpha', 'bravo', 'charlie', 'delta'],
-            ['2', 'red', 'green', 'blue', 'green'],
+            ['2', 'red\'s', 'green', 'blue', 'green'],
             ['3', '', 'missing', '', ''],
             ['4', '', '', '', ''],
             ['5', 'whoa', 'what', 'happened', 'here'],
@@ -122,21 +122,21 @@ class ReaderTest extends TestCase
             ],
             [
                 'LastName' => 'green',
-                'FirstName' => 'red',
+                'FirstName' => 'red\'s',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '2'
             ],
             [
                 'LastName' => 'missing',
-                'FirstName' => 'red',
+                'FirstName' => 'red\'s',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '3'
             ],
             [
                 'LastName' => 'missing',
-                'FirstName' => 'red',
+                'FirstName' => 'red\'s',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '4'
@@ -202,7 +202,7 @@ class ReaderTest extends TestCase
             ],
             [
                 'LastName' => 'green',
-                'FirstName' => 'red',
+                'FirstName' => 'red\'s',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '2'
