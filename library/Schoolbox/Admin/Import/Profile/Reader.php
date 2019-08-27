@@ -69,6 +69,13 @@ class Reader implements \Iterator
      */
     private $filename;
 
+    /**
+     * Optionally recycle previous non-null/non-empty column values
+     *
+     * @var bool
+     */
+    private $filldown;
+
 
     /**
      * The filepointer to read from
@@ -110,11 +117,12 @@ class Reader implements \Iterator
      * Check that the filename/resource is valid
      * Die loudly if it's not
      *
-     * @param resource|string  $filename   a path to file or a fopen'd file resource
-     * @param array|null $expectedColumns  an optional set of expected columns
+     * @param resource|string $filename        a path to file or a fopen'd file resource
+     * @param bool            $filldown        optionally recycle previous non-null/non-empty column values
+     * @param array|null      $expectedColumns an optional set of expected columns
      * @throws \RuntimeException
      */
-    public function __construct($filename, ?array $expectedColumns = null)
+    public function __construct($filename, bool $filldown = false, ?array $expectedColumns = null)
     {
         if (\is_resource($filename)) {
 
@@ -133,6 +141,10 @@ class Reader implements \Iterator
              */
             throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
         }
+
+        /* Optionally recycle previous non-null/non-empty column values
+         */
+        $this->filldown = $filldown;
 
         /* If expected columns were provided we'll need to map rows to expected columns
          * using case-insensitive matching; take the expected columns and strtolower them
