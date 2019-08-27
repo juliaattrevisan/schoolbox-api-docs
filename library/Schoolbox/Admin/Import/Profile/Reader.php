@@ -23,6 +23,7 @@ class Reader implements \Iterator
      */
     private $currentKey = 0;
 
+
     /**
      * The current row that came from the csv
      *
@@ -33,16 +34,73 @@ class Reader implements \Iterator
      */
     private $currentRow = false;
 
-    /* Take a $filename or a file resource as first arg
-     * Take an optional set of expected columns as second arg
-     *
-     * If expected columns were provided we'll need to map rows to expected columns
-     * using case-insensitive matching
+
+    /* This class can read from a filename or a resource
      */
 
-    /* Check that the filename/resource is valid
-     * Die loudly if it's not
+    /**
+     * The file name to read from.
+     *
+     * @var null|string
      */
+    private $filename;
+
+
+    /**
+     * The filepointer to read from
+     *
+     * @var null|resource
+     */
+    private $fp;
+
+
+    /**
+     * A stack of expected column names e.g.
+     * ['ID', 'Firstname', 'Lastname' ...]
+     *
+     * @var array|null
+     */
+    private $expectedColumns = [];
+
+
+    /**
+     * Reader constructor.
+     *
+     * Check that the filename/resource is valid
+     * Die loudly if it's not
+     *
+     * @param            $filename         a $filename or a fopen'd file resource
+     * @param array|null $expectedColumns  an optional set of expected columns
+     * @throws \RuntimeException
+     */
+    public function __construct($filename, ?array $expectedColumns)
+    {
+        if (\is_resource($filename)) {
+
+            /* Check if it's a fopen'd resource
+             */
+            $this->filename = null;
+            $this->fp       = $filename;
+        } elseif (is_readable($filename)) {
+
+            /* Otherwise maybe it's a path to a filename
+             */
+            $this->filename = $filename;
+        } else {
+
+            /* Everything else is unknown; exit loudly
+             */
+            throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+        }
+
+        /* If expected columns were provided we'll need to map rows to expected columns
+         * using case-insensitive matching
+         */
+        if (null !== $expectedColumns) {
+            $this->expectedColumns = $expectedColumns;
+        }
+    }
+
 
     /* Read the header row from the csv and remember it
      */
