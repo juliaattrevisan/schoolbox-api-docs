@@ -52,6 +52,39 @@ class ReaderTest extends TestCase
         $this->assertEquals($expected, $outcome);
     }
 
+
+    /**
+     * This is an example of when filldown is false
+     * Column matching doesn't matter
+     *
+     * @throws \RuntimeException
+     */
+    public function testValidTransientUnspecifiedColumns()
+    {
+        $reader = new Reader(__DIR__ . '/provider.csv');
+
+        $outcome = [];
+
+        foreach ($reader as $row) {
+            $outcome[] = $row;
+        }
+
+        $expected = [
+            ['external id', 'firstname', 'lastname', 'address', 'phone'],
+            ['1', 'alpha', 'bravo', 'charlie', 'delta'],
+            ['2', 'red', 'green', 'blue', 'green'],
+            ['3', '', 'missing', '', ''],
+            ['4', '', '', '', ''],
+            ['5', 'whoa', 'what', 'happened', 'here'],
+            ['6', 'heh', 'niceuuu', '', ''],
+            ['7', 'hello', '', '', '']
+        ];
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+
+
     /**
      * This is an example of when filldown is true
      * A specific column name ordering and case exists
