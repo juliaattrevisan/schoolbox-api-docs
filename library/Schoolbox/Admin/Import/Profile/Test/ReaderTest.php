@@ -64,7 +64,7 @@ class ReaderTest extends TestCase
      */
     public function testValidPersistentSpecifiedColumns()
     {
-        $expectedColumns = ['Firstname', 'Lastname', 'Phone', 'Address', 'External ID'];
+        $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
 
         $reader = new Reader(__DIR__ . '/provider.csv', true, $expectedColumns);
 
@@ -76,57 +76,57 @@ class ReaderTest extends TestCase
 
         $expected = [
             [
-                'Lastname' => 'lastname',
-                'Firstname' => 'firstname',
+                'LastName' => 'lastname',
+                'FirstName' => 'firstname',
                 'Phone' => 'phone',
                 'Address' => 'address',
                 'External ID' => 'external id'
             ],
             [
-                'Lastname' => 'bravo',
-                'Firstname' => 'alpha',
+                'LastName' => 'bravo',
+                'FirstName' => 'alpha',
                 'Phone' => 'delta',
                 'Address' => 'charlie',
                 'External ID' => '1'
             ],
             [
-                'Lastname' => 'green',
-                'Firstname' => 'red',
+                'LastName' => 'green',
+                'FirstName' => 'red',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '2'
             ],
             [
-                'Lastname' => 'missing',
-                'Firstname' => 'red',
+                'LastName' => 'missing',
+                'FirstName' => 'red',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '3'
             ],
             [
-                'Lastname' => 'missing',
-                'Firstname' => 'red',
+                'LastName' => 'missing',
+                'FirstName' => 'red',
                 'Phone' => 'green',
                 'Address' => 'blue',
                 'External ID' => '4'
             ],
             [
-                'Lastname' => 'what',
-                'Firstname' => 'whoa',
+                'LastName' => 'what',
+                'FirstName' => 'whoa',
                 'Phone' => 'here',
                 'Address' => 'happened',
                 'External ID' => '5'
             ],
             [
-                'Lastname' => 'niceuuu',
-                'Firstname' => 'heh',
+                'LastName' => 'niceuuu',
+                'FirstName' => 'heh',
                 'Phone' => 'here',
                 'Address' => 'happened',
                 'External ID' => '6'
             ],
             [
-                'Lastname' => 'niceuuu',
-                'Firstname' => 'hello',
+                'LastName' => 'niceuuu',
+                'FirstName' => 'hello',
                 'Phone' => 'here',
                 'Address' => 'happened',
                 'External ID' => '7'
