@@ -19,6 +19,30 @@ class Reader implements \Iterator
 {
 
     /**
+     * Field delimiter for the CSV file
+     *
+     * @var string
+     */
+    private const DELIMITER = ',';
+
+
+    /**
+     * Field enclosure for the CSV file
+     *
+     * @var string
+     */
+    private const ENCLOSURE = '"';
+
+
+    /**
+     * Field escaper for the CSV file
+     *
+     * @var string
+     */
+    private const ESCAPE = '\\';
+
+
+    /**
      * @var int
      */
     private $currentKey = 0;
@@ -55,6 +79,15 @@ class Reader implements \Iterator
 
 
     /**
+     * The header row
+     * A stack of column names from the first row in csv
+     *
+     * @var array
+     */
+    private $columnList = [];
+
+
+    /**
      * A stack of expected column names e.g.
      * ['ID', 'Firstname', 'Lastname' ...]
      *
@@ -69,11 +102,11 @@ class Reader implements \Iterator
      * Check that the filename/resource is valid
      * Die loudly if it's not
      *
-     * @param            $filename         a $filename or a fopen'd file resource
+     * @param resource|string  $filename   a path to file or a fopen'd file resource
      * @param array|null $expectedColumns  an optional set of expected columns
      * @throws \RuntimeException
      */
-    public function __construct($filename, ?array $expectedColumns)
+    public function __construct($filename, ?array $expectedColumns = null)
     {
         if (\is_resource($filename)) {
 
@@ -102,8 +135,27 @@ class Reader implements \Iterator
     }
 
 
-    /* Read the header row from the csv and remember it
+    /**
+     * Read the header row from the csv and remember it
      */
+    public function readHeaderRow()
+    {
+        $this->rewind();
+
+        return $this->currentRow;
+    }
+
+    /**
+     *
+     * Loads the next row from the CSV file.
+     *
+     * @return null|array|bool
+     */
+    private function loadRow()
+    {
+        return fgetcsv($this->fp, 0, self::DELIMITER, self::ENCLOSURE, self::ESCAPE);
+    }
+
 
     /* Read a row from the csv
      *
@@ -122,6 +174,7 @@ class Reader implements \Iterator
      * format the whole time
      */
 
+
     /**
      * Return the current element
      * @link  https://php.net/manual/en/iterator.current.php
@@ -130,8 +183,9 @@ class Reader implements \Iterator
      */
     public function current()
     {
-        // TODO: Implement current() method.
+        return $this->currentRow;
     }
+
 
     /**
      * Move forward to next element
@@ -142,9 +196,9 @@ class Reader implements \Iterator
     public function next(): void
     {
         $this->currentKey++;
-        // Loadrow() equivalent
-        // $this->currentRow
+        $this->currentRow = $this->loadRow();
     }
+
 
     /**
      * Return the key of the current element
@@ -156,6 +210,7 @@ class Reader implements \Iterator
     {
         return $this->currentKey;
     }
+
 
     /**
      * Checks if current position is valid
@@ -169,14 +224,42 @@ class Reader implements \Iterator
         return $this->currentRow !== false;
     }
 
+
     /**
      * Rewind the Iterator to the first element
      * @link  https://php.net/manual/en/iterator.rewind.php
      * @return void Any returned value is ignored.
      * @since 5.0.0
      */
-    public function rewind()
+    public function rewind(): void
     {
-        // TODO: Implement rewind() method.
+        /* Reset all the vars
+         */
+        $this->cleanup();
+
+        /* Reopen the file
+         */
+        if (!\is_resource($this->fp)) {
+            $this->fp = fopen($this->filename, 'r');
+        }
+
+        /* Read that first row
+         */
+        $this->next();
+    }
+
+
+    /**
+     * Close files and reset properties
+     */
+    private function cleanup() {
+        if (\is_resource($this->fp) && $this->filename) {
+            fclose($this->fp);
+            unset($this->fp);
+        }
+
+        $this->currentKey = 0;
+        $this->currentRow = false;
     }
 }
+
