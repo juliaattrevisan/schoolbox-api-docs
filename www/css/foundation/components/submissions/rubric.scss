@@ -126,11 +126,14 @@ table.rb {
         /* So that in readonly view, absolute elements end up in the correct location
          * such as the student's avatar in Self Reflection
          */
-        div {
-            position: relative;
-            padding: .7rem;
-        }
     }
+  div {
+    position: relative;
+    line-height: $form-label-line-height;
+    span{
+      margin: $table-row-padding;
+    }
+  }
     textarea {
         font-size: 0.625rem;
         resize: none;
@@ -402,11 +405,6 @@ select.letter-grade-select {
                 label {
                     font-weight: bold;
                 }
-            }
-        }
-        td {
-            div {
-                padding: .7rem 0;
             }
         }
         .rb-criterion-name {

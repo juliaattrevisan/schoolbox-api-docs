@@ -27,7 +27,7 @@
     {% if hasLevels | length %}
     <thead>
     <tr>
-        <th colspan="2" class="rb-no-cell" scope="row">&nbsp;</th>
+        <th colspan="2"  scope="row">&nbsp;</th>
         {% for level in rubricGrid.levels %}
         <th scope="col">{{ level.name }}</th>
         {% endfor %}
@@ -47,7 +47,7 @@
             <tr>
                 {# yay html tables... -_-; #}
                 {% if rowspan %}
-                    <th class="capability rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
+                    <th class="rb-group-name"  rowspan="{{ rowspan }}">{{ groupUsage.capability.name }}</th>
                     {% set rowspan = 0 %}
                 {% endif %}
 
@@ -75,11 +75,11 @@
 
                         <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
-                                <p class="rb-description">
+                                <span class="rb-description">
                                     {{- descriptor.description|nl2br -}}
-                                </p>
+                                </span>
                                 {% if descriptor.hasValue and config.rubric_show_points and showDescriptorValue %}
-                                    <aside class="rb-value used" >
+                                    <span class="rb-value used" >
                                         {% if rubricGrid.assessment.useMarkRange and descriptor.hasRange %}
                                             {% if isMarkDisplayed %}
                                                 <span class="range-selection-value">{{ indicatorMark.value }}</span>
@@ -90,7 +90,7 @@
                                         {% else %}
                                             {{ descriptor.maxValue }}
                                         {% endif %}
-                                    </aside>
+                                    </span>
                                 {% endif %}
 
                             {# Self-Assessment #}
