@@ -204,11 +204,15 @@ class Reader implements \Iterator
             $n = \count($this->currentRow);
 
             for ($i = 0; $i < $n; $i++) {
-                if ('' === $this->currentRow[$i] || null === $this->currentRow[$i]) {
+                if ('' === trim($this->currentRow[$i]) || null === $this->currentRow[$i]) {
                     $this->currentRow[$i] = $this->previousRow[$i];
                 }
             }
         }
+
+        /* Trim trailing spaces and whatnot
+         */
+        $this->currentRow = array_map('trim', $this->currentRow);
 
         /* Remember this as the new previousRow
          */
@@ -250,10 +254,16 @@ class Reader implements \Iterator
          */
         if ($this->filldown && $this->previousRow) {
             foreach ($this->currentRow as $key => $value) {
-                if ('' === $this->currentRow[$key] || null === $this->currentRow[$key]) {
+                if ('' === trim($this->currentRow[$key]) || null === $this->currentRow[$key]) {
                     $this->currentRow[$key] = $this->previousRow[$key];
                 }
             }
+        }
+
+        /* Trim trailing spaces and whatnot
+         */
+        foreach ($this->currentRow as $key => $value) {
+            $this->currentRow[$key] = trim($this->currentRow[$key]);
         }
 
         /* Remember this as the new previousRow
