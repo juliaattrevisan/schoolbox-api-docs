@@ -1173,7 +1173,6 @@ class Adapter {
                            (new Position())->setDescription($currentResult['JobPositionDescription'])
                                            ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'Y-m-d H:i:s'))
                                            ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'Y-m-d H:i:s'))
-
                            )
                ;
 

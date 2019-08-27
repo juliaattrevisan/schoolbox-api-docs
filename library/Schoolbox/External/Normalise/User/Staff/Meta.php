@@ -148,7 +148,6 @@ class Meta {
                 continue;
             }
             $positionNames[] = $pos->getDescription();
-
         }
         return implode(',', $positionNames);
     }
