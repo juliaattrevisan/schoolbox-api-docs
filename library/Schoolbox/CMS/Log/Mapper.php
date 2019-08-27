@@ -14,8 +14,8 @@ use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Link;
-use Schoolbox\Resource\My\File as MyFile;
-use Schoolbox\Resource\My\Folder as MyFolder;
+use Schoolbox\Resource\My\File\Model as MyFile;
+use Schoolbox\Resource\My\Folder\Model as MyFolder;
 
 class Mapper extends BaseMapper
 {
