@@ -126,10 +126,14 @@ table.rb {
         /* So that in readonly view, absolute elements end up in the correct location
          * such as the student's avatar in Self Reflection
          */
-        div {
-            position: relative;
-        }
     }
+  div {
+    position: relative;
+    line-height: $form-label-line-height;
+    span{
+      margin: $table-row-padding;
+    }
+  }
     textarea {
         font-size: 0.625rem;
         resize: none;
@@ -372,29 +376,6 @@ select.letter-grade-select {
             font-size: rem-calc(($base-font-size - 2));
             text-align: center;
             width: 100%;
-        }
-        td[data-header]:before {
-            content: attr(data-header);
-            display: block;
-            float: left;
-            font-weight: bold;
-            text-align: left;
-            width: 50%;
-        }
-        td[data-header] > * {
-            clear: right;
-            display: block;
-            float: right;
-            width: 50%;
-        }
-        td[data-header]:after {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 50%;
-            padding-bottom: 200%;
-            display: block;
         }
     }
     table.rb {
