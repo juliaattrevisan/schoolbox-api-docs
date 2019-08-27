@@ -7,11 +7,31 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
 
-
-class Reader
+/**
+ * Class Reader
+ *
+ * Import a csv and match optionally coerce its row data
+ * to the columns specified via constructor
+ *
+ * @package Schoolbox\Admin\Import\Profile
+ */
+class Reader implements \Iterator
 {
-    /* Implement Iterator interface
+
+    /**
+     * @var int
      */
+    private $currentKey = 0;
+
+    /**
+     * The current row that came from the csv
+     *
+     * array if fgetcsv succeeded
+     * false if fgetcsv() didn't succeed
+     *
+     * @var bool|array
+     */
+    private $currentRow = false;
 
     /* Take a $filename or a file resource as first arg
      * Take an optional set of expected columns as second arg
@@ -44,4 +64,61 @@ class Reader
      * format the whole time
      */
 
+    /**
+     * Return the current element
+     * @link  https://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     * @since 5.0.0
+     */
+    public function current()
+    {
+        // TODO: Implement current() method.
+    }
+
+    /**
+     * Move forward to next element
+     * @link  https://php.net/manual/en/iterator.next.php
+     * @return void Any returned value is ignored.
+     * @since 5.0.0
+     */
+    public function next(): void
+    {
+        $this->currentKey++;
+        // Loadrow() equivalent
+        // $this->currentRow
+    }
+
+    /**
+     * Return the key of the current element
+     * @link  https://php.net/manual/en/iterator.key.php
+     * @return mixed scalar on success, or null on failure.
+     * @since 5.0.0
+     */
+    public function key()
+    {
+        return $this->currentKey;
+    }
+
+    /**
+     * Checks if current position is valid
+     * @link  https://php.net/manual/en/iterator.valid.php
+     * @return boolean The return value will be casted to boolean and then evaluated.
+     * Returns true on success or false on failure.
+     * @since 5.0.0
+     */
+    public function valid(): bool
+    {
+        return $this->currentRow !== false;
+    }
+
+    /**
+     * Rewind the Iterator to the first element
+     * @link  https://php.net/manual/en/iterator.rewind.php
+     * @return void Any returned value is ignored.
+     * @since 5.0.0
+     */
+    public function rewind()
+    {
+        // TODO: Implement rewind() method.
+    }
 }
