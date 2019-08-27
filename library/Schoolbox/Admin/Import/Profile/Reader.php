@@ -59,6 +59,14 @@ class Reader implements \Iterator
     private $currentRow = false;
 
 
+    /**
+     * The previous row that came from the csv
+     *
+     * @var bool
+     */
+    private $previousRow = false;
+
+
     /* This class can read from a filename or a resource
      */
 
@@ -200,6 +208,11 @@ class Reader implements \Iterator
          * If column headings don't matter, just return the current row without any transformations
          */
         if (null === $this->columnList) {
+
+            /* Remember this as the new previousRow
+             */
+            $this->previousRow = $this->currentRow;
+
             return $this->currentRow;
         }
 
@@ -221,7 +234,13 @@ class Reader implements \Iterator
          * the csv format, though wild, will transparently (and magically) look like it was in the right
          * format the whole time
          */
-        return array_combine($this->expectedColumns, array_values($merged));
+        $this->currentRow = array_combine($this->expectedColumns, array_values($merged));
+
+        /* Remember this as the new previousRow
+         */
+        $this->previousRow = $this->currentRow;
+
+        return $this->currentRow;
     }
 
 
