@@ -193,50 +193,46 @@ class Reader implements \Iterator
 
 
     /**
-     * Return the current element
+     * If the filldown option is true, recycle previous row's data where
+     * the current row has empty/null gaps
      *
-     * If column headings don't matter, just return the current row without any transformations
-     * Otherwise try to return an associative array of (expected column, value)
-     *
-     * @link  https://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
-     * @since 5.0.0
+     * @return void
      */
-    public function current()
+    private function preprocessUnspecifiedColumns(): void
     {
-        /* Read a row from the csv
-         * If column headings don't matter, just return the current row without any transformations
-         */
-        if (null === $this->columnList) {
+        if ($this->filldown && $this->previousRow) {
+            $n = \count($this->currentRow);
 
-            /* If the filldown option is true, recycle previous row's data where
-             * the current row has empty/null gaps
-             */
-            if ($this->filldown && $this->previousRow) {
-                $n = \count($this->currentRow);
-
-                for ($i = 0; $i < $n; $i++) {
-                    if ('' === $this->currentRow[$i] || null === $this->currentRow[$i]) {
-                        $this->currentRow[$i] = $this->previousRow[$i];
-                    }
+            for ($i = 0; $i < $n; $i++) {
+                if ('' === $this->currentRow[$i] || null === $this->currentRow[$i]) {
+                    $this->currentRow[$i] = $this->previousRow[$i];
                 }
             }
-
-            /* Remember this as the new previousRow
-             */
-            $this->previousRow = $this->currentRow;
-
-            return $this->currentRow;
         }
 
-        /* Otherwise try to return an associative array of (expected column, value)
-         *
-         * The row, in its worst acceptable configuration, has an out-of-order subset of columns
-         * with non-identical headings due to case insensitivity
-         *
-         * The data row from the csv will be in the columns denoted by the file's header row
-         * Make an associative array using array_combine
+        /* Remember this as the new previousRow
          */
+        $this->previousRow = $this->currentRow;
+    }
+
+
+    /**
+     * Try to return an associative array of (expected column, value) whilst recycling previous
+     * rows' data where the current row has empty strings or null values
+     *
+     * The row, in its worst acceptable configuration, has an out-of-order subset of columns
+     * with non-identical headings due to case insensitivity
+     *
+     * The data row from the csv will be in the columns denoted by the file's header row
+     * Make an associative array using array_combine
+     *
+     * If the filldown option is true, recycle previous row's data where
+     * the current row has empty/null gaps
+     *
+     * @return void
+     */
+    private function preprocessSpecifiedColumns(): void
+    {
         $combined = array_combine($this->columnList, $this->currentRow);
 
         /* array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
@@ -263,6 +259,32 @@ class Reader implements \Iterator
         /* Remember this as the new previousRow
          */
         $this->previousRow = $this->currentRow;
+    }
+
+
+    /**
+     * Read a row from the csv
+     *
+     * If column headings don't matter, just return the current row without any transformations
+     * Otherwise try to return an associative array of (expected column, value)
+     *
+     * @link  https://php.net/manual/en/iterator.current.php
+     * @return mixed Can return any type.
+     * @since 5.0.0
+     */
+    public function current()
+    {
+        /* If column headings don't matter, just return the current row without any transformations
+         */
+        if (null === $this->columnList) {
+            $this->preprocessUnspecifiedColumns();
+
+            return $this->currentRow;
+        }
+
+        /* Otherwise try to return an associative array of (expected column, value)
+         */
+        $this->preprocessSpecifiedColumns();
 
         return $this->currentRow;
     }
