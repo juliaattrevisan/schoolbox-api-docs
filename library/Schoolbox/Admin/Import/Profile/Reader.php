@@ -97,11 +97,11 @@ class Reader implements \Iterator
 
 
     /**
-     * $expecetdColumns, but each value is strtolower'd
+     * An array of $expectedColumns as keys, but each key is strtolower'd
      *
      * @var array
      */
-    private $loweredExpectedColumns = [];
+    private $template = [];
 
 
     /**
@@ -140,7 +140,7 @@ class Reader implements \Iterator
         if (null !== $expectedColumns) {
             $this->expectedColumns = $expectedColumns;
 
-            $this->loweredExpectedColumns = array_map('strtolower', $expectedColumns);
+            $this->template = array_fill_keys(array_map('strtolower', $expectedColumns), '');
         }
 
         /* Find the column arrangement from the csv
@@ -192,8 +192,7 @@ class Reader implements \Iterator
 
         /* array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
          */
-        $template = array_fill_keys($this->loweredExpectedColumns, '');
-        $merged = array_merge($template, $combined);
+        $merged = array_merge($this->template, $combined);
 
         /* array_combine again to use the expected columns' case, not the strtolowered version
          * the csv format, though wild, will transparently (and magically) look like it was in the right
