@@ -54,7 +54,6 @@ class Staff extends IteratorIterator
             ->setGivenName($currentResult['staff_given_name'])
             ->setLastname($currentResult['staff_surname'])
             ->getMeta()
-            ->setPosition($currentResult['staff_position'])
             ->setDepartment($currentResult['staff_department'])
         ;
 
@@ -91,8 +90,12 @@ class Staff extends IteratorIterator
 
         /* Position - one for every item in stack
          */
-
-        $staff->getMeta()->setPosition($this->columnValuesAsArray($preStack, 'staff_position'));
+        $positions = $this->columnValuesAsArray($preStack, 'staff_position');
+        foreach ($positions as $position) {
+            $staff->getMeta()->getPosition()->add(
+                (new User\Staff\Position())->setDescription($position)
+            );
+        }
 
         /* Campus
          */

@@ -14,6 +14,7 @@
 
 namespace Schoolbox\External\Normalise\User;
 use Schoolbox\Collection;
+use Schoolbox\External\Normalise\User\Staff\Position;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
@@ -1168,11 +1169,12 @@ class Adapter {
                     ->getMeta()
                         ->setDepartment($currentResult['StaffDepartment'])
                         ->setExtension($currentResult['StaffExtension'])
-                        ->getPosition()
-                            ->setDescription($currentResult['JobPositionDescription'])
-                            ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'Y-m-d H:i:s'))
-                            ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'Y-m-d H:i:s'))
-                ;
+                        ->getPosition()->add(
+                           (new Position())->setDescription($currentResult['JobPositionDescription'])
+                                           ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'Y-m-d H:i:s'))
+                                           ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'Y-m-d H:i:s'))
+                           )
+               ;
 
                 $staff
                     ->getMeta()

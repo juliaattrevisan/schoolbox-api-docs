@@ -9,7 +9,7 @@
 
 namespace Schoolbox\External\Normalise\User\Staff;
 
-use Schoolbox\External\Normalise\User\Staff\Category;
+use Schoolbox\GenericCollection;
 
 class Meta {
 
@@ -30,7 +30,7 @@ class Meta {
     /**
      * Job position
      *
-     * @var Position
+     * @var GenericCollection
      */
     private $position = null;
 
@@ -80,7 +80,7 @@ class Meta {
      * Hook method
      */
     protected function setup() {
-        $this->setPosition(new Position());
+        $this->setPosition(new GenericCollection(Position::class));
         $this->setCategory(new Category());
     }
 
@@ -112,7 +112,7 @@ class Meta {
     /**
      * Set position
      *
-     * @param Position $position
+     * @param GenericCollection $position
      * @return $this
      */
     public function setPosition($position)
@@ -124,11 +124,32 @@ class Meta {
     /**
      * Get position
      *
-     * @return Position
+     * @return GenericCollection
      */
     public function getPosition()
     {
         return $this->position;
+    }
+
+    /**
+     * Get comma separated position descriptions.
+     * Used for meta.positionName token.
+     * @return string
+     */
+    public function getPositionName(): string
+    {
+        if (!$this->position) {
+            return '';
+        }
+        $positionNames = [];
+        foreach ($this->position as $pos) {
+            /** @var Position $pos */
+            if (empty($pos->getDescription())) {
+                continue;
+            }
+            $positionNames[] = $pos->getDescription();
+        }
+        return implode(',', $positionNames);
     }
 
     /**

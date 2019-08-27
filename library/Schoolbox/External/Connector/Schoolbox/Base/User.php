@@ -19,6 +19,7 @@ use Schoolbox\External\Normalise\User\Guardian;
 use Schoolbox\External\Normalise\User\Staff;
 use Schoolbox\External\Normalise\User\Student;
 use Schoolbox\External\UserRelation;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Role;
 use Schoolbox\User as SchoolboxUser;
@@ -885,9 +886,10 @@ class User extends Base implements IUser
 
         // Metadata
 
-        $meta = new Staff\Meta();
-        $meta->setPosition($staffRow['positionTitle']);
-
+        $meta      = new Staff\Meta();
+        $positions = new GenericCollection(Staff\Position::class);
+        $positions->add((new Staff\Position())->setDescription($staffRow['positionTitle']));
+        $meta->setPosition($positions);
         $staff->setMeta($meta);
 
         // Portrait
