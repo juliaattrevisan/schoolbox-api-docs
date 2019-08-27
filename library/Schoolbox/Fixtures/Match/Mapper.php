@@ -163,7 +163,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('home_team', null, 'h')}
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
-            LEFT JOIN {$this->getJoinSql('season', null, 's')}
+            LEFT JOIN {$this->getJoinSql('season', null, 's', true)}
             LEFT JOIN {$this->getJoinSql('home_school', null, 'hs')}
             LEFT JOIN {$this->getJoinSql('away_school', null, 'as')}
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
