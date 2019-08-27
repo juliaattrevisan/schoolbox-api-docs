@@ -95,7 +95,7 @@ class Mapper extends BaseMapper
         return "
             FROM {$this->getTable()}
             INNER JOIN {$this->getJoinSql('sport', null, 'sp', true)}
-            LEFT JOIN {$this->getJoinSql('season', null, 'se')}
+            LEFT JOIN {$this->getJoinSql('season', null, 'se', true)}
         ";
     }
 
