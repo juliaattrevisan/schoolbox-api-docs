@@ -101,7 +101,7 @@ class Reader implements \Iterator
      *
      * @var array
      */
-    private $loweredExpecetdColumns = [];
+    private $loweredExpectedColumns = [];
 
 
     /**
@@ -185,16 +185,21 @@ class Reader implements \Iterator
          * The row, in its worst acceptable configuration, has an out-of-order subset of columns
          * with non-identical headings due to case insensitivity
          *
-         * 2. The data row from the csv will be in the columns denoted by the file's header row
+         * The data row from the csv will be in the columns denoted by the file's header row
          * Make an associative array using array_combine
-         *
-         * 3. array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
-         *
-         * 4. array_combine again to use the expected columns' case, not the strtolowered version
+         */
+        $combined = array_combine($this->columnList, $this->currentRow);
+
+        /* array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
+         */
+        $template = array_fill_keys($this->loweredExpectedColumns, '');
+        $merged = array_merge($template, $combined);
+
+        /* array_combine again to use the expected columns' case, not the strtolowered version
          * the csv format, though wild, will transparently (and magically) look like it was in the right
          * format the whole time
          */
-        return $this->currentRow;
+        return array_combine($this->expectedColumns, array_values($merged));
     }
 
 
