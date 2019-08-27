@@ -80,7 +80,7 @@ class Reader implements \Iterator
 
     /**
      * The header row
-     * A stack of column names from the first row in csv
+     * A stack of strtolower'd column names from the first row in csv
      *
      * @var array
      */
@@ -94,6 +94,14 @@ class Reader implements \Iterator
      * @var array|null
      */
     private $expectedColumns = [];
+
+
+    /**
+     * $expecetdColumns, but each value is strtolower'd
+     *
+     * @var array
+     */
+    private $loweredExpecetdColumns = [];
 
 
     /**
@@ -127,15 +135,17 @@ class Reader implements \Iterator
         }
 
         /* If expected columns were provided we'll need to map rows to expected columns
-         * using case-insensitive matching
+         * using case-insensitive matching; take the expected columns and strtolower them
          */
         if (null !== $expectedColumns) {
             $this->expectedColumns = $expectedColumns;
+
+            $this->loweredExpectedColumns = array_map('strtolower', $expectedColumns);
         }
 
         /* Find the column arrangement from the csv
          */
-        $this->columnList = $this->readHeaderRow();
+        $this->columnList = array_map('strtolower', $this->readHeaderRow());
     }
 
 
@@ -162,24 +172,6 @@ class Reader implements \Iterator
     }
 
 
-    /* Read a row from the csv
-     *
-     * The row, in its worst acceptable configuration, has an out-of-order subset of columns
-     * with non-identical headings due to case insensitivity
-     *
-     * 1. Take the expected columns and strtolower them
-     *
-     * 2. The data row from the csv will be in the columns denoted by the file's header row
-     * Make an associative array using array_combine
-     *
-     * 3. array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
-     *
-     * 4. array_combine again to use the expected columns' case, not the strtolowered version
-     * the csv format, though wild, will transparently (and magically) look like it was in the right
-     * format the whole time
-     */
-
-
     /**
      * Return the current element
      * @link  https://php.net/manual/en/iterator.current.php
@@ -188,6 +180,20 @@ class Reader implements \Iterator
      */
     public function current()
     {
+        /* Read a row from the csv
+         *
+         * The row, in its worst acceptable configuration, has an out-of-order subset of columns
+         * with non-identical headings due to case insensitivity
+         *
+         * 2. The data row from the csv will be in the columns denoted by the file's header row
+         * Make an associative array using array_combine
+         *
+         * 3. array_merge(1, 2) so that the data from the csv is in the order denoted by the expected columns
+         *
+         * 4. array_combine again to use the expected columns' case, not the strtolowered version
+         * the csv format, though wild, will transparently (and magically) look like it was in the right
+         * format the whole time
+         */
         return $this->currentRow;
     }
 
