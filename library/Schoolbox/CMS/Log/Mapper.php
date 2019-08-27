@@ -10,12 +10,12 @@ namespace Schoolbox\CMS\Log;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Link;
+use Schoolbox\Resource\My\File as MyFile;
+use Schoolbox\Resource\My\Folder as MyFolder;
 
 class Mapper extends BaseMapper
 {
@@ -61,6 +61,33 @@ class Mapper extends BaseMapper
                 'multiple' => false,
             )
         );
+        $this->hasJoin(
+            'myFile',
+            array(
+                'mapper' => '\\Schoolbox\\Resource\\My\\File\\Mapper',
+                'other_key' => 'id',
+                'this_key' => 'objectId',
+                'multiple' => false,
+            )
+        );
+        $this->hasJoin(
+            'myFolder',
+            array(
+                'mapper' => '\\Schoolbox\\Resource\\My\\Folder\\Mapper',
+                'other_key' => 'id',
+                'this_key' => 'objectId',
+                'multiple' => false,
+            )
+        );
+        $this->hasJoin(
+            'textBox',
+            array(
+                'mapper' => '\\Schoolbox\\Resource\\Textbox\\Mapper',
+                'other_key' => 'textBoxId',
+                'this_key' => 'objectId',
+                'multiple' => false,
+            )
+        );
     }
 
     /**
@@ -72,10 +99,12 @@ class Mapper extends BaseMapper
             SELECT {$this->getColumnString('')},
                 {$this->getJoinColumnString('folder', 'fo')},
                 {$this->getJoinColumnString('file', 'fi')},
-                {$this->getJoinColumnString('link', 'li')}
+                {$this->getJoinColumnString('link', 'li')},
+                {$this->getJoinColumnString('textBox', 't')},
+                {$this->getJoinColumnString('myFile', 'mf')},                
+                {$this->getJoinColumnString('myFolder', 'ml')}
         ";
     }
-
     /**
      * @return string
      */
@@ -83,9 +112,12 @@ class Mapper extends BaseMapper
     {
         return parent::getFromString()."
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('folder', '', 'fo')}
-            LEFT JOIN {$this->getJoinSql('file', '', 'fi')}
-            LEFT JOIN {$this->getJoinSql('link', '', 'li')}
+            LEFT JOIN {$this->getJoinSql('folder', '', 'fo')} AND object = 'folder'
+            LEFT JOIN {$this->getJoinSql('file', '', 'fi')} AND object = 'file'
+            LEFT JOIN {$this->getJoinSql('link', '', 'li')} AND object = 'link'
+            LEFT JOIN {$this->getJoinSql('textBox', '', 't')} AND object = 'content'
+            LEFT JOIN {$this->getJoinSql('myFile', '', 'mf')} AND object = 'myfile'
+            LEFT JOIN {$this->getJoinSql('myFolder', '', 'ml')} AND object = 'myfolder'
         ";
     }
 
@@ -120,6 +152,21 @@ class Mapper extends BaseMapper
                 /** @var Link $link */
                 $link = $this->hydrateJoin($row, 'link', 'li');
                 $record->setLink($link);
+            }
+            if (!empty($row['t.textboxID'])) {
+                /** @var TextBox $textbox */
+                $textbox = $this->hydrateJoin($row, 'textBox', 't');
+                $record->setTextbox($textbox);
+            }
+            if (!empty($row['mf.id'])) {
+                /** @var Myfile $myFile */
+                $myFile = $this->hydrateJoin($row, 'myFile', 'mf');
+                $record->setMyfile($myFile);
+            }
+            if (!empty($row['ml.id'])) {
+                /** @var MyFolder $myFolder */
+                $myFolder = $this->hydrateJoin($row, 'myFolder', 'ml');
+                $record->setMyfolder($myFolder);
             }
 
             $records->add($record);

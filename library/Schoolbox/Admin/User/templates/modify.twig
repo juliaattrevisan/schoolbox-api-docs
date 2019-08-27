@@ -587,10 +587,16 @@
                                     {{ log.action | capitalize }}
                                     {% if log.folder %}
                                         '{{ log.folder.name }}'
-                                    {% elseif log.file %}
+                                    {% elseif log.file.id %}
                                         '{{ log.file.filename }}'
                                     {% elseif log.link %}
                                         '{{ log.link.name }}'
+                                    {% elseif log.textbox %}
+                                        textbox {% if log.textbox.heading %}'{{ log.textbox.heading }}'{% endif %}
+                                    {% elseif log.myFile.id %}
+                                        {{ log.myFile.filename }}
+                                    {% elseif log.myFolder.id %}
+                                        {{ log.myFolder.name }}
                                     {% endif %}
                                 </td>
                             </tr>

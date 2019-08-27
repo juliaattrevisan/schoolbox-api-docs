@@ -10,6 +10,9 @@ namespace Schoolbox\CMS\Log;
 
 use Schoolbox\Resource\File\Model as File;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Resource\Textbox\Model as Textbox;
+use Schoolbox\Resource\My\File\Model as myFile;
+use Schoolbox\Resource\My\Folder\Model as myFolder;
 use Schoolbox\Resource\Link;
 use Schoolbox\User;
 
@@ -29,6 +32,15 @@ class Model
 
     /** @var Folder */
     protected $folder;
+
+    /** @var Textbox */
+    protected $textbox;
+
+    /** @var myFile */
+    protected $myFile;
+
+    /** @var myFolder */
+    protected $myFolder;
 
     /** @var Link */
     protected $link;
@@ -130,6 +142,60 @@ class Model
     public function getFolder()
     {
         return $this->folder;
+    }
+
+    /**
+     * @param Textbox $textbox
+     * @return self
+     */
+    public function setTextbox($textbox): self
+    {
+        $this->textbox = $textbox;
+        return $this;
+    }
+
+    /**
+     * @return Textbox
+     */
+    public function getTextbox()
+    {
+        return $this->textbox;
+    }
+
+    /**
+     * @param myFile $myFile
+     * @return self
+     */
+    public function setMyFile($myFile): self
+    {
+        $this->myFile = $myFile;
+        return $this;
+    }
+
+    /**
+     * @return myFile
+     */
+    public function getMyFile()
+    {
+        return $this->myFile;
+    }
+
+    /**
+     * @param myFolder $myFolder
+     * @return self
+     */
+    public function setMyFolder($myFolder): self
+    {
+        $this->myFolder = $myFolder;
+        return $this;
+    }
+
+    /**
+     * @return myFolder
+     */
+    public function getMyFolder()
+    {
+        return $this->myFolder;
     }
 
     /**
