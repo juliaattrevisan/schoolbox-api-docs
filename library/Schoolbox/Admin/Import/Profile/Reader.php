@@ -132,18 +132,23 @@ class Reader implements \Iterator
         if (null !== $expectedColumns) {
             $this->expectedColumns = $expectedColumns;
         }
+
+        /* Find the column arrangement from the csv
+         */
+        $this->columnList = $this->readHeaderRow();
     }
 
 
     /**
      * Read the header row from the csv and remember it
      */
-    public function readHeaderRow()
+    private function readHeaderRow()
     {
         $this->rewind();
 
         return $this->currentRow;
     }
+
 
     /**
      *
