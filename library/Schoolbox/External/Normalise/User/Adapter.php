@@ -1215,7 +1215,7 @@ class Adapter {
 
                 /* Stack it up
                  */
-                $collection->setOffset($staff->getId(), $staff);
+                $collection->add($staff);
             }
         }
 
