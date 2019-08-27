@@ -20,8 +20,8 @@ use Schoolbox\Admin\Import\Profile\Reader;
 class ReaderTest extends TestCase
 {
     /**
-     * persistent.csv
      * This is an example of when filldown is true
+     * Column matching doesn't matter
      *
      * Values from a previous row should flow through to the next row
      * where the next row's elements are empty or null
@@ -53,7 +53,6 @@ class ReaderTest extends TestCase
     }
 
     /**
-     * persistent.csv
      * This is an example of when filldown is true
      * A specific column name ordering and case exists
      *
