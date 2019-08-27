@@ -209,6 +209,19 @@ class Reader implements \Iterator
          */
         if (null === $this->columnList) {
 
+            /* If the filldown option is true, recycle previous row's data where
+             * the current row has empty/null gaps
+             */
+            if ($this->filldown && $this->previousRow) {
+                $n = \count($this->currentRow);
+
+                for ($i = 0; $i < $n; $i++) {
+                    if (null === $this->currentRow[$i] || $this->currentRow[$i] === '') {
+                        $this->currentRow[$i] = $this->previousRow[$i];
+                    }
+                }
+            }
+
             /* Remember this as the new previousRow
              */
             $this->previousRow = $this->currentRow;
