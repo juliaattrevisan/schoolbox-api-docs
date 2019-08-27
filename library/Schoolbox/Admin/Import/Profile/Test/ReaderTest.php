@@ -30,7 +30,7 @@ class ReaderTest extends TestCase
      */
     public function testValidPersistentUnspecifiedColumns()
     {
-        $reader = new Reader(__DIR__ . '/persistent.csv', true);
+        $reader = new Reader(__DIR__ . '/provider.csv', true);
 
         $outcome = [];
 
@@ -66,7 +66,7 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['Firstname', 'Lastname', 'Phone', 'Address', 'External ID'];
 
-        $reader = new Reader(__DIR__ . '/persistent.csv', true, $expectedColumns);
+        $reader = new Reader(__DIR__ . '/provider.csv', true, $expectedColumns);
 
         $outcome = [];
 
