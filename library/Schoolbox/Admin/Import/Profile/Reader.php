@@ -82,9 +82,9 @@ class Reader implements \Iterator
      * The header row
      * A stack of strtolower'd column names from the first row in csv
      *
-     * @var array
+     * @var null|array
      */
-    private $columnList = [];
+    private $columnList;
 
 
     /**
@@ -141,11 +141,11 @@ class Reader implements \Iterator
             $this->expectedColumns = $expectedColumns;
 
             $this->template = array_fill_keys(array_map('strtolower', $expectedColumns), '');
-        }
 
-        /* Find the column arrangement from the csv
-         */
-        $this->columnList = array_map('strtolower', $this->readHeaderRow());
+            /* Find the column arrangement from the csv
+             */
+            $this->columnList = array_map('strtolower', $this->readHeaderRow());
+        }
     }
 
 
@@ -174,6 +174,10 @@ class Reader implements \Iterator
 
     /**
      * Return the current element
+     *
+     * If column headings don't matter, just return the current row without any transformations
+     * Otherwise try to return an associative array of (expected column, value)
+     *
      * @link  https://php.net/manual/en/iterator.current.php
      * @return mixed Can return any type.
      * @since 5.0.0
@@ -181,6 +185,13 @@ class Reader implements \Iterator
     public function current()
     {
         /* Read a row from the csv
+         * If column headings don't matter, just return the current row without any transformations
+         */
+        if (null === $this->columnList) {
+            return $this->currentRow;
+        }
+
+        /* Otherwise try to return an associative array of (expected column, value)
          *
          * The row, in its worst acceptable configuration, has an out-of-order subset of columns
          * with non-identical headings due to case insensitivity
