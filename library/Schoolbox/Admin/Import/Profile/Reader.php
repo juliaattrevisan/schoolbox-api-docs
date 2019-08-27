@@ -216,7 +216,7 @@ class Reader implements \Iterator
                 $n = \count($this->currentRow);
 
                 for ($i = 0; $i < $n; $i++) {
-                    if (null === $this->currentRow[$i] || $this->currentRow[$i] === '') {
+                    if ('' === $this->currentRow[$i] || null === $this->currentRow[$i]) {
                         $this->currentRow[$i] = $this->previousRow[$i];
                     }
                 }
@@ -248,6 +248,17 @@ class Reader implements \Iterator
          * format the whole time
          */
         $this->currentRow = array_combine($this->expectedColumns, array_values($merged));
+
+        /* If the filldown option is true, recycle previous row's data where
+         * the current row has empty/null gaps
+         */
+        if ($this->filldown && $this->previousRow) {
+            foreach ($this->currentRow as $key => $value) {
+                if ('' === $this->currentRow[$key] || null === $this->currentRow[$key]) {
+                    $this->currentRow[$key] = $this->previousRow[$key];
+                }
+            }
+        }
 
         /* Remember this as the new previousRow
          */
