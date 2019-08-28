@@ -59,32 +59,5 @@ class CalendarEvent extends Base
     {
         $this->setFormParam('title', $title);
     }
-
-    /**
-     * $this->guzzle_headers['Referer'] = 'https://'.VAGRANT_DOMAIN.'/calendar/modify.php';
-
-    $page='/calendar/modifyForm.php';
-    $url = 'https://'.VAGRANT_DOMAIN.$page;
-    $data=[
-    'id' => $id,
-    'userId' => $user_id,
-    'authorId' => $user_id,
-    'allday' => 1,
-    'return' => '/calendar/full/19-07-2019/'.$user_id,
-    'efficacy' => 'self',
-    'action' => 'Add',
-    'title' => $event_title,
-    'startDate' => '19/07/2019',
-    'endDate' => '19/07/2019',
-    'repeat' => null,
-    'repeat_until' => null,
-    'type' => 1,
-    'location' => 'Automated test location',
-    'detail' => '<p>Automated test description</p>',
-    'publishDate' => '18/07/2019 12:00pm'
-    ];
-    if ($id === '')
-    {
-    $data['Add'] ='Add Event';
-     */
+    
 }
