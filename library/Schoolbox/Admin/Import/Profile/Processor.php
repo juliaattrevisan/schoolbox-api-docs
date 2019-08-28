@@ -9,6 +9,7 @@ namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Profile;
+use Schoolbox\Role;
 
 /**
  * Class Processor
@@ -116,6 +117,7 @@ class Processor
      * Columns in a Relation csv
      */
     private const IMPORT_COLUMNS_RELATION = [
+        'Role Type',
         'Relation ID',
         'Student ID',
         'Type',
@@ -347,20 +349,38 @@ class Processor
          * so we might as well cache these to save on performance penalty
          */
         $statement = $this->database->prepareQuery('
-            SELECT id, external_id
-            FROM sis_user_profile
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::PARENT .'" AS roleType 
+            FROM schoolbox.sis_user_profile profile
+            INNER JOIN sis_user_profile_parent parent ON profile.id = parent.sis_user_profile_id
+            
+            UNION
+            
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STUDENT .'" AS roleType 
+            FROM schoolbox.sis_user_profile profile
+            INNER JOIN sis_user_profile_student student ON profile.id = student.sis_user_profile_id
+            
+            UNION
+            
+            SELECT id, external_id AS externalId, firstname, lastname, "' . Role::STAFF .'" AS roleType
+            FROM schoolbox.sis_user_profile profile
+            INNER JOIN sis_user_profile_staff staff ON profile.id = staff.sis_user_profile_id
+            
             ORDER BY id
         ');
 
         $statement->execute();
 
-        /* Set hash lookup of external_id => sis_user_profile.id
+        /* Set hash lookup of (external_id, type) => sis_user_profile.id
          * so we can quickly identify profile ids from their external ids
          */
         $cache = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $cache[$row['external_id']] = (int)$row['id'];
+            $roleType = $row['roleType'];
+            $externalId = $row['externalId'];
+            $profileId = (int)$row['id'];
+
+            $cache[$roleType][$externalId] = $profileId;
         }
 
         /* Delete previous relations
@@ -375,19 +395,18 @@ class Processor
         $n = 0;
 
         foreach ($reader as $row) {
-            $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
 
             /* Check that both relations exist. They might not exist because the
              * relation csv may contain data that wasn't in the other three files
              * (probably from human error but who knows)
              */
-            if (!$cache[$data['Relation ID']]) {
+            if (!$cache[$row['Role Type']][$row['Relation ID']]) {
                 $this->log("Relation between {$row['Relation ID']} and {$row['Student ID']}", '', "Skipped: Relation ID {$row['Relation ID']} doesn't exist");
 
                 continue;
             }
 
-            if (!$cache[$data['Student ID']]) {
+            if (!$cache[Role::STUDENT][$row['Student ID']]) {
                 $this->log("Relation between {$row['Relation ID']} and {$row['Student ID']}", '', "Skipped: Student ID {$row['Student ID']} doesn't exist");
 
                 continue;
@@ -396,8 +415,8 @@ class Processor
             /* Otherwise both exist; build relation
              */
             $relation = $this->relationMapper->createModel()
-                ->setChildProfileId($cache[$row['Relation ID']])
-                ->setUserProfileId($cache[$row['Student ID']])
+                ->setChildProfileId($cache[Role::STUDENT][$row['Student ID']])
+                ->setUserProfileId($cache[$row['Role Type']][$row['Relation ID']])
                 ->setType($row['Type'])
                 ->setEmergencyContact((bool)$row['Emergency Contact']);
 
