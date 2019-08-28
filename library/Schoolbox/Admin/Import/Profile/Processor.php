@@ -679,10 +679,10 @@ class Processor
             /* Otherwise both exist; build relation
              */
             $relation = $this->relationMapper->createModel()
-                                             ->setChildProfileId($cache[Role::STUDENT][$row['Student ID']])
-                                             ->setUserProfileId($cache[$row['Role Type']][$row['Relation ID']])
-                                             ->setType($row['Type'])
-                                             ->setEmergencyContact((bool)$row['Emergency Contact']);
+                 ->setChildProfileId($cache[Role::STUDENT][$row['Student ID']])
+                 ->setUserProfileId($cache[$row['Role Type']][$row['Relation ID']])
+                 ->setType($row['Type'])
+                 ->setEmergencyContact((bool)$row['Emergency Contact']);
 
             $this->relationMapper->save($relation);
 
@@ -717,7 +717,7 @@ class Processor
      * @param string $person
      * @param string $status
      */
-    private function log(string $message, string $person, string $status)
+    private function log(string $message, string $person, string $status): void
     {
         $this->log[] = [
             'timestamp' => \Alaress_Date_Format::now()->getTimeOnly(),
