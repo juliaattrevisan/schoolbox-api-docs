@@ -209,7 +209,10 @@ class Provisioner
                     /** @var User $internalUser */
                     try {
                         $internalUser = $this->userMapper->findByExternalId($externalUserId, $roleType);
-                        $internalUser->setAccessList($this->userAccessMapper->findAllForUser($internalUser));
+                        // Don't need to know about external DB access.
+                        // UPS can't change or do anything with class membership
+                        // as that comes from the SIS anyway.
+                        $internalUser->setAccessList($this->userAccessMapper->findAllForUser($internalUser, false));
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
