@@ -17,6 +17,7 @@ namespace Schoolbox\Learning\Assessment;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use InvalidArgumentException;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use \Schoolbox\User;
 
@@ -254,7 +255,6 @@ class Factory
 
         // Attach context
         $assessment->setContext($this->context);
-        $this->context->getAssessables()->add($assessment);
 
         return $this->produceFromExistingAssessment($assessment);
     }
@@ -270,6 +270,11 @@ class Factory
      */
     private function produceFromExistingAssessment(IAssessable $assessment)
     {
+        if ($this->context) {
+            // This class property is only set on CREATE, and is not hydrated
+            $this->context->setAssessables(new GenericCollection(IAssessable::class, [$assessment]));
+        }
+
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
