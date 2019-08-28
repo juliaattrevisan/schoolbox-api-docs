@@ -485,7 +485,7 @@ class Controller extends Base\Base
             $courseFolder = $this->persistFolder(
                 $post['name'],
                 (int)trim($post['parent']),
-                explode(',', $post['curriculumCodes'][0]),
+                array_filter(explode(',', $post['curriculumCodes'][0])),
                 $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                 $templateID,
                 $rolePermissions,
