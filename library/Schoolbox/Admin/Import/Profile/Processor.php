@@ -357,14 +357,8 @@ class Processor
         /* Process each relation
          */
         $n = 0;
-        $i = 0;
 
         foreach ($reader as $row) {
-            if (!$i) {
-                $i++;
-                continue;
-            }
-
             $data = array_combine(self::IMPORT_COLUMNS_RELATION, $row);
 
             /* Check that both relations exist. They might not exist because the
@@ -490,14 +484,7 @@ class Processor
          */
         $newIds = [];
 
-        $i = 0;
-
         foreach ($reader as $row) {
-            if (!$i) {
-                $i++;
-                continue;
-            }
-
             $baseProfile = $this->baseProfileMapper->createModel()
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
@@ -582,14 +569,7 @@ class Processor
          */
         $newIds = [];
 
-        $i = 0;
-
         foreach ($reader as $row) {
-            if (!$i) {
-                $i++;
-                continue;
-            }
-
             $baseProfile = $this->baseProfileMapper->createModel()
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])
@@ -654,14 +634,7 @@ class Processor
          */
         $newIds = [];
 
-        $i = 0;
-
         foreach ($reader as $row) {
-            if (!$i) {
-                $i++;
-                continue;
-            }
-
             $baseProfile = $this->baseProfileMapper->createModel()
                 ->setExternalId($row['External ID'])
                 ->setTitle($row['Title'])

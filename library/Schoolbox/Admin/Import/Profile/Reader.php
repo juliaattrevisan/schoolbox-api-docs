@@ -137,12 +137,13 @@ class Reader implements \Iterator
             /* Check if it's a fopen'd resource
              */
             $this->filename = null;
-            $this->fp       = $filename;
+            $this->fp = $filename;
         } elseif (is_readable($filename)) {
 
             /* Otherwise maybe it's a path to a filename
              */
             $this->filename = $filename;
+            $this->fp = fopen($this->filename, 'r');
         } else {
 
             /* Everything else is unknown; exit loudly
@@ -390,7 +391,11 @@ class Reader implements \Iterator
             rewind($this->fp);
         }
 
-        /* Read that first row
+        /* Read the header row
+         */
+        $this->next();
+
+        /* Get to the first row of actual data
          */
         $this->next();
     }

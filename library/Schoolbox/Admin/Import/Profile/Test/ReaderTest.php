@@ -39,7 +39,6 @@ class ReaderTest extends TestCase
         }
 
         $expected = [
-            ['external id', 'firstname', 'lastname', 'address', 'phone'],
             ['1', 'alpha', 'bravo', 'charlie', 'delta'],
             ['2', 'red\'s', 'green', 'blue', 'green'],
             ['3', 'red\'s', 'missing', 'blue', 'green'],
@@ -70,7 +69,6 @@ class ReaderTest extends TestCase
         }
 
         $expected = [
-            ['external id', 'firstname', 'lastname', 'address', 'phone'],
             ['1', 'alpha', 'bravo', 'charlie', 'delta'],
             ['2', 'red\'s', 'green', 'blue', 'green'],
             ['3', '', 'missing', '', ''],
@@ -107,13 +105,6 @@ class ReaderTest extends TestCase
         }
 
         $expected = [
-            [
-                'LastName' => 'lastname',
-                'FirstName' => 'firstname',
-                'Phone' => 'phone',
-                'Address' => 'address',
-                'External ID' => 'external id'
-            ],
             [
                 'LastName' => 'bravo',
                 'FirstName' => 'alpha',
@@ -189,13 +180,6 @@ class ReaderTest extends TestCase
 
         $expected = [
             [
-                'LastName' => 'lastname',
-                'FirstName' => 'firstname',
-                'Phone' => 'phone',
-                'Address' => 'address',
-                'External ID' => 'external id'
-            ],
-            [
                 'LastName' => 'bravo',
                 'FirstName' => 'alpha',
                 'Phone' => 'delta',
@@ -270,7 +254,6 @@ class ReaderTest extends TestCase
         }
 
         $expected = [
-            ['External ID' => 'external id'], // header row
             ['External ID' => '1'],
             ['External ID' => '2'],
             ['External ID' => '3'],
@@ -303,7 +286,6 @@ class ReaderTest extends TestCase
         }
 
         $expected = [
-            ['catness evergreen' => null], // header row
             ['catness evergreen' => null],
             ['catness evergreen' => null],
             ['catness evergreen' => null],
