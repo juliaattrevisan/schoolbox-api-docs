@@ -77,7 +77,6 @@ class Controller extends Base
      * @throws \ReflectionException
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
-     * @throws \http\Exception\InvalidArgumentException
      */
     public function postUpload()
     {
