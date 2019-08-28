@@ -13,7 +13,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Database\Predicate\IBuilder;
 use Alaress\Database\Predicate\InvalidColumnException;
-use function count;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
 use Schoolbox\Discussion\Thread;
@@ -162,6 +161,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 $article = $collection->offsetGet($row[$idColumn]);
             } else {
                 $article = $this->hydrate($row);
+                $collection->setOffset($row[$idColumn], $article);
 
                 // Hydrate 1:1 and 1:0..1 joins
                 $article->setTopics($topicMapper->createCollection());
