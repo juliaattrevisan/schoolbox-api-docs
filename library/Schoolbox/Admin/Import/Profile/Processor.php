@@ -220,9 +220,17 @@ class Processor
             $header = $reader->current();
 
             if ($this->isRelation($header)) {
-                $relationFiles[] = $file;
+                $relationFiles[] = [
+                    'file' => $file,
+                    'reader' => $reader,
+                    'header' => $header
+                ];
             } else {
-                $profileFiles[] = $file;
+                $profileFiles[] = [
+                    'file' => $file,
+                    'reader' => $reader,
+                    'header' => $header
+                ];
             }
         }
 
@@ -246,15 +254,14 @@ class Processor
     {
         foreach ($this->files as $file) {
             try {
-                $this->log("Starting processing {$file->getBasename()}", '', self::LOG_OK);
+                $this->log("Starting processing {$file['file']->getBasename()}", '', self::LOG_OK);
 
-                $n = $this->processOne($file->readStream());
+                $n = $this->processOne($file['reader'], $file['header']);
 
-                $this->log("Processing {$file->getBasename()} complete", '', "{$n} rows");
+                $this->log("Processing {$file['file']->getBasename()} complete", '', "{$n} rows");
             } catch (\InvalidArgumentException $e) {
 
                 $this->log($e->getMessage(), '', self::LOG_ERROR);
-                $this->log[] = $e->getMessage();
             }
         }
 
@@ -265,25 +272,17 @@ class Processor
     /**
      * Process the contents of a supplied file
      *
-     * @param resource $contents
-     *
+     * @param Reader $reader
+     * @param array  $header
      * @return int
-     * @throws \RuntimeException
-     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Alaress\Database\Exception
      * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
-    private function processOne($contents): int
+    private function processOne(Reader $reader, array $header): int
     {
-        $reader = new Reader($contents, true);
-
-        /* Load the first row
-         */
-        $reader->next();
-
-        /* Get the columns out and from here, work out what kind of file it is
-         */
-        $header = $reader->current();
-
         if ($this->isRelation($header)) {
 
             /* Process the Relations csv
