@@ -1,7 +1,7 @@
-Relation ID,Student ID,Type,Emergency Contact
-321,123,Father,
-654,123,Mother,
-864,123,,1
-321,75323,Step Father,
-864,464773,Father,
-865,123,Guardian,
+Role Type,Relation ID,Student ID,Type,Emergency Contact
+parent,321,123,Father,
+parent,654,123,Mother,
+parent,864,123,,1
+staff,321,75323,Step Father,
+parent,864,464773,Father,
+parent,865,123,Guardian,
