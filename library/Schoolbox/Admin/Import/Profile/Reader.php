@@ -127,10 +127,10 @@ class Reader implements \Iterator
      *
      * @param resource|string $filename        a path to file or a fopen'd file resource
      * @param bool            $filldown        optionally recycle previous non-null/non-empty column values
-     * @param array|null      $expectedColumns an optional set of expected columns
+     *
      * @throws \RuntimeException
      */
-    public function __construct($filename, bool $filldown = false, ?array $expectedColumns = null)
+    public function __construct($filename, bool $filldown = false)
     {
         if (\is_resource($filename)) {
 
@@ -153,21 +153,40 @@ class Reader implements \Iterator
         /* Optionally recycle previous non-null/non-empty column values
          */
         $this->filldown = $filldown;
+    }
 
-        /* If expected columns were provided we'll need to map rows to expected columns
-         * using case-insensitive matching; take the expected columns and strtolower them
+
+    /**
+     * If expected columns were provided we'll need to map rows to expected columns
+     * using case-insensitive matching; take the expected columns and strtolower them
+     *
+     * @param array $expectedColumns
+     * @return Reader
+     */
+    public function setExpectedColumns(array $expectedColumns): self
+    {
+        $this->expectedColumns = $expectedColumns;
+
+        /* Store it and use it as a template
          */
-        if (null !== $expectedColumns) {
-            $this->expectedColumns = $expectedColumns;
+        $this->template = array_fill_keys(array_map('strtolower', $expectedColumns), '');
 
-            /* Store it and use it as a template
-             */
-            $this->template = array_fill_keys(array_map('strtolower', $expectedColumns), '');
+        /* Find the column arrangement from the csv
+         */
+        $this->columnList = array_map('strtolower', $this->readHeaderRow());
 
-            /* Find the column arrangement from the csv
-             */
-            $this->columnList = array_map('strtolower', $this->readHeaderRow());
-        }
+        return $this;
+    }
+
+
+    /**
+     * Get a list of column headings that were derived from the first row in the csv
+     *
+     * @return array|null
+     */
+    public function getColumnList(): ?array
+    {
+        return $this->columnList;
     }
 
 

@@ -97,7 +97,8 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
 
-        $reader = new Reader(__DIR__ . '/provider.csv', true, $expectedColumns);
+        $reader = (new Reader(__DIR__ . '/provider.csv', true))
+            ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
 
@@ -177,7 +178,8 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['FirstName', 'LastName', 'Phone', 'Address', 'External ID'];
 
-        $reader = new Reader(__DIR__ . '/provider.csv', false, $expectedColumns);
+        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+            ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
 
@@ -258,7 +260,8 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['External ID'];
 
-        $reader = new Reader(__DIR__ . '/provider.csv', false, $expectedColumns);
+        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+            ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
 
@@ -290,7 +293,8 @@ class ReaderTest extends TestCase
     {
         $expectedColumns = ['catness evergreen'];
 
-        $reader = new Reader(__DIR__ . '/provider.csv', false, $expectedColumns);
+        $reader = (new Reader(__DIR__ . '/provider.csv', false))
+            ->setExpectedColumns($expectedColumns);
 
         $outcome = [];
 
