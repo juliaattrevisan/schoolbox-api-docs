@@ -5,7 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Payload;
+namespace Payload\Authentication;
+
+use Payload\PostTrait;
+use Payload\Request;
 
 class Login extends Request
 {
@@ -14,6 +17,7 @@ class Login extends Request
     public function __construct()
     {
         $this->setReferer(\Page\Login::URL);
+
         $this->setFormParam('page', '/login/');
         $this->setFormParam('username', '');
         $this->setFormParam('password', '');

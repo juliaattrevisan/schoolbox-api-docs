@@ -5,12 +5,15 @@
  */
 declare(strict_types=1);
 
-namespace Payload;
+namespace Payload\Homepage\Component;
+
+use Payload\PostTrait;
+use Payload\Request;
 
 /**
  * Encapsulates a textbox CREATE request
  */
-class TextBoxComponent extends Request
+class TextBoxCreate extends Request
 {
     use PostTrait;
 
@@ -25,14 +28,14 @@ class TextBoxComponent extends Request
         $this->setBody('');
     }
 
-    public function setHeading(string $heading): self
+    public function setHeading(string $heading): void
     {
-        return $this->setFormParam('textBoxHeading', $heading);
+        $this->setFormParam('textBoxHeading', $heading);
     }
 
-    public function setBody(string $text): self
+    public function setBody(string $text): void
     {
-        return $this->setFormParam('textBoxBody', $text);
+        $this->setFormParam('textBoxBody', $text);
     }
 
     /** @inheritDoc */

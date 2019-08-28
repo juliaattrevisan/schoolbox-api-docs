@@ -5,7 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Payload;
+namespace Payload\Assessable\Grading;
+
+use Payload\PostTrait;
+use Payload\Request;
 
 class AssessmentMark extends Request
 {
@@ -43,19 +46,16 @@ class AssessmentMark extends Request
         $this->setFormParam('publish', '1');
     }
 
-
     public function getAssessmentId(): int
     {
         return $this->assessmentId;
     }
 
-
-    public function addMarkRubricDescriptorSelect(int $descriptorId): self
+    public function addMarkRubricDescriptorSelect(int $descriptorId): void
     {
-        return $this->setFormParam("rubric[descriptors][$descriptorId][selected]", 1);
+        $this->setFormParam("rubric[descriptors][$descriptorId][selected]", 1);
     }
 
-    /** @inheritDoc */
     protected function getUrl(): string
     {
         return $this->submissionId === null

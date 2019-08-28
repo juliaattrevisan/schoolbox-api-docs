@@ -5,7 +5,10 @@
  */
 declare(strict_types=1);
 
-namespace Payload;
+namespace Payload\Authentication;
+
+use Payload\PostTrait;
+use Payload\Request;
 
 class ForgotPassword extends Request
 {
@@ -18,9 +21,9 @@ class ForgotPassword extends Request
         $this->setEmailOrUsername('');
     }
 
-    public function setEmailOrUsername(string $email): self
+    public function setEmailOrUsername(string $email): void
     {
-        return $this->setFormParam('email', $email);
+        $this->setFormParam('email', $email);
     }
 
     protected function getUrl(): string

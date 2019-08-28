@@ -5,30 +5,37 @@
  */
 declare(strict_types=1);
 
-namespace Payload;
+namespace Payload\News;
 
-use Schoolbox\Comms\News\Querystring;
+use Payload\PostTrait;
+use Payload\Request;
 
-class CreateNews extends Request
+class Create extends Request
 {
+    use PostTrait;
 
-    public function __construct()
+    public function __construct(string $returnUrl)
     {
-        $this->setPage('/news/create');
+
         $this->setReferer('/news/create');
-        $this->setFormParam('returnUrl', Querystring::encode('/'));
-        $this->setFormParam('title', 'sometitle');
+
+        $this->setFormParam('returnUrl', $returnUrl);
+        $this->setNewsTitle('');
         $this->setFormParam('body', '');
         $this->setFormParam('blurb', '');
-        $this->setFormParam('audience', 'role:IjMi:self');
+        $this->setFormParam('audience', '');
         $this->setFormParam('publishAt', date('d/m/Y g:ia'));
         $this->setFormParam('expiresAt', date('d/m/Y g:ia', strtotime('+ 5 days')));
         $this->setFormParam('draft', 'true');
     }
 
-    public function setNewsTitle(string $title)
+    public function setNewsTitle(string $title): void
     {
         $this->setFormParam('title', $title);
     }
 
+    protected function getUrl(): string
+    {
+       return '/news/create';
+    }
 }
