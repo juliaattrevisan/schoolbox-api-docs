@@ -278,8 +278,8 @@ class Provisioner
                     // get a diff of the access list aswell
                     if ($newGroups = count($internalUser->getAccessList()->diffBy($originalUser->getAccessList(), 'serviceIdentifier'))) {
                         $diff['accessList'] = [
-                            'old' => count($originalUser->getAccessList()),
-                            'new' => '+' . $newGroups,
+                            'old' => $this->formatAccessLevels($originalUser),
+                            'new' => $this->formatAccessLevels($internalUser),
                         ];
                     }
 
@@ -436,5 +436,56 @@ class Provisioner
             $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
         }
         return true;
+    }
+
+
+
+
+    /**
+     * Format access levels in a user-readable manner
+     *
+     * @param User $user
+     * @return array
+     */
+    private function formatAccessLevels(User $user): array
+    {
+        // Take existing group access levels
+        $result = [];
+        foreach ($user->getAccessList() as $access) {
+            if ($access->getService() === UserAccess::SERVICE_HOMEPAGE) {
+                $result[$access->getServiceIdentifier()] = $access->getAccessLevel();
+            }
+        }
+
+        // Remove any groups in the remove list
+        foreach ($user->getUserAccessRemove() as $accessRemove) {
+            unset($result[$accessRemove]);
+        }
+
+        // Format it in a readable format
+        ksort($result);
+        $formattedResult = [];
+        foreach ($result as $groupId => $accessLevel) {
+            $accessLevelString = '';
+            switch ($accessLevel) {
+                case UserAccess::ACCESS_FULL:
+                    $accessLevelString = 'full';
+                    break;
+
+                case UserAccess::ACCESS_WRITE:
+                    $accessLevelString = 'write';
+                    break;
+
+                case UserAccess::ACCESS_READ:
+                    $accessLevelString = 'read';
+                    break;
+
+                case UserAccess::ACCESS_DENY:
+                default:
+                    break;
+            }
+            $formattedResult[] = sprintf('%d: %s', $groupId, $accessLevelString);
+        }
+        return $formattedResult;
     }
 }
