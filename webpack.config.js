@@ -4,7 +4,6 @@ const { VueLoaderPlugin } = require('vue-loader')
 module.exports = {
   entry: {
     hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
-    clickoutside: path.resolve(__dirname, 'resources/js/click-outside/index.js'),
     fullCalendar: "./library/Schoolbox/Calendar/vue/fullCalendar.main.js",
     assessmentCalendar: "./library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js",
     upcomingDueworkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/calendar.main.js"
