@@ -13,7 +13,6 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Division;
 use Schoolbox\Fixtures\Season;
