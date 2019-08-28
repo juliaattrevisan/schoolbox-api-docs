@@ -634,7 +634,7 @@ class Processor
 
         $statement->execute();
 
-        /* Set hash lookup of (external_id, type) => sis_user_profile.id
+        /* Set hash lookup of (externalId, roleType) => sis_user_profile.id
          * so we can quickly identify profile ids from their external ids
          */
         $cache = [];
